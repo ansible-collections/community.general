@@ -1,0 +1,84 @@
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_accounts_enabled: True
+    state: present
+  register: client
+
+- name: Create new client role 1
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ role_one }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create new client role 2
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ role_two }}"
+    description: "{{ description_2 }}"
+    state: present
+
+- name: Create new client composite role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ role_three }}"
+    description: "{{ description_3 }}"
+    state: present
+
+- name: Create composite role with client roles
+  vars:
+    - composite_role: {'name': '{{ role_three }}'}
+    - client_roles: [{'name': '{{ role_one }}'}, {'name': '{{ role_two }}'}, {'name': '{{ role_three }}'}]
+  community.general.keycloak_role_composites:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    composite_role: "{{ composite_role }}"
+    role_client_id: "{{ client_id }}"
+    roles: "{{ client_roles }}"
+    state: present
+  register: result
+
+- name: Assert composite role is created
+  assert:
+    that:
+      - result is changed
+      - result.end_state | selectattr("composite", "eq", true) | selectattr("name", "eq", "{{ role_three }}") | list | count == 1

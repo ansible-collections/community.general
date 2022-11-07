@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
@@ -369,7 +370,7 @@ def main():
     # Do nothing
     else:
         result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are correctly mapped to composite role %s.' % (roles, composite_role.get('name'))
+        result['msg'] = 'Nothing to do, roles %s are already mapped to composite role %s.' % (roles, composite_role.get('name'))
         module.exit_json(**result)
 
 
