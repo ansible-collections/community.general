@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Author: Alexei Znamensky (russoz@gmail.com)
 # Largely adapted from test_redhat_subscription by
 # Jiri Hnidek (jhnidek@redhat.com)
@@ -25,7 +26,7 @@ def patch_cpanm(mocker):
     """
     Function used for mocking some parts of redhat_subscription module
     """
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.module_helper.AnsibleModule.get_bin_path',
+    mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path',
                  return_value='/testbin/cpanm')
 
 
@@ -36,8 +37,8 @@ TEST_CASES = [
             'id': 'install_dancer_compatibility',
             'run_command.calls': [
                 (
-                    ['perl', '-le', 'use Dancer;'],
-                    {'environ_update': {}, 'check_rc': False},
+                    ['/testbin/cpanm', '-le', 'use Dancer;'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
                     (2, '', 'error, not installed',),  # output rc, out, err
                 ),
                 (
@@ -55,8 +56,8 @@ TEST_CASES = [
             'id': 'install_dancer_already_installed_compatibility',
             'run_command.calls': [
                 (
-                    ['perl', '-le', 'use Dancer;'],
-                    {'environ_update': {}, 'check_rc': False},
+                    ['/testbin/cpanm', '-le', 'use Dancer;'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
                     (0, '', '',),  # output rc, out, err
                 ),
             ],
