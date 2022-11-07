@@ -1,2 +1,0 @@
-minor_changes:
-  - cpanm - refactored module to use ``CmdRunner`` to execute ``cpanm`` (https://github.com/ansible-collections/community.general/pull/5485).

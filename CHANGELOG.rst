@@ -6,13 +6,13 @@ Community General Release Notes
 
 This changelog describes changes after version 5.0.0.
 
-v6.0.0-a1
-=========
+v6.0.0
+======
 
 Release Summary
 ---------------
 
-This is a pre-release for the upcoming 6.0.0 major release. The main objective of this pre-release is to make it possible to test the large stuctural changes by flattening the directory structure. See the corresponding entry in the changelog for details.
+New major release of community.general with lots of bugfixes, new features, some removed deprecated features, and some other breaking changes. Please check the coresponding sections of the changelog for more details.
 
 Major Changes
 -------------
@@ -33,6 +33,7 @@ Minor Changes
 - alternatives - add ``state=absent`` to be able to remove an alternative (https://github.com/ansible-collections/community.general/pull/4654).
 - alternatives - add ``subcommands`` parameter (https://github.com/ansible-collections/community.general/pull/4654).
 - ansible_galaxy_install - minor refactoring using latest ``ModuleHelper`` updates (https://github.com/ansible-collections/community.general/pull/4752).
+- ansible_galaxy_install - refactored module to use ``CmdRunner`` to execute ``ansible-galaxy`` (https://github.com/ansible-collections/community.general/pull/5477).
 - apk - add ``world`` parameter for supporting a custom world file (https://github.com/ansible-collections/community.general/pull/4976).
 - bitwarden lookup plugin - add option ``search`` to search for other attributes than name (https://github.com/ansible-collections/community.general/pull/5297).
 - cartesian lookup plugin - start using Ansible's configuration manager to parse options (https://github.com/ansible-collections/community.general/pull/5440).
@@ -41,6 +42,7 @@ Minor Changes
 - consul - adds ``ttl`` parameter for session  (https://github.com/ansible-collections/community.general/pull/4996).
 - consul - minor refactoring (https://github.com/ansible-collections/community.general/pull/5367).
 - consul_session - adds ``token`` parameter for session (https://github.com/ansible-collections/community.general/pull/5193).
+- cpanm - refactored module to use ``CmdRunner`` to execute ``cpanm`` (https://github.com/ansible-collections/community.general/pull/5485).
 - cpanm - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived modules (https://github.com/ansible-collections/community.general/pull/4674).
 - credstash lookup plugin - start using Ansible's configuration manager to parse options (https://github.com/ansible-collections/community.general/pull/5440).
 - dependent lookup plugin - start using Ansible's configuration manager to parse options (https://github.com/ansible-collections/community.general/pull/5440).
@@ -65,9 +67,11 @@ Minor Changes
 - gitlab_user - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
 - hiera lookup plugin - start using Ansible's configuration manager to parse options. The Hiera executable and config file can now also be passed as lookup parameters (https://github.com/ansible-collections/community.general/pull/5440).
 - homebrew, homebrew_tap - added Homebrew on Linux path to defaults (https://github.com/ansible-collections/community.general/pull/5241).
+- hponcfg - refactored module to use ``CmdRunner`` to execute ``hponcfg`` (https://github.com/ansible-collections/community.general/pull/5483).
 - keycloak_* modules - add ``http_agent`` parameter with default value ``Ansible`` (https://github.com/ansible-collections/community.general/issues/5023).
 - keyring lookup plugin - start using Ansible's configuration manager to parse options (https://github.com/ansible-collections/community.general/pull/5440).
 - lastpass - use config manager for handling plugin options (https://github.com/ansible-collections/community.general/pull/5022).
+- ldap_attrs - allow for DNs to have ``{x}`` prefix on first RDN (https://github.com/ansible-collections/community.general/issues/977, https://github.com/ansible-collections/community.general/pull/5450).
 - linode inventory plugin - simplify option handling (https://github.com/ansible-collections/community.general/pull/5438).
 - listen_ports_facts - add new ``include_non_listening`` option which adds ``-a`` option to ``netstat`` and ``ss``. This shows both listening and non-listening (for TCP this means established connections) sockets, and returns ``state`` and ``foreign_address`` (https://github.com/ansible-collections/community.general/issues/4762, https://github.com/ansible-collections/community.general/pull/4953).
 - lmdb_kv lookup plugin - start using Ansible's configuration manager to parse options (https://github.com/ansible-collections/community.general/pull/5440).
@@ -76,6 +80,7 @@ Minor Changes
 - machinectl become plugin - combine the success command when building the become command to be consistent with other become plugins (https://github.com/ansible-collections/community.general/pull/5287).
 - manifold lookup plugin - start using Ansible's configuration manager to parse options (https://github.com/ansible-collections/community.general/pull/5440).
 - maven_artifact - add a new ``unredirected_headers`` option that can be used with ansible-core 2.12 and above. The default value is to not use ``Authorization`` and ``Cookie`` headers on redirects for security reasons. With ansible-core 2.11, all headers are still passed on for redirects (https://github.com/ansible-collections/community.general/pull/4812).
+- mksysb - refactored module to use ``CmdRunner`` to execute ``mksysb`` (https://github.com/ansible-collections/community.general/pull/5484).
 - mksysb - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived modules (https://github.com/ansible-collections/community.general/pull/4674).
 - nagios - minor refactoring on parameter validation for different actions (https://github.com/ansible-collections/community.general/pull/5239).
 - netcup_dnsapi - add ``timeout`` parameter (https://github.com/ansible-collections/community.general/pull/5301).
@@ -83,6 +88,7 @@ Minor Changes
 - nmcli - add bond option ``xmit_hash_policy`` to bond options (https://github.com/ansible-collections/community.general/issues/5148).
 - nmcli - adds ``vpn`` type and parameter for supporting VPN with service type L2TP and PPTP (https://github.com/ansible-collections/community.general/pull/4746).
 - nmcli - honor IP options for VPNs (https://github.com/ansible-collections/community.general/pull/5228).
+- onepassword - support version 2 of the OnePassword CLI (https://github.com/ansible-collections/community.general/pull/4728)
 - opentelemetry callback plugin - allow configuring opentelementry callback via config file (https://github.com/ansible-collections/community.general/pull/4916).
 - opentelemetry callback plugin - send logs. This can be disabled by setting ``disable_logs=false`` (https://github.com/ansible-collections/community.general/pull/4175).
 - pacman - added parameters ``reason`` and ``reason_for`` to set/change the install reason of packages (https://github.com/ansible-collections/community.general/pull/4956).
@@ -125,6 +131,7 @@ Breaking Changes / Porting Guide
 --------------------------------
 
 - newrelic_deployment - ``revision`` is required for v2 API (https://github.com/ansible-collections/community.general/pull/5341).
+- scaleway_container_registry_info - no longer replace ``secret_environment_variables`` in the output by ``SENSITIVE_VALUE`` (https://github.com/ansible-collections/community.general/pull/5497).
 
 Deprecated Features
 -------------------
@@ -179,8 +186,10 @@ Bugfixes
 - filesystem - improve error messages when output cannot be parsed by including newlines in escaped form (https://github.com/ansible-collections/community.general/pull/4700).
 - funcd connection plugin - fix signature of ``exec_command`` (https://github.com/ansible-collections/community.general/pull/5111).
 - ini_file - minor refactor fixing a python lint error (https://github.com/ansible-collections/community.general/pull/5307).
+- iso_create - the module somtimes failed to add folders for Joliet and UDF formats (https://github.com/ansible-collections/community.general/issues/5275).
 - keycloak_realm - fix default groups and roles (https://github.com/ansible-collections/community.general/issues/4241).
 - keyring_info - fix the result from the keyring library never getting returned (https://github.com/ansible-collections/community.general/pull/4964).
+- ldap_attrs - fix bug which caused a ``Bad search filter`` error. The error was occuring when the ldap attribute value contained special characters such as ``(`` or ``*`` (https://github.com/ansible-collections/community.general/issues/5434, https://github.com/ansible-collections/community.general/pull/5435).
 - ldap_attrs - fix ordering issue by ignoring the ``{x}`` prefix on attribute values (https://github.com/ansible-collections/community.general/issues/977, https://github.com/ansible-collections/community.general/pull/5385).
 - listen_ports_facts - removed leftover ``EnvironmentError`` . The ``else`` clause had a wrong indentation. The check is now handled in the ``split_pid_name`` function (https://github.com/ansible-collections/community.general/pull/5202).
 - locale_gen - fix support for Ubuntu (https://github.com/ansible-collections/community.general/issues/5281).
@@ -220,6 +229,7 @@ Bugfixes
 - redis* modules - fix call to ``module.fail_json`` when failing because of missing Python libraries (https://github.com/ansible-collections/community.general/pull/4733).
 - slack - fix incorrect channel prefix ``#`` caused by incomplete pattern detection by adding ``G0`` and ``GF`` as channel ID patterns (https://github.com/ansible-collections/community.general/pull/5019).
 - slack - fix message update for channels which start with ``CP``. When ``message-id`` was passed it failed for channels which started with ``CP`` because the ``#`` symbol was added before the ``channel_id`` (https://github.com/ansible-collections/community.general/pull/5249).
+- snap - allow values in the ``options`` parameter to contain whitespaces (https://github.com/ansible-collections/community.general/pull/5475).
 - sudoers - ensure sudoers config files are created with the permissions requested by sudoers (0440) (https://github.com/ansible-collections/community.general/pull/4814).
 - sudoers - fix incorrect handling of ``state: absent`` (https://github.com/ansible-collections/community.general/issues/4852).
 - tss lookup plugin - adding support for updated Delinea library (https://github.com/DelineaXPM/python-tss-sdk/issues/9, https://github.com/ansible-collections/community.general/pull/5151).
@@ -255,8 +265,14 @@ New Modules
 - pipx_info - Rretrieves information about applications installed with pipx
 - proxmox_disk - Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster.
 - scaleway_compute_private_network - Scaleway compute - private network management
+- scaleway_container - Scaleway Container management
+- scaleway_container_info - Retrieve information on Scaleway Container
+- scaleway_container_namespace - Scaleway Container namespace management
+- scaleway_container_namespace_info - Retrieve information on Scaleway Container namespace
 - scaleway_container_registry - Scaleway Container registry management module
 - scaleway_container_registry_info - Scaleway Container registry info module
+- scaleway_function - Scaleway Function management
+- scaleway_function_info - Retrieve information on Scaleway Function
 - scaleway_function_namespace - Scaleway Function namespace management
 - scaleway_function_namespace_info - Retrieve information on Scaleway Function namespace
 - wdc_redfish_command - Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs

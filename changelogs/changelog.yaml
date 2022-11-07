@@ -1,5 +1,62 @@
 ancestor: 5.0.0
 releases:
+  6.0.0:
+    changes:
+      breaking_changes:
+      - scaleway_container_registry_info - no longer replace ``secret_environment_variables``
+        in the output by ``SENSITIVE_VALUE`` (https://github.com/ansible-collections/community.general/pull/5497).
+      bugfixes:
+      - iso_create - the module somtimes failed to add folders for Joliet and UDF
+        formats (https://github.com/ansible-collections/community.general/issues/5275).
+      - ldap_attrs - fix bug which caused a ``Bad search filter`` error. The error
+        was occuring when the ldap attribute value contained special characters such
+        as ``(`` or ``*`` (https://github.com/ansible-collections/community.general/issues/5434,
+        https://github.com/ansible-collections/community.general/pull/5435).
+      - snap - allow values in the ``options`` parameter to contain whitespaces (https://github.com/ansible-collections/community.general/pull/5475).
+      minor_changes:
+      - ansible_galaxy_install - refactored module to use ``CmdRunner`` to execute
+        ``ansible-galaxy`` (https://github.com/ansible-collections/community.general/pull/5477).
+      - cpanm - refactored module to use ``CmdRunner`` to execute ``cpanm`` (https://github.com/ansible-collections/community.general/pull/5485).
+      - hponcfg - refactored module to use ``CmdRunner`` to execute ``hponcfg`` (https://github.com/ansible-collections/community.general/pull/5483).
+      - ldap_attrs - allow for DNs to have ``{x}`` prefix on first RDN (https://github.com/ansible-collections/community.general/issues/977,
+        https://github.com/ansible-collections/community.general/pull/5450).
+      - mksysb - refactored module to use ``CmdRunner`` to execute ``mksysb`` (https://github.com/ansible-collections/community.general/pull/5484).
+      - onepassword - support version 2 of the OnePassword CLI (https://github.com/ansible-collections/community.general/pull/4728)
+      release_summary: New major release of community.general with lots of bugfixes,
+        new features, some removed deprecated features, and some other breaking changes.
+        Please check the coresponding sections of the changelog for more details.
+    fragments:
+    - 4728-onepassword-v2.yml
+    - 5435-escape-ldap-param.yml
+    - 5450-allow-for-xordered-dns.yaml
+    - 5468-iso-create-not-add-folders.yml
+    - 5475-snap-option-value-whitespace.yml
+    - 5477-ansible-galaxy-install-cmd-runner.yml
+    - 5483-hponcfg-cmd-runner.yml
+    - 5484-mksysb-cmd-runner.yml
+    - 5485-cpanm-cmd-runner.yml
+    - 5497-scaleway-filtering.yml
+    - 6.0.0.yml
+    modules:
+    - description: Scaleway Container management
+      name: scaleway_container
+      namespace: ''
+    - description: Retrieve information on Scaleway Container
+      name: scaleway_container_info
+      namespace: ''
+    - description: Scaleway Container namespace management
+      name: scaleway_container_namespace
+      namespace: ''
+    - description: Retrieve information on Scaleway Container namespace
+      name: scaleway_container_namespace_info
+      namespace: ''
+    - description: Scaleway Function management
+      name: scaleway_function
+      namespace: ''
+    - description: Retrieve information on Scaleway Function
+      name: scaleway_function_info
+      namespace: ''
+    release_date: '2022-11-07'
   6.0.0-a1:
     changes:
       breaking_changes:
@@ -508,14 +565,15 @@ releases:
     - simplified-bsd-license.yml
     - unflatmap.yml
     modules:
-    - description: Scaleway Function namespace management
-      name: scaleway_function_namespace
-      namespace: ''
-    - description: Retrieve information on Scaleway Function namespace
-      name: scaleway_function_namespace_info
-      namespace: ''
     - description: Retrieve GConf configurations
       name: gconftool2_info
+      namespace: ''
+    - description: Add/remove/change files in ISO file
+      name: iso_customize
+      namespace: ''
+    - description: Allows administration of Keycloak user_rolemapping with the Keycloak
+        API
+      name: keycloak_user_rolemapping
       namespace: ''
     - description: Set or delete a passphrase using the Operating System's native
         keyring
@@ -524,8 +582,32 @@ releases:
     - description: Get a passphrase using the Operating System's native keyring
       name: keyring_info
       namespace: ''
+    - description: Listing of resource policy_profiles in ManageIQ
+      name: manageiq_policies_info
+      namespace: ''
+    - description: Retrieve resource tags in ManageIQ
+      name: manageiq_tags_info
+      namespace: ''
+    - description: Rretrieves information about applications installed with pipx
+      name: pipx_info
+      namespace: ''
+    - description: Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster.
+      name: proxmox_disk
+      namespace: ''
     - description: Scaleway compute - private network management
       name: scaleway_compute_private_network
+      namespace: ''
+    - description: Scaleway Container registry management module
+      name: scaleway_container_registry
+      namespace: ''
+    - description: Scaleway Container registry info module
+      name: scaleway_container_registry_info
+      namespace: ''
+    - description: Scaleway Function namespace management
+      name: scaleway_function_namespace
+      namespace: ''
+    - description: Retrieve information on Scaleway Function namespace
+      name: scaleway_function_namespace_info
       namespace: ''
     - description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish
         APIs
@@ -534,31 +616,6 @@ releases:
     - description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish
         APIs
       name: wdc_redfish_info
-      namespace: ''
-    - description: Rretrieves information about applications installed with pipx
-      name: pipx_info
-      namespace: ''
-    - description: Allows administration of Keycloak user_rolemapping with the Keycloak
-        API
-      name: keycloak_user_rolemapping
-      namespace: ''
-    - description: Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster.
-      name: proxmox_disk
-      namespace: ''
-    - description: Add/remove/change files in ISO file
-      name: iso_customize
-      namespace: ''
-    - description: Listing of resource policy_profiles in ManageIQ
-      name: manageiq_policies_info
-      namespace: ''
-    - description: Retrieve resource tags in ManageIQ
-      name: manageiq_tags_info
-      namespace: ''
-    - description: Scaleway Container registry management module
-      name: scaleway_container_registry
-      namespace: ''
-    - description: Scaleway Container registry info module
-      name: scaleway_container_registry_info
       namespace: ''
     plugins:
       filter:
