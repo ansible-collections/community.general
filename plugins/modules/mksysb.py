@@ -146,16 +146,15 @@ class MkSysB(ModuleHelper):
                 self.do_raise("mksysb failed.")
             self.vars.msg = out
 
-        if not self.check_mode:
-            runner = CmdRunner(
-                self.module,
-                ['mksysb', '-X'],
-                self.command_args_formats,
-            )
-            with runner(['create_map_files', 'use_snapshot', 'exclude_files', 'exclude_wpar_files', 'software_packing',
-                         'extended_attrs', 'backup_crypt_files', 'backup_dmapi_fs', 'new_image_data', 'combined_path'],
-                        output_process=process) as ctx:
-                ctx.run(combined_path=[self.vars.storage_path, self.vars.name])
+        runner = CmdRunner(
+            self.module,
+            ['mksysb', '-X'],
+            self.command_args_formats,
+        )
+        with runner(['create_map_files', 'use_snapshot', 'exclude_files', 'exclude_wpar_files', 'software_packing',
+                      'extended_attrs', 'backup_crypt_files', 'backup_dmapi_fs', 'new_image_data', 'combined_path'],
+                    output_process=process, check_mode_skip=True) as ctx:
+            ctx.run(combined_path=[self.vars.storage_path, self.vars.name])
 
         self.changed = True
 
