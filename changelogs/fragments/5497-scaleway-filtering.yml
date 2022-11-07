@@ -1,0 +1,2 @@
+breaking_changes:
+  - "scaleway_container_registry_info - no longer replace ``secret_environment_variables`` in the output by ``SENSITIVE_VALUE`` (https://github.com/ansible-collections/community.general/pull/5497)."
