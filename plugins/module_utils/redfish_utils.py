@@ -19,7 +19,7 @@ POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json'
 PATCH_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
                  'OData-Version': '4.0'}
 PUT_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
-                 'OData-Version': '4.0'}
+               'OData-Version': '4.0'}
 DELETE_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 
 FAIL_MSG = 'Issuing a data modification command without specifying the '\
