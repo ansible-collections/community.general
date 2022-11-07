@@ -1,2 +1,0 @@
-bugfixes:
-  - snap - allow values in the ``options`` parameter to contain whitespaces (https://github.com/ansible-collections/community.general/pull/5475).

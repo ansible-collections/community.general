@@ -1,2 +1,0 @@
-minor_changes:
-  - hponcfg - refactored module to use ``CmdRunner`` to execute ``hponcfg`` (https://github.com/ansible-collections/community.general/pull/5483).

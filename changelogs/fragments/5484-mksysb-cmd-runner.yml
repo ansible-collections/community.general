@@ -1,2 +1,0 @@
-minor_changes:
-  - mksysb - refactored module to use ``CmdRunner`` to execute ``mksysb`` (https://github.com/ansible-collections/community.general/pull/5484).
