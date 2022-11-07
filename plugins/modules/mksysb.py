@@ -98,12 +98,15 @@ msg:
 
 import os
 
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdModuleHelper, ArgFormat
+    ArgFormat
 )
 
 
-class MkSysB(CmdModuleHelper):
+class MkSysB(ModuleHelper):
     module = dict(
         argument_spec=dict(
             backup_crypt_files=dict(type='bool', default=True),
@@ -120,18 +123,17 @@ class MkSysB(CmdModuleHelper):
         ),
         supports_check_mode=True,
     )
-    command = ['mksysb', '-X']
     command_args_formats = dict(
-        create_map_files=dict(fmt="-m", style=ArgFormat.BOOLEAN),
-        use_snapshot=dict(fmt="-T", style=ArgFormat.BOOLEAN),
-        exclude_files=dict(fmt="-e", style=ArgFormat.BOOLEAN),
-        exclude_wpar_files=dict(fmt="-G", style=ArgFormat.BOOLEAN),
-        new_image_data=dict(fmt="-i", style=ArgFormat.BOOLEAN),
-        software_packing=dict(fmt="-p", style=ArgFormat.BOOLEAN_NOT),
-        extended_attrs=dict(fmt="-a", style=ArgFormat.BOOLEAN),
-        backup_crypt_files=dict(fmt="-Z", style=ArgFormat.BOOLEAN_NOT),
-        backup_dmapi_fs=dict(fmt="-A", style=ArgFormat.BOOLEAN),
-        combined_path=dict(fmt=lambda p, n: ["%s/%s" % (p, n)], stars=1)
+        create_map_files=cmd_runner_fmt.as_bool("-m"),
+        use_snapshot=cmd_runner_fmt.as_bool("-T"),
+        exclude_files=cmd_runner_fmt.as_bool("-e"),
+        exclude_wpar_files=cmd_runner_fmt.as_bool("-G"),
+        new_image_data=cmd_runner_fmt.as_bool("-i"),
+        software_packing=cmd_runner_fmt.as_bool_not("-p"),
+        extended_attrs=cmd_runner_fmt.as_bool("-a"),
+        backup_crypt_files=cmd_runner_fmt.as_bool_not("-Z"),
+        backup_dmapi_fs=cmd_runner_fmt.as_bool("-A"),
+        combined_path=cmd_runner_fmt.as_func(cmd_runner_fmt.unpack_args(lambda p, n: ["%s/%s" % (p, n)])),
     )
 
     def __init_module__(self):
@@ -139,18 +141,22 @@ class MkSysB(CmdModuleHelper):
             self.do_raise("Storage path %s is not valid." % self.vars.storage_path)
 
     def __run__(self):
-        if not self.module.check_mode:
-            self.run_command(params=[
-                'create_map_files', 'use_snapshot', 'exclude_files', 'exclude_wpar_files', 'software_packing',
-                'extended_attrs', 'backup_crypt_files', 'backup_dmapi_fs', 'new_image_data',
-                {'combined_path': [self.vars.storage_path, self.vars.name]},
-            ])
-        self._changed = True
+        def process(rc, out, err):
+            if rc != 0:
+                self.do_raise("mksysb failed.")
+            self.vars.msg = out
 
-    def process_command_output(self, rc, out, err):
-        if rc != 0:
-            self.do_raise("mksysb failed.")
-        self.vars.msg = out
+        runner = CmdRunner(
+            self.module,
+            ['mksysb', '-X'],
+            self.command_args_formats,
+        )
+        with runner(['create_map_files', 'use_snapshot', 'exclude_files', 'exclude_wpar_files', 'software_packing',
+                     'extended_attrs', 'backup_crypt_files', 'backup_dmapi_fs', 'new_image_data', 'combined_path'],
+                    output_process=process, check_mode_skip=True) as ctx:
+            ctx.run(combined_path=[self.vars.storage_path, self.vars.name])
+
+        self.changed = True
 
 
 def main():
