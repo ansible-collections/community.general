@@ -29,16 +29,16 @@ description:
       be returned that way by this module. You may pass single values for attributes when calling the module,
       and this will be translated into a list suitable for the API.
 
-    - When updating a user_rolemapping, where possible provide the role ID to the module. This removes a lookup
+    - When updating composite role content, where possible provide the role ID to the module. This removes a lookup
       to the API to translate the name into the role ID.
 
 
 options:
     state:
         description:
-            - State of the composite_rolemapping.
-            - On C(present), the composite_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the composite_rolemapping will be removed if it exists.
+            - State of the composite role.
+            - On C(present), specified composite role content will be created if it does not yet exist, or updated with the parameters you provide.
+            - On C(absent), specified composite role content will be removed if it exists.
         default: 'present'
         type: str
         choices:
@@ -48,7 +48,7 @@ options:
     realm:
         type: str
         description:
-            - They Keycloak realm under which this role_representation resides.
+            - They Keycloak realm under which this role will reside.
         default: 'master'
 
     composite_role:
@@ -60,13 +60,13 @@ options:
             name:
                 type: str
                 description:
-                    - Name of the role_representation.
-                    - This parameter is required only when creating or updating the role_representation.
+                    - Name of the role.
+                    - This parameter is required only when creating or updating the role.
             id:
                 type: str
                 description:
-                    - The unique identifier for this role_representation.
-                    - This parameter is not required for updating or deleting a role_representation but
+                    - The unique identifier for this role.
+                    - This parameter is not required for updating or deleting a role but
                       providing it will reduce the number of API calls required.
 
     client_id:
@@ -104,13 +104,13 @@ options:
             name:
                 type: str
                 description:
-                    - Name of the role_representation.
-                    - This parameter is required only when creating or updating the role_representation.
+                    - Name of the role.
+                    - This parameter is required only when creating or updating the role.
             id:
                 type: str
                 description:
-                    - The unique identifier for this role_representation.
-                    - This parameter is not required for updating or deleting a role_representation but
+                    - The unique identifier for this role.
+                    - This parameter is not required for updating or deleting a role but
                       providing it will reduce the number of API calls required.
 
 extends_documentation_fragment:
