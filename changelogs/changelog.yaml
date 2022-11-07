@@ -514,4 +514,59 @@ releases:
     - description: Retrieve information on Scaleway Function namespace
       name: scaleway_function_namespace_info
       namespace: ''
+    - description: Retrieve GConf configurations
+      name: gconftool2_info
+      namespace: ''
+    - description: Set or delete a passphrase using the Operating System's native
+        keyring
+      name: keyring
+      namespace: ''
+    - description: Get a passphrase using the Operating System's native keyring
+      name: keyring_info
+      namespace: ''
+    - description: Scaleway compute - private network management
+      name: scaleway_compute_private_network
+      namespace: ''
+    - description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish
+        APIs
+      name: wdc_redfish_command
+      namespace: ''
+    - description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish
+        APIs
+      name: wdc_redfish_info
+      namespace: ''
+    - description: Rretrieves information about applications installed with pipx
+      name: pipx_info
+      namespace: ''
+    - description: Allows administration of Keycloak user_rolemapping with the Keycloak
+        API
+      name: keycloak_user_rolemapping
+      namespace: ''
+    - description: Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster.
+      name: proxmox_disk
+      namespace: ''
+    - description: Add/remove/change files in ISO file
+      name: iso_customize
+      namespace: ''
+    - description: Listing of resource policy_profiles in ManageIQ
+      name: manageiq_policies_info
+      namespace: ''
+    - description: Retrieve resource tags in ManageIQ
+      name: manageiq_tags_info
+      namespace: ''
+    - description: Scaleway Container registry management module
+      name: scaleway_container_registry
+      namespace: ''
+    - description: Scaleway Container registry info module
+      name: scaleway_container_registry_info
+      namespace: ''
+    plugins:
+      filter:
+      - description: Counts hashable elements in a sequence
+        name: counter
+        namespace: null
+      lookup:
+      - description: Retrieve secrets from Bitwarden
+        name: bitwarden
+        namespace: null
     release_date: '2022-11-02'

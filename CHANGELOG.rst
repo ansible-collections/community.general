@@ -229,8 +229,35 @@ Bugfixes
 - xfconf - fix setting of boolean values (https://github.com/ansible-collections/community.general/issues/4999, https://github.com/ansible-collections/community.general/pull/5007).
 - zfs - fix wrong quoting of properties (https://github.com/ansible-collections/community.general/issues/4707, https://github.com/ansible-collections/community.general/pull/4726).
 
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- counter - Counts hashable elements in a sequence
+
+Lookup
+~~~~~~
+
+- bitwarden - Retrieve secrets from Bitwarden
+
 New Modules
 -----------
 
+- gconftool2_info - Retrieve GConf configurations
+- iso_customize - Add/remove/change files in ISO file
+- keycloak_user_rolemapping - Allows administration of Keycloak user_rolemapping with the Keycloak API
+- keyring - Set or delete a passphrase using the Operating System's native keyring
+- keyring_info - Get a passphrase using the Operating System's native keyring
+- manageiq_policies_info - Listing of resource policy_profiles in ManageIQ
+- manageiq_tags_info - Retrieve resource tags in ManageIQ
+- pipx_info - Rretrieves information about applications installed with pipx
+- proxmox_disk - Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster.
+- scaleway_compute_private_network - Scaleway compute - private network management
+- scaleway_container_registry - Scaleway Container registry management module
+- scaleway_container_registry_info - Scaleway Container registry info module
 - scaleway_function_namespace - Scaleway Function namespace management
 - scaleway_function_namespace_info - Retrieve information on Scaleway Function namespace
+- wdc_redfish_command - Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
+- wdc_redfish_info - Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
