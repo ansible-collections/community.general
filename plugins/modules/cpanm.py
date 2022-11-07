@@ -134,12 +134,11 @@ EXAMPLES = '''
 
 import os
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ModuleHelper, CmdMixin, ArgFormat
-)
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
 
-class CPANMinus(CmdMixin, ModuleHelper):
+class CPANMinus(ModuleHelper):
     output_params = ['name', 'version']
     module = dict(
         argument_spec=dict(
@@ -160,13 +159,13 @@ class CPANMinus(CmdMixin, ModuleHelper):
     )
     command = 'cpanm'
     command_args_formats = dict(
-        notest=dict(fmt="--notest", style=ArgFormat.BOOLEAN),
-        locallib=dict(fmt=('--local-lib', '{0}'),),
-        mirror=dict(fmt=('--mirror', '{0}'),),
-        mirror_only=dict(fmt="--mirror-only", style=ArgFormat.BOOLEAN),
-        installdeps=dict(fmt="--installdeps", style=ArgFormat.BOOLEAN),
+        notest=cmd_runner_fmt.as_bool("--notest"),
+        locallib=cmd_runner_fmt.as_opt_val('--local-lib'),
+        mirror=cmd_runner_fmt.as_opt_val('--mirror'),
+        mirror_only=cmd_runner_fmt.as_bool("--mirror-only"),
+        installdeps=cmd_runner_fmt.as_bool("--installdeps"),
+        pkg_spec=cmd_runner_fmt.as_list(),
     )
-    check_rc = True
 
     def __init_module__(self):
         v = self.vars
@@ -181,15 +180,17 @@ class CPANMinus(CmdMixin, ModuleHelper):
         self.vars.set("binary", self.command)
 
     def _is_package_installed(self, name, locallib, version):
+        def process(rc, out, err):
+            return rc == 0
+
         if name is None or name.endswith('.tar.gz'):
             return False
         version = "" if version is None else " " + version
 
         env = {"PERL5LIB": "%s/lib/perl5" % locallib} if locallib else {}
-        cmd = ['perl', '-le', 'use %s%s;' % (name, version)]
-        rc, out, err = self.module.run_command(cmd, check_rc=False, environ_update=env)
-
-        return rc == 0
+        runner = CmdRunner(self.module, ["perl", "-le"], {"mod": cmd_runner_fmt.as_list()}, check_rc=False, environ_update=env)
+        with runner("mod", output_process=process) as ctx:
+            return ctx.run(mod='use %s%s;' % (name, version))
 
     def sanitize_pkg_spec_version(self, pkg_spec, version):
         if version is None:
@@ -207,6 +208,13 @@ class CPANMinus(CmdMixin, ModuleHelper):
         return pkg_spec + version
 
     def __run__(self):
+        def process(rc, out, err):
+            if self.vars.mode == "compatibility" and rc != 0:
+                self.do_raise(msg=err, cmd=self.vars.cmd_args)
+            return 'is up to date' not in err and 'is up to date' not in out
+
+        runner = CmdRunner(self.module, self.command, self.command_args_formats, check_rc=True)
+
         v = self.vars
         pkg_param = 'from_path' if v.from_path else 'name'
 
@@ -214,22 +222,14 @@ class CPANMinus(CmdMixin, ModuleHelper):
             if self._is_package_installed(v.name, v.locallib, v.version):
                 return
             pkg_spec = v[pkg_param]
-            self.changed = self.run_command(
-                params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', {'name': pkg_spec}],
-            )
         else:
             installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
             if installed:
                 return
             pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
-            self.changed = self.run_command(
-                params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', {'name': pkg_spec}],
-            )
 
-    def process_command_output(self, rc, out, err):
-        if self.vars.mode == "compatibility" and rc != 0:
-            self.do_raise(msg=err, cmd=self.vars.cmd_args)
-        return 'is up to date' not in err and 'is up to date' not in out
+        with runner(['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'pkg_spec'], output_process=process) as ctx:
+            self.changed = ctx.run(pkg_spec=pkg_spec)
 
 
 def main():
