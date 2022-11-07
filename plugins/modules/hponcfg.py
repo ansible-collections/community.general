@@ -73,12 +73,11 @@ EXAMPLES = r'''
     executable: /opt/hp/tools/hponcfg
 '''
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdModuleHelper, ArgFormat
-)
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
 
-class HPOnCfg(CmdModuleHelper):
+class HPOnCfg(ModuleHelper):
     module = dict(
         argument_spec=dict(
             src=dict(type='path', required=True, aliases=['path']),
@@ -88,19 +87,22 @@ class HPOnCfg(CmdModuleHelper):
         )
     )
     command_args_formats = dict(
-        src=dict(fmt=["-f", "{0}"]),
-        verbose=dict(fmt="-v", style=ArgFormat.BOOLEAN),
-        minfw=dict(fmt=["-m", "{0}"]),
+        src=cmd_runner_fmt.as_opt_val("-f"),
+        verbose=cmd_runner_fmt.as_bool("-v"),
+        minfw=cmd_runner_fmt.as_opt_val("-m"),
     )
-    check_rc = True
-
-    def __init_module__(self):
-        self.command = self.vars.executable
-        # Consider every action a change (not idempotent yet!)
-        self.changed = True
 
     def __run__(self):
-        self.run_command(params=['src', 'verbose', 'minfw'])
+        runner = CmdRunner(
+            self.module,
+            self.vars.executable,
+            self.command_args_formats,
+            check_rc=True,
+        )
+        runner(['src', 'verbose', 'minfw']).run()
+
+        # Consider every action a change (not idempotent yet!)
+        self.changed = True
 
 
 def main():
