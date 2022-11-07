@@ -84,7 +84,7 @@ def parse_pagination_link(header):
 
 
 def _filter_sensitive_attributes(container, attributes):
-    '''WARNING: Will re removed once removing this no longer triggers a pylint bug.'''
+    # WARNING: Will re removed once removing this no longer triggers a pylint bug.
     for attr in attributes:
         container[attr] = "SENSITIVE_VALUE"
 
