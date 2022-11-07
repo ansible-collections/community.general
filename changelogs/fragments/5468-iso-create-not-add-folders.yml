@@ -1,0 +1,2 @@
+bugfixes:
+  - iso_create - iso_create doesn't add folders (https://github.com/ansible-collections/community.general/issues/5275).
