@@ -1,2 +1,2 @@
 bugfixes:
-  - iso_create - iso_create doesn't add folders (https://github.com/ansible-collections/community.general/issues/5275).
+  - iso_create - the module somtimes failed to add folders for Joliet and UDF formats (https://github.com/ansible-collections/community.general/issues/5275).
