@@ -1,0 +1,2 @@
+bugfixes:
+  - one_vm - NoneType object has no attribute split in get_vm_labels_and_attributes_dict (https://github.com/ansible-collections/community.general/pull/5489).
