@@ -1,0 +1,2 @@
+bugfixes:
+  - one_vm - avoid splitting labels that are ``None`` (https://github.com/ansible-collections/community.general/pull/5489).

@@ -970,7 +970,7 @@ def get_vm_labels_and_attributes_dict(client, vm_id):
         if key != 'LABELS':
             attrs_dict[key] = value
         else:
-            if key is not None:
+            if key is not None and value is not None:
                 labels_list = value.split(',')
 
     return labels_list, attrs_dict
