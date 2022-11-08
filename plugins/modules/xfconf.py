@@ -16,9 +16,9 @@ author:
 short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration with the help of
-    xfconf-query.  Please see the xfconf-query(1) man pages for more details.
+    xfconf-query. Please see the xfconf-query(1) man page for more details.
 seealso:
-  - name: C(xfconf-query) man page
+  - name: xfconf-query(1) man page
     description: Manual page of the C(xfconf-query) tool at the XFCE documentation site.
     link: 'https://docs.xfce.org/xfce/xfconf/xfconf-query'
 
@@ -70,7 +70,7 @@ options:
     default: "present"
   force_array:
     description:
-      - Force array even if only one element
+      - Force array even if only one element.
     type: bool
     default: false
     aliases: ['array']
