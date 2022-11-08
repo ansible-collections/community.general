@@ -26,6 +26,7 @@ DOCUMENTATION = '''
       description:
         - The correct parser for the input data.
         - For example C(ifconfig).
+        - "Note: use underscores instead of dashes (if any) in the parser module name."
         - See U(https://github.com/kellyjonbrazil/jc#parsers) for the latest list of parsers.
       type: string
       required: true
