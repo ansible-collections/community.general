@@ -158,7 +158,7 @@ def test_op_get_field(mocker, op_fixture, output, expected, request):
     ("cli_class", "vault", "queries", "kwargs", "output", "expected"),
     (
         (_cli_class, item["vault_name"], item["queries"], item.get("kwargs", {}), item["output"], item["expected"])
-        for _cli_class in MOCK_ENTRIES
+        for _cli_class in sorted(MOCK_ENTRIES)
         for item in MOCK_ENTRIES[_cli_class]
     )
 )
