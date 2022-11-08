@@ -13,7 +13,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_deploy_key
-short_description: Manages GitLab project deploy keys.
+short_description: Manages GitLab project deploy keys
 description:
   - Adds, updates and removes project deploy keys
 author:

@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: logentries_msg
-short_description: Send a message to logentries.
+short_description: Send a message to logentries
 description:
    - Send a message to logentries
 requirements:
