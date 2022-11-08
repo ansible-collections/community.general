@@ -1,0 +1,2 @@
+minor_changes:
+  - xfconf - prune deprecated code related to generating facts (https://github.com/ansible-collections/community.general/pull/5502).
