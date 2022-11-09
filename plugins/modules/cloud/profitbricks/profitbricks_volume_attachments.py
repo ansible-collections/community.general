@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: profitbricks_volume_attachments
-short_description: Attach or detach a volume.
+short_description: Attach or detach a volume
 description:
      - Allows you to attach or detach a volume from a ProfitBricks server. This module has a dependency on profitbricks >= 1.0.0
 options:
