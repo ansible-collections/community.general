@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_network
-short_description: create / delete an isolated network in Rackspace Public Cloud
+short_description: Create / delete an isolated network in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud isolated network.
 options:

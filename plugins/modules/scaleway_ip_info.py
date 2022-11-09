@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scaleway_ip_info
-short_description: Gather information about the Scaleway ips available.
+short_description: Gather information about the Scaleway ips available
 description:
   - Gather information about the Scaleway ips available.
 author:

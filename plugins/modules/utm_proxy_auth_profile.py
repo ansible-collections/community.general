@@ -16,7 +16,7 @@ module: utm_proxy_auth_profile
 author:
     - Stephan Schwarz (@stearz)
 
-short_description: create, update or destroy reverse_proxy auth_profile entry in Sophos UTM
+short_description: Create, update or destroy reverse_proxy auth_profile entry in Sophos UTM
 
 description:
     - Create, update or destroy a reverse_proxy auth_profile entry in SOPHOS UTM.

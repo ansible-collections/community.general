@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: vertica_user
-short_description: Adds or removes Vertica database users and assigns roles.
+short_description: Adds or removes Vertica database users and assigns roles
 description:
   - Adds or removes Vertica database user and, optionally, assigns roles.
   - A user will not be removed until all the dependencies have been dropped.

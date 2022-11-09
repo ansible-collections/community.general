@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: rax_clb_ssl
-short_description: Manage SSL termination for a Rackspace Cloud Load Balancer.
+short_description: Manage SSL termination for a Rackspace Cloud Load Balancer
 description:
 - Set up, reconfigure, or remove SSL termination for an existing load balancer.
 options:

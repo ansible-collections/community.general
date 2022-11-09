@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: zfs_facts
-short_description: Gather facts about ZFS datasets.
+short_description: Gather facts about ZFS datasets
 description:
   - Gather facts from ZFS dataset properties.
 author: Adam Števko (@xen0l)

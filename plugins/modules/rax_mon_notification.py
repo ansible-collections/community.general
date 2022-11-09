@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_mon_notification
-short_description: Create or delete a Rackspace Cloud Monitoring notification.
+short_description: Create or delete a Rackspace Cloud Monitoring notification
 description:
 - Create or delete a Rackspace Cloud Monitoring notification that specifies a
   channel that can be used to communicate alarms, such as email, webhooks, or

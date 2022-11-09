@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: xenserver_facts
-short_description: get facts reported on xenserver
+short_description: Get facts reported on xenserver
 description:
   - Reads data out of XenAPI, can be used instead of multiple xe commands.
 author:

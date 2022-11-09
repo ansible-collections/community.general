@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_mon_alarm
-short_description: Create or delete a Rackspace Cloud Monitoring alarm.
+short_description: Create or delete a Rackspace Cloud Monitoring alarm
 description:
 - Create or delete a Rackspace Cloud Monitoring alarm that associates an
   existing rax_mon_entity, rax_mon_check, and rax_mon_notification_plan with

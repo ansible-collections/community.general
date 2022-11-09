@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: vertica_role
-short_description: Adds or removes Vertica database roles and assigns roles to them.
+short_description: Adds or removes Vertica database roles and assigns roles to them
 description:
   - Adds or removes Vertica database role and, optionally, assign other roles.
 options:

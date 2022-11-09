@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: vmadm
-short_description: Manage SmartOS virtual machines and zones.
+short_description: Manage SmartOS virtual machines and zones
 description:
   - Manage SmartOS virtual machines through vmadm(1M).
 author: Jasper Lievisse Adriaanse (@jasperla)

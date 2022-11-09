@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: spectrum_device
-short_description: Creates/deletes devices in CA Spectrum.
+short_description: Creates/deletes devices in CA Spectrum
 description:
    - This module allows you to create and delete devices in CA Spectrum U(https://www.ca.com/us/products/ca-spectrum.html).
    - Tested on CA Spectrum 9.4.2, 10.1.1 and 10.2.1

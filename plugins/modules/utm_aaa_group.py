@@ -15,7 +15,7 @@ module: utm_aaa_group
 author:
     - Johannes Brunswicker (@MatrixCrawler)
 
-short_description: Create, update or destroy an aaa group object in Sophos UTM.
+short_description: Create, update or destroy an aaa group object in Sophos UTM
 
 description:
     - Create, update or destroy an aaa group object in Sophos UTM.

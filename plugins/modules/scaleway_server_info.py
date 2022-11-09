@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scaleway_server_info
-short_description: Gather information about the Scaleway servers available.
+short_description: Gather information about the Scaleway servers available
 description:
   - Gather information about the Scaleway servers available.
 author:

@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: vertica_configuration
-short_description: Updates Vertica configuration parameters.
+short_description: Updates Vertica configuration parameters
 description:
     - Updates Vertica configuration parameters.
 options:
