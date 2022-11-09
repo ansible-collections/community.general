@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: zpool_facts
-short_description: Gather facts about ZFS pools.
+short_description: Gather facts about ZFS pools
 description:
   - Gather facts from ZFS pool properties.
 author: Adam Števko (@xen0l)

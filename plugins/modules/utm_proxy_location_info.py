@@ -16,7 +16,7 @@ module: utm_proxy_location_info
 author:
     - Johannes Brunswicker (@MatrixCrawler)
 
-short_description: create, update or destroy reverse_proxy location entry in Sophos UTM
+short_description: Create, update or destroy reverse_proxy location entry in Sophos UTM
 
 description:
     - Create, update or destroy a reverse_proxy location entry in SOPHOS UTM.

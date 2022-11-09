@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax
-short_description: create / delete an instance in Rackspace Public Cloud
+short_description: Create / delete an instance in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud instance and optionally
        waits for it to be 'running'.

@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: sl_vm
-short_description: create or cancel a virtual instance in SoftLayer
+short_description: Create or cancel a virtual instance in SoftLayer
 description:
   - Creates or cancels SoftLayer instances.
   - When created, optionally waits for it to be 'running'.

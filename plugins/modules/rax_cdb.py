@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_cdb
-short_description: create/delete or resize a Rackspace Cloud Databases instance
+short_description: Create/delete or resize a Rackspace Cloud Databases instance
 description:
   - creates / deletes or resize a Rackspace Cloud Databases instance
     and optionally waits for it to be 'running'. The name option needs to be

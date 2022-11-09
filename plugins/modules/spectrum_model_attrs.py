@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: spectrum_model_attrs
-short_description: Enforce a model's attributes in CA Spectrum.
+short_description: Enforce a model's attributes in CA Spectrum
 description:
     - This module can be used to enforce a model's attributes in CA Spectrum.
 version_added: 2.5.0

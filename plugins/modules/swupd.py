@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: swupd
-short_description: Manages updates and bundles in ClearLinux systems.
+short_description: Manages updates and bundles in ClearLinux systems
 description:
   - Manages updates and bundles with the swupd bundle manager, which is used by the
     Clear Linux Project for Intel Architecture.

@@ -16,7 +16,7 @@ module: utm_ca_host_key_cert
 author:
     - Stephan Schwarz (@stearz)
 
-short_description: create, update or destroy ca host_key_cert entry in Sophos UTM
+short_description: Create, update or destroy ca host_key_cert entry in Sophos UTM
 
 description:
     - Create, update or destroy a ca host_key_cert entry in SOPHOS UTM.

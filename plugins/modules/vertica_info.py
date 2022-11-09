@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: vertica_info
-short_description: Gathers Vertica database facts.
+short_description: Gathers Vertica database facts
 description:
   - Gathers Vertica database information.
   - This module was called C(vertica_facts) before Ansible 2.9, returning C(ansible_facts).

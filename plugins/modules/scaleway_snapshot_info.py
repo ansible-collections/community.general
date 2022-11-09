@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scaleway_snapshot_info
-short_description: Gather information about the Scaleway snapshots available.
+short_description: Gather information about the Scaleway snapshots available
 description:
   - Gather information about the Scaleway snapshot available.
 author:

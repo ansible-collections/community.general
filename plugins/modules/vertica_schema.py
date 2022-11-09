@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: vertica_schema
-short_description: Adds or removes Vertica database schema and roles.
+short_description: Adds or removes Vertica database schema and roles
 description:
   - Adds or removes Vertica database schema and, optionally, roles
     with schema access privileges.

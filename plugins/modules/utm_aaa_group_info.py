@@ -17,7 +17,7 @@ module: utm_aaa_group_info
 author:
     - Johannes Brunswicker (@MatrixCrawler)
 
-short_description: get info for reverse_proxy frontend entry in Sophos UTM
+short_description: Get info for reverse_proxy frontend entry in Sophos UTM
 
 description:
     - get info for a reverse_proxy frontend entry in SOPHOS UTM.

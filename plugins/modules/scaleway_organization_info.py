@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: scaleway_organization_info
-short_description: Gather information about the Scaleway organizations available.
+short_description: Gather information about the Scaleway organizations available
 description:
   - Gather information about the Scaleway organizations available.
 author:

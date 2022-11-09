@@ -17,7 +17,7 @@ DOCUMENTATION = '''
 ---
 module: rundeck_project
 
-short_description: Manage Rundeck projects.
+short_description: Manage Rundeck projects
 description:
     - Create and remove Rundeck projects through HTTP API.
 author: "Loic Blot (@nerzhul)"

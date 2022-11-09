@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_queue
-short_description: create / delete a queue in Rackspace Public Cloud
+short_description: Create / delete a queue in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud queue.
 options:

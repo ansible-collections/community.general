@@ -15,7 +15,7 @@ module: utm_dns_host
 author:
     - Johannes Brunswicker (@MatrixCrawler)
 
-short_description: create, update or destroy dns entry in Sophos UTM
+short_description: Create, update or destroy dns entry in Sophos UTM
 
 description:
     - Create, update or destroy a dns entry in SOPHOS UTM.
