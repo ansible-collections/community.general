@@ -822,7 +822,8 @@ files:
     maintainers: marc-sensenich
   $modules/ohai.py:
     labels: ohai
-    maintainers: $team_ansible_core mpdehaan
+    maintainers: $team_ansible_core
+    ignore: mpdehaan
   $modules/omapi_host.py:
     maintainers: amasolov nerzhul
   $modules/one_:
@@ -1072,7 +1073,8 @@ files:
   $modules/sapcar_extract.py:
     maintainers: RainerLeber
   $modules/say.py:
-    maintainers: $team_ansible_core mpdehaan
+    maintainers: $team_ansible_core
+    ignore: mpdehaan
   $modules/scaleway_:
     maintainers: $team_scaleway
   $modules/scaleway_compute_private_network.py:
