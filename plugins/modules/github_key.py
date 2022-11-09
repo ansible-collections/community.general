@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: github_key
-short_description: Manage GitHub access keys.
+short_description: Manage GitHub access keys
 description:
     - Creates, removes, or updates GitHub access keys.
 options:

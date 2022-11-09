@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ibm_sa_vol
-short_description: Handle volumes on IBM Spectrum Accelerate Family storage systems.
+short_description: Handle volumes on IBM Spectrum Accelerate Family storage systems
 
 description:
     - "This module creates or deletes volumes to be used on IBM Spectrum Accelerate Family storage systems."

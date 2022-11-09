@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ibm_sa_host
-short_description: Adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems.
+short_description: Adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems
 
 description:
     - "This module adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems."
