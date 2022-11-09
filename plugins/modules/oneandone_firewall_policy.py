@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: oneandone_firewall_policy
-short_description: Configure 1&1 firewall policy.
+short_description: Configure 1&1 firewall policy
 description:
      - Create, remove, reconfigure, update firewall policies.
        This module has a dependency on 1and1 >= 1.0

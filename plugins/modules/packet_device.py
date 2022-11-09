@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: packet_device
 
-short_description: Manage a bare metal server in the Packet Host.
+short_description: Manage a bare metal server in the Packet Host
 
 description:
     - Manage a bare metal server in the Packet Host (a "device" in the API terms).

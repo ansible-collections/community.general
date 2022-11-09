@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 author: Kairo Araujo (@kairoaraujo)
 module: mksysb
-short_description: Generates AIX mksysb rootvg backups.
+short_description: Generates AIX mksysb rootvg backups
 description:
   - This module manages a basic AIX mksysb (image) of rootvg.
 options:

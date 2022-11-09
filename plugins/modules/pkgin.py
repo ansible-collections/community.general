@@ -19,7 +19,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: pkgin
-short_description: Package manager for SmartOS, NetBSD, et al.
+short_description: Package manager for SmartOS, NetBSD, et al
 description:
     - "The standard package manager for SmartOS, but also usable on NetBSD
       or any OS that uses C(pkgsrc).  (Home: U(http://pkgin.net/))"

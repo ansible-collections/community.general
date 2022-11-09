@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: packet_project
 
-short_description: Create/delete a project in Packet host.
+short_description: Create/delete a project in Packet host
 
 description:
     - Create/delete a project in Packet host.

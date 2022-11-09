@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: packet_volume_attachment
 
-short_description: Attach/detach a volume to a device in the Packet host.
+short_description: Attach/detach a volume to a device in the Packet host
 
 description:
      - Attach/detach a volume to a device in the Packet host.

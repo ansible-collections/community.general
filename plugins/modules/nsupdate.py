@@ -18,7 +18,7 @@ DOCUMENTATION = '''
 ---
 module: nsupdate
 
-short_description: Manage DNS records.
+short_description: Manage DNS records
 description:
     - Create, update and remove DNS records using DDNS updates
 requirements:

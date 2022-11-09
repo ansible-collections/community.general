@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 module: launchd
 author:
 - Martin Migasiewicz (@martinm82)
-short_description:  Manage macOS services
+short_description: Manage macOS services
 version_added: 1.0.0
 description:
 - Manage launchd services on target macOS hosts.

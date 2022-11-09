@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: profitbricks_volume
-short_description: Create or destroy a volume.
+short_description: Create or destroy a volume
 description:
      - Allows you to create or remove a volume from a ProfitBricks datacenter. This module has a dependency on profitbricks >= 1.0.0
 options:

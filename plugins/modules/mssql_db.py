@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: mssql_db
-short_description: Add or remove MSSQL databases from a remote host.
+short_description: Add or remove MSSQL databases from a remote host
 description:
    - Add or remove MSSQL databases from a remote host.
 options:

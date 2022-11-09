@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: pip_package_info
-short_description: pip package information
+short_description: Pip package information
 description:
   - Return information about installed pip packages
 extends_documentation_fragment:

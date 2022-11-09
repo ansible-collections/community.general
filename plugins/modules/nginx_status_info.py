@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: nginx_status_info
-short_description: Retrieve information on nginx status.
+short_description: Retrieve information on nginx status
 description:
   - Gathers information from nginx from an URL having C(stub_status) enabled.
 author: "René Moser (@resmo)"

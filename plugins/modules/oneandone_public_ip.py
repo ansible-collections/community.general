@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: oneandone_public_ip
-short_description: Configure 1&1 public IPs.
+short_description: Configure 1&1 public IPs
 description:
      - Create, update, and remove public IPs.
        This module has a dependency on 1and1 >= 1.0
