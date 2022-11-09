@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: gunicorn
-short_description: Run gunicorn with various settings.
+short_description: Run gunicorn with various settings
 description:
      - Starts gunicorn with the parameters specified. Common settings for gunicorn
        configuration are supported. For additional configuration use a config file

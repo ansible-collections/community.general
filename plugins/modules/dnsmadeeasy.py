@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: dnsmadeeasy
-short_description: Interface with dnsmadeeasy.com (a DNS hosting service).
+short_description: Interface with dnsmadeeasy.com (a DNS hosting service)
 description:
    - >
      Manages DNS records via the v2 REST API of the DNS Made Easy service.  It handles records only; there is no manipulation of domains or
