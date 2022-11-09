@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: pulp_repo
 author: "Joe Adams (@sysadmind)"
-short_description: Add or remove Pulp repos from a remote host.
+short_description: Add or remove Pulp repos from a remote host
 description:
   - Add or remove Pulp repos from a remote host.
   - Note, this is for Pulp 2 only.
