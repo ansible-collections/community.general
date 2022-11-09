@@ -16,7 +16,7 @@ author:
  - "Artem Feofanov (@tyouxa)"
  - "Nikolai Lomov (@lomserman)"
 
-short_description: module for sending notifications via telegram
+short_description: Send notifications via telegram
 
 description:
     - Send notifications via telegram bot, to a verified group or user.

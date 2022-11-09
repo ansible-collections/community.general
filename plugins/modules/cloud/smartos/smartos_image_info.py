@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: smartos_image_info
-short_description: Get SmartOS image details.
+short_description: Get SmartOS image details
 description:
     - Retrieve information about all installed images on SmartOS.
     - This module was called C(smartos_image_facts) before Ansible 2.9, returning C(ansible_facts).

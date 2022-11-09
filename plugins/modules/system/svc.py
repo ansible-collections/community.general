@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 module: svc
 author:
 - Brian Coca (@bcoca)
-short_description:  Manage daemontools services
+short_description: Manage daemontools services
 description:
     - Controls daemontools services on remote hosts using the svc utility.
 options:
