@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: packet_ip_subnet
 
-short_description: Assign IP subnet to a bare metal server.
+short_description: Assign IP subnet to a bare metal server
 
 description:
     - Assign or unassign IPv4 or IPv6 subnets to or from a device in the Packet host.
