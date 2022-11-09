@@ -44,3 +44,6 @@ elastic-apm ; python_version >= '3.6'
 
 # requirements for scaleway modules
 passlib[argon2]
+
+# requirements for jenkins modules
+python-jenkins >= 0.4.12

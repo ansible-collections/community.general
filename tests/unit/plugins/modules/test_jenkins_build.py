@@ -12,6 +12,7 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.modules import jenkins_build
 
 import json
+import jenkins
 
 
 def set_module_args(args):
@@ -51,6 +52,8 @@ class JenkinsMock():
         }
 
     def get_build_info(self, name, build_number):
+        if name == "host-delete":
+            raise jenkins.JenkinsException("job {0} number {1} does not exist".format(name, build_number))
         return {
             "building": True,
             "result": "SUCCESS"
@@ -83,7 +86,7 @@ class JenkinsMockIdempotent():
         return None
 
     def delete_build(self, name, build_number):
-        return None
+        raise jenkins.NotFoundException("job {0} number {1} does not exist".format(name, build_number))
 
     def stop_build(self, name, build_number):
         return None
@@ -173,7 +176,23 @@ class TestJenkinsBuild(unittest.TestCase):
 
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
-                "name": "host-check",
+                "name": "host-delete",
+                "build_number": "1234",
+                "state": "absent",
+                "user": "abc",
+                "token": "xyz"
+            })
+            jenkins_build.main()
+
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    def test_module_delete_build_again(self, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMockIdempotent()
+
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                "name": "host-delete",
                 "build_number": "1234",
                 "state": "absent",
                 "user": "abc",
