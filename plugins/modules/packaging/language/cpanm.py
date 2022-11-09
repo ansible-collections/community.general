@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: cpanm
-short_description: Manages Perl library dependencies.
+short_description: Manages Perl library dependencies
 description:
   - Manage Perl library dependencies using cpanminus.
 options:

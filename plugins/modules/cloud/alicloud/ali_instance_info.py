@@ -27,7 +27,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ali_instance_info
-short_description: Gather information on instances of Alibaba Cloud ECS.
+short_description: Gather information on instances of Alibaba Cloud ECS
 description:
      - This module fetches data from the Open API in Alicloud.
        The module must be called from within the ECS instance itself.

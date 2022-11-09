@@ -16,7 +16,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 module: jira
-short_description: create and modify issues in a JIRA instance
+short_description: Create and modify issues in a JIRA instance
 description:
   - Create and modify issues in a JIRA instance.
 

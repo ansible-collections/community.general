@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: clc_server
-short_description: Create, Delete, Start and Stop servers in CenturyLink Cloud.
+short_description: Create, Delete, Start and Stop servers in CenturyLink Cloud
 description:
   - An Ansible module to Create, Delete, Start and Stop servers in CenturyLink Cloud.
 options:
