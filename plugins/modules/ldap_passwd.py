@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ldap_passwd
-short_description: Set passwords in LDAP.
+short_description: Set passwords in LDAP
 description:
   - Set a password for an LDAP entry.  This module only asserts that
     a given password is valid for a given entry.  To assert the

@@ -12,7 +12,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: github_issue
-short_description: View GitHub issue.
+short_description: View GitHub issue
 description:
     - View GitHub issue for a given repository and organization.
 options:

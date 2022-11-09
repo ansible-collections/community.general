@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 
 module: manageiq_tags
 
-short_description: Management of resource tags in ManageIQ.
+short_description: Management of resource tags in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 

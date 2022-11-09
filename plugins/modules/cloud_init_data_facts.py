@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: cloud_init_data_facts
-short_description: Retrieve facts of cloud-init.
+short_description: Retrieve facts of cloud-init
 description:
   - Gathers facts by reading the status.json and result.json of cloud-init.
 author: René Moser (@resmo)

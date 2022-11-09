@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: clc_aa_policy
-short_description: Create or Delete Anti Affinity Policies at CenturyLink Cloud.
+short_description: Create or Delete Anti Affinity Policies at CenturyLink Cloud
 description:
   - An Ansible module to Create or Delete Anti Affinity Policies at CenturyLink Cloud.
 options:

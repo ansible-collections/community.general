@@ -18,7 +18,7 @@ description:
     - This module currently supports Linux only.
 requirements:
   - netstat or ss
-short_description: Gather facts on processes listening on TCP and UDP ports.
+short_description: Gather facts on processes listening on TCP and UDP ports
 notes:
   - |
     C(ss) returns all processes for each listen address and port.

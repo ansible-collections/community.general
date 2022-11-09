@@ -15,7 +15,7 @@ DOCUMENTATION = '''
 ---
 module: deploy_helper
 author: "Ramon de la Fuente (@ramondelafuente)"
-short_description: Manages some of the steps common in deploying projects.
+short_description: Manages some of the steps common in deploying projects
 description:
   - The Deploy Helper manages some of the steps common in deploying software.
     It creates a folder structure, manages a symlink for the current release

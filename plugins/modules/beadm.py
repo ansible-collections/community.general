@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: beadm
-short_description: Manage ZFS boot environments on FreeBSD/Solaris/illumos systems.
+short_description: Manage ZFS boot environments on FreeBSD/Solaris/illumos systems
 description:
     - Create, delete or activate ZFS boot environments.
     - Mount and unmount ZFS boot environments.

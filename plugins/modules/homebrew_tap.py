@@ -19,7 +19,7 @@ module: homebrew_tap
 author:
     - "Indrajit Raychaudhuri (@indrajitr)"
     - "Daniel Jaouen (@danieljaouen)"
-short_description: Tap a Homebrew repository.
+short_description: Tap a Homebrew repository
 description:
     - Tap external Homebrew repositories.
 options:

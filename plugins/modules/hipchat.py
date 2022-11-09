@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: hipchat
-short_description: Send a message to Hipchat.
+short_description: Send a message to Hipchat
 description:
    - Send a message to a Hipchat room, with options to control the formatting.
 options:
