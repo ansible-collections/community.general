@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: say
-short_description: Makes a computer to speak.
+short_description: Makes a computer to speak
 description:
    - makes a computer speak! Amuse your friends, annoy your coworkers!
 notes:

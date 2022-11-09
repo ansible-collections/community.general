@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_clb_nodes
-short_description: add, modify and remove nodes from a Rackspace Cloud Load Balancer
+short_description: Add, modify and remove nodes from a Rackspace Cloud Load Balancer
 description:
   - Adds, modifies and removes nodes from a Rackspace Cloud Load Balancer
 options:
