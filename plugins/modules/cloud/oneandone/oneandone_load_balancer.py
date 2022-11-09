@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: oneandone_load_balancer
-short_description: Configure 1&1 load balancer.
+short_description: Configure 1&1 load balancer
 description:
      - Create, remove, update load balancers.
        This module has a dependency on 1and1 >= 1.0

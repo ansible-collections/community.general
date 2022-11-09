@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: online_server_info
-short_description: Gather information about Online servers.
+short_description: Gather information about Online servers
 description:
   - Gather information about the servers.
   - U(https://www.online.net/en/dedicated-server)
