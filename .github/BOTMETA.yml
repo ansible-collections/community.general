@@ -747,7 +747,8 @@ files:
     labels: rocketchat
     ignore: ramondelafuente
   $modules/notification/say.py:
-    maintainers: $team_ansible_core mpdehaan
+    maintainers: $team_ansible_core
+    ignore: mpdehaan
   $modules/notification/sendgrid.py:
     maintainers: makaimc
   $modules/notification/slack.py:
@@ -1099,7 +1100,8 @@ files:
   $modules/system/nosh.py:
     maintainers: tacatac
   $modules/system/ohai.py:
-    maintainers: $team_ansible_core mpdehaan
+    maintainers: $team_ansible_core
+    ignore: mpdehaan
     labels: ohai
   $modules/system/open_iscsi.py:
     maintainers: srvg
