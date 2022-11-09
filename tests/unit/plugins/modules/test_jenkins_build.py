@@ -12,7 +12,9 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.modules import jenkins_build
 
 import json
-import jenkins
+import pytest
+
+jenkins = pytest.importorskip('jenkins')
 
 
 def set_module_args(args):
