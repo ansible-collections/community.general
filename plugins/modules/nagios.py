@@ -17,7 +17,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: nagios
-short_description: Perform common tasks in Nagios related to downtime and notifications.
+short_description: Perform common tasks in Nagios related to downtime and notifications
 description:
   - "The C(nagios) module has two basic functions: scheduling downtime and toggling alerts for services or hosts."
   - The C(nagios) module is not idempotent.

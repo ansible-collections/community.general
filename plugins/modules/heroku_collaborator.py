@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: heroku_collaborator
-short_description: "Add or delete app collaborators on Heroku"
+short_description: Add or delete app collaborators on Heroku
 description:
   - Manages collaborators for Heroku apps.
   - If set to C(present) and heroku user is already collaborator, then do nothing.

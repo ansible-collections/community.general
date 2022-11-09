@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: omapi_host
-short_description: Setup OMAPI hosts.
+short_description: Setup OMAPI hosts
 description: Manage OMAPI hosts into compatible DHCPd servers
 requirements:
   - pypureomapi
