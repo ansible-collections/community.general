@@ -14,7 +14,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ldap_entry
-short_description: Add or remove LDAP entries.
+short_description: Add or remove LDAP entries
 description:
   - Add or remove LDAP entries. This module only asserts the existence or
     non-existence of an LDAP entry, not its attributes. To assert the
