@@ -15,7 +15,7 @@ DOCUMENTATION = '''
 ---
 module: rundeck_acl_policy
 
-short_description: Manage Rundeck ACL policies.
+short_description: Manage Rundeck ACL policies
 description:
     - Create, update and remove Rundeck ACL policies through HTTP API.
 author: "Loic Blot (@nerzhul)"

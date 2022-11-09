@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_cdb_user
-short_description: create / delete a Rackspace Cloud Database
+short_description: Create / delete a Rackspace Cloud Database
 description:
   - create / delete a database in the Cloud Databases.
 options:
