@@ -13,7 +13,7 @@ module: keycloak_role_composites
 
 short_description: Allows administration of Keycloak composite roles with the Keycloak API
 
-version_added: 5.3.0
+version_added: 6.1.0
 
 description:
     - This module allows you to add, remove or modify Keycloak roles to composite roles with the Keycloak REST API.
