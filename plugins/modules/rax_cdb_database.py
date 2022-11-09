@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: rax_cdb_database
-short_description: 'create / delete a database in the Cloud Databases'
+short_description: Create / delete a database in the Cloud Databases
 description:
   - create / delete a database in the Cloud Databases.
 options:
