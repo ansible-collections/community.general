@@ -16,7 +16,7 @@ author:
     - Christian Berendt (@berendt)
     - Ralf Hertel (@n0trax)
     - Robin Roth (@robinro)
-short_description: Enables/disables a module of the Apache2 webserver.
+short_description: Enables/disables a module of the Apache2 webserver
 description:
    - Enables or disables a specified module of the Apache2 webserver.
 options:

@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: dimensiondata_vlan
-short_description: Manage a VLAN in a Cloud Control network domain.
+short_description: Manage a VLAN in a Cloud Control network domain
 extends_documentation_fragment:
 - community.general.dimensiondata
 - community.general.dimensiondata_wait
