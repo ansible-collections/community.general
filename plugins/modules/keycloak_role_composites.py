@@ -79,7 +79,7 @@ options:
         type: str
         description:
             - Id of the client to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
+            - This parameter is not required for updating or deleting the role mapping but
               providing it will reduce the number of API calls required.
 
     role_client_id:
@@ -92,7 +92,7 @@ options:
         type: str
         description:
             - Id of the client to be mapped.
-            - This parameter is not required for updating or deleting the rolemapping but
+            - This parameter is not required for updating or deleting the role mapping but
               providing it will reduce the number of API calls required. If not provided, clientRole=false
 
     roles:
