@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rax_clb
-short_description: create / delete a load balancer in Rackspace Public Cloud
+short_description: Create / delete a load balancer in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud load balancer.
 options:

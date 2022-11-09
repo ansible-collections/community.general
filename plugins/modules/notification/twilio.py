@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: twilio
-short_description: Sends a text message to a mobile phone through Twilio.
+short_description: Sends a text message to a mobile phone through Twilio
 description:
    - Sends a text message to a phone number through the Twilio messaging API.
 notes:
