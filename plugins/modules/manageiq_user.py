@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 
 module: manageiq_user
 
-short_description: Management of users in ManageIQ.
+short_description: Management of users in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 

@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: github_deploy_key
 author: "Ali (@bincyber)"
-short_description: Manages deploy keys for GitHub repositories.
+short_description: Manages deploy keys for GitHub repositories
 description:
   - "Adds or removes deploy keys for GitHub repositories. Supports authentication using username and password,
   username and password and 2-factor authentication code (OTP), OAuth2 token, or personal access token. Admin
