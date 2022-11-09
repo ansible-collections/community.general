@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: packet_sshkey
-short_description: Create/delete an SSH key in Packet host.
+short_description: Create/delete an SSH key in Packet host
 description:
      - Create/delete an SSH key in Packet host.
      - API is documented at U(https://www.packet.net/help/api/#page:ssh-keys,header:ssh-keys-ssh-keys-post).

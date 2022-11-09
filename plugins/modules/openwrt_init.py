@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: openwrt_init
 author:
     - "Andrew Gaffney (@agaffney)"
-short_description:  Manage services on OpenWrt.
+short_description: Manage services on OpenWrt
 description:
     - Controls OpenWrt services on remote hosts.
 options:

@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: etcd3
-short_description: "Set or delete key value pairs from an etcd3 cluster"
+short_description: Set or delete key value pairs from an etcd3 cluster
 requirements:
   - etcd3
 description:
