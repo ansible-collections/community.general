@@ -237,7 +237,7 @@ class JenkinsBuild:
             elif self.state == "absent" and build_status['result'] == "ABSENT":
                 result['changed'] = True
                 result['build_info'] = build_status
-            elif build_status['result'] == "SUCCESS":
+            elif self.state != "absent" and build_status['result'] == "SUCCESS":
                 result['changed'] = True
                 result['build_info'] = build_status
             else:
