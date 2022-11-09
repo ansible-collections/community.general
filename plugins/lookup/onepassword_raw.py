@@ -30,6 +30,11 @@ DOCUMENTATION = '''
         description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
       subdomain:
         description: The 1Password subdomain to authenticate against.
+      domain:
+        description: Domain of 1Password.
+        version_added: 6.0.0
+        default: '1password.com'
+        type: str
       username:
         description: The username used to sign in.
       secret_key:
