@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: memset_zone_domain
 author: "Simon Weald (@glitchcrab)"
-short_description: Create and delete domains in Memset DNS zones.
+short_description: Create and delete domains in Memset DNS zones
 notes:
   - Zone domains can be thought of as a collection of domains, all of which share the
     same DNS records (i.e. they point to the same IP). An API key generated via the
