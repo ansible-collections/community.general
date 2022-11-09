@@ -32,7 +32,7 @@ DOCUMENTATION = '''
       section:
         description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
       domain:
-        description: Domain of 1Password. Default is U(1password.com).
+        description: Domain of 1Password.
         version_added: 3.2.0
         default: '1password.com'
         type: str
