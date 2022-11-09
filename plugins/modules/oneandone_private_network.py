@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: oneandone_private_network
-short_description: Configure 1&1 private networking.
+short_description: Configure 1&1 private networking
 description:
      - Create, remove, reconfigure, update a private network.
        This module has a dependency on 1and1 >= 1.0

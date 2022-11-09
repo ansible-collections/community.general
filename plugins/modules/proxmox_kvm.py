@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: proxmox_kvm
-short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster.
+short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster
 description:
   - Allows you to create/delete/stop Qemu(KVM) Virtual Machines in Proxmox VE cluster.
   - Since community.general 4.0.0 on, there are no more default values, see I(proxmox_default_behavior).

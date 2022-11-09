@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: memset_server_info
 author: "Simon Weald (@glitchcrab)"
-short_description: Retrieve server information.
+short_description: Retrieve server information
 notes:
     - An API key generated via the Memset customer control panel is needed with the
       following minimum scope - I(server.info).

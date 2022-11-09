@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_protected_branch
-short_description: (un)Marking existing branches for protection
+short_description: Manage protection of existing branches
 version_added: 3.4.0
 description:
   - (un)Marking existing branches for protection.
@@ -25,7 +25,7 @@ extends_documentation_fragment:
 options:
   state:
     description:
-      - Create or delete proteced branch.
+      - Create or delete protected branch.
     default: present
     type: str
     choices: ["present", "absent"]

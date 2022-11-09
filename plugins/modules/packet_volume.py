@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: packet_volume
 
-short_description: Create/delete a volume in Packet host.
+short_description: Create/delete a volume in Packet host
 
 description:
      - Create/delete a volume in Packet host.

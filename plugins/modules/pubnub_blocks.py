@@ -17,7 +17,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: pubnub_blocks
-short_description: PubNub blocks management module.
+short_description: PubNub blocks management module
 description:
   - "This module allows Ansible to interface with the PubNub BLOCKS
   infrastructure by providing the following operations: create / remove,

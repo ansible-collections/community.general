@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 module: nosh
 author:
     - "Thomas Caravia (@tacatac)"
-short_description:  Manage services with nosh
+short_description: Manage services with nosh
 description:
     - Control running and enabled state for system-wide or user services.
     - BSD and Linux systems are supported.

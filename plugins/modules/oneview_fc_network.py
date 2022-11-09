@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: oneview_fc_network
-short_description: Manage OneView Fibre Channel Network resources.
+short_description: Manage OneView Fibre Channel Network resources
 description:
     - Provides an interface to manage Fibre Channel Network resources. Can create, update, and delete.
 requirements:

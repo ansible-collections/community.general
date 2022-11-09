@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ipinfoio_facts
-short_description: "Retrieve IP geolocation facts of a host's IP address"
+short_description: Retrieve IP geolocation facts of a host's IP address
 description:
   - "Gather IP geolocation facts of a host's IP address using ipinfo.io API"
 author: "Aleksei Kostiuk (@akostyuk)"

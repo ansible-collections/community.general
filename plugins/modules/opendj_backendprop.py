@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: opendj_backendprop
-short_description: Will update the backend configuration of OpenDJ via the dsconfig set-backend-prop command.
+short_description: Will update the backend configuration of OpenDJ via the dsconfig set-backend-prop command
 description:
    - This module will update settings for OpenDJ with the command set-backend-prop.
    - It will check first via de get-backend-prop if configuration needs to be applied.

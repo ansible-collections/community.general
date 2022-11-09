@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: memset_memstore_info
 author: "Simon Weald (@glitchcrab)"
-short_description: Retrieve Memstore product usage information.
+short_description: Retrieve Memstore product usage information
 notes:
     - An API key generated via the Memset customer control panel is needed with the
       following minimum scope - I(memstore.usage).

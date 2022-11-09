@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 module: online_user_info
-short_description: Gather information about Online user.
+short_description: Gather information about Online user
 description:
   - Gather information about the user.
 author:
