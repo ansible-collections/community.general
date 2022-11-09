@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: clc_blueprint_package
-short_description: deploys a blue print package on a set of servers in CenturyLink Cloud.
+short_description: Deploys a blue print package on a set of servers in CenturyLink Cloud
 description:
   - An Ansible module to deploy blue print package on a set of servers in CenturyLink Cloud.
 options:

@@ -14,7 +14,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: gitlab_hook
-short_description: Manages GitLab project hooks.
+short_description: Manages GitLab project hooks
 description:
   - Adds, updates and removes project hook
 author:

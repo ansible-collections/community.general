@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: htpasswd
-short_description: manage user files for basic authentication
+short_description: Manage user files for basic authentication
 description:
   - Add and remove username/password entries in a password file using htpasswd.
   - This is used by web servers such as Apache and Nginx for basic authentication.

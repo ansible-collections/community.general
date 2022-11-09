@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ibm_sa_pool
-short_description: Handles pools on IBM Spectrum Accelerate Family storage systems.
+short_description: Handles pools on IBM Spectrum Accelerate Family storage systems
 
 description:
     - "This module creates or deletes pools to be used on IBM Spectrum Accelerate Family storage systems"

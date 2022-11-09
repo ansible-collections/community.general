@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: manageiq_provider
-short_description: Management of provider in ManageIQ.
+short_description: Management of provider in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 

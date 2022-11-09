@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 
 module: manageiq_group
 
-short_description: Management of groups in ManageIQ.
+short_description: Management of groups in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 

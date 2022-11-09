@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: gitlab_runner
-short_description: Create, modify and delete GitLab Runners.
+short_description: Create, modify and delete GitLab Runners
 description:
   - Register, update and delete runners with the GitLab API.
   - All operations are performed using the GitLab API v4.

@@ -14,7 +14,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: apt_rpm
-short_description: apt_rpm package manager
+short_description: APT-RPM package manager
 description:
   - Manages packages with I(apt-rpm). Both low-level (I(rpm)) and high-level (I(apt-get)) package manager binaries required.
 options:

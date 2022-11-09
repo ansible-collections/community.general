@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: circonus_annotation
-short_description: create an annotation in circonus
+short_description: Create an annotation in circonus
 description:
     - Create an annotation event with a given category, title and description. Optionally start, end or durations can be provided
 author: "Nick Harring (@NickatEpic)"

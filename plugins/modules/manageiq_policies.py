@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 
 module: manageiq_policies
 
-short_description: Management of resource policy_profiles in ManageIQ.
+short_description: Management of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 

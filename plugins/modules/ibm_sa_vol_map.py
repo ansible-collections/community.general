@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ibm_sa_vol_map
-short_description: Handles volume mapping on IBM Spectrum Accelerate Family storage systems.
+short_description: Handles volume mapping on IBM Spectrum Accelerate Family storage systems
 
 description:
     - "This module maps volumes to or unmaps them from the hosts on

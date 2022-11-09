@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: consul
-short_description: "Add, modify & delete services within a consul cluster."
+short_description: "Add, modify & delete services within a consul cluster"
 description:
  - Registers services and checks for an agent with a consul cluster.
    A service is some process running on the agent node that should be advertised by

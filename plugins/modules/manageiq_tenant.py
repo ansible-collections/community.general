@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 
 module: manageiq_tenant
 
-short_description: Management of tenants in ManageIQ.
+short_description: Management of tenants in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 

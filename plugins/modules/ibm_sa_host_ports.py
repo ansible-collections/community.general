@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ibm_sa_host_ports
-short_description: Add host ports on IBM Spectrum Accelerate Family storage systems.
+short_description: Add host ports on IBM Spectrum Accelerate Family storage systems
 
 description:
     - "This module adds ports to or removes them from the hosts

@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: lldp
 requirements: [ lldpctl ]
-short_description: get details reported by lldp
+short_description: Get details reported by lldp
 description:
   - Reads data out of lldpctl
 options: {}
