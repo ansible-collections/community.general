@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: proxmox_template
-short_description: management of OS templates in Proxmox VE cluster
+short_description: Management of OS templates in Proxmox VE cluster
 description:
   - allows you to upload/delete templates in Proxmox VE cluster
 options:
