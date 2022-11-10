@@ -12,9 +12,6 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.modules import jenkins_build
 
 import json
-import pytest
-
-jenkins = pytest.importorskip('jenkins')
 
 
 def set_module_args(args):
@@ -45,6 +42,12 @@ def fail_json(*args, **kwargs):
     kwargs['failed'] = True
     raise AnsibleFailJson(kwargs)
 
+class jenkins:
+    class JenkinsException(Exception):
+        pass
+
+    class NotFoundException(JenkinsException):
+        pass
 
 class JenkinsMock():
 
