@@ -183,7 +183,10 @@ class JenkinsBuild:
         try:
             response = self.server.get_build_info(self.name, self.build_number)
             return response
-
+        except jenkins.JenkinsException as e:
+            response = {}
+            response["result"] = "ABSENT"
+            return response
         except Exception as e:
             self.module.fail_json(msg='Unable to fetch build information, %s' % to_native(e),
                                   exception=traceback.format_exc())
@@ -231,7 +234,10 @@ class JenkinsBuild:
             if self.state == "stopped" and build_status['result'] == "ABORTED":
                 result['changed'] = True
                 result['build_info'] = build_status
-            elif build_status['result'] == "SUCCESS":
+            elif self.state == "absent" and build_status['result'] == "ABSENT":
+                result['changed'] = True
+                result['build_info'] = build_status
+            elif self.state != "absent" and build_status['result'] == "SUCCESS":
                 result['changed'] = True
                 result['build_info'] = build_status
             else:
