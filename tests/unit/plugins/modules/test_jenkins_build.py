@@ -54,7 +54,7 @@ class jenkins:
 class JenkinsBuildMock():
     def get_build_status(self):
         try:
-            response = self.server.get_build_info(self.name, self.build_number)
+            response = JenkinsMock.get_build_info(self.name, self.build_number)
             return response
         except jenkins.JenkinsException as e:
             response = {}
