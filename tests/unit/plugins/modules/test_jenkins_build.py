@@ -54,9 +54,7 @@ class jenkins:
 class JenkinsBuildMock():
     def get_build_status(self):
         try:
-            job_name = self.name
-            build_num = self.build_number
-            response = JenkinsMock.get_build_info(job_name, build_num)
+            response = JenkinsMock.get_build_info('host-delete', 1234)
             return response
         except jenkins.JenkinsException as e:
             response = {}
