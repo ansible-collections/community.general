@@ -194,7 +194,7 @@ class TestJenkinsBuild(unittest.TestCase):
     def test_module_delete_build(self, build_status, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
-        build_status.return_value = JenkinsBuildMock()
+        build_status.return_value = JenkinsBuildMock().get_build_status()
 
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
