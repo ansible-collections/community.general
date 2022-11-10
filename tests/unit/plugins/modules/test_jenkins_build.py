@@ -42,12 +42,14 @@ def fail_json(*args, **kwargs):
     kwargs['failed'] = True
     raise AnsibleFailJson(kwargs)
 
+
 class jenkins:
     class JenkinsException(Exception):
         pass
 
     class NotFoundException(JenkinsException):
         pass
+
 
 class JenkinsMock():
 
@@ -63,6 +65,17 @@ class JenkinsMock():
             "building": True,
             "result": "SUCCESS"
         }
+
+    def get_build_status(self):
+        try:
+            response = self.get_build_info(self.name, self.build_number)
+            return response
+        except jenkins.JenkinsException as e:
+            response = {}
+            response["result"] = "ABSENT"
+            return response
+        except Exception as e:
+            fail_json(msg='Unable to fetch build information')
 
     def build_job(self, *args):
         return None
@@ -86,6 +99,17 @@ class JenkinsMockIdempotent():
             "building": False,
             "result": "ABORTED"
         }
+
+    def get_build_status(self):
+        try:
+            response = self.get_build_info(self.name, self.build_number)
+            return response
+        except jenkins.JenkinsException as e:
+            response = {}
+            response["result"] = "ABSENT"
+            return response
+        except Exception as e:
+            fail_json(msg='Unable to fetch build information')
 
     def build_job(self, *args):
         return None
