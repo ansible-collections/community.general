@@ -1,0 +1,2 @@
+minor_changes:
+  - merge_variables - Add new merge_variables lookup plugin (https://github.com/ansible-collections/community.general/pull/5533).
