@@ -72,7 +72,7 @@ def declare(name, *args, **kwargs):
 
 
 def validate(module, spec=None):
-    dep_names = list(_deps.keys())
+    dep_names = sorted(_deps)
 
     if spec is not None:
         if spec.startswith("-"):
