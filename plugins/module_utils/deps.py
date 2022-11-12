@@ -9,14 +9,13 @@ __metaclass__ = type
 
 
 import traceback
-from collections import OrderedDict
 from contextlib import contextmanager
 
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import missing_required_lib
 
 
-_deps = OrderedDict()
+_deps = dict()
 
 
 class _Dependency(object):
