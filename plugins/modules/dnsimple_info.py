@@ -230,18 +230,11 @@ dnsimple_record_info:
         type: str
 '''
 
-import traceback
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.basic import missing_required_lib
+from ansible_collections.community.general.plugins.module_utils import deps
 
-try:
+with deps.declare("requests"):
     from requests import Request, Session
-except ImportError:
-    HAS_REQUESTS = False
-    REQUESTS_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_REQUESTS = True
-    REQUESTS_IMPORT_ERROR = None
 
 
 def build_url(account, key, is_sandbox):
@@ -310,10 +303,7 @@ def main():
                     params['api_key'],
                     params['sandbox'])
 
-    if not HAS_REQUESTS:
-        module.exit_json(
-            msg=missing_required_lib('requests'),
-            exception=REQUESTS_IMPORT_ERROR)
+    deps.validate(module)
 
     # At minimum we need account and key
     if params['account_id'] and params['api_key']:
