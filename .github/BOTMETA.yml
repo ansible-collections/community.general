@@ -241,6 +241,8 @@ files:
   $lookups/manifold.py:
     labels: manifold
     maintainers: galanoff
+  $lookups/merge_variables.py:
+    maintainers: rlenferink m-a-r-k-e
   $lookups/onepass:
     labels: onepassword
     maintainers: samdoran
