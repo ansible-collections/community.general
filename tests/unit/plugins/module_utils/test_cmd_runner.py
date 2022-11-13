@@ -240,6 +240,24 @@ TC_RUNNER = dict(
             ),
         ),
     ),
+    aa_bb_fixed=(
+        dict(
+            args_bundle=dict(
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_fixed, fmt_arg=["fixed", "args"]),
+            ),
+            runner_init_args=dict(),
+            runner_ctx_args=dict(args_order=['aa', 'bb']),
+        ),
+        dict(runner_ctx_run_args=dict(), rc=0, out="", err=""),
+        dict(
+            run_info=dict(
+                cmd=['/mock/bin/testing', '--answer=11', 'fixed', 'args'],
+                environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
+                args_order=('aa', 'bb'),
+            ),
+        ),
+    ),
 )
 TC_RUNNER_IDS = sorted(TC_RUNNER.keys())
 
