@@ -43,6 +43,28 @@ def fail_json(*args, **kwargs):
     raise AnsibleFailJson(kwargs)
 
 
+class jenkins:
+    class JenkinsException(Exception):
+        pass
+
+    class NotFoundException(JenkinsException):
+        pass
+
+
+class JenkinsBuildMock():
+    def get_build_status(self):
+        try:
+            instance = JenkinsMock()
+            response = JenkinsMock.get_build_info(instance, 'host-delete', 1234)
+            return response
+        except jenkins.JenkinsException as e:
+            response = {}
+            response["result"] = "ABSENT"
+            return response
+        except Exception as e:
+            fail_json(msg='Unable to fetch build information, {0}'.format(e))
+
+
 class JenkinsMock():
 
     def get_job_info(self, name):
@@ -51,6 +73,8 @@ class JenkinsMock():
         }
 
     def get_build_info(self, name, build_number):
+        if name == "host-delete":
+            raise jenkins.JenkinsException("job {0} number {1} does not exist".format(name, build_number))
         return {
             "building": True,
             "result": "SUCCESS"
@@ -83,7 +107,7 @@ class JenkinsMockIdempotent():
         return None
 
     def delete_build(self, name, build_number):
-        return None
+        raise jenkins.NotFoundException("job {0} number {1} does not exist".format(name, build_number))
 
     def stop_build(self, name, build_number):
         return None
@@ -167,13 +191,31 @@ class TestJenkinsBuild(unittest.TestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
-    def test_module_delete_build(self, jenkins_connection, test_deps):
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_build_status')
+    def test_module_delete_build(self, build_status, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
+        build_status.return_value = JenkinsBuildMock().get_build_status()
 
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
-                "name": "host-check",
+                "name": "host-delete",
+                "build_number": "1234",
+                "state": "absent",
+                "user": "abc",
+                "token": "xyz"
+            })
+            jenkins_build.main()
+
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    def test_module_delete_build_again(self, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMockIdempotent()
+
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                "name": "host-delete",
                 "build_number": "1234",
                 "state": "absent",
                 "user": "abc",
