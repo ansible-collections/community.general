@@ -1,0 +1,2 @@
+bugfixes:
+  - cmd_runner module utils - formatting arguments ``as_fixed()`` was expecting an non-existing argument (https://github.com/ansible-collections/community.general/pull/5538).
