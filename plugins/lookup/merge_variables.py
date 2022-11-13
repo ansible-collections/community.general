@@ -21,18 +21,26 @@ DOCUMENTATION = """
         description:
           - The suffix of the variable name (all available variables will be checked with endswith(suffix))
         required: true
+      pattern_type:
+        description:
+          - Change the way of searching for the specified pattern.
+          - Possible values are C(prefix), C(suffix) and C(regex). By default C(suffix) is used.
+        type: str
+        default: 'suffix'
+        env:
+          - name: ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE
       initial_value:
         description:
           - An initial value to start with
         required: false
-      override_warning:
+      override:
         description:
-          - Print a warning when a key will be overwritten
-        default: false
-      override_error:
-        description:
-          - Return error when a key will be overwritten
-        default: false
+          - Return an error, print a warning or ignore it when a key will be overwritten.
+          - Possible values are C(error), C(warn) and C(ignore). By default C(error) is used.
+        type: str
+        default: 'error'
+        env:
+          - name: ANSIBLE_MERGE_VARIABLES_OVERRIDE
 """
 
 EXAMPLES = """
@@ -56,8 +64,8 @@ testb__test_dict:
     - 3
 
 
-# Merging variables that ends with '__test_dict' and store the result in a variable 'example_a'
-example_a: "{{ lookup('merge_variables', '__test_dict') }}"
+# Merge variables that end with '__test_dict' and store the result in a variable 'example_a'
+example_a: "{{ lookup('community.general.merge_variables', '__test_dict') }}"
 
 # The variable example_a now contains:
 # ports:
@@ -65,9 +73,9 @@ example_a: "{{ lookup('merge_variables', '__test_dict') }}"
 #   - 3
 
 
-# Merging variables that ends with '__test_list', starting with an initial value and store the result
+# Merge variables that end with '__test_list', starting with an initial value and store the result
 # in a variable 'example_b'
-example_b: "{{ lookup('merge_variables', '__test_list', initial_value=test_init_list) }}"
+example_b: "{{ lookup('community.general.merge_variables', '__test_list', initial_value=test_init_list) }}"
 
 # The variable example_b now contains:
 #   - "list init item 1"
@@ -76,9 +84,10 @@ example_b: "{{ lookup('merge_variables', '__test_list', initial_value=test_init_
 #   - "test b item 1"
 """
 
+import re
+
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.utils.display import Display
 
 display = Display()
@@ -98,8 +107,20 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(direct=kwargs)
         initial_value = self.get_option("initial_value", None)
-        self._override_warning = boolean(self.get_option('override_warning', False))
-        self._override_error = boolean(self.get_option('override_error', False))
+        self._override = self.get_option('override', 'error')
+        self._pattern_type = self.get_option('pattern_type', 'suffix')
+
+        # Verify argument values
+        if self._override not in ["error", "warn", "ignore"]:
+            raise AnsibleError("Unsupported value '{0}' for the 'override' option specified".format(self._override))
+
+        if self._pattern_type not in ["prefix", "suffix", "regex"]:
+            raise AnsibleError("Unsupported value '{0}' for the 'pattern_type' option specified".format(self._pattern_type))
+
+        # In case of a 'warn' or 'ignore', display a warning that the merge order is not guaranteed
+        if self._override != "error":
+            display.warning("Setting the override option to 'warn' or 'ignore' can result in undefined behaviour, "
+                            "since the merge order can change between different playbook runs.")
 
         ret = []
         for term in terms:
@@ -107,9 +128,20 @@ class LookupModule(LookupBase):
 
         return ret
 
-    def _merge_vars(self, search_suffix, initial_value, variables):
-        display.v("Merge variables with suffix: {0}".format(search_suffix))
-        var_merge_names = sorted([key for key in variables.keys() if key.endswith(search_suffix)])
+    def _var_matches(self, key, search_pattern):
+        if self._pattern_type == "prefix":
+            return key.startswith(search_pattern)
+        elif self._pattern_type == "suffix":
+            return key.endswith(search_pattern)
+        elif self._pattern_type == "regex":
+            matcher = re.compile(search_pattern)
+            return matcher.search(key)
+
+        return False
+
+    def _merge_vars(self, search_pattern, initial_value, variables):
+        display.v("Merge variables with {0}: {1}".format(self._pattern_type, search_pattern))
+        var_merge_names = sorted([key for key in variables.keys() if self._var_matches(key, search_pattern)])
         display.v("The following variables will be merged: {0}".format(var_merge_names))
 
         prev_var_type = None
@@ -152,9 +184,9 @@ class LookupModule(LookupBase):
                     msg = "The key '{0}' with value '{1}' will be overwritten with value '{2}' from '{3}.{0}'".format(
                         key, dest[key], value, ".".join(path))
 
-                    if self._override_error:
+                    if self._override == "error":
                         raise AnsibleError(msg)
-                    if self._override_warning:
+                    if self._override == "warn":
                         display.warning(msg)
 
                 dest[key] = value

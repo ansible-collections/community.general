@@ -6,36 +6,11 @@
 
 - name: Test merge_variables lookup plugin
   hosts: localhost
-  vars:
-    testlist_initial_value: "{{ testlist2 }}"
-    testlist1__merge_list:
-      - item1
-    testlist2:
-      - item2
-    testlist3__merge_list:
-      - item3
-
-    testdict1__merge_dict:
-      item1: test
-      list_item:
-        - test1
-    testdict2__merge_dict:
-      item2: test
-      list_item:
-        - test2
-
-    override_warning_init:
-      key_to_override: Initial value
-    override__override_warning:
-      key_to_override: Override value
-
-    override_error_init:
-      key_to_override: Initial value
-    override__override_error:
-      key_to_override: Override value
-
-    logging_output_file: /tmp/ansible-test-merge-variables  # The Ansible log output is available in this file
   tasks:
+    - name: Include test data
+      include_vars: vars.yml
+
+    # Test the default behaviour
     - name: Test merge list
       block:
         - name: Print the merged list
@@ -69,6 +44,7 @@
       vars:
         merged_dict: "{{ lookup('community.general.merge_variables', '__merge_dict') }}"
 
+    # Test the behaviour when no results are found
     - name: Test merge without results
       block:
         - debug:
@@ -81,6 +57,56 @@
       vars:
         not_found: "{{ lookup('community.general.merge_variables', '__merge_not_found') }}"
 
+    # Test the 'pattern_type' options
+    - name: Test merge list (pattern_type = prefix)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 4"
+              - "'item1' in merged_list"
+              - "'item2' in merged_list"
+              - "'item2' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', 'testlist', pattern_type='prefix') }}"
+
+    - name: Test merge list (pattern_type = suffix)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 2"
+              - "'item1' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '__merge_list', pattern_type='suffix') }}"
+
+    - name: Test merge list (pattern_type = regex)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 3"
+              - "'item1' in merged_list"
+              - "'item2' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '^testlist[0-9].*', pattern_type='regex') }}"
+
+    # Test the 'initial_value' option
     - name: Test merge without results but with initial value
       block:
         - name: Print the merged list
@@ -96,7 +122,7 @@
       vars:
         not_found_initial_value: "{{ lookup('community.general.merge_variables', '__merge_not_found', initial_value=testlist_initial_value) }}"
 
-    - name: Test merge start with an initial value
+    - name: Test merging a list with an initial value
       block:
         - name: Print the merged list
           debug:
@@ -112,27 +138,28 @@
       vars:
         merged_list_with_initial_value: "{{ lookup('community.general.merge_variables', '__merge_list', initial_value=testlist_initial_value) }}"
 
-    - name: Test that an override prints a warning
+    # Test the 'override' options
+    - name: Test the 'override=warn' option
       block:
         - name: Print the merged list
           debug:
-            msg: "{{ merged_with_override_warning }}"
+            msg: "{{ merged_with_override_warn }}"
 
         - name: Validate that the dict is complete and the warning is printed
           assert:
             that:
-              - "'key_to_override' in merged_with_override_warning"
-              - "merged_with_override_warning.key_to_override == 'Override value'"
+              - "'key_to_override' in merged_with_override_warn"
+              - "merged_with_override_warn.key_to_override == 'Override value'"
               - "'key_to_override' in lookup('file', logging_output_file)"  # Check if a message is given
               - "'[WARNING]' in lookup('file', logging_output_file)"        # and verify that the message is a WARNING
       vars:
-        merged_with_override_warning: "{{ lookup('community.general.merge_variables', '__override_warning', initial_value=override_warning_init, override_warning=True) }}"
+        merged_with_override_warn: "{{ lookup('community.general.merge_variables', '__override_warn', initial_value=override_warn_init, override='warn') }}"
 
-    - name: Test that an override result in an error
+    - name: Test the 'override=error' option
       block:
         - name: Validate that an override result in an error
           debug:
-            msg: "{{ lookup('community.general.merge_variables', '__override_error', initial_value=override_error_init, override_error=True) }}"
+            msg: "{{ lookup('community.general.merge_variables', '__override_error', initial_value=override_error_init, override='error') }}"
           ignore_errors: true  # Do not stop the playbook
           register: _override_error_result
 
@@ -145,3 +172,21 @@
             that:
               - "_override_error_result.failed"
               - "'key_to_override' in _override_error_result.msg"
+
+    - name: Test whether the 'override' option fails on unknown options
+      block:
+        - name: Validate that an override result in an error
+          debug:
+            msg: "{{ lookup('community.general.merge_variables', '__override_error', initial_value=override_error_init, override='non_existing_option') }}"
+          ignore_errors: true  # Do not stop the playbook
+          register: _override_options_result
+
+        - name: Print the output
+          debug:
+            msg: "{{ _override_options_result }}"
+
+        - name: Validate that the error is reported
+          assert:
+            that:
+              - "_override_options_result.failed"
+              - "'Unsupported value' in _override_options_result.msg"

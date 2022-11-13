@@ -5,5 +5,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -eux
 
-ANSIBLE_ROLES_PATH=../ ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
-    ansible-playbook test_merge_lookup.yml "$@"
+ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
+    ansible-playbook test.yml "$@"
+
+ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
+ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE=regex \
+    ansible-playbook test_with_env.yml "$@"
