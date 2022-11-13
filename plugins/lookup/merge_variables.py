@@ -24,9 +24,12 @@ DOCUMENTATION = """
       pattern_type:
         description:
           - Change the way of searching for the specified pattern.
-          - Possible values are C(prefix), C(suffix) and C(regex). By default C(suffix) is used.
         type: str
-        default: 'suffix'
+        default: 'regex'
+        choices:
+          - prefix
+          - suffix
+          - regex
         env:
           - name: ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE
       initial_value:
@@ -36,9 +39,17 @@ DOCUMENTATION = """
       override:
         description:
           - Return an error, print a warning or ignore it when a key will be overwritten.
-          - Possible values are C(error), C(warn) and C(ignore). By default C(error) is used.
+          - The default behavior C(error) makes the plugin fail when a key would be overwritten.
+          - When C(warn) and C(ignore) are used, note that it is important to know that the variables
+            are sorted by name before being merged. Keys for later variables in this order will overwrite
+            keys of the same name for variables earlier in this order. To avoid potential confusion,
+            better use I(override=error) whenever possible.
         type: str
         default: 'error'
+        choices:
+          - error
+          - warn
+          - ignore
         env:
           - name: ANSIBLE_MERGE_VARIABLES_OVERRIDE
 """
@@ -108,14 +119,7 @@ class LookupModule(LookupBase):
         self.set_options(direct=kwargs)
         initial_value = self.get_option("initial_value", None)
         self._override = self.get_option('override', 'error')
-        self._pattern_type = self.get_option('pattern_type', 'suffix')
-
-        # Verify argument values
-        if self._override not in ["error", "warn", "ignore"]:
-            raise AnsibleError("Unsupported value '{0}' for the 'override' option specified".format(self._override))
-
-        if self._pattern_type not in ["prefix", "suffix", "regex"]:
-            raise AnsibleError("Unsupported value '{0}' for the 'pattern_type' option specified".format(self._pattern_type))
+        self._pattern_type = self.get_option('pattern_type', 'regex')
 
         # In case of a 'warn' or 'ignore', display a warning that the merge order is not guaranteed
         if self._override != "error":

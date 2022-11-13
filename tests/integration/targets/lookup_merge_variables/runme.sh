@@ -9,5 +9,5 @@ ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
     ansible-playbook test.yml "$@"
 
 ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
-ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE=regex \
+ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE=suffix \
     ansible-playbook test_with_env.yml "$@"
