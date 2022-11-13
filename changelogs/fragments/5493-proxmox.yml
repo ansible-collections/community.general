@@ -1,0 +1,2 @@
+bugfixes:
+  - "proxmox_disk - avoid duplicate ``vmid`` reference (https://github.com/ansible-collections/community.general/issues/5492, https://github.com/ansible-collections/community.general/pull/5493)."
