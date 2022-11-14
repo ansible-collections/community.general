@@ -57,10 +57,9 @@ options:
     required: false
     description:
       - Timeout in seconds for URL requests to iLO.
-    type: int
-    description:
       - The default value for this param is 10 but that is being deprecated
         and it will be replaced with 60 in community.general 5.7.0.
+    type: int
   cert_file:
     required: false
     description:
@@ -192,6 +191,7 @@ try:
 except ImportError as e:
     iLO_REDFISH_IMP_ERR = traceback.format_exc()
     HAS_iLO_REDFISH = False
+
 
 def main():
     result = {}
