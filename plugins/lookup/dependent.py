@@ -131,7 +131,9 @@ from ansible.template import Templar
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
-_HAS_TEMPLATE_CACHE = LooseVersion(ansible_version) < LooseVersion('2.14.0')
+# Whether Templar has a cache, which can be controlled by Templar.template()'s cache option.
+# The cache was removed for ansible-core 2.14 (https://github.com/ansible/ansible/pull/78419)
+_TEMPLAR_HAS_TEMPLATE_CACHE = LooseVersion(ansible_version) < LooseVersion('2.14.0')
 
 
 class LookupModule(LookupBase):
@@ -143,7 +145,7 @@ class LookupModule(LookupBase):
         """
         templar.available_variables = variables or {}
         expression = "{0}{1}{2}".format("{{", expression, "}}")
-        if _HAS_TEMPLATE_CACHE:
+        if _TEMPLAR_HAS_TEMPLATE_CACHE:
             return templar.template(expression, cache=False)
         return templar.template(expression)
 
