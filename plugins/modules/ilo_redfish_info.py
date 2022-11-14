@@ -182,11 +182,17 @@ CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
 
 CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
+import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import (
+try:
+    from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import (
     iLORedfishUtils, ilo_certificate_login
 )
+except ImportError as e:
+    iLO_REDFISH_IMP_ERR = traceback.format_exc()
+    HAS_iLO_REDFISH = False
+
 
 
 def main():
@@ -216,6 +222,9 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    if not HAS_IPADDRESS:
+        module.fail_json(msg="missing required fucntions in ilo_redfish_utils.py")
 
     creds = {"user": module.params['username'],
              "pswd": module.params['password'],
