@@ -65,13 +65,11 @@ options:
     description:
       - absolute path to the server cert file
     type: str
-    default: NONE
   key_file:
     required: false
     description:
       - absolute path to the server key file
     type: str
-    default: NONE
 author:
   - Bhavya B (@bhavya06)
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
@@ -168,8 +166,7 @@ ilo_redfish_info:
                     type: bool
                 msg:
                     description: Information of all retrieved details.
-                    type: list/dict
-                    elements: list/dict
+                    type: dict
     returned: always
 '''
 
@@ -205,8 +202,8 @@ def main():
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
             timeout=dict(type='int'),
-            cert_file=dict(requied=False, type='str'),
-            key_file=dict(requied=False, type='str')
+            cert_file=dict(type='str'),
+            key_file=dict(type='str')
         ),
         required_together=[
             ('username', 'password'),
