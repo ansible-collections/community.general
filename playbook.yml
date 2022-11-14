@@ -1,0 +1,17 @@
+---
+- name: test greppy
+  hosts: localhost
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: test greppy
+      greppy:
+        path: example.txt
+        search: Cicero
+        findexit: yes
+      register: this
+
+
+    - debug:
+        var: this

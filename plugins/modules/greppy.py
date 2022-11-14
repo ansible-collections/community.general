@@ -114,10 +114,14 @@ def search_line(pattern, string, ignore_case):
     else:
         return None
 
-def grep_file(filename, patterns, excludes, ignore_case, timeout):
+def grep_file(filename, patterns, excludes, ignore_case, timeout, findexit):
     """Search a single file or standard input."""
     file = open(filename, 'r')
-    output = []
+    result = {
+        'output': [],
+        'exclude_matches': 0,
+        'matches': 0
+    }
 
     timeout_start = time.time()
 
@@ -126,9 +130,10 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout):
         continue_while = False
 
         # skip on exclude patterns
-        for e in excludes:
+        for e in (excludes or []):
             if search_line(re.compile(e), line, ignore_case):
                 continue_while = True
+                result['exclude_matches'] += 1
                 break
 
         if continue_while:
@@ -137,9 +142,13 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout):
         for p in patterns:
             found_line = search_line(re.compile(p), line, ignore_case)
             if found_line != None:
-                output.append(found_line)
+                result['output'].append(found_line)
+                result['matches'] += 1
+                if findexit:
+                    return result
 
-    return output
+    result['matches'] = len(result['output'])
+    return result
 
 
 def run_module():
@@ -149,6 +158,7 @@ def run_module():
         search=dict(type='list', required=True),
         exclude=dict(type='list', required=False),
         ignore_case=dict(type='bool', required=False, default=False),
+        findexit=dict(type='bool', required=False, default=False),
         timeout=dict(type='int', required=False, default=60)
     )
 
@@ -160,7 +170,8 @@ def run_module():
     result = dict(
         changed=False,
         output=[],
-        matches=0
+        matches=0,
+        exclude_matches=0
     )
 
     # the AnsibleModule object will be our abstraction working with Ansible
@@ -181,9 +192,9 @@ def run_module():
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
     run_checks(module)
-    result['output'] = grep_file(module.params['path'], module.params['search'], 
-        module.params['exclude'], module.params['ignore_case'], module.params['timeout'])
-    result['matches'] = len(result['output'])
+    result = grep_file(module.params['path'], module.params['search'], 
+        module.params['exclude'], module.params['ignore_case'], 
+        module.params['timeout'], module.params['findexit'])
     result['changed'] = True
 
     # during the execution of the module, if there is an exception or a
