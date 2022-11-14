@@ -180,7 +180,7 @@ options:
         required: false
         description:
           - The SNMPv3 Engine ID is the unique identifier of an SNMP engine that belongs to an SNMP agent entity
-          - This value must be a hexadecimal string with an even number of 10 to 64 characters, excluding the first two characters, 0x (example 0x01020304abcdef)
+          - This value must be a hexadecimal string with an even number of 10 to 64 characters, excluding first two characters, 0x (example 0x01020304abcdef)
         type: str
   alert_destinations:
     required: false
