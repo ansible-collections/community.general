@@ -178,6 +178,8 @@ CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
 
 CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
+HAS_iLO_REDFISH = True
+
 import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -232,7 +234,7 @@ def main():
             'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
                 10, 60
             ),
-            version='6.0.0',
+            version='6.1.0',
             collection_name='community.general'
         )
 
