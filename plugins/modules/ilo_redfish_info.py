@@ -175,10 +175,10 @@ ilo_redfish_info:
 '''
 
 CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
-                         "Systems": ["GetServiceBiosAttributes", "GetBootSettings", "GetPhysicalDrives",
-                                     "GetLogicalDrives", "GetLogicalDrivesWithArrayControllers",
-                                     "GetServerPostState", "GetNvmeDrives","GetUSBInfo","GetPCIDevices","GetPCISlots", "GetNetworkAdapters"],
-                         "Managers": ["GetSNMPv3Users", "GetSNMPAlertDestinations","GetiLOBackupFiles"]}
+                         "Systems": ["GetServiceBiosAttributes","GetBootSettings","GetPhysicalDrives",
+                                     "GetLogicalDrives","GetLogicalDrivesWithArrayControllers",
+                                     "GetServerPostState","GetNvmeDrives","GetUSBInfo","GetPCIDevices","GetPCISlots","GetNetworkAdapters"],
+                         "Managers": ["GetSNMPv3Users","GetSNMPAlertDestinations","GetiLOBackupFiles"]}
 
 CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
