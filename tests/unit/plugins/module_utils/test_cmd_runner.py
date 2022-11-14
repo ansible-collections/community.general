@@ -258,6 +258,42 @@ TC_RUNNER = dict(
             ),
         ),
     ),
+    aa_bb_map=(
+        dict(
+            args_bundle=dict(
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_map, fmt_arg={"v1": 111, "v2": 222}),
+            ),
+            runner_init_args=dict(),
+            runner_ctx_args=dict(args_order=['aa', 'bb']),
+        ),
+        dict(runner_ctx_run_args=dict(bb="v2"), rc=0, out="", err=""),
+        dict(
+            run_info=dict(
+                cmd=['/mock/bin/testing', '--answer=11', '222'],
+                environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
+                args_order=('aa', 'bb'),
+            ),
+        ),
+    ),
+    aa_bb_map_default=(
+        dict(
+            args_bundle=dict(
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_map, fmt_arg={"v1": 111, "v2": 222}),
+            ),
+            runner_init_args=dict(),
+            runner_ctx_args=dict(args_order=['aa', 'bb']),
+        ),
+        dict(runner_ctx_run_args=dict(bb="v123456789"), rc=0, out="", err=""),
+        dict(
+            run_info=dict(
+                cmd=['/mock/bin/testing', '--answer=11'],
+                environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
+                args_order=('aa', 'bb'),
+            ),
+        ),
+    ),
 )
 TC_RUNNER_IDS = sorted(TC_RUNNER.keys())
 
