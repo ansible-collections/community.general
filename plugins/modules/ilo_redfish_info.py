@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_info
 short_description: Gathers server information through iLO using Redfish APIs
-version_added: 5.7.0
+version_added: 6.0.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     get information back.
@@ -218,7 +218,7 @@ def main():
         supports_check_mode=True
     )
 
-    if not HAS_IPADDRESS:
+    if not HAS_iLO_REDFISH:
         module.fail_json(msg="missing required fucntions in ilo_redfish_utils.py")
 
     creds = {"user": module.params['username'],
@@ -232,14 +232,14 @@ def main():
             'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
                 10, 60
             ),
-            version='5.7.0',
+            version='6.0.0',
             collection_name='community.general'
         )
 
     root_uri = "https://" + module.params['baseuri']
 
     if module.params["cert_file"]:
-        creds["token"] = iLO_certificate_login(root_uri, module, module.params["cert_file"], module.params["key_file"])
+        creds["token"] = ilo_certificate_login(root_uri, module, module.params["cert_file"], module.params["key_file"])
 
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
 
