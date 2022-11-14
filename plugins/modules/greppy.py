@@ -33,10 +33,16 @@ options:
     timeout:
         description: The number of seconds to wait.
         required: false
+        default: 60
         type: int
     ignore_case:
         description: Case insensitive regex search.
         required: false
+        type: bool
+    findexit:
+        description: Exit right after finding the first occurrence
+        required: false
+        default: false
         type: bool
 # Specify this value according to your collection
 # in format of namespace.collection.doc_fragment_name
