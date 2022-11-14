@@ -78,7 +78,7 @@ options:
     description:
       - List of RAID details that need to be configured in the given server
     type: list
-    default: NONE
+    elements: dict
     suboptions:
       LogicalDriveName:
         required: false
@@ -120,11 +120,13 @@ options:
     description:
       - logical drives names which are to be deleted
     type: list
+    elements: str
   snmpv3_usernames:
     required: false
     description:
       - List of SNMPv3 user names that need to be deleted from the given server
     type: list
+    elements: str
   cert_file:
     required: false
     description:
@@ -140,6 +142,7 @@ options:
     description:
       - List of SNMPv3 users that needs to be added in the given server
     type: list
+    elements: dict
     suboptions:
       security_name:
         required: false
@@ -184,6 +187,7 @@ options:
     description:
       - List of alert destination that needs to be added in the given server
     type: list
+    elements: dict
     suboptions:
       alert_destination:
         required: false
@@ -453,13 +457,13 @@ def main():
             attribute_value=dict(),
             timeout=dict(type='int'),
             service_attributes=dict(type='dict'),
-            raid_details=dict(type='list'),
-            logical_drives_names=dict(type='list'),
+            raid_details=dict(type='list', elements='dict'),
+            logical_drives_names=dict(type='list', elements='str'),
             cert_file=dict(type='str'),
             key_file=dict(type='str'),
-            snmpv3_usernames=dict(type='list'),
-            snmpv3_users=dict(type='list'),
-            alert_destinations=dict(type='list')
+            snmpv3_usernames=dict(type='list', elements='str'),
+            snmpv3_users=dict(type='list', elements='dict'),
+            alert_destinations=dict(type='list', elements='dict')
         ),
         required_together=[
             ('username', 'password'),
