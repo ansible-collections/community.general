@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_config
 short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
-version_added: 5.7.0
+version_added: 7.0.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     set or update a configuration attribute.
