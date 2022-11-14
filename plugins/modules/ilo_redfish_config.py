@@ -206,11 +206,11 @@ options:
           - Configuring trap community string
           - This option is supported for SNMPv1Trap, SNMPv3Trap, and SNMPv3Inform alert protocols
         type: str
-      service_attributes:
-        required: false
-        description:
-          - BIOS service attributes that needs to be configured in the given server
-        type: dict
+  service_attributes:
+    required: false
+    description:
+      - BIOS service attributes that needs to be configured in the given server
+    type: dict
 author:
   - Bhavya B (@bhavya06)
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
