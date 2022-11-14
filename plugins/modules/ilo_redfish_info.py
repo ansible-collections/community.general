@@ -187,13 +187,11 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 try:
     from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import (
-    iLORedfishUtils, ilo_certificate_login
-)
+        iLORedfishUtils, ilo_certificate_login
+    )
 except ImportError as e:
     iLO_REDFISH_IMP_ERR = traceback.format_exc()
     HAS_iLO_REDFISH = False
-
-
 
 def main():
     result = {}
