@@ -517,6 +517,22 @@ options:
     elements: str
     default: []
 
+  multai_token:
+    description:
+      - Token used for Multai configuration.
+    type: str
+
+  multai_load_balancers:
+    description:
+      - Configuration parameters for Multai load balancers.
+    type: list
+    elements: dict
+
+  elastic_beanstalk:
+    description:
+      - Placeholder parameter for future implementation of Elastic Beanstalk configurations.
+    type: dict
+
 '''
 EXAMPLES = '''
 # Basic configuration YAML example
@@ -1487,7 +1503,7 @@ def main():
         mesosphere=dict(type='dict'),
         min_size=dict(type='int', required=True),
         monitoring=dict(type='str'),
-        multai_load_balancers=dict(type='list'),
+        multai_load_balancers=dict(type='list', elements='dict'),
         multai_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
         network_interfaces=dict(type='list', elements='dict'),
