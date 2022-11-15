@@ -13,14 +13,17 @@ DOCUMENTATION = """
     name: merge_variables
     short_description: merge variables with a certain suffix
     description:
-        - This lookup returns the merged result of all variables in scope that matches the given suffix optionally
-          starting with an initial value.
+        - This lookup returns the merged result of all variables in scope that match the given prefixes, suffixes, or
+         regular expressions, optionally.
     version_added: 6.1.0
     options:
       _terms:
         description:
-          - The suffix of the variable name (all available variables will be checked with endswith(suffix))
+          - Depending on the value of I(pattern_type), this is a list of prefixes, suffixes, or regular expressions
+            that will be used to match all variables that should be merged.
         required: true
+        type: list
+        elements: str
       pattern_type:
         description:
           - Change the way of searching for the specified pattern.
@@ -32,10 +35,13 @@ DOCUMENTATION = """
           - regex
         env:
           - name: ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE
+        ini:
+          - section: merge_variables_lookup
+            key: pattern_type
       initial_value:
         description:
-          - An initial value to start with
-        required: false
+          - An initial value to start with.
+        type: raw
       override:
         description:
           - Return an error, print a warning or ignore it when a key will be overwritten.
@@ -52,6 +58,9 @@ DOCUMENTATION = """
           - ignore
         env:
           - name: ANSIBLE_MERGE_VARIABLES_OVERRIDE
+        ini:
+          - section: merge_variables_lookup
+            key: override
 """
 
 EXAMPLES = """
@@ -95,6 +104,14 @@ example_b: "{{ lookup('community.general.merge_variables', '__test_list', initia
 #   - "test b item 1"
 """
 
+RETURN = """
+  _raw:
+    description: In case the search matches list items, a list will be returned. In case the search matches dicts, a
+     dict will be returned.
+    type: raw
+    elements: raw
+"""
+
 import re
 
 from ansible.errors import AnsibleError
@@ -121,13 +138,11 @@ class LookupModule(LookupBase):
         self._override = self.get_option('override', 'error')
         self._pattern_type = self.get_option('pattern_type', 'regex')
 
-        # In case of a 'warn' or 'ignore', display a warning that the merge order is not guaranteed
-        if self._override != "error":
-            display.warning("Setting the override option to 'warn' or 'ignore' can result in undefined behaviour, "
-                            "since the merge order can change between different playbook runs.")
-
         ret = []
         for term in terms:
+            if not isinstance(term, str):
+                raise AnsibleError("Non-string type '{0}' passed, only 'str' types are allowed!".format(type(term)))
+
             ret.append(self._merge_vars(term, initial_value, variables))
 
         return ret
@@ -144,15 +159,14 @@ class LookupModule(LookupBase):
         return False
 
     def _merge_vars(self, search_pattern, initial_value, variables):
-        display.v("Merge variables with {0}: {1}".format(self._pattern_type, search_pattern))
+        display.vvv("Merge variables with {0}: {1}".format(self._pattern_type, search_pattern))
         var_merge_names = sorted([key for key in variables.keys() if self._var_matches(key, search_pattern)])
-        display.v("The following variables will be merged: {0}".format(var_merge_names))
+        display.vvv("The following variables will be merged: {0}".format(var_merge_names))
 
         prev_var_type = None
         result = None
 
         if initial_value is not None:
-            display.v("Start merge with initial value: {0}".format(initial_value))
             prev_var_type = _verify_and_get_type(initial_value)
             result = initial_value
 
