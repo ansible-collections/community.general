@@ -119,7 +119,7 @@ def run_checks(module):
     if os.path.isdir(b_dest):
         module.fail_json(rc=256, msg='Destination %s is a directory !' % path)
 
-    time_to_wait = 5
+    time_to_wait = 3
     time_counter = 0
     while not os.path.exists(path):
         time.sleep(1)
@@ -127,21 +127,21 @@ def run_checks(module):
         if time_counter > time_to_wait:
             module.fail_json(rc=256, msg='Destination %s does not exist !' % path)
 
-def search_line(pattern, string, ignore_case):
+def search_line(pattern, string):
     """Find pattern match in string."""
-    if ignore_case:
-        pattern = pattern.lower()
-        string = string.lower()
+    if type(string) is bytes:
+        pc = re.compile(bytes(pattern, "utf-8"))
+    else:
+        pc = re.compile(pattern)
 
-    mo = re.search(pattern, string)
-    if mo:
+    if re.search(pc, string):
         return string
     else:
         return None
 
-def grep_file(filename, patterns, excludes, ignore_case, timeout, findexit):
-    """Search a single file or standard input."""
-    file = open(filename, 'r')
+def grep_file(filename, patterns, excludes, ignore_case, timeout, find_exit):
+    """Search a single file."""
+    file = open(filename, 'rb')
     result = {
         'output': [],
         'exclude_matches': 0,
@@ -156,7 +156,10 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, findexit):
 
         # skip on exclude patterns
         for e in (excludes or []):
-            if search_line(re.compile(e), line, ignore_case):
+            if ignore_case:
+                e = e.lower()
+                line = line.lower()
+            if search_line(e, line):
                 continue_while = True
                 result['exclude_matches'] += 1
                 break
@@ -165,11 +168,14 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, findexit):
             continue
 
         for p in patterns:
-            found_line = search_line(re.compile(p), line, ignore_case)
-            if found_line != None:
+            if ignore_case:
+                p = p.lower()
+                line = line.lower()
+            found_line = search_line(p, line)
+            if found_line:
                 result['output'].append(found_line)
                 result['matches'] += 1
-                if findexit:
+                if find_exit:
                     return result
 
     result['matches'] = len(result['output'])
@@ -219,7 +225,7 @@ def run_module():
     run_checks(module)
     result = grep_file(module.params['path'], module.params['search'], 
         module.params['exclude'], module.params['ignore_case'], 
-        module.params['timeout'], module.params['findexit'])
+        module.params['timeout'], module.params['find_exit'])
     result['changed'] = True
 
     # during the execution of the module, if there is an exception or a
