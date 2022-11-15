@@ -627,3 +627,22 @@ releases:
         name: bitwarden
         namespace: null
     release_date: '2022-11-02'
+  6.0.1:
+    changes:
+      bugfixes:
+      - dependent lookup plugin - avoid warning on deprecated parameter for ``Templar.template()``
+        (https://github.com/ansible-collections/community.general/pull/5543).
+      - jenkins_build - fix the logical flaw when deleting a Jenkins build (https://github.com/ansible-collections/community.general/pull/5514).
+      - one_vm - avoid splitting labels that are ``None`` (https://github.com/ansible-collections/community.general/pull/5489).
+      - onepassword_raw - add missing parameter to plugin documentation (https://github.com/ansible-collections/community.general/issues/5506).
+      - proxmox_disk - avoid duplicate ``vmid`` reference (https://github.com/ansible-collections/community.general/issues/5492,
+        https://github.com/ansible-collections/community.general/pull/5493).
+      release_summary: Bugfix release for Ansible 7.0.0.
+    fragments:
+    - 5489-nonetype-in-get-vm-by-label.yml
+    - 5493-proxmox.yml
+    - 5506-onepassword_raw-missing-param.yml
+    - 5514-fix-logical-flaw-when-deleting-jenkins-build.yml
+    - 5543-dependent-template.yml
+    - 6.0.1.yml
+    release_date: '2022-11-15'

@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 5.0.0.
 
+v6.0.1
+======
+
+Release Summary
+---------------
+
+Bugfix release for Ansible 7.0.0.
+
+Bugfixes
+--------
+
+- dependent lookup plugin - avoid warning on deprecated parameter for ``Templar.template()`` (https://github.com/ansible-collections/community.general/pull/5543).
+- jenkins_build - fix the logical flaw when deleting a Jenkins build (https://github.com/ansible-collections/community.general/pull/5514).
+- one_vm - avoid splitting labels that are ``None`` (https://github.com/ansible-collections/community.general/pull/5489).
+- onepassword_raw - add missing parameter to plugin documentation (https://github.com/ansible-collections/community.general/issues/5506).
+- proxmox_disk - avoid duplicate ``vmid`` reference (https://github.com/ansible-collections/community.general/issues/5492, https://github.com/ansible-collections/community.general/pull/5493).
+
 v6.0.0
 ======
 
