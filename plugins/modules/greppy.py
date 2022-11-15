@@ -47,7 +47,7 @@ options:
 # Specify this value according to your collection
 # in format of namespace.collection.doc_fragment_name
 extends_documentation_fragment:
-    - my_namespace.my_collection.my_doc_fragment_name
+    - community.general.greppy
 
 author:
     - David Peng (@dpengftw)
@@ -55,7 +55,7 @@ author:
 
 EXAMPLES = r'''
 - name: Grep for strings in given list but also exclude certain strings
-  my_namespace.my_collection.greppy:
+  community.general.greppy:
     path: example.txt
     search:
       - first string
@@ -64,14 +64,14 @@ EXAMPLES = r'''
       - third
 
 - name: Grep for strings and wait for 120 seconds
-  my_namespace.my_collection.greppy:
+  community.general.greppy:
     path: example.txt
     search:
       - first string
     timeout: 120
 
 - name: Grep for first occurrence then exit
-  my_namespace.my_collection.greppy:
+  community.general.greppy:
     path: example.txt
     search:
       - first occurrence
@@ -97,6 +97,10 @@ matches:
     returned: always
     sample: "matches": 2
 
+exclude_matches:
+    description: Number of lines that matched the exclusion strings
+    type: int
+    sample: "exclude_matches": 1
 '''
 
 import re
