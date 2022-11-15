@@ -1,0 +1,2 @@
+minor_changes:
+   - java_certs - add error output to json error structure.
