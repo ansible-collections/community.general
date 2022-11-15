@@ -6,6 +6,36 @@ Community General Release Notes
 
 This changelog describes changes after version 4.0.0.
 
+v5.8.1
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Minor Changes
+-------------
+
+- passwordstore lookup plugin - improve error messages to include stderr (https://github.com/ansible-collections/community.general/pull/5436)
+
+Deprecated Features
+-------------------
+
+- Please note that some tools, like the VScode plugin (https://github.com/ansible/vscode-ansible/issues/573), or ``ansible-doc --list --type module``, suggest to replace the correct FQCNs for modules and actions in community.general with internal names that have more than three components. For example, ``community.general.ufw`` is suggested to be replaced by ``community.general.system.ufw``. While these longer names do work, they are considered **internal names** by the collection and are subject to change and be removed at all time. They **will** be removed in community.general 6.0.0 and result in deprecation messages. Avoid using these internal names, and use general three-component FQCNs (``community.general.<name_of_module>``) instead (https://github.com/ansible-collections/community.general/pull/5373).
+
+Bugfixes
+--------
+
+- dependent lookup plugin - avoid warning on deprecated parameter for ``Templar.template()`` (https://github.com/ansible-collections/community.general/pull/5543).
+- iso_create - the module somtimes failed to add folders for Joliet and UDF formats (https://github.com/ansible-collections/community.general/issues/5275).
+- ldap_attrs - fix bug which caused a ``Bad search filter`` error. The error was occuring when the ldap attribute value contained special characters such as ``(`` or ``*`` (https://github.com/ansible-collections/community.general/issues/5434, https://github.com/ansible-collections/community.general/pull/5435).
+- nmcli - fix int options idempotence (https://github.com/ansible-collections/community.general/issues/4998).
+- nsupdate - fix silent failures when updating ``NS`` entries from Bind9 managed DNS zones (https://github.com/ansible-collections/community.general/issues/4657).
+- one_vm - avoid splitting labels that are ``None`` (https://github.com/ansible-collections/community.general/pull/5489).
+- proxmox_disk - avoid duplicate ``vmid`` reference (https://github.com/ansible-collections/community.general/issues/5492, https://github.com/ansible-collections/community.general/pull/5493).
+- snap - allow values in the ``options`` parameter to contain whitespaces (https://github.com/ansible-collections/community.general/pull/5475).
+
 v5.8.0
 ======
 

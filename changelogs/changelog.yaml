@@ -1307,3 +1307,48 @@ releases:
       name: scaleway_container_registry_info
       namespace: cloud.scaleway
     release_date: '2022-10-25'
+  5.8.1:
+    changes:
+      bugfixes:
+      - dependent lookup plugin - avoid warning on deprecated parameter for ``Templar.template()``
+        (https://github.com/ansible-collections/community.general/pull/5543).
+      - iso_create - the module somtimes failed to add folders for Joliet and UDF
+        formats (https://github.com/ansible-collections/community.general/issues/5275).
+      - ldap_attrs - fix bug which caused a ``Bad search filter`` error. The error
+        was occuring when the ldap attribute value contained special characters such
+        as ``(`` or ``*`` (https://github.com/ansible-collections/community.general/issues/5434,
+        https://github.com/ansible-collections/community.general/pull/5435).
+      - nmcli - fix int options idempotence (https://github.com/ansible-collections/community.general/issues/4998).
+      - nsupdate - fix silent failures when updating ``NS`` entries from Bind9 managed
+        DNS zones (https://github.com/ansible-collections/community.general/issues/4657).
+      - one_vm - avoid splitting labels that are ``None`` (https://github.com/ansible-collections/community.general/pull/5489).
+      - proxmox_disk - avoid duplicate ``vmid`` reference (https://github.com/ansible-collections/community.general/issues/5492,
+        https://github.com/ansible-collections/community.general/pull/5493).
+      - snap - allow values in the ``options`` parameter to contain whitespaces (https://github.com/ansible-collections/community.general/pull/5475).
+      deprecated_features:
+      - Please note that some tools, like the VScode plugin (https://github.com/ansible/vscode-ansible/issues/573),
+        or ``ansible-doc --list --type module``, suggest to replace the correct FQCNs
+        for modules and actions in community.general with internal names that have
+        more than three components. For example, ``community.general.ufw`` is suggested
+        to be replaced by ``community.general.system.ufw``. While these longer names
+        do work, they are considered **internal names** by the collection and are
+        subject to change and be removed at all time. They **will** be removed in
+        community.general 6.0.0 and result in deprecation messages. Avoid using these
+        internal names, and use general three-component FQCNs (``community.general.<name_of_module>``)
+        instead (https://github.com/ansible-collections/community.general/pull/5373).
+      minor_changes:
+      - passwordstore lookup plugin - improve error messages to include stderr (https://github.com/ansible-collections/community.general/pull/5436)
+      release_summary: Regular bugfix release.
+    fragments:
+    - 4998-nmcli-fix-int-options-idempotence.yml
+    - 5.8.1.yml
+    - 5377-nsupdate-ns-records-with-bind.yml
+    - 5435-escape-ldap-param.yml
+    - 5436-passwordstore-errors.yml
+    - 5468-iso-create-not-add-folders.yml
+    - 5475-snap-option-value-whitespace.yml
+    - 5489-nonetype-in-get-vm-by-label.yml
+    - 5493-proxmox.yml
+    - 5543-dependent-template.yml
+    - fqcn-warnings.yml
+    release_date: '2022-11-15'
