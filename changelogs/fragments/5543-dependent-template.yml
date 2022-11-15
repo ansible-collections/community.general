@@ -1,0 +1,2 @@
+bugfixes:
+  - "dependent lookup plugin - avoid warning on deprecated parameter for ``Templar.template()`` (https://github.com/ansible-collections/community.general/pull/5543)."
