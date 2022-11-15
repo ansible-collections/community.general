@@ -1,0 +1,2 @@
+minor_changes:
+  - lxd_project - refactored code out to module utils to clear sanity check (https://github.com/ansible-collections/community.general/pull/5549).

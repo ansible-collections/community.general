@@ -178,7 +178,9 @@ actions:
   sample: ["create"]
 '''
 
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+from ansible_collections.community.general.plugins.module_utils.lxd import (
+    LXDClient, LXDClientException, default_key_file, default_cert_file
+)
 from ansible.module_utils.basic import AnsibleModule
 import os
 
@@ -211,10 +213,10 @@ class LXDProjectManagement(object):
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
-            self.key_file = os.path.expanduser('~/.config/lxc/client.key')
+            self.key_file = default_key_file()
         self.cert_file = self.module.params.get('client_cert')
         if self.cert_file is None:
-            self.cert_file = os.path.expanduser('~/.config/lxc/client.crt')
+            self.cert_file = default_cert_file()
         self.debug = self.module._verbosity >= 4
 
         try:
