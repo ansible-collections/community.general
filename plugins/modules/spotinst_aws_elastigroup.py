@@ -507,6 +507,7 @@ options:
     description:
       - TODO document.
     type: list
+    elements: str
     default: []
 
 '''
@@ -1455,7 +1456,7 @@ def main():
         block_device_mappings=dict(type='list', elements='dict'),
         chef=dict(type='dict'),
         credentials_path=dict(type='path', default="~/.spotinst/credentials"),
-        do_not_update=dict(default=[], type='list'),
+        do_not_update=dict(default=[], type='list', elements='str'),
         down_scaling_policies=dict(type='list', elements='dict'),
         draining_timeout=dict(type='int'),
         ebs_optimized=dict(type='bool'),
