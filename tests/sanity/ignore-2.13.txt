@@ -23,9 +23,6 @@ plugins/modules/rax_scaling_group.py use-argspec-type-path  # fix needed, expand
 plugins/modules/redhat_subscription.py validate-modules:return-syntax-error
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/scaleway_organization_info.py validate-modules:return-syntax-error
-plugins/modules/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
-plugins/modules/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
-plugins/modules/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
 plugins/modules/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
 plugins/modules/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/udm_user.py validate-modules:parameter-list-no-elements

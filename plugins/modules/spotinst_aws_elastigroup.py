@@ -35,6 +35,13 @@ options:
         By default this is retrieved from the credentials path.
     type: str
 
+  token:
+    description:
+      - A Personal API Access Token issued by Spotinst.
+      - >-
+        When not specified, the module will try to obtain it, in that order, from: environment variable C(SPOTINST_TOKEN), or from the credentials path.
+    type: str
+
   availability_vs_cost:
     description:
       - The strategy orientation.
@@ -507,7 +514,24 @@ options:
     description:
       - TODO document.
     type: list
+    elements: str
     default: []
+
+  multai_token:
+    description:
+      - Token used for Multai configuration.
+    type: str
+
+  multai_load_balancers:
+    description:
+      - Configuration parameters for Multai load balancers.
+    type: list
+    elements: dict
+
+  elastic_beanstalk:
+    description:
+      - Placeholder parameter for future implementation of Elastic Beanstalk configurations.
+    type: dict
 
 '''
 EXAMPLES = '''
@@ -1455,7 +1479,7 @@ def main():
         block_device_mappings=dict(type='list', elements='dict'),
         chef=dict(type='dict'),
         credentials_path=dict(type='path', default="~/.spotinst/credentials"),
-        do_not_update=dict(default=[], type='list'),
+        do_not_update=dict(default=[], type='list', elements='str'),
         down_scaling_policies=dict(type='list', elements='dict'),
         draining_timeout=dict(type='int'),
         ebs_optimized=dict(type='bool'),
@@ -1479,7 +1503,7 @@ def main():
         mesosphere=dict(type='dict'),
         min_size=dict(type='int', required=True),
         monitoring=dict(type='str'),
-        multai_load_balancers=dict(type='list'),
+        multai_load_balancers=dict(type='list', elements='dict'),
         multai_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
         network_interfaces=dict(type='list', elements='dict'),
