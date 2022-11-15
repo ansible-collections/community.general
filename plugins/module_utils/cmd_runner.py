@@ -268,6 +268,8 @@ class _CmdRunnerContext(object):
                 elif not runner.arg_formats[arg_name].ignore_missing_value:
                     raise MissingArgumentValue(self.args_order, arg_name)
                 self.cmd.extend(runner.arg_formats[arg_name](value, ctx_ignore_none=self.ignore_value_none))
+            except MissingArgumentValue:
+                raise
             except Exception as e:
                 raise FormatError(arg_name, value, runner.arg_formats[arg_name], e)
 
