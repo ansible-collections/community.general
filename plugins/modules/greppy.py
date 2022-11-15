@@ -70,6 +70,13 @@ EXAMPLES = r'''
       - first string
     timeout: 120
 
+- name: Grep for first occurrence then exit
+  my_namespace.my_collection.greppy:
+    path: example.txt
+    search:
+      - first occurrence
+    find_exit: yes
+
 '''
 
 RETURN = r'''
@@ -100,6 +107,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native
 
 def run_checks(module):
+    """Do baseline checks before proceeding."""
     params = module.params
     path = params['path']
 
@@ -107,6 +115,13 @@ def run_checks(module):
     if os.path.isdir(b_dest):
         module.fail_json(rc=256, msg='Destination %s is a directory !' % path)
 
+    time_to_wait = 5
+    time_counter = 0
+    while not os.path.exists(path):
+        time.sleep(1)
+        time_counter += 1
+        if time_counter > time_to_wait:
+            module.fail_json(rc=256, msg='Destination %s does not exist !' % path)
 
 def search_line(pattern, string, ignore_case):
     """Find pattern match in string."""
@@ -164,7 +179,7 @@ def run_module():
         search=dict(type='list', required=True),
         exclude=dict(type='list', required=False),
         ignore_case=dict(type='bool', required=False, default=False),
-        findexit=dict(type='bool', required=False, default=False),
+        find_exit=dict(type='bool', required=False, default=False),
         timeout=dict(type='int', required=False, default=60)
     )
 
