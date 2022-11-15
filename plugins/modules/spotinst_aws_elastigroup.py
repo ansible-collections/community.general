@@ -39,7 +39,7 @@ options:
     description:
       - A Personal API Access Token issued by Spotinst.
       - >-
-        It can be obtained, in that order, from: environment variable C(SPOTINST_TOKEN), or from the credentials path.
+        When not specified, the module will try to obtain it, in that order, from: environment variable C(SPOTINST_TOKEN), or from the credentials path.
     type: str
 
   availability_vs_cost:
