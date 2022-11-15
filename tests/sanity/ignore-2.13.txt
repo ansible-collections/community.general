@@ -6,7 +6,6 @@ plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice   
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/jenkins_plugin.py use-argspec-type-path
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/lxd_project.py use-argspec-type-path # expanduser() applied to constants
 plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice
 plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
