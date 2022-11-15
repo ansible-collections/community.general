@@ -83,75 +83,17 @@ RETURN = '''
 ...
 '''
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils.gconftool2 import gconftool2_runner
 
 
-class GConf2Preference(object):
-    def __init__(self, ansible, key, value_type, value,
-                 direct=False, config_source=""):
-        self.ansible = ansible
-        self.key = key
-        self.value_type = value_type
-        self.value = value
-        self.config_source = config_source
-        self.direct = direct
-
-    def value_already_set(self):
-        return False
-
-    def call(self, call_type, fail_onerr=True):
-        """ Helper function to perform gconftool-2 operations """
-        config_source = []
-        direct = []
-        changed = False
-        out = ''
-
-        # If the configuration source is different from the default, create
-        # the argument
-        if self.config_source is not None and len(self.config_source) > 0:
-            config_source = ["--config-source", self.config_source]
-
-        # If direct is true, create the argument
-        if self.direct:
-            direct = ["--direct"]
-
-        # Execute the call
-        cmd = ["gconftool-2"]
-        try:
-            # If the call is "get", then we don't need as many parameters and
-            # we can ignore some
-            if call_type == 'get':
-                self.ansible.deprecate(
-                    msg="State 'get' is deprecated. Please use the module community.general.gconftool2_info instead",
-                    version="8.0.0", collection_name="community.general"
-                )
-                cmd.extend(["--get", self.key])
-            # Otherwise, we will use all relevant parameters
-            elif call_type == 'set':
-                cmd.extend(direct)
-                cmd.extend(config_source)
-                cmd.extend(["--type", self.value_type, "--{3}".format(call_type), self.key, self.value])
-            elif call_type == 'unset':
-                cmd.extend(["--unset", self.key])
-
-            # Start external command
-            rc, out, err = self.ansible.run_command(cmd)
-
-            if err and fail_onerr:
-                self.ansible.fail_json(msg='gconftool-2 failed with '
-                                           'error: %s' % (str(err)))
-            else:
-                changed = True
-
-        except OSError as exception:
-            self.ansible.fail_json(msg='gconftool-2 failed with exception: '
-                                       '%s' % exception)
-        return changed, out.rstrip()
-
-
-def main():
-    # Setup the Ansible module
-    module = AnsibleModule(
+class GConftool(StateModuleHelper):
+    change_params = 'value',
+    diff_params = 'value',
+    output_params = ('key', 'value_type')
+    facts_params = ('key', 'value_type')
+    facts_name = 'gconftool2'
+    module = dict(
         argument_spec=dict(
             key=dict(type='str', required=True, no_log=False),
             value_type=dict(type='str', choices=['bool', 'float', 'int', 'string']),
@@ -160,75 +102,54 @@ def main():
             direct=dict(type='bool', default=False),
             config_source=dict(type='str'),
         ),
-        supports_check_mode=True
+        required_if=[
+            ('state', 'present', ['value', 'value_type']),
+            ('state', 'absent', ['value']),
+            ('direct', True, ['config_source']),
+        ],
+        supports_check_mode=True,
     )
 
-    state_values = {"present": "set", "absent": "unset", "get": "get"}
+    def __init_module__(self):
+        self.runner = gconftool2_runner(self.module, check_rc=True)
+        if self.vars.state != "get":
+            if not self.vars.direct and self.vars.config_source is not None:
+                self.module.fail_json(msg='If the "config_source" is specified then "direct" must be "true"')
 
-    # Assign module values to dictionary values
-    key = module.params['key']
-    value_type = module.params['value_type']
-    if module.params['value'].lower() == "true":
-        value = "true"
-    elif module.params['value'] == "false":
-        value = "false"
-    else:
-        value = module.params['value']
+        self.vars.set('previous_value', self._get(), fact=True)
+        self.vars.set('value_type', self.vars.value_type)
+        self.vars.set_meta('value', initial_value=self.vars.previous_value)
+        self.vars.set('playbook_value', self.vars.value, fact=True)
 
-    state = state_values[module.params['state']]
-    direct = module.params['direct']
-    config_source = module.params['config_source']
+    def _make_process(self, fail_on_err):
+        def process(rc, out, err):
+            if err and fail_on_err:
+                self.ansible.fail_json(msg='gconftool-2 failed with error: %s' % (str(err)))
+            self.vars.value = out.rstrip()
+            return self.vars.value
+        return process
 
-    # Initialize some variables for later
-    change = False
-    new_value = ''
+    def _get(self):
+        return self.runner("state key", output_process=self._make_process(False)).run(state="get")
 
-    if state != "get":
-        if value is None or value == "":
-            module.fail_json(msg='State %s requires "value" to be set'
-                                 % str(state))
-        elif value_type is None or value_type == "":
-            module.fail_json(msg='State %s requires "value_type" to be set'
-                                 % str(state))
+    def state_get(self):
+        self.deprecate(
+            msg="State 'get' is deprecated. Please use the module community.general.gconftool2_info instead",
+            version="8.0.0", collection_name="community.general"
+        )
 
-        if direct and config_source is None:
-            module.fail_json(msg='If "direct" is "true" then the ' +
-                                 '"config_source" must be specified')
-        elif not direct and config_source is not None:
-            module.fail_json(msg='If the "config_source" is specified ' +
-                                 'then "direct" must be "true"')
+    def state_absent(self):
+        with self.runner("state key", output_process=self._make_process(False)) as ctx:
+            ctx.run()
+        self.vars.set('new_value', None, fact=True)
 
-    # Create a gconf2 preference
-    gconf_pref = GConf2Preference(module, key, value_type,
-                                  value, direct, config_source)
-    # Now we get the current value, if not found don't fail
-    dummy, current_value = gconf_pref.call("get", fail_onerr=False)
+    def state_present(self):
+        with self.runner("direct config_source value_type state key value", output_process=self._make_process(True)) as ctx:
+            self.vars.set('new_value', ctx.run(), fact=True)
 
-    # Check if the current value equals the value we want to set.  If not, make
-    # a change
-    if current_value != value:
-        # If check mode, we know a change would have occurred.
-        if module.check_mode:
-            # So we will set the change to True
-            change = True
-            # And set the new_value to the value that would have been set
-            new_value = value
-        # If not check mode make the change.
-        else:
-            change, new_value = gconf_pref.call(state)
-    # If the value we want to set is the same as the current_value, we will
-    # set the new_value to the current_value for reporting
-    else:
-        new_value = current_value
 
-    facts = dict(gconftool2={'changed': change,
-                             'key': key,
-                             'value_type': value_type,
-                             'new_value': new_value,
-                             'previous_value': current_value,
-                             'playbook_value': module.params['value']})
-
-    module.exit_json(changed=change, ansible_facts=facts)
+def main():
+    GConftool.execute()
 
 
 if __name__ == '__main__':

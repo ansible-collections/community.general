@@ -6,7 +6,14 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+
+_state_map = {
+    "present": "--set",
+    "absent": "--unset",
+    "get": "--get",
+}
 
 
 def gconftool2_runner(module, **kwargs):
@@ -14,14 +21,12 @@ def gconftool2_runner(module, **kwargs):
         module,
         command='gconftool-2',
         arg_formats=dict(
-            key=fmt.as_list(),
-            value_type=fmt.as_opt_val("--type"),
-            value=fmt.as_list(),
-            direct=fmt.as_bool("--direct"),
-            config_source=fmt.as_opt_val("--config-source"),
-            get=fmt.as_bool("--get"),
-            set_arg=fmt.as_bool("--set"),
-            unset=fmt.as_bool("--unset"),
+            state=cmd_runner_fmt.as_map(_state_map),
+            key=cmd_runner_fmt.as_list(),
+            value_type=cmd_runner_fmt.as_opt_val("--type"),
+            value=cmd_runner_fmt.as_list(),
+            direct=cmd_runner_fmt.as_bool("--direct"),
+            config_source=cmd_runner_fmt.as_opt_val("--config-source"),
         ),
         **kwargs
     )
