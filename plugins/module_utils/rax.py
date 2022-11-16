@@ -314,3 +314,21 @@ def setup_rax_module(module, rax_module, region_required=True):
                          (region, ','.join(rax_module.regions)))
 
     return rax_module
+
+
+def rax_scaling_group_personality_file(module, files):
+    if not files:
+        return []
+
+    results = []
+    for rpath, lpath in files.items():
+        lpath = os.path.expanduser(lpath)
+        try:
+            with open(lpath, 'r') as f:
+                results.append({
+                    'path': rpath,
+                    'contents': f.read(),
+                })
+        except Exception as e:
+            module.fail_json(msg='Failed to load %s: %s' % (lpath, str(e)))
+    return results
