@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: gitlab_project_badge
 short_description: Manage project badges on GitLab Server
-version_added: 6.0.0
+version_added: 6.1.0
 description:
   - This module allows to add and remove badges to/from a project.
 author: Guillaume MARTINEZ (@Lunik)
@@ -21,6 +21,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   project:
@@ -40,18 +47,16 @@ options:
 
   link_url:
     description:
-      - The URL associated with the badge
+      - The URL associated with the badge.
     required: true
     type: str
 
   image_url:
     description:
-      - The image URL of the badge
+      - The image URL of the badge.
+      - A badge is identified by this URL.
     required: true
     type: str
-
-notes:
-  - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -64,7 +69,7 @@ EXAMPLES = r'''
     link_url: 'https://example.gitlab.com/%{project_path}'
     image_url: 'https://example.gitlab.com/%{project_path}/badges/%{default_branch}/pipeline.svg'
 
-- name: Remove a badge to a GitLab Project
+- name: Remove a badge from a GitLab Project
   community.general.gitlab_project_badge:
     api_url: 'https://example.gitlab.com'
     api_token: 'Your-Private-Token'
