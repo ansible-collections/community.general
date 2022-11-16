@@ -215,6 +215,7 @@ options:
             - Allow the authentication only on this Microsoft Windows host.
         aliases: [ sambaUserWorkstations ]
         type: list
+        elements: str
         default: []
     sambahome:
         description:
@@ -406,6 +407,7 @@ def main():
                                   aliases=['sambaPrivileges']),
             samba_user_workstations=dict(default=[],
                                          type='list',
+                                         elements='str',
                                          aliases=['sambaUserWorkstations']),
             sambahome=dict(type='str'),
             scriptpath=dict(type='str'),
