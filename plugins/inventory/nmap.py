@@ -46,6 +46,18 @@ DOCUMENTATION = '''
             description: use IPv6 type addresses
             type: boolean
             default: true
+        udp_scan:
+            description: scan via UDP, note you need to had sudo as true on my systems for this to work
+            type: boolean
+            default: false
+        icmp_timestamp:
+            description: scan via ICMP Timestamp (-PP), note you need to had sudo as true on my systems for this to work
+            type: boolean
+            default: false
+        dns_resolve:
+            description: Never do DNS resolution/Always resolve
+            type: boolean
+            default: false
     notes:
         - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
         - 'TODO: add OS fingerprinting'
@@ -165,6 +177,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self._options['exclude']:
                 cmd.append('--exclude')
                 cmd.append(','.join(self._options['exclude']))
+
+            if self._options['dns_resolve']:
+                cmd.append('-n')
+
+            if self._options['udp_scan']:
+                if not self._options['sudo']:
+                    raise AnsibleParserError('Sudo is required for this option')
+                cmd.append('-sU')
+
+            if self._options['icmp_timestamp']:
+                if not self._options['sudo']:
+                    raise AnsibleParserError('Sudo is required for this option')
+                cmd.append('-PP')
 
             cmd.append(self._options['address'])
             try:
