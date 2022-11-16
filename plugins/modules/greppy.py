@@ -26,10 +26,12 @@ options:
         description: The literal string to look for in every line of the file. This does not have to match the entire line.
         required: true
         type: list
+        elements: str
     exclude:
         description: The literal string to exclude from the file. This does not have to match the entire line.
         required: false
         type: list
+        elements: str
     timeout:
         description: The number of seconds to wait.
         required: false
@@ -62,6 +64,7 @@ EXAMPLES = r'''
       - second string
     exclude:
       - third
+      - fourth
 
 - name: Grep for strings and wait for 120 seconds
   community.general.greppy:
@@ -158,8 +161,8 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, find_exit):
         for e in (excludes or []):
             if ignore_case:
                 e = e.lower()
-                line = line.lower()
-            if search_line(e, line):
+                lower_case_line = line.lower()
+            if search_line(e, lower_case_line):
                 continue_while = True
                 result['exclude_matches'] += 1
                 break
@@ -170,10 +173,10 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, find_exit):
         for p in patterns:
             if ignore_case:
                 p = p.lower()
-                line = line.lower()
-            found_line = search_line(p, line)
+                lower_case_line = line.lower()
+            found_line = search_line(p, lower_case_line)
             if found_line:
-                result['output'].append(found_line)
+                result['output'].append(line)
                 result['matches'] += 1
                 if find_exit:
                     return result
@@ -199,7 +202,6 @@ def run_module():
     # state will include any data that you want your module to pass back
     # for consumption, for example, in a subsequent task
     result = dict(
-        changed=False,
         output=[],
         matches=0,
         exclude_matches=0
@@ -226,7 +228,6 @@ def run_module():
     result = grep_file(module.params['path'], module.params['search'], 
         module.params['exclude'], module.params['ignore_case'], 
         module.params['timeout'], module.params['find_exit'])
-    result['changed'] = True
 
     # during the execution of the module, if there is an exception or a
     # conditional state that effectively causes a failure, run
