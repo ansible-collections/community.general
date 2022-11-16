@@ -230,6 +230,7 @@ options:
         description:
             - A list of superiors as LDAP DNs.
         type: list
+        elements: str
     serviceprovider:
         default: ['']
         description:
@@ -412,7 +413,8 @@ def main():
             sambahome=dict(type='str'),
             scriptpath=dict(type='str'),
             secretary=dict(default=[],
-                           type='list'),
+                           type='list',
+                           elements='str'),
             serviceprovider=dict(default=[''],
                                  type='list'),
             shell=dict(default='/bin/bash',
