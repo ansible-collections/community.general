@@ -12,7 +12,7 @@ import os
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
-_puppet_path_prefix = ["/opt/puppetlabs/bin"]
+_PUPPET_PATH_PREFIX = ["/opt/puppetlabs/bin"]
 
 
 def get_facter_dir():
@@ -23,7 +23,7 @@ def get_facter_dir():
 
 
 def _puppet_cmd(module):
-    return module.get_bin_path("puppet", False, _puppet_path_prefix)
+    return module.get_bin_path("puppet", False, _PUPPET_PATH_PREFIX)
 
 
 # If the `timeout` CLI command feature is removed,
@@ -32,7 +32,7 @@ def ensure_agent_enabled(module):
     runner = CmdRunner(
         module,
         command="puppet",
-        path_prefix=_puppet_path_prefix,
+        path_prefix=_PUPPET_PATH_PREFIX,
         arg_formats=dict(
             _agent_disabled=cmd_runner_fmt.as_fixed(['config', 'print', 'agent_disabled_lockfile']),
         ),
@@ -84,7 +84,7 @@ def puppet_runner(module):
     runner = CmdRunner(
         module,
         command=_prepare_base_cmd(),
-        path_prefix=_puppet_path_prefix,
+        path_prefix=_PUPPET_PATH_PREFIX,
         arg_formats=dict(
             _agent_fixed=cmd_runner_fmt.as_fixed([
                 "agent", "--onetime", "--no-daemonize", "--no-usecacheonfailure",
