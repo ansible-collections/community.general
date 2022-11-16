@@ -47,7 +47,9 @@ DOCUMENTATION = '''
             type: boolean
             default: true
         udp_scan:
-            description: scan via UDP, note you need to had sudo as true on my systems for this to work
+            description:
+              - Scan via UDP.
+              - Depending on your system you might need I(sudo=true) for this to work.
             type: boolean
             default: false
         icmp_timestamp:
