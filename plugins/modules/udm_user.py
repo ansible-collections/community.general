@@ -118,6 +118,7 @@ options:
             - List of private telephone numbers.
         aliases: [ homeTelephoneNumber ]
         type: list
+        elements: str
     homedrive:
         description:
             - Windows home drive, e.g. C("H:").
@@ -128,6 +129,7 @@ options:
             - List of alternative e-mail addresses.
         aliases: [ mailAlternativeAddress ]
         type: list
+        elements: str
     mail_home_server:
         description:
             - FQDN of mail server
@@ -144,6 +146,7 @@ options:
             - Mobile phone number
         aliases: [ mobileTelephoneNumber ]
         type: list
+        elements: str
     organisation:
         description:
             - Organisation
@@ -167,6 +170,7 @@ options:
             - List of pager telephone numbers.
         aliases: [ pagerTelephonenumber ]
         type: list
+        elements: str
     phone:
         description:
             - List of telephone numbers.
@@ -352,11 +356,13 @@ def main():
                                  aliases=['homeSharePath']),
             home_telephone_number=dict(default=[],
                                        type='list',
+                                       elements='str',
                                        aliases=['homeTelephoneNumber']),
             homedrive=dict(type='str'),
             lastname=dict(type='str'),
             mail_alternative_address=dict(default=[],
                                           type='list',
+                                          elements='str',
                                           aliases=['mailAlternativeAddress']),
             mail_home_server=dict(type='str',
                                   aliases=['mailHomeServer']),
@@ -364,6 +370,7 @@ def main():
                                       aliases=['mailPrimaryAddress']),
             mobile_telephone_number=dict(default=[],
                                          type='list',
+                                         elements='str',
                                          aliases=['mobileTelephoneNumber']),
             organisation=dict(type='str',
                               aliases=['organization']),
@@ -375,6 +382,7 @@ def main():
                                   aliases=['override_pw_length']),
             pager_telephonenumber=dict(default=[],
                                        type='list',
+                                       elements='str',
                                        aliases=['pagerTelephonenumber']),
             password=dict(type='str',
                           no_log=True),
