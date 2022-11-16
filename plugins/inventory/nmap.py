@@ -47,6 +47,7 @@ DOCUMENTATION = '''
             type: boolean
             default: true
         udp_scan:
+<<<<<<< HEAD
             description: 
                 - Scan via UDP.
                 - Depending on your system you might need I(sudo=true) for this to work.
@@ -65,6 +66,21 @@ DOCUMENTATION = '''
             type: boolean
             default: false
             version_added: 6.1.0
+=======
+            description:
+              - Scan via UDP.
+              - Depending on your system you might need I(sudo=true) for this to work.
+            type: boolean
+            default: false
+        icmp_timestamp:
+            description: scan via ICMP Timestamp (-PP), note you need to had sudo as true on my systems for this to work
+            type: boolean
+            default: false
+        dns_resolve:
+            description: Never do DNS resolution/Always resolve
+            type: boolean
+            default: false
+>>>>>>> cb77d89684973974ce22e2218998070664b47ca4
     notes:
         - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
         - 'TODO: add OS fingerprinting'
