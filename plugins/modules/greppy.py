@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-# Copyright: (c) 2022, David Peng <dpeng1@gmail.com>
+# SPDX-FileCopyrightText: 2022, David Peng <dpeng1@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
