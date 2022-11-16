@@ -100,6 +100,7 @@ options:
                LDAP filter for each group as $GROUP:
                C((&(objectClass=posixGroup)(cn=$GROUP)))."
         type: list
+        elements: str
     home_share:
         description:
             - "Home NFS share. Must be a LDAP DN, e.g.
@@ -343,7 +344,8 @@ def main():
             firstname=dict(type='str'),
             gecos=dict(type='str'),
             groups=dict(default=[],
-                        type='list'),
+                        type='list',
+                        elements='str'),
             home_share=dict(type='str',
                             aliases=['homeShare']),
             home_share_path=dict(type='str',
