@@ -322,6 +322,7 @@ def rax_scaling_group_personality_file(module, files):
 
     results = []
     for rpath, lpath in files.items():
+        lpath = os.path.expanduser(lpath)
         try:
             with open(lpath, 'r') as f:
                 results.append({
