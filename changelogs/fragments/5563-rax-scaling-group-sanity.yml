@@ -1,0 +1,2 @@
+minor_changes:
+  - rax_scaling_group - refactored out code to the ``rax`` module utils to clear the sanity check (https://github.com/ansible-collections/community.general/pull/5563).

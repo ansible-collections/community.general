@@ -161,8 +161,11 @@ except ImportError:
     HAS_PYRAX = False
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.rax import (rax_argument_spec, rax_find_image, rax_find_network,
-                                                                            rax_required_together, rax_to_dict, setup_rax_module)
+from ansible_collections.community.general.plugins.module_utils.rax import (
+    rax_argument_spec, rax_find_image, rax_find_network,
+    rax_required_together, rax_to_dict, setup_rax_module,
+    rax_scaling_group_personality_file,
+)
 from ansible.module_utils.six import string_types
 
 
@@ -223,19 +226,7 @@ def rax_asg(module, cooldown=300, disk_config=None, files=None, flavor=None,
                     del nic['net-id']
 
         # Handle the file contents
-        personality = []
-        if files:
-            for rpath in files.keys():
-                lpath = os.path.expanduser(files[rpath])
-                try:
-                    f = open(lpath, 'r')
-                    personality.append({
-                        'path': rpath,
-                        'contents': f.read()
-                    })
-                    f.close()
-                except Exception as e:
-                    module.fail_json(msg='Failed to load %s' % lpath)
+        personality = rax_scaling_group_personality_file(module, files)
 
         lbs = []
         if loadbalancers:

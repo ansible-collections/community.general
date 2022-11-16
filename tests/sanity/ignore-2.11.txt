@@ -24,7 +24,6 @@ plugins/modules/puppet.py validate-modules:parameter-invalid  # invalid alias - 
 plugins/modules/rax_files_objects.py use-argspec-type-path
 plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice
 plugins/modules/rax.py use-argspec-type-path # fix needed
-plugins/modules/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/scaleway_organization_info.py validate-modules:return-syntax-error
 plugins/modules/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
