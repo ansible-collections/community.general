@@ -236,6 +236,7 @@ options:
         description:
             - Enable user for the following service providers.
         type: list
+        elements: str
     shell:
         default: '/bin/bash'
         description:
@@ -416,7 +417,8 @@ def main():
                            type='list',
                            elements='str'),
             serviceprovider=dict(default=[''],
-                                 type='list'),
+                                 type='list',
+                                 elements='str'),
             shell=dict(default='/bin/bash',
                        type='str'),
             street=dict(type='str'),
