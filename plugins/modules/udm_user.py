@@ -208,6 +208,7 @@ options:
                join."
         aliases: [ sambaPrivileges ]
         type: list
+        elements: str
         default: []
     samba_user_workstations:
         description:
@@ -401,6 +402,7 @@ def main():
                              aliases=['roomNumber']),
             samba_privileges=dict(default=[],
                                   type='list',
+                                  elements='str',
                                   aliases=['sambaPrivileges']),
             samba_user_workstations=dict(default=[],
                                          type='list',
