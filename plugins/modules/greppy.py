@@ -5,7 +5,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = '''
 ---
 module: greppy
 
@@ -13,7 +13,6 @@ short_description: Scan logs for certain patterns within a given timeframe.
 
 # If this is part of a collection, you need to use semantic versioning,
 # i.e. the version is of the form "2.5.0" and not "2.4".
-version_added: "1.0.0"
 
 description: Grep logs for a list of patterns within a given timeframe.
 
@@ -55,7 +54,7 @@ author:
     - David Peng (@dpengftw)
 '''
 
-EXAMPLES = r'''
+EXAMPLES = '''
 - name: Grep for strings in given list but also exclude certain strings
   community.general.greppy:
     path: example.txt
@@ -82,14 +81,13 @@ EXAMPLES = r'''
 
 '''
 
-RETURN = r'''
+RETURN = '''
 # These are examples of possible return values, and in general should use other names for return values.
 output:
     description: List of lines that matched given search
     type: list
     returned: always
-    sample:
-        "output": [
+    sample: [
             "Ex eorum enim scriptis et institutis cum omnis doctrina liberalis, omnis historia.\n",
             "Esse enim quam vellet iniquus iustus poterat inpune.\n"
         ]
@@ -98,12 +96,12 @@ matches:
     description: Number of lines that matched
     type: int
     returned: always
-    sample: "matches": 2
+    sample: 2
 
 exclude_matches:
     description: Number of lines that matched the exclusion strings
     type: int
-    sample: "exclude_matches": 1
+    sample: 1
 '''
 
 import re
@@ -225,8 +223,8 @@ def run_module():
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
     run_checks(module)
-    result = grep_file(module.params['path'], module.params['search'], 
-        module.params['exclude'], module.params['ignore_case'], 
+    result = grep_file(module.params['path'], module.params['search'],
+        module.params['exclude'], module.params['ignore_case'],
         module.params['timeout'], module.params['find_exit'])
 
     # during the execution of the module, if there is an exception or a
