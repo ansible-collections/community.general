@@ -1,0 +1,2 @@
+minor_changes
+  - nmap - adds flags to the nmap plugin ``udp_scan``, ``icmp_timestamp`` and ``dns_resolve`` parameter for different types of scans (https://github.com/ansible-collections/community.general/pull/5566).

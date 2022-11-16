@@ -47,17 +47,24 @@ DOCUMENTATION = '''
             type: boolean
             default: true
         udp_scan:
-            description: scan via UDP, note you need to had sudo as true on my systems for this to work
+            description: 
+                - Scan via UDP.
+                - Depending on your system you might need I(sudo=true) for this to work.
             type: boolean
             default: false
+            version_added: 6.1.0
         icmp_timestamp:
-            description: scan via ICMP Timestamp (-PP), note you need to had sudo as true on my systems for this to work
+            description:
+                - Scan via ICMP Timestamp (C(-PP)).
+                - Depending on your system you might need I(sudo=true) for this to work.
             type: boolean
             default: false
+            version_added: 6.1.0
         dns_resolve:
-            description: Never do DNS resolution/Always resolve
+            description: Whether to always (C(true)) or never (C(false)) do DNS resolution.
             type: boolean
             default: false
+            version_added: 6.1.0
     notes:
         - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
         - 'TODO: add OS fingerprinting'
@@ -182,13 +189,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 cmd.append('-n')
 
             if self._options['udp_scan']:
-                if not self._options['sudo']:
-                    raise AnsibleParserError('Sudo is required for this option')
                 cmd.append('-sU')
 
             if self._options['icmp_timestamp']:
-                if not self._options['sudo']:
-                    raise AnsibleParserError('Sudo is required for this option')
                 cmd.append('-PP')
 
             cmd.append(self._options['address'])
