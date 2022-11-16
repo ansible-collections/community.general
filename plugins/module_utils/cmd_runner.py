@@ -88,9 +88,10 @@ class FormatError(CmdRunnerException):
 
 
 class _ArgFormat(object):
-    def __init__(self, func, ignore_none=None):
+    def __init__(self, func, ignore_none=None, ignore_missing_value=False):
         self.func = func
         self.ignore_none = ignore_none
+        self.ignore_missing_value = ignore_missing_value
 
     def __call__(self, value, ctx_ignore_none):
         ignore_none = self.ignore_none if self.ignore_none is not None else ctx_ignore_none
@@ -127,7 +128,7 @@ class _Format(object):
 
     @staticmethod
     def as_fixed(args):
-        return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False)
+        return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False, ignore_missing_value=True)
 
     @staticmethod
     def as_func(func, ignore_none=None):
@@ -135,14 +136,15 @@ class _Format(object):
 
     @staticmethod
     def as_map(_map, default=None, ignore_none=None):
+        if default is None:
+            default = []
         return _ArgFormat(lambda value: _ensure_list(_map.get(value, default)), ignore_none=ignore_none)
 
     @staticmethod
     def as_default_type(_type, arg="", ignore_none=None):
         fmt = _Format
         if _type == "dict":
-            return fmt.as_func(lambda d: ["--{0}={1}".format(*a) for a in iteritems(d)],
-                               ignore_none=ignore_none)
+            return fmt.as_func(lambda d: ["--{0}={1}".format(*a) for a in iteritems(d)], ignore_none=ignore_none)
         if _type == "list":
             return fmt.as_func(lambda value: ["--{0}".format(x) for x in value], ignore_none=ignore_none)
         if _type == "bool":
@@ -261,10 +263,13 @@ class _CmdRunnerContext(object):
         for arg_name in self.args_order:
             value = None
             try:
-                value = named_args[arg_name]
+                if arg_name in named_args:
+                    value = named_args[arg_name]
+                elif not runner.arg_formats[arg_name].ignore_missing_value:
+                    raise MissingArgumentValue(self.args_order, arg_name)
                 self.cmd.extend(runner.arg_formats[arg_name](value, ctx_ignore_none=self.ignore_value_none))
-            except KeyError:
-                raise MissingArgumentValue(self.args_order, arg_name)
+            except MissingArgumentValue:
+                raise
             except Exception as e:
                 raise FormatError(arg_name, value, runner.arg_formats[arg_name], e)
 
