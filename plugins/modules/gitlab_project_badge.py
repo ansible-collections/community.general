@@ -173,7 +173,7 @@ def core(module):
 
     wished_badge = {
         "link_url": module.params["link_url"],
-        "image_url": module.params["image_url"]
+        "image_url": module.params["image_url"],
     }
 
     changed, summary = state_strategy[state](module=module, gl=gl, project=project, wished_badge=wished_badge)
