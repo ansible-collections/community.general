@@ -47,7 +47,7 @@ DOCUMENTATION = '''
             type: boolean
             default: true
         udp_scan:
-            description: 
+            description:
                 - Scan via UDP.
                 - Depending on your system you might need I(sudo=true) for this to work.
             type: boolean
