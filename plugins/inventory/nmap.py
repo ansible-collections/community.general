@@ -53,14 +53,12 @@ DOCUMENTATION = '''
             type: boolean
             default: false
             version_added: 6.1.0
-            version_added: 6.1.0
         icmp_timestamp:
             description:
                 - Scan via ICMP Timestamp (C(-PP)).
                 - Depending on your system you might need I(sudo=true) for this to work.
             type: boolean
             default: false
-            version_added: 6.1.0
             version_added: 6.1.0
         dns_resolve:
             description: Whether to always (C(true)) or never (C(false)) do DNS resolution.
