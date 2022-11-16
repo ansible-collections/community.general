@@ -175,6 +175,7 @@ options:
         description:
             - List of telephone numbers.
         type: list
+        elements: str
         default: []
     postcode:
         description:
@@ -387,7 +388,8 @@ def main():
             password=dict(type='str',
                           no_log=True),
             phone=dict(default=[],
-                       type='list'),
+                       type='list',
+                       elements='str'),
             postcode=dict(type='str'),
             primary_group=dict(type='str',
                                aliases=['primaryGroup']),
