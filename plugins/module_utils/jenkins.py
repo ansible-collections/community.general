@@ -21,7 +21,7 @@ def download_updates_file(updates_expiration):
 
     # Make sure the destination directory exists
     if not os.path.isdir(updates_dir):
-        os.makedirs(updates_dir, 0o700))
+        os.makedirs(updates_dir, 0o700)
 
     # Check if we need to download new updates file
     if os.path.isfile(updates_file):
