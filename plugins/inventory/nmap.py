@@ -61,6 +61,7 @@ DOCUMENTATION = '''
             type: boolean
             default: false
             version_added: 6.1.0
+            version_added: 6.1.0
         dns_resolve:
             description: Whether to always (C(true)) or never (C(false)) do DNS resolution.
             type: boolean
