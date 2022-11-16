@@ -78,6 +78,7 @@ options:
         description:
             - A list of e-mail addresses.
         type: list
+        elements: str
     employee_number:
         description:
             - Employee number
@@ -333,7 +334,8 @@ def main():
             display_name=dict(type='str',
                               aliases=['displayName']),
             email=dict(default=[''],
-                       type='list'),
+                       type='list',
+                       elements='str'),
             employee_number=dict(type='str',
                                  aliases=['employeeNumber']),
             employee_type=dict(type='str',
