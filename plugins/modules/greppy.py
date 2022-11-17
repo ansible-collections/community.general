@@ -114,7 +114,7 @@ def run_checks(module):
 
     b_dest = to_bytes(path, errors='surrogate_or_strict')
     if os.path.isdir(b_dest):
-        module.fail_json(rc=256, msg='Destination %s is a directory !' % path)
+        module.fail_json(rc=256, msg='Destination %s is a directory!' % path)
 
     time_to_wait = 3
     time_counter = 0
