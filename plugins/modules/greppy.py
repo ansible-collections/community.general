@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: 2022, David Peng <dpeng1@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -12,9 +13,11 @@ module: greppy
 
 short_description: Scan logs for certain patterns within a given timeframe
 
-version_added: 6.1.0
-
-description: Grep logs for a list of patterns within a given timeframe.
+description: 
+    - >
+        Grep logs for a list of patterns within a given timeframe. If given, also excludes 
+        a list of patterns from the file. Returns a list of matching strings, along with 
+        a count of both matched and excluded patterns.
 
 options:
     path:
@@ -32,7 +35,7 @@ options:
         type: list
         elements: str
     timeout:
-        description: The number of seconds to wait.
+        description: The number of seconds to wait on file that is continually being written to.
         required: false
         default: 60
         type: int
@@ -40,8 +43,8 @@ options:
         description: Case insensitive regex search.
         required: false
         type: bool
-    findexit:
-        description: Exit right after finding the first occurrence
+    find_only_first:
+        description: Exit right after finding the first occurrence.
         required: false
         default: false
         type: bool
@@ -73,14 +76,13 @@ EXAMPLES = '''
     path: example.txt
     search:
       - first occurrence
-    find_exit: yes
+    find_only_first: true
 
 '''
 
 RETURN = '''
-# These are examples of possible return values, and in general should use other names for return values.
 output:
-    description: List of lines that matched given search
+    description: List of lines that matched given search.
     type: list
     returned: always
     sample: [
@@ -89,7 +91,7 @@ output:
         ]
 
 matches:
-    description: Number of lines that matched
+    description: Number of lines that matched.
     type: int
     returned: always
     sample: 2
@@ -106,6 +108,7 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_text
 
 def run_checks(module):
     """Do baseline checks before proceeding."""
@@ -122,21 +125,21 @@ def run_checks(module):
         time.sleep(1)
         time_counter += 1
         if time_counter > time_to_wait:
-            module.fail_json(rc=256, msg='Destination %s does not exist !' % path)
+            module.fail_json(rc=256, msg='Destination %s does not exist!' % path)
 
 def search_line(pattern, string):
     """Find pattern match in string."""
     if type(string) is bytes:
         pc = re.compile(bytes(pattern, "utf-8"))
     else:
-        pc = re.compile(pattern)
+        pc = re.compile(to_text(pattern))
 
     if re.search(pc, string):
         return string
     else:
         return None
 
-def grep_file(filename, patterns, excludes, ignore_case, timeout, find_exit):
+def grep_file(filename, patterns, excludes, ignore_case, timeout, find_only_first):
     """Search a single file."""
     file = open(filename, 'rb')
     result = {
@@ -172,10 +175,11 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, find_exit):
             if found_line:
                 result['output'].append(line)
                 result['matches'] += 1
-                if find_exit:
+                if find_only_first:
                     return result
 
     result['matches'] = len(result['output'])
+    file.close()
     return result
 
 
@@ -186,7 +190,7 @@ def run_module():
         search=dict(type='list', required=True),
         exclude=dict(type='list', required=False),
         ignore_case=dict(type='bool', required=False, default=False),
-        find_exit=dict(type='bool', required=False, default=False),
+        find_only_first=dict(type='bool', required=False, default=False),
         timeout=dict(type='int', required=False, default=60)
     )
 
@@ -219,15 +223,12 @@ def run_module():
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
     run_checks(module)
-    result = grep_file(module.params['path'], module.params['search'],
-        module.params['exclude'], module.params['ignore_case'],
-        module.params['timeout'], module.params['find_exit'])
-
-    # during the execution of the module, if there is an exception or a
-    # conditional state that effectively causes a failure, run
-    # AnsibleModule.fail_json() to pass in the message and the result
-    #if module.params['name'] == 'fail me':
-    #    module.fail_json(msg='You requested this to fail', **result)
+    result = grep_file(module.params['path'], 
+        module.params['search'],
+        module.params['exclude'],
+        module.params['ignore_case'],
+        module.params['timeout'],
+        module.params['find_only_first'])
 
     # in the event of a successful module execution, you will want to
     # simple AnsibleModule.exit_json(), passing the key/value results
