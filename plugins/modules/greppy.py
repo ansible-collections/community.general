@@ -14,9 +14,6 @@ short_description: Scan logs for certain patterns within a given timeframe
 
 version_added: 6.1.0
 
-# If this is part of a collection, you need to use semantic versioning,
-# i.e. the version is of the form "2.5.0" and not "2.4".
-
 description: Grep logs for a list of patterns within a given timeframe.
 
 options:
