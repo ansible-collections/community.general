@@ -5,7 +5,6 @@ plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choic
 plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice         # state=get - removed in 8.0.0
 plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter
-plugins/modules/jenkins_plugin.py use-argspec-type-path
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice
 plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions

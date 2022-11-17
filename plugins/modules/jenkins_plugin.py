@@ -290,18 +290,21 @@ state:
     sample: "present"
 '''
 
-from ansible.module_utils.basic import AnsibleModule, to_bytes
-from ansible.module_utils.six.moves import http_cookiejar as cookiejar
-from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.urls import fetch_url, url_argument_spec
-from ansible.module_utils.six import text_type, binary_type
-from ansible.module_utils.common.text.converters import to_native
 import hashlib
 import io
 import json
 import os
 import tempfile
 import time
+
+from ansible.module_utils.basic import AnsibleModule, to_bytes
+from ansible.module_utils.six.moves import http_cookiejar as cookiejar
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.six import text_type, binary_type
+from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.jenkins import download_updates_file
 
 
 class FailedInstallingWithPluginManager(Exception):
@@ -605,21 +608,12 @@ class JenkinsPlugin(object):
         return urls
 
     def _download_updates(self):
-        updates_filename = 'jenkins-plugin-cache.json'
-        updates_dir = os.path.expanduser('~/.ansible/tmp')
-        updates_file = "%s/%s" % (updates_dir, updates_filename)
-        download_updates = True
-
-        # Check if we need to download new updates file
-        if os.path.isfile(updates_file):
-            # Get timestamp when the file was changed last time
-            ts_file = os.stat(updates_file).st_mtime
-            ts_now = time.time()
-
-            if ts_now - ts_file < self.params['updates_expiration']:
-                download_updates = False
-
-        updates_file_orig = updates_file
+        try:
+            updates_file, download_updates = download_updates_file(self.params['updates_expiration'])
+        except OSError as e:
+            self.module.fail_json(
+                msg="Cannot create temporal directory.",
+                details=to_native(e))
 
         # Download the updates file if needed
         if download_updates:
@@ -632,56 +626,39 @@ class JenkinsPlugin(object):
                 msg_exception="Updates download failed.")
 
             # Write the updates file
-            update_fd, updates_file = tempfile.mkstemp()
-            os.write(update_fd, r.read())
+            tmp_update_fd, tmp_updates_file = tempfile.mkstemp()
+            os.write(tmp_update_fd, r.read())
 
             try:
-                os.close(update_fd)
+                os.close(tmp_update_fd)
             except IOError as e:
                 self.module.fail_json(
-                    msg="Cannot close the tmp updates file %s." % updates_file,
+                    msg="Cannot close the tmp updates file %s." % tmp_updates_file,
                     details=to_native(e))
 
         # Open the updates file
         try:
-            f = io.open(updates_file, encoding='utf-8')
+            f = io.open(tmp_updates_file, encoding='utf-8')
+
+            # Read only the second line
+            dummy = f.readline()
+            data = json.loads(f.readline())
         except IOError as e:
             self.module.fail_json(
                 msg="Cannot open temporal updates file.",
                 details=to_native(e))
-
-        i = 0
-        for line in f:
-            # Read only the second line
-            if i == 1:
-                try:
-                    data = json.loads(line)
-                except Exception as e:
-                    self.module.fail_json(
-                        msg="Cannot load JSON data from the tmp updates file.",
-                        details=to_native(e))
-
-                break
-
-            i += 1
+        except Exception as e:
+            self.module.fail_json(
+                msg="Cannot load JSON data from the tmp updates file.",
+                details=to_native(e))
 
         # Move the updates file to the right place if we could read it
         if download_updates:
-            # Make sure the destination directory exists
-            if not os.path.isdir(updates_dir):
-                try:
-                    os.makedirs(updates_dir, int('0700', 8))
-                except OSError as e:
-                    self.module.fail_json(
-                        msg="Cannot create temporal directory.",
-                        details=to_native(e))
-
-            self.module.atomic_move(updates_file, updates_file_orig)
+            self.module.atomic_move(tmp_updates_file, updates_file)
 
         # Check if we have the plugin data available
-        if 'plugins' not in data or self.params['name'] not in data['plugins']:
-            self.module.fail_json(
-                msg="Cannot find plugin data in the updates file.")
+        if not data.get('plugins', {}).get(self.params['name']):
+            self.module.fail_json(msg="Cannot find plugin data in the updates file.")
 
         return data['plugins'][self.params['name']]
 
