@@ -95,7 +95,7 @@ matches:
     sample: 2
 
 exclude_matches:
-    description: Number of lines that matched the exclusion strings
+    description: Number of lines that matched the exclusion strings.
     type: int
     sample: 1
 '''
