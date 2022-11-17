@@ -3,8 +3,8 @@
 # Copyright (c) 2019, Saranya Sridharan
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-from __future__ import (absolute_import, division, print_function)
 
+from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -60,17 +60,14 @@ import re
 from os.path import basename
 
 from ansible.module_utils import six
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-try:
+with deps.declare("psutil"):
     import psutil
-
-    HAS_PSUTIL = True
-except ImportError:
-    HAS_PSUTIL = False
 
 
 class PSAdapterError(Exception):
@@ -177,8 +174,8 @@ def compare_lower(a, b):
 
 class Pids(object):
     def __init__(self, module):
-        if not HAS_PSUTIL:
-            module.fail_json(msg=missing_required_lib('psutil'))
+
+        deps.validate(module)
 
         self._ps = PSAdapter.from_package(psutil)
 
