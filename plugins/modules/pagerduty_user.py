@@ -80,25 +80,12 @@ EXAMPLES = r'''
 
 RETURN = r''' # '''
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import traceback
 from os import path
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils import deps
 
-try:
-    from pdpyras import APISession
-    HAS_PD_PY = True
-    PD_IMPORT_ERR = None
-except ImportError:
-    HAS_PD_PY = False
-    PD_IMPORT_ERR = traceback.format_exc()
-
-try:
-    from pdpyras import PDClientError
-    HAS_PD_CLIENT_ERR = True
-    PD_CLIENT_ERR_IMPORT_ERR = None
-except ImportError:
-    HAS_PD_CLIENT_ERR = False
-    PD_CLIENT_ERR_IMPORT_ERR = traceback.format_exc()
+with deps.declare("pdpyras", url="https://github.com/PagerDuty/pdpyras"):
+    from pdpyras import APISession, PDClientError
 
 
 class PagerDutyUser(object):
@@ -202,11 +189,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAS_PD_PY:
-        module.fail_json(msg=missing_required_lib('pdpyras', url='https://github.com/PagerDuty/pdpyras'), exception=PD_IMPORT_ERR)
-
-    if not HAS_PD_CLIENT_ERR:
-        module.fail_json(msg=missing_required_lib('PDClientError', url='https://github.com/PagerDuty/pdpyras'), exception=PD_CLIENT_ERR_IMPORT_ERR)
+    deps.validate(module)
 
     access_token = module.params['access_token']
     pd_user = module.params['pd_user']

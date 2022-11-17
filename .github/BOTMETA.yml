@@ -265,6 +265,8 @@ files:
     maintainers: delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
+  $module_utils/deps.py:
+    maintainers: russoz
   $module_utils/gconftool2.py:
     labels: gconftool2
     maintainers: russoz
