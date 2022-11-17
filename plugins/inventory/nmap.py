@@ -46,6 +46,25 @@ DOCUMENTATION = '''
             description: use IPv6 type addresses
             type: boolean
             default: true
+        udp_scan:
+            description:
+                - Scan via UDP.
+                - Depending on your system you might need I(sudo=true) for this to work.
+            type: boolean
+            default: false
+            version_added: 6.1.0
+        icmp_timestamp:
+            description:
+                - Scan via ICMP Timestamp (C(-PP)).
+                - Depending on your system you might need I(sudo=true) for this to work.
+            type: boolean
+            default: false
+            version_added: 6.1.0
+        dns_resolve:
+            description: Whether to always (C(true)) or never (C(false)) do DNS resolution.
+            type: boolean
+            default: false
+            version_added: 6.1.0
     notes:
         - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
         - 'TODO: add OS fingerprinting'
@@ -165,6 +184,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self._options['exclude']:
                 cmd.append('--exclude')
                 cmd.append(','.join(self._options['exclude']))
+
+            if self._options['dns_resolve']:
+                cmd.append('-n')
+
+            if self._options['udp_scan']:
+                cmd.append('-sU')
+
+            if self._options['icmp_timestamp']:
+                cmd.append('-PP')
 
             cmd.append(self._options['address'])
             try:
