@@ -45,6 +45,7 @@ scaleway_organization_info:
   description: Response from Scaleway API
   returned: success
   type: list
+  elements: dict
   sample:
     "scaleway_organization_info": [
         {
