@@ -44,7 +44,8 @@ RETURN = r'''
 scaleway_organization_info:
   description: Response from Scaleway API
   returned: success
-  type: complex
+  type: list
+  elements: dict
   sample:
     "scaleway_organization_info": [
         {
