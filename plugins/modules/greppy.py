@@ -45,10 +45,6 @@ options:
         required: false
         default: false
         type: bool
-# Specify this value according to your collection
-# in format of namespace.collection.doc_fragment_name
-extends_documentation_fragment:
-    - community.general.greppy
 
 author:
     - David Peng (@dpengftw)
