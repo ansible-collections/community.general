@@ -22,6 +22,7 @@ DOCUMENTATION = '''
             - The path of the chroot you want to access.
         default: inventory_hostname
         vars:
+            - name: inventory_hostname
             - name: ansible_host
       executable:
         description:
