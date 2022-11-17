@@ -24,16 +24,16 @@ options:
         description: The file to grep.
         required: true
         type: path
+        aliases:
+          - src
     search:
         description: The literal string to look for in every line of the file. This does not have to match the entire line.
         required: true
         type: list
-        elements: str
     exclude:
         description: The literal string to exclude from the file. This does not have to match the entire line.
         required: false
         type: list
-        elements: str
     timeout:
         description: The number of seconds to wait on file that is continually being written to.
         required: false
@@ -42,6 +42,7 @@ options:
     ignore_case:
         description: Case insensitive regex search.
         required: false
+        default: false
         type: bool
     find_only_first:
         description: Exit right after finding the first occurrence.
@@ -99,7 +100,8 @@ matches:
 exclude_matches:
     description: Number of lines that matched the exclusion strings.
     type: int
-    sample: 1
+    returned: always
+    sample: 0
 '''
 
 import re
@@ -152,14 +154,15 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, find_only_firs
 
     while time.time() < timeout_start + timeout:
         line = file.readline()
+        orig_line = line
         continue_while = False
 
         # skip on exclude patterns
         for e in (excludes or []):
             if ignore_case:
                 e = e.lower()
-                lower_case_line = line.lower()
-            if search_line(e, lower_case_line):
+                line = line.lower()
+            if search_line(e, line):
                 continue_while = True
                 result['exclude_matches'] += 1
                 break
@@ -170,10 +173,10 @@ def grep_file(filename, patterns, excludes, ignore_case, timeout, find_only_firs
         for p in patterns:
             if ignore_case:
                 p = p.lower()
-                lower_case_line = line.lower()
-            found_line = search_line(p, lower_case_line)
+                line = line.lower()
+            found_line = search_line(p, line)
             if found_line:
-                result['output'].append(line)
+                result['output'].append(orig_line)
                 result['matches'] += 1
                 if find_only_first:
                     return result
