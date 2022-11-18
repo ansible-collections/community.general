@@ -651,7 +651,7 @@ CATEGORY_COMMANDS_ALL = {
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
                 "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
                 "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
-    "Update": ["SimpleUpdate", "PerformRequestedOperations"]
+    "Update": ["SimpleUpdate", "PerformRequestedOperations"],
 }
 
 
