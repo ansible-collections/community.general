@@ -290,7 +290,7 @@ def main():
 
     if not HAS_iLO_REDFISH:
         module.fail_json(msg="missing required fucntions in ilo_redfish_utils.py")
-        
+
     category = module.params['category']
     command_list = module.params['command']
 
@@ -379,6 +379,7 @@ def main():
 
     changed = result[command].get('changed', False)
     module.exit_json(ilo_redfish_command=result, changed=changed)
+
 
 if __name__ == '__main__':
     main()
