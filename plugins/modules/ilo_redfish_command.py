@@ -12,7 +12,6 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_command
 short_description: Manages Out-Of-Band controllers using Redfish APIs
-version: 7.0.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
@@ -64,7 +63,7 @@ options:
     description:
       - List of RAID details that need to be configured in the given server
     type: list
-    default: NONE
+    elements: dict
     suboptions:
       LogicalDriveName:
         required: false
