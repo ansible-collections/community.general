@@ -166,6 +166,12 @@ options:
     description:
       - Time when to apply the update.
     type: str
+    choices:
+      - Immediate
+      - OnReset
+      - AtMaintenanceWindowStart
+      - InMaintenanceWindowOnReset
+      - OnStartUpdateRequest
     version_added: '6.1.0'
   update_handle:
     required: false
@@ -631,6 +637,19 @@ msg:
     returned: always
     type: str
     sample: "Action was successful"
+return_values:
+    description: Dictionary containing command-specific response data from the action
+    returned: on success
+    type: dict
+    sample: {
+        "update_status": {
+            "handle": "/redfish/v1/TaskService/TaskMonitors/735",
+            "messages": [],
+            "resets_requested": [],
+            "ret": true,
+            "status": "New"
+        }
+    }
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -657,7 +676,7 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
-    redfish_facts = {}
+    return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
@@ -887,7 +906,7 @@ def main():
             if command == "SimpleUpdate":
                 result = rf_utils.simple_update(update_opts)
                 if 'update_status' in result:
-                    redfish_facts['update_status'] = result['update_status']
+                    return_values['update_status'] = result['update_status']
             elif command == "PerformRequestedOperations":
                 result = rf_utils.perform_requested_update_operations(update_opts['update_handle'])
 
@@ -898,7 +917,7 @@ def main():
         session = result.get('session', dict())
         module.exit_json(changed=changed, session=session,
                          msg='Action was successful',
-                         redfish_facts=redfish_facts)
+                         return_values=return_values)
     else:
         module.fail_json(msg=to_native(result['msg']))
 

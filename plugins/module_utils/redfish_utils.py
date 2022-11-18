@@ -157,7 +157,7 @@ class RedfishUtils(object):
                             use_proxy=True, timeout=self.timeout)
             try:
                 data = json.loads(to_native(resp.read()))
-            except:
+            except Exception as e:
                 # No response data; this is okay in many cases
                 data = None
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
@@ -1437,7 +1437,7 @@ class RedfishUtils(object):
                     operation_results['status'] = 'Exception'
 
             # Clear out the handle if the operation is complete
-            if operation_results['status'] in [ 'Completed', 'Cancelled', 'Exception', 'Killed' ]:
+            if operation_results['status'] in ['Completed', 'Cancelled', 'Exception', 'Killed']:
                 operation_results['handle'] = None
 
             # Scan the messages to see if next steps are needed
