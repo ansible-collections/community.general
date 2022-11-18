@@ -1,0 +1,2 @@
+minor_changes:
+  - added new module ilo_redfish_command (https://github.com/ansible-collections/community.general/pull/5582).
