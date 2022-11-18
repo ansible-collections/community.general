@@ -1,0 +1,214 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Create {{ gitlab_project_name }}
+  gitlab_project:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    name: "{{ gitlab_project_name }}"
+    initialize_with_readme: True
+    state: present
+
+- name: Create Badge (check)
+  check_mode: yes
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: present
+    link_url: "{{ gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_create_check_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_create_check_task
+
+- name: Check module call result
+  assert:
+    that:
+      - gitlab_badge_create_check_task.changed
+      - not gitlab_badge_create_check_task.failed
+
+- name: Create Badge
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: present
+    link_url: "{{ gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_create_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_create_task
+
+- name: Check module call result
+  assert:
+    that:
+      - gitlab_badge_create_task.changed
+      - not gitlab_badge_create_task.failed
+
+- name: Create Badge (confirmation)
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: present
+    link_url: "{{ gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_create_confirmation_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_create_confirmation_task
+
+- name: Check module call result
+  assert:
+    that:
+      - not gitlab_badge_create_confirmation_task.changed
+      - not gitlab_badge_create_confirmation_task.failed
+
+- name: Update Badge (check)
+  check_mode: yes
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: present
+    link_url: "{{ updated_gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_update_check_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_update_check_task
+
+- name: Check module call result
+  assert:
+    that:
+      - gitlab_badge_update_check_task.changed
+      - not gitlab_badge_update_check_task.failed
+
+- name: Update Badge
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: present
+    link_url: "{{ updated_gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_update_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_update_task
+
+- name: Check module call result
+  assert:
+    that:
+      - gitlab_badge_update_task.changed
+      - not gitlab_badge_update_task.failed
+
+- name: Update Badge (confirmation)
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: present
+    link_url: "{{ updated_gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_update_confirmation_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_update_confirmation_task
+
+- name: Check module call result
+  assert:
+    that:
+      - not gitlab_badge_update_confirmation_task.changed
+      - not gitlab_badge_update_confirmation_task.failed
+
+- name: Delete Badge (check)
+  check_mode: yes
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: absent
+    link_url: "{{ updated_gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_delete_check_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_delete_check_task
+
+- name: Check module call result
+  assert:
+    that:
+      - gitlab_badge_delete_check_task.changed
+      - not gitlab_badge_delete_check_task.failed
+
+- name: Delete Badge
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: absent
+    link_url: "{{ updated_gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_delete_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_delete_task
+
+- name: Check module call result
+  assert:
+    that:
+      - gitlab_badge_delete_task.changed
+      - not gitlab_badge_delete_task.failed
+
+- name: Delete Badge (confirmation)
+  gitlab_project_badge:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: absent
+    link_url: "{{ updated_gitlab_badge_link_url }}"
+    image_url: "{{ gitlab_badge_image_url }}"
+  register: gitlab_badge_delete_confirmation_task
+
+- ansible.builtin.debug:
+    var: gitlab_badge_delete_confirmation_task
+
+- name: Check module call result
+  assert:
+    that:
+      - not gitlab_badge_delete_confirmation_task.changed
+      - not gitlab_badge_delete_confirmation_task.failed
+
+- name: Clean up {{ gitlab_project_name }}
+  gitlab_project:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: False
+    api_token: "{{ gitlab_api_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: absent

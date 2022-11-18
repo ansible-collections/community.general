@@ -1,0 +1,11 @@
+---
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gitlab_api_token: glpat-XXXXXXXXXXXXXXXXXXXX
+gitlab_api_url: https://gitlab.com
+gitlab_project_name: ansible_test_project
+gitlab_badge_link_url: 'https://example.gitlab.com/%{project_path}'
+updated_gitlab_badge_link_url: 'https://test.gitlab.com/%{project_path}'
+gitlab_badge_image_url: 'https://example.gitlab.com/%{project_path}/badges/%{default_branch}/pipeline.svg'
