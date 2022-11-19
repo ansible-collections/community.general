@@ -367,7 +367,7 @@ def main():
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10),
-            update_handle=dict()
+            update_handle=dict(),
         ),
         required_together=[
             ('username', 'password'),
