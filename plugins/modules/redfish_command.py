@@ -638,7 +638,7 @@ msg:
     type: str
     sample: "Action was successful"
 return_values:
-    description: Dictionary containing command-specific response data from the action
+    description: Dictionary containing command-specific response data from the action.
     returned: on success
     type: dict
     version_added: 6.1.0
