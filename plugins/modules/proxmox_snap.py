@@ -74,10 +74,12 @@ options:
       - Lists all snapshots of a vm
       - to be optionally combined with older_than
       - to be optionally combine with snapname (finds snapshot starting with the snapname)
+    default: false
     type: bool
   older_than:
     description:
       - Minimum age of backup to be listed by getsnapshots in days
+    default: 0
     type: int
 
 notes:
@@ -336,17 +338,17 @@ def main():
     if getsnapshots:
         snapshotlist = proxmox.snapshot(vm, vmid).get()
         oldsnapshotlist = []
-        
+
         for s in snapshotlist:
             if s["name"] == "current":
                 continue
-            if snapname != 'ansible_snap':   #default value
+            if snapname != 'ansible_snap':   # default value
                 if not s["name"][0:len(snapname)] == snapname:
                     continue
-            if ((time.time() - s["snaptime"]) / 60 / 60 /24) > older_than:
+            if ((time.time() - s["snaptime"]) / 60 / 60 / 24) > older_than:
                 oldsnapshotlist.append(s["name"])
 
-        snapshotdict = { "results" : oldsnapshotlist, "older_than" : older_than }
+        snapshotdict = {"results": oldsnapshotlist, "older_than": older_than}
 
         module.exit_json(**snapshotdict)
 
