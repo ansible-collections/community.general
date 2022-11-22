@@ -334,22 +334,21 @@ def main():
     vm = proxmox.get_vm(vmid)
 
     if getsnapshots:
-        snapshotlist=proxmox.snapshot(vm, vmid).get()
-        oldsnapshotlist=[]
-        #if older_than:
+        snapshotlist = proxmox.snapshot(vm, vmid).get()
+        oldsnapshotlist = []
+        
         for s in snapshotlist:
-            if s["name"]=="current":
+            if s["name"] == "current":
                 continue
-            if snapname!='ansible_snap': #default value
+            if snapname != 'ansible_snap':   #default value
                 if not s["name"][0:len(snapname)] == snapname:
                     continue
-            if ((time.time()-s["snaptime"])/60/60/24)>older_than:
-                    oldsnapshotlist.append(s["name"])
+            if ((time.time() - s["snaptime"]) / 60 / 60 /24) > older_than:
+                oldsnapshotlist.append(s["name"])
 
-        snapshotdict={"results":oldsnapshotlist,"older_than":older_than}
+        snapshotdict = { "results" : oldsnapshotlist, "older_than" : older_than }
 
-        #s=",".join(snapshotlist)
-        module.exit_json(**snapshotdict) 
+        module.exit_json(**snapshotdict)
 
     elif state == 'present':
         try:
