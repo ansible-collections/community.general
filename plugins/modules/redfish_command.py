@@ -161,6 +161,24 @@ options:
         description:
           - Password for retrieving the update image.
         type: str
+  update_apply_time:
+    required: false
+    description:
+      - Time when to apply the update.
+    type: str
+    choices:
+      - Immediate
+      - OnReset
+      - AtMaintenanceWindowStart
+      - InMaintenanceWindowOnReset
+      - OnStartUpdateRequest
+    version_added: '6.1.0'
+  update_handle:
+    required: false
+    description:
+      - Handle to check the status of an update in progress.
+    type: str
+    version_added: '6.1.0'
   virtual_media:
     required: false
     description:
@@ -508,6 +526,15 @@ EXAMPLES = '''
         username: operator
         password: supersecretpwd
 
+  - name: Perform requested operations to continue the update
+    community.general.redfish_command:
+      category: Update
+      command: PerformRequestedOperations
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      update_handle: /redfish/v1/TaskService/TaskMonitors/735
+
   - name: Insert Virtual Media
     community.general.redfish_command:
       category: Systems
@@ -610,6 +637,20 @@ msg:
     returned: always
     type: str
     sample: "Action was successful"
+return_values:
+    description: Dictionary containing command-specific response data from the action.
+    returned: on success
+    type: dict
+    version_added: 6.1.0
+    sample: {
+        "update_status": {
+            "handle": "/redfish/v1/TaskService/TaskMonitors/735",
+            "messages": [],
+            "resets_requested": [],
+            "ret": true,
+            "status": "New"
+        }
+    }
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -630,12 +671,13 @@ CATEGORY_COMMANDS_ALL = {
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
                 "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
                 "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
-    "Update": ["SimpleUpdate"]
+    "Update": ["SimpleUpdate", "PerformRequestedOperations"],
 }
 
 
 def main():
     result = {}
+    return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
@@ -667,6 +709,9 @@ def main():
                     password=dict(no_log=True)
                 )
             ),
+            update_apply_time=dict(choices=['Immediate', 'OnReset', 'AtMaintenanceWindowStart',
+                                            'InMaintenanceWindowOnReset', 'OnStartUpdateRequest']),
+            update_handle=dict(),
             virtual_media=dict(
                 type='dict',
                 options=dict(
@@ -721,7 +766,9 @@ def main():
         'update_image_uri': module.params['update_image_uri'],
         'update_protocol': module.params['update_protocol'],
         'update_targets': module.params['update_targets'],
-        'update_creds': module.params['update_creds']
+        'update_creds': module.params['update_creds'],
+        'update_apply_time': module.params['update_apply_time'],
+        'update_handle': module.params['update_handle'],
     }
 
     # Boot override options
@@ -859,6 +906,10 @@ def main():
         for command in command_list:
             if command == "SimpleUpdate":
                 result = rf_utils.simple_update(update_opts)
+                if 'update_status' in result:
+                    return_values['update_status'] = result['update_status']
+            elif command == "PerformRequestedOperations":
+                result = rf_utils.perform_requested_update_operations(update_opts['update_handle'])
 
     # Return data back or fail with proper message
     if result['ret'] is True:
@@ -866,7 +917,8 @@ def main():
         changed = result.get('changed', True)
         session = result.get('session', dict())
         module.exit_json(changed=changed, session=session,
-                         msg='Action was successful')
+                         msg='Action was successful',
+                         return_values=return_values)
     else:
         module.fail_json(msg=to_native(result['msg']))
 
