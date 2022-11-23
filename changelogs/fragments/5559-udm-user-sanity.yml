@@ -1,0 +1,2 @@
+minor_changes:
+  - udm_user - add ``elements`` attribute when missing in ``list`` parameters (https://github.com/ansible-collections/community.general/pull/5559).
