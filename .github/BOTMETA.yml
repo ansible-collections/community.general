@@ -527,9 +527,6 @@ files:
     maintainers: zimbatm
   $modules/gunicorn.py:
     maintainers: agmezr
-  $modules/hana_query.py:
-    maintainers: rainerleber
-    migrated_to: community.sap_libs
   $modules/haproxy.py:
     maintainers: ravibhure Normo
   $modules/heroku_collaborator.py:
@@ -1074,12 +1071,6 @@ files:
     maintainers: nerzhul
   $modules/runit.py:
     maintainers: jsumners
-  $modules/sap_task_list_execute:
-    maintainers: rainerleber
-    migrated_to: community.sap_libs
-  $modules/sapcar_extract.py:
-    maintainers: RainerLeber
-    migrated_to: community.sap_libs
   $modules/say.py:
     maintainers: $team_ansible_core
     ignore: mpdehaan
