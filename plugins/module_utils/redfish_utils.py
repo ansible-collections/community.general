@@ -143,7 +143,7 @@ class RedfishUtils(object):
         except Exception as e:
             return {'ret': False,
                     'msg': "Failed GET request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'data': data, 'headers': headers}
+        return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
     def post_request(self, uri, pyld):
         req_headers = dict(POST_HEADERS)
@@ -155,6 +155,11 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
+            try:
+                data = json.loads(to_native(resp.read()))
+            except Exception as e:
+                # No response data; this is okay in many cases
+                data = None
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
@@ -169,7 +174,7 @@ class RedfishUtils(object):
         except Exception as e:
             return {'ret': False,
                     'msg': "Failed POST request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'headers': headers, 'resp': resp}
+        return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
     def patch_request(self, uri, pyld, check_pyld=False):
         req_headers = dict(PATCH_HEADERS)
@@ -1384,11 +1389,82 @@ class RedfishUtils(object):
         else:
             return self._software_inventory(self.software_uri)
 
+    def _operation_results(self, response, data, handle=None):
+        """
+        Builds the results for an operation from task, job, or action response.
+
+        :param response: HTTP response object
+        :param data: HTTP response data
+        :param handle: The task or job handle that was last used
+        :return: dict containing operation results
+        """
+
+        operation_results = {'status': None, 'messages': [], 'handle': None, 'ret': True,
+                             'resets_requested': []}
+
+        if response.status == 204:
+            # No content; successful, but nothing to return
+            # Use the Redfish "Completed" enum from TaskState for the operation status
+            operation_results['status'] = 'Completed'
+        else:
+            # Parse the response body for details
+
+            # Determine the next handle, if any
+            operation_results['handle'] = handle
+            if response.status == 202:
+                # Task generated; get the task monitor URI
+                operation_results['handle'] = response.getheader('Location', handle)
+
+            # Pull out the status and messages based on the body format
+            if data is not None:
+                response_type = data.get('@odata.type', '')
+                if response_type.startswith('#Task.') or response_type.startswith('#Job.'):
+                    # Task and Job have similar enough structures to treat the same
+                    operation_results['status'] = data.get('TaskState', data.get('JobState'))
+                    operation_results['messages'] = data.get('Messages', [])
+                else:
+                    # Error response body, which is a bit of a misnomer since it's used in successful action responses
+                    operation_results['status'] = 'Completed'
+                    if response.status >= 400:
+                        operation_results['status'] = 'Exception'
+                    operation_results['messages'] = data.get('error', {}).get('@Message.ExtendedInfo', [])
+            else:
+                # No response body (or malformed); build based on status code
+                operation_results['status'] = 'Completed'
+                if response.status == 202:
+                    operation_results['status'] = 'New'
+                elif response.status >= 400:
+                    operation_results['status'] = 'Exception'
+
+            # Clear out the handle if the operation is complete
+            if operation_results['status'] in ['Completed', 'Cancelled', 'Exception', 'Killed']:
+                operation_results['handle'] = None
+
+            # Scan the messages to see if next steps are needed
+            for message in operation_results['messages']:
+                message_id = message['MessageId']
+
+                if message_id.startswith('Update.1.') and message_id.endswith('.OperationTransitionedToJob'):
+                    # Operation rerouted to a job; update the status and handle
+                    operation_results['status'] = 'New'
+                    operation_results['handle'] = message['MessageArgs'][0]
+                    operation_results['resets_requested'] = []
+                    # No need to process other messages in this case
+                    break
+
+                if message_id.startswith('Base.1.') and message_id.endswith('.ResetRequired'):
+                    # A reset to some device is needed to continue the update
+                    reset = {'uri': message['MessageArgs'][0], 'type': message['MessageArgs'][1]}
+                    operation_results['resets_requested'].append(reset)
+
+        return operation_results
+
     def simple_update(self, update_opts):
         image_uri = update_opts.get('update_image_uri')
         protocol = update_opts.get('update_protocol')
         targets = update_opts.get('update_targets')
         creds = update_opts.get('update_creds')
+        apply_time = update_opts.get('update_apply_time')
 
         if not image_uri:
             return {'ret': False, 'msg':
@@ -1439,11 +1515,65 @@ class RedfishUtils(object):
                 payload["Username"] = creds.get('username')
             if creds.get('password'):
                 payload["Password"] = creds.get('password')
+        if apply_time:
+            payload["@Redfish.OperationApplyTime"] = apply_time
         response = self.post_request(self.root_uri + update_uri, payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
-                'msg': "SimpleUpdate requested"}
+                'msg': "SimpleUpdate requested",
+                'update_status': self._operation_results(response['resp'], response['data'])}
+
+    def get_update_status(self, update_handle):
+        """
+        Gets the status of an update operation.
+
+        :param handle: The task or job handle tracking the update
+        :return: dict containing the response of the update status
+        """
+
+        if not update_handle:
+            return {'ret': False, 'msg': 'Must provide a handle tracking the update.'}
+
+        # Get the task or job tracking the update
+        response = self.get_request(self.root_uri + update_handle)
+        if response['ret'] is False:
+            return response
+
+        # Inspect the response to build the update status
+        return self._operation_results(response['resp'], response['data'], update_handle)
+
+    def perform_requested_update_operations(self, update_handle):
+        """
+        Performs requested operations to allow the update to continue.
+
+        :param handle: The task or job handle tracking the update
+        :return: dict containing the result of the operations
+        """
+
+        # Get the current update status
+        update_status = self.get_update_status(update_handle)
+        if update_status['ret'] is False:
+            return update_status
+
+        changed = False
+
+        # Perform any requested updates
+        for reset in update_status['resets_requested']:
+            resp = self.post_request(self.root_uri + reset['uri'], {'ResetType': reset['type']})
+            if resp['ret'] is False:
+                # Override the 'changed' indicator since other resets may have
+                # been successful
+                resp['changed'] = changed
+                return resp
+            changed = True
+
+        msg = 'No operations required for the update'
+        if changed:
+            # Will need to consider finetuning this message if the scope of the
+            # requested operations grow over time
+            msg = 'One or more components reset to continue the update'
+        return {'ret': True, 'changed': changed, 'msg': msg}
 
     def get_bios_attributes(self, systems_uri):
         result = {}
