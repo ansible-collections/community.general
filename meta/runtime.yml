@@ -952,7 +952,7 @@ plugin_routing:
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
     database.saphana.hana_query:
-      redirect: community.general.hana_query
+      redirect: community.sap_libs.sap_hdbsql
       deprecation:
         removal_version: 9.0.0
         warning_text: You are using an internal name to access the community.general.hana_query
@@ -3530,14 +3530,14 @@ plugin_routing:
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
     system.sap_task_list_execute:
-      redirect: community.general.sap_task_list_execute
+      redirect: community.sap_libs.sap_task_list_execute
       deprecation:
         removal_version: 9.0.0
         warning_text: You are using an internal name to access the community.general.sap_task_list_execute
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
     files.sapcar_extract:
-      redirect: community.general.sapcar_extract
+      redirect: community.sap_libs.sapcar_extract
       deprecation:
         removal_version: 9.0.0
         warning_text: You are using an internal name to access the community.general.sapcar_extract
