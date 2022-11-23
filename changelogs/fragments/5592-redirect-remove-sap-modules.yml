@@ -1,0 +1,4 @@
+minor_changes:
+  - sapcar_extract - migrated to community.sap_libs.sapcar_extract
+  - sap_task_list_execute - migrated to community.sap_libs.sap_task_list_execute
+  - hana_query - migrated to community.sap_libs.sap_hdbsql
