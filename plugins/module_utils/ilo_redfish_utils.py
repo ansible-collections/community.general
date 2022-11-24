@@ -99,29 +99,9 @@ class iLORedfishUtils(RedfishUtils):
         result["ret"] = True
         return result
 
-    def get_systems_data(self):
-        response = self.get_request(self.root_uri + self.systems_uri)
-        if not response["ret"]:
-            return response
-
-        return {
-            "ret": True,
-            "msg": response
-        }
-
-    def get_managers_data(self):
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if not response["ret"]:
-            return response
-
-        return {
-            "ret": True,
-            "msg": response
-        }
-
     def get_service_bios_attributes(self):
         # This method returns service BIOS attributes
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -187,7 +167,7 @@ class iLORedfishUtils(RedfishUtils):
         physical_drives_count = 0
         result = {}
 
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -268,7 +248,7 @@ class iLORedfishUtils(RedfishUtils):
 
         result = {}
 
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -377,7 +357,7 @@ class iLORedfishUtils(RedfishUtils):
         # This method returns list of SNMPv3 users
         snmpv3_users = []
 
-        response = self.get_managers_data()
+        response = self.get_request(self.root_uri + self.manager_uri)
         if not response["ret"]:
             return response
 
@@ -406,7 +386,7 @@ class iLORedfishUtils(RedfishUtils):
         # This method returns list of SNMP alert destinations
         alert_destinations = []
 
-        response = self.get_managers_data()
+        response = self.get_request(self.root_uri + self.manager_uri)
         if not response["ret"]:
             return response
 
@@ -749,7 +729,7 @@ class iLORedfishUtils(RedfishUtils):
 
     def set_service_bios_attributes(self, service_attributes):
         # This method applies provided service BIOS attributes in the OOB controller
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -911,7 +891,7 @@ class iLORedfishUtils(RedfishUtils):
 
     def delete_all_logical_drives(self):
         # This function deletes all the logical drives
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -945,7 +925,7 @@ class iLORedfishUtils(RedfishUtils):
         unused_physical_drives = []
 
         # Getting smart storage details
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -1377,7 +1357,7 @@ class iLORedfishUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -1452,7 +1432,7 @@ class iLORedfishUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -1484,7 +1464,7 @@ class iLORedfishUtils(RedfishUtils):
         # This function enable Secure Boot on an OOB controller
 
         # Get server details
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -1536,7 +1516,7 @@ class iLORedfishUtils(RedfishUtils):
 
         body = {"LogicalDrives": [], "DataGuard": "Permissive"}
 
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -1685,7 +1665,7 @@ class iLORedfishUtils(RedfishUtils):
 
     def get_server_poststate(self):
         # Get server details
-        response = self.get_systems_data()
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
             return response
 
@@ -1784,69 +1764,6 @@ class iLORedfishUtils(RedfishUtils):
             }
 
         result["logical_drives_details"] = needed_logical_drives
-
-        return {
-            "ret": True,
-            "msg": result
-        }
-
-    def get_nvme_drives_details(self):
-        # This method returns NVMe drive details
-        result = {}
-        nvme_drives_list = []
-
-        response = self.get_systems_data()
-        if not response["ret"]:
-            return response
-
-        nvme_drive_url = self.root_uri + self.systems_uri + "Storage/"
-        init_data = self.get_request(nvme_drive_url)
-        if not init_data["ret"]:
-            return init_data
-
-        if init_data["data"]["Members@odata.count"] == 0:
-            result["nvme_drives_count"] = 0
-            result["nvme_drives_list"] = []
-            return {
-                "ret": True,
-                "msg": result
-            }
-
-        # Get Members of Storage
-        for mem in init_data["data"]["Members"]:
-            mem_url = mem["@odata.id"]
-            mem_res = self.get_request(self.root_uri + mem_url)
-            if not mem_res["ret"]:
-                return mem_res
-
-            # Get Storage drives URI
-            if 'Drives' in mem_res['data']:
-                drives_url = mem_res['data']['Drives']
-            else:
-                return {
-                    "ret": False,
-                    "msg": "Physical drive URI not found in %s response %s" % (str(mem_url), str(mem_res))
-                }
-
-            # Get NVMe drive details
-            temp_data = mem_res["data"]
-            self.remove_odata(temp_data)
-            drives = []
-            for url in drives_url:
-                resp_NVMe = self.get_request(self.root_uri + url["@odata.id"])
-                if not resp_NVMe["ret"]:
-                    return resp_NVMe
-                if "Protocol" in resp_NVMe["data"] and resp_NVMe["data"]["Protocol"].lower() == "nvme":
-                    self.remove_odata(resp_NVMe["data"])
-                    drives.append(resp_NVMe["data"])
-
-            if not drives:
-                continue
-            temp_data = drives
-            nvme_drives_list.append(temp_data)
-
-        result["nvme_drives_count"] = len(drives)
-        result["nvme_drives_list"] = nvme_drives_list
 
         return {
             "ret": True,
