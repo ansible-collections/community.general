@@ -142,14 +142,6 @@ EXAMPLES = '''
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
-
-  - name: Get NVMe drives details
-    ilo_redfish_info:
-      category: Systems
-      command: GetNvmeDrives
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
 '''
 
 RETURN = '''
@@ -173,7 +165,7 @@ ilo_redfish_info:
 CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
                          "Systems": ["GetServiceBiosAttributes", "GetBootSettings", "GetPhysicalDrives",
                                      "GetLogicalDrives", "GetLogicalDrivesWithArrayControllers",
-                                     "GetServerPostState", "GetNvmeDrives", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"],
+                                     "GetServerPostState", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"],
                          "Managers": ["GetSNMPv3Users", "GetSNMPAlertDestinations", "GetiLOBackupFiles"]}
 
 CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
@@ -294,8 +286,6 @@ def main():
                     result[command] = rf_utils.get_logical_drives_details(True)
                 elif command == "GetServerPostState":
                     result[command] = rf_utils.get_server_poststate()
-                elif command == "GetNvmeDrives":
-                    result[command] = rf_utils.get_nvme_drives_details()
         elif category == "Managers":
             for command in command_list:
                 if command == "GetSNMPv3Users":
