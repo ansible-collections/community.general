@@ -1,4 +1,8 @@
-minor_changes:
-  - sapcar_extract - migrated to community.sap_libs.sapcar_extract
-  - sap_task_list_execute - migrated to community.sap_libs.sap_task_list_execute
-  - hana_query - migrated to community.sap_libs.sap_hdbsql
+removed_features:
+  - |
+    All ``sap`` modules have been removed from this collection.
+    They have been migrated to the `community.sap_libs <https://galaxy.ansible.com/community/sap_libs>`_ collection.
+    Following modules are affected:
+    - sapcar_extract
+    - sap_task_list_execute
+    - hana_query
