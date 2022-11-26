@@ -12,63 +12,63 @@ module: keycloak_clientsecret
 
 short_description: Administration of Keycloak client secret via Keycloak API
 
-version_added: 4.4.0
+version_added: 6.1.0
 
 description:
-    - This module allows you to get or generate new Keycloak client secret via the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
+  - This module allows you to get or generate new Keycloak client secret via the Keycloak REST API.
+    It requires access to the REST API via OpenID Connect; the user connecting and the client being
+    used must have the requisite access rights. In a default Keycloak installation, admin-cli
+    and an admin user would work, as would a separate client definition with the scope tailored
+    to your needs and a user having the expected roles.
 
-    - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+  - The names of module options are snake_cased versions of the camelCase ones found in the
+    Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
 
-    - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
-      be returned that way by this module. You may pass single values for attributes when calling the module,
-      and this will be translated into a list suitable for the API.
+  - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
+    be returned that way by this module. You may pass single values for attributes when calling the module,
+    and this will be translated into a list suitable for the API.
 
-    - When generate a new client secret, where possible provide the client ID (not client_id) to the module.
-      This removes a lookup to the API to translate the client_id into the client ID.
+  - When generate a new client secret, where possible provide the client ID (not client_id) to the module.
+    This removes a lookup to the API to translate the client_id into the client ID.
 
 
 options:
-    state:
-        description:
-            - State of the client secret.
-            - On C(present), get the current client secret.
-            - On C(absent), the new client secret will be generated.
-        default: 'present'
-        type: str
-        choices:
-            - present
-            - absent
+  state:
+    description:
+      - State of the client secret.
+      - On C(present), get the current client secret.
+      - On C(absent), the new client secret will be generated.
+    default: 'present'
+    type: str
+    choices:
+      - present
+      - absent
 
-    realm:
-        type: str
-        description:
-            - They Keycloak realm under which this client resides.
-        default: 'master'
+  realm:
+    type: str
+    description:
+      - They Keycloak realm under which this client resides.
+    default: 'master'
 
-    id:
-        description:
-            - The unique identifier for this client.
-            - This parameter is not required for getting or generating a client secret but
-              providing it will reduce the number of API calls required.
-        type: str
-    client_id:
-        description:
-            - The client_id of the client to lookup account client ID
-        aliases:
-          - clientId
-        type: str
+  id:
+    description:
+      - The unique identifier for this client.
+      - This parameter is not required for getting or generating a client secret but
+        providing it will reduce the number of API calls required.
+    type: str
+  client_id:
+    description:
+      - The client_id of the client to lookup account client ID
+    aliases:
+      - clientId
+    type: str
 
 
 extends_documentation_fragment:
-- community.general.keycloak
+  - community.general.keycloak
 
 author:
-    - Fynn Chen (@fynncfchen)
+  - Fynn Chen (@fynncfchen)
 '''
 
 EXAMPLES = '''
@@ -97,43 +97,43 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
+  description: Message as to what action was taken.
+  returned: always
+  type: str
 
 end_state:
-    description: Representation of the client credential after module execution (sample is truncated).
-    returned: on success
-    type: complex
-    contains:
-        type:
-            description: Credential type.
-            type: str
-            returned: always
-            sample: secret
-        value:
-            description: Secret of the client.
-            type: str
-            returned: always
-            sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
+  description: Representation of the client credential after module execution (sample is truncated).
+  returned: on success
+  type: complex
+  contains:
+    type:
+      description: Credential type.
+      type: str
+      returned: always
+      sample: secret
+    value:
+      description: Secret of the client.
+      type: str
+      returned: always
+      sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
 
 clientsecret:
   description:
-      - Representation of the client credential after module execution.
-      - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
+    - Representation of the client credential after module execution.
+    - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
   returned: always
   type: complex
   contains:
-      type:
-          description: Credential type.
-          type: str
-          returned: always
-          sample: secret
-      value:
-          description: Secret of the client.
-          type: str
-          returned: always
-          sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
+    type:
+      description: Credential type.
+      type: str
+      returned: always
+      sample: secret
+    value:
+      description: Secret of the client.
+      type: str
+      returned: always
+      sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
 
 '''
 
@@ -164,7 +164,12 @@ def main():
                            supports_check_mode=True,
                            required_one_of=([['id', 'client_id'],
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+                           required_together=([['auth_realm', 'auth_username', 'auth_password']]),
+                           mutually_exclusive=[
+                               ['token', 'auth_realm'],
+                               ['token', 'auth_username'],
+                               ['token', 'auth_password']
+                           ])
 
     result = dict(changed=False, msg='', diff={}, clientsecret='')
 
@@ -184,7 +189,8 @@ def main():
     # only lookup the client_id if id isn't provided.
     # in the case that both are provided, prefer the ID, since it's one
     # less lookup.
-    if id is None and client_id is not None:
+    if id is None:
+        # Due to the required_one_of spec, client_id is guaranteed to not be None
         client = kc.get_client_by_clientid(client_id, realm=realm)
 
         if client is None:
@@ -206,7 +212,6 @@ def main():
         result['end_state'] = clientsecret
         result['msg'] = 'Get client secret successful for ID {id}'.format(id=id)
 
-        module.exit_json(**result)
     else:
         if state == 'absent':
             # Process a creation
@@ -227,7 +232,6 @@ def main():
         result['changed'] = False
         result['end_state'] = {}
         result['msg'] = 'State not specified; doing nothing.'
-        module.exit_json(**result)
 
     module.exit_json(**result)
 

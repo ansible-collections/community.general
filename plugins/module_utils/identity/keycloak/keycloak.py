@@ -1172,7 +1172,7 @@ class KeycloakAPI(object):
         clientsecret_url = URL_CLIENTSECRET.format(url=self.baseurl, realm=realm, id=id)
 
         try:
-            return json.loads(to_native(open_url(clientsecret_url, method='POST', headers=self.restheaders,
+            return json.loads(to_native(open_url(clientsecret_url, method='POST', headers=self.restheaders, timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -1195,7 +1195,7 @@ class KeycloakAPI(object):
         clientsecret_url = URL_CLIENTSECRET.format(url=self.baseurl, realm=realm, id=id)
 
         try:
-            return json.loads(to_native(open_url(clientsecret_url, method='GET', headers=self.restheaders,
+            return json.loads(to_native(open_url(clientsecret_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
