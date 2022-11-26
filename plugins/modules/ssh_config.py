@@ -92,6 +92,7 @@ options:
     description:
       - Sets the C(HostKeyAlgorithms) option.
     type: str
+    version_added: 6.1.0
 requirements:
 - StormSSH
 notes:
