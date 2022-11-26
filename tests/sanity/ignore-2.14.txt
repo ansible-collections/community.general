@@ -21,7 +21,6 @@ plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice
 plugins/modules/rax.py use-argspec-type-path # fix needed
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
-plugins/modules/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/xfconf.py validate-modules:return-syntax-error
 plugins/modules/yarn.py use-argspec-type-path

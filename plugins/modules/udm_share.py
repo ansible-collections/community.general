@@ -125,6 +125,7 @@ options:
         description:
             - Option name in smb.conf and its value.
         type: list
+        elements: dict
         aliases: [ samba_custom_settings ]
     sambaDirectoryMode:
         default: '0755'
@@ -200,12 +201,14 @@ options:
         description:
             - Allowed host/network.
         type: list
+        elements: str
         aliases: [ samba_hosts_allow ]
     sambaHostsDeny:
         default: []
         description:
             - Denied host/network.
         type: list
+        elements: str
         aliases: [ samba_hosts_deny ]
     sambaInheritAcls:
         default: true
@@ -314,11 +317,13 @@ options:
         description:
             - Only allow access for this host, IP address or network.
         type: list
+        elements: str
     nfsCustomSettings:
         default: []
         description:
             - Option name in exports file.
         type: list
+        elements: str
         aliases: [ nfs_custom_settings ]
 '''
 
@@ -382,6 +387,7 @@ def main():
                                 aliases=['samba_csc_policy'],
                                 default='manual'),
             sambaCustomSettings=dict(type='list',
+                                     elements='dict',
                                      aliases=['samba_custom_settings'],
                                      default=[]),
             sambaDirectoryMode=dict(type='str',
@@ -418,9 +424,11 @@ def main():
                                      aliases=['samba_hide_unreadable'],
                                      default=False),
             sambaHostsAllow=dict(type='list',
+                                 elements='str',
                                  aliases=['samba_hosts_allow'],
                                  default=[]),
             sambaHostsDeny=dict(type='list',
+                                elements='str',
                                 aliases=['samba_hosts_deny'],
                                 default=[]),
             sambaInheritAcls=dict(type='bool',
@@ -474,8 +482,10 @@ def main():
                                 aliases=['samba_writeable'],
                                 default=True),
             nfs_hosts=dict(type='list',
+                           elements='str',
                            default=[]),
             nfsCustomSettings=dict(type='list',
+                                   elements='str',
                                    aliases=['nfs_custom_settings'],
                                    default=[]),
             state=dict(default='present',
