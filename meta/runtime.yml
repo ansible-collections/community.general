@@ -972,6 +972,8 @@ plugin_routing:
         warning_text: You are using an internal name to access the community.general.heroku_collaborator
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
+    hana_query:
+      redirect: community.sap_libs.sap_hdbsql
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
     hetzner_failover_ip_info:
@@ -3389,6 +3391,10 @@ plugin_routing:
         warning_text: You are using an internal name to access the community.general.redfish_info
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
+    sapcar_extract:
+      redirect: community.sap_libs.sapcar_extract
+    sap_task_list_execute:
+      redirect: community.sap_libs.sap_task_list_execute
     packaging.os.redhat_subscription:
       redirect: community.general.redhat_subscription
       deprecation:
