@@ -86,14 +86,31 @@ RETURN = r'''#'''
 
 import time
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.general.plugins.modules.proxmox_snap import (ProxmoxSnapAnsible)
+
+import traceback
+
+try:
+    from ansible_collections.community.general.plugins.modules.proxmox_snap import (ProxmoxSnapAnsible)
+except ImportError:
+    HAS_PROXMOX_SNAP = False
+    PROXMOX_SNAP_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_PROXMOX_SNAP = True
+
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
 
 
 def main():
+    if not HAS_PROXMOX_SNAP:
+        # Needs: from ansible.module_utils.basic import missing_required_lib
+        module.fail_json(
+            msg=missing_required_lib('proxmox_snap'),
+            exception=PROXMOX_SNAP_IMPORT_ERROR)
+
+
     module_args = proxmox_auth_argument_spec()
     snap_args = dict(
         vmid=dict(required=False),
