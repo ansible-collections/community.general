@@ -26,13 +26,6 @@ options:
       - The instance id.
       - If not set, will be fetched from PromoxAPI based on the hostname.
     type: str
-  state:
-    description:
-     - Indicate desired state of the instance snapshot.
-     - The C(rollback) value was added in community.general 4.8.0.
-    choices: ['present', 'absent', 'rollback']
-    default: present
-    type: str
   timeout:
     description:
       - Timeout for operations.
@@ -95,7 +88,6 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-#from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 from ansible_collections.community.general.plugins.modules.proxmox_snap import ProxmoxAnsible
 
 
@@ -108,9 +100,6 @@ def main():
         state=dict(default='present', choices=['present', 'absent', 'rollback']),
         description=dict(type='str'),
         snapname=dict(type='str', default=''),
-        force=dict(type='bool', default=False),
-        unbind=dict(type='bool', default=False),
-        vmstate=dict(type='bool', default=False),
         getsnapshots=dict(type='bool', default=False),
         older_than=dict(type='int', default=0)
     )
@@ -129,9 +118,6 @@ def main():
     description = module.params['description']
     snapname = module.params['snapname']
     timeout = module.params['timeout']
-    force = module.params['force']
-    unbind = module.params['unbind']
-    vmstate = module.params['vmstate']
     getsnapshots = module.params['getsnapshots']
     older_than = module.params['older_than']
 

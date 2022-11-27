@@ -23,4 +23,3 @@ def test_proxmox_snap_info_without_argument(capfd):
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']
-
