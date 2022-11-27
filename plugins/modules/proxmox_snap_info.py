@@ -104,13 +104,6 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 
 def main():
-    if not HAS_PROXMOX_SNAP:
-        # Needs: from ansible.module_utils.basic import missing_required_lib
-        module.fail_json(
-            msg=missing_required_lib('proxmox_snap'),
-            exception=PROXMOX_SNAP_IMPORT_ERROR)
-
-
     module_args = proxmox_auth_argument_spec()
     snap_args = dict(
         vmid=dict(required=False),
@@ -126,6 +119,13 @@ def main():
         argument_spec=module_args,
         supports_check_mode=True
     )
+
+    if not HAS_PROXMOX_SNAP:
+        # Needs: from ansible.module_utils.basic import missing_required_lib
+        module.fail_json(
+            msg=missing_required_lib('proxmox_snap'),
+            exception=PROXMOX_SNAP_IMPORT_ERROR)
+
 
     proxmox = ProxmoxSnapAnsible(module)
 
