@@ -69,18 +69,6 @@ options:
       - Name of the snapshot that has to be created/deleted/restored.
     default: 'ansible_snap'
     type: str
-  getsnapshots:
-    description:
-      - Lists all snapshots of a vm
-      - to be optionally combined with older_than
-      - to be optionally combine with snapname (finds snapshot starting with the snapname)
-    default: false
-    type: bool
-  older_than:
-    description:
-      - Minimum age of backup to be listed by getsnapshots in days
-    default: 0
-    type: int
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
@@ -128,27 +116,6 @@ EXAMPLES = r'''
     vmid: 100
     state: rollback
     snapname: pre-updates
-
-- name: Get all snapshots older than 2 day
-  community.general.proxmox_snap:
-    api_user: root@pam
-    api_password: 1q2w3e
-    api_host: node1
-    vmid: 100
-    getsnapshots: True
-    older_than: 2
-    snapname: snapshot_
-  register: snaplist
-
-- name: delete Snapshots from list
-  community.general.proxmox_snap:
-    api_user: root@pam
-    api_password: 1q2w3e
-    api_host: node1
-    vmid: 100
-    snapname: "{{ item }}"
-    state: absent
-  loop: "{{ snaplist['results'] }}"
 '''
 
 RETURN = r'''#'''
@@ -303,8 +270,6 @@ def main():
         force=dict(type='bool', default=False),
         unbind=dict(type='bool', default=False),
         vmstate=dict(type='bool', default=False),
-        getsnapshots=dict(type='bool', default=False),
-        older_than=dict(type='int', default=0)
     )
     module_args.update(snap_args)
 
@@ -324,8 +289,6 @@ def main():
     force = module.params['force']
     unbind = module.params['unbind']
     vmstate = module.params['vmstate']
-    getsnapshots = module.params['getsnapshots']
-    older_than = module.params['older_than']
 
     # If hostname is set get the VM id from ProxmoxAPI
     if not vmid and hostname:
@@ -335,24 +298,7 @@ def main():
 
     vm = proxmox.get_vm(vmid)
 
-    if getsnapshots:
-        snapshotlist = proxmox.snapshot(vm, vmid).get()
-        oldsnapshotlist = []
-
-        for s in snapshotlist:
-            if s["name"] == "current":
-                continue
-            if snapname != 'ansible_snap':   # default value
-                if not s["name"][0:len(snapname)] == snapname:
-                    continue
-            if ((time.time() - s["snaptime"]) / 60 / 60 / 24) > older_than:
-                oldsnapshotlist.append(s["name"])
-
-        snapshotdict = {"results": oldsnapshotlist, "older_than": older_than}
-
-        module.exit_json(**snapshotdict)
-
-    elif state == 'present':
+    if state == 'present':
         try:
             for i in proxmox.snapshot(vm, vmid).get():
                 if i['name'] == snapname:
