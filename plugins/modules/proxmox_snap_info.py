@@ -123,7 +123,7 @@ def main():
     if not vmid and hostname:
         vmid = proxmox.get_vmid(hostname)
     elif not vmid:
-        module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
+        module.exit_json(changed=False, msg="Vmid could not be fetched")
 
     vm = proxmox.get_vm(vmid)
 
