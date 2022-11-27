@@ -3392,7 +3392,7 @@ plugin_routing:
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
     sapcar_extract:
-      redirect: community.sap.sapcar_extract
+      redirect: community.sap_libs.sapcar_extract
     sap_task_list_execute:
       redirect: community.sap_libs.sap_task_list_execute
     packaging.os.redhat_subscription:
