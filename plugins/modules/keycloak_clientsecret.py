@@ -104,26 +104,8 @@ msg:
   type: str
 
 end_state:
-  description: Representation of the client credential after module execution (sample is truncated).
+  description: Representation of the client credential after module execution
   returned: on success
-  type: complex
-  contains:
-    type:
-      description: Credential type.
-      type: str
-      returned: always
-      sample: secret
-    value:
-      description: Secret of the client.
-      type: str
-      returned: always
-      sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
-
-clientsecret:
-  description:
-    - Representation of the client credential after module execution.
-    - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
-  returned: always
   type: complex
   contains:
     type:
@@ -210,31 +192,21 @@ def main():
         # Create new secret
         clientsecret = kc.get_clientsecret(id=id, realm=realm)
 
-        result['clientsecret'] = clientsecret
         result['end_state'] = clientsecret
         result['msg'] = 'Get client secret successful for ID {id}'.format(id=id)
 
-    else:
-        if state == 'absent':
-            # Process a creation
-            result['changed'] = True
+    elif state == 'absent':
+        # Process a creation
+        result['changed'] = True
 
-            if module.check_mode:
-                module.exit_json(**result)
-
-            # Create new secret
-            clientsecret = kc.create_clientsecret(id=id, realm=realm)
-
-            result['clientsecret'] = clientsecret
-            result['end_state'] = clientsecret
-            result['msg'] = 'New client secret has been generated for ID {id}'.format(id=id)
-
+        if module.check_mode:
             module.exit_json(**result)
 
-        # Do nothing and exit
-        result['changed'] = False
-        result['end_state'] = {}
-        result['msg'] = 'State not specified; doing nothing.'
+        # Create new secret
+        clientsecret = kc.create_clientsecret(id=id, realm=realm)
+
+        result['end_state'] = clientsecret
+        result['msg'] = 'New client secret has been generated for ID {id}'.format(id=id)
 
     module.exit_json(**result)
 

@@ -42,9 +42,7 @@
     that:
       - not fetch_result.failed
       - not fetch_result.changed
-      - fetch_result.clientsecret.type == "secret"
       - fetch_result.end_state.type == "secret"
-      - "{{ fetch_result.clientsecret.value | length }} >= 32"
       - "{{ fetch_result.end_state.value | length }} >= 32"
 
 - name: Keycloak Client fetch clientsecret by id
@@ -59,7 +57,7 @@
 - name: Assert that same client secret was retrieved
   assert:
     that:
-      - fetch_by_id_result.clientsecret.value == fetch_result.clientsecret.value
+      - fetch_by_id_result.end_state.value == fetch_result.end_state.value
 
 - name: Modify clientsecret
   community.general.keycloak_clientsecret: "{{ auth_args | combine(call_args) }}"
@@ -78,9 +76,6 @@
     that:
       - not modify_result.failed
       - modify_result.changed
-      - modify_result.clientsecret.type == "secret"
       - modify_result.end_state.type == "secret"
-      - "{{ modify_result.clientsecret.value | length }} >= 32"
       - "{{ modify_result.end_state.value | length }} >= 32"
-      - modify_result.clientsecret != fetch_result.clientsecret
       - modify_result.end_state != fetch_result.end_state
