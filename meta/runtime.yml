@@ -3394,7 +3394,7 @@ plugin_routing:
     sapcar_extract:
       redirect: community.sap.sapcar_extract
     sap_task_list_execute:
-      redirect: community.sap.sap_task_list_execute
+      redirect: community.sap_libs.sap_task_list_execute
     packaging.os.redhat_subscription:
       redirect: community.general.redhat_subscription
       deprecation:
