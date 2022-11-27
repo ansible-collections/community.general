@@ -34,7 +34,7 @@ options:
   snapname:
     description:
       - Name of the snapshot that has to be created/deleted/restored.
-    default: 'ansible_snap'
+    default: ''
     type: str
   getsnapshots:
     description:
@@ -99,7 +99,6 @@ def main():
         vmid=dict(required=False),
         hostname=dict(),
         timeout=dict(type='int', default=30),
-        state=dict(default='present', choices=['present', 'absent', 'rollback']),
         description=dict(type='str'),
         snapname=dict(type='str', default=''),
         getsnapshots=dict(type='bool', default=False),
