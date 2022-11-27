@@ -126,7 +126,6 @@ def main():
             msg=missing_required_lib('proxmox_snap'),
             exception=PROXMOX_SNAP_IMPORT_ERROR)
 
-
     proxmox = ProxmoxSnapAnsible(module)
 
     vmid = module.params['vmid']
