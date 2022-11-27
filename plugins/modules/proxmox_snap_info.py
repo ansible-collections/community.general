@@ -88,7 +88,7 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.general.plugins.modules.proxmox_snap import ProxmoxSnapAnsible
+from proxmox_snap import ProxmoxSnapAnsible
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
 
