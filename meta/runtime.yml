@@ -973,7 +973,7 @@ plugin_routing:
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
     hana_query:
-        redirect: community.sap_libs.sap_hdbsql
+      redirect: community.sap_libs.sap_hdbsql
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
     hetzner_failover_ip_info:
