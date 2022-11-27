@@ -99,7 +99,6 @@ def main():
         vmid=dict(required=False),
         hostname=dict(),
         timeout=dict(type='int', default=30),
-        description=dict(type='str'),
         snapname=dict(type='str', default=''),
         getsnapshots=dict(type='bool', default=False),
         older_than=dict(type='int', default=0)
@@ -113,10 +112,8 @@ def main():
 
     proxmox = ProxmoxSnapAnsible(module)
 
-    state = module.params['state']
     vmid = module.params['vmid']
     hostname = module.params['hostname']
-    description = module.params['description']
     snapname = module.params['snapname']
     timeout = module.params['timeout']
     getsnapshots = module.params['getsnapshots']
