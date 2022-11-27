@@ -225,6 +225,7 @@ def main():
             # Create new secret
             clientsecret = kc.create_clientsecret(id=id, realm=realm)
 
+            result['clientsecret'] = clientsecret
             result['end_state'] = clientsecret
             result['msg'] = 'New client secret has been generated for ID {id}'.format(id=id)
 
