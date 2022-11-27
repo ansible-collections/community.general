@@ -18,4 +18,3 @@ auth_args:
   auth_realm: "{{ admin_realm }}"
   auth_username: "{{ admin_user }}"
   auth_password: "{{ admin_password }}"
-
