@@ -2,6 +2,7 @@ removed_features:
   - |
     All ``sap`` modules have been removed from this collection.
     They have been migrated to the `community.sap_libs <https://galaxy.ansible.com/community/sap_libs>`_ collection.
+    Redirections have been provided.
     Following modules are affected:
     - sapcar_extract
     - sap_task_list_execute
