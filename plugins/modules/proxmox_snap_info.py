@@ -93,6 +93,9 @@ import traceback
 
 try:
     from ansible_collections.community.general.plugins.modules.proxmox_snap import (ProxmoxSnapAnsible)
+
+    HAS_PROXMOX_SNAP = True
+    PROXMOX_SNAP_IMPORT_ERROR = None
 except ImportError:
     HAS_PROXMOX_SNAP = False
     PROXMOX_SNAP_IMPORT_ERROR = traceback.format_exc()
