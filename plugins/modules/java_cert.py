@@ -281,7 +281,8 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
     (export_rc, export_stdout, export_err) = module.run_command(export_cmd, data=password, check_rc=False)
 
     if export_rc != 0:
-        module.fail_json(msg="Internal module failure, cannot extract public certificate from pkcs12, error: %s" % export_stdout,
+        module.fail_json(msg="Internal module failure, cannot extract public certificate from PKCS12, message: %s" % export_stdout,
+                         stderr=export_err,
                          rc=export_rc)
 
     with open(dest, 'w') as f:
