@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: keycloak_clientsecret
+module: keycloak_clientsecret_info
 
 short_description: Retrieve client secret via Keycloak API
 
@@ -62,7 +62,7 @@ author:
 
 EXAMPLES = '''
 - name: Get a Keycloak client secret, authentication with credentials
-  community.general.keycloak_clientsecret:
+  community.general.keycloak_clientsecret_info:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
     realm: MyCustomRealm
     auth_client_id: admin-cli
@@ -73,7 +73,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Get a new Keycloak client secret, authentication with token
-  community.general.keycloak_user:
+  community.general.keycloak_clientsecret_info:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
     realm: MyCustomRealm
     auth_client_id: admin-cli
@@ -82,7 +82,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Get a new Keycloak client secret, passing client_id instead of id
-  community.general.keycloak_user:
+  community.general.keycloak_clientsecret_info:
     client_id: 'myClientId'
     realm: MyCustomRealm
     auth_client_id: admin-cli
@@ -108,7 +108,7 @@ clientsecret_info:
       returned: always
       sample: secret
     value:
-      description: Secret of the client.
+      description: Client secret.
       type: str
       returned: always
       sample: cUGnX1EIeTtPPAkcyGMv0ncyqDPu68P1
