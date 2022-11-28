@@ -142,7 +142,7 @@ def main():
     if module.check_mode:
         dummy_result = {
             "msg": 'No action taken while in check mode',
-            "end_state": {'type': 'secret', 'value': 'X'*32}
+            "end_state": {'type': 'secret', 'value': 'X' * 32}
         }
         module.exit_json(**dummy_result)
 
