@@ -320,25 +320,25 @@ def main():
         if state == 'present':
             # Assign roles
             result['changed'] = True
-            if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_group_rolemapping(gid, cid, update_roles, realm=realm)
             result['msg'] = 'Roles %s assigned to group %s.' % (update_roles, group_name)
             assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+            if module._diff:
+                result['diff'] = dict(before=assigned_roles_before, after=assigned_roles_after)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
         else:
             # Remove mapping of role
             result['changed'] = True
-            if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
             if module.check_mode:
                 module.exit_json(**result)
             kc.delete_group_rolemapping(gid, cid, update_roles, realm=realm)
             result['msg'] = 'Roles %s removed from group %s.' % (update_roles, group_name)
             assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+            if module._diff:
+                result['diff'] = dict(before=assigned_roles_before, after=assigned_roles_after)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
     # Do nothing
