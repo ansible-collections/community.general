@@ -161,7 +161,7 @@ class iLORedfishUtils(RedfishUtils):
 
         return result
 
-    def get_physical_drives_details(self):
+    def get_smartstorage_physical_drives(self):
         # This method returns list of physical drives present in the OOB controller
         physical_drives = {}
         physical_drives_count = 0
