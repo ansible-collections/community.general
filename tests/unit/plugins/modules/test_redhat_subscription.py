@@ -92,7 +92,6 @@ TEST_CASES = [
                 ),
                 (
                     ['/testbin/subscription-manager', 'register',
-                        '--serverurl', 'satellite.company.com',
                         '--username', 'admin',
                         '--password', 'admin'],
                     {'check_rc': True, 'expand_user_and_vars': False},
@@ -180,7 +179,6 @@ TEST_CASES = [
                     [
                         '/testbin/subscription-manager',
                         'register',
-                        '--serverurl', 'satellite.company.com',
                         '--org', 'admin',
                         '--activationkey', 'some-activation-key'
                     ],
@@ -340,9 +338,6 @@ TEST_CASES = [
                         'register',
                         '--force',
                         '--org', 'admin',
-                        '--proxy', 'proxy.company.com:12345',
-                        '--proxyuser', 'proxy_user',
-                        '--proxypassword', 'secret_proxy_password',
                         '--username', 'admin',
                         '--password', 'admin'
                     ],
