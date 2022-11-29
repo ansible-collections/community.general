@@ -394,8 +394,7 @@ class Rhsm(RegistrationBase):
 
     def register(self, username, password, auto_attach, activationkey, org_id,
                  consumer_type, consumer_name, consumer_id, force_register, environment,
-                 rhsm_baseurl, server_insecure, server_hostname, server_proxy_hostname,
-                 server_proxy_port, server_proxy_user, server_proxy_password, release):
+                 release):
         '''
             Register the current system to the provided RHSM or Red Hat Satellite
             or Katello server
@@ -409,26 +408,8 @@ class Rhsm(RegistrationBase):
         if force_register:
             args.extend(['--force'])
 
-        if rhsm_baseurl:
-            args.extend(['--baseurl', rhsm_baseurl])
-
-        if server_insecure:
-            args.extend(['--insecure'])
-
-        if server_hostname:
-            args.extend(['--serverurl', server_hostname])
-
         if org_id:
             args.extend(['--org', org_id])
-
-        if server_proxy_hostname and server_proxy_port:
-            args.extend(['--proxy', server_proxy_hostname + ':' + server_proxy_port])
-
-        if server_proxy_user:
-            args.extend(['--proxyuser', server_proxy_user])
-
-        if server_proxy_password:
-            args.extend(['--proxypassword', server_proxy_password])
 
         if activationkey:
             args.extend(['--activationkey', activationkey])
@@ -924,8 +905,7 @@ def main():
                 rhsm.configure(**module.params)
                 rhsm.register(username, password, auto_attach, activationkey, org_id,
                               consumer_type, consumer_name, consumer_id, force_register,
-                              environment, rhsm_baseurl, server_insecure, server_hostname,
-                              server_proxy_hostname, server_proxy_port, server_proxy_user, server_proxy_password, release)
+                              environment, release)
                 if syspurpose and 'sync' in syspurpose and syspurpose['sync'] is True:
                     rhsm.sync_syspurpose()
                 if pool_ids:
