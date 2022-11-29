@@ -297,7 +297,7 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
-        if channel.startswith(('#', '@', 'C0', 'GF', 'G0', 'CP')):
+        if channel.startswith(('#', '@')) or re.match(r'^[C|D|G][A-Za-z0-9]{8}$', channel):
             payload['channel'] = channel
         else:
             payload['channel'] = '#' + channel
