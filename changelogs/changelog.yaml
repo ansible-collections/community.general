@@ -1352,3 +1352,21 @@ releases:
     - 5543-dependent-template.yml
     - fqcn-warnings.yml
     release_date: '2022-11-15'
+  5.8.2:
+    changes:
+      bugfixes:
+      - chroot connection plugin - add ``inventory_hostname`` to vars under ``remote_addr``.
+        This is needed for compatibility with ansible-core 2.13 (https://github.com/ansible-collections/community.general/pull/5570).
+      - cmd_runner module utils - fixed bug when handling default cases in ``cmd_runner_fmt.as_map()``
+        (https://github.com/ansible-collections/community.general/pull/5538).
+      - cmd_runner module utils - formatting arguments ``cmd_runner_fmt.as_fixed()``
+        was expecting an non-existing argument (https://github.com/ansible-collections/community.general/pull/5538).
+      - unixy callback plugin - fix plugin to work with ansible-core 2.14 by using
+        Ansible's configuration manager for handling options (https://github.com/ansible-collections/community.general/issues/5600).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 5.8.2.yml
+    - 5538-cmd-runner-as-fixed.yml
+    - 5570-chroot-plugin-fix-default-inventory_hostname.yml
+    - 5601-unixy-callback-use-config-manager.yml
+    release_date: '2022-11-29'
