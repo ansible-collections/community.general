@@ -132,7 +132,12 @@ options:
   prepend_hash:
     type: str
     description:
-      - Setting for automatically prepending a # symbol on the passed in channel_id
+      - Setting for automatically prepending a C(#) symbol on the passed in I(channel_id).
+      - The C(auto) method prepends a C(#) unless I(channel_id) starts with one of C(#), C(@), C(C0), C(GF), C(G0), C(CP).
+        These prefixes only cover a small set of the prefixes that should not have a C(#) prepended.
+        Since an exact condition which I(channel_id) values must not have the C(#) prefix is not known,
+        the value C(auto) for this option will be deprecated in the future. It is best to explicitly set
+        I(prepend_hash=always) or I(prepend_hash=never) to obtain the needed behavior.
     choices:
       - 'always'
       - 'never'
