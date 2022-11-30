@@ -129,6 +129,15 @@ options:
     type: list
     elements: dict
     version_added: 1.0.0
+  prepend_hash:
+    type: str
+    description:
+      - Setting for automatically prepending a # symbol on the passed in channel_id
+    choices:
+      - 'always'
+      - 'never'
+      - 'auto'
+    default: 'auto'
 """
 
 EXAMPLES = """
@@ -289,7 +298,7 @@ def recursive_escape_quotes(obj, keys):
 
 
 def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                            parse, color, attachments, blocks, message_id):
+                            parse, color, attachments, blocks, message_id, prepend_hash):
     payload = {}
     if color == "normal" and text is not None:
         payload = dict(text=escape_quotes(text))
@@ -297,6 +306,16 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
+        if prepend_hash == 'auto':
+            if channel.startswith(('#', '@', 'C0', 'GF', 'G0', 'CP')):
+                payload['channel'] = channel
+            else:
+                payload['channel'] = '#' + channel
+        elif prepend_hash == 'always':
+            payload['channel'] = '#' + channel
+        elif prepend_hash == 'never':
+            payload['channel'] = channel
+
         payload['channel'] = channel
     if thread_id is not None:
         payload['thread_ts'] = thread_id
@@ -425,6 +444,7 @@ def main():
             attachments=dict(type='list', elements='dict'),
             blocks=dict(type='list', elements='dict'),
             message_id=dict(type='str'),
+            prepend_hash=dict(type='str', default='auto', choices=['always', 'never', 'auto']),
         ),
         supports_check_mode=True,
     )
@@ -443,6 +463,7 @@ def main():
     attachments = module.params['attachments']
     blocks = module.params['blocks']
     message_id = module.params['message_id']
+    prepend_hash = module.params['prepend_hash']
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):
@@ -467,7 +488,7 @@ def main():
         module.exit_json(changed=changed)
 
     payload = build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                                      parse, color, attachments, blocks, message_id)
+                                      parse, color, attachments, blocks, message_id, prepend_hash)
     slack_response = do_notify_slack(module, domain, token, payload)
 
     if 'ok' in slack_response:

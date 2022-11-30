@@ -1,2 +1,0 @@
-bugfixes:
-  - slack - fix message update for channels which start with a prefix not in the hardcoded list, for example ``G4``. When ``message-id`` was passed it failed for channels which started with ``G4`` because the ``#`` symbol was added before the ``channel_id``. The fix is to remove the logic to prepend a ``#`` and instead leave the passed in channel value alone (https://github.com/ansible-collections/community.general/pull/5629).
