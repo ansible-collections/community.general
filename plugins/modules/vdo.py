@@ -332,7 +332,7 @@ def inventory_vdos(module, vdocmd):
     if rc != 0:
         module.fail_json(msg="Inventorying VDOs failed: %s" % vdostatusout, rc=rc, err=err)
 
-    vdostatusyaml = yaml.load(vdostatusout)
+    vdostatusyaml = yaml.safe_load(vdostatusout)
     if vdostatusyaml is None:
         return vdolist
 
@@ -548,7 +548,7 @@ def run_module():
     # Modify the current parameters of a VDO that exists.
     if desiredvdo in vdolist and state == 'present':
         rc, vdostatusoutput, err = module.run_command([vdocmd, "status"])
-        vdostatusyaml = yaml.load(vdostatusoutput)
+        vdostatusyaml = yaml.safe_load(vdostatusoutput)
 
         # An empty dictionary to contain dictionaries of VDO statistics
         processedvdos = {}
