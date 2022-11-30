@@ -138,6 +138,7 @@ options:
       - 'never'
       - 'auto'
     default: 'auto'
+    version_added: 6.1.0
 """
 
 EXAMPLES = """
