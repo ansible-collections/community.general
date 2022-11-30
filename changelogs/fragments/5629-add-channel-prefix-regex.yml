@@ -1,2 +1,2 @@
 bugfixes:
-  - slack - When ``message-id`` was passed it failed for channels that have a 2 digit prefix not in the hardcoded list, for example ``G4``, because the ``#`` symbol was added before the ``channel_id``. This change adds a regex to catch those channels. (https://github.com/ansible-collections/community.general/pull/5629).
+  - slack - when ``message-id`` was passed it failed for channels that have a 2 digit prefix not in the hardcoded list, for example ``G4``, because the ``#`` symbol was added before the ``channel_id``. This change adds a regex to catch those channels (https://github.com/ansible-collections/community.general/pull/5629).
