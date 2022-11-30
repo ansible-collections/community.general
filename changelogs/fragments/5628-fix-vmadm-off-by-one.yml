@@ -1,2 +1,2 @@
 bugfixes:
-  - vmadm - fix for vmadm get_vm_uuid out of range  (https://github.com/ansible-collections/community.general/pull/5628).
+  - vmadm - fix for index out of range error in ``get_vm_uuid`` (https://github.com/ansible-collections/community.general/pull/5628).
