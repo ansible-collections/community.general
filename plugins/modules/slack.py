@@ -321,8 +321,6 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
             payload['channel'] = '#' + channel
         elif prepend_hash == 'never':
             payload['channel'] = channel
-
-        payload['channel'] = channel
     if thread_id is not None:
         payload['thread_ts'] = thread_id
     if username is not None:
