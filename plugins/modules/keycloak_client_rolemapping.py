@@ -295,7 +295,7 @@ def main():
     assigned_roles_before = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
 
     result['existing'] = assigned_roles_before
-    result['proposed'] = assigned_roles_before.copy() if assigned_roles_before else []
+    result['proposed'] = list(assigned_roles_before) if assigned_roles_before else []
 
     update_roles = []
     for role_index, role in enumerate(roles, start=0):
