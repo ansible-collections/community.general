@@ -519,6 +519,7 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     id: realm
+    realm: realm
     state: present
 
 - name: Delete a Keycloak realm
