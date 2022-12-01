@@ -1,0 +1,2 @@
+bugfixes:
+  - "proxmox - fix lookup in inventory plugin (https://github.com/ansible-collections/community.general/pull/5640)"
