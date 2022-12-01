@@ -129,6 +129,21 @@ options:
     type: list
     elements: dict
     version_added: 1.0.0
+  prepend_hash:
+    type: str
+    description:
+      - Setting for automatically prepending a C(#) symbol on the passed in I(channel_id).
+      - The C(auto) method prepends a C(#) unless I(channel_id) starts with one of C(#), C(@), C(C0), C(GF), C(G0), C(CP).
+        These prefixes only cover a small set of the prefixes that should not have a C(#) prepended.
+        Since an exact condition which I(channel_id) values must not have the C(#) prefix is not known,
+        the value C(auto) for this option will be deprecated in the future. It is best to explicitly set
+        I(prepend_hash=always) or I(prepend_hash=never) to obtain the needed behavior.
+    choices:
+      - 'always'
+      - 'never'
+      - 'auto'
+    default: 'auto'
+    version_added: 6.1.0
 """
 
 EXAMPLES = """
@@ -289,7 +304,7 @@ def recursive_escape_quotes(obj, keys):
 
 
 def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                            parse, color, attachments, blocks, message_id):
+                            parse, color, attachments, blocks, message_id, prepend_hash):
     payload = {}
     if color == "normal" and text is not None:
         payload = dict(text=escape_quotes(text))
@@ -297,10 +312,15 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
-        if channel.startswith(('#', '@', 'C0', 'GF', 'G0', 'CP')):
-            payload['channel'] = channel
-        else:
+        if prepend_hash == 'auto':
+            if channel.startswith(('#', '@', 'C0', 'GF', 'G0', 'CP')):
+                payload['channel'] = channel
+            else:
+                payload['channel'] = '#' + channel
+        elif prepend_hash == 'always':
             payload['channel'] = '#' + channel
+        elif prepend_hash == 'never':
+            payload['channel'] = channel
     if thread_id is not None:
         payload['thread_ts'] = thread_id
     if username is not None:
@@ -428,6 +448,7 @@ def main():
             attachments=dict(type='list', elements='dict'),
             blocks=dict(type='list', elements='dict'),
             message_id=dict(type='str'),
+            prepend_hash=dict(type='str', default='auto', choices=['always', 'never', 'auto']),
         ),
         supports_check_mode=True,
     )
@@ -446,6 +467,7 @@ def main():
     attachments = module.params['attachments']
     blocks = module.params['blocks']
     message_id = module.params['message_id']
+    prepend_hash = module.params['prepend_hash']
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):
@@ -470,7 +492,7 @@ def main():
         module.exit_json(changed=changed)
 
     payload = build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                                      parse, color, attachments, blocks, message_id)
+                                      parse, color, attachments, blocks, message_id, prepend_hash)
     slack_response = do_notify_slack(module, domain, token, payload)
 
     if 'ok' in slack_response:
