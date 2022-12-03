@@ -1,0 +1,15 @@
+# Copyright (c) 2022 Maxwell G <gotmax@e.email>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
+# https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+copr_host: copr.fedorainfracloud.org
+copr_namespace: gotmax23
+copr_name: community.general.copr_integration_tests
+copr_fullname: '{{ copr_namespace }}/{{ copr_name }}'
+copr_repofile: '/etc/yum.repos.d/_copr:{{ copr_host }}:{{ copr_namespace }}:{{ copr_name }}.repo'
+
+# TODO: Fix chroot autodetection so this isn't necessary
+_copr_chroot_fedora: "fedora-rawhide-x86_64"
+_copr_chroot_rhelish: "epel-{{ ansible_distribution_major_version }}-x86_64"
+copr_chroot: "{{ _copr_chroot_fedora if ansible_distribution == 'Fedora' else _copr_chroot_rhelish }}"

@@ -7,5 +7,3 @@ needs/root
 skip/macos
 skip/osx
 skip/freebsd
-
-disabled  # FIXME tests are currently failing
