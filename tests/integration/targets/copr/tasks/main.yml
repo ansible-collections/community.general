@@ -3,14 +3,27 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- when: ansible_distribution == 'Fedora'
+- when:
+    # Fedora or RHEL >= 8
+    # This module requires the dnf module which is not available on RHEL 7.
+    - >
+      ansible_distribution == 'Fedora'
+      or (ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
+          and ansible_distribution_major_version | int >= 8)
+    # The copr module imports dnf which is only available for the system Python
+    # interpreter.
+    - >
+      not (ansible_distribution == 'CentOS' and
+           ansible_distribution_major_version | int == 8 and not
+           ansible_python_version.startswith('3.6'))
   block:
+  - debug: var=copr_chroot
   - name: enable copr project
     copr:
       host: copr.fedorainfracloud.org
       state: enabled
-      name: '@copr/integration_tests'
-      chroot: fedora-rawhide-x86_64
+      name: '{{ copr_fullname }}'
+      chroot: "{{ copr_chroot }}"
     register: result
 
   - name: assert that the copr project was enabled
@@ -24,8 +37,8 @@
     check_mode: yes
     copr:
       state: enabled
-      name: '@copr/integration_tests'
-      chroot: fedora-rawhide-x86_64
+      name: '{{ copr_fullname }}'
+      chroot: '{{ copr_chroot }}'
     register: result
 
   - name: assert that the copr project was enabled
@@ -34,10 +47,53 @@
         - result is not changed
         - result.msg == 'enabled'
 
+  - name: Ensure the repo is installed and enabled | slurp
+    register: result
+    ansible.builtin.slurp:
+      src: "{{ copr_repofile }}"
+
+  - name: Ensure the repo is installed and enabled
+    vars:
+      content: "{{ result.content | b64decode }}"
+      _baseurl: "{{ 'https://download.copr.fedorainfracloud.org/results/gotmax23/community.general.copr_integration_tests' | regex_escape }}"
+      baseurl: "{{ content | regex_search('baseurl=' ~ _baseurl) }}"
+    block:
+      - ansible.builtin.debug:
+          var: content
+      - ansible.builtin.debug:
+          var: baseurl
+      - name: Ensure the repo is installed and enabled
+        ansible.builtin.assert:
+          that:
+            - "'enabled=1' in content"
+            - baseurl | length > 0
+
+  - name: Install test package from Copr
+    when:
+      # Copr does not build new packages for EOL Fedoras.
+      - >
+        not (ansible_distribution == 'Fedora' and
+             ansible_distribution_major_version | int < 35)
+    block:
+      - name: install test package from the copr
+        ansible.builtin.package:
+          update_cache: true
+          name: copr-module-integration-dummy-package
+
+      - name: uninstall test package
+        register: result
+        ansible.builtin.package:
+          name: copr-module-integration-dummy-package
+          state: absent
+
+      - name: check uninstall test package
+        ansible.builtin.assert:
+          that: result.changed | bool
+
   - name: remove copr project
     copr:
       state: absent
-      name: '@copr/integration_tests'
+      name: '{{ copr_fullname }}'
     register: result
 
   - name: assert that the copr project was removed
@@ -46,11 +102,20 @@
         - 'result is changed'
         - result.msg == 'absent'
 
+  - name: Ensure the repo file was removed | stat
+    register: result
+    ansible.builtin.stat:
+      dest: "{{ copr_repofile }}"
+
+  - name: Ensure the repo file was removed
+    ansible.builtin.assert:
+      that: not result.stat.exists | bool
+
   - name: disable copr project
     copr:
       state: disabled
-      name: '@copr/integration_tests'
-      chroot: fedora-rawhide-x86_64
+      name: '{{ copr_fullname }}'
+      chroot: '{{ copr_chroot }}'
     register: result
 
   - name: assert that the copr project was disabled
@@ -59,10 +124,37 @@
         - 'result is changed'
         - result.msg == 'disabled'
 
+  - name: Ensure the repo is installed but disabled | slurp
+    register: result
+    ansible.builtin.slurp:
+      src: "{{ copr_repofile }}"
+
+  - name: Ensure the repo is installed but disabled
+    vars:
+      content: "{{ result.content | b64decode }}"
+      _baseurl: "{{ 'https://download.copr.fedorainfracloud.org/results/gotmax23/community.general.copr_integration_tests' | regex_escape }}"
+      baseurl: "{{ content | regex_search('baseurl=' ~ _baseurl) }}"
+    block:
+      - ansible.builtin.debug:
+          var: content
+      - ansible.builtin.debug:
+          var: baseurl
+      - name: Ensure the repo is installed but disabled
+        ansible.builtin.assert:
+          that:
+            - "'enabled=0' in content"
+            - baseurl | length > 0
+
   always:
     - name: clean up
+      ignore_errors: true
       copr:
         host: copr.fedorainfracloud.org
         state: absent
-        name: '@copr/integration_tests'
-        chroot: fedora-rawhide-x86_64
+        name: '{{ copr_fullname }}'
+        chroot: '{{ copr_chroot }}'
+
+    - name: cleanup test package
+      ansible.builtin.package:
+        name: copr-module-integration-dummy-package
+        state: absent
