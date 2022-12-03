@@ -54,6 +54,54 @@ TEST_CASES = [
             "changed": False,
         }
     ],
+    [
+        {
+            "certname": "potatobox"
+        },
+        {
+            "id": "puppet_agent_certname",
+            "run_command.calls": [
+                (
+                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
+                    (0, "blah, anything", "",),  # output rc, out, err
+                ),
+                (
+                    [
+                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--certname=potatobox"
+                    ],
+                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
+                    (0, "", "",),  # output rc, out, err
+                ),
+            ],
+            "changed": False,
+        }
+    ],
+    [
+        {
+            "tags": ["a", "b", "c"]
+        },
+        {
+            "id": "puppet_agent_tags_abc",
+            "run_command.calls": [
+                (
+                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
+                    (0, "blah, anything", "",),  # output rc, out, err
+                ),
+                (
+                    [
+                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--tags", "a,b,c"
+                    ],
+                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
+                    (0, "", "",),  # output rc, out, err
+                ),
+            ],
+            "changed": False,
+        }
+    ],
 ]
 TEST_CASES_IDS = [item[1]["id"] for item in TEST_CASES]
 
