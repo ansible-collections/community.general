@@ -408,7 +408,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     stripped_value = value.strip()
                     if stripped_value:
                         parsed_key = key + "_parsed"
-                        properties[parsed_key] = [tag.strip() for tag in stripped_value.split(",")]
+                        properties[parsed_key] = [tag.strip() for tag in stripped_value.replace(',', ';').split(";")]
 
                 # The first field in the agent string tells you whether the agent is enabled
                 # the rest of the comma separated string is extra config for the agent.
