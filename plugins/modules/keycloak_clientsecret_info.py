@@ -28,6 +28,8 @@ description:
   - When retrieving a new client secret, where possible provide the client's
     I(id) (not I(client_id)) to the module. This removes a lookup to the API to
     translate the I(client_id) into the client ID.
+  - "Note that this module returns the client secret. To avoid this showing up in the logs,
+     please add C(no_log: true) to the task."
 
 options:
   realm:
