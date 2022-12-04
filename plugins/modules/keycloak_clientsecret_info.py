@@ -26,7 +26,7 @@ description:
     and a user having the expected roles.
 
   - When retrieving a new client secret, where possible provide the client's
-    id (not client_id) to the module. This removes a lookup to the API to
+    I(id) (not I(client_id)) to the module. This removes a lookup to the API to
     translate the client_id into the client ID.
 
 options:
