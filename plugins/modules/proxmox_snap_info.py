@@ -33,7 +33,7 @@ options:
     type: int
   snapname:
     description:
-      - Name of the snapshot that has to be created/deleted/restored.
+      - Beginning of the snapshot name getsnapshots takes care of.
     default: ''
     type: str
   getsnapshots:
@@ -72,15 +72,6 @@ EXAMPLES = r'''
     snapname: snapshot_
   register: snaplist
 
-- name: delete Snapshots from list
-  community.general.proxmox_snap:
-    api_user: root@pam
-    api_password: 1q2w3e
-    api_host: node1
-    vmid: 100
-    snapname: "{{ item }}"
-    state: absent
-  loop: "{{ snaplist['results'] }}"
 '''
 
 RETURN = r'''#'''
