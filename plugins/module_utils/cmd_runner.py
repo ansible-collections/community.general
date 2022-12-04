@@ -103,8 +103,13 @@ class _ArgFormat(object):
 
 class _Format(object):
     @staticmethod
-    def as_bool(args):
-        return _ArgFormat(lambda value: _ensure_list(args) if value else [])
+    def as_bool(args_true, args_false=None, ignore_none=None):
+        if args_false is not None:
+            if ignore_none is None:
+                ignore_none = False
+        else:
+            args_false = []
+        return _ArgFormat(lambda value: _ensure_list(args_true) if value else _ensure_list(args_false), ignore_none=ignore_none)
 
     @staticmethod
     def as_bool_not(args):
