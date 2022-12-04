@@ -5,21 +5,22 @@
 
 <!--- Please do not forget to include a changelog fragment:
       https://docs.ansible.com/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment
-      No need to include one for docs-only or test-only PR, and for new plugins/modules PRs.
+      No need to include one for docs-only or test-only PR, and for new plugin/module PRs.
       Read about more details in CONTRIBUTING.md.
       -->
 
 ##### ISSUE TYPE
-<!--- Pick one below and delete the rest -->
+<!--- Pick one or more below and delete the rest.
+      'Test Pull Request' is for PRs that add/extend tests without code changes. -->
 - Bugfix Pull Request
 - Docs Pull Request
 - Feature Pull Request
-- New Module Pull Request
-- New Plugin Pull Request
+- New Module/Plugin Pull Request
+- Refactoring Pull Request
 - Test Pull Request
 
 ##### COMPONENT NAME
-<!--- Write the SHORT NAME of the module, plugin, task or feature below. Do not include `community.general.`! -->
+<!--- Write the SHORT NAME of the module, plugin, task or feature below. -->
 
 ##### ADDITIONAL INFORMATION
 <!--- Include additional information to help people understand the change here -->
