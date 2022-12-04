@@ -75,6 +75,7 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
   delegate_to: localhost
+  no_log: true
 
 - name: Get a new Keycloak client secret, authentication with token
   community.general.keycloak_clientsecret_info:
