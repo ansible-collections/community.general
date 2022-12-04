@@ -45,7 +45,7 @@ options:
 
   client_id:
     description:
-      - The client_id of the client. Passing this instead of id results in an
+      - The I(client_id) of the client. Passing this instead of I(id) results in an
         extra API call.
     aliases:
       - clientId
