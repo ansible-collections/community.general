@@ -116,7 +116,8 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI, KeycloakError, get_token, keycloak_argument_spec,
+    KeycloakAPI, KeycloakError, get_token)
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak_clientsecret import (
     keycloak_clientsecret_module, keycloak_clientsecret_module_resolve_params)
 
 
