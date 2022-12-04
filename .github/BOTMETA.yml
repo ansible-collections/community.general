@@ -281,6 +281,8 @@ files:
     maintainers: $team_huawei
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak
+  $module_utils/identity/keycloak/keycloak_clientsecret.py:
+    maintainers: $team_keycloak
   $module_utils/ipa.py:
     labels: ipa
     maintainers: $team_ipa
