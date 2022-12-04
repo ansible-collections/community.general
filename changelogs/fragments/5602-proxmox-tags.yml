@@ -1,0 +1,2 @@
+bugfixes:
+  - "proxmox inventory plugin - handle tags delimited by semicolon instead of comma, which happens from Proxmox 7.3 on (https://github.com/ansible-collections/community.general/pull/5602)."
