@@ -55,6 +55,8 @@ requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Jeffrey van Pelt (@Thulium-Drake)
 extends_documentation_fragment:
     - community.general.proxmox.documentation
+    - community.general.attributes
+    - community.general.attributes.info_module
 '''
 
 EXAMPLES = r'''
