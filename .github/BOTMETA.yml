@@ -282,7 +282,7 @@ files:
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak
   $module_utils/identity/keycloak/keycloak_clientsecret.py:
-    maintainers: $team_keycloak
+    maintainers: $team_keycloak fynncfchen johncant
   $module_utils/ipa.py:
     labels: ipa
     maintainers: $team_ipa
