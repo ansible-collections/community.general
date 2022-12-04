@@ -27,7 +27,7 @@ description:
 
   - When retrieving a new client secret, where possible provide the client's
     I(id) (not I(client_id)) to the module. This removes a lookup to the API to
-    translate the client_id into the client ID.
+    translate the I(client_id) into the client ID.
 
 options:
   realm:
