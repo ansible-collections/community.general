@@ -29,6 +29,9 @@ description:
     (not client_id) to the module. This removes a lookup to the API to
     translate the client_id into the client ID.
 
+  - "Note that this module returns the client secret. To avoid this showing up in the logs,
+     please add C(no_log: true) to the task."
+
 options:
   realm:
     type: str
@@ -71,6 +74,7 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
   delegate_to: localhost
+  no_log: true
 
 - name: Regenerate a Keycloak client secret, authentication with token
   community.general.keycloak_clientsecret_regenerate:
@@ -80,6 +84,7 @@ EXAMPLES = '''
     auth_keycloak_url: https://auth.example.com/auth
     token: TOKEN
   delegate_to: localhost
+  no_log: true
 
 - name: Regenerate a Keycloak client secret, passing client_id instead of id
   community.general.keycloak_clientsecret_info:
@@ -89,6 +94,7 @@ EXAMPLES = '''
     auth_keycloak_url: https://auth.example.com/auth
     token: TOKEN
   delegate_to: localhost
+  no_log: true
 '''
 
 RETURN = '''
