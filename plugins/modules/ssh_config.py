@@ -88,6 +88,11 @@ options:
       - If I(user) and this option are not specified, C(/etc/ssh/ssh_config) is used.
       - Mutually exclusive with I(user).
     type: path
+  host_key_algorithms:
+    description:
+      - Sets the C(HostKeyAlgorithms) option.
+    type: str
+    version_added: 6.1.0
 requirements:
 - StormSSH
 notes:
@@ -207,6 +212,7 @@ class SSHConfig():
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
             proxycommand=self.params.get('proxycommand'),
+            host_key_algorithms=self.params.get('host_key_algorithms'),
         )
 
         # Convert True / False to 'yes' / 'no' for usage in ssh_config
@@ -297,6 +303,7 @@ def main():
             group=dict(default=None, type='str'),
             host=dict(type='str', required=True),
             hostname=dict(type='str'),
+            host_key_algorithms=dict(type='str', no_log=False),
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
