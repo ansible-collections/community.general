@@ -220,8 +220,8 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         self.get_bin_path.side_effect = ['modprobe']
 
         modprobe = Modprobe(module)
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modules_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
                 modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
 
                 assert modprobe.module_is_loaded_persistently
@@ -249,8 +249,8 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         self.get_bin_path.side_effect = ['modprobe']
 
         modprobe = Modprobe(module)
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data='')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modules_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='')) as mocked_file:
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
                 modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
 
                 assert not modprobe.module_is_loaded_persistently
@@ -278,7 +278,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         self.get_bin_path.side_effect = ['modprobe']
 
         modprobe = Modprobe(module)
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modules_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
             modprobe.modules_files = []
 
             assert not modprobe.module_is_loaded_persistently
@@ -328,9 +328,9 @@ class TestPermanentParams(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open()) as mocked_file:
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
             mocked_file.side_effect = mock_files_content
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modprobe_files'):
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
                 modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
 
                 assert modprobe.permanent_params == set(['numdummies=4', 'dummy_parameter1=6', 'dummy_parameter2=5'])
@@ -363,9 +363,9 @@ class TestPermanentParams(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data='')) as mocked_file:
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='')) as mocked_file:
             mocked_file.side_effect = mock_files_content
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modprobe_files'):
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
                 modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
 
                 assert modprobe.permanent_params == set()
@@ -407,7 +407,7 @@ class TestCreateModuleFIle(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open()) as mocked_file:
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
             modprobe.create_module_file()
             mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf', 'w')
             mocked_file().write.assert_called_once_with('dummy\n')
@@ -450,7 +450,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open()) as mocked_file:
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open()) as mocked_file:
             modprobe.create_module_options_file()
             mocked_file.assert_called_once_with('/etc/modprobe.d/dummy.conf', 'w')
             mocked_file().write.assert_called_once_with('options dummy numdummies=4\n')
@@ -494,8 +494,8 @@ class TestDisableOldParams(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modprobe_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
                 modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf']
                 modprobe.disable_old_params()
                 mocked_file.assert_called_with('/etc/modprobe.d/dummy1.conf', 'w')
@@ -525,8 +525,8 @@ class TestDisableOldParams(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modprobe_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data=mock_data)) as mocked_file:
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modprobe_files'):
                 modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf']
                 modprobe.disable_old_params()
                 mocked_file.assert_called_once_with('/etc/modprobe.d/dummy1.conf')
@@ -569,8 +569,8 @@ class TestDisableModulePermanent(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modules_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='dummy')) as mocked_file:
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
                 modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
                 modprobe.disable_module_permanent()
                 mocked_file.assert_called_with('/etc/modules-load.d/dummy.conf', 'w')
@@ -599,8 +599,8 @@ class TestDisableModulePermanent(ModuleTestCase):
 
         modprobe = Modprobe(module)
 
-        with patch('ansible_collections.community.general.plugins.modules.system.modprobe.open', mock_open(read_data='notdummy')) as mocked_file:
-            with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modules_files'):
+        with patch('ansible_collections.community.general.plugins.modules.modprobe.open', mock_open(read_data='notdummy')) as mocked_file:
+            with patch('ansible_collections.community.general.plugins.modules.modprobe.Modprobe.modules_files'):
                 modprobe.modules_files = ['/etc/modules-load.d/dummy.conf']
                 modprobe.disable_module_permanent()
                 mocked_file.assert_called_once_with('/etc/modules-load.d/dummy.conf')
