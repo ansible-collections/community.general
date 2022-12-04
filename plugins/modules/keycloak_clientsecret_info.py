@@ -54,6 +54,8 @@ options:
 
 extends_documentation_fragment:
   - community.general.keycloak
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 author:
   - Fynn Chen (@fynncfchen)
