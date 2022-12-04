@@ -51,7 +51,6 @@ options:
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
-  - Supports C(check_mode).
 requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Jeffrey van Pelt (@Thulium-Drake)
 extends_documentation_fragment:
