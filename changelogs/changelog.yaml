@@ -1370,3 +1370,24 @@ releases:
     - 5570-chroot-plugin-fix-default-inventory_hostname.yml
     - 5601-unixy-callback-use-config-manager.yml
     release_date: '2022-11-29'
+  5.8.3:
+    changes:
+      bugfixes:
+      - keycloak_client_rolemapping - calculate ``proposed`` and ``after`` return
+        values properly (https://github.com/ansible-collections/community.general/pull/5619).
+      - keycloak_client_rolemapping - remove only listed mappings with ``state=absent``
+        (https://github.com/ansible-collections/community.general/pull/5619).
+      - proxmox inventory plugin - handle tags delimited by semicolon instead of comma,
+        which happens from Proxmox 7.3 on (https://github.com/ansible-collections/community.general/pull/5602).
+      - vdo - now uses ``yaml.safe_load()`` to parse command output instead of the
+        deprecated ``yaml.load()`` which is potentially unsafe. Using ``yaml.load()``
+        without explicitely setting a ``Loader=`` is also an error in pyYAML 6.0 (https://github.com/ansible-collections/community.general/pull/5632).
+      - vmadm - fix for index out of range error in ``get_vm_uuid`` (https://github.com/ansible-collections/community.general/pull/5628).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 5.8.3.yml
+    - 5602-proxmox-tags.yml
+    - 5619-keycloak-improvements.yml
+    - 5628-fix-vmadm-off-by-one.yml
+    - 5632-vdo-Use-yaml-safe-load-instead-of-yaml-load.yml
+    release_date: '2022-12-05'
