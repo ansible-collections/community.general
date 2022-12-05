@@ -608,7 +608,7 @@ class KeycloakAPI(object):
         """
         available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            open_url(available_rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders,
+            open_url(available_rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
             self.module.fail_json(msg="Could not delete available rolemappings for client %s in group %s, realm %s: %s"
