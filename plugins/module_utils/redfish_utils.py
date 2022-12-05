@@ -19,6 +19,8 @@ POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json'
                 'OData-Version': '4.0'}
 PATCH_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
                  'OData-Version': '4.0'}
+PUT_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
+               'OData-Version': '4.0'}
 DELETE_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 
 FAIL_MSG = 'Issuing a data modification command without specifying the '\
@@ -223,6 +225,41 @@ class RedfishUtils(object):
             return {'ret': False, 'changed': False,
                     'msg': "Failed PATCH request to '%s': '%s'" % (uri, to_text(e))}
         return {'ret': True, 'changed': True, 'resp': resp, 'msg': 'Modified %s' % uri}
+
+    def put_request(self, uri, pyld):
+        req_headers = dict(PUT_HEADERS)
+        r = self.get_request(uri)
+        if r['ret']:
+            # Get etag from etag header or @odata.etag property
+            etag = r['headers'].get('etag')
+            if not etag:
+                etag = r['data'].get('@odata.etag')
+            if etag:
+                if self.strip_etag_quotes:
+                    etag = etag.strip('"')
+                req_headers['If-Match'] = etag
+        username, password, basic_auth = self._auth_params(req_headers)
+        try:
+            resp = open_url(uri, data=json.dumps(pyld),
+                            headers=req_headers, method="PUT",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
+                            follow_redirects='all',
+                            use_proxy=True, timeout=self.timeout)
+        except HTTPError as e:
+            msg = self._get_extended_message(e)
+            return {'ret': False,
+                    'msg': "HTTP Error %s on PUT request to '%s', extended message: '%s'"
+                           % (e.code, uri, msg),
+                    'status': e.code}
+        except URLError as e:
+            return {'ret': False, 'msg': "URL Error on PUT request to '%s': '%s'"
+                                         % (uri, e.reason)}
+        # Almost all errors should be caught above, but just in case
+        except Exception as e:
+            return {'ret': False,
+                    'msg': "Failed PUT request to '%s': '%s'" % (uri, to_text(e))}
+        return {'ret': True, 'resp': resp}
 
     def delete_request(self, uri, pyld=None):
         req_headers = dict(DELETE_HEADERS)
