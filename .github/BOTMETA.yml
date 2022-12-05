@@ -281,6 +281,8 @@ files:
     maintainers: $team_huawei
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak
+  $module_utils/identity/keycloak/keycloak_clientsecret.py:
+    maintainers: $team_keycloak fynncfchen johncant
   $module_utils/ipa.py:
     labels: ipa
     maintainers: $team_ipa
@@ -668,6 +670,10 @@ files:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope.py:
     maintainers: Gaetan2907
+  $modules/keycloak_clientsecret_info.py:
+    maintainers: fynncfchen johncant
+  $modules/keycloak_clientsecret_regenerate.py:
+    maintainers: fynncfchen johncant
   $modules/keycloak_group.py:
     maintainers: adamgoossens
   $modules/keycloak_identity_provider.py:
