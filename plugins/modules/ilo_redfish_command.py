@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_command
 short_description: Manages Out-Of-Band controllers using Redfish APIs
+version_added: 6.1.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
@@ -136,7 +137,7 @@ author:
 
 EXAMPLES = '''
   - name: Verify service BIOS attributes
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: VerifyServiceBiosAttributes
       baseuri: "***.***.***.***"
@@ -147,7 +148,7 @@ EXAMPLES = '''
         CustomDebugBlkIo: "Disabled"
 
   - name: Verify bios attributes
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: VerifyBiosAttributes
       baseuri: "***.***.***.***"
@@ -158,7 +159,7 @@ EXAMPLES = '''
         WorkloadProfile: "Virtualization-MaxPerformance"
 
   - name: Verify logical drives
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: VerifyLogicalDrives
       baseuri: "***.***.***.***"
@@ -174,7 +175,7 @@ EXAMPLES = '''
               DataDriveMinimumSizeGiB: 0
 
   - name: Verify UEFI boot order
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: VerifyUefiBootOrder
       baseuri: "***.***.***.***"
@@ -183,7 +184,7 @@ EXAMPLES = '''
       uefi_boot_order: ["Generic.USB.1.1"]
 
   - name: Verify specified logical drives
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: VerifySpecifiedLogicalDrives
       baseuri: "***.***.***.***"
@@ -199,7 +200,7 @@ EXAMPLES = '''
               DataDriveMinimumSizeGiB: 0
 
   - name: Check server reboot status
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: CheckRebootStatus
       baseuri: "***.***.***.***"
@@ -207,7 +208,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get specified logical drives details
-    ilo_redfish_command:
+    community.general.ilo_redfish_command:
       category: Systems
       command: GetSpecifiedLogicalDrives
       baseuri: "***.***.***.***"
