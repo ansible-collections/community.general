@@ -239,7 +239,7 @@ class iLORedfishUtils(RedfishUtils):
         }
         # return result
 
-    def get_logical_drives_details(self, array_controllers=False):
+    def get_smartstorage_logical_drives(self, array_controllers=False):
         # This method returns the logical drives details
         logical_drives_details = []
         if array_controllers:
