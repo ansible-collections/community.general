@@ -1,5 +1,0 @@
-deprecated_features:
-  - "The ``sap`` modules ``sapcar_extract``, ``sap_task_list_execute``, and ``hana_query``, will be removed
-     from this collection in community.general 7.0.0 and replaced with redirects to ``community.sap_libs``.
-     If you want to continue using these modules, make sure to also install ``community.sap_libs`` (it is
-     part of the Ansible package) (https://github.com/ansible-collections/community.general/pull/5614)."

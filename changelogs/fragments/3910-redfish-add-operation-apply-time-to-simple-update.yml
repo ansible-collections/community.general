@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_command - add ``update_apply_time`` to ``SimpleUpdate`` command (https://github.com/ansible-collections/community.general/issues/3910).

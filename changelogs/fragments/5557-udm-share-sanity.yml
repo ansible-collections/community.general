@@ -1,2 +1,0 @@
-minor_changes:
-  - udm_share - added ``elements`` attribute to ``list`` type parameters (https://github.com/ansible-collections/community.general/pull/5557).

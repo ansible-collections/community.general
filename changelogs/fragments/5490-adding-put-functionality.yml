@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_utils module utils - added PUT (``put_request()``) functionality (https://github.com/ansible-collections/community.general/pull/5490).
