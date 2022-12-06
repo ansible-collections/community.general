@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_config
 short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
-version_added: 7.0.0
+version_added: 4.2.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     set or update a configuration attribute.
@@ -122,28 +122,33 @@ options:
       - logical drives names which are to be deleted
     type: list
     elements: str
+    version_added: 6.1.0
   snmpv3_usernames:
     required: false
     description:
       - List of SNMPv3 user names that need to be deleted from the given server
     type: list
     elements: str
+    version_added: 6.1.0
   cert_file:
     required: false
     description:
       - absolute path to the server cert file
     type: str
+    version_added: 6.1.0
   key_file:
     required: false
     description:
       - absolute path to the server key file
     type: str
+    version_added: 6.1.0
   snmpv3_users:
     required: false
     description:
       - List of SNMPv3 users that needs to be added in the given server
     type: list
     elements: dict
+    version_added: 6.1.0
     suboptions:
       security_name:
         required: false
@@ -189,6 +194,7 @@ options:
       - List of alert destination that needs to be added in the given server
     type: list
     elements: dict
+    version_added: 6.1.0
     suboptions:
       alert_destination:
         required: false
@@ -212,6 +218,7 @@ options:
     description:
       - BIOS service attributes that needs to be configured in the given server
     type: dict
+    version_added: 6.1.0
 author:
   - Bhavya B (@bhavya06)
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
@@ -251,7 +258,7 @@ EXAMPLES = '''
       attribute_value: X.X.X.X
 
   - name: Create logical drive
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Systems
       command: CreateLogicalDrives
       baseuri: "***.***.***.***"
@@ -267,7 +274,7 @@ EXAMPLES = '''
               DataDriveMinimumSizeGiB: 0
 
   - name: Create logical drives with particular physical drives
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Systems
       command: CreateLogicalDrivesWithParticularPhysicalDrives
       baseuri: "***.***.***.***"
@@ -280,7 +287,7 @@ EXAMPLES = '''
         DataDrives: ["1I:1:1", "1I:1:2"]
 
   - name: Delete all logical drives
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Systems
       command: DeleteAllLogicalDrives
       baseuri: "***.***.***.***"
@@ -288,7 +295,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Delete specified logical drives
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Systems
       command: DeleteSpecifiedLogicalDrives
       baseuri: "***.***.***.***"
@@ -297,7 +304,7 @@ EXAMPLES = '''
       logical_drives_names: ["LD1", "LD2"]
 
   - name: Enable secure boot
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Systems
       command: EnableSecureBoot
       baseuri: "***.***.***.***"
@@ -305,7 +312,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Deleting all the SNMPv3 users
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Manager
       command: DeleteAllSNMPv3Users
       baseuri: "***.***.***.***"
@@ -313,7 +320,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Deleting all the SNMP alert destinations
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Manager
       command: DeleteAllSNMPAlertDestinations
       baseuri: "***.***.***.***"
@@ -321,7 +328,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Deleting specified SNMPv3 users
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Manager
       command: DeleteSpecifiedSNMPv3Users
       baseuri: "***.***.***.***"
@@ -332,7 +339,7 @@ EXAMPLES = '''
         - user2
 
   - name: Creating SNMPv3 users
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Manager
       command: CreateSNMPv3Users
       baseuri: "***.***.***.***"
@@ -347,7 +354,7 @@ EXAMPLES = '''
           user_engine_id: "123450abdcef"
 
   - name: Updating specified SNMPv3 users
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Manager
       command: UpdateSNMPv3Users
       baseuri: "***.***.***.***"
@@ -362,7 +369,7 @@ EXAMPLES = '''
           user_engine_id: "123450abdcef"
 
   - name: Creating SNMP alert destinations
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Manager
       command: CreateSNMPAlertDestinations
       baseuri: "***.***.***.***"
@@ -375,7 +382,7 @@ EXAMPLES = '''
           security_name: "Sec1"
 
   - name: Configure service BIOS attributes
-    ilo_redfish_config:
+    community.general.ilo_redfish_config:
       category: Systems
       command: SetServiceBiosAttributes
       baseuri: "***.***.***.***"
