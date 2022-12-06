@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_info
 short_description: Gathers server information through iLO using Redfish APIs
-version_added: 6.0.0
+version_added: 4.2.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     get information back.
@@ -57,19 +57,21 @@ options:
     required: false
     description:
       - Timeout in seconds for URL requests to iLO.
-      - The default value for this param is 10 but that is being deprecated
-        and it will be replaced with 60 in community.general 5.7.0.
+      - The default value for this param is C(10) but that is being deprecated
+        and it will be replaced with C(60) in community.general 8.0.0.
     type: int
   cert_file:
     required: false
     description:
       - absolute path to the server cert file
     type: str
+    version_added: 6.1.0
   key_file:
     required: false
     description:
       - absolute path to the server key file
     type: str
+    version_added: 6.1.0
 author:
   - Bhavya B (@bhavya06)
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
@@ -88,7 +90,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get physical drive details
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Systems
       command: GetPhysicalDrives
       baseuri: "***.***.***.***"
@@ -96,7 +98,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get logical drive details
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Systems
       command: GetLogicalDrives
       baseuri: "***.***.***.***"
@@ -104,7 +106,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get SNMP alert destinations
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Managers
       command: GetSnmpAlertDestinations
       baseuri: "***.***.***.***"
@@ -112,7 +114,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get SNMP V3 Users
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Managers
       command: GetSnmpV3Users
       baseuri: "***.***.***.***"
@@ -120,7 +122,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get network boot settings
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Systems
       command: GetBootSettings
       baseuri: "***.***.***.***"
@@ -128,7 +130,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get service bios attributes
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Systems
       command: GetServiceBiosAttributes
       baseuri: "***.***.***.***"
@@ -136,7 +138,7 @@ EXAMPLES = '''
       password: "******"
 
   - name: Get logical drive details with array controllers
-    ilo_redfish_info:
+    community.general.ilo_redfish_info:
       category: Systems
       command: GetLogicalDrivesWithArrayControllers
       baseuri: "***.***.***.***"
@@ -226,7 +228,7 @@ def main():
             'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
                 10, 60
             ),
-            version='7.0.0',
+            version='8.0.0',
             collection_name='community.general'
         )
 
@@ -279,11 +281,11 @@ def main():
                 elif command == "GetBootSettings":
                     result[command] = rf_utils.get_network_boot_settings()
                 elif command == "GetPhysicalDrives":
-                    result[command] = rf_utils.get_physical_drives_details()
+                    result[command] = rf_utils.get_smartstorage_physical_drives()
                 elif command == "GetLogicalDrives":
-                    result[command] = rf_utils.get_logical_drives_details()
+                    result[command] = rf_utils.get_smartstorage_logical_drives()
                 elif command == "GetLogicalDrivesWithArrayControllers":
-                    result[command] = rf_utils.get_logical_drives_details(True)
+                    result[command] = rf_utils.get_smartstorage_logical_drives(True)
                 elif command == "GetServerPostState":
                     result[command] = rf_utils.get_server_poststate()
         elif category == "Managers":
