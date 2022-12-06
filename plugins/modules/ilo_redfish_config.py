@@ -53,7 +53,7 @@ options:
     required: false
     description:
       - Timeout in seconds for URL requests to iLO controller.
-      - The default value for this param is 10 but that is being deprecated
+      - The default value for this param is C(10) but that is being deprecated
         and it will be replaced with 60 in community.general 5.7.0.
     type: int
   attribute_name:
