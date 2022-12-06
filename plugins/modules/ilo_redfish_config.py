@@ -69,7 +69,7 @@ options:
   raid_details:
     required: false
     description:
-      - List of RAID details that need to be configured in the given server
+      - List of RAID details that need to be configured in the given server.
     type: list
     elements: dict
     suboptions:
