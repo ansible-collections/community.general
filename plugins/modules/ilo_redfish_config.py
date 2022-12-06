@@ -72,6 +72,7 @@ options:
       - List of RAID details that need to be configured in the given server.
     type: list
     elements: dict
+    version_added: 6.1.0
     suboptions:
       LogicalDriveName:
         required: false
