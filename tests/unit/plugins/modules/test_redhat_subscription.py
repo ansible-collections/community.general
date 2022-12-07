@@ -308,6 +308,7 @@ TEST_CASES = [
             'org_id': 'admin',
             'force_register': 'true',
             'server_proxy_hostname': 'proxy.company.com',
+            'server_proxy_scheme': 'https',
             'server_proxy_port': '12345',
             'server_proxy_user': 'proxy_user',
             'server_proxy_password': 'secret_proxy_password'
@@ -327,6 +328,7 @@ TEST_CASES = [
                         '--server.proxy_hostname=proxy.company.com',
                         '--server.proxy_password=secret_proxy_password',
                         '--server.proxy_port=12345',
+                        '--server.proxy_scheme=https',
                         '--server.proxy_user=proxy_user'
                     ],
                     {'check_rc': True},
