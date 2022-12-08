@@ -70,6 +70,11 @@ options:
         description:
             - Specify an HTTP proxy hostname.
         type: str
+    server_proxy_scheme:
+        description:
+            - Specify an HTTP proxy scheme, for example C(http) or C(https).
+        type: str
+        version_added: 6.2.0
     server_proxy_port:
         description:
             - Specify an HTTP proxy port.
@@ -806,6 +811,7 @@ def main():
             'consumer_id': {},
             'force_register': {'default': False, 'type': 'bool'},
             'server_proxy_hostname': {},
+            'server_proxy_scheme': {},
             'server_proxy_port': {},
             'server_proxy_user': {},
             'server_proxy_password': {'no_log': True},
