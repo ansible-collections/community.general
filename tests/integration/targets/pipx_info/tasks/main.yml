@@ -56,7 +56,8 @@
       - info_all_deps.application|length == 1
       - info_all_deps.application[0].name == "tox"
       - "'version' in info_all_deps.application[0]"
-      - info_all_deps.application[0].dependencies == ["virtualenv"]
+      - info_all_deps.application[0].dependencies == ["chardet", "virtualenv"]
+        or info_all_deps.application[0].dependencies == ["virtualenv"]
       - "'injected' not in info_all.application[0]"
 
       - info_tox.application == info_all_deps.application
