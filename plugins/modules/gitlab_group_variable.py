@@ -102,6 +102,7 @@ options:
       raw:
         description:
           - Whether the variable is expandable.
+          - Support for I(raw) requires GitLab >= 15.6.
         type: bool
         default: false
 notes:
