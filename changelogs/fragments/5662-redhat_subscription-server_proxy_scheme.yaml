@@ -1,0 +1,3 @@
+minor_changes:
+  - redhat_subscription - add a ``server_proxy_scheme`` parameter to configure the scheme for the proxy server
+    (https://github.com/ansible-collections/community.general/pull/5662).
