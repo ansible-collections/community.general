@@ -99,6 +99,11 @@ options:
           - The scope for the variable.
         type: str
         default: '*'
+      raw:
+        description:
+          - Whether the variable is expandable.
+        type: bool
+        default: false
 notes:
 - Supports I(check_mode).
 '''
@@ -182,6 +187,7 @@ def vars_to_variables(vars, module):
                     "masked": False,
                     "protected": False,
                     "variable_type": "env_var",
+                    "raw": False
                 }
             )
 
@@ -194,6 +200,7 @@ def vars_to_variables(vars, module):
                 "masked": value.get('masked'),
                 "protected": value.get('protected'),
                 "variable_type": value.get('variable_type'),
+                "raw": value.get('raw')
             }
 
             if value.get('environment_scope'):
@@ -236,6 +243,7 @@ class GitlabGroupVariables(object):
             "masked": var_obj.get('masked'),
             "protected": var_obj.get('protected'),
             "variable_type": var_obj.get('variable_type'),
+            "raw": var_obj.get('raw')
         }
         if var_obj.get('environment_scope') is not None:
             var["environment_scope"] = var_obj.get('environment_scope')
@@ -313,6 +321,8 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['environment_scope'] = '*'
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
+        if item.get('raw') is None:
+            item['raw'] = False
 
     if module.check_mode:
         untouched, updated, added = compare(requested_variables, existing_variables, state)
@@ -386,7 +396,8 @@ def main():
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
-            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
+            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"]),
+            raw=dict(type='bool', default=False),
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
