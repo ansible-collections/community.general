@@ -112,12 +112,12 @@ def gitlab_authentication(module):
     return gitlab_instance
 
 
-def preprocessing_returned_variables(gitlab_keys):
+def filter_returned_variables(gitlab_variables):
     # pop properties we don't know
-    existing_variables = [x.attributes for x in gitlab_keys]
-    KOWN = ['key', 'value', 'masked', 'protected', 'variable_type', 'environment_scope']
+    existing_variables = [x.attributes for x in gitlab_variables]
+    KNOWN = ['key', 'value', 'masked', 'protected', 'variable_type', 'environment_scope']
     for item in existing_variables:
         for key in list(item.keys()):
-            if key not in KOWN:
+            if key not in KNOWN:
                 item.pop(key)
     return existing_variables
