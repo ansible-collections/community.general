@@ -357,9 +357,8 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
-                if item not in add_or_update:
-                    if this_gitlab.delete_variable(item):
-                        return_value['removed'].append(item)
+                if this_gitlab.delete_variable(item):
+                    return_value['removed'].append(item)
 
     elif state == 'absent':
         # value does not matter on removing variables.
