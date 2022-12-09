@@ -189,7 +189,7 @@ except Exception:
     HAS_GITLAB_PACKAGE = False
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, preprocessing_returned_variables
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
 )
 
 
@@ -321,7 +321,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     before = [x.attributes for x in gitlab_keys]
 
     gitlab_keys = this_gitlab.list_all_project_variables()
-    existing_variables = preprocessing_returned_variables(gitlab_keys)
+    existing_variables = filter_returned_variables(gitlab_keys)
 
     # filter out and enrich before compare
     for item in requested_variables:
@@ -353,7 +353,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         if purge:
             # refetch and filter
             gitlab_keys = this_gitlab.list_all_project_variables()
-            existing_variables = preprocessing_returned_variables(gitlab_keys)
+            existing_variables = filter_returned_variables(gitlab_keys)
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
