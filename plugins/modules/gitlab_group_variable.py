@@ -99,12 +99,6 @@ options:
           - The scope for the variable.
         type: str
         default: '*'
-      raw:
-        description:
-          - Whether the variable is expandable.
-          - Support for I(raw) requires GitLab >= 15.6.
-        type: bool
-        default: false
 notes:
 - Supports I(check_mode).
 '''
@@ -188,7 +182,6 @@ def vars_to_variables(vars, module):
                     "masked": False,
                     "protected": False,
                     "variable_type": "env_var",
-                    "raw": False
                 }
             )
 
@@ -201,7 +194,6 @@ def vars_to_variables(vars, module):
                 "masked": value.get('masked'),
                 "protected": value.get('protected'),
                 "variable_type": value.get('variable_type'),
-                "raw": value.get('raw')
             }
 
             if value.get('environment_scope'):
@@ -244,7 +236,6 @@ class GitlabGroupVariables(object):
             "masked": var_obj.get('masked'),
             "protected": var_obj.get('protected'),
             "variable_type": var_obj.get('variable_type'),
-            "raw": var_obj.get('raw')
         }
         if var_obj.get('environment_scope') is not None:
             var["environment_scope"] = var_obj.get('environment_scope')
@@ -307,10 +298,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     gitlab_keys = this_gitlab.list_all_group_variables()
     existing_variables = preprocessing_returned_variables(gitlab_keys)
 
-    # preprocessing:filter out and enrich before compare
-    for item in existing_variables:
-        item.pop('group_id')
-
     for item in requested_variables:
         item['key'] = item.pop('name')
         item['value'] = str(item.get('value'))
@@ -322,8 +309,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['environment_scope'] = '*'
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
-        if item.get('raw') is None:
-            item['raw'] = False
 
     if module.check_mode:
         untouched, updated, added = compare(requested_variables, existing_variables, state)
@@ -343,8 +328,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             # refetch and filter
             gitlab_keys = this_gitlab.list_all_group_variables()
             existing_variables = preprocessing_returned_variables(gitlab_keys)
-            for item in existing_variables:
-                item.pop('group_id')
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
@@ -397,8 +380,7 @@ def main():
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
-            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"]),
-            raw=dict(type='bool', default=False),
+            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
