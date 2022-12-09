@@ -205,7 +205,7 @@ def vars_to_variables(vars, module):
                     "value": str(value),
                     "masked": False,
                     "protected": False,
-                    "variable_type": "env_var"
+                    "variable_type": "env_var",
                 }
             )
 
