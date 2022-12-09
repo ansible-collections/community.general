@@ -102,12 +102,6 @@ options:
           - Support for I(environment_scope) requires GitLab Premium >= 13.11.
         type: str
         default: '*'
-      raw:
-        description:
-          - Whether the variable is expandable.
-          - Support for I(raw) requires GitLab >= 15.6.
-        type: bool
-        default: false
 '''
 
 
@@ -195,7 +189,7 @@ except Exception:
     HAS_GITLAB_PACKAGE = False
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, preprocessing_returned_variables
 )
 
 
@@ -211,8 +205,7 @@ def vars_to_variables(vars, module):
                     "value": str(value),
                     "masked": False,
                     "protected": False,
-                    "variable_type": "env_var",
-                    "raw": False
+                    "variable_type": "env_var"
                 }
             )
 
@@ -224,7 +217,6 @@ def vars_to_variables(vars, module):
                 "masked": value.get('masked'),
                 "protected": value.get('protected'),
                 "variable_type": value.get('variable_type'),
-                "raw": value.get('raw')
             }
 
             if value.get('environment_scope'):
@@ -268,7 +260,6 @@ class GitlabProjectVariables(object):
             "masked": var_obj.get('masked'),
             "protected": var_obj.get('protected'),
             "variable_type": var_obj.get('variable_type'),
-            "raw": var_obj.get('raw')
         }
 
         if var_obj.get('environment_scope') is not None:
@@ -330,12 +321,9 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     before = [x.attributes for x in gitlab_keys]
 
     gitlab_keys = this_gitlab.list_all_project_variables()
-    existing_variables = [x.attributes for x in gitlab_keys]
+    existing_variables = preprocessing_returned_variables(gitlab_keys)
 
-    # preprocessing:filter out and enrich before compare
-    for item in existing_variables:
-        item.pop('project_id')
-
+    # filter out and enrich before compare
     for item in requested_variables:
         item['key'] = item.pop('name')
         item['value'] = str(item.get('value'))
@@ -347,8 +335,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['environment_scope'] = '*'
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
-        if item.get('raw') is None:
-            item['raw'] = False
 
     if module.check_mode:
         untouched, updated, added = compare(requested_variables, existing_variables, state)
@@ -367,14 +353,13 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         if purge:
             # refetch and filter
             gitlab_keys = this_gitlab.list_all_project_variables()
-            existing_variables = [x.attributes for x in gitlab_keys]
-            for item in existing_variables:
-                item.pop('project_id')
+            existing_variables = preprocessing_returned_variables(gitlab_keys)
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
-                if this_gitlab.delete_variable(item):
-                    return_value['removed'].append(item)
+                if item not in add_or_update:
+                    if this_gitlab.delete_variable(item):
+                        return_value['removed'].append(item)
 
     elif state == 'absent':
         # value does not matter on removing variables.
@@ -423,7 +408,6 @@ def main():
             protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"]),
-            raw=dict(type='bool', default=False),
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
