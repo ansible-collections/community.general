@@ -51,17 +51,26 @@
       src: httpd_echo.py
       dest: "{{ process_file }}"
 
-  - name: Install virtualenv on CentOS 8
+  - name: Install virtualenv via package manager
     package:
       name: virtualenv
       state: present
-    when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+    when:
+      - ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
 
-  - name: Install virtualenv on Arch Linux
+  - name: Install virtualenv via package manager (python3-virtualenv)
+    package:
+      name: python3-virtualenv
+      state: present
+    when:
+      - ansible_distribution == 'Fedora'
+
+  - name: Install virtualenv via pip
     pip:
       name: virtualenv
       state: present
-    when: ansible_os_family == 'Archlinux'
+    when:
+      - ansible_os_family == 'Archlinux'
 
   - name: install dependencies
     pip:
