@@ -9,3 +9,4 @@ skip/osx
 skip/macos
 skip/docker
 skip/fedora  # FIXME
+skip/ubuntu # FIXME
