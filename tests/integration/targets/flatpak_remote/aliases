@@ -9,4 +9,6 @@ skip/freebsd
 skip/osx
 skip/macos
 skip/rhel
+skip/alpine
+skip/fedora
 needs/root

@@ -5,5 +5,8 @@
 azp/posix/1
 needs/root
 skip/docker
+skip/alpine
+skip/fedora
 skip/osx
 skip/rhel
+skip/ubuntu

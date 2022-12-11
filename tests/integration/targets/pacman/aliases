@@ -5,8 +5,11 @@
 azp/posix/1
 destructive
 skip/aix
+skip/alpine
+skip/fedora
 skip/freebsd
 skip/osx
 skip/macos
 skip/rhel
+skip/ubuntu
 needs/root

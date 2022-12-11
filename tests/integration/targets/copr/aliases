@@ -7,3 +7,5 @@ needs/root
 skip/macos
 skip/osx
 skip/freebsd
+skip/ubuntu
+skip/alpine

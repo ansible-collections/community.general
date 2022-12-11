@@ -4,6 +4,9 @@
 
 azp/posix/1
 skip/aix
+skip/alpine
+skip/fedora
 skip/freebsd
 skip/rhel
+skip/ubuntu
 skip/docker
