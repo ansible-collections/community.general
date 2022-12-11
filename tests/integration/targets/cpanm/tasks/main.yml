@@ -22,6 +22,7 @@
   package:
     name:
       - cpanminus
+      - make
     state: present
   become: yes
   when: ansible_os_family == "Debian"
