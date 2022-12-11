@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Make sure gcc is installed
-  packages:
+  package:
     name: gcc
     state: present
   when: ansible_distribution == 'Alpine'
