@@ -8,9 +8,11 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Make sure gcc is installed
+- name: Install requirements to install psutil on Alpine
   package:
-    name: gcc
+    name:
+      - gcc
+      - musl-dev
     state: present
   when: ansible_distribution == 'Alpine'
 
