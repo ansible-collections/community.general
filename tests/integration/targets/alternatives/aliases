@@ -9,3 +9,4 @@ skip/aix
 skip/freebsd
 skip/osx
 skip/macos
+skip/fedora  # FIXME
