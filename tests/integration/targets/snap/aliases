@@ -8,3 +8,4 @@ skip/freebsd
 skip/osx
 skip/macos
 skip/docker
+skip/fedora  # FIXME
