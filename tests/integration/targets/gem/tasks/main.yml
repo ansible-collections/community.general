@@ -9,7 +9,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- block:
+- when:
+    - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 20)
+  block:
 
   - include_vars: '{{ item }}'
     with_first_found:
