@@ -231,7 +231,12 @@ class AnsibleGalaxyInstall(ModuleHelper):
         return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang)
 
     def _get_ansible_galaxy_version(self):
+        class UnsupportedLocale(Exception):
+            pass
+
         def process(rc, out, err):
+            if rc != 0 and "unsupported locale setting" in err:
+                raise UnsupportedLocale()
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)
             if not match:
@@ -242,11 +247,9 @@ class AnsibleGalaxyInstall(ModuleHelper):
 
         try:
             runner = self._make_runner("C.UTF-8")
-            with runner("version", check_rc=True, output_process=process) as ctx:
+            with runner("version", check_rc=False, output_process=process) as ctx:
                 return runner, ctx.run(version=True)
-        except Exception as e:
-            if "unsupported locale setting" not in str(e):
-                raise
+        except UnsupportedLocale as e:
             runner = self._make_runner("en_US.UTF-8")
             with runner("version", check_rc=True, output_process=process) as ctx:
                 return runner, ctx.run(version=True)
