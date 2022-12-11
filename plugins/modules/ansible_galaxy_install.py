@@ -226,8 +226,9 @@ class AnsibleGalaxyInstall(ModuleHelper):
         version=fmt.as_bool("--version"),
         name=fmt.as_list(),
     )
-    force_lang = "en_US.UTF-8"
-    check_rc = True
+
+    def _make_runner(self, lang="C"):
+        return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang)
 
     def _get_ansible_galaxy_version(self):
         def process(rc, out, err):
@@ -239,12 +240,20 @@ class AnsibleGalaxyInstall(ModuleHelper):
             version = tuple(int(x) for x in version.split('.')[:3])
             return version
 
-        with self.runner("version", check_rc=True, output_process=process) as ctx:
-            return ctx.run(version=True)
+        try:
+            runner = self._make_runner("C.UTF-8")
+            with runner("version", check_rc=True, output_process=process) as ctx:
+                return runner, ctx.run(version=True)
+        except Exception as e:
+            if "unsupported locale setting" not in str(e):
+                raise
+            runner = self._make_runner("en_US.UTF-8")
+            with runner("version", check_rc=True, output_process=process) as ctx:
+                return runner, ctx.run(version=True)
 
     def __init_module__(self):
-        self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
-        self.ansible_version = self._get_ansible_galaxy_version()
+        # self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
+        self.runner, self.ansible_version = self._get_ansible_galaxy_version()
         if self.ansible_version < (2, 11) and not self.vars.ack_min_ansiblecore211:
             self.module.deprecate(
                 "Support for Ansible 2.9 and ansible-base 2.10 is being deprecated. "
