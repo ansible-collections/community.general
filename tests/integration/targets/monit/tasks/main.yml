@@ -63,6 +63,12 @@
       state: present
     when: ansible_distribution == 'Fedora'
 
+  - name: Install virtualenv via package manager (py3-virtualenv)
+    package:
+      name: py3-virtualenv
+      state: present
+    when: ansible_distribution == 'Alpine'
+
   - name: Install virtualenv via pip
     pip:
       name: virtualenv
