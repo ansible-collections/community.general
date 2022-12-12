@@ -10,7 +10,6 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_command
 short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
-version_added: 4.2.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     perform an action.
@@ -34,12 +33,19 @@ options:
       - Base URI of iLO.
     type: str
   username:
+    required: true
     description:
       - Username for authenticating to iLO.
     type: str
   password:
+    required: true
     description:
       - Password for authenticating to iLO.
+    type: str
+  auth_token:
+    required: true
+    description:
+      - Security Token for authenticating to iLO.
     type: str
   timeout:
     description:
@@ -48,26 +54,48 @@ options:
     type: int
   fwpkg_file:
     required: true
+    type: str
     description:
       - Absolute path of the firmware package file that the user wishes to attach.
   force:
     required: false
+    default: true
+    type: bool
     description:
-      - 
+      - force the upload.
   tover:
     required: false
+    default: false
+    type: bool
     description:
-      - 
+      - tpm flag
   update_srs:
     required: false
+    default: false
+    type: bool
     description:
       - The component uploaded will become a part of the system recovery set (srs).
+  update_repository:
+    required: false
+    default: false
+    type: bool
+    description:
+      - The component uploaded will become a part of the repository.
+  update_target:
+    required: false
+    default: false
+    type: bool
+    description:
+      - The component uploaded will flashed as well.
   componentsig:
     required: false
+    type: str
     description:
-      - 
+      - signature of component.
   overwrite:
     required: false
+    default: false
+    type: bool
     description:
       - Permission to overwrite a file present of the server with same name.
 author:
@@ -151,7 +179,7 @@ def main():
         ],
         supports_check_mode=False
     )
-    
+
     category = module.params['category']
     command_list = module.params['command']
 
@@ -159,7 +187,7 @@ def main():
              "pswd": module.params['password']}
 
     options = {}
-    
+
     options["fwpkgfile"] = module.params['fwpkg_file']
     options["forceupload"] = module.params['force']
     options["tover"] = module.params['tover']
@@ -188,7 +216,7 @@ def main():
         resource = rf_utils._find_updateservice_resource()
         if not resource['ret']:
             module.fail_json(msg=to_native(resource['msg']))
-        
+
         for command in command_list:
             if command == "Flashfwpkg":
                 result = rf_utils.flash_firmware(options)
