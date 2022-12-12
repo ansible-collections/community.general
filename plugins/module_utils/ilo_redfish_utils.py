@@ -407,7 +407,7 @@ class iLORedfishUtils(RedfishUtils):
 
         try:
             location = os.sep.join(cutpath[:-1])
-        except:
+        except as e:
             location = os.curdir
 
         if not location:
@@ -522,7 +522,8 @@ class iLORedfishUtils(RedfishUtils):
                     ):
 
                         if not options["overwrite"]:
-                            ret["msg"] = "Upload stopped by user due to filename conflict. If you would like to bypass this check include the --forceupload option"
+                            ret["msg"] = "Upload stopped by user due to filename conflict."
+                                    " If you would like to bypass this check include the --forceupload option"
                             ret["validation"] = False
                             break
 
@@ -533,7 +534,9 @@ class iLORedfishUtils(RedfishUtils):
                             and prevfile != filehndl[0].upper()
                             and comp["Locked"]
                         ):
-                            ret["msg"] = "Error: Component is currently locked by a taskqueue task or installset. \n Remove any installsets or taskqueue tasks containing the file and try again OR use taskqueue command to put the component to installation queue\n"
+                            ret["msg"] = "Error: Component is currently locked by a taskqueue task or installset.\n"
+                                "Remove any installsets or taskqueue tasks containing the file and try again OR use taskqueue command to put the component "
+                                "to installation queue\n"
                             ret["validation"] = False
                             break
                     prevfile = str(comp["Filename"].upper())
@@ -554,7 +557,7 @@ class iLORedfishUtils(RedfishUtils):
 
         total_time = 0
         state = ""
-    
+
         while total_time < wait_time:
             state, _ = self.get_update_service_state()
 
@@ -670,7 +673,7 @@ class iLORedfishUtils(RedfishUtils):
                 ("file", (ilo_upload_filename, output, "application/octet-stream"))
             )
 
-            headers = {'Cookie': 'sessionKey='+session_key, 'X-Auth-Token': session_key, 'OData-Version': '4.0'}
+            headers = {'Cookie': 'sessionKey=' + session_key, 'X-Auth-Token': session_key, 'OData-Version': '4.0'}
 
             args = None
 
@@ -679,7 +682,7 @@ class iLORedfishUtils(RedfishUtils):
             if results.status == 200:
                 ret["ret"] = True
                 ret["msg"] = "Uploaded successfully"
-                
+
             else:
                 ret["msg"] = "iLO UpdateService is busy. Please try again."
                 ret["ret"] = False
@@ -780,7 +783,7 @@ class iLORedfishUtils(RedfishUtils):
 
         version = float(response['data']['FirmwareVersion'][4] + "." + response['data']
                         ['FirmwareVersion'][7] + response['data']['FirmwareVersion'][9:11])
-       
+
         if version <= 5.120 and options["fwpkgfile"].lower().startswith("iegen10"):
             raise IncompatibleiLOVersionError(
                 "Please upgrade to iLO 5 1.20 or greater to ensure correct flash of this firmware."
@@ -803,7 +806,7 @@ class iLORedfishUtils(RedfishUtils):
             final = self.applyfwpkg(options, tempdir, components, comptype)
             result = {}
             if final["ret"]:
-                result["msg"] = final["msg"]+"\n"
+                result["msg"] = final["msg"] + "\n"
                 if comptype == "A":
                     result['msg'] += "Firmware has successfully been flashed. \n "
                     if "ilo" in options["fwpkgfile"].lower():
@@ -819,7 +822,7 @@ class iLORedfishUtils(RedfishUtils):
 
             else:
                 result["ret"] = False
-                result["msg"] = final.get("msg")           
+                result["msg"] = final.get("msg")
 
         except (FirmwareUpdateError, UploadError) as excp:
             raise excp
