@@ -407,7 +407,7 @@ class iLORedfishUtils(RedfishUtils):
 
         try:
             location = os.sep.join(cutpath[:-1])
-        except as e:
+        except Exception as e:
             location = os.curdir
 
         if not location:
