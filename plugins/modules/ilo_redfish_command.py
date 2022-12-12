@@ -77,7 +77,7 @@ options:
       - The component uploaded will become a part of the system recovery set (srs).
   update_repository:
     required: false
-    default: false
+    default: true
     type: bool
     description:
       - The component uploaded will become a part of the repository.
@@ -163,7 +163,7 @@ def main():
             force=dict(type='bool', default=True),
             tover=dict(type='bool', default=False),
             update_srs=dict(type='bool', default=False),
-            componentsig=dict(type='str', default=''),
+            componentsig=dict(type='str', default=None),
             overwrite=dict(type='bool', default=False),
             update_target=dict(type='bool', default=False),
             update_repository=dict(type='bool', default=True),
@@ -198,7 +198,7 @@ def main():
     options["update_target"] = module.params['update_target']
     options["update_repository"] = module.params['update_repository']
     if "UploadComponent" in command_list:
-      options["component"] = module.params['fwpkg_file']
+        options["component"] = module.params['fwpkg_file']
 
     timeout = module.params['timeout']
 
