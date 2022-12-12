@@ -10,6 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - when:
+    - not (ansible_os_family == 'Alpine')  # TODO
     - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version | int == 20)
   block:
 
