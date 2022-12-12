@@ -104,31 +104,31 @@ author:
 
 EXAMPLES = '''
   - name: Flash Firmware package for Bios
-      community.general.ilo_redfish_command:
-        category: UpdateService
-        command: Flashfwpkg
-        baseuri: "15.x.x.x"
-        username: "Admin"
-        password: "testpass123"
-        fwpkg_file: Bios_fwpkgfile.fwpkg
+    community.general.ilo_redfish_command:
+      category: UpdateService
+      command: Flashfwpkg
+      baseuri: "15.x.x.x"
+      username: "Admin"
+      password: "testpass123"
+      fwpkg_file: Bios_fwpkgfile.fwpkg
 
   - name: Flash Firmware package for iLO
-      community.general.ilo_redfish_command:
-        category: UpdateService
-        command: Flashfwpkg
-        baseuri: "15.x.x.x"
-        username: "Admin"
-        password: "testpass123"
-        fwpkg_file: ilo_fwpkgfile.fwpkg
+    community.general.ilo_redfish_command:
+      category: UpdateService
+      command: Flashfwpkg
+      baseuri: "15.x.x.x"
+      username: "Admin"
+      password: "testpass123"
+      fwpkg_file: ilo_fwpkgfile.fwpkg
 
   - name: Upload Firmware package onto server
-      community.general.ilo_redfish_command:
-        category: UpdateService
-        command: UploadComponent
-        baseuri: "15.x.x.x"
-        username: "Admin"
-        password: "testpass123"
-        fwpkg_file: ilo_fwpkgfile.fwpkg
+    community.general.ilo_redfish_command:
+      category: UpdateService
+      command: UploadComponent
+      baseuri: "15.x.x.x"
+      username: "Admin"
+      password: "testpass123"
+      fwpkg_file: ilo_fwpkgfile.fwpkg
 '''
 
 RETURN = '''
