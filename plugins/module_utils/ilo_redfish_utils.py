@@ -443,7 +443,7 @@ class iLORedfishUtils(RedfishUtils):
         filelist = []
 
         # Get the component filename
-        t, filename = os.path.split(options["component"])
+        temp, filename = os.path.split(options["component"])
         check_file_rw(os.path.normpath(options["component"]), "r")
         size = os.path.getsize(options["component"])
 
@@ -454,7 +454,7 @@ class iLORedfishUtils(RedfishUtils):
         if size > maxcompsize:
             section = 1
 
-            sigpath, t = os.path.split(options["componentsig"])
+            sigpath, temp = os.path.split(options["componentsig"])
             check_file_rw(os.path.normpath(options["componentsig"]), "r")
             filebasename = filename[: filename.rfind(".")]
             tempfoldername = "bmn" + \
@@ -559,7 +559,7 @@ class iLORedfishUtils(RedfishUtils):
         state = ""
 
         while total_time < wait_time:
-            state, t = self.get_update_service_state()
+            state, temp = self.get_update_service_state()
 
             if state == "ERROR":
                 return False
@@ -622,7 +622,7 @@ class iLORedfishUtils(RedfishUtils):
             componentpath = item[1]
             compsigpath = item[2]
 
-            t, filename = os.path.split(componentpath)
+            temp, filename = os.path.split(componentpath)
 
             if not etag:
                 etag = "sum" + filename.replace(".", "")
@@ -726,7 +726,7 @@ class iLORedfishUtils(RedfishUtils):
                 result["msg"] += str(self.human_readable_time(time.time() - start_time))
 
             if len(filestoupload) > 1:
-                path, t = os.path.split((filestoupload[0])[1])
+                path, temp = os.path.split((filestoupload[0])[1])
                 shutil.rmtree(path)
             elif fwpkg:
                 if os.path.exists(loc):
