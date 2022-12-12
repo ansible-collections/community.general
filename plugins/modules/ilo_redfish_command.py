@@ -158,6 +158,7 @@ def main():
             baseuri=dict(required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
+            auth_token=dict(required=True, no_log=True),
             fwpkg_file=dict(required=True),
             force=dict(type='bool', default=True),
             tover=dict(type='bool', default=False),
