@@ -19,7 +19,7 @@
   register: loop_device2
 
 - name: "Create loop device for file"
-  command: "losetup --show -f {{ remote_tmp_dir }}/img2"
+  command: "losetup -f {{ remote_tmp_dir }}/img2"
 
 - name: "Affect name on disk to work on"
   set_fact:
