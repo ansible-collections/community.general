@@ -701,7 +701,7 @@ class iLORedfishUtils(RedfishUtils):
         minutes = seconds / 60
         seconds = seconds % 60
 
-        return "{} hour(s) {} minute(s) {} second(s) ".format(
+        return "{0:02.0f} hour(s) {1:02.0f} minute(s) {2:02.0f} second(s) ".format(
             hours, minutes, seconds
         )
 
