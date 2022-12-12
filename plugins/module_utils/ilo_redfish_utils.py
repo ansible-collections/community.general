@@ -522,8 +522,8 @@ class iLORedfishUtils(RedfishUtils):
                     ):
 
                         if not options["overwrite"]:
-                            ret["msg"] = "Upload stopped by user due to filename conflict."
-                                    " If you would like to bypass this check include the --forceupload option"
+                            ret["msg"] = "Upload stopped by user due to filename conflict.\
+                            If you would like to bypass this check include the --forceupload option"
                             ret["validation"] = False
                             break
 
@@ -534,9 +534,9 @@ class iLORedfishUtils(RedfishUtils):
                             and prevfile != filehndl[0].upper()
                             and comp["Locked"]
                         ):
-                            ret["msg"] = "Error: Component is currently locked by a taskqueue task or installset.\n"
-                                "Remove any installsets or taskqueue tasks containing the file and try again OR use taskqueue command to put the component "
-                                "to installation queue\n"
+                            ret["msg"] = "Error: Component is currently locked by a taskqueue task or installset.\n\
+                            Remove any installsets or taskqueue tasks containing the file and try again OR use taskqueue command to put the component \
+                            to installation queue\n"
                             ret["validation"] = False
                             break
                     prevfile = str(comp["Filename"].upper())
