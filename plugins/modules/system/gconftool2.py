@@ -125,7 +125,7 @@ class GConf2Preference(object):
             elif call_type == 'set':
                 cmd.extend(direct)
                 cmd.extend(config_source)
-                cmd.extend(["--type", self.value_type, "--{3}".format(call_type), self.key, self.value])
+                cmd.extend(["--type", self.value_type, "--{0}".format(call_type), self.key, self.value])
             elif call_type == 'unset':
                 cmd.extend(["--unset", self.key])
 
