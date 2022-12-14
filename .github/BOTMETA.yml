@@ -309,6 +309,9 @@ files:
   $module_utils/pipx.py:
     labels: pipx
     maintainers: russoz
+  $module_utils/puppet.py:
+    labels: puppet
+    maintainers: russoz
   $module_utils/pure.py:
     labels: pure pure_storage
     maintainers: $team_purestorage
