@@ -22,6 +22,9 @@ options:
     name:
         description:
             - Name of package(s) to install/remove.
+            - C(NAME=VERSION) syntax is also supported to install a package
+              in a certain version. See the examples. This is supported since
+              community.general 6.2.0.
         aliases: [pkg]
         required: true
         type: list
@@ -64,6 +67,11 @@ EXAMPLES = '''
     name: foo
     state: present
 
+- name: Install foo in version 1.2
+  community.general.opkg:
+    name: foo=1.2
+    state: present
+
 - name: Update cache and install foo
   community.general.opkg:
     name: foo
@@ -102,16 +110,33 @@ def update_package_db(module, opkg_path):
         module.fail_json(msg="could not update package db")
 
 
-def query_package(module, opkg_path, name, state="present"):
+def query_package(module, opkg_path, name, version=None, state="present"):
     """ Returns whether a package is installed or not. """
 
     if state == "present":
+        rc, out, err = module.run_command("%s list-installed %s" % (opkg_path, name))
+        if rc != 0:
+            return False
+        # variable out is one line if the package is installed:
+        # "NAME - VERSION - DESCRIPTION"
+        if version is not None:
+            if not out.startswith("%s - %s " % (name, version)):
+                return False
+        else:
+            if not out.startswith(name + " "):
+                return False
+        return True
+    else:
+        raise NotImplementedError()
 
-        rc, out, err = module.run_command("%s list-installed | grep -q \"^%s \"" % (shlex_quote(opkg_path), shlex_quote(name)), use_unsafe_shell=True)
-        if rc == 0:
-            return True
 
-        return False
+def split_name_and_version(module, package):
+    """ Split the name and the version when using the NAME=VERSION syntax """
+    splitted = package.split('=', 1)
+    if len(splitted) == 1:
+        return splitted[0], None
+    else:
+        return splitted[0], splitted[1]
 
 
 def remove_packages(module, opkg_path, packages):
@@ -125,6 +150,8 @@ def remove_packages(module, opkg_path, packages):
     remove_c = 0
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
+        package, version = split_name_and_version(module, package)
+
         # Query the package first, to see if we even need to remove
         if not query_package(module, opkg_path, package):
             continue
@@ -154,13 +181,20 @@ def install_packages(module, opkg_path, packages):
     install_c = 0
 
     for package in packages:
-        if query_package(module, opkg_path, package) and (force != '--force-reinstall'):
+        package, version = split_name_and_version(module, package)
+
+        if query_package(module, opkg_path, package, version) and (force != '--force-reinstall'):
             continue
 
-        rc, out, err = module.run_command("%s install %s %s" % (opkg_path, force, package))
+        if version is not None:
+            version_str = "=%s" % version
+        else:
+            version_str = ""
 
-        if not query_package(module, opkg_path, package):
-            module.fail_json(msg="failed to install %s: %s" % (package, out))
+        rc, out, err = module.run_command("%s install %s %s%s" % (opkg_path, force, package, version_str))
+
+        if not query_package(module, opkg_path, package, version):
+            module.fail_json(msg="failed to install %s%s: %s" % (package, version_str, out))
 
         install_c += 1
 
