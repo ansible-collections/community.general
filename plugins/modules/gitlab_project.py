@@ -453,9 +453,9 @@ def main():
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
         avatar_path=dict(type='path'),
-        builds=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        forks=dict(type='str', choices=['private', 'disabled', 'enabled']),
-        container_registry=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        builds=dict(type='str', choices=['private', 'disabled', 'enabled'], default='enabled'),
+        forks=dict(type='str', choices=['private', 'disabled', 'enabled']), default='enabled',
+        container_registry=dict(type='str', choices=['private', 'disabled', 'enabled'], default='enabled'),
     ))
 
     module = AnsibleModule(
