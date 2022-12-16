@@ -116,6 +116,8 @@ class Bitwarden(object):
 
         if field in ['password', 'passwordRevisionDate', 'totp', 'uris', 'username']:
             return [match['login'][field] for match in matches]
+        elif not field:
+          return matches
         else:
             custom_field_matches = []
             for match in matches:
@@ -125,8 +127,6 @@ class Bitwarden(object):
             if not len(custom_field_matches):
               raise AnsibleError("Custom field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
             return custom_field_matches
-
-        return matches
 
 
 class LookupModule(LookupBase):
