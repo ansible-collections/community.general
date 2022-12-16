@@ -117,15 +117,15 @@ class Bitwarden(object):
         if field in ['password', 'passwordRevisionDate', 'totp', 'uris', 'username']:
             return [match['login'][field] for match in matches]
         elif not field:
-          return matches
+            return matches
         else:
             custom_field_matches = []
             for match in matches:
-              for custom_field in match['fields']:
-                if custom_field['name'] == field:
-                  custom_field_matches.append(custom_field['value'])
+                for custom_field in match['fields']:
+                    if custom_field['name'] == field:
+                        custom_field_matches.append(custom_field['value'])
             if not len(custom_field_matches):
-              raise AnsibleError("Custom field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
+                raise AnsibleError("Custom field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
             return custom_field_matches
 
 
