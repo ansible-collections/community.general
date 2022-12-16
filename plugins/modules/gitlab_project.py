@@ -172,6 +172,39 @@ options:
       - This option is only used on creation, not for updates. This is also only used if I(initialize_with_readme=true).
     type: str
     version_added: "4.2.0"
+  builds:
+    description:
+      - C(private) Repository CI/CD allowed only to project members.
+      - C(disabled) Repository CI/CD is disabled.
+      - C(enabled) Repository CI/CD is enabled.
+    default: enabled
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    aliases:
+      - builds_access_level
+    version_added: "6.1.0"
+  forks:
+    description:
+      - C(private) Repository forks allowed only to project members.
+      - C(disabled) Repository forks are disabled.
+      - C(enabled) Repository forks are enabled.
+    default: enabled
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    aliases:
+      - forking_access_level
+    version_added: "6.1.0"
+  container_registry:
+    description:
+      - C(private) Container registry allowed only to project members.
+      - C(disabled) Container registry is disabled.
+      - C(enabled) Container registry is enabled.
+    default: enabled
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    aliases:
+      - container_registry_access_level
+    version_added: "6.1.0"
 '''
 
 EXAMPLES = r'''
@@ -287,6 +320,9 @@ class GitLabProject(object):
             'squash_option': options['squash_option'],
             'ci_config_path': options['ci_config_path'],
             'shared_runners_enabled': options['shared_runners_enabled'],
+            'builds_access_level': options['builds'],
+            'forking_access_level': options['forks'],
+            'container_registry_access_level': options['container_registry'],
         }
         # Because we have already call userExists in main()
         if self.project_object is None:
@@ -417,6 +453,9 @@ def main():
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
         avatar_path=dict(type='path'),
+        builds=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        forks=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        container_registry=dict(type='str', choices=['private', 'disabled', 'enabled']),
     ))
 
     module = AnsibleModule(
@@ -464,6 +503,9 @@ def main():
     shared_runners_enabled = module.params['shared_runners_enabled']
     avatar_path = module.params['avatar_path']
     default_branch = module.params['default_branch']
+    builds = module.params['builds']
+    forks = module.params['forks']
+    container_registry = module.params['container_registry']
 
     if default_branch and not initialize_with_readme:
         module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
@@ -533,6 +575,9 @@ def main():
             "ci_config_path": ci_config_path,
             "shared_runners_enabled": shared_runners_enabled,
             "avatar_path": avatar_path,
+            "builds": builds,
+            "forks": forks,
+            "container_registry": container_registry,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
