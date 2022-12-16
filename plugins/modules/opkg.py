@@ -104,7 +104,7 @@ from ansible.module_utils.six.moves import shlex_quote
 def update_package_db(module, opkg_path):
     """ Updates packages list. """
 
-    rc, out, err = module.run_command("%s update" % opkg_path)
+    rc, out, err = module.run_command([opkg_path, "update"])
 
     if rc != 0:
         module.fail_json(msg="could not update package db")
@@ -114,7 +114,7 @@ def query_package(module, opkg_path, name, version=None, state="present"):
     """ Returns whether a package is installed or not. """
 
     if state == "present":
-        rc, out, err = module.run_command("%s list-installed %s" % (opkg_path, name))
+        rc, out, err = module.run_command([opkg_path, "list-installed", name])
         if rc != 0:
             return False
         # variable out is one line if the package is installed:
@@ -156,7 +156,10 @@ def remove_packages(module, opkg_path, packages):
         if not query_package(module, opkg_path, package):
             continue
 
-        rc, out, err = module.run_command("%s remove %s %s" % (opkg_path, force, package))
+        if force:
+            rc, out, err = module.run_command([opkg_path, "remove", force, package])
+        else:
+            rc, out, err = module.run_command([opkg_path, "remove", package])
 
         if query_package(module, opkg_path, package):
             module.fail_json(msg="failed to remove %s: %s" % (package, out))
@@ -191,7 +194,10 @@ def install_packages(module, opkg_path, packages):
         else:
             version_str = ""
 
-        rc, out, err = module.run_command("%s install %s %s%s" % (opkg_path, force, package, version_str))
+        if force:
+            rc, out, err = module.run_command([opkg_path, "install", force, package + version_str])
+        else:
+            rc, out, err = module.run_command([opkg_path, "install", package + version_str])
 
         if not query_package(module, opkg_path, package, version):
             module.fail_json(msg="failed to install %s%s: %s" % (package, version_str, out))
