@@ -60,6 +60,11 @@
   set_fact:
     reqs_file: '{{ remote_tmp_dir }}/reqs.yaml'
 
+- name: Remove collection before test
+  ansible.builtin.file:
+    path: /root/ansible_collections/geerlingguy
+    state: absent
+
 - name: Copy requirements file
   copy:
     src: 'files/test.yml'
