@@ -677,7 +677,7 @@ class LxcContainerManagement(object):
 
         false_values = BOOLEANS_FALSE.union([None, ''])
         result = dict(
-            (k, v)
+            (v, self.module.params[k])
             for k, v in variables.items()
             if self.module.params[k] not in false_values
         )
