@@ -109,7 +109,7 @@ EXAMPLES = '''
 
 RETURN = '''
 tag:
-    description: Version of the created/latest release
+    description: Version of the created/latest release.
     type: str
     returned: success
     sample: 1.1.0
