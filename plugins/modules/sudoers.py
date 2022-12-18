@@ -235,7 +235,7 @@ def main():
         'host': {
           'type': 'str',
           'default': 'ALL',
-        }
+        },
         'runas': {
             'type': 'str',
             'default': None,
