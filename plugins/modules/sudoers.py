@@ -185,7 +185,13 @@ class Sudoers(object):
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
-        return "{owner} {host}={runas}{nopasswd} {commands}\n".format(owner=owner, host=self.host, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
+        return "{owner} {host}={runas}{nopasswd} {commands}\n".format(
+            owner=owner,
+            host=self.host,
+            runas=runas_str,
+            nopasswd=nopasswd_str,
+            commands=commands_str
+        )
 
     def validate(self):
         if self.validation == 'absent':
@@ -233,8 +239,8 @@ def main():
             'default': True,
         },
         'host': {
-          'type': 'str',
-          'default': 'ALL',
+            'type': 'str',
+            'default': 'ALL',
         },
         'runas': {
             'type': 'str',
