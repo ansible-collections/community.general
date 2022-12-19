@@ -1,0 +1,4 @@
+minor_changes:
+  - gitlab_project - add ``builds`` option (https://github.com/ansible-collections/community.general/pull/5706).
+  - gitlab_project - add ``forks`` option (https://github.com/ansible-collections/community.general/pull/5706).
+  - gitlab_project - add ``container_registry`` option (https://github.com/ansible-collections/community.general/pull/5706).
