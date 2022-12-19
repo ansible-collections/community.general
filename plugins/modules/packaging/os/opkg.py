@@ -154,7 +154,7 @@ def install_packages(module, opkg_path, packages):
     install_c = 0
 
     for package in packages:
-        if query_package(module, opkg_path, package):
+        if query_package(module, opkg_path, package) and (force != '--force-reinstall'):
             continue
 
         rc, out, err = module.run_command("%s install %s %s" % (opkg_path, force, package))
