@@ -699,7 +699,7 @@ def main():
                 module.exit_json(changed=False, vmid=vmid, msg='Disk %s already detached in VM %s' % (disk, vmid))
             if disk not in vm_config:
                 module.exit_json(changed=False, vmid=vmid, msg="Disk %s not present in VM %s config" % (disk, vmid))
-            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=0)
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(idlist=disk, force=0)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s detached from VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(msg="Failed to detach disk %s from VM %s with exception: %s" % (disk, vmid, str(e)))
@@ -734,7 +734,7 @@ def main():
         try:
             if disk not in vm_config:
                 module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already absent in VM %s" % (disk, vmid))
-            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=1)
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(idlist=disk, force=1)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed from VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to remove disk %s from VM %s: %s' % (disk, vmid, str(e)))

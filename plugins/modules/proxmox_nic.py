@@ -223,7 +223,7 @@ class ProxmoxNicAnsible(ProxmoxAnsible):
 
         if interface in vminfo:
             if not self.module.check_mode:
-                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(vmid=vmid, delete=interface)
+                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(delete=interface)
             return True
 
         return False
