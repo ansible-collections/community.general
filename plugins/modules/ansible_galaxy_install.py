@@ -231,7 +231,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
         name=fmt.as_list(),
     )
 
-    def _make_runner(self, lang="C"):
+    def _make_runner(self, lang):
         return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True)
 
     def _get_ansible_galaxy_version(self):
@@ -239,7 +239,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
             pass
 
         def process(rc, out, err):
-            if rc != 0 and "unsupported locale setting" in err:
+            if rc != 0 and "locale" in err:
                 raise UnsupportedLocale()
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)

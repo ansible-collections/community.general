@@ -8,7 +8,6 @@
   community.general.ansible_galaxy_install:
     type: collection
     name: netbox.netbox
-    dest: "{{ remote_tmp_dir }}/collections"
   register: install_c0
 
 - name: Assert collection netbox.netbox was installed
@@ -21,7 +20,6 @@
   community.general.ansible_galaxy_install:
     type: collection
     name: netbox.netbox
-    dest: "{{ remote_tmp_dir }}/collections"
   register: install_c1
 
 - name: Assert collection was not installed
@@ -34,7 +32,6 @@
   community.general.ansible_galaxy_install:
     type: role
     name: ansistrano.deploy
-    dest: "{{ remote_tmp_dir }}/roles"
   register: install_r0
 
 - name: Assert collection ansistrano.deploy was installed
@@ -47,7 +44,6 @@
   community.general.ansible_galaxy_install:
     type: role
     name: ansistrano.deploy
-    dest: "{{ remote_tmp_dir }}/roles"
   register: install_r1
 
 - name: Assert role was not installed
@@ -71,8 +67,6 @@
     requirements_file: "{{ reqs_file }}"
   register: install_rq0
   ignore_errors: true
-  environment:
-    ANSIBLE_COLLECTIONS_PATH: "{{ remote_tmp_dir }}/from_file"
 
 - name: Assert requirements file was installed
   assert:
@@ -87,8 +81,6 @@
     requirements_file: "{{ reqs_file }}"
   register: install_rq1
   ignore_errors: true
-  environment:
-    ANSIBLE_COLLECTIONS_PATH: "{{ remote_tmp_dir }}/from_file"
 
 - name: Assert requirements file was not installed
   assert:
