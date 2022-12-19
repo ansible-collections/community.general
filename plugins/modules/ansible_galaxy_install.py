@@ -239,7 +239,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
             pass
 
         def process(rc, out, err):
-            if rc != 0 and "locale" in err:
+            if (rc != 0 and "unsupported locale setting" in err) or (rc == 0 and "cannot change locale" in err):
                 raise UnsupportedLocale()
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)
