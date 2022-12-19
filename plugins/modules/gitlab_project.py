@@ -182,7 +182,7 @@ options:
     choices: ["private", "disabled", "enabled"]
     aliases:
       - builds_access_level
-    version_added: "6.1.0"
+    version_added: "6.2.0"
   forks:
     description:
       - C(private) Repository forks allowed only to project members.
