@@ -48,6 +48,7 @@ options:
       - Specify the host the rule is for.
     default: ALL
     type: str
+    version_added: 6.2.0
   runas:
     description:
       - Specify the target user the command(s) will run as.
