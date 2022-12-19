@@ -60,11 +60,6 @@
   set_fact:
     reqs_file: '{{ remote_tmp_dir }}/reqs.yaml'
 
-- name: Remove collection before test
-  ansible.builtin.file:
-    path: /root/ansible_collections/geerlingguy
-    state: absent
-
 - name: Copy requirements file
   copy:
     src: 'files/test.yml'
@@ -76,6 +71,8 @@
     requirements_file: "{{ reqs_file }}"
   register: install_rq0
   ignore_errors: true
+  environment:
+    ANSIBLE_COLLECTIONS_PATH: "{{ remote_tmp_dir }}/from_file"
 
 - name: Assert requirements file was installed
   assert:
@@ -90,6 +87,8 @@
     requirements_file: "{{ reqs_file }}"
   register: install_rq1
   ignore_errors: true
+  environment:
+    ANSIBLE_COLLECTIONS_PATH: "{{ remote_tmp_dir }}/from_file"
 
 - name: Assert requirements file was not installed
   assert:

@@ -20,6 +20,10 @@ notes:
   - >
     B(Ansible 2.9/2.10): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and
     ansible-base 2.10 (later ansible-core 2.11). See comments in the parameters.
+  - >
+    The module will try and run using the C(C.UTF-8) locale.
+    If that fails, it will try C(en_US.UTF-8).
+    If that one also fails, the module will fail.
 requirements:
   - Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
 options:
@@ -228,7 +232,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
     )
 
     def _make_runner(self, lang="C"):
-        return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang)
+        return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True)
 
     def _get_ansible_galaxy_version(self):
         class UnsupportedLocale(Exception):
@@ -351,11 +355,12 @@ class AnsibleGalaxyInstall(ModuleHelper):
             self._setup210plus()
         with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install")
+            if self.verbosity > 2:
+                self.vars.set("run_info", ctx.run_info)
 
 
 def main():
-    galaxy = AnsibleGalaxyInstall()
-    galaxy.run()
+    AnsibleGalaxyInstall.execute()
 
 
 if __name__ == '__main__':
