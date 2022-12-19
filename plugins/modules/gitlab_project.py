@@ -174,37 +174,28 @@ options:
     version_added: "4.2.0"
   builds:
     description:
-      - C(private) Repository CI/CD allowed only to project members.
-      - C(disabled) Repository CI/CD is disabled.
-      - C(enabled) Repository CI/CD is enabled.
-    default: enabled
+      - C(private) means that repository CI/CD is allowed only to project members.
+      - C(disabled) means that repository CI/CD is disabled.
+      - C(enabled) means that repository CI/CD is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
-    aliases:
-      - builds_access_level
     version_added: "6.2.0"
   forks:
     description:
-      - C(private) Repository forks allowed only to project members.
-      - C(disabled) Repository forks are disabled.
-      - C(enabled) Repository forks are enabled.
-    default: enabled
+      - C(private) means that repository forks is allowed only to project members.
+      - C(disabled) means that repository forks are disabled.
+      - C(enabled) means that repository forks are enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
-    aliases:
-      - forking_access_level
-    version_added: "6.1.0"
+    version_added: "6.2.0"
   container_registry:
     description:
-      - C(private) Container registry allowed only to project members.
-      - C(disabled) Container registry is disabled.
-      - C(enabled) Container registry is enabled.
-    default: enabled
+      - C(private) means that container registry is allowed only to project members.
+      - C(disabled) means that container registry is disabled.
+      - C(enabled) means that container registry is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
-    aliases:
-      - container_registry_access_level
-    version_added: "6.1.0"
+    version_added: "6.2.0"
 '''
 
 EXAMPLES = r'''
@@ -453,9 +444,9 @@ def main():
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
         avatar_path=dict(type='path'),
-        builds=dict(type='str', choices=['private', 'disabled', 'enabled'], default='enabled', aliases=["builds_access_level"]),
-        forks=dict(type='str', choices=['private', 'disabled', 'enabled'], default='enabled', aliases=["forking_access_level"]),
-        container_registry=dict(type='str', choices=['private', 'disabled', 'enabled'], default='enabled', aliases=["container_registry_access_level"]),
+        builds=dict(type='str', choices=['private', 'disabled', 'enabled'], aliases=["builds_access_level"]),
+        forks=dict(type='str', choices=['private', 'disabled', 'enabled'], aliases=["forking_access_level"]),
+        container_registry=dict(type='str', choices=['private', 'disabled', 'enabled'], aliases=["container_registry_access_level"]),
     ))
 
     module = AnsibleModule(
