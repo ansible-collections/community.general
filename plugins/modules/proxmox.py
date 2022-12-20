@@ -435,11 +435,11 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         version = self.version()
         pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
 
-        #The features work only on PVE 7
+        # The features work only on PVE 7
         if pve_major_version < 7:
-          for p in only_v7:
-            if p in kwargs:
-              del kwargs[p]
+            for p in only_v7:
+                if p in kwargs:
+                    del kwargs[p]
 
         if VZ_TYPE == 'lxc':
             kwargs['cpulimit'] = cpus
