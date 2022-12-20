@@ -106,6 +106,14 @@ options:
     description:
       - sets DNS search domain for a container
     type: str
+  tags:
+    description:
+      - List of tags to apply to the container.
+      - Tags must start with C([a-z0-9_]) followed by zero or more of the following characters C([a-z0-9_-+.]).
+      - Tags are only available in Proxmox 7+.
+    type: list
+    elements: str
+    version_added: TODO
   timeout:
     description:
       - timeout for operations
@@ -391,6 +399,7 @@ EXAMPLES = r'''
     state: absent
 '''
 
+import re
 import time
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
@@ -415,10 +424,22 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         return config['template']
 
     def create_instance(self, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
+        # Available only in PVE 7
+        only_v7 = ['tags']
+
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Remove all empty kwarg entries
         kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+
+        version = self.version()
+        pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
+
+        #The features work only on PVE 7
+        if pve_major_version < 7:
+          for p in only_v7:
+            if p in kwargs:
+              del kwargs[p]
 
         if VZ_TYPE == 'lxc':
             kwargs['cpulimit'] = cpus
@@ -436,6 +457,14 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         else:
             kwargs['cpus'] = cpus
             kwargs['disk'] = disk
+
+        # LXC tags are expected to be valid and presented as a comma/semi-colon delimited string
+        if 'tags' in kwargs:
+            re_tag = re.compile(r'^[a-z0-9_][a-z0-9_\-\+\.]*$')
+            for tag in kwargs['tags']:
+                if not re_tag.match(tag):
+                    self.module.fail_json(msg='%s is not a valid tag' % tag)
+            kwargs['tags'] = ",".join(kwargs['tags'])
 
         if clone is not None:
             if VZ_TYPE != 'lxc':
@@ -569,6 +598,7 @@ def main():
         proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
         clone=dict(type='int'),
         clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
+        tags=dict(type='list', elements='str')
     )
     module_args.update(proxmox_args)
 
@@ -674,7 +704,8 @@ def main():
                                     features=",".join(module.params['features']) if module.params['features'] is not None else None,
                                     unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                                     description=module.params['description'],
-                                    hookscript=module.params['hookscript'])
+                                    hookscript=module.params['hookscript'],
+                                    tags=module.params['tags'])
 
             module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
