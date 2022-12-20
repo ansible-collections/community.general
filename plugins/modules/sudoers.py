@@ -43,6 +43,12 @@ options:
       - Whether a password will be required to run the sudo'd command.
     default: true
     type: bool
+  host:
+    description:
+      - Specify the host the rule is for.
+    default: ALL
+    type: str
+    version_added: 6.2.0
   runas:
     description:
       - Specify the target user the command(s) will run as.
@@ -95,10 +101,11 @@ EXAMPLES = '''
 
 - name: >-
     Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics
-    without requiring a password
+    without requiring a password on the host called webserver
   community.general.sudoers:
     name: monitor-app
     group: monitoring
+    host: webserver
     commands: /usr/local/bin/gather-app-metrics
 
 - name: >-
@@ -136,6 +143,7 @@ class Sudoers(object):
         self.group = module.params['group']
         self.state = module.params['state']
         self.nopassword = module.params['nopassword']
+        self.host = module.params['host']
         self.runas = module.params['runas']
         self.sudoers_path = module.params['sudoers_path']
         self.file = os.path.join(self.sudoers_path, self.name)
@@ -178,7 +186,13 @@ class Sudoers(object):
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
-        return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
+        return "{owner} {host}={runas}{nopasswd} {commands}\n".format(
+            owner=owner,
+            host=self.host,
+            runas=runas_str,
+            nopasswd=nopasswd_str,
+            commands=commands_str
+        )
 
     def validate(self):
         if self.validation == 'absent':
@@ -224,6 +238,10 @@ def main():
         'nopassword': {
             'type': 'bool',
             'default': True,
+        },
+        'host': {
+            'type': 'str',
+            'default': 'ALL',
         },
         'runas': {
             'type': 'str',
