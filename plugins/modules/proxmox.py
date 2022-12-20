@@ -113,7 +113,7 @@ options:
       - Tags are only available in Proxmox 7+.
     type: list
     elements: str
-    version_added: 6.3.0
+    version_added: 6.2.0
   timeout:
     description:
       - timeout for operations
