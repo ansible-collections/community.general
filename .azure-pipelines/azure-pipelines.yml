@@ -189,6 +189,18 @@ stages:
             - test: 3.5
 
 ## Remote
+  - stage: Remote_devel_extra_vms
+    displayName: Remote devel extra VMs
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: devel/{0}
+          targets:
+            - name: Ubuntu 22.04
+              test: ubuntu/22.04
+          groups:
+            - vm
   - stage: Remote_devel
     displayName: Remote devel
     dependsOn: []
@@ -457,6 +469,7 @@ stages:
       - Units_2_12
       - Units_2_13
       - Units_2_14
+      - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_11
       - Remote_2_12
