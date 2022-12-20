@@ -1,4 +1,2 @@
 minor_changes:
-  - gitlab_project - add ``builds`` option (https://github.com/ansible-collections/community.general/pull/5706).
-  - gitlab_project - add ``forks`` option (https://github.com/ansible-collections/community.general/pull/5706).
-  - gitlab_project - add ``container_registry`` option (https://github.com/ansible-collections/community.general/pull/5706).
+  - gitlab_project - add ``builds_access_level``, ``container_registry_access_level`` and ``forking_access_level`` options (https://github.com/ansible-collections/community.general/pull/5706).
