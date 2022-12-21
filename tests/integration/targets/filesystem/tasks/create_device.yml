@@ -14,10 +14,14 @@
   block:
     - when: fstype == 'lvm'
       block:
+        - name: 'Show next free loop device'
+          ansible.builtin.command:
+            cmd: 'losetup -f'
+          register: loop_device_cmd
+
         - name: 'Create a loop device for LVM'
           ansible.builtin.command:
-            cmd: 'losetup --show -f {{ dev }}'
-          register: loop_device_cmd
+            cmd: 'losetup -f {{ dev }}'
 
         - name: 'Switch to loop device target for further tasks'
           ansible.builtin.set_fact:
