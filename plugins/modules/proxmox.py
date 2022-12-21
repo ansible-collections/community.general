@@ -424,9 +424,11 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         return config['template']
 
     def create_instance(self, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
-        # Available only in PVE 7
-        only_v7 = ['tags']
 
+        # Version limited features
+        minimum_version = {
+            'tags': 7,
+        }
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Remove all empty kwarg entries
@@ -435,11 +437,11 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         version = self.version()
         pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
 
-        # The features work only on PVE 7
-        if pve_major_version < 7:
-            for p in only_v7:
-                if p in kwargs:
-                    del kwargs[p]
+        # Fail on unsupported features
+        for option, version in minimum_version.items():
+            if pve_major_version < version:
+                self.module.fail_json(changed=False, msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_major_version}".
+                                      format(option=option, version=version, pve_major_version=pve_major_version))
 
         if VZ_TYPE == 'lxc':
             kwargs['cpulimit'] = cpus
