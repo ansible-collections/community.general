@@ -6,7 +6,7 @@
 - name: "Create volume group on first disk"
   lvg:
     vg: testvg
-    pvs: "{{ loop_device1.stdout }}"
+    pvs: "{{ loop_device1 }}"
 
 - name: "get lvm facts"
   setup:
@@ -16,14 +16,14 @@
 - name: "Assert the testvg span only on first disk"
   assert:
     that:
-      - ansible_lvm.pvs[loop_device1.stdout].vg == "testvg"
-      - 'loop_device2.stdout not in ansible_lvm.pvs or
-         ansible_lvm.pvs[loop_device2.stdout].vg == ""'
+      - ansible_lvm.pvs[loop_device1].vg == "testvg"
+      - 'loop_device2 not in ansible_lvm.pvs or
+         ansible_lvm.pvs[loop_device2].vg == ""'
 
 - name: "Extend to second disk AND reduce from the first disk"
   lvg:
     vg: testvg
-    pvs: "{{ loop_device2.stdout }}"
+    pvs: "{{ loop_device2 }}"
 
 - name: "get lvm facts"
   setup:
@@ -33,6 +33,6 @@
 - name: "Assert the testvg span only on first disk"
   assert:
     that:
-      - 'loop_device1.stdout not in ansible_lvm.pvs or
-         ansible_lvm.pvs[loop_device1.stdout].vg == ""'
-      - ansible_lvm.pvs[loop_device2.stdout].vg == "testvg"
+      - 'loop_device1 not in ansible_lvm.pvs or
+         ansible_lvm.pvs[loop_device1].vg == ""'
+      - ansible_lvm.pvs[loop_device2].vg == "testvg"
