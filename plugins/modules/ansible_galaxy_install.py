@@ -189,7 +189,7 @@ RETURN = """
 import re
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
 
 
 class AnsibleGalaxyInstall(ModuleHelper):
@@ -235,12 +235,12 @@ class AnsibleGalaxyInstall(ModuleHelper):
         return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True)
 
     def _get_ansible_galaxy_version(self):
-        class UnsupportedLocale(Exception):
+        class UnsupportedLocale(ModuleHelperException):
             pass
 
         def process(rc, out, err):
             if (rc != 0 and "unsupported locale setting" in err) or (rc == 0 and "cannot change locale" in err):
-                raise UnsupportedLocale()
+                raise UnsupportedLocale(msg=err)
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)
             if not match:
