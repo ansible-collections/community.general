@@ -27,7 +27,10 @@ options:
     description:
       - C(absent) - policy_profiles should not exist,
       - C(present) - policy_profiles should exist,
-      - C(list) - list current policy_profiles and policies.
+      - >
+        C(list) - list current policy_profiles and policies.
+        This state is deprecated and will be removed 8.0.0.
+        Please use the module M(community.general.manageiq_policies_info) instead.
     choices: ['absent', 'present', 'list']
     default: 'present'
   policy_profiles:
@@ -162,6 +165,13 @@ def main():
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
+
+    if state == "list":
+        module.deprecate(
+            'The value "list" for "state" is deprecated. Please use community.general.manageiq_policies_info instead.',
+            version='8.0.0',
+            collection_name='community.general'
+        )
 
     # get the action and resource type
     action = actions[state]
