@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 azp/posix/2
+azp/posix/vm
 skip/aix
 skip/docker
 skip/freebsd

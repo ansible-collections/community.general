@@ -6,7 +6,7 @@
 - name: "Create volume group on first disk"
   lvg:
     vg: testvg
-    pvs: "{{ loop_device1.stdout }}"
+    pvs: "{{ loop_device1 }}"
 
 - name: Gets current vg size
   shell: vgs -v testvg -o pv_size --noheading --units b | xargs
@@ -21,12 +21,12 @@
   command: "dd if=/dev/zero bs=8MiB count=1 of={{ remote_tmp_dir }}/img1 conv=notrunc oflag=append"
 
 - name: "Reread size of file associated with loop_device1"
-  command: "losetup -c {{ loop_device1.stdout }}"
+  command: "losetup -c {{ loop_device1 }}"
 
 - name: "Reruns lvg with pvresize:no"
   lvg:
    vg: testvg
-   pvs: "{{ loop_device1.stdout }}"
+   pvs: "{{ loop_device1 }}"
    pvresize: no
   register: cmd_result
  
@@ -46,7 +46,7 @@
 - name: "Reruns lvg with pvresize:yes and check_mode:yes"
   lvg:
    vg: testvg
-   pvs: "{{ loop_device1.stdout }}"
+   pvs: "{{ loop_device1 }}"
    pvresize: yes
   check_mode: yes
   register: cmd_result
@@ -68,7 +68,7 @@
 - name: "Reruns lvg with pvresize:yes"
   lvg:
    vg: testvg
-   pvs: "{{ loop_device1.stdout }}"
+   pvs: "{{ loop_device1 }}"
    pvresize: yes
 
 - name: Gets current vg size
