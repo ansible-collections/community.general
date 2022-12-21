@@ -167,13 +167,12 @@
 
 
 
-- name: "get security, raw and mangle tables states"
+- name: "get raw and mangle tables states"
   iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
     table: "{{ item }}"
   loop:
-    - security
     - raw
     - mangle
   changed_when: false
@@ -198,8 +197,6 @@
       - "'*nat' in iptables_state.saved"
       - "'raw' in iptables_state.tables"
       - "'*raw' in iptables_state.saved"
-      - "'security' in iptables_state.tables"
-      - "'*security' in iptables_state.saved"
     quiet: yes
 
 
@@ -233,17 +230,14 @@
       - "'*mangle' in iptables_state.initial_state"
       - "'*nat' in iptables_state.initial_state"
       - "'*raw' in iptables_state.initial_state"
-      - "'*security' in iptables_state.initial_state"
       - "'filter' in iptables_state.tables"
       - "'mangle' not in iptables_state.tables"
       - "'nat' not in iptables_state.tables"
       - "'raw' not in iptables_state.tables"
-      - "'security' not in iptables_state.tables"
       - "'*filter' in iptables_state.restored"
       - "'*mangle' not in iptables_state.restored"
       - "'*nat' not in iptables_state.restored"
       - "'*raw' not in iptables_state.restored"
-      - "'*security' not in iptables_state.restored"
       - iptables_state is not changed
     quiet: yes
 
@@ -264,17 +258,14 @@
       - "'*mangle' in iptables_state.initial_state"
       - "'*nat' in iptables_state.initial_state"
       - "'*raw' in iptables_state.initial_state"
-      - "'*security' in iptables_state.initial_state"
       - "'filter' in iptables_state.tables"
       - "'mangle' in iptables_state.tables"
       - "'nat' in iptables_state.tables"
       - "'raw' in iptables_state.tables"
-      - "'security' in iptables_state.tables"
       - "'*filter' in iptables_state.restored"
       - "'*mangle' in iptables_state.restored"
       - "'*nat' in iptables_state.restored"
       - "'*raw' in iptables_state.restored"
-      - "'*security' in iptables_state.restored"
       - iptables_state is not changed
     quiet: yes
 
