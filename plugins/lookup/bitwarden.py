@@ -114,7 +114,7 @@ class Bitwarden(object):
         """
         matches = self._get_matches(search_value, search_field)
 
-        if field in ['password', 'passwordRevisionDate', 'totp', 'uris', 'username']:
+        if field in ['autofillOnPageLoad', 'password', 'passwordRevisionDate', 'totp', 'uris', 'username']:
             return [match['login'][field] for match in matches]
         elif not field:
             return matches
