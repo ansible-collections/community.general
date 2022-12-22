@@ -225,7 +225,8 @@ def main():
         return desired_installed == has_package
 
     def state_present(self):
-        self.runner("update_cache").run()
+        if self.vars.update_cache:
+            self.runner("update_cache").run()
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 if not self._package_in_desired_state(package, desired_installed=True) or self.vars.force == "reinstall":
