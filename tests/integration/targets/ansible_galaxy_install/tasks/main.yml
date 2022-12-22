@@ -10,7 +10,7 @@
     name: netbox.netbox
   register: install_c0
 
-- name: Assert collection was installed
+- name: Assert collection netbox.netbox was installed
   assert:
     that:
     - install_c0 is changed
@@ -34,7 +34,7 @@
     name: ansistrano.deploy
   register: install_r0
 
-- name: Assert collection was installed
+- name: Assert collection ansistrano.deploy was installed
   assert:
     that:
     - install_r0 is changed
@@ -52,7 +52,7 @@
     - install_r1 is not changed
 
 ###################################################
-- name:
+- name: Set requirements file path
   set_fact:
     reqs_file: '{{ remote_tmp_dir }}/reqs.yaml'
 
