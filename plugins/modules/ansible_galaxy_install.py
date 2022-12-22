@@ -20,6 +20,10 @@ notes:
   - >
     B(Ansible 2.9/2.10): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and
     ansible-base 2.10 (later ansible-core 2.11). See comments in the parameters.
+  - >
+    The module will try and run using the C(C.UTF-8) locale.
+    If that fails, it will try C(en_US.UTF-8).
+    If that one also fails, the module will fail.
 requirements:
   - Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
 options:
@@ -185,7 +189,7 @@ RETURN = """
 import re
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
-from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper, ModuleHelperException
 
 
 class AnsibleGalaxyInstall(ModuleHelper):
@@ -226,11 +230,17 @@ class AnsibleGalaxyInstall(ModuleHelper):
         version=fmt.as_bool("--version"),
         name=fmt.as_list(),
     )
-    force_lang = "en_US.UTF-8"
-    check_rc = True
+
+    def _make_runner(self, lang):
+        return CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=lang, check_rc=True)
 
     def _get_ansible_galaxy_version(self):
+        class UnsupportedLocale(ModuleHelperException):
+            pass
+
         def process(rc, out, err):
+            if (rc != 0 and "unsupported locale setting" in err) or (rc == 0 and "cannot change locale" in err):
+                raise UnsupportedLocale(msg=err)
             line = out.splitlines()[0]
             match = self._RE_GALAXY_VERSION.match(line)
             if not match:
@@ -239,12 +249,18 @@ class AnsibleGalaxyInstall(ModuleHelper):
             version = tuple(int(x) for x in version.split('.')[:3])
             return version
 
-        with self.runner("version", check_rc=True, output_process=process) as ctx:
-            return ctx.run(version=True)
+        try:
+            runner = self._make_runner("C.UTF-8")
+            with runner("version", check_rc=False, output_process=process) as ctx:
+                return runner, ctx.run(version=True)
+        except UnsupportedLocale as e:
+            runner = self._make_runner("en_US.UTF-8")
+            with runner("version", check_rc=True, output_process=process) as ctx:
+                return runner, ctx.run(version=True)
 
     def __init_module__(self):
-        self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
-        self.ansible_version = self._get_ansible_galaxy_version()
+        # self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
+        self.runner, self.ansible_version = self._get_ansible_galaxy_version()
         if self.ansible_version < (2, 11) and not self.vars.ack_min_ansiblecore211:
             self.module.deprecate(
                 "Support for Ansible 2.9 and ansible-base 2.10 is being deprecated. "
@@ -339,11 +355,12 @@ class AnsibleGalaxyInstall(ModuleHelper):
             self._setup210plus()
         with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install")
+            if self.verbosity > 2:
+                self.vars.set("run_info", ctx.run_info)
 
 
 def main():
-    galaxy = AnsibleGalaxyInstall()
-    galaxy.run()
+    AnsibleGalaxyInstall.execute()
 
 
 if __name__ == '__main__':
