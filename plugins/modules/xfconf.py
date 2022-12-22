@@ -172,7 +172,6 @@ class XFConfProperty(StateModuleHelper):
     change_params = 'value',
     diff_params = 'value',
     output_params = ('property', 'channel', 'value')
-    facts_params = ('property', 'channel', 'value')
     module = dict(
         argument_spec=dict(
             state=dict(type='str', choices=("present", "absent"), default="present"),
