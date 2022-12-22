@@ -1,2 +1,2 @@
 minor_changes:
-  - bitwarden - can now retrieve secrets from custom fields
+  - bitwarden lookup plugin - can now retrieve secrets from custom fields (https://github.com/ansible-collections/community.general/pull/5694).
