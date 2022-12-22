@@ -215,7 +215,6 @@ def main():
                 force=cmd_runner_fmt.as_func(_force),
                 update_cache=cmd_runner_fmt.as_bool("update")
             ),
-            check_rc=True,
         )
 
     def _package_in_desired_state(self, name, desired_installed):
@@ -226,7 +225,9 @@ def main():
 
     def state_present(self):
         if self.vars.update_cache:
-            self.runner("update_cache").run()
+            dummy, rc, dummy = self.runner("update_cache").run()
+            if rc != 0:
+                self.do_raise("could not update package db")
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 if not self._package_in_desired_state(package, desired_installed=True) or self.vars.force == "reinstall":
@@ -234,10 +235,16 @@ def main():
                     if not self._package_in_desired_state(package, desired_installed=True):
                         self.do_raise("failed to install %s" % package)
                     self.vars.install_c += 1
+        if self.vars.install_c > 0:
+            self.vars.msg = "installed %s package(s)" % (self.vars.install_c)
+        else:
+            self.vars.msg = "package(s) already present"
 
     def state_absent(self):
         if self.vars.update_cache:
-            self.runner("update_cache").run()
+            dummy, rc, dummy = self.runner("update_cache").run()
+            if rc != 0:
+                self.do_raise("could not update package db")
         with self.runner("state package") as ctx:
             for package in self.vars.name:
                 if not self._package_in_desired_state(package, desired_installed=False):
@@ -245,6 +252,10 @@ def main():
                     if not self._package_in_desired_state(package, desired_installed=False):
                         self.do_raise("failed to remove %s" % package)
                     self.vars.remove_c += 1
+        if self.vars.remove_c > 0:
+            self.vars.msg = "removed %s package(s)" % (self.vars.remove_c)
+        else:
+            self.vars.msg = "package(s) already absent"
 
     state_installed = state_present
     state_removed = state_absent
