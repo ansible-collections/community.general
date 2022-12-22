@@ -323,6 +323,8 @@ files:
   $module_utils/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
+  $module_utils/ssh.py:
+    maintainers: russoz
   $module_utils/storage/hpe3par/hpe3par.py:
     maintainers: farhan7500 gautamphegde
   $module_utils/utm_utils.py:

@@ -169,6 +169,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
 class SSHConfig():
@@ -188,10 +189,7 @@ class SSHConfig():
         self.config.load()
 
     def check_ssh_config_path(self):
-        if self.user:
-            self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config')
-        elif self.config_file is None:
-            self.config_file = '/etc/ssh/ssh_config'
+        self.config_file = determine_config_file(self.user, self.config_file)
 
         # See if the identity file exists or not, relative to the config file
         if os.path.exists(self.config_file) and self.identity_file is not None:
