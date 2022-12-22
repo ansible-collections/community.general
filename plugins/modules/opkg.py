@@ -242,7 +242,7 @@ def main():
                     ctx.run(package=package)
                     if not self._package_in_desired_state(package, desired_installed=False):
                         self.do_raise("failed to remove %s" % package)
-                    self.vars.install_c += 1
+                    self.vars.remove_c += 1
 
     state_installed = state_present
     state_removed = state_absent
