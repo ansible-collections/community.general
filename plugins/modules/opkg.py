@@ -209,7 +209,7 @@ def main():
         self.runner = CmdRunner(
             self.module,
             command="opkg",
-            arg_fornats=dict(
+            arg_formats=dict(
                 package=cmd_runner_fmt.as_list(),
                 state=cmd_runner_fmt.as_map(state_map),
                 force=cmd_runner_fmt.as_func(_force),
