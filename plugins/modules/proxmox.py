@@ -439,7 +439,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         # Fail on unsupported features
         for option, version in minimum_version.items():
-            if pve_major_version < version:
+            if pve_major_version < version and option in kwargs:
                 self.module.fail_json(changed=False, msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_major_version}".
                                       format(option=option, version=version, pve_major_version=pve_major_version))
 
