@@ -6,7 +6,7 @@ plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice   
 plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice
+plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice  # state=list - removed in 8.0.0
 plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
