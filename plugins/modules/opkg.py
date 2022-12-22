@@ -236,7 +236,8 @@ def main():
                     self.vars.install_c += 1
 
     def state_absent(self):
-        self.runner("update_cache").run()
+        if self.vars.update_cache:
+            self.runner("update_cache").run()
         with self.runner("state package") as ctx:
             for package in self.vars.name:
                 if not self._package_in_desired_state(package, desired_installed=False):
