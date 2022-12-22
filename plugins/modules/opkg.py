@@ -101,85 +101,8 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 
-def update_package_db(module, opkg_path):
-    """ Updates packages list. """
-
-    rc, out, err = module.run_command("%s update" % opkg_path)
-
-    if rc != 0:
-        module.fail_json(msg="could not update package db")
-
-
-def query_package(module, opkg_path, name, state="present"):
-    """ Returns whether a package is installed or not. """
-
-    if state == "present":
-
-        rc, out, err = module.run_command("%s list-installed | grep -q \"^%s \"" % (shlex_quote(opkg_path), shlex_quote(name)), use_unsafe_shell=True)
-        if rc == 0:
-            return True
-
-        return False
-
-
-def remove_packages(module, opkg_path, packages):
-    """ Uninstalls one or more packages if installed. """
-
-    p = module.params
-    force = p["force"]
-    if force:
-        force = "--force-%s" % force
-
-    remove_c = 0
-    # Using a for loop in case of error, we can report the package that failed
-    for package in packages:
-        # Query the package first, to see if we even need to remove
-        if not query_package(module, opkg_path, package):
-            continue
-
-        rc, out, err = module.run_command("%s remove %s %s" % (opkg_path, force, package))
-
-        if query_package(module, opkg_path, package):
-            module.fail_json(msg="failed to remove %s: %s" % (package, out))
-
-        remove_c += 1
-
-    if remove_c > 0:
-
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
-
-    module.exit_json(changed=False, msg="package(s) already absent")
-
-
-def install_packages(module, opkg_path, packages):
-    """ Installs one or more packages if not already installed. """
-
-    p = module.params
-    force = p["force"]
-    if force:
-        force = "--force-%s" % force
-
-    install_c = 0
-
-    for package in packages:
-        if query_package(module, opkg_path, package) and (force != '--force-reinstall'):
-            continue
-
-        rc, out, err = module.run_command("%s install %s %s" % (opkg_path, force, package))
-
-        if not query_package(module, opkg_path, package):
-            module.fail_json(msg="failed to install %s: %s" % (package, out))
-
-        install_c += 1
-
-    if install_c > 0:
-        module.exit_json(changed=True, msg="installed %s package(s)" % (install_c))
-
-    module.exit_json(changed=False, msg="package(s) already present")
-
-
-def main():
-    module = AnsibleModule(
+class Opkg(StateModuleHelper):
+    module = dict(
         argument_spec=dict(
             name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
@@ -217,10 +140,21 @@ def main():
             ),
         )
 
-    def _package_in_desired_state(self, name, desired_installed):
-        dummy, out, dummy = self.runner("state package").run(state="query", package=name)
+    @staticmethod
+    def split_name_and_version(package):
+        """ Split the name and the version when using the NAME=VERSION syntax """
+        splitted = package.split('=', 1)
+        if len(splitted) == 1:
+            return splitted[0], None
+        else:
+            return splitted[0], splitted[1]
 
-        has_package = out.startswith(name + " ")
+    def _package_in_desired_state(self, name, desired_installed, version=None):
+        dummy, out, dummy = self.runner("state package").run(state="query", package=name)
+        if version is None:
+            version = ""
+
+        has_package = out.startswith(name + " - %s" % version)
         return desired_installed == has_package
 
     def state_present(self):
@@ -230,9 +164,10 @@ def main():
                 self.do_raise("could not update package db")
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
-                if not self._package_in_desired_state(package, desired_installed=True) or self.vars.force == "reinstall":
+                pkg_name, pkg_version = self.split_name_and_version(package)
+                if not self._package_in_desired_state(pkg_name, desired_installed=True, version=pkg_version) or self.vars.force == "reinstall":
                     ctx.run(package=package)
-                    if not self._package_in_desired_state(package, desired_installed=True):
+                    if not self._package_in_desired_state(pkg_name, desired_installed=True, version=pkg_version):
                         self.do_raise("failed to install %s" % package)
                     self.vars.install_c += 1
         if self.vars.install_c > 0:
@@ -245,8 +180,9 @@ def main():
             dummy, rc, dummy = self.runner("update_cache").run()
             if rc != 0:
                 self.do_raise("could not update package db")
-        with self.runner("state package") as ctx:
+        with self.runner("state force package") as ctx:
             for package in self.vars.name:
+                package, dummy = self.split_name_and_version(package)
                 if not self._package_in_desired_state(package, desired_installed=False):
                     ctx.run(package=package)
                     if not self._package_in_desired_state(package, desired_installed=False):
