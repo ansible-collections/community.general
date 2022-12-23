@@ -151,10 +151,8 @@ class Opkg(StateModuleHelper):
 
     def _package_in_desired_state(self, name, desired_installed, version=None):
         dummy, out, dummy = self.runner("state package").run(state="query", package=name)
-        if version is None:
-            version = ""
 
-        has_package = out.startswith(name + " - %s" % version)
+        has_package = out.startswith(name + " - %s" % "" if not version else (version + " "))
         return desired_installed == has_package
 
     def state_present(self):
