@@ -24,7 +24,7 @@ description:
       to your needs and a user having the expected roles.
 
     - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
+      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
 
 
 options:
