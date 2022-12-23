@@ -85,17 +85,6 @@ EXAMPLES = '''
       username: 'admin'
       password: 'smartvm'
       validate_certs: false
-
-- name: List current policy_profile and policies for a provider in ManageIQ
-  community.general.manageiq_policies:
-    state: list
-    resource_name: 'EngLab'
-    resource_type: 'provider'
-    manageiq_connection:
-      url: 'http://127.0.0.1:3000'
-      username: 'admin'
-      password: 'smartvm'
-      validate_certs: false
 '''
 
 RETURN = '''
