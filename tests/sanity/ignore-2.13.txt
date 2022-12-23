@@ -10,7 +10,7 @@ plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-s
 plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
-plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice
+plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice      # state=list - removed in 8.0.0
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/puppet.py validate-modules:parameter-invalid                          # invalid alias - removed in 7.0.0

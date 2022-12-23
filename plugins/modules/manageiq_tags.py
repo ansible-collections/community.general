@@ -27,7 +27,10 @@ options:
     description:
       - C(absent) - tags should not exist.
       - C(present) - tags should exist.
-      - C(list) - list current tags.
+      - >
+        C(list) - list current tags.
+        This state is deprecated and will be removed 8.0.0.
+        Please use the module M(community.general.manageiq_tags_info) instead.
     choices: ['absent', 'present', 'list']
     default: 'present'
   tags:
@@ -103,17 +106,6 @@ EXAMPLES = '''
       username: 'admin'
       password: 'smartvm'
       validate_certs: false
-
-- name: List current tags for a provider in ManageIQ.
-  community.general.manageiq_tags:
-    state: list
-    resource_name: 'EngLab'
-    resource_type: 'provider'
-    manageiq_connection:
-      url: 'http://127.0.0.1:3000'
-      username: 'admin'
-      password: 'smartvm'
-      validate_certs: false
 '''
 
 RETURN = '''
@@ -154,6 +146,13 @@ def main():
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
+
+    if state == "list":
+        module.deprecate(
+            'The value "list" for "state" is deprecated. Please use community.general.manageiq_tags_info instead.',
+            version='8.0.0',
+            collection_name='community.general'
+        )
 
     # get the action and resource type
     action = actions[state]
