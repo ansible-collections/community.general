@@ -55,6 +55,11 @@ DOCUMENTATION = r'''
             type: str
             default: none
             choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
+        project:
+            description: Filter the instance according to the given project.
+            type: str
+            default: default
+            version_added: 6.2.0
         type_filter:
             description:
             - Filter the instances by type C(virtual-machine), C(container) or C(both).
@@ -140,6 +145,9 @@ groupby:
   vlan666:
     type: vlanid
     attribute: 666
+  projectInternals:
+    type: project
+    attribute: internals
 '''
 
 import binascii
@@ -153,6 +161,7 @@ from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.module_utils.six import raise_from
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 try:
@@ -330,7 +339,15 @@ class InventoryModule(BaseInventoryPlugin):
         #        "status_code": 200,
         #        "type": "sync"
         #      }
-        instances = self.socket.do('GET', '/1.0/instances')
+        url = '/1.0/instances'
+        if self.project:
+            url = url + '?{0}'.format(urlencode(dict(project=self.project)))
+
+        instances = self.socket.do('GET', url)
+
+        if self.project:
+            return [m.split('/')[3].split('?')[0] for m in instances['metadata']]
+
         return [m.split('/')[3] for m in instances['metadata']]
 
     def _get_config(self, branch, name):
@@ -351,9 +368,11 @@ class InventoryModule(BaseInventoryPlugin):
             dict(config): Config of the instance"""
         config = {}
         if isinstance(branch, (tuple, list)):
-            config[name] = {branch[1]: self.socket.do('GET', '/1.0/{0}/{1}/{2}'.format(to_native(branch[0]), to_native(name), to_native(branch[1])))}
+            config[name] = {branch[1]: self.socket.do(
+                'GET', '/1.0/{0}/{1}/{2}?{3}'.format(to_native(branch[0]), to_native(name), to_native(branch[1]), urlencode(dict(project=self.project))))}
         else:
-            config[name] = {branch: self.socket.do('GET', '/1.0/{0}/{1}'.format(to_native(branch), to_native(name)))}
+            config[name] = {branch: self.socket.do(
+                'GET', '/1.0/{0}/{1}?{2}'.format(to_native(branch), to_native(name), urlencode(dict(project=self.project))))}
         return config
 
     def get_instance_data(self, names):
@@ -583,6 +602,8 @@ class InventoryModule(BaseInventoryPlugin):
             self._set_data_entry(instance_name, 'network_interfaces', self.extract_network_information_from_instance_config(instance_name))
             self._set_data_entry(instance_name, 'preferred_interface', self.get_prefered_instance_network_interface(instance_name))
             self._set_data_entry(instance_name, 'vlan_ids', self.get_instance_vlans(instance_name))
+            self._set_data_entry(instance_name, 'project', self._get_data_entry(
+                'instances/{0}/instances/metadata/project'.format(instance_name)))
 
     def build_inventory_network(self, instance_name):
         """Add the network interfaces of the instance to the inventory
@@ -686,6 +707,8 @@ class InventoryModule(BaseInventoryPlugin):
             # add VLAN_ID information
             if self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name)):
                 self.inventory.set_variable(instance_name, 'ansible_lxd_vlan_ids', self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name)))
+            # add project
+            self.inventory.set_variable(instance_name, 'ansible_lxd_project', self._get_data_entry('inventory/{0}/project'.format(instance_name)))
 
     def build_inventory_groups_location(self, group_name):
         """create group by attribute: location
@@ -760,6 +783,28 @@ class InventoryModule(BaseInventoryPlugin):
                         except ValueError:
                             # Ignore invalid IP addresses returned by lxd
                             pass
+
+    def build_inventory_groups_project(self, group_name):
+        """create group by attribute: project
+
+        Args:
+            str(group_name): Group name
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            None"""
+        # maybe we just want to expand one group
+        if group_name not in self.inventory.groups:
+            self.inventory.add_group(group_name)
+
+        gen_instances = [
+            instance_name for instance_name in self.inventory.hosts
+            if 'ansible_lxd_project' in self.inventory.get_host(instance_name).get_vars()]
+        for instance_name in gen_instances:
+            if self.groupby[group_name].get('attribute').lower() == self.inventory.get_host(instance_name).get_vars().get('ansible_lxd_project'):
+                self.inventory.add_child(group_name, instance_name)
 
     def build_inventory_groups_os(self, group_name):
         """create group by attribute: os
@@ -899,6 +944,7 @@ class InventoryModule(BaseInventoryPlugin):
                 * 'profile'
                 * 'vlanid'
                 * 'type'
+                * 'project'
 
             Args:
                 str(group_name): Group name
@@ -926,6 +972,8 @@ class InventoryModule(BaseInventoryPlugin):
                 self.build_inventory_groups_vlanid(group_name)
             elif self.groupby[group_name].get('type') == 'type':
                 self.build_inventory_groups_type(group_name)
+            elif self.groupby[group_name].get('type') == 'project':
+                self.build_inventory_groups_project(group_name)
             else:
                 raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
 
@@ -1032,6 +1080,7 @@ class InventoryModule(BaseInventoryPlugin):
         try:
             self.client_key = self.get_option('client_key')
             self.client_cert = self.get_option('client_cert')
+            self.project = self.get_option('project')
             self.debug = self.DEBUG
             self.data = {}  # store for inventory-data
             self.groupby = self.get_option('groupby')
