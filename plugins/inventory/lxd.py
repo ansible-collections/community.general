@@ -59,7 +59,7 @@ DOCUMENTATION = r'''
             description: Filter the instance according to the given project.
             type: str
             default: default
-            version_added: 6.1.0
+            version_added: 6.2.0
         type_filter:
             description:
             - Filter the instances by type C(virtual-machine), C(container) or C(both).
