@@ -12,7 +12,9 @@ DOCUMENTATION = '''
 module: rax_clb_ssl
 short_description: Manage SSL termination for a Rackspace Cloud Load Balancer
 description:
-- Set up, reconfigure, or remove SSL termination for an existing load balancer.
+  - Set up, reconfigure, or remove SSL termination for an existing load balancer.
+  - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
+  - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
 options:
   loadbalancer:
     type: str

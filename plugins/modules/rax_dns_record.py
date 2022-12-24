@@ -13,7 +13,9 @@ DOCUMENTATION = '''
 module: rax_dns_record
 short_description: Manage DNS records on Rackspace Cloud DNS
 description:
-     - Manage DNS records on Rackspace Cloud DNS
+  - Manage DNS records on Rackspace Cloud DNS.
+  - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
+  - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
 options:
   comment:
     type: str

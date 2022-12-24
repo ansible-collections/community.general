@@ -13,7 +13,9 @@ DOCUMENTATION = '''
 module: rax_clb_nodes
 short_description: Add, modify and remove nodes from a Rackspace Cloud Load Balancer
 description:
-  - Adds, modifies and removes nodes from a Rackspace Cloud Load Balancer
+  - Adds, modifies and removes nodes from a Rackspace Cloud Load Balancer.
+  - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
+  - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
 options:
   address:
     type: str
