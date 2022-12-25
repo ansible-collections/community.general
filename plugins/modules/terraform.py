@@ -310,7 +310,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace):
     command = [bin_path, 'init', '-input=false', '-no-color']
     if backend_config:
         for key, val in backend_config.items():
@@ -328,7 +328,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
     if plugin_paths:
         for plugin_path in plugin_paths:
             command.extend(['-plugin-dir', plugin_path])
-    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
+    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path, environ_update={"TF_WORKSPACE": workspace})
 
 
 def get_workspace_context(bin_path, project_path):
@@ -343,6 +343,7 @@ def get_workspace_context(bin_path, project_path):
             continue
         elif stripped_item.startswith('* '):
             workspace_ctx["current"] = stripped_item.replace('* ', '')
+            workspace_ctx["all"].append(stripped_item.replace('* ', ''))
         else:
             workspace_ctx["all"].append(stripped_item)
     return workspace_ctx
@@ -485,7 +486,7 @@ def main():
 
     if force_init:
         if overwrite_init or not os.path.isfile(os.path.join(project_path, ".terraform", "terraform.tfstate")):
-            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths)
+            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
