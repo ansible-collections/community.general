@@ -48,7 +48,9 @@ options:
     version_added: 3.0.0
   workspace:
     description:
-      - The terraform workspace to work with.
+      - The terraform workspace to work with. This sets the 'TF_WORKSPACE' environmental variable
+        that is used to override workspace selection. For more information about workspaces
+        have a look at U(https://developer.hashicorp.com/terraform/language/state/workspaces).
     type: str
     default: default
   purge_workspace:
