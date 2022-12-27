@@ -11,7 +11,7 @@ DOCUMENTATION = """
     description:
         - This become plugins allows your remote/login user to execute commands as another user by calling su through the ksu utility.
     author:
-    - Ed Schaller
+    - Ed Schaller (@schallee)
     options:
         become_user_ksu:
             description: User you use with ksu to run su
