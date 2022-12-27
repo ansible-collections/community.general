@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2021, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = """
     name: ksusu
-    short_description: Kerberos substitute user
+    short_description: Kerberos substitute (ksu) user followed by substitute user (su).
     description:
         - This become plugins allows your remote/login user to execute commands as another user by calling su through the ksu utility.
     author:
     - Ed Schaller
-    version_added: 2.13.0
     options:
         become_user_ksu:
             description: User you use with ksu to run su
@@ -179,7 +178,5 @@ class BecomeModule(BecomeBase):
         flags_su = self.get_option('become_flags') or ''
         user_ksu = self.get_option('become_user_ksu') or 'root'
         user_su = self.get_option('become_user') or 'root'
-        prompt = ''
 
         return '%s %s %s -e %s -l %s %s %s ' % (exe_ksu, user_ksu, flags_ksu, exe_su, flags_su, user_su, self._build_success_command(cmd, shell))
-
