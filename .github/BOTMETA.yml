@@ -25,6 +25,8 @@ files:
     maintainers: $team_ansible_core
   $becomes/ksu.py:
     maintainers: $team_ansible_core
+  $becomes/ksusu.py:
+    maintainers: schallee
   $becomes/machinectl.py:
     maintainers: $team_ansible_core
   $becomes/pbrun.py:
