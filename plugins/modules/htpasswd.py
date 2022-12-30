@@ -45,7 +45,7 @@ options:
         which are linux passwd hashes.  Only some schemes in addition to
         the four choices below will be compatible with Apache or Nginx and
         supported schemes depend on passlib version and its dependencies
-      - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter default_scheme.
+      - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
       - 'Some of the available choices might be: C(apr_md5_crypt), C(des_crypt), C(ldap_sha1), C(plaintext)'
   state:
     type: str
