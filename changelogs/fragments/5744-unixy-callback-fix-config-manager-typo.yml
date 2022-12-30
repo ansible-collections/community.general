@@ -1,0 +1,2 @@
+bugfixes:
+  - unixy callback plugin - fix typo introduced when updating to use Ansible's configuration manager for handling options (https://github.com/ansible-collections/community.general/issues/5600).
