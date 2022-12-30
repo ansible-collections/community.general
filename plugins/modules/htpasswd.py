@@ -41,7 +41,7 @@ options:
     description:
       - Encryption scheme to be used.  As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
-        portable_apache22 and host_apache24; or md5_crypt and sha256_crypt,
+        C(portable_apache22) and C(host_apache24); or C(md5_crypt) and C(sha256_crypt),
         which are linux passwd hashes.  Only some schemes in addition to
         the four choices below will be compatible with Apache or Nginx and
         supported schemes depend on passlib version and its dependencies
