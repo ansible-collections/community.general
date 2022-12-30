@@ -44,9 +44,11 @@ options:
 
     force:
         description:
+            - When used in specific package installation or upgrade (combined with I(name)), bypass "IgnorePkg" pacman configuration option.
             - When removing packages, forcefully remove them, without any checks.
               Same as I(extra_args="--nodeps --nodeps").
-              When combined with I(update_cache), force a refresh of all package databases.
+            - When combined with I(upgrade), bypass "IgnorePkg" pacman configuration option and upgrade all upgradable packages.
+            - When combined with I(update_cache), force a refresh of all package databases.
               Same as I(update_cache_extra_args="--refresh --refresh").
         default: false
         type: bool
@@ -764,11 +766,16 @@ class Pacman(object):
                 l = l.strip()
                 if not l:
                     continue
-                if "[ignored]" in l:
-                    continue
                 s = l.split()
-                if len(s) != 4:
-                    self.fail(msg="Invalid line: %s" % l)
+                if "[ignored]" in l:
+                    if self.m.params["force"]:
+                        if len(s) != 5:
+                            self.fail(msg="Invalid line: %s" % l)
+                    else:
+                        continue
+                else:
+                    if len(s) != 4:
+                        self.fail(msg="Invalid line: %s" % l)
 
                 pkg = s[0]
                 current = s[1]
