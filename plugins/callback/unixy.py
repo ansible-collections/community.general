@@ -142,7 +142,7 @@ class CallbackModule(CallbackModule_default):
             display_color = C.COLOR_CHANGED
             task_result = self._process_result_output(result, msg)
             self._display.display("  " + task_result, display_color)
-        elif self.get('display_ok_hosts'):
+        elif self.get_option('display_ok_hosts'):
             task_result = self._process_result_output(result, msg)
             self._display.display("  " + task_result, display_color)
 
