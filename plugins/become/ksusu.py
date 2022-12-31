@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
     name: ksusu
-    short_description: Kerberos substitute (ksu) user followed by substitute user (su).
+    short_description: Kerberos substitute (ksu) user followed by substitute user (su)
     description:
         - This become plugins allows your remote/login user to execute commands as another user by calling su through the ksu utility.
     author:
