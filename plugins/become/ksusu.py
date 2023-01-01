@@ -113,7 +113,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_FLAGS_SU
               - name: ANSIBLE_KSU_FLAGS_SU
         become_pass:
-            description: ksu password
+            description: C(ksu) password.
             required: False
             vars:
               - name: ansible_ksusu_pass
