@@ -127,7 +127,7 @@ DOCUMENTATION = """
                 key: password
         prompt_l10n:
             description:
-                - List of localized strings to match for prompt detection
+                - List of localized strings to match for prompt detection.
                 - If empty we'll use the built in one
             default: []
             ini:
