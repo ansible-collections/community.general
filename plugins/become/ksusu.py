@@ -15,7 +15,7 @@ DOCUMENTATION = """
     version_added: 6.2.0
     options:
         become_user_ksu:
-            description: User you use with ksu to run su
+            description: User you use with C(ksu) to run C(su).
             default: root
             ini:
               - section: privilege_escalation
