@@ -94,7 +94,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_FLAGS_KSU
               - name: ANSIBLE_KSU_FLAGS_KSU
         become_flags:
-            description: Options to pass to su
+            description: Options to pass to C(su).
             default: ''
             ini:
               - section: privilege_escalation
