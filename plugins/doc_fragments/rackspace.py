@@ -108,7 +108,7 @@ options:
 deprecated:
   removed_in: 9.0.0
   why: This module relies on the deprecated package pyrax.
-  alternative: Use the Openstack modules isntead.
+  alternative: Use the Openstack modules instead.
 requirements:
   - python >= 2.6
   - pyrax
