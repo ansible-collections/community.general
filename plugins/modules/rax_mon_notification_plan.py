@@ -14,10 +14,12 @@ module: rax_mon_notification_plan
 short_description: Create or delete a Rackspace Cloud Monitoring notification
                    plan.
 description:
-- Create or delete a Rackspace Cloud Monitoring notification plan by
-  associating existing rax_mon_notifications with severity levels. Rackspace
-  monitoring module flow | rax_mon_entity -> rax_mon_check ->
-  rax_mon_notification -> *rax_mon_notification_plan* -> rax_mon_alarm
+  - Create or delete a Rackspace Cloud Monitoring notification plan by
+    associating existing rax_mon_notifications with severity levels. Rackspace
+    monitoring module flow | rax_mon_entity -> rax_mon_check ->
+    rax_mon_notification -> *rax_mon_notification_plan* -> rax_mon_alarm.
+  - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
+  - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
 options:
   state:
     type: str

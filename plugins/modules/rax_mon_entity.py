@@ -13,11 +13,13 @@ DOCUMENTATION = '''
 module: rax_mon_entity
 short_description: Create or delete a Rackspace Cloud Monitoring entity
 description:
-- Create or delete a Rackspace Cloud Monitoring entity, which represents a device
-  to monitor. Entities associate checks and alarms with a target system and
-  provide a convenient, centralized place to store IP addresses. Rackspace
-  monitoring module flow | *rax_mon_entity* -> rax_mon_check ->
-  rax_mon_notification -> rax_mon_notification_plan -> rax_mon_alarm
+  - Create or delete a Rackspace Cloud Monitoring entity, which represents a device
+    to monitor. Entities associate checks and alarms with a target system and
+    provide a convenient, centralized place to store IP addresses. Rackspace
+    monitoring module flow | *rax_mon_entity* -> rax_mon_check ->
+    rax_mon_notification -> rax_mon_notification_plan -> rax_mon_alarm.
+  - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
+  - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
 options:
   label:
     type: str
