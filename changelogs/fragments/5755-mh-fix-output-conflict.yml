@@ -1,0 +1,2 @@
+bugfixes:
+  - ModuleHelper - fix bug when adjusting the name of reserved output variables (https://github.com/ansible-collections/community.general/pull/5755).
