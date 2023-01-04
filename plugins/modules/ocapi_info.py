@@ -13,6 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ocapi_info
+version_added: 6.3.0
 short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI).
 description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to
@@ -138,12 +139,7 @@ status:
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
 from ansible.module_utils.common.text.converters import to_native
-
-try:
-    from urlparse import urljoin  # Python 2
-except ImportError:
-    from urllib.parse import quote_plus, urljoin  # Python 3+
-
+from ansible.module_utils.six.moves.urllib.parse import quote_plus, urljoin
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
