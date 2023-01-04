@@ -127,7 +127,7 @@ class Opkg(StateModuleHelper):
         def _force(value):
             if value == "":
                 value = None
-            return cmd_runner_fmt.as_optval("--force-")(value)
+            return cmd_runner_fmt.as_optval("--force-")(value, ctx_ignore_none=True)
 
         self.runner = CmdRunner(
             self.module,
