@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - include_tasks: msimple.yml
+- include_tasks: msimple_output_conflict.yml
 - include_tasks: mdepfail.yml
 - include_tasks: mstate.yml
 - include_tasks: msimpleda.yml
