@@ -19,7 +19,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 name: sumologic
-type: aggregate
+type: notification
 short_description: Sends task result events to Sumologic
 author: "Ryan Currah (@ryancurrah)"
 description:
@@ -122,7 +122,7 @@ class SumologicHTTPCollectorSource(object):
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'community.general.sumologic'
     CALLBACK_NEEDS_WHITELIST = True
 
