@@ -32,7 +32,7 @@ TEST_CASES = [
         output={
             "msg": "installed 1 package(s)"
         },
-        run_command_calls = [
+        run_command_calls=[
             RunCmdCall(
                 command=["/testbin/opkg", "list-installed", "zlib-dev"],
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
@@ -69,7 +69,7 @@ TEST_CASES = [
         output={
             "msg": "package(s) already present"
         },
-        run_command_calls = [
+        run_command_calls=[
             RunCmdCall(
                 command=["/testbin/opkg", "list-installed", "zlib-dev"],
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
@@ -85,7 +85,7 @@ TEST_CASES = [
         output={
             "msg": "installed 1 package(s)"
         },
-        run_command_calls = [
+        run_command_calls=[
             RunCmdCall(
                 command=["/testbin/opkg", "list-installed", "zlib-dev"],
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
