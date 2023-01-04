@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
     name: logdna
-    type: aggregate
+    type: notification
     short_description: Sends playbook logs to LogDNA
     description:
       - This callback will report logs from playbook actions, tasks, and events to LogDNA (https://app.logdna.com)
@@ -111,7 +111,7 @@ def isJSONable(obj):
 class CallbackModule(CallbackBase):
 
     CALLBACK_VERSION = 0.1
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'community.general.logdna'
     CALLBACK_NEEDS_WHITELIST = True
 
