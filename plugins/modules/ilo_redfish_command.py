@@ -202,7 +202,7 @@ EXAMPLES = '''
   - name: Check server reboot status
     community.general.ilo_redfish_command:
       category: Systems
-      command: CheckRebootStatus
+      command: CheckiLORebootStatus
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -252,7 +252,7 @@ except ImportError as e:
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["VerifyServiceBiosAttributes", "VerifyBiosAttributes", "VerifyLogicalDrives", "VerifyUefiBootOrder",
-                "VerifySpecifiedLogicalDrives", "CheckRebootStatus", "GetSpecifiedLogicalDrives"]
+                "VerifySpecifiedLogicalDrives", "CheckiLORebootStatus", "GetSpecifiedLogicalDrives"]
 }
 
 
@@ -364,7 +364,7 @@ def main():
                     result[command]['msg'] = "uefi_boot_order params is required"
                     module.fail_json(result)
                 result[command] = rf_utils.verify_uefi_boot_order(module.params["uefi_boot_order"])
-            elif command == "CheckRebootStatus":
+            elif command == "CheckiLORebootStatus":
                 result[command] = rf_utils.check_reboot_status()
             elif command == "GetSpecifiedLogicalDrives":
                 if not module.params["logical_drives_names"]:
