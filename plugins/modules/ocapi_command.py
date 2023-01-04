@@ -11,7 +11,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: ocapi_command
-short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI).
+version_added: 6.3.0
+short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI)
 description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to
     perform an action.
@@ -33,7 +34,7 @@ options:
       - Base URI of OOB controller.
     type: str
   proxy_slot_number:
-    description: For proxied inband requests, the slot number of the IOM.  Only applies if baseuri is a proxy server.
+    description: For proxied inband requests, the slot number of the IOM.  Only applies if I(baseuri) is a proxy server.
     type: int
   update_image_path:
     required: false
