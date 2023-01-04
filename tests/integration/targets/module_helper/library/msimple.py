@@ -35,12 +35,13 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import c
 
 
 class MSimple(ModuleHelper):
-    output_params = ('a', 'b', 'c')
+    output_params = ('a', 'b', 'c', 'm')
     module = dict(
         argument_spec=dict(
             a=dict(type='int', default=0),
             b=dict(type='str'),
             c=dict(type='str'),
+            m=dict(type='str'),
         ),
         supports_check_mode=True,
     )
@@ -64,6 +65,9 @@ class MSimple(ModuleHelper):
             self.vars['b'] = str(self.vars.b) * 2
             self.vars['c'] = str(self.vars.c) * 2
         self.process_a3_bc()
+
+        if self.vars.m:
+            self.vars.msg = self.vars.m
 
 
 def main():
