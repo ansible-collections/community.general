@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: loganalytics
-    type: aggregate
+    type: notification
     short_description: Posts task results to Azure Log Analytics
     author: "Cyrus Li (@zhcli) <cyrus1006@gmail.com>"
     description:
@@ -155,7 +155,7 @@ class AzureLogAnalyticsSource(object):
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'loganalytics'
     CALLBACK_NEEDS_WHITELIST = True
 
