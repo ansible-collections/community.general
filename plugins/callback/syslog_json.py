@@ -71,7 +71,7 @@ class CallbackModule(CallbackBase):
     """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'community.general.syslog_json'
     CALLBACK_NEEDS_WHITELIST = True
 
