@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: splunk
-    type: aggregate
+    type: notification
     short_description: Sends task result events to Splunk HTTP Event Collector
     author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
     description:
@@ -165,7 +165,7 @@ class SplunkHTTPCollectorSource(object):
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'community.general.splunk'
     CALLBACK_NEEDS_WHITELIST = True
 

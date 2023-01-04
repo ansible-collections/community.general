@@ -113,7 +113,7 @@ from ansible.plugins.callback import CallbackBase
 class CallbackModule(CallbackBase):
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'community.general.logstash'
     CALLBACK_NEEDS_WHITELIST = True
 
