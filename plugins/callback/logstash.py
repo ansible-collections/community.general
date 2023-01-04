@@ -13,13 +13,13 @@ DOCUMENTATION = r'''
     type: notification
     short_description: Sends events to Logstash
     description:
-      - This callback will report facts and task events to Logstash https://www.elastic.co/products/logstash
+      - This callback will report facts and task events to Logstash U(https://www.elastic.co/products/logstash).
     requirements:
       - whitelisting in configuration
-      - logstash (python library)
+      - logstash (Python library)
     options:
       server:
-        description: Address of the Logstash server
+        description: Address of the Logstash server.
         env:
           - name: LOGSTASH_SERVER
         ini:
@@ -28,7 +28,7 @@ DOCUMENTATION = r'''
             version_added: 1.0.0
         default: localhost
       port:
-        description: Port on which logstash is listening
+        description: Port on which logstash is listening.
         env:
             - name: LOGSTASH_PORT
         ini:
@@ -37,7 +37,7 @@ DOCUMENTATION = r'''
             version_added: 1.0.0
         default: 5000
       type:
-        description: Message type
+        description: Message type.
         env:
           - name: LOGSTASH_TYPE
         ini:
@@ -54,7 +54,7 @@ DOCUMENTATION = r'''
         env:
           - name: LOGSTASH_PRE_COMMAND
       format_version:
-        description: Logging format
+        description: Logging format.
         type: str
         version_added: 2.0.0
         ini:

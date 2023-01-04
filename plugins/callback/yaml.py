@@ -11,7 +11,7 @@ DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
     name: yaml
     type: stdout
-    short_description: yaml-ized Ansible screen output
+    short_description: YAML-ized Ansible screen output
     description:
         - Ansible output that can be quite a bit easier to read than the
           default JSON formatting.
