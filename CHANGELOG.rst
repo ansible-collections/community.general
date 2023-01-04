@@ -6,6 +6,26 @@ Community General Release Notes
 
 This changelog describes changes after version 4.0.0.
 
+v5.8.4
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- gconftool2 - fix crash that prevents setting a key (https://github.com/ansible-collections/community.general/issues/5591, https://github.com/ansible-collections/community.general/pull/5687).
+- gitlab_group_variables - fix dropping variables accidentally when GitLab introduced new properties (https://github.com/ansible-collections/community.general/pull/5667).
+- gitlab_project_variables - fix dropping variables accidentally when GitLab introduced new properties (https://github.com/ansible-collections/community.general/pull/5667).
+- lxc_container - fix the arguments of the lxc command which broke the creation and cloning of containers (https://github.com/ansible-collections/community.general/issues/5578).
+- opkg - fix issue that ``force=reinstall`` would not reinstall an existing package (https://github.com/ansible-collections/community.general/pull/5705).
+- proxmox_disk - fixed possible issues with redundant ``vmid`` parameter (https://github.com/ansible-collections/community.general/issues/5492, https://github.com/ansible-collections/community.general/pull/5672).
+- proxmox_nic - fixed possible issues with redundant ``vmid`` parameter (https://github.com/ansible-collections/community.general/issues/5492, https://github.com/ansible-collections/community.general/pull/5672).
+- unixy callback plugin - fix typo introduced when updating to use Ansible's configuration manager for handling options (https://github.com/ansible-collections/community.general/issues/5600).
+
 v5.8.3
 ======
 

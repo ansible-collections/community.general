@@ -1391,3 +1391,32 @@ releases:
     - 5628-fix-vmadm-off-by-one.yml
     - 5632-vdo-Use-yaml-safe-load-instead-of-yaml-load.yml
     release_date: '2022-12-05'
+  5.8.4:
+    changes:
+      bugfixes:
+      - gconftool2 - fix crash that prevents setting a key (https://github.com/ansible-collections/community.general/issues/5591,
+        https://github.com/ansible-collections/community.general/pull/5687).
+      - gitlab_group_variables - fix dropping variables accidentally when GitLab introduced
+        new properties (https://github.com/ansible-collections/community.general/pull/5667).
+      - gitlab_project_variables - fix dropping variables accidentally when GitLab
+        introduced new properties (https://github.com/ansible-collections/community.general/pull/5667).
+      - lxc_container - fix the arguments of the lxc command which broke the creation
+        and cloning of containers (https://github.com/ansible-collections/community.general/issues/5578).
+      - opkg - fix issue that ``force=reinstall`` would not reinstall an existing
+        package (https://github.com/ansible-collections/community.general/pull/5705).
+      - proxmox_disk - fixed possible issues with redundant ``vmid`` parameter (https://github.com/ansible-collections/community.general/issues/5492,
+        https://github.com/ansible-collections/community.general/pull/5672).
+      - proxmox_nic - fixed possible issues with redundant ``vmid`` parameter (https://github.com/ansible-collections/community.general/issues/5492,
+        https://github.com/ansible-collections/community.general/pull/5672).
+      - unixy callback plugin - fix typo introduced when updating to use Ansible's
+        configuration manager for handling options (https://github.com/ansible-collections/community.general/issues/5600).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 5.8.4.yml
+    - 5659-fix-lxc_container-command.yml
+    - 5666-gitlab-variables.yml
+    - 5672-proxmox.yml
+    - 5687-gconftool2.yml
+    - 5705-opkg-fix-force-reinstall.yml
+    - 5744-unixy-callback-fix-config-manager-typo.yml
+    release_date: '2023-01-04'

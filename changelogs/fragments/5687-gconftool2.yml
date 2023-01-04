@@ -1,2 +1,0 @@
-bugfixes:
-  - "gconftool2 - fix crash that prevents setting a key (https://github.com/ansible-collections/community.general/issues/5591, https://github.com/ansible-collections/community.general/pull/5687)."
