@@ -63,7 +63,6 @@ class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelper
         for varname in list(result):
             if varname in self._output_conflict_list:
                 result["_" + varname] = result[varname]
-                del result[varname]
         return result
 
 

@@ -46,12 +46,16 @@ def module_fails_on_exception(func):
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
+            # patchy solution to resolve conflict with output variables
+            output = dict([(k, v) for k, v in self.output.items() if k not in self._output_conflict_list])
             self.module.fail_json(msg=e.msg, exception=traceback.format_exc(),
-                                  output=self.output, vars=self.vars.output(), **self.output)
+                                  output=self.output, vars=self.vars.output(), **output)
         except Exception as e:
+            # patchy solution to resolve conflict with output variables
+            output = dict([(k, v) for k, v in self.output.items() if k not in self._output_conflict_list])
             msg = "Module failed with exception: {0}".format(str(e).strip())
             self.module.fail_json(msg=msg, exception=traceback.format_exc(),
-                                  output=self.output, vars=self.vars.output(), **self.output)
+                                  output=self.output, vars=self.vars.output(), **output)
     return wrapper
 
 
