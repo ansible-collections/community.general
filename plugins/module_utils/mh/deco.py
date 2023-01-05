@@ -37,8 +37,17 @@ def cause_changes(on_success=None, on_failure=None):
 
 
 def module_fails_on_exception(func):
+    conflict_list = ('msg', 'exception', 'output', 'vars', 'changed')
+
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        def fix_var_conflicts(output):
+            result = dict([
+                (k if k not in conflict_list else "_" + k, v)
+                for k, v in output.items()
+            ])
+            return result
+
         try:
             func(self, *args, **kwargs)
         except SystemExit:
@@ -47,12 +56,12 @@ def module_fails_on_exception(func):
             if e.update_output:
                 self.update_output(e.update_output)
             # patchy solution to resolve conflict with output variables
-            output = dict([(k, v) for k, v in self.output.items() if k not in self._output_conflict_list])
+            output = fix_var_conflicts(self.output)
             self.module.fail_json(msg=e.msg, exception=traceback.format_exc(),
                                   output=self.output, vars=self.vars.output(), **output)
         except Exception as e:
             # patchy solution to resolve conflict with output variables
-            output = dict([(k, v) for k, v in self.output.items() if k not in self._output_conflict_list])
+            output = fix_var_conflicts(self.output)
             msg = "Module failed with exception: {0}".format(str(e).strip())
             self.module.fail_json(msg=msg, exception=traceback.format_exc(),
                                   output=self.output, vars=self.vars.output(), **output)

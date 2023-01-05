@@ -28,8 +28,10 @@
       - simple1.abc == "abc"
       - simple1 is not changed
       - simple1.value is none
-      - 'simple2._msg == "a message in a bottle"'
-      - 'simple2.msg == "a message in a bottle"'
+      - >
+        "_msg" not in simple2
+      - >
+        simple2.msg == "a message in a bottle"
 
 - name: test msimple 3
   msimple:
@@ -42,8 +44,10 @@
   assert:
     that:
       - simple3.a == 101
-      - 'simple3.msg == "Module failed with exception: a >= 100"'
-      - 'simple3._msg == "a message in a bottle"'
+      - >
+        simple3.msg == "Module failed with exception: a >= 100"
+      - >
+        simple3._msg == "a message in a bottle"
       - simple3.abc == "abc"
       - simple3 is failed
       - simple3 is not changed
