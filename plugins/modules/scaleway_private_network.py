@@ -88,7 +88,7 @@ EXAMPLES = '''
 RETURN = '''
 scaleway_private_network:
     description: Information on the VPC.
-    returned: success when I(state=present).
+    returned: success when I(state=present)
     type: dict
     sample:
         {
