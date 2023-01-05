@@ -96,14 +96,14 @@ options:
         type: str
         description:
           - The script/command that will be run periodically to check the health of the service.
-            Requires I(interval) to be provided.
+          - Requires I(interval) to be provided.
     interval:
         type: str
         description:
           - The interval at which the service check will be run.
             This is a number with a C(s) or C(m) suffix to signify the units of seconds or minutes e.g C(15s) or C(1m).
             If no suffix is supplied C(s) will be used by default, e.g. C(10) will be C(10s).
-            Required if one of the parameters I(script), I(http), or I(tcp) is specified.
+          - Required if one of the parameters I(script), I(http), or I(tcp) is specified.
     check_id:
         type: str
         description:
@@ -130,14 +130,14 @@ options:
           - Checks can be registered with a TCP port. This means that consul
             will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
             The format is C(host:port), for example C(localhost:80).
-            Requires I(interval) to be provided.
+          - Requires I(interval) to be provided.
         version_added: '1.3.0'
     http:
         type: str
         description:
           - Checks can be registered with an HTTP endpoint. This means that consul
             will check that the http endpoint returns a successful HTTP status.
-            Requires I(interval) to be provided.
+          - Requires I(interval) to be provided.
     timeout:
         type: str
         description:
