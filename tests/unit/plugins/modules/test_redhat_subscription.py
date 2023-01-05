@@ -102,6 +102,37 @@ TEST_CASES = [
             'msg': "System successfully registered to 'satellite.company.com'."
         }
     ],
+    # Test simple registration using token
+    [
+        {
+            'state': 'present',
+            'server_hostname': 'satellite.company.com',
+            'token': 'fake_token',
+        },
+        {
+            'id': 'test_registeration_token',
+            'run_command.calls': [
+                (
+                    ['/testbin/subscription-manager', 'identity'],
+                    {'check_rc': False},
+                    (1, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'config', '--server.hostname=satellite.company.com'],
+                    {'check_rc': True},
+                    (0, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'register',
+                        '--token', 'fake_token'],
+                    {'check_rc': True, 'expand_user_and_vars': False},
+                    (0, '', '')
+                )
+            ],
+            'changed': True,
+            'msg': "System successfully registered to 'satellite.company.com'."
+        }
+    ],
     # Test unregistration, when system is unregistered
     [
         {

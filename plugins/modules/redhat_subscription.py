@@ -40,6 +40,11 @@ options:
         description:
             - access.redhat.com or Red Hat Satellite or Katello password
         type: str
+    token:
+        description:
+            - sso.redhat.com API access token.
+        type: str
+        version_added: 6.3.0
     server_hostname:
         description:
             - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server
@@ -294,10 +299,11 @@ class RegistrationBase(object):
 
     REDHAT_REPO = "/etc/yum.repos.d/redhat.repo"
 
-    def __init__(self, module, username=None, password=None):
+    def __init__(self, module, username=None, password=None, token=None):
         self.module = module
         self.username = username
         self.password = password
+        self.token = token
 
     def configure(self):
         raise NotImplementedError("Must be implemented by a sub-class")
@@ -340,8 +346,8 @@ class RegistrationBase(object):
 
 
 class Rhsm(RegistrationBase):
-    def __init__(self, module, username=None, password=None):
-        RegistrationBase.__init__(self, module, username, password)
+    def __init__(self, module, username=None, password=None, token=None):
+        RegistrationBase.__init__(self, module, username, password, token)
         self.module = module
 
     def enable(self):
@@ -397,7 +403,7 @@ class Rhsm(RegistrationBase):
         else:
             return False
 
-    def register(self, username, password, auto_attach, activationkey, org_id,
+    def register(self, username, password, token, auto_attach, activationkey, org_id,
                  consumer_type, consumer_name, consumer_id, force_register, environment,
                  release):
         '''
@@ -433,6 +439,8 @@ class Rhsm(RegistrationBase):
 
         if activationkey:
             args.extend(['--activationkey', activationkey])
+        elif token:
+            args.extend(['--token', token])
         else:
             if username:
                 args.extend(['--username', username])
@@ -794,6 +802,7 @@ def main():
             'state': {'default': 'present', 'choices': ['present', 'absent']},
             'username': {},
             'password': {'no_log': True},
+            'token': {'no_log': True},
             'server_hostname': {},
             'server_insecure': {},
             'server_prefix': {},
@@ -831,17 +840,20 @@ def main():
                            ['server_proxy_hostname', 'server_proxy_port'],
                            ['server_proxy_user', 'server_proxy_password']],
         mutually_exclusive=[['activationkey', 'username'],
+                            ['activationkey', 'token'],
+                            ['token', 'username'],
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
                             ['activationkey', 'auto_attach'],
                             ['pool', 'pool_ids']],
-        required_if=[['state', 'present', ['username', 'activationkey'], True]],
+        required_if=[['state', 'present', ['username', 'activationkey', 'token'], True]],
     )
 
     rhsm.module = module
     state = module.params['state']
     username = module.params['username']
     password = module.params['password']
+    token = module.params['token']
     server_hostname = module.params['server_hostname']
     server_insecure = module.params['server_insecure']
     server_prefix = module.params['server_prefix']
@@ -914,7 +926,7 @@ def main():
             try:
                 rhsm.enable()
                 rhsm.configure(**module.params)
-                rhsm.register(username, password, auto_attach, activationkey, org_id,
+                rhsm.register(username, password, token, auto_attach, activationkey, org_id,
                               consumer_type, consumer_name, consumer_id, force_register,
                               environment, release)
                 if syspurpose and 'sync' in syspurpose and syspurpose['sync'] is True:
