@@ -1,0 +1,2 @@
+minor_changes:
+  - ModuleHelper module utils - handling of output variables with protected names now allows module to set them if unused by MH itself (https://github.com/ansible-collections/community.general/pull/5765).
