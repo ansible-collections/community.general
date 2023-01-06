@@ -124,7 +124,7 @@ class Bitwarden(object):
                 for custom_field in match['fields']:
                     if custom_field['name'] == field:
                         custom_field_matches.append(custom_field['value'])
-            if not len(custom_field_matches):
+            if matches and not custom_field_matches:
                 raise AnsibleError("Custom field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
             return custom_field_matches
 
