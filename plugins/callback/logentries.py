@@ -45,7 +45,7 @@ DOCUMENTATION = '''
           - section: callback_logentries
             key: tls_port
       token:
-        description: The logentries "TCP token".
+        description: The logentries C(TCP token).
         env:
           - name: LOGENTRIES_ANSIBLE_TOKEN
         required: true
