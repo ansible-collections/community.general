@@ -45,7 +45,7 @@ DOCUMENTATION = '''
           - section: callback_slack
             key: username
       validate_certs:
-        description: validate the SSL certificate of the Slack server. (For HTTPS URLs.)
+        description: Validate the SSL certificate of the Slack server. (For HTTPS URLs.)
         env:
           - name: SLACK_VALIDATE_CERTS
         ini:

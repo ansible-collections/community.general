@@ -63,7 +63,7 @@ DOCUMENTATION = '''
           - section: callback_logentries
             key: use_tls
       flatten:
-        description: flatten complex data structures into a single dictionary with complex keys.
+        description: Flatten complex data structures into a single dictionary with complex keys.
         type: boolean
         default: false
         env:
