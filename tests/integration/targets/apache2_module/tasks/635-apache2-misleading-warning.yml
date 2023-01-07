@@ -26,7 +26,7 @@
     name: "{{ item.module}}"
     state: "{{ item.state}}"
     ignore_configcheck: true
-    warn_mpm_absent: False
+    warn_mpm_absent: false
   register: disable_mpm_modules
   with_items:
     - { module: mpm_event, state: absent }
