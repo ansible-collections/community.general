@@ -30,7 +30,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_KSUSU_USER_KSU
             required: False
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
             default: root
             ini:
               - section: privilege_escalation
