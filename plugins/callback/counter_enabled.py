@@ -21,7 +21,7 @@ DOCUMENTATION = '''
     extends_documentation_fragment:
       - default_callback
     requirements:
-      - set as stdout callback in ansible.cfg  (stdout_callback = counter_enabled)
+      - set as stdout callback in C(ansible.cfg) (C(stdout_callback = counter_enabled))
 '''
 
 from ansible import constants as C
