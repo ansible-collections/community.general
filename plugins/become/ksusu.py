@@ -51,7 +51,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_KSUSU_USER_SU
             required: False
         become_exe_ksu:
-            description: Ksu executable
+            description: C(ksu) executable.
             default: ksu
             ini:
               - section: privilege_escalation
