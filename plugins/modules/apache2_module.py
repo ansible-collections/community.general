@@ -52,8 +52,8 @@ options:
    warn_mpm_absent:
      description:
         - Control the behavior of the warning process for MPM modules.
-    type: bool
-    default: true
+     type: bool
+     default: true
 requirements: ["a2enmod","a2dismod"]
 notes:
   - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
@@ -94,7 +94,7 @@ EXAMPLES = '''
     state: absent
   - module: mpm_prefork
     state: present
-  
+
 - name: Enable dump_io module, which is identified as dumpio_module inside apache2
   community.general.apache2_module:
     state: present
