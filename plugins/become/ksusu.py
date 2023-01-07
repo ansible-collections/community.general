@@ -80,7 +80,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_EXE_SU
               - name: ANSIBLE_KSUSU_EXE_SU
         become_flags_ksu:
-            description: Options to pass to ksu
+            description: Options to pass to C(ksu).
             default: '-Z -q'
             ini:
               - section: privilege_escalation
