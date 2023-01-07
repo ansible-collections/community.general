@@ -18,7 +18,6 @@ from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprec
 
 
 class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelperBase):
-    _output_conflict_list = ('msg', 'exception', 'output', 'vars', 'changed')
     facts_name = None
     output_params = ()
     diff_params = ()
@@ -60,10 +59,6 @@ class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelper
             vars_diff = self.vars.diff() or {}
             result['diff'] = dict_merge(dict(diff), vars_diff)
 
-        for varname in list(result):
-            if varname in self._output_conflict_list:
-                result["_" + varname] = result[varname]
-                del result[varname]
         return result
 
 
