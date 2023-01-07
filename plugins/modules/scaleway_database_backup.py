@@ -19,7 +19,7 @@ short_description: Scaleway database backups management module
 version_added: 1.2.0
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
-    - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
+    - "This module manages database backups on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
     - community.general.scaleway
 options:
@@ -139,7 +139,7 @@ EXAMPLES = '''
 RETURN = '''
 metadata:
     description: Backup metadata.
-    returned: when I(state=present), I(state=exported) or I(state=restored).
+    returned: when I(state=present), I(state=exported) or I(state=restored)
     type: dict
     sample: {
         "metadata": {

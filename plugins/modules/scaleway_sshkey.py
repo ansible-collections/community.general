@@ -19,8 +19,7 @@ module: scaleway_sshkey
 short_description: Scaleway SSH keys management module
 author: Remy Leone (@remyleone)
 description:
-    - This module manages SSH keys on Scaleway account
-      U(https://developer.scaleway.com)
+    - "This module manages SSH keys on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
 - community.general.scaleway
 
@@ -42,7 +41,7 @@ options:
   api_url:
     type: str
     description:
-      - Scaleway API URL
+      - Scaleway API URL.
     default: 'https://account.scaleway.com'
     aliases: ['base_url']
 '''

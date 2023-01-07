@@ -18,8 +18,7 @@ module: scaleway_security_group
 short_description: Scaleway Security Group management module
 author: Antoine Barbare (@abarbare)
 description:
-    - This module manages Security Group on Scaleway account
-      U(https://developer.scaleway.com).
+    - "This module manages Security Group on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
 - community.general.scaleway
 

@@ -18,8 +18,7 @@ short_description: Scaleway private network management
 version_added: 4.5.0
 author: Pascal MANGIN (@pastral)
 description:
-    - This module manages private network on Scaleway account
-      (U(https://developer.scaleway.com)).
+    - "This module manages private network on Scaleway account (U(https://developer.scaleway.com))."
 extends_documentation_fragment:
 - community.general.scaleway
 
