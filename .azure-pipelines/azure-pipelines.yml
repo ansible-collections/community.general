@@ -487,10 +487,11 @@ stages:
       - Docker_2_13
       - Docker_2_14
       - Docker_community_devel
-      - Generic_devel
-      - Generic_2_11
-      - Generic_2_12
-      - Generic_2_13
-      - Generic_2_14
+# Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
+#      - Generic_devel
+#      - Generic_2_11
+#      - Generic_2_12
+#      - Generic_2_13
+#      - Generic_2_14
     jobs:
       - template: templates/coverage.yml
