@@ -88,8 +88,8 @@ EXAMPLES = '''
   community.general.apache2_module:
     name: "{{ item.module }}"
     state: "{{ item.state }}"
-    warn_mpm_absent: False
-    ignore_configcheck: True
+    warn_mpm_absent: false
+    ignore_configcheck: true
   loop:
   - module: mpm_event
     state: absent
