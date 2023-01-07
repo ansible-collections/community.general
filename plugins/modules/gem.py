@@ -234,7 +234,7 @@ def uninstall(module):
         cmd.extend(['--version', module.params['version']])
     else:
         cmd.append('--all')
-        cmd.append('--executable')
+    cmd.append('--executable')
     cmd.append(module.params['name'])
     module.run_command(cmd, environ_update=environ, check_rc=True)
 
