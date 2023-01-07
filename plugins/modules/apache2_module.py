@@ -54,6 +54,7 @@ options:
         - Control the behavior of the warning process for MPM modules.
      type: bool
      default: true
+     version_added: 6.3.0
 requirements: ["a2enmod","a2dismod"]
 notes:
   - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
