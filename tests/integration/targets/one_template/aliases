@@ -4,4 +4,4 @@
 
 azp/generic/1
 cloud/opennebula
-disabled  # FIXME
+disabled  # FIXME  - when this is fixed, also re-enable the generic tests in CI!
