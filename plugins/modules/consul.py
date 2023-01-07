@@ -611,7 +611,7 @@ def main():
         # When reaching c.g 8.0.0:
         # - Replace the deprecation with a fail_json(), remove the "ack_params_state_absent" condition from the "if"
         # - Add mutually_exclusive for ('script', 'ttl', 'tcp', 'http'), then remove that validation from parse_check()
-        # - Add required_by {'script': 'interval', 'http': 'interval', 'tcp': 'interval', then remove checks for 'interval' in ConsulCheck.__init__()
+        # - Add required_by {'script': 'interval', 'http': 'interval', 'tcp': 'interval'}, then remove checks for 'interval' in ConsulCheck.__init__()
         # - Deprecate the parameter ack_params_state_absent
 
     try:
