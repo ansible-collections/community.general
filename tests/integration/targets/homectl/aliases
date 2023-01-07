@@ -8,3 +8,4 @@ skip/freebsd
 skip/osx
 skip/macos
 skip/rhel9.0  # See https://www.reddit.com/r/Fedora/comments/si7nzk/homectl/
+skip/rhel9.1  # See https://www.reddit.com/r/Fedora/comments/si7nzk/homectl/
