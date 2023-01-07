@@ -156,6 +156,9 @@ class SnapAlias(StateModuleHelper):
                 # self.changed = True
                 with self.runner("state name alias", check_mode_skip=True) as ctx:
                     ctx.run()
+                    if self.verbosity >= 4:
+                        self.vars.run_info = ctx.run_info
+
 
     def state_absent(self):
         if not self.vars.alias:
@@ -163,12 +166,16 @@ class SnapAlias(StateModuleHelper):
                 # self.changed = True
                 with self.runner("state name", check_mode_skip=True) as ctx:
                     ctx.run()
+                    if self.verbosity >= 4:
+                        self.vars.run_info = ctx.run_info
         else:
             for alias in self.vars.alias:
                 if self._has_alias(self.vars.name, alias):
                     # self.changed = True
                     with self.runner("state alias", check_mode_skip=True) as ctx:
                         ctx.run()
+                        if self.verbosity >= 4:
+                            self.vars.run_info = ctx.run_info
 
 
 def main():
