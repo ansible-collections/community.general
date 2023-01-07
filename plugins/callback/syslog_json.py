@@ -15,11 +15,11 @@ DOCUMENTATION = '''
       - whitelist in configuration
     short_description: sends JSON events to syslog
     description:
-      - This plugin logs ansible-playbook and ansible runs to a syslog server in JSON format
-      - Before Ansible 2.9 only environment variables were available for configuration
+      - This plugin logs ansible-playbook and ansible runs to a syslog server in JSON format.
+      - Before Ansible 2.9 only environment variables were available for configuration.
     options:
       server:
-        description: syslog server that will receive the event
+        description: Syslog server that will receive the event.
         env:
         - name: SYSLOG_SERVER
         default: localhost
@@ -27,7 +27,7 @@ DOCUMENTATION = '''
           - section: callback_syslog_json
             key: syslog_server
       port:
-        description: port on which the syslog server is listening
+        description: Port on which the syslog server is listening.
         env:
           - name: SYSLOG_PORT
         default: 514
@@ -35,7 +35,7 @@ DOCUMENTATION = '''
           - section: callback_syslog_json
             key: syslog_port
       facility:
-        description: syslog facility to log as
+        description: Syslog facility to log as.
         env:
           - name: SYSLOG_FACILITY
         default: user
