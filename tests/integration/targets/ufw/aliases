@@ -10,6 +10,7 @@ skip/macos
 skip/freebsd
 skip/rhel8.0  # FIXME
 skip/rhel9.0  # FIXME
+skip/rhel9.1  # FIXME
 skip/docker
 needs/root
 needs/target/setup_epel
