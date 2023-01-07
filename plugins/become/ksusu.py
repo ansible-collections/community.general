@@ -65,7 +65,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_EXE_KSU
               - name: ANSIBLE_KSU_EXE_KSU
         become_exe_su:
-            description: Absolute path to the su executable
+            description: Absolute path to the C(su) executable.
             default: /bin/su
             ini:
               - section: privilege_escalation
