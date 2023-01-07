@@ -154,7 +154,7 @@ class SnapAlias(StateModuleHelper):
         for alias in self.vars.alias:
             if not self._has_alias(self.vars.name, alias):
                 self.changed = True
-                if self.check_mode:
+                if not self.check_mode:
                     with self.runner("state name alias") as ctx:
                         ctx.run()
                         if self.verbosity >= 4:
@@ -164,7 +164,7 @@ class SnapAlias(StateModuleHelper):
         if not self.vars.alias:
             if self._has_alias(self.vars.name):
                 self.changed = True
-                if self.check_mode:
+                if not self.check_mode:
                     with self.runner("state name") as ctx:
                         ctx.run()
                         if self.verbosity >= 4:
