@@ -15,7 +15,7 @@ DOCUMENTATION = '''
       - set as main display callback
     short_description: Don't display stuff to screen
     description:
-        - This callback prevents outputing events to screen
+        - This callback prevents outputing events to screen.
 '''
 
 from ansible.plugins.callback import CallbackBase
