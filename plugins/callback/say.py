@@ -14,12 +14,12 @@ DOCUMENTATION = '''
     type: notification
     requirements:
       - whitelisting in configuration
-      - the '/usr/bin/say' command line program (standard on macOS) or 'espeak' command line program
+      - the C(/usr/bin/say) command line program (standard on macOS) or C(espeak) command line program
     short_description: notify using software speech synthesizer
     description:
-      - This plugin will use the 'say' or 'espeak' program to "speak" about play events.
+      - This plugin will use the C(say) or C(espeak) program to "speak" about play events.
     notes:
-      - In 2.8, this callback has been renamed from C(osx_say) into M(community.general.say).
+      - In Ansible 2.8, this callback has been renamed from C(osx_say) into M(community.general.say).
 '''
 
 import platform

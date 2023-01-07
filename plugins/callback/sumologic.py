@@ -12,14 +12,14 @@ type: notification
 short_description: Sends task result events to Sumologic
 author: "Ryan Currah (@ryancurrah)"
 description:
-  - This callback plugin will send task results as JSON formatted events to a Sumologic HTTP collector source
+  - This callback plugin will send task results as JSON formatted events to a Sumologic HTTP collector source.
 requirements:
   - Whitelisting this callback plugin
   - 'Create a HTTP collector source in Sumologic and specify a custom timestamp format of C(yyyy-MM-dd HH:mm:ss ZZZZ) and a custom timestamp locator
     of C("timestamp": "(.*)")'
 options:
   url:
-    description: URL to the Sumologic HTTP collector source
+    description: URL to the Sumologic HTTP collector source.
     env:
       - name: SUMOLOGIC_URL
     ini:
@@ -28,7 +28,7 @@ options:
 '''
 
 EXAMPLES = '''
-examples: >
+examples: |
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
     callback_whitelist = community.general.sumologic

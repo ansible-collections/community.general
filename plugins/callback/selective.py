@@ -22,7 +22,7 @@ DOCUMENTATION = '''
     options:
       nocolor:
         default: false
-        description: This setting allows suppressing colorizing output
+        description: This setting allows suppressing colorizing output.
         env:
           - name: ANSIBLE_NOCOLOR
           - name: ANSIBLE_SELECTIVE_DONT_COLORIZE

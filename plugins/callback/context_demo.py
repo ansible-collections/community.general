@@ -13,8 +13,8 @@ DOCUMENTATION = '''
     type: aggregate
     short_description: demo callback that adds play/task context
     description:
-      - Displays some play and task context along with normal output
-      - This is mostly for demo purposes
+      - Displays some play and task context along with normal output.
+      - This is mostly for demo purposes.
     requirements:
       - whitelist in configuration
 '''

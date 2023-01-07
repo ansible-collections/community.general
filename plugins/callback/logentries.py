@@ -13,15 +13,15 @@ DOCUMENTATION = '''
     short_description: Sends events to Logentries
     description:
       - This callback plugin will generate JSON objects and send them to Logentries via TCP for auditing/debugging purposes.
-      - Before 2.4, if you wanted to use an ini configuration, the file must be placed in the same directory as this plugin and named logentries.ini
+      - Before 2.4, if you wanted to use an ini configuration, the file must be placed in the same directory as this plugin and named C(logentries.ini).
       - In 2.4 and above you can just put it in the main Ansible configuration file.
     requirements:
       - whitelisting in configuration
-      - certifi (python library)
-      - flatdict (python library), if you want to use the 'flatten' option
+      - certifi (Python library)
+      - flatdict (Python library), if you want to use the 'flatten' option
     options:
       api:
-        description: URI to the Logentries API
+        description: URI to the Logentries API.
         env:
           - name: LOGENTRIES_API
         default: data.logentries.com
@@ -29,7 +29,7 @@ DOCUMENTATION = '''
           - section: callback_logentries
             key: api
       port:
-        description: HTTP port to use when connecting to the API
+        description: HTTP port to use when connecting to the API.
         env:
             - name: LOGENTRIES_PORT
         default: 80
@@ -37,7 +37,7 @@ DOCUMENTATION = '''
           - section: callback_logentries
             key: port
       tls_port:
-        description: Port to use when connecting to the API when TLS is enabled
+        description: Port to use when connecting to the API when TLS is enabled.
         env:
             - name: LOGENTRIES_TLS_PORT
         default: 443
@@ -45,7 +45,7 @@ DOCUMENTATION = '''
           - section: callback_logentries
             key: tls_port
       token:
-        description: The logentries "TCP token"
+        description: The logentries C(TCP token).
         env:
           - name: LOGENTRIES_ANSIBLE_TOKEN
         required: true
@@ -54,7 +54,7 @@ DOCUMENTATION = '''
             key: token
       use_tls:
         description:
-          - Toggle to decide whether to use TLS to encrypt the communications with the API server
+          - Toggle to decide whether to use TLS to encrypt the communications with the API server.
         env:
           - name: LOGENTRIES_USE_TLS
         default: false
@@ -63,7 +63,7 @@ DOCUMENTATION = '''
           - section: callback_logentries
             key: use_tls
       flatten:
-        description: flatten complex data structures into a single dictionary with complex keys
+        description: Flatten complex data structures into a single dictionary with complex keys.
         type: boolean
         default: false
         env:
