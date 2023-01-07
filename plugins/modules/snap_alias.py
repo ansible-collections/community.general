@@ -159,7 +159,6 @@ class SnapAlias(StateModuleHelper):
                     if self.verbosity >= 4:
                         self.vars.run_info = ctx.run_info
 
-
     def state_absent(self):
         if not self.vars.alias:
             if self._has_alias(self.vars.name):
