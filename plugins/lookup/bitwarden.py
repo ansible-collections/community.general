@@ -47,6 +47,11 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test') }}
+
+- name: "Get custom field 'api_key' from Bitwarden record named 'a_test'"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'a_test', field='api_key') }}
 """
 
 RETURN = """
@@ -109,10 +114,19 @@ class Bitwarden(object):
         """
         matches = self._get_matches(search_value, search_field)
 
-        if field:
+        if field in ['autofillOnPageLoad', 'password', 'passwordRevisionDate', 'totp', 'uris', 'username']:
             return [match['login'][field] for match in matches]
-
-        return matches
+        elif not field:
+            return matches
+        else:
+            custom_field_matches = []
+            for match in matches:
+                for custom_field in match['fields']:
+                    if custom_field['name'] == field:
+                        custom_field_matches.append(custom_field['value'])
+            if matches and not custom_field_matches:
+                raise AnsibleError("Custom field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
+            return custom_field_matches
 
 
 class LookupModule(LookupBase):
