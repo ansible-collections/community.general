@@ -60,6 +60,8 @@ options:
     description:
       - A list of subcommands.
       - Each subcommand needs a name, a link and a path parameter.
+      - Subcommands are also named 'slaves' or 'followers', depending on the version
+        of alternatives.
     type: list
     elements: dict
     aliases: ['slaves']
@@ -310,10 +312,10 @@ class AlternativesModule(object):
         current_mode_regex = re.compile(r'\s-\s(?:status\sis\s)?(\w*)(?:\smode|.)$', re.MULTILINE)
         current_path_regex = re.compile(r'^\s*link currently points to (.*)$', re.MULTILINE)
         current_link_regex = re.compile(r'^\s*link \w+ is (.*)$', re.MULTILINE)
-        subcmd_path_link_regex = re.compile(r'^\s*slave (\S+) is (.*)$', re.MULTILINE)
+        subcmd_path_link_regex = re.compile(r'^\s*(?:slave|follower) (\S+) is (.*)$', re.MULTILINE)
 
-        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority\s(\d+)((?:\s+slave.*)*)', re.MULTILINE)
-        subcmd_regex = re.compile(r'^\s+slave (.*): (.*)$', re.MULTILINE)
+        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority\s(\d+)((?:\s+(?:slave|follower).*)*)', re.MULTILINE)
+        subcmd_regex = re.compile(r'^\s+(?:slave|follower) (.*): (.*)$', re.MULTILINE)
 
         match = current_mode_regex.search(display_output)
         if not match:
