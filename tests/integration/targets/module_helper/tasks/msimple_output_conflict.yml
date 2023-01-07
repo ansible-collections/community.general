@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: test msimple (set a=80)
+- name: test msimple conflict output (set a=80)
   msimple:
     a: 80
   register: simple1
@@ -15,7 +15,7 @@
       - simple1 is not changed
       - simple1.value is none
 
-- name: test msimple 2
+- name: test msimple conflict output 2
   msimple:
     a: 80
     m: a message in a bottle
@@ -28,4 +28,27 @@
       - simple1.abc == "abc"
       - simple1 is not changed
       - simple1.value is none
-      - 'simple2._msg == "a message in a bottle"'
+      - >
+        "_msg" not in simple2
+      - >
+        simple2.msg == "a message in a bottle"
+
+- name: test msimple 3
+  msimple:
+    a: 101
+    m: a message in a bottle
+  ignore_errors: yes
+  register: simple3
+
+- name: assert simple3
+  assert:
+    that:
+      - simple3.a == 101
+      - >
+        simple3.msg == "Module failed with exception: a >= 100"
+      - >
+        simple3._msg == "a message in a bottle"
+      - simple3.abc == "abc"
+      - simple3 is failed
+      - simple3 is not changed
+      - simple3.value is none

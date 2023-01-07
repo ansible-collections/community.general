@@ -57,6 +57,8 @@ class MSimple(ModuleHelper):
             self.vars['c'] = str(self.vars.c) * 3
 
     def __run__(self):
+        if self.vars.m:
+            self.vars.msg = self.vars.m
         if self.vars.a >= 100:
             raise Exception("a >= 100")
         if self.vars.c == "abc change":
@@ -65,9 +67,6 @@ class MSimple(ModuleHelper):
             self.vars['b'] = str(self.vars.b) * 2
             self.vars['c'] = str(self.vars.c) * 2
         self.process_a3_bc()
-
-        if self.vars.m:
-            self.vars.msg = self.vars.m
 
 
 def main():
