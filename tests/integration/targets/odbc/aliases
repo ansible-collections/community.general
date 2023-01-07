@@ -8,4 +8,5 @@ skip/osx
 skip/macos
 skip/rhel8.0
 skip/rhel9.0
+skip/rhel9.1
 skip/freebsd

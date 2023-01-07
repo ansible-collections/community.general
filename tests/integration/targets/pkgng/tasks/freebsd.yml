@@ -501,14 +501,19 @@
   # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
   #       only running this on 12.1 or higher
   #
+  # NOTE: FreeBSD 12.4 fails to update repositories because it cannot load certificates from /usr/share/keys/pkg/trusted
+  #       knowledge has to take a look)
+  #
   # NOTE: FreeBSD 13.0 fails to update the package catalogue for unknown reasons (someone with FreeBSD
   #       knowledge has to take a look)
   #
   # NOTE: FreeBSD 13.1 fails to update the package catalogue for unknown reasons (someone with FreeBSD
   #       knowledge has to take a look)
   #
+  # See also
+  # https://github.com/ansible-collections/community.general/issues/5795
   when: >-
-    (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('13.0', '<'))
+    (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('12.4', '<'))
     or ansible_distribution_version is version('13.2', '>=')
   block:
     - name: Setup testjail
