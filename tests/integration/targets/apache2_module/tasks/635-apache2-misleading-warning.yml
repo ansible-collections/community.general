@@ -21,12 +21,22 @@
       "No MPM module loaded! apache2 reload AND other module actions will fail if no MPM module is loaded immediately."
       ]
 
+- name: Enable MPM event module - Revert previous change
+  apache2_module:
+    name: "{{ item.module}}"
+    state: "{{ item.state}}"
+    ignore_configcheck: true
+  register: disable_mpm_modules
+  with_items:
+    - { module: mpm_prefork, state: absent }
+    - { module: mpm_event, state: present }
+
 - name: Disable MPM event module
   apache2_module:
     name: "{{ item.module}}"
     state: "{{ item.state}}"
     ignore_configcheck: true
-    warn_mpm_absent: false
+    warn_mpm_absent: False
   register: disable_mpm_modules
   with_items:
     - { module: mpm_event, state: absent }
