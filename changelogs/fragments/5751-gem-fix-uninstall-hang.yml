@@ -1,0 +1,2 @@
+bugfixes:
+  - gem - fix hang due to interactive prompt for confirmation on specific version uninstall (https://github.com/ansible-collections/community.general/pull/5751).
