@@ -128,8 +128,7 @@ DOCUMENTATION = """
         prompt_l10n:
             description:
                 - List of localized strings to match for prompt detection.
-                - If empty we'll use the built in one
-            default: []
+            default: ['Kerberos password for .*@.*:']
             ini:
               - section: ksusu_become_plugin
                 key: localized_prompts
@@ -172,7 +171,7 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        exe_ksu = self.get_option('become_exe_ksu')
+        exe_ksu = self.get_option('become_exe_ksu') or 'ksu'
         exe_su = self.get_option('become_exe_su') or '/bin/su'  # Must be absolute
 
         flags_ksu = self.get_option('become_flags_ksu') or '-Z -q'
