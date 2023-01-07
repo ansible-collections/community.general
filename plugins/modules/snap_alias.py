@@ -175,7 +175,7 @@ class SnapAlias(StateModuleHelper):
                     self.changed = True
                     if not self.check_mode:
                         with self.runner("state alias") as ctx:
-                            ctx.run()
+                            ctx.run(alias=alias)
                             if self.verbosity >= 4:
                                 self.vars.run_info = ctx.run_info
 
