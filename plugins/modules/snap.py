@@ -399,8 +399,7 @@ class Snap(CmdStateModuleHelper):
 
 
 def main():
-    snap = Snap()
-    snap.run()
+    Snap.execute()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,2 @@
+minor_changes:
+  - snap - minor refactor when executing module (https://github.com/ansible-collections/community.general/pull/5773).
