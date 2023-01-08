@@ -1,0 +1,2 @@
+minor_changes:
+  - snap_alias - refactored module to use ``CmdRunner`` to execute ``snap`` (https://github.com/ansible-collections/community.general/pull/5486).
