@@ -1,0 +1,2 @@
+deprecated_features:
+  - iptables_state - undocumented parameters ``_timeout`` and ``_back`` relate to unfinished work and are deprecated. They will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5800).
