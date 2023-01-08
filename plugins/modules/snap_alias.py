@@ -79,9 +79,8 @@ snap_aliases:
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper
-)
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 
 _state_map = dict(
@@ -91,7 +90,7 @@ _state_map = dict(
 )
 
 
-class SnapAlias(CmdStateModuleHelper):
+class SnapAlias(StateModuleHelper):
     _RE_ALIAS_LIST = re.compile(r"^(?P<snap>[\w-]+)\s+(?P<alias>[\w-]+)\s+.*$")
 
     module = dict(
@@ -106,25 +105,26 @@ class SnapAlias(CmdStateModuleHelper):
         ],
         supports_check_mode=True,
     )
-    command = "snap"
-    command_args_formats = dict(
-        _alias=dict(fmt=lambda v: [v]),
-        state=dict(fmt=lambda v: [_state_map[v]]),
-    )
-    check_rc = False
+
+    command_args_formats = {
+        "state": cmd_runner_fmt.as_map(_state_map),
+        "name": cmd_runner_fmt.as_list(),
+        "alias": cmd_runner_fmt.as_list(),
+    }
 
     def _aliases(self):
         n = self.vars.name
         return {n: self._get_aliases_for(n)} if n else self._get_aliases()
 
     def __init_module__(self):
+        self.runner = CmdRunner(self.module, "snap", self.command_args_formats, check_rc=False)
         self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
 
     def __quit_module__(self):
         self.vars.snap_aliases = self._aliases()
 
     def _get_aliases(self):
-        def process_get_aliases(rc, out, err):
+        def process(rc, out, err):
             if err:
                 return {}
             aliases = [self._RE_ALIAS_LIST.match(a.strip()) for a in out.splitlines()[1:]]
@@ -134,9 +134,8 @@ class SnapAlias(CmdStateModuleHelper):
                 results[snap] = results.get(snap, []) + [alias]
             return results
 
-        return self.run_command(params=[{'state': 'info'}, 'name'], check_rc=True,
-                                publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False,
-                                process_output=process_get_aliases)
+        with self.runner("state name", check_rc=True, output_process=process) as ctx:
+            return ctx.run(state="info")
 
     def _get_aliases_for(self, name):
         return self._get_aliases().get(name, [])
@@ -152,24 +151,30 @@ class SnapAlias(CmdStateModuleHelper):
         return any(alias in aliases for aliases in self.vars.snap_aliases.values())
 
     def state_present(self):
-        for alias in self.vars.alias:
-            if not self._has_alias(self.vars.name, alias):
+        for _alias in self.vars.alias:
+            if not self._has_alias(self.vars.name, _alias):
                 self.changed = True
-                if not self.module.check_mode:
-                    self.run_command(params=['state', 'name', {'_alias': alias}])
+                with self.runner("state name alias", check_mode_skip=True) as ctx:
+                    ctx.run(alias=_alias)
+                    if self.verbosity >= 4:
+                        self.vars.run_info = ctx.run_info
 
     def state_absent(self):
         if not self.vars.alias:
             if self._has_alias(self.vars.name):
                 self.changed = True
-                if not self.module.check_mode:
-                    self.run_command(params=['state', 'name'])
+                with self.runner("state name", check_mode_skip=True) as ctx:
+                    ctx.run()
+                    if self.verbosity >= 4:
+                        self.vars.run_info = ctx.run_info
         else:
-            for alias in self.vars.alias:
-                if self._has_alias(self.vars.name, alias):
+            for _alias in self.vars.alias:
+                if self._has_alias(self.vars.name, _alias):
                     self.changed = True
-                    if not self.module.check_mode:
-                        self.run_command(params=['state', {'_alias': alias}])
+                    with self.runner("state alias", check_mode_skip=True) as ctx:
+                        ctx.run(alias=_alias)
+                        if self.verbosity >= 4:
+                            self.vars.run_info = ctx.run_info
 
 
 def main():
