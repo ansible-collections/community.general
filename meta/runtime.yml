@@ -4603,6 +4603,10 @@ plugin_routing:
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
   doc_fragments:
+    rackspace:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This doc fragment is used by rax modules, that rely on the deprecated package pyrax.
     _gcp:
       redirect: community.google._gcp
     docker:
@@ -4618,6 +4622,10 @@ plugin_routing:
     postgresql:
       redirect: community.postgresql.postgresql
   module_utils:
+    rax:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module util relies on the deprecated package pyrax.
     docker.common:
       redirect: community.docker.common
     docker.swarm:
