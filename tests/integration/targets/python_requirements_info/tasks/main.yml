@@ -43,3 +43,7 @@
   assert:
     that:
       - wrong_spec1 is failed
+
+# See https://github.com/ansible-collections/community.general/issues/731
+- name: include test related to parsing issue for extra syntax
+  include_tasks: 731-parse-project-extra-syntax.yml
