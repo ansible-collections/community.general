@@ -4,9 +4,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Ensure Python libraries are installed
+  pip:
+    name: requests[security]>=2.28.1
+
+- name: Ensure Python libraries is installed
   python_requirements_info:
-    dependencies: "{{ item }}"
-  loop: "{{ lookup('file', '731-requirements.txt').splitlines() }}"
+    dependencies: requests[security]>=2.28.1
   register: _py_facts
   failed_when: | 
-      ( _py_facts.msg is defined) and ( _py_facts.msg | regex_search("Failed to parse"))
+      ( _py_facts.msg is defined) and ( _py_facts.msg | regex_search("Failed to parse")) or
+      ( _py_facts.valid is not defined) or
+      ( 'requests[security]' not in _py_facts.valid)
+
+  
