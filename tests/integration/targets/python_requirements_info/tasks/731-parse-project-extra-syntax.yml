@@ -3,17 +3,34 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Ensure Python libraries are installed
+- name: Install Python pywinrm libraries
   pip:
-    name: requests[security]>=2.28.1
+    name: pywinrm[credssp]>=0.4.3
 
-- name: Ensure Python libraries is installed
+- name: Ensure pywinrm is installed
   python_requirements_info:
-    dependencies: requests[security]>=2.28.1
+    dependencies: pywinrm[credssp]>=0.4.3
   register: _py_facts
   failed_when: | 
       ( _py_facts.msg is defined) and ( _py_facts.msg | regex_search("Failed to parse")) or
       ( _py_facts.valid is not defined) or
-      ( 'requests[security]' not in _py_facts.valid)
+      ( 'pywinrm[credssp]' not in _py_facts.valid)
 
+- name: Ensure pywinrm library is installed - with spaces
+  python_requirements_info:
+    dependencies: pywinrm[credssp] >= 0.4.3
+  register: _py_facts
+  failed_when: | 
+      ( _py_facts.msg is defined) and ( _py_facts.msg | regex_search("Failed to parse")) or
+      ( _py_facts.valid is not defined) or
+      ( 'pywinrm[credssp]' not in _py_facts.valid)
+
+- name: Ensure pywinrm library extra is installed
+  python_requirements_info:
+    dependencies: requests-credssp>=1.0.0
+  register: _py_facts
+  failed_when: | 
+      ( _py_facts.msg is defined) and ( _py_facts.msg | regex_search("Failed to parse")) or
+      ( _py_facts.valid is not defined) or
+      ( 'requests-credssp' not in _py_facts.valid)
   
