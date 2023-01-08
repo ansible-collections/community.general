@@ -175,6 +175,7 @@ def main():
     )
 
     for dep in module.params['dependencies']:
+        dep = dep.replace(' ', '')
         match = pkg_dep_re.match(dep)
         if not match:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
