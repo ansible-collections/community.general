@@ -23,8 +23,9 @@ options:
     description: >
       A list of version-likes or module names to check for installation.
       Supported operators: <, >, <=, >=, or ==. The bare module name like
-      I(ansible), the module with a specific version like I(boto3==1.6.1), or a
-      partial version like I(requests>2) are all valid specifications.
+      I(ansible), the module with a specific version like I(boto3==1.6.1), a
+      partial version like I(requests>2) or a module with extra like I(ansible[azure]==2.0.0)
+      are all valid specifications.
     default: []
 author:
   - Will Thames (@willthames)
@@ -165,7 +166,7 @@ def main():
             python_version_info=python_version_info,
             python_system_path=sys.path,
         )
-    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(?:(==|[><]=?)([0-9.]+))?$')
+    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+\[?([a-z][a-zA-Z0-9_ ]+){0,1}\]?)(?:(==|[><]=?)([0-9.]+))?$', flags=re.IGNORECASE)
 
     results = dict(
         not_found=[],
@@ -177,7 +178,7 @@ def main():
         match = pkg_dep_re.match(dep)
         if not match:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
-        pkg, op, version = match.groups()
+        pkg, extras, op, version = match.groups()
         if op is not None and op not in operations:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
         try:
