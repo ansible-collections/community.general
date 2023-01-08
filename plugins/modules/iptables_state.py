@@ -375,8 +375,8 @@ def main():
             modprobe=dict(type='path'),
             ip_version=dict(type='str', choices=['ipv4', 'ipv6'], default='ipv4'),
             wait=dict(type='int'),
-            _timeout=dict(type='int'),
-            _back=dict(type='path'),
+            _timeout=dict(type='int', removed_in_version='9.0.0', removed_from_collection='community.general'),
+            _back=dict(type='path', removed_in_version='9.0.0', removed_from_collection='community.general'),
         ),
         required_together=[
             ['_timeout', '_back'],
