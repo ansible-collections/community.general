@@ -43,7 +43,8 @@
 - assert:
     that:
       - wrong_spec is failed
-      - "'Must be formatted like' in wrong_spec"
+      - wrong_spec.msg is defined
+      - "'Must be formatted like' in wrong_spec.msg"
 
 - name: Ensure sampleprojectpy2test] syntax is invalid
   python_requirements_info:
@@ -54,4 +55,5 @@
 - assert:
     that:
       - wrong_spec is failed
-      - "'Must be formatted like' in wrong_spec"
+      - wrong_spec.msg is defined
+      - "'Must be formatted like' in wrong_spec.msg"
