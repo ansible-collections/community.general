@@ -62,13 +62,13 @@ def render(to_render):
     def recurse(to_render):
         for key, value in sorted(to_render.items()):
             if isinstance(value, dict):
-                yield '{}=[{}]'.format(key, ','.join(recurse(value)))
+                yield '{0:}=[{1:}]'.format(key, ','.join(recurse(value)))
                 continue
             if isinstance(value, list):
                 for item in value:
-                    yield '{}=[{}]'.format(key, ','.join(recurse(item)))
+                    yield '{0:}=[{1:}]'.format(key, ','.join(recurse(item)))
                 continue
-            yield '{}="{}"'.format(key, value)
+            yield '{0:}="{1:}"'.format(key, value)
     return '\n'.join(recurse(to_render))
 
 

@@ -200,7 +200,7 @@ options:
     description:
       - When C(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call via direct template merge.
-      - Allows for complete modifications of the C(CONTEXT) attribute (see https://docs.opennebula.io/6.6/integration_and_development/system_interfaces/api.html#one-vm-updateconf).
+      - Allows for complete modifications of the C(CONTEXT) attribute.
     type: dict
 author:
     - "Milan Ilic (@ilicmilan)"
@@ -692,12 +692,12 @@ def check_updateconf(module, to_check):
     '''Checks if attributes are compatible with one.vm.updateconf API call.'''
     for attr, subattributes in to_check.items():
         if attr not in UPDATECONF_ATTRIBUTES:
-            module.fail_json(msg="'{}' is not a valid VM attribute.".format(attr))
+            module.fail_json(msg="'{0:}' is not a valid VM attribute.".format(attr))
         if not UPDATECONF_ATTRIBUTES[attr]:
             continue
         for subattr in subattributes:
             if subattr not in UPDATECONF_ATTRIBUTES[attr]:
-                module.fail_json(msg="'{}' is not a valid VM subattribute of '{}'".format(subattr, attr))
+                module.fail_json(msg="'{0:}' is not a valid VM subattribute of '{1:}'".format(subattr, attr))
 
 
 def parse_updateconf(vm_template):
@@ -1107,8 +1107,10 @@ def get_all_vms_by_attributes(client, attributes_dict, labels_list):
     return vm_list
 
 
-def create_count_of_vms(
-        module, client, template_id, count, attributes_dict, labels_list, disk_size, network_attrs_list, wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
+def create_count_of_vms(module, client,
+                        template_id, count,
+                        attributes_dict, labels_list, disk_size, network_attrs_list,
+                        wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
     new_vms_list = []
 
     vm_name = ''
@@ -1137,7 +1139,9 @@ def create_count_of_vms(
             new_vm_name += next_index
         # Update NAME value in the attributes in case there is index
         attributes_dict['NAME'] = new_vm_name
-        new_vm_dict = create_vm(module, client, template_id, attributes_dict, labels_list, disk_size, network_attrs_list, vm_start_on_hold, vm_persistent, updateconf_dict)
+        new_vm_dict = create_vm(module, client,
+                                template_id, attributes_dict, labels_list, disk_size, network_attrs_list,
+                                vm_start_on_hold, vm_persistent, updateconf_dict)
         new_vm_id = new_vm_dict.get('vm_id')
         new_vm = get_vm_by_id(client, new_vm_id)
         new_vms_list.append(new_vm)
@@ -1155,9 +1159,10 @@ def create_count_of_vms(
     return True, new_vms_list, []
 
 
-def create_exact_count_of_vms(module, client, template_id, exact_count, attributes_dict, count_attributes_dict,
-                              labels_list, count_labels_list, disk_size, network_attrs_list, hard, wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
-
+def create_exact_count_of_vms(module, client,
+                              template_id, exact_count, attributes_dict, count_attributes_dict,
+                              labels_list, count_labels_list, disk_size, network_attrs_list,
+                              hard, wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
     vm_list = get_all_vms_by_attributes(client, count_attributes_dict, count_labels_list)
 
     vm_count_diff = exact_count - len(vm_list)
