@@ -129,14 +129,6 @@ EXAMPLES = '''
       username: "abcxyz"
       password: "******"
 
-  - name: Get service bios attributes
-    community.general.ilo_redfish_info:
-      category: Systems
-      command: GetServiceBiosAttributes
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-
   - name: Get logical drive details with array controllers
     community.general.ilo_redfish_info:
       category: Systems
@@ -165,7 +157,7 @@ ilo_redfish_info:
 '''
 
 CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
-                         "Systems": ["GetServiceBiosAttributes", "GetBootSettings", "GetPhysicalDrives",
+                         "Systems": ["GetBootSettings", "GetPhysicalDrives",
                                      "GetLogicalDrives", "GetLogicalDrivesWithArrayControllers",
                                      "GetServerPostState", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"],
                          "Managers": ["GetSNMPv3Users", "GetSNMPAlertDestinations", "GetiLOBackupFiles"]}
@@ -276,9 +268,7 @@ def main():
                     result[command] = rf_utils.get_ilo_sessions()
         elif category == "Systems":
             for command in command_list:
-                if command == "GetServiceBiosAttributes":
-                    result[command] = rf_utils.get_service_bios_attributes()
-                elif command == "GetBootSettings":
+                if command == "GetBootSettings":
                     result[command] = rf_utils.get_network_boot_settings()
                 elif command == "GetPhysicalDrives":
                     result[command] = rf_utils.get_smartstorage_physical_drives()
