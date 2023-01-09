@@ -101,11 +101,6 @@ options:
         description:
           - Minimum size required in the physical drive
         type: int
-  service_attributes:
-    required: false
-    description:
-      - service BIOS attributes that needs to be verified in the given server
-    type: dict
   uefi_boot_order:
     required: false
     description:
@@ -136,17 +131,6 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Verify service BIOS attributes
-    community.general.ilo_redfish_command:
-      category: Systems
-      command: VerifyServiceBiosAttributes
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-      service_attributes:
-        ConnectSequenceTrace: "Disabled"
-        CustomDebugBlkIo: "Disabled"
-
   - name: Verify bios attributes
     community.general.ilo_redfish_command:
       category: Systems
@@ -251,7 +235,7 @@ except ImportError as e:
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["VerifyServiceBiosAttributes", "VerifyBiosAttributes", "VerifyLogicalDrives", "VerifyUefiBootOrder",
+    "Systems": ["VerifyBiosAttributes", "VerifyLogicalDrives", "VerifyUefiBootOrder",
                 "VerifySpecifiedLogicalDrives", "CheckiLORebootStatus", "GetSpecifiedLogicalDrives"]
 }
 
@@ -267,7 +251,6 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
-            service_attributes=dict(type="dict"),
             bios_attributes=dict(type="dict"),
             raid_details=dict(type="list", elements='dict'),
             uefi_boot_order=dict(type='list', elements='str'),
@@ -334,13 +317,7 @@ def main():
                 result[command] = res
                 module.fail_json(msg=to_native(result))
 
-            if command == "VerifyServiceBiosAttributes":
-                if not module.params.get("service_attributes") and module.params.get("service_attributes") != {}:
-                    result[command]['ret'] = False
-                    result[command]['msg'] = "service_attributes params is required"
-                    module.fail_json(result)
-                result[command] = rf_utils.verify_service_bios_attributes(module.params["service_attributes"])
-            elif command == "VerifyBiosAttributes":
+            if command == "VerifyBiosAttributes":
                 if not module.params.get("bios_attributes") and module.params.get("bios_attributes") != {}:
                     result[command]['ret'] = False
                     result[command]['msg'] = "bios_attributes params is required"
