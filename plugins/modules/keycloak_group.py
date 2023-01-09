@@ -22,7 +22,7 @@ description:
       to your needs and a user having the expected roles.
 
     - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html).
+      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
 
     - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
       be returned that way by this module. You may pass single values for attributes when calling the module,
@@ -69,6 +69,17 @@ options:
             - A dict of key/value pairs to set as custom attributes for the group.
             - Values may be single values (e.g. a string) or a list of strings.
 
+    parents:
+        version_added: TODO
+        type: list
+        description:
+            - List of parent groups for the group to handle sorted top to bottom.
+            - Set this to create a group as a subgroup of another group or groups (parents).
+            - Each element can describe a parent either by name or ID, both is
+              fine but using names needs some more internal API calls (to map
+              to ID's internally). On default given strings are interpreted as
+              names, to mark them as ID's prefix them with C(id:)
+
 notes:
     - Presently, the I(realmRoles), I(clientRoles) and I(access) attributes returned by the Keycloak API
       are read-only for groups. This limitation will be removed in a later version of this module.
@@ -79,6 +90,7 @@ extends_documentation_fragment:
 
 author:
     - Adam Goossens (@adamgoossens)
+    - Mirko Wilhelmi (@morco)
 '''
 
 EXAMPLES = '''
@@ -92,6 +104,7 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
+  register: result_new_kcgrp
   delegate_to: localhost
 
 - name: Create a Keycloak group, authentication with token
@@ -156,6 +169,64 @@ EXAMPLES = '''
             - individual
             - list
             - items
+  delegate_to: localhost
+
+- name: Create a Keycloak subgroup of a base group (using parent name)
+  community.general.keycloak_group:
+    name: my-new-kc-group-sub
+    realm: MyCustomRealm
+    state: present
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    parents:
+      - my-new-kc-group
+  register: result_new_kcgrp_sub
+  delegate_to: localhost
+
+- name: Create a Keycloak subgroup of a base group (using parent id)
+  community.general.keycloak_group:
+    name: my-new-kc-group-sub2
+    realm: MyCustomRealm
+    state: present
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    parents:
+      - "id:{{ result_new_kcgrp.end_state.id }}"
+  delegate_to: localhost
+
+- name: Create a Keycloak subgroup of a subgroup (using parent names)
+  community.general.keycloak_group:
+    name: my-new-kc-group-sub-sub
+    realm: MyCustomRealm
+    state: present
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    parents:
+      - my-new-kc-group
+      - my-new-kc-group-sub
+  delegate_to: localhost
+
+- name: Create a Keycloak subgroup of a subgroup (using direct parent id)
+  community.general.keycloak_group:
+    name: my-new-kc-group-sub-sub
+    realm: MyCustomRealm
+    state: present
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    parents:
+      - "id:{{  result_new_kcgrp_sub }}"
   delegate_to: localhost
 '''
 
@@ -235,6 +306,7 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         attributes=dict(type='dict'),
+        parents=dict(type='list', elements='str'),
     )
 
     argument_spec.update(meta_args)
@@ -245,7 +317,7 @@ def main():
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    result = dict(changed=False, msg='', diff={}, group='')
+    result = dict(changed=False, msg='', diff={})
 
     # Obtain access token, initialize API
     try:
@@ -261,6 +333,8 @@ def main():
     name = module.params.get('name')
     attributes = module.params.get('attributes')
 
+    parents = module.params.get('parents')
+
     # attributes in Keycloak have their values returned as lists
     # via the API. attributes is a dict, so we'll transparently convert
     # the values to lists.
@@ -270,12 +344,12 @@ def main():
 
     # Filter and map the parameters names that apply to the group
     group_params = [x for x in module.params
-                    if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
+                    if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'parents'] and
                     module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
     if gid is None:
-        before_group = kc.get_group_by_name(name, realm=realm)
+        before_group = kc.get_group_by_name(name, realm=realm, parents=parents)
     else:
         before_group = kc.get_group_by_groupid(gid, realm=realm)
 
@@ -318,9 +392,15 @@ def main():
         if module.check_mode:
             module.exit_json(**result)
 
-        # create it
-        kc.create_group(desired_group, realm=realm)
-        after_group = kc.get_group_by_name(name, realm)
+        # create it ...
+        if parents:
+            # ... as subgroup of another parent group
+            kc.create_subgroup(parents, desired_group, realm=realm)
+        else:
+            # ... as toplvl base group
+            kc.create_group(desired_group, realm=realm)
+
+        after_group = kc.get_group_by_name(name, realm, parents=parents)
 
         result['end_state'] = after_group
 

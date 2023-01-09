@@ -42,6 +42,7 @@ URL_CLIENTTEMPLATE = "{url}/admin/realms/{realm}/client-templates/{id}"
 URL_CLIENTTEMPLATES = "{url}/admin/realms/{realm}/client-templates"
 URL_GROUPS = "{url}/admin/realms/{realm}/groups"
 URL_GROUP = "{url}/admin/realms/{realm}/groups/{groupid}"
+URL_GROUP_CHILDREN = "{url}/admin/realms/{realm}/groups/{groupid}/children"
 
 URL_CLIENTSCOPES = "{url}/admin/realms/{realm}/client-scopes"
 URL_CLIENTSCOPE = "{url}/admin/realms/{realm}/client-scopes/{id}"
@@ -1249,7 +1250,7 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not fetch group %s in realm %s: %s"
                                       % (gid, realm, str(e)))
 
-    def get_group_by_name(self, name, realm="master"):
+    def get_group_by_name(self, name, realm="master", parents=None):
         """ Fetch a keycloak group within a realm based on its name.
 
         The Keycloak API does not allow filtering of the Groups resource by name.
@@ -1259,10 +1260,19 @@ class KeycloakAPI(object):
         If the group does not exist, None is returned.
         :param name: Name of the group to fetch.
         :param realm: Realm in which the group resides; default 'master'
+        :param parents: Optional list of parents when group to look for is a subgroup
         """
         groups_url = URL_GROUPS.format(url=self.baseurl, realm=realm)
         try:
-            all_groups = self.get_groups(realm=realm)
+            if parents:
+                parent = self.get_subgroup_direct_parent(parents, realm)
+
+                if not parent:
+                    return None
+
+                all_groups = parent['subGroups']
+            else:
+                all_groups = self.get_groups(realm=realm)
 
             for group in all_groups:
                 if group['name'] == name:
@@ -1273,6 +1283,88 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not fetch group %s in realm %s: %s"
                                       % (name, realm, str(e)))
+
+    def get_subgroup_by_chain(self, name_chain, realm="master"):
+        """ Access a subgroup API object by walking down a given name/id chain.
+
+        Groups can be given either as by name or by ID, the first element
+        must either be a toplvl group or given as ID, all parents must exist.
+
+        If the group cannot be found, None is returned.
+        :param name_chain: Topdown ordered list of subgroup parent (ids or names) + its own name at the end
+        :param realm: Realm in which the group resides; default 'master'
+        """
+        cp = name_chain[0]
+
+        # for 1st parent in chain we must query the server
+        if cp.startswith("id:"):
+            tmp = self.get_group_by_groupid(cp[len("id:"):], realm=realm)
+        else:
+            # given as name, assume toplvl group
+            tmp = self.get_group_by_name(cp, realm=realm)
+
+        if not tmp:
+            return None
+
+        for p in name_chain[1:]:
+            for sg in tmp['subGroups']:
+                equals = False
+
+                if p.startswith("id:"):
+                    equals = p[len("id:"):] == sg["id"]
+                else:
+                    equals = p == sg["name"]
+
+                if equals:
+                    tmp = sg
+                    break
+
+            if not tmp:
+                return None
+
+        return tmp
+
+    def get_subgroup_direct_parent(self, parents, realm="master", childs_to_resolve=None):
+        """ Get keycloak direct parent group API object for a given chain of parents.
+
+        To succesfully work the API for subgroups we actually dont need
+        to "walk the whole tree" for nested groups but only need to know
+        the ID for the direct predecessor of current subgroup. This
+        method will guarantee us this information getting there with
+        as minimal work as possible.
+
+        Note that given parent list can and might be incomplete at the
+        upper levels as long as it starts with an ID instead of a name
+
+        If the group does not exist, None is returned.
+        :param parents: Topdown ordered list of subgroup parents
+        :param realm: Realm in which the group resides; default 'master'
+        """
+        if childs_to_resolve is None:
+            # start recursion by reversing parents (in optimal cases
+            # we dont need to walk the whole tree upwarts)
+            parents = list(reversed(parents))
+            childs_to_resolve = []
+
+        if not parents:
+            # walk complete parents list to the top, all names, no id's,
+            # try to resolve it assuming list is complete and 1st
+            # element is a toplvl group
+            return self.get_subgroup_by_chain(list(reversed(childs_to_resolve)), realm=realm)
+
+        cp = parents[0]
+
+        if cp.startswith("id:"):
+            # current parent is given as ID, we can stop walking
+            # upwards searching for an entry point
+            return self.get_subgroup_by_chain([cp] + list(reversed(childs_to_resolve)), realm=realm)
+        else:
+            # current parent is given as name, it must be resolved
+            # later, try next parent (recurse)
+            childs_to_resolve.append(cp)
+            return self.get_subgroup_direct_parent(parents[1:],
+                realm=realm, childs_to_resolve=childs_to_resolve
+            )
 
     def create_group(self, grouprep, realm="master"):
         """ Create a Keycloak group.
@@ -1287,6 +1379,34 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not create group %s in realm %s: %s"
                                       % (grouprep['name'], realm, str(e)))
+
+    def create_subgroup(self, parents, grouprep, realm="master"):
+        """ Create a Keycloak subgroup.
+
+        :param parents: list of one or more parent groups
+        :param grouprep: a GroupRepresentation of the group to be created. Must contain at minimum the field name.
+        :return: HTTPResponse object on success
+        """
+        parent_id = "---UNDETERMINED---"
+        try:
+            parent_id = self.get_subgroup_direct_parent(parents, realm)
+
+            if not parent_id:
+                raise Exception(
+                    "Could not determine subgroup parent ID for given"\
+                    " parent chain {}. Assure that all parents exist"\
+                    " already and the list is complete and properly"\
+                    " ordered, starts with an ID or starts at the"\
+                    " toplvl".format(parents)
+                )
+
+            parent_id = parent_id["id"]
+            url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent_id)
+            return open_url(url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(grouprep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create subgroup %s for parent group %s in realm %s: %s"
+                                      % (grouprep['name'], parent_id, realm, str(e)))
 
     def update_group(self, grouprep, realm="master"):
         """ Update an existing group.
