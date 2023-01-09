@@ -38,36 +38,30 @@ options:
       - Base URI of iLO.
     type: str
   username:
-    required: false
     description:
       - Username for authenticating to iLO.
     type: str
   password:
-    required: false
     description:
       - Password for authenticating to iLO.
     type: str
   auth_token:
-    required: false
     description:
       - Security token for authenticating to iLO.
     type: str
     version_added: 2.3.0
   timeout:
-    required: false
     description:
       - Timeout in seconds for URL requests to iLO.
       - The default value for this param is C(10) but that is being deprecated
         and it will be replaced with C(60) in community.general 8.0.0.
     type: int
   cert_file:
-    required: false
     description:
       - absolute path to the server cert file
     type: str
     version_added: 6.1.0
   key_file:
-    required: false
     description:
       - absolute path to the server key file
     type: str
