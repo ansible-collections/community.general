@@ -34,3 +34,24 @@
       ( _py_facts.valid is not defined) or
       ( 'coverage' not in _py_facts.valid)
   
+- name: Ensure sampleprojectpy2[test syntax is invalid
+  python_requirements_info:
+    dependencies: sampleprojectpy2[test
+  register: wrong_spec
+  ignore_errors: true
+
+- assert:
+    that:
+      - wrong_spec is failed
+      - "'Must be formatted like' in wrong_spec"
+
+- name: Ensure sampleprojectpy2test] syntax is invalid
+  python_requirements_info:
+    dependencies: sampleprojectpy2test]
+  register: wrong_spec
+  ignore_errors: true
+
+- assert:
+    that:
+      - wrong_spec is failed
+      - "'Must be formatted like' in wrong_spec"
