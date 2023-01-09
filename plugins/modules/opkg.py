@@ -149,11 +149,11 @@ class Opkg(StateModuleHelper):
         else:
             return splitted[0], splitted[1]
 
-    def _package_in_desired_state(self, name, desired_installed, version=None):
+    def _package_in_desired_state(self, name, want_installed, version=None):
         dummy, out, dummy = self.runner("state package").run(state="query", package=name)
 
         has_package = out.startswith(name + " - %s" % ("" if not version else (version + " ")))
-        return desired_installed == has_package
+        return want_installed == has_package
 
     def state_present(self):
         if self.vars.update_cache:
@@ -163,9 +163,9 @@ class Opkg(StateModuleHelper):
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 pkg_name, pkg_version = self.split_name_and_version(package)
-                if not self._package_in_desired_state(pkg_name, desired_installed=True, version=pkg_version) or self.vars.force == "reinstall":
+                if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version) or self.vars.force == "reinstall":
                     ctx.run(package=package)
-                    if not self._package_in_desired_state(pkg_name, desired_installed=True, version=pkg_version):
+                    if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version):
                         self.do_raise("failed to install %s" % package)
                     self.vars.install_c += 1
         if self.vars.install_c > 0:
@@ -181,9 +181,9 @@ class Opkg(StateModuleHelper):
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 package, dummy = self.split_name_and_version(package)
-                if not self._package_in_desired_state(package, desired_installed=False):
+                if not self._package_in_desired_state(package, want_installed=False):
                     ctx.run(package=package)
-                    if not self._package_in_desired_state(package, desired_installed=False):
+                    if not self._package_in_desired_state(package, want_installed=False):
                         self.do_raise("failed to remove %s" % package)
                     self.vars.remove_c += 1
         if self.vars.remove_c > 0:
