@@ -1,2 +1,2 @@
 bugfixes:
-- python_requirements_info - fix bug with parsing project[extra] syntax
+- python_requirements_info - fix bug with parsing ``project[extra]`` syntax (https://github.com/ansible-collections/community.general/pull/5802).
