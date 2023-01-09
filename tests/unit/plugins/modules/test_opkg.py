@@ -113,6 +113,43 @@ TEST_CASES = [
             ),
         ],
     ),
+    ModuleTestCase(
+        id="install_zlibdev_with_version",
+        input={"name": "zlib-dev=1.2.11-6", "state": "present"},
+        output={
+            "msg": "installed 1 package(s)"
+        },
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/opkg", "list-installed", "zlib-dev"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+            RunCmdCall(
+                command=["/testbin/opkg", "install", "zlib-dev=1.2.11-6"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out=(
+                    "Installing zlib-dev (1.2.11-6) to root..."
+                    "Downloading https://downloads.openwrt.org/releases/22.03.0/packages/mips_24kc/base/zlib-dev_1.2.11-6_mips_24kc.ipk"
+                    "Installing zlib (1.2.11-6) to root..."
+                    "Downloading https://downloads.openwrt.org/releases/22.03.0/packages/mips_24kc/base/zlib_1.2.11-6_mips_24kc.ipk"
+                    "Configuring zlib."
+                    "Configuring zlib-dev."
+                ),
+                err="",
+            ),
+            RunCmdCall(
+                command=["/testbin/opkg", "list-installed", "zlib-dev"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="zlib-dev - 1.2.11-6 \n",   # This output has the extra space at the end, to satisfy the behaviour of Yocto/OpenEmbedded's opkg
+                err="",
+            ),
+        ],
+    ),
 ]
 TEST_CASES_IDS = [item.id for item in TEST_CASES]
 
