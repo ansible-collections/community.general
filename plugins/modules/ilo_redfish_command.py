@@ -145,7 +145,7 @@ EXAMPLES = '''
   - name: Verify logical drives
     community.general.ilo_redfish_command:
       category: Systems
-      command: VerifyLogicalDrives
+      command: VerifySmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -235,7 +235,7 @@ except ImportError as e:
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["VerifyBiosAttributes", "VerifyLogicalDrives", "VerifyUefiBootOrder",
+    "Systems": ["VerifyBiosAttributes", "VerifySmartStorageLogicalDrives", "VerifyUefiBootOrder",
                 "VerifySpecifiedLogicalDrives", "CheckiLORebootStatus", "GetSpecifiedLogicalDrives"]
 }
 
@@ -323,7 +323,7 @@ def main():
                     result[command]['msg'] = "bios_attributes params is required"
                     module.fail_json(result)
                 result[command] = rf_utils.verify_bios_attributes(module.params["bios_attributes"])
-            elif command == "VerifyLogicalDrives":
+            elif command == "VerifySmartStorageLogicalDrives":
                 if not module.params.get("raid_details") and module.params.get("raid_details") != []:
                     result[command]['ret'] = False
                     result[command]['msg'] = "raid_details params is required"
