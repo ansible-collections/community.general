@@ -99,40 +99,6 @@ class iLORedfishUtils(RedfishUtils):
         result["ret"] = True
         return result
 
-    def get_service_bios_attributes(self):
-        # This method returns service BIOS attributes
-        response = self.get_request(self.root_uri + self.systems_uri)
-        if not response["ret"]:
-            return response
-
-        data = response["msg"]["data"]
-
-        if "Bios" not in data:
-            return {
-                "ret": False,
-                "msg": "Getting BIOS URI Failed, Key 'Bios' "
-                       "not found in %s response: %s"
-                       % (self.root_uri + self.service_root, str(data))
-            }
-
-        bios_uri = data["Bios"]["@odata.id"]
-
-        # Get service settings
-        service_uri = bios_uri + "service/settings/"
-        response = self.get_request(self.root_uri + service_uri)
-        # Check if service API doesn't support
-        if not response["ret"]:
-            service_uri = bios_uri + "oem/hpe/service/settings/"
-            response = self.get_request(self.root_uri + service_uri)
-
-            if not response["ret"]:
-                return response
-
-        return {
-            "ret": True,
-            "service_bios_attributes": response["data"]
-        }
-
     def get_network_boot_settings(self):
         # This method returns network boot settings present in the OOB controller
         result = {}
@@ -420,40 +386,6 @@ class iLORedfishUtils(RedfishUtils):
             "msg": alert_destinations
         }
 
-    def verify_service_bios_attributes(self, service_attributes):
-        # This method verifies service BIOS attributes against the provided input
-        server_service_bios = self.get_service_bios_attributes()
-
-        if not server_service_bios["ret"]:
-            return server_service_bios
-
-        service_dict = {}
-        wrong_param = {}
-        # Verify service attributes with service BIOS settings available in the server
-        for key, value in service_attributes.items():
-            if key in server_service_bios["service_bios_attributes"]["Attributes"]:
-                if str(server_service_bios["service_bios_attributes"]["Attributes"][key]).lower() != str(value).lower():
-                    service_dict.update({key: value})
-            else:
-                wrong_param.update({key: value})
-
-        if wrong_param:
-            return {
-                "ret": False,
-                "msg": "Wrong parameters are provided: %s" % wrong_param
-            }
-        if service_dict:
-            return {
-                "ret": False,
-                "msg": "Service BIOS parameters are not matching: %s" % service_dict
-            }
-
-        return {
-            "ret": True,
-            "changed": False,
-            "msg": "Service BIOS verification completed"
-        }
-
     def verify_bios_attributes(self, bios_attributes):
         # This method verifies BIOS attributes against the provided input
         server_bios = self.get_multi_bios_attributes()
@@ -677,44 +609,6 @@ class iLORedfishUtils(RedfishUtils):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified %s" % mgrattr['mgr_attr_name']}
 
-    def validate_input_attributes(self, service_bios, attributes):
-        # Make a copy of the attributes dict
-        attrs_to_patch = dict(attributes)
-        # List to hold attributes not found
-        attrs_bad = {}
-
-        # Check the attributes
-        for attr_name, attr_value in attributes.items():
-            # Check if attribute exists
-            if attr_name not in service_bios['Attributes']:
-                # Remove and proceed to next attribute if this isn't valid
-                attrs_bad.update({attr_name: attr_value})
-                del attrs_to_patch[attr_name]
-                continue
-
-            # If already set to requested value, remove it from PATCH payload
-            if service_bios['Attributes'][attr_name] == attributes[attr_name]:
-                del attrs_to_patch[attr_name]
-
-        if attrs_bad:
-            return {
-                "ret": False,
-                "changed": False,
-                "msg": "Incorrect attributes: %s" % attrs_bad
-            }
-        # Return success with changed=False if no attrs need to be changed
-        if not attrs_to_patch:
-            return {
-                "ret": True,
-                "changed": False,
-                "msg": "Service BIOS attributes already set"
-            }
-
-        return {
-            "ret": True,
-            "msg": "Set service attributes"
-        }
-
     def verify_drive_count(self, raid_details, logical_drives_count):
         if len(raid_details) != logical_drives_count:
             return {
@@ -725,59 +619,6 @@ class iLORedfishUtils(RedfishUtils):
         return {
             "ret": True,
             "msg": "Drive count is same as input"
-        }
-
-    def set_service_bios_attributes(self, service_attributes):
-        # This method applies provided service BIOS attributes in the OOB controller
-        response = self.get_request(self.root_uri + self.systems_uri)
-        if not response["ret"]:
-            return response
-
-        server_details = response["msg"]["data"]
-        uri = self.root_uri + self.systems_uri
-
-        if "Bios" not in server_details:
-            return "Getting BIOS URI Failed, Key 'Bios' not found in %s response: %s" % (uri, server_details)
-
-        # GET service BIOS URI and service BIOS attributes in the server
-        server_service_bios = self.get_service_bios_attributes()
-
-        if not server_service_bios["ret"]:
-            return server_service_bios
-
-        service_uri = server_service_bios["service_bios_attributes"]["@odata.id"]
-        server_service_bios = server_service_bios["service_bios_attributes"]
-
-        # validate input attributes
-        response = self.validate_input_attributes(server_service_bios, service_attributes)
-        if not response["ret"]:
-            return response
-
-        if "Incorrect" in response["msg"]:
-            return {
-                "ret": False,
-                "changed": False,
-                "msg": response["msg"]
-            }
-
-        if "already" in response["msg"]:
-            return {
-                "ret": True,
-                "changed": False,
-                "msg": response["msg"]
-            }
-
-        payload = {"Attributes": service_attributes}
-
-        # PATCH service settings
-        response = self.patch_request(self.root_uri + service_uri, payload)
-        if not response["ret"]:
-            return response
-
-        return {
-            "ret": True,
-            "changed": True,
-            "msg": "Service BIOS settings applied. System Reset required."
         }
 
     def verify_logical_drives(self, raid_details, check_length=False):
