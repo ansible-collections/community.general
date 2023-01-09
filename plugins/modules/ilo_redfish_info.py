@@ -148,7 +148,7 @@ EXAMPLES = '''
 
 RETURN = '''
 ilo_redfish_info:
-    description: Returns the retrived information from the iLO.
+    description: Returns the retrieved information from the iLO.
     type: dict
     contains:
         command:
