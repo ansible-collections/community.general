@@ -225,7 +225,7 @@ def main():
     if module.params['timeout'] is None:
         timeout = 10
         module.deprecate(
-            'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
+            'The default value {0} for parameter "timeout" is being deprecated and it will be replaced by {1}'.format(
                 10, 60
             ),
             version='8.0.0',
