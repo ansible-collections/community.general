@@ -86,7 +86,7 @@ EXAMPLES = '''
   - name: Get physical drive details
     community.general.ilo_redfish_info:
       category: Systems
-      command: GetPhysicalDrives
+      command: GetSmartStoragePhysicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -94,7 +94,7 @@ EXAMPLES = '''
   - name: Get logical drive details
     community.general.ilo_redfish_info:
       category: Systems
-      command: GetLogicalDrives
+      command: GetSmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -151,8 +151,8 @@ ilo_redfish_info:
 '''
 
 CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
-                         "Systems": ["GetBootSettings", "GetPhysicalDrives",
-                                     "GetLogicalDrives", "GetLogicalDrivesWithArrayControllers",
+                         "Systems": ["GetBootSettings", "GetSmartStoragePhysicalDrives",
+                                     "GetSmartStorageLogicalDrives", "GetLogicalDrivesWithArrayControllers",
                                      "GetServerPostState", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"],
                          "Managers": ["GetSNMPv3Users", "GetSNMPAlertDestinations", "GetiLOBackupFiles"]}
 
@@ -264,9 +264,9 @@ def main():
             for command in command_list:
                 if command == "GetBootSettings":
                     result[command] = rf_utils.get_network_boot_settings()
-                elif command == "GetPhysicalDrives":
+                elif command == "GetSmartStoragePhysicalDrives":
                     result[command] = rf_utils.get_smartstorage_physical_drives()
-                elif command == "GetLogicalDrives":
+                elif command == "GetSmartStorageLogicalDrives":
                     result[command] = rf_utils.get_smartstorage_logical_drives()
                 elif command == "GetLogicalDrivesWithArrayControllers":
                     result[command] = rf_utils.get_smartstorage_logical_drives(True)
