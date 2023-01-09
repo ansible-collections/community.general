@@ -1,0 +1,2 @@
+bugfixes:
+- xml - fixed a bug where empty ``children`` list would not be set
