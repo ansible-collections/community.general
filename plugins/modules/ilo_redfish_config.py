@@ -42,39 +42,32 @@ options:
       - Base URI of iLO.
     type: str
   username:
-    required: false
     description:
       - Username for authenticating to iLO.
     type: str
   password:
-    required: false
     description:
       - Password for authenticating to iLO.
     type: str
   auth_token:
-    required: false
     description:
       - Security token for authenticating to iLO.
     type: str
   timeout:
-    required: false
     description:
       - Timeout in seconds for URL requests to iLO controller.
       - The default value for this param is C(10) but that is being deprecated
         and it will be replaced with C(60) in community.general 8.0.0.
     type: int
   attribute_name:
-    required: false
     description:
       - Name of the attribute to be configured.
     type: str
   attribute_value:
-    required: false
     description:
       - Value of the attribute to be configured.
     type: str
   raid_details:
-    required: false
     description:
       - List of RAID details that need to be configured in the given server.
     type: list
@@ -82,68 +75,63 @@ options:
     version_added: 6.1.0
     suboptions:
       LogicalDriveName:
-        required: false
+        required: true
         description:
           - Logical drive name that needs to be configured in the given server
         type: str
       Raid:
-        required: false
+        required: true
         description:
           - Type of RAID
         type: str
       DataDrives:
-        required: false
+        required: true
         description:
           - Specifies the data drive details like media type, interface type, disk count and size
         type: dict
       DataDriveCount:
-        required: false
+        required: true
         description:
           - Number of physical drives that is required to create specified RAID
         type: int
       DataDriveMediaType:
-        required: false
+        required: true
         description:
           - Media type of the disk
         type: str
       DataDriveInterfaceType:
-        required: false
+        required: true
         description:
           - Interface type of the disk
         type: str
       DataDriveMinimumSizeGiB:
-        required: false
+        required: true
         description:
           - Minimum size required in the physical drive
         type: int
   logical_drives_names:
-    required: false
     description:
       - logical drives names which are to be deleted
     type: list
     elements: str
     version_added: 6.1.0
   snmpv3_usernames:
-    required: false
     description:
       - List of SNMPv3 user names that need to be deleted from the given server
     type: list
     elements: str
     version_added: 6.1.0
   cert_file:
-    required: false
     description:
       - absolute path to the server cert file
     type: str
     version_added: 6.1.0
   key_file:
-    required: false
     description:
       - absolute path to the server key file
     type: str
     version_added: 6.1.0
   snmpv3_users:
-    required: false
     description:
       - List of SNMPv3 users that needs to be added in the given server
     type: list
@@ -151,45 +139,44 @@ options:
     version_added: 6.1.0
     suboptions:
       security_name:
-        required: false
+        required: true
         description:
           - SNMPv3 security name associated with SNMPv3trap or SNMPv3Inform set on SNMPAlertProtocol
           - Alphanumeric value with 1-32 characters
         type: str
       auth_protocol:
-        required: false
+        required: true
         description:
           - Sets the message digest algorithm to use for encoding the authorization passphrase
           - The message digest is calculated over an appropriate portion of an SNMP message and is included as part of the message sent to the recipient
           - Supported Auth protocols are MD5, SHA, and SHA256
         type: str
       auth_passphrase:
-        required: false
+        required: true
         description:
           - Sets the passphrase to use for sign operations
           - String with 8-49 characters
         type: str
       privacy_protocol:
-        required: false
+        required: true
         description:
           - Sets the encryption algorithm to use for encoding the privacy passphrase
           - A portion of an SNMP message is encrypted before transmission
           - Supported privacy protocols are AES and DES
         type: str
       privacy_passphrase:
-        required: false
+        required: true
         description:
           - Sets the passphrase to use for encrypt operations
           - String with 8-49 characters
         type: str
       user_engine_id:
-        required: false
+        required: true
         description:
           - The SNMPv3 Engine ID is the unique identifier of an SNMP engine that belongs to an SNMP agent entity
           - This value must be a hexadecimal string with an even number of 10 to 64 characters, excluding first two characters, 0x (example 0x01020304abcdef)
         type: str
   alert_destinations:
-    required: false
     description:
       - List of alert destination that needs to be added in the given server
     type: list
@@ -197,18 +184,18 @@ options:
     version_added: 6.1.0
     suboptions:
       alert_destination:
-        required: false
+        required: true
         description:
           - IP address/hostname/FQDN of remote management system that receives SNMP alerts
         type: str
       snmp_alert_protocol:
-        required: false
+        required: true
         description:
           - SNMP protocol associated with the AlertDestination
           - The supported SNMP alert protocols are SNMPv1Trap, SNMPv3Trap, and SNMPv3Inform
         type: str
       trap_community:
-        required: false
+        required: true
         description:
           - Configuring trap community string
           - This option is supported for SNMPv1Trap, SNMPv3Trap, and SNMPv3Inform alert protocols
