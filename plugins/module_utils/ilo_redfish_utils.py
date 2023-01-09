@@ -95,7 +95,7 @@ class iLORedfishUtils(RedfishUtils):
 
         while len(ntp_list) < 2:
             ntp_list.append("0.0.0.0")
-        
+
         payload = {setkey: ntp_list}
 
         response1 = self.patch_request(self.root_uri + datetime_uri, payload)
