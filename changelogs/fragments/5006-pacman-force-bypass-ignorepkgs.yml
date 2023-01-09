@@ -1,0 +1,2 @@
+minor_changes:
+  - pacman plugin - added bypass for IgnorePkg pacman option with ``force`` flag
