@@ -183,6 +183,8 @@ def main():
         if op is not None and op not in operations:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
         try:
+            if extras:
+                pkg = "{0}[{1}]".format(pkg, extras)
             existing = pkg_resources.get_distribution(pkg).version
         except pkg_resources.DistributionNotFound:
             # not there
