@@ -196,6 +196,11 @@ options:
       - Name of Datastore to use to create a new instace
     version_added: '0.2.0'
     type: str
+  updateconf:
+    description:
+      - When C(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
+      - Allows for complete modifications of the C(CONTEXT) attribute (see https://docs.opennebula.io/6.6/integration_and_development/system_interfaces/api.html#one-vm-updateconf).
+    type: dict
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"
@@ -403,6 +408,22 @@ EXAMPLES = '''
     disk_saveas:
       name: bar-image
       disk_id: 1
+
+- name: "Add a custom 'start script' to a running VM"
+  community.general.one_vm:
+    instance_ids: 351
+    updateconf:
+      CONTEXT:
+        START_SCRIPT: ip r r 169.254.16.86/32 dev eth0
+
+- name: "Update SSH public keys inside the VM's context"
+  community.general.one_vm:
+    instance_ids: 351
+    updateconf:
+      CONTEXT:
+        SSH_PUBLIC_KEY: |-
+          ssh-rsa ...
+          ssh-ed25519 ...
 '''
 
 RETURN = '''
@@ -510,6 +531,16 @@ instances:
                         "TE_GALAXY": "bar",
                         "USER_INPUTS": null
                     }
+        updateconf:
+            description: A dictionary of key/values attributes that are set with the updateconf API call
+            type: dict
+            sample: {
+                        "OS": { "ARCH": "x86_64" },
+                        "CONTEXT": {
+                            "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
+                            "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
+                        }
+                    }
 tagged_instances:
     description:
         - A list of instances info based on a specific attributes and/or
@@ -615,6 +646,16 @@ tagged_instances:
                         "TE_GALAXY": "bar",
                         "USER_INPUTS": null
                     }
+        updateconf:
+            description: A dictionary of key/values attributes that are set with the updateconf API call
+            type: dict
+            sample: {
+                        "OS": { "ARCH": "x86_64" },
+                        "CONTEXT": {
+                            "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
+                            "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
+                        }
+                    }
 '''
 
 try:
@@ -623,8 +664,45 @@ try:
 except ImportError:
     HAS_PYONE = False
 
+from ansible_collections.community.general.plugins.module_utils.opennebula import render
 from ansible.module_utils.basic import AnsibleModule
 import os
+
+
+UPDATECONF_ATTRIBUTES = {
+    "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID"],
+    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT"],
+    "INPUT": ["TYPE", "BUS"],
+    "GRAPHICS": ["TYPE", "LISTEN", "PASSWD", "KEYMAP"],
+    "RAW": ["DATA", "DATA_VMX", "TYPE"],
+    "CONTEXT": [],
+}
+
+
+def check_updateconf(module, to_check):
+    '''Checks if attributes are compatible with one.vm.updateconf API call.'''
+    for attr, subattributes in to_check.items():
+        if attr not in UPDATECONF_ATTRIBUTES:
+            module.fail_json(msg="'{}' is not a valid VM attribute.".format(attr))
+        if not UPDATECONF_ATTRIBUTES[attr]:
+            continue
+        for subattr in subattributes:
+            if subattr not in UPDATECONF_ATTRIBUTES[attr]:
+                module.fail_json(msg="'{}' is not a valid VM subattribute of '{}'".format(subattr, attr))
+
+
+def parse_updateconf(vm_template):
+    '''Extracts 'updateconf' attributes from a VM template.'''
+    updateconf = {
+        attr: {
+            subattr: value
+            for subattr, value in subattributes.items()
+            if not UPDATECONF_ATTRIBUTES[attr] or subattr in UPDATECONF_ATTRIBUTES[attr]
+        }
+        for attr, subattributes in vm_template.items()
+        if attr in UPDATECONF_ATTRIBUTES
+    }
+    return updateconf
 
 
 def get_template(module, client, predicate):
@@ -767,6 +845,8 @@ def get_vm_info(client, vm):
 
     vm_labels, vm_attributes = get_vm_labels_and_attributes_dict(client, vm.ID)
 
+    updateconf = parse_updateconf(vm.TEMPLATE)
+
     info = {
         'template_id': int(vm.TEMPLATE['TEMPLATE_ID']),
         'vm_id': vm.ID,
@@ -785,7 +865,8 @@ def get_vm_info(client, vm):
         'uptime_h': int(vm_uptime),
         'attributes': vm_attributes,
         'mode': permissions_str,
-        'labels': vm_labels
+        'labels': vm_labels,
+        'updateconf': updateconf
     }
 
     return info
@@ -841,6 +922,28 @@ def set_vm_ownership(module, client, vms, owner_id, group_id):
             except pyone.OneAuthorizationException:
                 module.fail_json(msg="Ownership changing is unsuccessful, but instances are present if you deployed them.")
 
+    return changed
+
+
+def update_vm(module, client, vm, updateconf_dict):
+    changed = False
+    if not updateconf_dict:
+        return changed
+
+    before = client.vm.info(vm.ID).TEMPLATE
+
+    client.vm.updateconf(vm.ID, render(updateconf_dict), 1)  # 1: Merge new template with the existing one.
+
+    after = client.vm.info(vm.ID).TEMPLATE
+
+    changed = before != after
+    return changed
+
+
+def update_vms(module, client, vms, *args):
+    changed = False
+    for vm in vms:
+        changed = update_vm(module, client, vm, *args) or changed
     return changed
 
 
@@ -1398,7 +1501,8 @@ def main():
         "labels": {"default": [], "type": "list", "elements": "str"},
         "count_labels": {"required": False, "type": "list", "elements": "str"},
         "disk_saveas": {"type": "dict"},
-        "persistent": {"default": False, "type": "bool"}
+        "persistent": {"default": False, "type": "bool"},
+        "updateconf": {"required": False, "type": "dict"},
     }
 
     module = AnsibleModule(argument_spec=fields,
@@ -1452,6 +1556,7 @@ def main():
     count_labels = params.get('count_labels')
     disk_saveas = params.get('disk_saveas')
     persistent = params.get('persistent')
+    updateconf = params.get('updateconf')
 
     if not (auth.username and auth.password):
         module.warn("Credentials missing")
@@ -1469,6 +1574,9 @@ def main():
             module.warn('When you pass `count_attributes` without `attributes` option when deploying, `attributes` option will have same values implicitly.')
             attributes = copy.copy(count_attributes)
         check_attributes(module, count_attributes)
+
+    if updateconf:
+        check_updateconf(module, updateconf)
 
     if count_labels and not labels:
         module.warn('When you pass `count_labels` without `labels` option when deploying, `labels` option will have same values implicitly.')
@@ -1586,6 +1694,9 @@ def main():
 
     if owner_id is not None or group_id is not None:
         changed = set_vm_ownership(module, one_client, vms, owner_id, group_id) or changed
+
+    if template_id is None and instance_ids is not None and updateconf is not None:
+        changed = update_vms(module, one_client, vms, updateconf) or changed
 
     if wait and not module.check_mode and state != 'present':
         wait_for = {
