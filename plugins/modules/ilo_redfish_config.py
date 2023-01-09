@@ -213,12 +213,6 @@ options:
           - Configuring trap community string
           - This option is supported for SNMPv1Trap, SNMPv3Trap, and SNMPv3Inform alert protocols
         type: str
-  service_attributes:
-    required: false
-    description:
-      - BIOS service attributes that needs to be configured in the given server
-    type: dict
-    version_added: 6.1.0
 author:
   - Bhavya B (@bhavya06)
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
@@ -381,17 +375,6 @@ EXAMPLES = '''
           alert_destination: "************"
           security_name: "Sec1"
 
-  - name: Configure service BIOS attributes
-    community.general.ilo_redfish_config:
-      category: Systems
-      command: SetServiceBiosAttributes
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-      service_attributes:
-        ConnectSequenceTrace: "Disabled"
-        CustomDebugBlkIo: "Disabled"
-
 '''
 
 RETURN = '''
@@ -427,7 +410,6 @@ CATEGORY_COMMANDS_ALL = {
         "CreateSNMPAlertDestinations",
     ],
     "Systems": [
-        "SetServiceBiosAttributes",
         "DeleteAllLogicalDrives",
         "DeleteSpecifiedLogicalDrives",
         "CreateLogicalDrives",
@@ -464,7 +446,6 @@ def main():
             attribute_name=dict(),
             attribute_value=dict(),
             timeout=dict(type='int'),
-            service_attributes=dict(type='dict'),
             raid_details=dict(type='list', elements='dict'),
             logical_drives_names=dict(type='list', elements='str'),
             cert_file=dict(type='str'),
@@ -500,7 +481,7 @@ def main():
     if module.params['timeout'] is None:
         timeout = 10
         module.deprecate(
-            'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
+            'The default value {0} for parameter "timeout" is being deprecated and it will be replaced by {1}'.format(
                 10, 60
             ),
             version='8.0.0',
@@ -591,7 +572,6 @@ def main():
 
     elif category == "Systems":
         dispatch = dict(
-            SetServiceBiosAttributes=rf_utils.set_service_bios_attributes,
             DeleteAllLogicalDrives=rf_utils.delete_all_logical_drives,
             DeleteSpecifiedLogicalDrives=rf_utils.delete_specified_logical_drives,
             CreateLogicalDrives=rf_utils.create_logical_drives,
@@ -601,9 +581,7 @@ def main():
         )
 
         for command in command_list:
-            if command == "SetServiceBiosAttributes":
-                result[command] = dispatch[command](module.params["service_attributes"])
-            elif command == "DeleteAllLogicalDrives":
+            if command == "DeleteAllLogicalDrives":
                 result[command] = dispatch[command]()
             elif command == "DeleteSpecifiedLogicalDrives":
                 result[command] = dispatch[command](module.params["logical_drives_names"])
