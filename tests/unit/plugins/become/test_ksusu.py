@@ -31,16 +31,20 @@ def _test_ksu_task(mocker, parser, task, shell='/bin/bash', cmd='/bin/foo'):
     task['become_method'] = 'community.general.ksusu'  # Force the become method.
 
     # We are appending here instead of formatting so the parts are easily understood.
-    regex = ''
-    regex += become_exe_ksu
-    regex += '\\s+' + become_user_ksu
-    regex += '\\s+' + become_flags_ksu
-    regex += '\\s+-e\\s+' + become_exe_su
-    regex += '\\s+-l\\s+' + become_flags
-    regex += '\\s+' + become_user
-    regex += '\\s+' + shell
-    regex += "\\s+-c\\s+'echo\\s+BECOME-SUCCESS-.+?\\s*;\\s*" + cmd
-    regex += "\\s*'"
+    regex = (
+        r"{exe_ksu}\s+{user_ksu}\s+{flags_ksu}\s+"
+        r"-e\s+{exe_su}\s+-l\s+{flags}\s+{user}\s+{shell}"
+        r"\s+-c\s+'echo\s+BECOME-SUCCESS-.+?\s*;\s*{cmd}\s*".format(
+            exe_ksu=become_exe_ksu,
+            user_ksu=become_user_ksu,
+            flags_ksu=become_flags_ksu,
+            exe_su=become_exe_su,
+            flags=become_flags,
+            user=become_user,
+            shell=shell,
+            cmd=cmd,
+        )
+    )
     print('regex: %s' % regex)
 
     var_options = {}
