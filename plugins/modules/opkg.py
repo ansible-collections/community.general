@@ -15,9 +15,9 @@ DOCUMENTATION = '''
 ---
 module: opkg
 author: "Patrick Pelletier (@skinp)"
-short_description: Package manager for OpenWrt
+short_description: Package manager for OpenWrt and Openembedded/Yocto based Linux distributions
 description:
-    - Manages OpenWrt packages
+    - Manages ipk packages for OpenWrt and Openembedded/Yocto based Linux distributions
 options:
     name:
         description:
