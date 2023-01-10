@@ -155,7 +155,7 @@ class BecomeModule(BecomeBase):
     def check_password_prompt(self, b_output):
         ''' checks if the expected password prompt exists in b_output '''
 
-        prompts = self.get_option('prompt_l10n') or ["Kerberos password for .*@.*:"]
+        prompts = self.get_option('prompt_l10n')
         b_prompt = b"|".join(to_bytes(p) for p in prompts)
 
         return bool(re.match(b_prompt, b_output))
@@ -171,12 +171,12 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        exe_ksu = self.get_option('become_exe_ksu') or 'ksu'
-        exe_su = self.get_option('become_exe_su') or '/bin/su'  # Must be absolute
-
-        flags_ksu = self.get_option('become_flags_ksu') or '-Z -q'
-        flags_su = self.get_option('become_flags') or ''
-        user_ksu = self.get_option('become_user_ksu') or 'root'
-        user_su = self.get_option('become_user') or 'root'
+	# defaults come from above via configuration manager
+        exe_ksu = self.get_option('become_exe_ksu')
+        exe_su = self.get_option('become_exe_su')
+        flags_ksu = self.get_option('become_flags_ksu')
+        flags_su = self.get_option('become_flags')
+        user_ksu = self.get_option('become_user_ksu')
+        user_su = self.get_option('become_user')
 
         return '%s %s %s -e %s -l %s %s %s ' % (exe_ksu, user_ksu, flags_ksu, exe_su, flags_su, user_su, self._build_success_command(cmd, shell))
