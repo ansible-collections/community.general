@@ -36,6 +36,10 @@ options:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
         existing entry, use M(community.general.ldap_attrs) module instead.
+        Each attribute value can be a string for single-valued attributes or
+        a list of strings for multi-valued attributes.
+        If you need to pass a list of list of strings like ACLs strings,
+        use the complex YAML syntax instead as indicated in the examples.
     type: dict
     default: {}
   objectClass:
@@ -79,6 +83,29 @@ EXAMPLES = """
     attributes:
       description: An LDAP administrator
       userPassword: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
+
+- name: Set possible values for attributes elements
+  community.general.ldap_entry:
+    dn: cn=admin,dc=example,dc=com
+    objectClass:
+      - simpleSecurityObject
+      - organizationalRole
+    attributes:
+      description: An LDAP Administrator
+      roleOccupant:
+      - cn=Chocs Puddington,ou=Information Technology,dc=example,dc=com
+      - cn=Alice Stronginthebrain,ou=Information Technology,dc=example,dc=com
+      olcAccess:
+      - >-
+        {0}to attrs=userPassword,shadowLastChange
+        by self write
+        by anonymous auth
+        by dn="cn=admin,dc=example,dc=com" write
+        by * none'
+      - >-
+        {1}to dn.base="dc=example,dc=com"
+        by dn="cn=admin,dc=example,dc=com" write
+        by * read
 
 - name: Get rid of an old entry
   community.general.ldap_entry:
