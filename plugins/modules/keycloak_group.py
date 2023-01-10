@@ -75,10 +75,13 @@ options:
         description:
             - List of parent groups for the group to handle sorted top to bottom.
             - Set this to create a group as a subgroup of another group or groups (parents).
-            - Each element can describe a parent either by name or ID, both is
-              fine but using names needs some more internal API calls (to map
-              to ID's internally). On default given strings are interpreted as
-              names, to mark them as ID's prefix them with C(id:)
+        elements:
+            type: str
+            description:
+                - Each element can describe a parent either by name or ID, both is
+                  fine but using names needs some more internal API calls (to map
+                  to ID's internally). On default given strings are interpreted as
+                  names, to mark them as ID's prefix them with C(id:).
 
 notes:
     - Presently, the I(realmRoles), I(clientRoles) and I(access) attributes returned by the Keycloak API
@@ -90,7 +93,6 @@ extends_documentation_fragment:
 
 author:
     - Adam Goossens (@adamgoossens)
-    - Mirko Wilhelmi (@morco)
 '''
 
 EXAMPLES = '''

@@ -1362,7 +1362,8 @@ class KeycloakAPI(object):
             # current parent is given as name, it must be resolved
             # later, try next parent (recurse)
             childs_to_resolve.append(cp)
-            return self.get_subgroup_direct_parent(parents[1:],
+            return self.get_subgroup_direct_parent(
+                parents[1:],
                 realm=realm, childs_to_resolve=childs_to_resolve
             )
 
@@ -1393,10 +1394,10 @@ class KeycloakAPI(object):
 
             if not parent_id:
                 raise Exception(
-                    "Could not determine subgroup parent ID for given"\
-                    " parent chain {}. Assure that all parents exist"\
-                    " already and the list is complete and properly"\
-                    " ordered, starts with an ID or starts at the"\
+                    "Could not determine subgroup parent ID for given"
+                    " parent chain {0}. Assure that all parents exist"
+                    " already and the list is complete and properly"
+                    " ordered, starts with an ID or starts at the"
                     " toplvl".format(parents)
                 )
 
