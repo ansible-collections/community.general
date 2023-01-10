@@ -23,8 +23,9 @@ options:
         description:
             - Name of package(s) to install/remove.
             - C(NAME=VERSION) syntax is also supported to install a package
-              in a certain version. See the examples. This is supported since
-              community.general 6.2.0.
+              in a certain version. See the examples. This only works on Yocto based
+              Linux distributions (opkg>=0.3.2) and not for OpenWrt. This is
+              supported since community.general 6.2.0.
         aliases: [pkg]
         required: true
         type: list
@@ -67,7 +68,7 @@ EXAMPLES = '''
     name: foo
     state: present
 
-- name: Install foo in version 1.2
+- name: Install foo in version 1.2 (opkg>=0.3.2 on Yocto based Linux distributions)
   community.general.opkg:
     name: foo=1.2
     state: present
