@@ -30,9 +30,9 @@
     dependencies: coverage
   register: _py_facts
   failed_when: | 
-      ( _py_facts.msg is defined) and ( _py_facts.msg | regex_search("Failed to parse")) or
-      ( _py_facts.valid is not defined) or
-      ( 'coverage' not in _py_facts.valid)
+      (_py_facts.msg is defined) and (_py_facts.msg | regex_search("Failed to parse")) or
+      (_py_facts.valid is not defined) or
+      ('coverage' not in _py_facts.valid)
   
 - name: Ensure sampleprojectpy2[test syntax is invalid
   python_requirements_info:
