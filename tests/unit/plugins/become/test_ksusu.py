@@ -23,7 +23,7 @@ def _test_ksu_task(mocker, parser, task, shell='/bin/bash', cmd='/bin/foo'):
     become_user = task.get('become_user', 'root')
     become_exe_ksu = task.get('become_exe_ksu', 'ksu')
     become_exe_su = task.get('become_exe_su', '/bin/su')
-    become_flags_ksu = task.get('become_flags_ksu', '-Z\\s+-q')
+    become_flags_ksu = task.get('become_flags_ksu', r'-Z\s+-q')
     become_flags = task.get('become_flags', '')
     become_pass = task.get('become_pass', None)
     prompt_l10n = task.get('prompt_l10n', [])
