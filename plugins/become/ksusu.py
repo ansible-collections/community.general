@@ -129,7 +129,6 @@ DOCUMENTATION = """
             description:
                 - List of localized strings to match for prompt detection.
             default: ['Kerberos password for .*@.*:']
-            default: ['Kerberos password for .*@.*:']
             ini:
               - section: ksusu_become_plugin
                 key: localized_prompts
