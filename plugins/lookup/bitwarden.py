@@ -136,7 +136,7 @@ class LookupModule(LookupBase):
         field = self.get_option('field')
         search_field = self.get_option('search')
         if not _bitwarden.logged_in:
-            raise AnsibleError("Not logged into Bitwarden. Run 'bw login'.")
+            raise AnsibleError("Bitwarden Vault not unlocked. Run 'bw unlock'.")
 
         return [_bitwarden.get_field(field, term, search_field) for term in terms]
 
