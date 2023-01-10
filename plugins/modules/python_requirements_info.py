@@ -23,7 +23,7 @@ options:
     description: >
       A list of version-likes or module names to check for installation.
       Supported operators: <, >, <=, >=, or ==. The bare module name like
-      I(ansible), the module with a specific version like I(boto3==1.6.1), a
+      C(ansible), the module with a specific version like C(boto3==1.6.1), a
       partial version like C(requests>2), or a module with extra like C(requests[security]==2.0.0)
       are all valid specifications.
     default: []
