@@ -1483,7 +1483,7 @@ def main():
         "count_labels": {"required": False, "type": "list", "elements": "str"},
         "disk_saveas": {"type": "dict"},
         "persistent": {"default": False, "type": "bool"},
-        "updateconf": {"required": False, "type": "dict"},
+        "updateconf": {"type": "dict"},
     }
 
     module = AnsibleModule(argument_spec=fields,

@@ -7,8 +7,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import os
-import pytest
 import textwrap
+
+import pytest
 
 from ansible_collections.community.general.plugins.module_utils.opennebula import extend, flatten, render
 
