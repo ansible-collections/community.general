@@ -27,22 +27,6 @@ except ImportError:
 
 
 # A helper function to mitigate https://github.com/OpenNebula/one/issues/6064.
-# Used for template merging in the JSON-like template representation.
-def extend(to_extend, extend_by):
-    """Extends dictionary in-place (by merging), then returns it."""
-    def recurse(to_extend, extend_by):
-        for key, value in extend_by.items():
-            if key in to_extend:
-                if isinstance(to_extend[key], dict) and isinstance(value, dict):
-                    recurse(to_extend[key], value)
-                    continue
-            to_extend[key] = value
-    if extend_by:
-        recurse(to_extend, extend_by)
-    return to_extend
-
-
-# A helper function to mitigate https://github.com/OpenNebula/one/issues/6064.
 # It allows for easily handling lists like "NIC" or "DISK" in the JSON-like template representation.
 # There are either lists of dictionaries (length > 1) or just dictionaries.
 def flatten(to_flatten, extract=False):

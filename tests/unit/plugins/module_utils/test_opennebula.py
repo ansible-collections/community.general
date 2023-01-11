@@ -11,31 +11,8 @@ import textwrap
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import extend, flatten, render
+from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
-
-EXTEND_VALID = [
-    (
-        {"a": 1},
-        {"b": 2},
-        {"a": 1, "b": 2}
-    ),
-    (
-        {"a": 1, "b": 2},
-        {"b": 3},
-        {"a": 1, "b": 3}
-    ),
-    (
-        {"a": 1, "b": {"c": 2}},
-        {"b": {"c": 3}},
-        {"a": 1, "b": {"c": 3}}
-    ),
-    (
-        {"a": 1, "b": [2, 3]},
-        {"b": [4, 5]},
-        {"a": 1, "b": [4, 5]}
-    ),
-]
 
 FLATTEN_VALID = [
     (
@@ -100,12 +77,6 @@ RENDER_VALID = [
         ''').strip()
     ),
 ]
-
-
-@pytest.mark.parametrize('to_extend,extend_by,expected_result', EXTEND_VALID)
-def test_extend(to_extend, extend_by, expected_result):
-    result = extend(to_extend, extend_by)
-    assert result == expected_result, repr(result)
 
 
 @pytest.mark.parametrize('to_flatten,extract,expected_result', FLATTEN_VALID)

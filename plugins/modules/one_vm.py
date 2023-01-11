@@ -673,9 +673,13 @@ try:
 except ImportError:
     HAS_PYONE = False
 
-from ansible_collections.community.general.plugins.module_utils.opennebula import extend, flatten, render
-from ansible.module_utils.basic import AnsibleModule
+
 import os
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.dict_transformations import dict_merge
+
+from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
 
 
 UPDATECONF_ATTRIBUTES = {
@@ -989,31 +993,29 @@ def create_vm(module, client, template_id, attributes_dict, labels_list, disk_si
 
     template = client.template.info(template_id).TEMPLATE
 
-    disk_count = len(flatten(template['DISK']))
+    disk_count = len(flatten(template.get('DISK', [])))
     if disk_size:
         size_count = len(flatten(disk_size))
         # check if the number of disks is correct
         if disk_count != size_count:
             module.fail_json(msg='This template has ' + str(disk_count) + ' disks but you defined ' + str(size_count))
 
-    vm_extra_template = {}
-    extend(vm_extra_template, template)
-    extend(vm_extra_template, attributes_dict)
-    extend(vm_extra_template, {
+    vm_extra_template = dict_merge(template or {}, attributes_dict or {})
+    vm_extra_template = dict_merge(vm_extra_template, {
         'LABELS': ','.join(labels_list),
         'NIC': flatten(network_attrs_list, extract=True),
         'DISK': flatten([
-            disk if not size else extend(disk, {
+            disk if not size else dict_merge(disk, {
                 'SIZE': str(int(get_size_in_MB(module, size))),
             })
             for disk, size in zip(
-                flatten(template['DISK']),
+                flatten(template.get('DISK', [])),
                 flatten(disk_size or [None] * disk_count),
             )
             if disk is not None
         ], extract=True)
     })
-    extend(vm_extra_template, updateconf_dict)
+    vm_extra_template = dict_merge(vm_extra_template, updateconf_dict or {})
 
     try:
         vm_id = client.template.instantiate(template_id,
