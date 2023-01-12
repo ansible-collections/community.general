@@ -19,7 +19,7 @@ short_description: Scaleway database backups management module
 version_added: 1.2.0
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
-    - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
+    - "This module manages database backups on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
     - community.general.scaleway
 options:
@@ -58,7 +58,7 @@ options:
     description:
         - Name used to identify the database backup.
         - Required for C(present) state.
-        - Ignored when C(state=absent), C(state=exported) or C(state=restored).
+        - Ignored when I(state=absent), I(state=exported) or I(state=restored).
     type: str
     required: false
 
@@ -66,7 +66,7 @@ options:
     description:
         - Name used to identify the database.
         - Required for C(present) and C(restored) states.
-        - Ignored when C(state=absent) or C(state=exported).
+        - Ignored when I(state=absent) or I(state=exported).
     type: str
     required: false
 
@@ -74,14 +74,14 @@ options:
     description:
         - UUID of the instance associated to the database backup.
         - Required for C(present) and C(restored) states.
-        - Ignored when C(state=absent) or C(state=exported).
+        - Ignored when I(state=absent) or I(state=exported).
     type: str
     required: false
 
   expires_at:
     description:
         - Expiration datetime of the database backup (ISO 8601 format).
-        - Ignored when C(state=absent), C(state=exported) or C(state=restored).
+        - Ignored when I(state=absent), I(state=exported) or I(state=restored).
     type: str
     required: false
 
@@ -139,7 +139,7 @@ EXAMPLES = '''
 RETURN = '''
 metadata:
     description: Backup metadata.
-    returned: when C(state=present), C(state=exported) or C(state=restored)
+    returned: when I(state=present), I(state=exported) or I(state=restored)
     type: dict
     sample: {
         "metadata": {
