@@ -175,7 +175,10 @@ options:
         type: path
     verify:
         description:
-          - In the case where the certificate is self-signed (LXD's default), you may opt to disable the TLS fingerprint verification with verify=False. As this disables an important security feature, doing so is strongly discouraged. The client filesystem will be searched for potential certificate to use for TLS verification.
+          - In the case where the certificate is self-signed (LXD's default),
+            you may opt to disable the TLS fingerprint verification with verify=False.
+            As this disables an important security feature, doing so is strongly discouraged.
+            The client filesystem will be searched for potential certificate to use for TLS verification.
         required: false
         type: bool
         default: true
