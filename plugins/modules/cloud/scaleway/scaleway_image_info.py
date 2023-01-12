@@ -24,7 +24,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway compute zone
+      - Scaleway compute zone.
     required: true
     choices:
       - ams1
