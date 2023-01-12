@@ -134,13 +134,23 @@ def default_cert_file():
     return os.path.expanduser('~/.config/lxc/client.crt')
 
 
-from pylxd import Client as PyLxdClient
-from pylxd.exceptions import LXDAPIException, ClientConnectionFailed
-
-import os
+from ansible.module_utils.basic import missing_required_lib
+try:
+    from pylxd import Client as PyLxdClient
+    from pylxd.exceptions import LXDAPIException, ClientConnectionFailed
+except ImportError:
+    HAS_PYLXD = False
+else:
+    HAS_PYLXD = True
 
 
 def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):
+
+    if not HAS_PYLXD:
+        raise LXDClientException(
+            missing_required_lib("pylxd", url='https://pylxd.readthedocs.io/'),
+        )
+
     try:
         # Connecting to the local unix socket
         if endpoint is None or endpoint == '/var/lib/lxd/unix.socket' or endpoint == 'unix:/var/lib/lxd/unix.socket':
