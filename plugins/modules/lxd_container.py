@@ -804,7 +804,7 @@ def main():
             url=dict(
                 type='str',
                 default=ANSIBLE_LXD_DEFAULT_URL,
-                aliasses=['endpoint']
+                aliases=['endpoint']
             ),
             snap_url=dict(
                 type='str',
