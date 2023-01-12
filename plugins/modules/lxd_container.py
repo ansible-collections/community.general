@@ -182,7 +182,7 @@ options:
         required: false
         type: bool
         default: true
-        version_added: [TODO]
+        version_added: 6.x.x
     trust_password:
         description:
           - The client trusted password.
