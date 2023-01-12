@@ -401,8 +401,10 @@ import os
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException
-from pylxd.exceptions import NotFound
+from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException, HAS_PYLXD
+
+if HAS_PYLXD:
+    from pylxd.exceptions import NotFound
 
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
