@@ -1398,7 +1398,7 @@ class KeycloakAPI(object):
                     " parent chain {0}. Assure that all parents exist"
                     " already and the list is complete and properly"
                     " ordered, starts with an ID or starts at the"
-                    " toplvl".format(parents)
+                    " top level".format(parents)
                 )
 
             parent_id = parent_id["id"]
