@@ -1,0 +1,83 @@
+---
+
+- name: Recursively create subvolumes
+  block:
+  - name: Create a subvolume named '/recursive/son/grandson'
+    community.general.btrfs_subvolume:
+      automount: Yes
+      recursive: Yes
+      name: "/recursive/son/grandson"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "present"
+    register: result
+  - name: Subvolume named '/recursive/son/grandson' created
+    ansible.builtin.assert:
+      that:
+      - result is changed
+
+  - name: Create a subvolume named '/recursive/son/grandson' (idempotency)
+    community.general.btrfs_subvolume:
+      automount: Yes
+      recursive: Yes
+      name: "/recursive/son/grandson"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "present"
+    register: result
+  - name: Subvolume named '/recursive/son/grandson' created (idempotency)
+    ansible.builtin.assert:
+      that:
+      - result is not changed
+
+  - name: Create a subvolume named '/recursive/daughter/granddaughter'
+    community.general.btrfs_subvolume:
+      automount: Yes
+      recursive: Yes
+      name: "/recursive/daughter/granddaughter"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "present"
+    register: result
+  - name: Subvolume named '/recursive/son/grandson' created
+    ansible.builtin.assert:
+      that:
+      - result is changed
+
+  - name: Create a subvolume named '/recursive/daughter/granddaughter' (idempotency)
+    community.general.btrfs_subvolume:
+      automount: Yes
+      recursive: Yes
+      name: "/recursive/daughter/granddaughter"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "present"
+    register: result
+  - name: Subvolume named '/recursive/son/grandson' created (idempotency)
+    ansible.builtin.assert:
+      that:
+      - result is not changed
+
+- name: Recursively remove subvolumes
+  block:
+  - name: Remove subvolume '/recursive' and all descendents
+    community.general.btrfs_subvolume:
+      automount: Yes
+      recursive: Yes
+      name: "/recursive"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "absent"
+    register: result
+  - name: Subvolume '/recursive' removed
+    ansible.builtin.assert:
+      that:
+      - result is changed
+
+  - name: Remove subvolume '/recursive' and all descendents (idempotency)
+    community.general.btrfs_subvolume:
+      automount: Yes
+      recursive: Yes
+      name: "/recursive"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "absent"
+    register: result
+  - name: Subvolume '/recursive' removed (idempotency)
+    ansible.builtin.assert:
+      that:
+      - result is not changed

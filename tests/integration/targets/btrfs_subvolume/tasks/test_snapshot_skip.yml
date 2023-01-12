@@ -1,0 +1,38 @@
+---
+
+- name: Create a snapshot if one does not already exist at path
+  block:
+  - name: Create a snapshot named 'snapshot_skip'
+    community.general.btrfs_subvolume:
+      automount: Yes
+      name: "/snapshot_skip"
+      snapshot_source: "/"
+      snapshot_conflict: "skip"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "present"
+    register: result
+  - name: Snapshot 'snapshot_skip' created
+    ansible.builtin.assert:
+      that:
+      - result is changed
+
+  - name: Create a snapshot named 'snapshot_skip' (idempotency)
+    community.general.btrfs_subvolume:
+      automount: Yes
+      name: "/snapshot_skip"
+      snapshot_source: "/"
+      snapshot_conflict: "skip"
+      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      state: "present"
+    register: result
+  - name: Snapshot 'snapshot_skip' created (idempotency)
+    ansible.builtin.assert:
+      that:
+      - result is not changed
+
+- name: Cleanup created snapshot
+  community.general.btrfs_subvolume:
+    automount: Yes
+    name: "/snapshot_skip"
+    device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+    state: "absent"

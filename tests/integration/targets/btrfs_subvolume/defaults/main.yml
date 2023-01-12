@@ -1,0 +1,14 @@
+---
+btrfs_subvolume_single_configs:
+- file: "/tmp/disks0.img"
+  loop: "/dev/loop95"
+btrfs_subvolume_multiple_configs:
+- file: "/tmp/diskm0.img"
+  loop: "/dev/loop97"
+- file: "/tmp/diskm1.img"
+  loop: "/dev/loop98"
+- file: "/tmp/diskm2.img"
+  loop: "/dev/loop99"
+btrfs_subvolume_configs: "{{ btrfs_subvolume_single_configs + btrfs_subvolume_multiple_configs }}"
+btrfs_subvolume_single_device: "{{ btrfs_subvolume_single_configs.0.loop }}"
+btrfs_subvolume_multiple_devices: "{{ btrfs_subvolume_multiple_configs | map(attribute='loop') }}"

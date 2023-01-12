@@ -1,0 +1,12 @@
+---
+
+- ansible.builtin.include_tasks: 'test_subvolume_simple.yml'
+- ansible.builtin.include_tasks: 'test_subvolume_nested.yml'
+- ansible.builtin.include_tasks: 'test_subvolume_recursive.yml'
+- ansible.builtin.include_tasks: 'test_subvolume_default.yml'
+
+- ansible.builtin.include_tasks: 'test_snapshot_skip.yml'
+- ansible.builtin.include_tasks: 'test_snapshot_clobber.yml'
+- ansible.builtin.include_tasks: 'test_snapshot_error.yml'
+
+- ansible.builtin.include_tasks: 'test_subvolume_whitespace.yml'
