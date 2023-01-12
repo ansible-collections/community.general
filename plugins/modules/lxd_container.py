@@ -454,7 +454,7 @@ class LXDContainerManagement(object):
         self.wait_for_container = self.module.params['wait_for_container']
         self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
-        self.type = self.module.params['type']
+        self.instance_type = self.module.params['type']
 
         self.client_key = self.module.params.get('client_key')
         self.client_cert = self.module.params.get('client_cert')
@@ -499,7 +499,7 @@ class LXDContainerManagement(object):
         config = self.config.copy()
         config['name'] = self.name
 
-        match self.type:
+        match self.instance_type:
             case 'container':
                 self.instance = self.client.containers.create(config=config, wait=True, target=self.target)
             case 'virtual-machine':
@@ -683,7 +683,7 @@ class LXDContainerManagement(object):
 
         try:
             try:
-                match self.type:
+                match self.instance_type:
                     case 'container':
                         self.instance = self.client.containers.get(self.name)
                     case 'virtual-machine':
