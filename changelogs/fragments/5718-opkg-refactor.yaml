@@ -1,0 +1,2 @@
+minor_changes:
+  - opkg - refactored module to use ``CmdRunner`` for executing ``opkg`` (https://github.com/ansible-collections/community.general/pull/5718).
