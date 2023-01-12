@@ -401,8 +401,10 @@ import os
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException
+#from ansible.module_utils.lxd import pylxd_client, LXDClientException
+from pylxd.exceptions import NotFound
+
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
 # when a particular state is evoked.
@@ -451,22 +453,15 @@ class LXDContainerManagement(object):
         self.addresses = None
         self.target = self.module.params['target']
         self.wait_for_container = self.module.params['wait_for_container']
+        self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
         self.type = self.module.params['type']
 
-        # LXD Rest API provides additional endpoints for creating containers and virtual-machines.
-        self.api_endpoint = None
-        if self.type == 'container':
-            self.api_endpoint = '/1.0/containers'
-        elif self.type == 'virtual-machine':
-            self.api_endpoint = '/1.0/virtual-machines'
+        self.client_key = self.module.params.get('client_key')
+        self.client_cert = self.module.params.get('client_cert')
+        self.trust_password = self.module.params.get('trust_password', None)
+        self.verify = self.module.params.get('verify')
 
-        self.key_file = self.module.params.get('client_key')
-        if self.key_file is None:
-            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
-        self.cert_file = self.module.params.get('client_cert')
-        if self.cert_file is None:
-            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -480,13 +475,18 @@ class LXDContainerManagement(object):
             self.module.fail_json(msg=e.msg)
 
         try:
-            self.client = LXDClient(
-                self.url, key_file=self.key_file, cert_file=self.cert_file,
-                debug=self.debug
+            self.client = pylxd_client(
+                endpoint=self.url,
+                client_cert=self.client_cert,
+                client_key=self.client_key,
+                password=self.trust_password,
+                project=self.project,
+                timeout=self.timeout,
+                verify=self.verify,
             )
         except LXDClientException as e:
             self.module.fail_json(msg=e.msg)
-        self.trust_password = self.module.params.get('trust_password', None)
+
         self.actions = []
 
     def _build_config(self):
@@ -496,78 +496,48 @@ class LXDContainerManagement(object):
             if param_val is not None:
                 self.config[attr] = param_val
 
-    def _get_instance_json(self):
-        url = '{0}/{1}'.format(self.api_endpoint, self.name)
-        if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        return self.client.do('GET', url, ok_error_codes=[404])
-
-    def _get_instance_state_json(self):
-        url = '{0}/{1}/state'.format(self.api_endpoint, self.name)
-        if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        return self.client.do('GET', url, ok_error_codes=[404])
-
-    @staticmethod
-    def _instance_json_to_module_state(resp_json):
-        if resp_json['type'] == 'error':
-            return 'absent'
-        return ANSIBLE_LXD_STATES[resp_json['metadata']['status']]
-
-    def _change_state(self, action, force_stop=False):
-        url = '{0}/{1}/state'.format(self.api_endpoint, self.name)
-        if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        body_json = {'action': action, 'timeout': self.timeout}
-        if force_stop:
-            body_json['force'] = True
-        return self.client.do('PUT', url, body_json=body_json)
-
     def _create_instance(self):
-        url = self.api_endpoint
-        url_params = dict()
-        if self.target:
-            url_params['target'] = self.target
-        if self.project:
-            url_params['project'] = self.project
-        if url_params:
-            url = '{0}?{1}'.format(url, urlencode(url_params))
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
+
+        match self.type:
+            case 'container':
+               self.instance = self.client.containers.create(config=config, wait=True, target=self.target)
+            case 'virtual-machine':
+                self.instance = self.client.virtual_machines.create(config=config, wait=True, target=self.target)
+
+# TODO: Re-add wait_for_container via stuff from Client.do() in pxd.py? Or just use/hijack the wait parameter above?
+
         self.actions.append('create')
 
     def _start_instance(self):
-        self._change_state('start')
+        self.instance.start(wait=True)
         self.actions.append('start')
 
     def _stop_instance(self):
-        self._change_state('stop', self.force_stop)
+        self.instance.stop(wait=True, force=self.force_stop)
         self.actions.append('stop')
 
     def _restart_instance(self):
-        self._change_state('restart', self.force_stop)
+        self.instance.restart(wait=True, force=self.force_stop)
         self.actions.append('restart')
 
     def _delete_instance(self):
-        url = '{0}/{1}'.format(self.api_endpoint, self.name)
-        if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        self.client.do('DELETE', url)
+        self.instance.delete(wait=True)
         self.actions.append('delete')
 
     def _freeze_instance(self):
-        self._change_state('freeze')
+        self.instance.freeze(wait=True)
         self.actions.append('freeze')
 
     def _unfreeze_instance(self):
-        self._change_state('unfreeze')
+        self.instance.unfreeze(wait=True)
         self.actions.append('unfreez')
 
     def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
 
-        resp_json = self._get_instance_state_json()
+        resp_json = self.client.api.instances[self.name].state.get().json()
         network = resp_json['metadata']['network'] or {}
         network = dict((k, v) for k, v in network.items() if k not in ignore_devices) or {}
         addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items()) or {}
@@ -706,22 +676,28 @@ class LXDContainerManagement(object):
         if self._needs_to_change_instance_config('profiles'):
             body_json['profiles'] = self.config['profiles']
 
-        url = '{0}/{1}'.format(self.api_endpoint, self.name)
-        if self.project:
-            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        self.client.do('PUT', url, body_json=body_json)
+        self.instance.api.put(json=body_json)
         self.actions.append('apply_instance_configs')
 
     def run(self):
         """Run the main method."""
 
         try:
-            if self.trust_password is not None:
-                self.client.authenticate(self.trust_password)
-            self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
+            try:
+                match self.type:
+                    case 'container':
+                        self.instance = self.client.containers.get(self.name)
+                    case 'virtual-machine':
+                        self.instance = self.client.virtual_machines.get(self.name)
 
-            self.old_instance_json = self._get_instance_json()
-            self.old_state = self._instance_json_to_module_state(self.old_instance_json)
+                self.old_instance_json = self.client.api.instances[self.name].get().json()
+
+            except NotFound:
+                self.instance = None
+                self.old_instance_json = { 'metadata': {} }
+
+            self.old_state = ANSIBLE_LXD_STATES[self.instance.status] if self.instance else 'absent'
+
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
 
@@ -732,11 +708,14 @@ class LXDContainerManagement(object):
                 'old_state': self.old_state,
                 'actions': self.actions
             }
-            if self.client.debug:
-                result_json['logs'] = self.client.logs
+# TODO: Is such logging needed at all when using the pylxd library
+            if self.debug:
+                # Provide a dummy log event
+                result_json['logs'] = [ '(Currently no client logging after switch to pylxd)' ]
             if self.addresses is not None:
                 result_json['addresses'] = self.addresses
             self.module.exit_json(**result_json)
+
         except LXDClientException as e:
             state_changed = len(self.actions) > 0
             fail_params = {
@@ -744,8 +723,8 @@ class LXDContainerManagement(object):
                 'changed': state_changed,
                 'actions': self.actions
             }
-            if self.client.debug:
-                fail_params['logs'] = e.kwargs['logs']
+            if self.debug:
+               fail_params['logs'] = e.kwargs['logs']
             self.module.fail_json(**fail_params)
 
 
@@ -814,7 +793,8 @@ def main():
             ),
             url=dict(
                 type='str',
-                default=ANSIBLE_LXD_DEFAULT_URL
+                default=ANSIBLE_LXD_DEFAULT_URL,
+                aliasses=['endpoint']
             ),
             snap_url=dict(
                 type='str',
@@ -827,6 +807,10 @@ def main():
             client_cert=dict(
                 type='path',
                 aliases=['cert_file']
+            ),
+            verify=dict(
+                type='bool',
+                default=True
             ),
             trust_password=dict(type='str', no_log=True)
         ),

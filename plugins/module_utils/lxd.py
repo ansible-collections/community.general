@@ -132,3 +132,85 @@ def default_key_file():
 
 def default_cert_file():
     return os.path.expanduser('~/.config/lxc/client.crt')
+
+
+
+
+
+
+
+from pylxd import Client as PyLxdClient
+from pylxd.exceptions import LXDAPIException, ClientConnectionFailed
+
+import os
+
+def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):
+    try:
+        # Connecting to the local unix socket
+        if endpoint is None or endpoint == '/var/lib/lxd/unix.socket' or endpoint == 'unix:/var/lib/lxd/unix.socket':
+            return PyLxdClient(
+                timeout=timeout,
+                project=project,
+            )
+
+        # Connecting to some other local socket
+        elif endpoint.startswith('/'):
+            return PyLxdClient(
+                endpoint=endpoint,
+                timeout=timeout,
+                project=project,
+            )
+
+        # Connecting to remote server
+        elif endpoint.startswith('https://'):
+
+            if client_cert is None:
+                client_cert = '~/.config/lxc/client.crt'
+            if client_key is None:
+                client_key = '~/.config/lxc/client.key'
+
+            # Expand an initial '~/'-path component
+            client_cert = os.path.expanduser(client_cert)
+            client_key  = os.path.expanduser(client_key)
+
+            if not os.path.isfile(client_cert):
+                raise ValueError(
+                    f"Invalid client_cert path: '{client_cert}' does not exist or is not a file."
+                )
+            if not os.path.isfile(client_key):
+                raise ValueError(
+                    f"Invalid client_key path: '{client_key}' does not exist or is not a file."
+                )
+
+            client = PyLxdClient(
+                endpoint=endpoint,
+                cert=( client_cert, client_key ),
+                verify=verify,
+                timeout=timeout,
+                project=project,
+            )
+
+            if not client.trusted:
+                if password is None:
+                    raise LXDClientException('The certificate is not yet trusted, but no trusted password provided')
+                try:
+                    client.authenticate(password)
+                except LXDAPIException as e:
+                    raise LXDClientException(str(e))
+
+            return client
+
+        # Invalid url
+        else:
+            raise ValueError('Invalid endpoint: ' + endpoint)
+
+    except ClientConnectionFailed as e:
+        raise LXDClientException(
+            f"Failed to connect to '{endpoint}'   " + str(e) + '  !'
+        )
+# TODO: Does this actually happen???
+#   except TypeError as e:
+#       # Happens when the verification failed.
+#       raise LXDClientException(
+#           f("Failed to connect to '{endpoint}' looks like the SSL verification failed, error was: {e}"
+#       )
