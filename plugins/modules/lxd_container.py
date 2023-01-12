@@ -499,11 +499,10 @@ class LXDContainerManagement(object):
         config = self.config.copy()
         config['name'] = self.name
 
-        match self.instance_type:
-            case 'container':
-                self.instance = self.client.containers.create(config=config, wait=True, target=self.target)
-            case 'virtual-machine':
-                self.instance = self.client.virtual_machines.create(config=config, wait=True, target=self.target)
+        if self.instance_type is 'container':
+            self.instance = self.client.containers.create(config=config, wait=True, target=self.target)
+        elif self.instance_type is 'virtual-machine':
+            self.instance = self.client.virtual_machines.create(config=config, wait=True, target=self.target)
 
 # TODO: Re-add wait_for_container via stuff from Client.do() in pxd.py? Or just use/hijack the wait parameter above?
 
@@ -683,11 +682,10 @@ class LXDContainerManagement(object):
 
         try:
             try:
-                match self.instance_type:
-                    case 'container':
-                        self.instance = self.client.containers.get(self.name)
-                    case 'virtual-machine':
-                        self.instance = self.client.virtual_machines.get(self.name)
+                if self.instance_type is 'container':
+                    self.instance = self.client.containers.get(self.name)
+                elif self.instance_type is 'virtual-machine':
+                    self.instance = self.client.virtual_machines.get(self.name)
 
                 self.old_instance_json = self.client.api.instances[self.name].get().json()
 
