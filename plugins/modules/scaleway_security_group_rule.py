@@ -18,8 +18,7 @@ module: scaleway_security_group_rule
 short_description: Scaleway Security Group Rule management module
 author: Antoine Barbare (@abarbare)
 description:
-  - This module manages Security Group Rule on Scaleway account
-    U(https://developer.scaleway.com)
+  - "This module manages Security Group Rule on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
   - community.general.scaleway
 requirements:
@@ -53,7 +52,7 @@ options:
   protocol:
     type: str
     description:
-      - Network protocol to use
+      - Network protocol to use.
     choices:
       - TCP
       - UDP
@@ -62,20 +61,20 @@ options:
 
   port:
     description:
-      - Port related to the rule, null value for all the ports
+      - Port related to the rule, null value for all the ports.
     required: true
     type: int
 
   ip_range:
     type: str
     description:
-      - IPV4 CIDR notation to apply to the rule
+      - IPV4 CIDR notation to apply to the rule.
     default: 0.0.0.0/0
 
   direction:
     type: str
     description:
-      - Rule direction
+      - Rule direction.
     choices:
       - inbound
       - outbound
@@ -84,7 +83,7 @@ options:
   action:
     type: str
     description:
-      - Rule action
+      - Rule action.
     choices:
       - accept
       - drop
@@ -93,7 +92,7 @@ options:
   security_group:
     type: str
     description:
-      - Security Group unique identifier
+      - Security Group unique identifier.
     required: true
 '''
 
@@ -113,8 +112,8 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: This is only present when C(state=present)
-    returned: when C(state=present)
+    description: This is only present when I(state=present).
+    returned: when I(state=present)
     type: dict
     sample: {
         "scaleway_security_group_rule": {
