@@ -20,7 +20,7 @@ author:
 options:
   api_url:
     description:
-      - Scaleway API URL
+      - Scaleway API URL.
     default: 'https://account.scaleway.com'
     aliases: ['base_url']
 extends_documentation_fragment:
@@ -42,7 +42,7 @@ EXAMPLES = r'''
 RETURN = r'''
 ---
 scaleway_organization_info:
-  description: Response from Scaleway API
+  description: Response from Scaleway API.
   returned: success
   type: list
   elements: dict

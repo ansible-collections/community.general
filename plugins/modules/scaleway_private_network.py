@@ -18,8 +18,7 @@ short_description: Scaleway private network management
 version_added: 4.5.0
 author: Pascal MANGIN (@pastral)
 description:
-    - This module manages private network on Scaleway account
-      (U(https://developer.scaleway.com)).
+    - "This module manages private network on Scaleway account (U(https://developer.scaleway.com))."
 extends_documentation_fragment:
 - community.general.scaleway
 
@@ -88,7 +87,7 @@ EXAMPLES = '''
 RETURN = '''
 scaleway_private_network:
     description: Information on the VPC.
-    returned: success when C(state=present)
+    returned: success when I(state=present)
     type: dict
     sample:
         {
