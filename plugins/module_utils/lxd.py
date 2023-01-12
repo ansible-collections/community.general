@@ -181,11 +181,11 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 
             if not os.path.isfile(client_cert):
                 raise ValueError(
-                    f"Invalid client_cert path: '{client_cert}' does not exist or is not a file."
+                    "Invalid client_cert path: '{}' does not exist or is not a file.".format(client_cert)
                 )
             if not os.path.isfile(client_key):
                 raise ValueError(
-                    f"Invalid client_key path: '{client_key}' does not exist or is not a file."
+                    "Invalid client_key path: '{}' does not exist or is not a file.".format(client_key)
                 )
 
             client = PyLxdClient(
@@ -212,7 +212,7 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 
     except ClientConnectionFailed as e:
         raise LXDClientException(
-            f"Failed to connect to '{endpoint}'   " + str(e) + '  !'
+            "Failed to connect to '{}'   {}  !".format(endpoint, str(e))
         )
 # TODO: Does this actually happen???
 #   except TypeError as e:
