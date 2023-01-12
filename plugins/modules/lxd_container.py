@@ -151,6 +151,7 @@ options:
           - The unix domain socket path or the https URL for the LXD server.
         required: false
         default: unix:/var/lib/lxd/unix.socket
+        aliases: [ endpoint ]
         type: str
     snap_url:
         description:
@@ -172,6 +173,13 @@ options:
         required: false
         aliases: [ cert_file ]
         type: path
+    verify:
+        description:
+          - In the case where the certificate is self-signed (LXD's default), you may opt to disable the TLS fingerprint verification with verify=False. As this disables an important security feature, doing so is strongly discouraged. The client filesystem will be searched for potential certificate to use for TLS verification.
+        required: false
+        type: bool
+        default: true
+        version_added: [TODO]
     trust_password:
         description:
           - The client trusted password.
