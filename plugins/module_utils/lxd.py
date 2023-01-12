@@ -107,7 +107,7 @@ class LXDClient(object):
                 self._raise_err_from_json(resp_json)
             return resp_json
         except socket.error as e:
-            raise LXDClientException('cannot connect to the LXD server', err=e)
+            raise LXDClientException('cannot connect to the LXD server', err=e) from e
 
     def _raise_err_from_json(self, resp_json):
         err_params = {}
@@ -202,7 +202,7 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
                 try:
                     client.authenticate(password)
                 except LXDAPIException as e:
-                    raise LXDClientException(str(e))
+                    raise LXDClientException(str(e)) from e
 
             return client
 
@@ -213,10 +213,10 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
     except ClientConnectionFailed as e:
         raise LXDClientException(
             "Failed to connect to '{endpoint}'   {msg}  !".format(endpoint=endpoint, msg=str(e))
-        )
+        ) from e
 # TODO: Does this actually happen???
 #   except TypeError as e:
 #       # Happens when the verification failed.
 #       raise LXDClientException(
 #           f("Failed to connect to '{endpoint}' looks like the SSL verification failed, error was: {e}"
-#       )
+#       ) from e
