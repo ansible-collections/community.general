@@ -88,8 +88,8 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: This is only present when C(state=present)
-    returned: when C(state=present)
+    description: This is only present when I(state=present).
+    returned: when I(state=present)
     type: dict
     sample: {
       "ips": [
