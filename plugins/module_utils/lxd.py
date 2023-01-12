@@ -134,15 +134,11 @@ def default_cert_file():
     return os.path.expanduser('~/.config/lxc/client.crt')
 
 
-
-
-
-
-
 from pylxd import Client as PyLxdClient
 from pylxd.exceptions import LXDAPIException, ClientConnectionFailed
 
 import os
+
 
 def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):
     try:
@@ -171,7 +167,7 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 
             # Expand an initial '~/'-path component
             client_cert = os.path.expanduser(client_cert)
-            client_key  = os.path.expanduser(client_key)
+            client_key = os.path.expanduser(client_key)
 
             if not os.path.isfile(client_cert):
                 raise ValueError(
@@ -184,7 +180,7 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 
             client = PyLxdClient(
                 endpoint=endpoint,
-                cert=( client_cert, client_key ),
+                cert=(client_cert, client_key),
                 verify=verify,
                 timeout=timeout,
                 project=project,

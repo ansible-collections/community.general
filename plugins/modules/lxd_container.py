@@ -402,7 +402,6 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException
-#from ansible.module_utils.lxd import pylxd_client, LXDClientException
 from pylxd.exceptions import NotFound
 
 
@@ -502,7 +501,7 @@ class LXDContainerManagement(object):
 
         match self.type:
             case 'container':
-               self.instance = self.client.containers.create(config=config, wait=True, target=self.target)
+                self.instance = self.client.containers.create(config=config, wait=True, target=self.target)
             case 'virtual-machine':
                 self.instance = self.client.virtual_machines.create(config=config, wait=True, target=self.target)
 
@@ -694,7 +693,7 @@ class LXDContainerManagement(object):
 
             except NotFound:
                 self.instance = None
-                self.old_instance_json = { 'metadata': {} }
+                self.old_instance_json = {'metadata': {}}
 
             self.old_state = ANSIBLE_LXD_STATES[self.instance.status] if self.instance else 'absent'
 
@@ -711,7 +710,7 @@ class LXDContainerManagement(object):
 # TODO: Is such logging needed at all when using the pylxd library
             if self.debug:
                 # Provide a dummy log event
-                result_json['logs'] = [ '(Currently no client logging after switch to pylxd)' ]
+                result_json['logs'] = ['(Currently no client logging after switch to pylxd)']
             if self.addresses is not None:
                 result_json['addresses'] = self.addresses
             self.module.exit_json(**result_json)
@@ -724,7 +723,7 @@ class LXDContainerManagement(object):
                 'actions': self.actions
             }
             if self.debug:
-               fail_params['logs'] = e.kwargs['logs']
+                fail_params['logs'] = e.kwargs['logs']
             self.module.fail_json(**fail_params)
 
 
