@@ -182,7 +182,7 @@ options:
         required: false
         type: bool
         default: true
-        version_added: 6.x.x
+        version_added: 6.3.0
     trust_password:
         description:
           - The client trusted password.
