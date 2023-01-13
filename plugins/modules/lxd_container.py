@@ -412,9 +412,9 @@ import os
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import HAS_PYLXD, PYLXD_IMPORT_ERROR
-from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException
-from ansible_collections.community.general.plugins.module_utils.lxd import CLIENT_ARGUMENT_SPEC, ANSIBLE_LXD_DEFAULT_URL
+from ansible_collections.community.general.plugins.module_utils.lxd import HAS_PYLXD
+from ansible_collections.community.general.plugins.module_utils.lxd import LXDClientException
+from ansible_collections.community.general.plugins.module_utils.lxd import LXDCommonManagement, ANSIBLE_LXD_DEFAULT_URL
 if HAS_PYLXD:
     from pylxd.exceptions import NotFound
 
@@ -443,63 +443,27 @@ CONFIG_PARAMS = [
 ]
 
 
-class LXDContainerManagement(object):
+class LXDContainerManagement(LXDCommonManagement):
     def __init__(self, module):
         """Management of LXC containers via Ansible.
 
         :param module: Processed Ansible Module.
         :type module: ``object``
         """
-        self.module = module
+        super().__init__(module)
+
         self.name = self.module.params['name']
-        self.project = self.module.params['project']
-        self._build_config()
-
-        self.state = self.module.params['state']
-
-        self.timeout = self.module.params['timeout']
-        self.wait_for_ipv4_addresses = self.module.params['wait_for_ipv4_addresses']
-        self.force_stop = self.module.params['force_stop']
-        self.addresses = None
-        self.target = self.module.params['target']
-        self.wait_for_container = self.module.params['wait_for_container']
-        self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
-
         self.instance_type = self.module.params['type']
+        self.state = self.module.params['state']
+        self.target = self.module.params['target']
 
-        self.client_key = self.module.params.get('client_key')
-        self.client_cert = self.module.params.get('client_cert')
-        self.trust_password = self.module.params.get('trust_password', None)
-        self.verify = self.module.params.get('verify')
+        self.force_stop = self.module.params['force_stop']
+        self.wait_for_container = self.module.params['wait_for_container']
+        self.wait_for_ipv4_addresses = self.module.params['wait_for_ipv4_addresses']
+        self.ignore_volatile_options = self.module.params['ignore_volatile_options']
 
-        self.debug = self.module._verbosity >= 4
-
-        try:
-            if self.module.params['url'] != ANSIBLE_LXD_DEFAULT_URL:
-                self.url = self.module.params['url']
-            elif os.path.exists(self.module.params['snap_url'].replace('unix:', '')):
-                self.url = self.module.params['snap_url']
-            else:
-                self.url = self.module.params['url']
-        except Exception as e:
-            self.module.fail_json(msg=e.msg)
-
-        try:
-            self.client = pylxd_client(
-                endpoint=self.url,
-                client_cert=self.client_cert,
-                client_key=self.client_key,
-                password=self.trust_password,
-                project=self.project,
-                timeout=self.timeout,
-                verify=self.verify,
-            )
-        except LXDClientException as e:
-            if not HAS_PYLXD:
-                self.module.fail_json(msg=e.msg, exception=PYLXD_IMPORT_ERROR)
-            else:
-                self.module.fail_json(msg=e.msg)
-
+        self.addresses = None
+        self._build_config()
         self.actions = []
 
     def _build_config(self):
@@ -741,7 +705,38 @@ def main():
     """Ansible Main module."""
 
     module = AnsibleModule(
-        argument_spec=CLIENT_ARGUMENT_SPEC | dict(
+        argument_spec=dict(
+            # Connection parameters
+            url=dict(
+                type='str',
+                default=ANSIBLE_LXD_DEFAULT_URL,
+                aliases=['endpoint']
+            ),
+            client_key=dict(
+                type='path',
+                aliases=['key_file']
+            ),
+            client_cert=dict(
+                type='path',
+                aliases=['cert_file']
+            ),
+            trust_password=dict(
+                type='str',
+                no_log=True
+            ),
+            verify=dict(
+                type='bool',
+                default=True
+            ),
+            timeout=dict(
+                type='int',
+                default=30
+            ),
+            project=dict(
+                type='str',
+            ),
+
+            # Instance parameters
             name=dict(
                 type='str',
                 required=True
@@ -751,10 +746,6 @@ def main():
             ),
             config=dict(
                 type='dict',
-            ),
-            ignore_volatile_options=dict(
-                type='bool',
-                default=False,
             ),
             devices=dict(
                 type='dict',
@@ -780,6 +771,12 @@ def main():
                 type='str',
                 default='container',
                 choices=['container', 'virtual-machine'],
+            ),
+
+            # Behavioral parameters
+            ignore_volatile_options=dict(
+                type='bool',
+                default=False,
             ),
             wait_for_container=dict(
                 type='bool',

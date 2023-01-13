@@ -147,6 +147,53 @@ else:
     PYLXD_IMPORT_ERROR = None
 
 
+# ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
+ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
+
+#
+CLIENT_ARGUMENT_SPEC=dict(
+)
+
+class LXDCommonManagement(object):
+    def __init__(self, module):
+        self.module = module
+
+        self.client_key = self.module.params['client_key']
+        self.client_cert = self.module.params['client_cert']
+        self.trust_password = self.module.params.get('trust_password', None)
+        self.verify = self.module.params['verify']
+        self.timeout = self.module.params['timeout']
+        self.project = self.module.params['project']
+
+        self.debug = self.module._verbosity >= 4
+
+        try:
+            if self.module.params['url'] != ANSIBLE_LXD_DEFAULT_URL:
+                self.url = self.module.params['url']
+            elif os.path.exists(self.module.params['snap_url'].replace('unix:', '')):
+                self.url = self.module.params['snap_url']
+            else:
+                self.url = self.module.params['url']
+        except Exception as e:
+            self.module.fail_json(msg=e.msg)
+
+        try:
+            self.client = pylxd_client(
+                endpoint=self.url,
+                client_cert=self.client_cert,
+                client_key=self.client_key,
+                password=self.trust_password,
+                project=self.project,
+                timeout=self.timeout,
+                verify=self.verify,
+            )
+        except LXDClientException as e:
+            if not HAS_PYLXD:
+                self.module.fail_json(msg=e.msg, exception=PYLXD_IMPORT_ERROR)
+            else:
+                self.module.fail_json(msg=e.msg)
+
+
 def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):
 
     if not HAS_PYLXD:
@@ -223,39 +270,3 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 #       raise LXDClientException(
 #           f("Failed to connect to '{endpoint}' looks like the SSL verification failed, error was: {e}"
 #       )
-
-
-# ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
-ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
-
-
-CLIENT_ARGUMENT_SPEC=dict(
-    url=dict(
-        type='str',
-        default=ANSIBLE_LXD_DEFAULT_URL,
-        aliases=['endpoint']
-    ),
-    client_key=dict(
-        type='path',
-        aliases=['key_file']
-    ),
-    client_cert=dict(
-        type='path',
-        aliases=['cert_file']
-    ),
-    trust_password=dict(
-        type='str',
-        no_log=True
-    ),
-    verify=dict(
-        type='bool',
-        default=True
-    ),
-    timeout=dict(
-        type='int',
-        default=30
-    ),
-    project=dict(
-        type='str',
-    ),
-)
