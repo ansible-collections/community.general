@@ -105,7 +105,7 @@ options:
     required: false
   force:
     description:
-      - Force gem to un/install, bypassing dependency checks.
+      - Force gem to (un-)install, bypassing dependency checks.
     required: false
     default: false
     type: bool
