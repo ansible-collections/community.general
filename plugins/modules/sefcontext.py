@@ -301,7 +301,6 @@ def semanage_fcontext_delete(module, result, target, ftype, do_reload, sestore='
     module.exit_json(changed=changed, **result)
 
 
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
