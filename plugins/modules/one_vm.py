@@ -706,15 +706,17 @@ def check_updateconf(module, to_check):
 
 def parse_updateconf(vm_template):
     '''Extracts 'updateconf' attributes from a VM template.'''
-    updateconf = {
-        attr: {
-            subattr: value
-            for subattr, value in subattributes.items()
-            if not UPDATECONF_ATTRIBUTES[attr] or subattr in UPDATECONF_ATTRIBUTES[attr]
-        }
-        for attr, subattributes in vm_template.items()
-        if attr in UPDATECONF_ATTRIBUTES
-    }
+    updateconf = {}
+    for attr, subattributes in vm_template.items():
+        if attr not in UPDATECONF_ATTRIBUTES:
+            continue
+        tmp = {}
+        for subattr, value in subattributes.items():
+            if UPDATECONF_ATTRIBUTES[attr] and subattr not in UPDATECONF_ATTRIBUTES[attr]:
+                continue
+            tmp[subattr] = value
+        if tmp:
+            updateconf[attr] = tmp
     return updateconf
 
 
