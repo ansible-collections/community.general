@@ -214,7 +214,7 @@ class Yarn(object):
 
             if self.globally and unsupported_with_global:
                 _rc, out, _err = self.module.run_command(self.executable + ['global', 'dir'], check_rc=check_rc)
-                path=out.strip()
+                path = out.strip()
 
             if path and not with_global_arg:
                 if not os.path.exists(path):
