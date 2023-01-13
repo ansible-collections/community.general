@@ -144,6 +144,7 @@ except ImportError:
     PYLXD_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYLXD = True
+    PYLXD_IMPORT_ERROR = None
 
 
 def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):

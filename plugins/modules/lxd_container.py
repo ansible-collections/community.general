@@ -412,7 +412,7 @@ import os
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException, HAS_PYLXD
+from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException, HAS_PYLXD, PYLXD_IMPORT_ERROR
 
 if HAS_PYLXD:
     from pylxd.exceptions import NotFound
@@ -497,8 +497,11 @@ class LXDContainerManagement(object):
                 verify=self.verify,
             )
         except LXDClientException as e:
-            self.module.fail_json(msg=e.msg)
-
+            if not HAS_PYLXD:
+                self.module.fail_json(msg=e.msg, exception=PYLXD_IMPORT_ERROR)
+            else:
+                self.module.fail_json(msg=e.msg)
+ 
         self.actions = []
 
     def _build_config(self):
