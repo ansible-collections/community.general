@@ -19,7 +19,6 @@ def normalize_subvolume_path(path):
     return result if len(result) > 0 else '/'
 
 
-# Based on os.path.commonpath (only available in python 3.5+)
 def find_common_path_prefix(paths):
     """
     Find the common prefix among all provided paths.
@@ -64,7 +63,7 @@ class BtrfsCommands(object):
         id = re.sub(r'^.*uuid:\s*', '', line)
 
         filesystem = {}
-        filesystem['label'] = label if label != 'none' else None
+        filesystem['label'] = label.strip("'") if label != 'none' else None
         filesystem['uuid'] = id
         filesystem['devices'] = []
         filesystem['mountpoints'] = []
@@ -285,6 +284,10 @@ class BtrfsFilesystem(object):
         return self.__uuid
 
     @property
+    def label(self):
+        return self.__label
+
+    @property
     def default_subvolid(self):
         return self.__default_subvolid
 
@@ -419,10 +422,32 @@ class BtrfsFilesystemsProvider(object):
         self.__provider = BtrfsInfoProvider(module)
         self.__filesystems = None
 
+    def get_matching_filesystem(self, criteria):
+        if criteria['device'] is not None:
+            criteria['device'] = os.path.realpath(criteria['device'])
+
+        self.__check_init()
+        matching = [f for f in self.__filesystems.values() if self.__filesystem_matches_criteria(f, criteria)]
+        if len(matching) == 1:
+            return matching[0]
+        else:
+            raise Exception("Found %d filesystems matching criteria uuid=%s label=%s device=%s" % (
+                len(matching),
+                criteria['uuid'],
+                criteria['label'],
+                criteria['device']
+            ))
+
+    def __filesystem_matches_criteria(self, filesystem, criteria):
+        return ((criteria['uuid'] is None or filesystem.uuid == criteria['uuid']) and
+                (criteria['label'] is None or filesystem.label == criteria['label']) and
+                (criteria['device'] is None or filesystem.contains_device(criteria['device'])))
+
     def get_filesystem_for_device(self, device):
+        real_device = os.path.realpath(device)
         self.__check_init()
         for fs in self.__filesystems.values():
-            if fs.contains_device(device):
+            if fs.contains_device(real_device):
                 return fs
         return None
 

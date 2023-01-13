@@ -5,9 +5,9 @@
   - name: Update filesystem default subvolume to '@'
     community.general.btrfs_subvolume:
       automount: Yes
-      name: "/@"
       default: True
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/@"
       state: "present"
     register: result
   - name: Subvolume '@' set to default
@@ -17,9 +17,9 @@
   - name: Update filesystem default subvolume to '@' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
-      name: "/@"
       default: True
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/@"
       state: "present"
     register: result
   - name: Subvolume '@' set to default (idempotency)
@@ -32,9 +32,9 @@
   - name: Revert filesystem default subvolume to '/'
     community.general.btrfs_subvolume:
       automount: Yes
-      name: "/"
       default: True
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/"
       state: "present"
     register: result
   - name: Subvolume '/' set to default
@@ -44,9 +44,9 @@
   - name: Revert filesystem default subvolume to '/' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
-      name: "/"
       default: True
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/"
       state: "present"
     register: result
   - name: Subvolume '/' set to default (idempotency)
@@ -60,9 +60,9 @@
   - name: Update filesystem default subvolume to '@'
     community.general.btrfs_subvolume:
       automount: Yes
-      name: "/@"
       default: True
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/@"
       state: "present"
     register: result
   - name: Subvolume '@' set to default
@@ -75,8 +75,8 @@
   - name: Delete custom default subvolume '@'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/@"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "absent"
     register: result
   - name: Subvolume '@' deleted
@@ -86,8 +86,8 @@
   - name: Delete custom default subvolume '@' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/@"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "absent"
     register: result
   - name: Subvolume '@' deleted (idempotency)

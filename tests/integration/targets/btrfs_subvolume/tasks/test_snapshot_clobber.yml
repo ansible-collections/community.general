@@ -5,10 +5,10 @@
   - name: Create a snapshot named 'snapshot_clobber'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/snapshot_clobber"
       snapshot_source: "/"
       snapshot_conflict: "clobber"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Snapshot 'snapshot_clobber' created
@@ -19,10 +19,10 @@
   - name: Create a snapshot named 'snapshot_clobber' (no idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/snapshot_clobber"
       snapshot_source: "/"
       snapshot_conflict: "clobber"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Snapshot 'snapshot_clobber' created (no idempotency)
@@ -33,6 +33,6 @@
 - name: Cleanup created snapshot
   community.general.btrfs_subvolume:
     automount: Yes
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
     name: "/snapshot_clobber"
-    device: "{{ btrfs_subvolume_target_device | default(omit) }}"
     state: "absent"

@@ -4,10 +4,10 @@
   - name: Create a snapshot named 'snapshot_error'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/snapshot_error"
       snapshot_source: "/"
       snapshot_conflict: "error"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Snapshot 'snapshot_error' created
@@ -18,10 +18,10 @@
   - name: Create a snapshot named 'snapshot_error' (no idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/snapshot_error"
       snapshot_source: "/"
       snapshot_conflict: "error"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
     ignore_errors: true
@@ -33,6 +33,6 @@
 - name: Cleanup created snapshot
   community.general.btrfs_subvolume:
     automount: Yes
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
     name: "/snapshot_error"
-    device: "{{ btrfs_subvolume_target_device | default(omit) }}"
     state: "absent"

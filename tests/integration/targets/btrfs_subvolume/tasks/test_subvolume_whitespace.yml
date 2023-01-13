@@ -3,8 +3,8 @@
 - name: Create a subvolume named 'container'
   community.general.btrfs_subvolume:
     automount: Yes
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
     name: "/container"
-    device: "{{ btrfs_subvolume_target_device | default(omit) }}"
     state: "present"
 
 - name: Create a subvolume with whitespace in the name
@@ -12,8 +12,8 @@
   - name: Create a subvolume named 'container/my data'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/container/my data"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Subvolume named 'container/my data' created
@@ -23,8 +23,8 @@
   - name: Create a subvolume named 'container/my data' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/container/my data"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Subvolume named 'container/my data' created (idempotency)
@@ -37,8 +37,8 @@
   - name: Remove a subvolume named 'container/my data'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/container/my data"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "absent"
     register: result
   - name: Subvolume named 'container/my data' removed
@@ -49,8 +49,8 @@
   - name: Remove a subvolume named 'container/my data' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/container/my data"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "absent"
     register: result
   - name: Subvolume named 'container/my data' removed (idempotency)

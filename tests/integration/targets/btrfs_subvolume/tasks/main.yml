@@ -2,37 +2,14 @@
 
 - ansible.builtin.include_tasks: 'setup.yml'
 
-- name: "Execute test scenario for explicit, unmounted single device filesystem"
-  ansible.builtin.include_tasks: 'run_common_tests.yml'
+- name: "Execute test scenario for single device filesystem"
+  ansible.builtin.include_tasks: 'run_filesystem_tests.yml'
   vars:
-    btrfs_subvolume_target_device: "{{ btrfs_subvolume_single_device }}"
+    btrfs_subvolume_target_device: "{{ btrfs_subvolume_single_devices | first }}"
+    btrfs_subvolume_target_label: "{{ btrfs_subvolume_single_label }}"
 
-- name: "Execute test scenario for explicit, unmounted multiple device configuration"
-  ansible.builtin.include_tasks: 'run_common_tests.yml'
+- name: "Execute test scenario for multiple device configuration"
+  ansible.builtin.include_tasks: 'run_filesystem_tests.yml'
   vars:
     btrfs_subvolume_target_device: "{{ btrfs_subvolume_multiple_devices | first }}"
-
-- name: "Execute test scenario for mounted single device configuration where the root subvolume is not mounted/visible"
-  block:
-  - name: Create subvolume '/otherroot'
-    community.general.btrfs_subvolume:
-      automount: Yes
-      name: "/existingmount"
-      device: "{{ btrfs_subvolume_single_device }}"
-      state: "present"
-    register: existingmount
-  - name: "Mount subvolume '/otherroot'"
-    ansible.posix.mount:
-      src: "{{ btrfs_subvolume_single_device }}"
-      path: /mnt
-      opts: "subvolid={{ (existingmount.filesystem.subvolumes | selectattr('path', 'eq', '/existingmount') | first).id }}"
-      fstype: btrfs
-      state: present
-  - name: "Run tests for explicit, mounted single device configuration"
-    ansible.builtin.include_tasks: 'run_common_tests.yml'
-    vars:
-      btrfs_subvolume_target_device: "{{ btrfs_subvolume_single_device }}"
-  - name: "Unmount subvolume /otherroot"
-    ansible.posix.mount:
-      path: /mnt
-      state: absent
+    btrfs_subvolume_target_label: "{{ btrfs_subvolume_multiple_label }}"

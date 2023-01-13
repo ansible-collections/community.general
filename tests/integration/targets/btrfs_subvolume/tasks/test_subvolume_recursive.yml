@@ -5,9 +5,9 @@
   - name: Create a subvolume named '/recursive/son/grandson'
     community.general.btrfs_subvolume:
       automount: Yes
-      recursive: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/recursive/son/grandson"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      recursive: Yes
       state: "present"
     register: result
   - name: Subvolume named '/recursive/son/grandson' created
@@ -18,9 +18,9 @@
   - name: Create a subvolume named '/recursive/son/grandson' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
-      recursive: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/recursive/son/grandson"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      recursive: Yes
       state: "present"
     register: result
   - name: Subvolume named '/recursive/son/grandson' created (idempotency)
@@ -31,9 +31,9 @@
   - name: Create a subvolume named '/recursive/daughter/granddaughter'
     community.general.btrfs_subvolume:
       automount: Yes
-      recursive: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/recursive/daughter/granddaughter"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      recursive: Yes
       state: "present"
     register: result
   - name: Subvolume named '/recursive/son/grandson' created
@@ -44,9 +44,9 @@
   - name: Create a subvolume named '/recursive/daughter/granddaughter' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
-      recursive: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/recursive/daughter/granddaughter"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      recursive: Yes
       state: "present"
     register: result
   - name: Subvolume named '/recursive/son/grandson' created (idempotency)
@@ -59,9 +59,9 @@
   - name: Remove subvolume '/recursive' and all descendents
     community.general.btrfs_subvolume:
       automount: Yes
-      recursive: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/recursive"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      recursive: Yes
       state: "absent"
     register: result
   - name: Subvolume '/recursive' removed
@@ -72,9 +72,9 @@
   - name: Remove subvolume '/recursive' and all descendents (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
-      recursive: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/recursive"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
+      recursive: Yes
       state: "absent"
     register: result
   - name: Subvolume '/recursive' removed (idempotency)

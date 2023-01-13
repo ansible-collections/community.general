@@ -20,12 +20,12 @@
 
 - name: Create single device btrfs filesystem
   ansible.builtin.command:
-    cmd: "mkfs.btrfs -f {{ btrfs_subvolume_single_device }}"
+    cmd: "mkfs.btrfs --label {{ btrfs_subvolume_single_label }} -f {{ btrfs_subvolume_single_devices | first }}"
   changed_when: True
 
 - name: Create multiple device btrfs filesystem
   ansible.builtin.command:
-    cmd: "mkfs.btrfs -f -d raid0 {{ btrfs_subvolume_multiple_devices | join(' ') }}"
+    cmd: "mkfs.btrfs --label {{ btrfs_subvolume_multiple_label }} -f -d raid0 {{ btrfs_subvolume_multiple_devices | join(' ') }}"
   changed_when: True
 
 # Typically created by udev, but apparently missing on Alpine

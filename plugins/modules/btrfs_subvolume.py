@@ -26,10 +26,24 @@ options:
         required: false
         type: bool
         default: false
-    device:
-        description: The block device containing the btrfs filesystem
+    filesystem_device:
+        description:
+        - A block device contained within the btrfs filesystem to be targeted
+        - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
         required: false
         type: path
+    filesystem_label:
+        description:
+        - A descriptive label assigned to the btrfs filesystem to be targeted
+        - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
+        required: false
+        type: str
+    filesystem_uuid:
+        description:
+        - A unique identifier assigned to the btrfs filesystem to be targeted
+        - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
+        required: false
+        type: str
     name:
         description:
         - Name of the subvolume/snapshot to be created
@@ -52,11 +66,11 @@ options:
         description:
         - Policy defining behavior when a subvolume already exists at the path of the requested snapshot
         - C(skip) - Create a snapshot only if a subvolume does not yet exist at the target location, otherwise indicate that no change is required.
-        - Warning, this option does not yet verify that the target subvolume was generated from a snapshot of the requested source.
+          Warning, this option does not yet verify that the target subvolume was generated from a snapshot of the requested source.
         - C(clobber) - If a subvolume already exists at the requested location, delete it first.
-        - This option is not idempotent and will result in a new snapshot being generated on every execution.
+          This option is not idempotent and will result in a new snapshot being generated on every execution.
         - C(error) - If a subvolume already exists at the requested location, return an error.
-        - This option is not idempotent and will result in an error on replay of the module.
+          This option is not idempotent and will result in an error on replay of the module.
         type: str
         required: false
         choices: [ skip, clobber, error ]
@@ -68,6 +82,13 @@ options:
         required: false
         choices: [ absent, present ]
         default: present
+
+notes:
+  - If any or all of the filesystem_device, filesystem_label or filesystem_uuid parameters are provided, there is expected
+    to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or only a single
+    btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and return an error.
+  - C(check_mode) is supported, but in some scenarios it may erroneously report intermediate subvolumes being created.
+    After mounting, if a directory like file is found where the subvolume would have been created, the operation is skipped.
 
 author:
     - Gregory Furlong (@gnfzdz)
@@ -174,6 +195,13 @@ modifications:
     type: list
     returned: Success
     elements: str
+
+target_subvolume_id:
+    description:
+    - The id of the subvolume specified with the name parameter, either pre-existing or created as part of module execution
+    type: int
+    sample: 257
+    returned: Success and subvolume exists after module execution
 '''
 
 from ansible_collections.community.general.plugins.module_utils.btrfs import BtrfsFilesystemsProvider, BtrfsCommands
@@ -210,7 +238,9 @@ class BtrfsSubvolumeModule(object):
 
         self.__automount = self.module.params['automount']
         self.__default = self.module.params['default']
-        self.__device = self.module.params['device']
+        self.__filesystem_device = self.module.params['filesystem_device']
+        self.__filesystem_label = self.module.params['filesystem_label']
+        self.__filesystem_uuid = self.module.params['filesystem_uuid']
         self.__recursive = self.module.params['recursive']
         self.__snapshot_conflict = self.module.params['snapshot_conflict']
         self.__snapshot_source = self.module.params['snapshot_source']
@@ -243,10 +273,10 @@ class BtrfsSubvolumeModule(object):
 
     # Identify the targeted filesystem and obtain the current state
     def __load_filesystem(self):
-        if self.__device is not None:
-            filesystem = self.__find_explicit_filesytem(self.__device)
+        if self.__has_filesystem_criteria():
+            filesystem = self.__find_matching_filesytem()
         else:
-            filesystem = self.__find_implicit_filesystem()
+            filesystem = self.__find_default_filesystem()
 
         # The filesystem must be mounted to obtain the current state (subvolumes, default, etc)
         if not filesystem.is_mounted():
@@ -254,16 +284,18 @@ class BtrfsSubvolumeModule(object):
             filesystem.refresh()
         self.__filesystem = filesystem
 
-    def __find_explicit_filesytem(self, device):
-        filesystem = self.__provider.get_filesystem_for_device(device)
+    def __has_filesystem_criteria(self):
+        return self.__filesystem_uuid is not None or self.__filesystem_label is not None or self.__filesystem_device is not None
 
-        if filesystem is None:
-            self.module.fail_json(
-                msg="A btrfs filesystem for indicated device=%s was not found." % (self.__device))
-        else:
-            return filesystem
+    def __find_matching_filesytem(self):
+        criteria = {
+            'uuid': self.__filesystem_uuid,
+            'label': self.__filesystem_label,
+            'device': self.__filesystem_device
+        }
+        return self.__provider.get_matching_filesystem(criteria)
 
-    def __find_implicit_filesystem(self):
+    def __find_default_filesystem(self):
         filesystems = self.__provider.get_filesystems()
         filesystem = None
 
@@ -555,10 +587,12 @@ class BtrfsSubvolumeModule(object):
 
     # Format and return results
     def get_results(self):
+        target = self.__filesystem.get_subvolume_by_name(self.__name)
         return dict(
             changed=len(self.__completed_work) > 0,
             filesystem=self.__filesystem.get_summary(),
-            modifications=self.__get_formatted_modifications()
+            modifications=self.__get_formatted_modifications(),
+            target_subvolume_id=(target.id if target is not None else None)
         )
 
     def __get_formatted_modifications(self):
@@ -609,15 +643,16 @@ class BtrfsSubvolumeModule(object):
 
 def run_module():
     module_args = dict(
+        automount=dict(type='bool', required=False, default=False),
+        default=dict(type='bool', required=False, default=False),
+        filesystem_device=dict(type='path', required=False),
+        filesystem_label=dict(type='str', required=False),
+        filesystem_uuid=dict(type='str', required=False),
         name=dict(type='str', required=True),
         recursive=dict(type='bool', default=False),
         state=dict(type='str', required=False, default='present', choices=['present', 'absent']),
         snapshot_source=dict(type='str', required=False),
-        snapshot_conflict=dict(type='str', required=False, default='skip', choices=['skip', 'clobber', 'error']),
-        device=dict(type='path', required=False),
-
-        default=dict(type='bool', required=False, default=False),
-        automount=dict(type='bool', required=False, default=False)
+        snapshot_conflict=dict(type='str', required=False, default='skip', choices=['skip', 'clobber', 'error'])
     )
 
     module = AnsibleModule(

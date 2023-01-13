@@ -5,8 +5,8 @@
   - name: Create a subvolume named 'simple'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/simple"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Subvolume named 'simple' created
@@ -16,8 +16,8 @@
   - name: Create a subvolume named 'simple' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/simple"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "present"
     register: result
   - name: Subvolume named 'simple' created (idempotency)
@@ -30,8 +30,8 @@
   - name: Remove a subvolume named 'simple'
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/simple"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "absent"
     register: result
   - name: Subvolume named 'simple' removed
@@ -41,8 +41,8 @@
   - name: Remove a subvolume named 'simple' (idempotency)
     community.general.btrfs_subvolume:
       automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
       name: "/simple"
-      device: "{{ btrfs_subvolume_target_device | default(omit) }}"
       state: "absent"
     register: result
   - name: Subvolume named 'simple' removed (idempotency)
