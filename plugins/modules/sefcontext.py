@@ -50,7 +50,7 @@ options:
     type: str
   equal:
     description:
-    - Path to use for substituting the target. The context labeling for the I(target) subtree is made equivalent to this path.
+    - Path to use for substituting the I(target). The context labeling for the I(target) subtree is made equivalent to this path.
     type: str
   seuser:
     description:
