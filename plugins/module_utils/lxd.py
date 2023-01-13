@@ -134,12 +134,14 @@ def default_cert_file():
     return os.path.expanduser('~/.config/lxc/client.crt')
 
 
+import traceback
 from ansible.module_utils.basic import missing_required_lib
 try:
     from pylxd import Client as PyLxdClient
     from pylxd.exceptions import LXDAPIException, ClientConnectionFailed
 except ImportError:
     HAS_PYLXD = False
+    PYLXD_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYLXD = True
 
