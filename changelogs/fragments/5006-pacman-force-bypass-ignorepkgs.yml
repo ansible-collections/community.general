@@ -1,2 +1,2 @@
 minor_changes:
-  - pacman plugin - added bypass for IgnorePkg pacman option with ``force`` flag
+  - pacman - added bypass for ``IgnorePkg`` pacman option with ``force`` flag (https://github.com/ansible-collections/community.general/pull/5805).
