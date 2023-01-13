@@ -150,9 +150,6 @@ else:
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
-#
-CLIENT_ARGUMENT_SPEC=dict(
-)
 
 class LXDCommonManagement(object):
     def __init__(self, module):
@@ -230,13 +227,9 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
             client_key = os.path.expanduser(client_key)
 
             if not os.path.isfile(client_cert):
-                raise ValueError(
-                    "Invalid client_cert path: '{path}' does not exist or is not a file.".format(path=client_cert)
-                )
+                raise ValueError("Invalid client_cert path: '{path}' does not exist or is not a file.".format(path=client_cert))
             if not os.path.isfile(client_key):
-                raise ValueError(
-                    "Invalid client_key path: '{path}' does not exist or is not a file.".format(path=client_key)
-                )
+                raise ValueError("Invalid client_key path: '{path}' does not exist or is not a file.".format(path=client_key))
 
             client = PyLxdClient(
                 endpoint=endpoint,
