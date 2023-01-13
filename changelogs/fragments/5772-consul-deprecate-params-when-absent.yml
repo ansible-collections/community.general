@@ -1,0 +1,2 @@
+deprecated_features:
+  - consul - deprecate using parameters unused for ``state=absent`` (https://github.com/ansible-collections/community.general/pull/5772).
