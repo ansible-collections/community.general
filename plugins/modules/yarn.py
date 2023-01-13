@@ -188,10 +188,12 @@ class Yarn(object):
         elif self.name is not None:
             self.name_version = self.name
 
-    def _exec(self, args, run_in_check_mode=False, check_rc=True):
+    def _exec(self, args, run_in_check_mode=False, check_rc=True, unsupported_with_global=False):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
 
-            if self.globally:
+            with_global_arg = self.globally and not unsupported_with_global
+
+            if with_global_arg:
                 # Yarn global arg is inserted before the command (e.g. `yarn global {some-command}`)
                 args.insert(0, 'global')
 
@@ -206,16 +208,23 @@ class Yarn(object):
                 cmd.append(self.registry)
 
             # If path is specified, cd into that path and run the command.
-            cwd = None
-            if self.path and not self.globally:
-                if not os.path.exists(self.path):
-                    # Module will make directory if not exists.
-                    os.makedirs(self.path)
-                if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="Path provided %s is not a directory" % self.path)
-                cwd = self.path
 
-                if not os.path.isfile(os.path.join(self.path, 'package.json')):
+            path = self.path
+            cwd = None
+
+            if self.globally and unsupported_with_global:
+                _rc, out, _err = self.module.run_command(self.executable + ['global', 'dir'], check_rc=check_rc)
+                path=out.strip()
+
+            if path and not with_global_arg:
+                if not os.path.exists(path):
+                    # Module will make directory if not exists.
+                    os.makedirs(path)
+                if not os.path.isdir(path):
+                    self.module.fail_json(msg="Path provided %s is not a directory" % path)
+                cwd = path
+
+                if not os.path.isfile(os.path.join(path, 'package.json')):
                     self.module.fail_json(msg="Package.json does not exist in provided path.")
 
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
@@ -276,9 +285,12 @@ class Yarn(object):
         if not os.path.isfile(os.path.join(self.path, 'yarn.lock')):
             return outdated
 
-        cmd_result, err = self._exec(['outdated', '--json'], True, False)
-        if err:
-            self.module.fail_json(msg=err)
+        cmd_result, err = self._exec(['outdated', '--json'], True, False, unsupported_with_global=True)
+
+        # the package.json in the global dir is missing a license field, so warnings are expected on stderr
+        for line in err.splitlines():
+            if json.loads(line)['type'] == 'error':
+                self.module.fail_json(msg=err)
 
         if not cmd_result:
             return outdated
