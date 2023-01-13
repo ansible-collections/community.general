@@ -214,7 +214,6 @@ class LxdBase(object):
         raise ValueError(type)
 
 
-
 def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):
     if not HAS_PYLXD:
         raise LXDClientException(_get_missing_pylxd_message(), PYLXD_IMPORT_ERROR)
