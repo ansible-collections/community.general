@@ -237,9 +237,9 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, equal, do_re
                     changed = True
 
                     if module._diff:
-                            prepared_diff += '# Change to semanage file context path substitutions\n'
-                            prepared_diff += '-%s = %s\n' % (orig_equal, target)
-                            prepared_diff += '+%s = %s\n' % (equal, target)
+                        prepared_diff += '# Change to semanage file context path substitutions\n'
+                        prepared_diff += '-%s = %s\n' % (orig_equal, target)
+                        prepared_diff += '+%s = %s\n' % (equal, target)
             else:
                 # Add missing path substitution entry
                 if not module.check_mode:
@@ -289,8 +289,8 @@ def semanage_fcontext_delete(module, result, target, ftype, do_reload, sestore='
             changed = True
 
             if module._diff:
-                 prepared_diff += '# Deletion to semanage file context path substitutions\n'
-                 prepared_diff += '-%s = %s\n' % (orig_equal, target)
+                prepared_diff += '# Deletion to semanage file context path substitutions\n'
+                prepared_diff += '-%s = %s\n' % (orig_equal, target)
 
     except Exception as e:
         module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)))
