@@ -1,4 +1,7 @@
 ---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Match targeted filesystem by label"
   block:
@@ -54,6 +57,9 @@
       opts: "subvolid={{ 5 }}"
       fstype: btrfs
       state: mounted
+
+  - name: Print current status
+    community.general.btrfs_info:
 
   - name: Match '{{ btrfs_subvolume_target_label }}' filesystem when only mount
     community.general.btrfs_subvolume:

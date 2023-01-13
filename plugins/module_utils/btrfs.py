@@ -1,5 +1,6 @@
-# Copyright: (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -376,6 +377,16 @@ class BtrfsFilesystem(object):
                 search = re.sub(r'/[^/]+$', '', search)
 
         return BtrfsSubvolume(self, 5)
+
+    def get_mountpath_as_child(self, subvolume_name):
+        """Find a path to the target subvolume through a mounted ancestor"""
+        nearest = self.get_nearest_subvolume(subvolume_name)
+        if nearest.path == subvolume_name:
+            nearest = nearest.get_parent_subvolume()
+        if nearest is None or nearest.get_mounted_path() is None:
+            raise Exception("Failed to find a path '%s' through a mounted parent subvolume" % subvolume_name)
+        else:
+            return nearest.get_mounted_path() + os.path.sep + nearest.get_child_relative_path(subvolume_name)
 
     def get_subvolume_children(self, subvolume_id):
         return [BtrfsSubvolume(self, x['id']) for x in self.__subvolumes.values() if x['parent'] == subvolume_id]

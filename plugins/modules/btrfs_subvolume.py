@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-# Copyright: (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -171,7 +173,7 @@ filesystem:
             returned: success and if filesystem is mounted
             type: list
             elements: dict
-            options:
+            contains:
                 id:
                     description: An identifier assigned to the subvolume, unique within the containing filesystem
                     type: int
@@ -447,16 +449,19 @@ class BtrfsSubvolumeModule(object):
 
     # Execute the unit of work
     def __execute_unit_of_work(self):
-        parent = self.__find_common_parent_subvolume(self.__unit_of_work)
-        # ensure the subvolume is mounted and accessible
-        parent_mountpath = self.__get_btrfs_subvolume_mountpoint(parent)
+        # TODO mount only as close as required for each operation (many mountpoints)?
+        # TODO check if anything needs to be mounted during __prepare* so that check_mode will fail when automount=False
+        if self.__automount:
+            parent = self.__find_common_parent_subvolume(self.__unit_of_work)
+            self.__get_btrfs_subvolume_mountpoint(parent)
+
         for op in self.__unit_of_work:
             if op['action'] == self.__CREATE_SUBVOLUME_OPERATION:
-                self.__execute_create_subvolume(parent, op)
+                self.__execute_create_subvolume(op)
             elif op['action'] == self.__CREATE_SNAPSHOT_OPERATION:
-                self.__execute_create_snapshot(parent, op)
+                self.__execute_create_snapshot(op)
             elif op['action'] == self.__DELETE_SUBVOLUME_OPERATION:
-                self.__execute_delete_subvolume(parent, op)
+                self.__execute_delete_subvolume(op)
             elif op['action'] == self.__SET_DEFAULT_SUBVOLUME_OPERATION:
                 self.__execute_set_default_subvolume(op)
             else:
@@ -490,28 +495,23 @@ class BtrfsSubvolumeModule(object):
             # There should be something already available as the filesystem needs to be online to query metadata
             return self.__filesystem.get_any_mounted_subvolume()
 
-    def __execute_create_subvolume(self, parent, operation):
-        relative_path = parent.get_child_relative_path(operation['target'])
-        full_mounted_path = parent.get_mounted_path() + os.path.sep + relative_path
-
-        if not self.__is_existing_directory_like(full_mounted_path):
-            self.__btrfs_api.subvolume_create(full_mounted_path)
+    def __execute_create_subvolume(self, operation):
+        target_mounted_path = self.__filesystem.get_mountpath_as_child(operation['target'])
+        if not self.__is_existing_directory_like(target_mounted_path):
+            self.__btrfs_api.subvolume_create(target_mounted_path)
             self.__completed_work.append(operation)
 
-    def __execute_create_snapshot(self, parent, operation):
-        relative_source_path = parent.get_child_relative_path(operation['source'])
-        full_source_path = parent.get_mounted_path() + os.path.sep + relative_source_path
+    def __execute_create_snapshot(self, operation):
+        source_subvolume = self.__filesystem.get_subvolume_by_name(operation['source'])
+        source_mounted_path = source_subvolume.get_mounted_path()
+        target_mounted_path = self.__filesystem.get_mountpath_as_child(operation['target'])
 
-        relative_target_path = parent.get_child_relative_path(operation['target'])
-        full_target_path = parent.get_mounted_path() + os.path.sep + relative_target_path
-
-        self.__btrfs_api.subvolume_snapshot(full_source_path, full_target_path)
+        self.__btrfs_api.subvolume_snapshot(source_mounted_path, target_mounted_path)
         self.__completed_work.append(operation)
 
-    def __execute_delete_subvolume(self, parent, operation):
-        relative_path = parent.get_child_relative_path(operation['target'])
-        full_mounted_path = parent.get_mounted_path() + os.path.sep + relative_path
-        self.__btrfs_api.subvolume_delete(full_mounted_path)
+    def __execute_delete_subvolume(self, operation):
+        target_mounted_path = self.__filesystem.get_mountpath_as_child(operation['target'])
+        self.__btrfs_api.subvolume_delete(target_mounted_path)
         self.__completed_work.append(operation)
 
     def __execute_set_default_subvolume(self, operation):

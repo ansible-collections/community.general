@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-# Copyright: (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -32,7 +33,7 @@ filesystems:
     type: list
     elements: dict
     returned: success
-    options:
+    contains:
         uuid:
             description: A unique identifier assigned to the filesystem
             type: str
@@ -55,7 +56,7 @@ filesystems:
             description: A list of dicts containing metadata for all of the filesystem's subvolumes
             type: list
             elements: dict
-            options:
+            contains:
                 id:
                     description: An identifier assigned to the subvolume, unique within the containing filesystem
                     type: int
