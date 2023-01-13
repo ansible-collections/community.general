@@ -198,10 +198,11 @@ options:
     type: str
   updateconf:
     description:
-      - When C(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
+      - When I(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call via direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
     type: dict
+    version_added: 6.3.0
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"
@@ -541,8 +542,9 @@ instances:
                         "USER_INPUTS": null
                     }
         updateconf:
-            description: A dictionary of key/values attributes that are set with the updateconf API call
+            description: A dictionary of key/values attributes that are set with the updateconf API call.
             type: dict
+            version_added: 6.3.0
             sample: {
                         "OS": { "ARCH": "x86_64" },
                         "CONTEXT": {
@@ -658,6 +660,7 @@ tagged_instances:
         updateconf:
             description: A dictionary of key/values attributes that are set with the updateconf API call
             type: dict
+            version_added: 6.3.0
             sample: {
                         "OS": { "ARCH": "x86_64" },
                         "CONTEXT": {
@@ -881,7 +884,7 @@ def get_vm_info(client, vm):
         'attributes': vm_attributes,
         'mode': permissions_str,
         'labels': vm_labels,
-        'updateconf': updateconf
+        'updateconf': updateconf,
     }
 
     return info
