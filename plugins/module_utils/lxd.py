@@ -223,3 +223,39 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 #       raise LXDClientException(
 #           f("Failed to connect to '{endpoint}' looks like the SSL verification failed, error was: {e}"
 #       )
+
+
+# ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
+ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
+
+
+CLIENT_ARGUMENT_SPEC=dict(
+    url=dict(
+        type='str',
+        default=ANSIBLE_LXD_DEFAULT_URL,
+        aliases=['endpoint']
+    ),
+    client_key=dict(
+        type='path',
+        aliases=['key_file']
+    ),
+    client_cert=dict(
+        type='path',
+        aliases=['cert_file']
+    ),
+    trust_password=dict(
+        type='str',
+        no_log=True
+    ),
+    verify=dict(
+        type='bool',
+        default=True
+    ),
+    timeout=dict(
+        type='int',
+        default=30
+    ),
+    project=dict(
+        type='str',
+    ),
+)

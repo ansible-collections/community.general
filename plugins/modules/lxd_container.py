@@ -412,8 +412,9 @@ import os
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException, HAS_PYLXD, PYLXD_IMPORT_ERROR
-
+from ansible_collections.community.general.plugins.module_utils.lxd import HAS_PYLXD, PYLXD_IMPORT_ERROR
+from ansible_collections.community.general.plugins.module_utils.lxd import pylxd_client, LXDClientException
+from ansible_collections.community.general.plugins.module_utils.lxd import CLIENT_ARGUMENT_SPEC, ANSIBLE_LXD_DEFAULT_URL
 if HAS_PYLXD:
     from pylxd.exceptions import NotFound
 
@@ -435,9 +436,6 @@ ANSIBLE_LXD_STATES = {
     'Stopped': 'stopped',
     'Frozen': 'frozen',
 }
-
-# ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
-ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
@@ -501,7 +499,7 @@ class LXDContainerManagement(object):
                 self.module.fail_json(msg=e.msg, exception=PYLXD_IMPORT_ERROR)
             else:
                 self.module.fail_json(msg=e.msg)
- 
+
         self.actions = []
 
     def _build_config(self):
@@ -743,13 +741,10 @@ def main():
     """Ansible Main module."""
 
     module = AnsibleModule(
-        argument_spec=dict(
+        argument_spec=CLIENT_ARGUMENT_SPEC | dict(
             name=dict(
                 type='str',
                 required=True
-            ),
-            project=dict(
-                type='str',
             ),
             architecture=dict(
                 type='str',
@@ -781,10 +776,6 @@ def main():
             target=dict(
                 type='str',
             ),
-            timeout=dict(
-                type='int',
-                default=30
-            ),
             type=dict(
                 type='str',
                 default='container',
@@ -802,28 +793,10 @@ def main():
                 type='bool',
                 default=False
             ),
-            url=dict(
-                type='str',
-                default=ANSIBLE_LXD_DEFAULT_URL,
-                aliases=['endpoint']
-            ),
             snap_url=dict(
                 type='str',
                 default='unix:/var/snap/lxd/common/lxd/unix.socket'
             ),
-            client_key=dict(
-                type='path',
-                aliases=['key_file']
-            ),
-            client_cert=dict(
-                type='path',
-                aliases=['cert_file']
-            ),
-            verify=dict(
-                type='bool',
-                default=True
-            ),
-            trust_password=dict(type='str', no_log=True)
         ),
         supports_check_mode=False,
     )
