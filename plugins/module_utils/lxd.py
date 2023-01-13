@@ -18,6 +18,19 @@ from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.common.text.converters import to_text
 
+
+# ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
+ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
+
+# ANSIBLE_LXD_STATES is a map of states of lxd containers to the Ansible
+# lxc_container module state parameter value.
+ANSIBLE_LXD_STATES = {
+    'Running': 'started',
+    'Stopped': 'stopped',
+    'Frozen': 'frozen',
+}
+
+
 # httplib/http.client connection using unix domain socket
 HTTPConnection = http_client.HTTPConnection
 HTTPSConnection = http_client.HTTPSConnection
@@ -134,6 +147,12 @@ def default_cert_file():
     return os.path.expanduser('~/.config/lxc/client.crt')
 
 
+# Copyright (c) 2023, Heino H. Gehlsen <heino.gehlsen@gmail.com>
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+import os
 import traceback
 from ansible.module_utils.basic import missing_required_lib
 try:
@@ -147,36 +166,36 @@ else:
     PYLXD_IMPORT_ERROR = None
 
 
-# ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
-ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
+class LxdBase(object):
 
-
-class LXDCommonManagement(object):
     def __init__(self, module):
+        if not HAS_PYLXD:
+            module.fail_json(msg=_get_missing_pylxd_message(), exception=PYLXD_IMPORT_ERROR)
+
         self.module = module
 
-        self.client_key = self.module.params['client_key']
+        self.endpoint = self.module.params['url']
         self.client_cert = self.module.params['client_cert']
-        self.trust_password = self.module.params.get('trust_password', None)
+        self.client_key = self.module.params['client_key']
+        self.trust_password = self.module.params['trust_password']
         self.verify = self.module.params['verify']
         self.timeout = self.module.params['timeout']
         self.project = self.module.params['project']
 
         self.debug = self.module._verbosity >= 4
 
-        try:
-            if self.module.params['url'] != ANSIBLE_LXD_DEFAULT_URL:
-                self.url = self.module.params['url']
-            elif os.path.exists(self.module.params['snap_url'].replace('unix:', '')):
-                self.url = self.module.params['snap_url']
-            else:
-                self.url = self.module.params['url']
-        except Exception as e:
-            self.module.fail_json(msg=e.msg)
+        # Snap override
+        if self.endpoint == ANSIBLE_LXD_DEFAULT_URL:
+            try:
+                snap_socket = self.module.params['snap_url']
+                if os.path.exists(snap_socket.replace('unix:', '')):
+                    self.endpoint = snap_socket
+            except Exception as e:
+                self.module.fail_json(msg=e.msg)
 
         try:
             self.client = pylxd_client(
-                endpoint=self.url,
+                endpoint=self.endpoint,
                 client_cert=self.client_cert,
                 client_key=self.client_key,
                 password=self.trust_password,
@@ -185,18 +204,20 @@ class LXDCommonManagement(object):
                 verify=self.verify,
             )
         except LXDClientException as e:
-            if not HAS_PYLXD:
-                self.module.fail_json(msg=e.msg, exception=PYLXD_IMPORT_ERROR)
-            else:
-                self.module.fail_json(msg=e.msg)
+            self.module.fail_json(msg=e.msg)
+
+    def get_instance(self, name, type):
+        if type == 'container':
+            return self.client.containers.get(name)
+        if type == 'virtual-machine':
+            return self.client.virtual_machines.get(name)
+        raise ValueError(type)
+
 
 
 def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, project=None, timeout=None, verify=True):
-
     if not HAS_PYLXD:
-        raise LXDClientException(
-            missing_required_lib("pylxd", url='https://pylxd.readthedocs.io/'),
-        )
+        raise LXDClientException(_get_missing_pylxd_message(), PYLXD_IMPORT_ERROR)
 
     try:
         # Connecting to the local unix socket
@@ -263,3 +284,7 @@ def pylxd_client(endpoint, client_cert=None, client_key=None, password=None, pro
 #       raise LXDClientException(
 #           f("Failed to connect to '{endpoint}' looks like the SSL verification failed, error was: {e}"
 #       )
+
+
+def _get_missing_pylxd_message():
+    return missing_required_lib('pylxd', url='https://pylxd.readthedocs.io/')

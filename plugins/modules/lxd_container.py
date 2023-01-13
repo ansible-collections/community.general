@@ -412,11 +412,14 @@ import os
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import HAS_PYLXD
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClientException
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDCommonManagement, ANSIBLE_LXD_DEFAULT_URL
+from ansible_collections.community.general.plugins.module_utils.lxd import (
+    HAS_PYLXD,
+    LxdBase,
+    LXDClientException,
+    ANSIBLE_LXD_DEFAULT_URL, ANSIBLE_LXD_STATES,
+)
 if HAS_PYLXD:
-    from pylxd.exceptions import NotFound
+    from pylxd.exceptions import NotFound, LXDAPIException
 
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
@@ -429,21 +432,13 @@ LXD_ANSIBLE_STATES = {
     'frozen': '_frozen'
 }
 
-# ANSIBLE_LXD_STATES is a map of states of lxd containers to the Ansible
-# lxc_container module state parameter value.
-ANSIBLE_LXD_STATES = {
-    'Running': 'started',
-    'Stopped': 'stopped',
-    'Frozen': 'frozen',
-}
-
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
     'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
 ]
 
 
-class LXDContainerManagement(LXDCommonManagement):
+class InstanceManager(LxdBase):
     def __init__(self, module):
         """Management of LXC containers via Ansible.
 
@@ -658,26 +653,25 @@ class LXDContainerManagement(LXDCommonManagement):
         """Run the main method."""
         try:
             try:
-                if self.instance_type == 'container':
-                    self.instance = self.client.containers.get(self.name)
-                elif self.instance_type == 'virtual-machine':
-                    self.instance = self.client.virtual_machines.get(self.name)
-
-                self.old_metadata = self.client.api.instances[self.name].get().json()['metadata']
-
+                self.instance = self.get_instance(self.name, self.instance_type)
+                self.old_state = ANSIBLE_LXD_STATES[self.instance.status]
             except NotFound:
                 self.instance = None
-                self.old_metadata = {}
+                self.old_state = 'absent'
 
-            self.old_state = ANSIBLE_LXD_STATES[self.instance.status] if self.instance else 'absent'
+            try:
+                self.old_metadata = self.client.api.instances[self.name].get().json()['metadata'] if self.instance else {}
+            except LXDAPIException as e:
+                self.module.fail_json(
+                    msg="Failed fetching metadata: '{msg}'".format(msg=str(e))
+                )
 
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
 
-            state_changed = len(self.actions) > 0
             result_json = {
                 'log_verbosity': self.module._verbosity,
-                'changed': state_changed,
+                'changed': len(self.actions) > 0,
                 'old_state': self.old_state,
                 'actions': self.actions
             }
@@ -690,10 +684,9 @@ class LXDContainerManagement(LXDCommonManagement):
             self.module.exit_json(**result_json)
 
         except LXDClientException as e:
-            state_changed = len(self.actions) > 0
             fail_params = {
                 'msg': e.msg,
-                'changed': state_changed,
+                'changed': len(self.actions) > 0,
                 'actions': self.actions
             }
             if self.debug:
@@ -798,7 +791,7 @@ def main():
         supports_check_mode=False,
     )
 
-    lxd_manage = LXDContainerManagement(module=module)
+    lxd_manage = InstanceManager(module=module)
     lxd_manage.run()
 
 
