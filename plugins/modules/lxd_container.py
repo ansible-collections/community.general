@@ -638,7 +638,7 @@ class LXDContainerManagement(object):
         if key not in self.config:
             return False
         if key == 'config' and self.ignore_volatile_options:  # the old behavior is to ignore configurations by keyword "volatile"
-            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items() if not k.startswith('volatile.'))
+            old_configs = dict((k, v) for k, v in self.old_metadata[key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -646,7 +646,7 @@ class LXDContainerManagement(object):
                     return True
             return False
         elif key == 'config':  # next default behavior
-            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items())
+            old_configs = dict((k, v) for k, v in self.old_metadata[key].items())
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -654,7 +654,7 @@ class LXDContainerManagement(object):
                     return True
             return False
         else:
-            old_configs = self.old_instance_json['metadata'][key]
+            old_configs = self.old_metadata[key]
             return self.config[key] != old_configs
 
     def _needs_to_apply_instance_configs(self):
@@ -667,12 +667,11 @@ class LXDContainerManagement(object):
         )
 
     def _apply_instance_configs(self):
-        old_metadata = self.old_instance_json['metadata']
         body_json = {
-            'architecture': old_metadata['architecture'],
-            'config': old_metadata['config'],
-            'devices': old_metadata['devices'],
-            'profiles': old_metadata['profiles']
+            'architecture': self.old_metadata['architecture'],
+            'config': self.old_metadata['config'],
+            'devices': self.old_metadata['devices'],
+            'profiles': self.old_metadata['profiles']
         }
 
         if self._needs_to_change_instance_config('architecture'):
@@ -692,7 +691,6 @@ class LXDContainerManagement(object):
 
     def run(self):
         """Run the main method."""
-
         try:
             try:
                 if self.instance_type == 'container':
@@ -700,11 +698,11 @@ class LXDContainerManagement(object):
                 elif self.instance_type == 'virtual-machine':
                     self.instance = self.client.virtual_machines.get(self.name)
 
-                self.old_instance_json = self.client.api.instances[self.name].get().json()
+                self.old_metadata = self.client.api.instances[self.name].get().json()['metadata']
 
             except NotFound:
                 self.instance = None
-                self.old_instance_json = {'metadata': {}}
+                self.old_metadata = {}
 
             self.old_state = ANSIBLE_LXD_STATES[self.instance.status] if self.instance else 'absent'
 
