@@ -28,6 +28,7 @@ options:
     - Target path (expression).
     type: str
     required: true
+    aliases: [ path ]
   ftype:
     description:
     - The file type that should have SELinux contexts applied.
@@ -45,22 +46,25 @@ options:
     default: a
   setype:
     description:
-    - SELinux type for the specified target.
+    - SELinux type for the specified I(target).
     type: str
-    required: true
-    aliases: [ equal ]
+  equal:
+    description:
+    - Path to use for substituting the target. The context labeling for the I(target) subtree is made equivalent to this path.
+    type: str
   seuser:
     description:
-    - SELinux user for the specified target.
+    - SELinux user for the specified I(target).
     type: str
   selevel:
     description:
-    - SELinux range for the specified target.
+    - SELinux range for the specified I(target).
     type: str
     aliases: [ serange ]
   state:
     description:
     - Whether the SELinux file context must be C(absent) or C(present).
+    - Specifying C(absent) deletes labeling mappings to both SELinux types and path substitutions.
     type: str
     choices: [ absent, present ]
     default: present
@@ -77,6 +81,8 @@ options:
     default: false
 notes:
 - The changes are persistent across reboots.
+- I(setype) and I(equal) are mutually exclusive.
+- If I(state) is C(present) then one of I(setype) or I(equal) is mandatory.
 - The M(community.general.sefcontext) module does not modify existing files to the new
   SELinux context(s), so it is advisable to first create the SELinux
   file contexts before creating files, or run C(restorecon) manually
