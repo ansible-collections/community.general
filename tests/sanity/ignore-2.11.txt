@@ -19,9 +19,9 @@ plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/puppet.py validate-modules:parameter-invalid                          # invalid alias - removed in 7.0.0
-plugins/modules/rax_files_objects.py use-argspec-type-path
-plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice
-plugins/modules/rax.py use-argspec-type-path # fix needed
+plugins/modules/rax_files_objects.py use-argspec-type-path                            # module deprecated - removed in 9.0.0
+plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice          # module deprecated - removed in 9.0.0
+plugins/modules/rax.py use-argspec-type-path                                          # module deprecated - removed in 9.0.0
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/xfconf.py validate-modules:return-syntax-error
 plugins/modules/yarn.py use-argspec-type-path

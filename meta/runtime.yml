@@ -22,6 +22,110 @@ plugin_routing:
     nios_next_network:
       redirect: infoblox.nios_modules.nios_next_network
   modules:
+    rax_cbs_attachments:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_cbs:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_cdb_database:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_cdb_user:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_cdb:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_clb_nodes:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_clb_ssl:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_clb:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_dns_record:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_dns:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_facts:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_files_objects:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_files:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_identity:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_keypair:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_meta:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_mon_alarm:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_mon_check:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_mon_entity:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_mon_notification_plan:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_mon_notification:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_network:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_queue:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_scaling_group:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
+    rax_scaling_policy:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on the deprecated package pyrax.
     database.aerospike.aerospike_migrations:
       redirect: community.general.aerospike_migrations
       deprecation:
@@ -4499,6 +4603,10 @@ plugin_routing:
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
   doc_fragments:
+    rackspace:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This doc fragment is used by rax modules, that rely on the deprecated package pyrax.
     _gcp:
       redirect: community.google._gcp
     docker:
@@ -4514,6 +4622,10 @@ plugin_routing:
     postgresql:
       redirect: community.postgresql.postgresql
   module_utils:
+    rax:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module util relies on the deprecated package pyrax.
     docker.common:
       redirect: community.docker.common
     docker.swarm:

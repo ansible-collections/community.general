@@ -1,0 +1,28 @@
+deprecated_features:
+  - rax_cbs_attachments - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_cbs - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_cdb_database - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_cdb - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_cdb_user - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_clb_nodes - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_clb - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_clb_ssl - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_dns - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_dns_record - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_facts - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_files_objects - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_files - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_identity - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_keypair - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_meta - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_mon_alarm - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_mon_check - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_mon_entity - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_mon_notification_plan - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_mon_notification - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_network - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_queue - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_scaling_group - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax_scaling_policy - module relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
+  - rax module utils - module utils code relies on deprecated library ``pyrax`` and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5752).
