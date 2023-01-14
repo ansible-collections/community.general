@@ -281,7 +281,7 @@ def semanage_fcontext_delete(module, result, target, ftype, equal, do_reload, se
         sefcontext.set_reload(do_reload)
         exists = semanage_fcontext_exists(sefcontext, target, ftype)
         equal_exists = semanage_fcontext_equal_exists(sefcontext, target)
-        if exists:
+        if exists and equal is None:
             # Remove existing entry
             orig_seuser, orig_serole, orig_setype, orig_serange = exists
 
