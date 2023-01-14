@@ -243,7 +243,7 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, equal, do_re
                 # Modify existing path substitution entry
                 orig_equal = exists
 
-                if target != orig_equal:
+                if equal != orig_equal:
                     if not module.check_mode:
                         sefcontext.modify_equal(target, equal)
                     changed = True
