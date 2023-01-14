@@ -106,6 +106,17 @@ EXAMPLES = r'''
     setype: httpd_git_rw_content_t
     state: present
 
+- name: Substitute file contexts for path /srv/containers with /var/lib/containers
+  community.general.sefcontext:
+    target: /srv/containers
+    equal: /var/lib/containers
+    state: present
+
+- name: Delete any file context mappings for path /srv/git
+  community.general.sefcontext:
+    target: /srv/git
+    state: absent
+
 - name: Apply new SELinux file context to filesystem
   ansible.builtin.command: restorecon -irv /srv/git_repos
 '''
