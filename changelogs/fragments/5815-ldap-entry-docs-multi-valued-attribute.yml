@@ -1,2 +1,0 @@
-minor_changes:
-  - ldap_entry - add documentation example on how to add multi-valued attribute (https://github.com/ansible-collections/community.general/pull/5815)
