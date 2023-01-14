@@ -166,7 +166,7 @@ def main():
             python_version_info=python_version_info,
             python_system_path=sys.path,
         )
-    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(?:\[([a-z][a-zA-Z0-9_ ]+)\])?(?:(==|[><]=?)([0-9.]+))?$', flags=re.IGNORECASE)
+    pkg_dep_re = re.compile(r'(^[a-z][a-z0-9_-]+) *(?:\[ *([a-z0-9][a-z0-9_ ]+) *\])? *(?:(==|[><]=?) *([0-9.]+))?$', flags=re.IGNORECASE)
 
     results = dict(
         not_found=[],
