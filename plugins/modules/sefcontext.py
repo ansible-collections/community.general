@@ -270,7 +270,7 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, equal, do_re
     module.exit_json(changed=changed, seuser=seuser, serange=serange, **result)
 
 
-def semanage_fcontext_delete(module, result, target, ftype, do_reload, sestore=''):
+def semanage_fcontext_delete(module, result, target, ftype, equal, do_reload, sestore=''):
     ''' Delete SELinux file context mapping definition from the policy. '''
 
     changed = False
@@ -292,7 +292,7 @@ def semanage_fcontext_delete(module, result, target, ftype, do_reload, sestore='
             if module._diff:
                 prepared_diff += '# Deletion to semanage file context mappings\n'
                 prepared_diff += '-%s      %s      %s:%s:%s:%s\n' % (target, ftype, exists[0], exists[1], exists[2], exists[3])
-        if equal_exists:
+        if (equal_exists and (equal is not None and equal_exists == equal)) or (equal_exists and equal is None):
             # Remove existing path substitution entry
             orig_equal = equal_exists
 
