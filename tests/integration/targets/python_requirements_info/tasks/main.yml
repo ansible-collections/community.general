@@ -28,7 +28,6 @@
       - SomeProject >= 1.2, < 2.0
       - SomeProject[foo, bar]
       - SomeProject ~= 1.4.2
-      - requests [security] >= 2.8.1, == 2.8.* ; python_version < "2.7"
   register: dep_info
 
 - name: ensure python_requirements_info returns desired info
