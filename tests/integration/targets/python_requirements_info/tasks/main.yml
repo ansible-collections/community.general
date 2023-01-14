@@ -19,6 +19,23 @@
       - "'python_version' in basic_info"
       - basic_info.python_version_info == ansible_python.version
 
+# See https://pip.pypa.io/en/stable/reference/requirement-specifiers/
+- name: ensure module supports PEP-508 specification
+  python_requirements_info:
+    dependencies:
+      - SomeProject
+      - SomeProject == 1.3
+      - SomeProject >= 1.2, < 2.0
+      - SomeProject[foo, bar]
+      - SomeProject ~= 1.4.2
+      - requests [security] >= 2.8.1, == 2.8.* ; python_version < "2.7"
+  register: dep_info
+
+- name: ensure python_requirements_info returns desired info
+  assert:
+    that:
+    - dep_info is not failed
+
 - name: run python_requirements_info module
   python_requirements_info:
     dependencies:
@@ -43,6 +60,72 @@
   assert:
     that:
       - wrong_spec1 is failed
+
+- name: wrong req
+  python_requirements_info:
+    dependencies:
+      - $azdqsc
+  register: wrong_spec2
+  ignore_errors: true
+
+- name: ensure wrong specs return error
+  assert:
+    that:
+      - wrong_spec2 is failed
+
+- name: wrong req
+  python_requirements_info:
+    dependencies:
+      - 1234=!>1.a
+  register: wrong_spec3
+  ignore_errors: true
+
+- name: ensure wrong specs return error
+  assert:
+    that:
+      - wrong_spec3 is failed
+
+- name: Install Python sampleprojectpy2 library
+  pip:
+    name: httpio==0.1.2
+
+- name: run python_requirements_info module
+  python_requirements_info:
+    dependencies:
+      - httpio==0.1.2
+  register: dep_info
+
+- name: ensure python_requirements_info returns desired info
+  assert:
+    that:
+      - "'installed' in dep_info.valid.httpio"
+
+- name: run python_requirements_info module
+  python_requirements_info:
+    dependencies:
+      - httpio==0.1.3
+  register: dep_info
+
+- name: ensure python_requirements_info returns desired info
+  assert:
+    that:
+      - "'httpio' in dep_info.mismatched"
+
+- name: run python_requirements_info module
+  python_requirements_info:
+    dependencies:
+      - httpio==5.0.0
+  register: dep_info
+
+- name: ensure python_requirements_info returns desired info
+  assert:
+    that:
+      - "'httpio' in dep_info.mismatched"
+
+- name: Uninstall Python sampleprojectpy2 library
+  pip:
+    name: httpio==0.1.2
+    state: absent
 
 # See https://github.com/ansible-collections/community.general/issues/731
 - name: include test related to parsing issue for extra syntax

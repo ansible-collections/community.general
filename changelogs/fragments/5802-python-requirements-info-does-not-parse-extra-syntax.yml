@@ -1,2 +1,6 @@
 bugfixes:
 - python_requirements_info - fix bug with parsing ``project[extra]`` syntax (https://github.com/ansible-collections/community.general/pull/5802).
+- python_requirements_info - fix bug with parsing PEP-508 syntax (https://github.com/ansible-collections/community.general/pull/5802).
+minor_changes:
+- python_requirements_info - add warning in case extras identifiers are provided in package names (https://github.com/ansible-collections/community.general/pull/5802).
+- python_requirements_info - add ignored return list in case packages could not be verified (e.g. extras identifiers) (https://github.com/ansible-collections/community.general/pull/5802).
