@@ -101,11 +101,11 @@ author:
 - Dag Wieers (@dagwieers)
 attributes:
     check_mode:
-      support: full
+        support: full
     diff_mode:
-      support: full
+        support: full
     platform:
-      platforms: rhel
+        platforms: rhel
 '''
 
 EXAMPLES = r'''
