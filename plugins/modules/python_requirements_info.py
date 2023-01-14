@@ -15,7 +15,8 @@ description:
   - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
   - Although the extra identifiers are valid input, only the correctness of the identifier is verified. The library verification is not performed.
   - This module is almost PEP-508 compliant.
-  - The requirements C(SomeProject == 5.4 ; python_version < "3.8") or C(SomeProject ; sys_platform == 'win32') are not considered valid.
+  - The requirements C(SomeProject == 5.4 ; python_version < "3.8"), C(SomeProject ; sys_platform == 'win32') are not considered valid.
+  - The version operator C(~=) is also not considered valid on every platform.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
