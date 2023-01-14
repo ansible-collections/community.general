@@ -23,6 +23,11 @@
     setype: httpd_sys_content_t
     state: absent
 
+- name: Ensure we start with a clean state
+  sefcontext:
+    path: /tmp/foo
+    state: absent
+
 - name: Set SELinux file context of foo/bar
   sefcontext:
     path: '/tmp/foo/bar(/.*)?'
