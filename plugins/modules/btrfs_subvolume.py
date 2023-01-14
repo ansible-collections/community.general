@@ -226,7 +226,6 @@ class BtrfsSubvolumeModule(object):
     __DELETE_SUBVOLUME_OPERATION = 'delete'
     __SET_DEFAULT_SUBVOLUME_OPERATION = 'set-default'
 
-    __DATETIME_FORMAT = "%Y%m%d_%H%M%S"
     __UNKNOWN_SUBVOLUME_ID = '?'
 
     def __init__(self, module):
