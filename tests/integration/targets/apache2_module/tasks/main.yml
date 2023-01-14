@@ -45,3 +45,8 @@
         that: modules_before.stdout == modules_after.stdout
   when: ansible_os_family in ['Debian', 'Suse']
   # centos/RHEL does not have a2enmod/a2dismod
+
+- name: include misleading warning test
+  include: 635-apache2-misleading-warning.yml
+  when: ansible_os_family in ['Debian']
+  # Suse has mpm_event module compiled within the base apache2
