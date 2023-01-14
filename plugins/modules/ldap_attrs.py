@@ -57,8 +57,12 @@ options:
     required: true
     type: dict
     description:
-      - The attribute(s) and value(s) to add or remove. The complex argument format is required in order to pass
-        a list of strings (see examples).
+      - The attribute(s) and value(s) to add or remove.
+      - Each attribute value can be a string for single-valued attributes or
+        a list of strings for multi-valued attributes.
+        To break long string values
+        into multiple lines for readability use the YAML block modifiers as
+        seen in the examples.
   ordered:
     required: false
     type: bool
