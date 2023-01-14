@@ -93,7 +93,9 @@ python_system_path:
     - /usr/local/opt/python@2/site-packages/
     - /usr/lib/python/site-packages/
 valid:
-  description: A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be null
+  description: 
+  - A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be null
+  - The dependency name will be normalised to no-spaces. This is not PEP-508 compliant.
   returned: always
   type: dict
   sample:
@@ -104,7 +106,9 @@ valid:
       desired: botocore<2
       installed: 1.10.60
 mismatched:
-  description: A dictionary of dependencies that did not satisfy the desired version
+  description:
+  - A dictionary of dependencies that did not satisfy the desired version
+  - The dependency name will be normalised to no-spaces. This is not PEP-508 compliant.
   returned: always
   type: dict
   sample:
@@ -112,7 +116,9 @@ mismatched:
       desired: botocore>2
       installed: 1.10.60
 not_found:
-  description: A list of packages that could not be imported at all, and are not installed
+  description:
+  - A list of packages that could not be imported at all, and are not installed
+  - The dependency name will be normalised to no-spaces. This is not PEP-508 compliant.
   returned: always
   type: list
   sample:
