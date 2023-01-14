@@ -36,7 +36,7 @@ options:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
         existing entry, use M(community.general.ldap_attrs) module instead.
-        Each attribute value can be a string for single-valued attributes or
+      - Each attribute value can be a string for single-valued attributes or
         a list of strings for multi-valued attributes.
         If you need to pass a list of list of strings like ACLs strings,
         use the complex YAML syntax instead as indicated in the examples.
