@@ -38,8 +38,9 @@ options:
         existing entry, use M(community.general.ldap_attrs) module instead.
       - Each attribute value can be a string for single-valued attributes or
         a list of strings for multi-valued attributes.
-        If you need to pass a list of list of strings like ACLs strings,
-        use the complex YAML syntax instead as indicated in the examples.
+        To break long string values
+        into multiple lines for readability use the YAML block modifiers as
+        seen in the examples.
     type: dict
     default: {}
   objectClass:
