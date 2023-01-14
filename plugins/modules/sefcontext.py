@@ -56,10 +56,12 @@ options:
   seuser:
     description:
     - SELinux user for the specified I(target).
+    - Defaults to C(system_u) for new file contexts and to existing value when modifying file contexts.
     type: str
   selevel:
     description:
     - SELinux range for the specified I(target).
+    - Defaults to C(s0) for new file contexts and to existing value when modifying file contexts.
     type: str
     aliases: [ serange ]
   state:
@@ -111,6 +113,12 @@ EXAMPLES = r'''
     target: /srv/containers
     equal: /var/lib/containers
     state: present
+
+- name: Delete file context path substitution for /srv/containers
+  community.general.sefcontext:
+    target: /srv/containers
+    equal: /var/lib/containers
+    state: absent
 
 - name: Delete any file context mappings for path /srv/git
   community.general.sefcontext:
