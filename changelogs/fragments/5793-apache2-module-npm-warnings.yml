@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_module - add module argument ``warn_mpm_absent`` to control whether warning are raised in some edge cases (https://github.com/ansible-collections/community.general/pull/5793).

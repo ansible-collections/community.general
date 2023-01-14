@@ -49,6 +49,12 @@ options:
         - Ignore configuration checks about inconsistent module configuration. Especially for mpm_* modules.
      type: bool
      default: false
+   warn_mpm_absent:
+     description:
+        - Control the behavior of the warning process for MPM modules.
+     type: bool
+     default: true
+     version_added: 6.3.0
 requirements: ["a2enmod","a2dismod"]
 notes:
   - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
@@ -77,6 +83,18 @@ EXAMPLES = '''
     state: absent
     name: mpm_worker
     ignore_configcheck: true
+
+- name: Disable mpm_event, enable mpm_prefork and ignore warnings about missing mpm module
+  community.general.apache2_module:
+    name: "{{ item.module }}"
+    state: "{{ item.state }}"
+    warn_mpm_absent: false
+    ignore_configcheck: true
+  loop:
+  - module: mpm_event
+    state: absent
+  - module: mpm_prefork
+    state: present
 
 - name: Enable dump_io module, which is identified as dumpio_module inside apache2
   community.general.apache2_module:
@@ -140,10 +158,11 @@ def _module_is_enabled(module):
         error_msg = "Error executing %s: %s" % (control_binary, stderr)
         if module.params['ignore_configcheck']:
             if 'AH00534' in stderr and 'mpm_' in module.params['name']:
-                module.warnings.append(
-                    "No MPM module loaded! apache2 reload AND other module actions"
-                    " will fail if no MPM module is loaded immediately."
-                )
+                if module.params['warn_mpm_absent']:
+                    module.warnings.append(
+                        "No MPM module loaded! apache2 reload AND other module actions"
+                        " will fail if no MPM module is loaded immediately."
+                    )
             else:
                 module.warnings.append(error_msg)
             return False
@@ -249,6 +268,7 @@ def main():
             force=dict(type='bool', default=False),
             state=dict(default='present', choices=['absent', 'present']),
             ignore_configcheck=dict(type='bool', default=False),
+            warn_mpm_absent=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
     )

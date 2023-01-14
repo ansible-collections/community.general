@@ -180,7 +180,7 @@
       - mpm_worker
       - mpm_event
       - mpm_prefork
-    ignore_errors: yes
+    ignore_errors: true
     register: remove_with_configcheck
 
   - name: ensure configcheck fails task with when run without mpm modules
