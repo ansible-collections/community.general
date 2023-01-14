@@ -22,6 +22,8 @@ attributes:
     support: full
   diff_mode:
     support: full
+  platform:
+    platforms: rhel
 options:
   target:
     description:
@@ -99,13 +101,6 @@ requirements:
 - policycoreutils-python
 author:
 - Dag Wieers (@dagwieers)
-attributes:
-  check_mode:
-    support: full
-  diff_mode:
-    support: full
-  platform:
-    platforms: rhel
 '''
 
 EXAMPLES = r'''
