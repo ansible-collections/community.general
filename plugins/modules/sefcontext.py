@@ -51,6 +51,7 @@ options:
   equal:
     description:
     - Path to use for substituting the I(target). The context labeling for the I(target) subtree is made equivalent to this path.
+    version_added: 5.8.5
     type: str
   seuser:
     description:
