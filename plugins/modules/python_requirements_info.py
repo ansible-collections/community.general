@@ -120,7 +120,7 @@ mismatched:
       installed: 1.10.60
 not_found:
   description:
-  - A list of packages that could not be imported at all, and are not installed
+  - A list of packages that could not be imported at all, and are not installed.
   - Only the package name is returned.
   returned: always
   type: list
