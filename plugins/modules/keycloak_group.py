@@ -37,7 +37,7 @@ options:
         description:
             - State of the group.
             - On C(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the group will be removed if it exists.
+            - On C(absent), the group will be removed if it exists. Be aware that absenting a group with subgroups will automatically delete all its subgroups too.
         default: 'present'
         type: str
         choices:
@@ -78,7 +78,7 @@ options:
             - Each element can describe a parent either by name or ID, both is
               fine but using names needs some more internal API calls (to map
               to ID's internally). On default given strings are interpreted as
-              names, to mark them as ID's prefix them with C(id:)
+              names, to mark them as ID's prefix them with C(id:).
         elements: str
 
 notes:
