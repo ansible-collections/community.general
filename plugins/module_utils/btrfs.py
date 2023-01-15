@@ -25,7 +25,7 @@ def find_common_path_prefix(paths):
     Find the common prefix among all provided paths.
     Assumes all paths are already normalized as by normalize_subvolume_path
     """
-    pieces = list(map(lambda p: p.split(os.path.sep), paths))
+    pieces = [p.split(os.path.sep) for p in paths]
     least = min(pieces)
     most = max(pieces)
 
@@ -48,7 +48,7 @@ class BtrfsCommands(object):
     def filesystem_show(self):
         command = "%s filesystem show -d" % (self.__btrfs)
         result = self.__module.run_command(command, check_rc=True)
-        stdout = map(lambda x: x.strip(), result[1].splitlines())
+        stdout = [x.strip() for x in result[1].splitlines()]
         filesystems = []
         current = None
         for line in stdout:
@@ -78,18 +78,18 @@ class BtrfsCommands(object):
     def subvolumes_list(self, filesystem_path):
         command = "%s subvolume list -tap %s" % (self.__btrfs, filesystem_path)
         result = self.__module.run_command(command, check_rc=True)
-        stdout = list(map(lambda x: x.split('\t'), result[1].splitlines()))
+        stdout = [x.split('\t') for x in result[1].splitlines()]
         subvolumes = [{'id': 5, 'parent': None, 'path': '/'}]
         if len(stdout) > 2:
-            subvolumes.extend(self.__parse_subvolume_list(stdout[0], stdout[2:]))
+            subvolumes.extend([self.__parse_subvolume_list_record(x) for x in stdout[2:]])
         return subvolumes
 
-    def __parse_subvolume_list(self, header, subvolumes):
-        return map(lambda x: {
-            'id': int(x[0]),
-            'parent': int(x[2]),
-            'path': normalize_subvolume_path(x[5])
-        }, subvolumes)
+    def __parse_subvolume_list_record(self, item):
+        return {
+            'id': int(item[0]),
+            'parent': int(item[2]),
+            'path': normalize_subvolume_path(item[5]),
+        }
 
     def subvolume_get_default(self, filesystem_path):
         command = [self.__btrfs, "subvolume", "get-default", to_bytes(filesystem_path)]
@@ -174,7 +174,7 @@ class BtrfsInfoProvider(object):
             return {
                 'mountpoint': groups['target'],
                 'device': groups['source'],
-                'subvolid': self.__extract_mount_subvolid(groups['options'])
+                'subvolid': self.__extract_mount_subvolid(groups['options']),
             }
         else:
             raise Exception("Failed to parse findmnt result for line: '%s'" % line)
@@ -410,7 +410,7 @@ class BtrfsFilesystem(object):
                 'id': id,
                 'path': subvolume['path'],
                 'parent': subvolume['parent'],
-                'mountpoints': self.get_mountpoints_by_subvolume_id(id)
+                'mountpoints': self.get_mountpoints_by_subvolume_id(id),
             })
 
         return {
@@ -418,7 +418,7 @@ class BtrfsFilesystem(object):
             'devices': self.__devices,
             'label': self.__label,
             'uuid': self.__uuid,
-            'subvolumes': subvolumes
+            'subvolumes': subvolumes,
         }
 
 

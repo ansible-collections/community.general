@@ -1,4 +1,0 @@
----
-minor_changes:
-  - btrfs_info - new module to query the state of available btrfs filesystems
-  - btrfs_subvolume - new module to create/update/delete btrfs subvolumes and snapshots

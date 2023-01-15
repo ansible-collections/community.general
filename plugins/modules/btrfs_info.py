@@ -10,12 +10,16 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: btrfs_info
-short_description: Returns the current status of all identified btrfs filesystems
-version_added: "1.0.0"
-description: Returns the current status of all identified btrfs filesystems
+short_description: Query btrfs filesystem info
+version_added: "6.3.0"
+description: Query status of available btrfs filesystems, including uuid, label, subvolumes and mountpoints.
 
 author:
     - Gregory Furlong (@gnfzdz)
+
+extends_documentation_fragment:
+      - community.general.attributes
+      - community.general.attributes.info_module
 '''
 
 EXAMPLES = r'''
@@ -90,9 +94,9 @@ def run_module():
     )
 
     provider = BtrfsFilesystemsProvider(module)
-    filesystems = list(map(lambda x: x.get_summary(), provider.get_filesystems()))
+    filesystems = [x.get_summary() for x in provider.get_filesystems()]
     result = {
-        "filesystems": filesystems
+        "filesystems": filesystems,
     }
     module.exit_json(**result)
 

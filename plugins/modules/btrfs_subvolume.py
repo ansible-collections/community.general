@@ -10,63 +10,56 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: btrfs_subvolume
-short_description: Creates/update/delete btrfs subvolumes
-version_added: "1.0.0"
+short_description: Manage btrfs subvolumes
+version_added: "6.3.0"
 
-description: Creates, updates and deletes btrfs subvolumes based on the provided parameters.
+description: Creates, updates and deletes btrfs subvolumes and snapshots.
 
 options:
     automount:
         description:
-        - Allow mounting the targeted btrfs filesystem as necessary to validate the current state and make required changes.
-        required: false
+        - Allow the module to temporarily mount the targeted btrfs filesystem in order to validate the current state and make any required changes.
         type: bool
         default: false
     default:
         description:
-        - Make the targetted subvolume the default subvolume
-        required: false
+        - Make the subvolume specified by I(name) the filesystem's default subvolume.
         type: bool
         default: false
     filesystem_device:
         description:
-        - A block device contained within the btrfs filesystem to be targeted
+        - A block device contained within the btrfs filesystem to be targeted.
         - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
-        required: false
         type: path
     filesystem_label:
         description:
-        - A descriptive label assigned to the btrfs filesystem to be targeted
+        - A descriptive label assigned to the btrfs filesystem to be targeted.
         - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
-        required: false
         type: str
     filesystem_uuid:
         description:
-        - A unique identifier assigned to the btrfs filesystem to be targeted
+        - A unique identifier assigned to the btrfs filesystem to be targeted.
         - Useful when multiple btrfs filesystems are present to specify which filesystem should be targeted.
-        required: false
         type: str
     name:
         description:
-        - Name of the subvolume/snapshot to be created
+        - Name of the subvolume/snapshot to be targeted.
         required: true
         type: str
     recursive:
         description:
-        - When true, indicates that parent/child subvolumes should be created/removed
-        - as necessary to complete the operation (for state present/absent respectively).
-        required: false
+        - When true, indicates that parent/child subvolumes should be created/removed.
+        - as necessary to complete the operation (for I(state=present) and I(state=absent) respectively).
         type: bool
         default: false
     snapshot_source:
         description:
-        - Source subvolume for the created snapshot.
+        - Identifies the source subvolume for the created snapshot.
         - Infers that the created subvolume is a snapshot.
-        required: false
         type: str
     snapshot_conflict:
         description:
-        - Policy defining behavior when a subvolume already exists at the path of the requested snapshot
+        - Policy defining behavior when a subvolume already exists at the path of the requested snapshot.
         - C(skip) - Create a snapshot only if a subvolume does not yet exist at the target location, otherwise indicate that no change is required.
           Warning, this option does not yet verify that the target subvolume was generated from a snapshot of the requested source.
         - C(clobber) - If a subvolume already exists at the requested location, delete it first.
@@ -74,22 +67,20 @@ options:
         - C(error) - If a subvolume already exists at the requested location, return an error.
           This option is not idempotent and will result in an error on replay of the module.
         type: str
-        required: false
         choices: [ skip, clobber, error ]
         default: skip
     state:
         description:
-            - Whether the subvolume should exist or not
+            - Indicates the current state of the targeted subvolume.
         type: str
-        required: false
         choices: [ absent, present ]
         default: present
 
 notes:
-  - If any or all of the filesystem_device, filesystem_label or filesystem_uuid parameters are provided, there is expected
+  - If any or all of the options I(filesystem_device), I(filesystem_label) or I(filesystem_uuid) parameters are provided, there is expected
     to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or only a single
     btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and return an error.
-  - C(check_mode) is supported, but in some scenarios it may erroneously report intermediate subvolumes being created.
+  - I(check_mode) is supported, but in some scenarios it may erroneously report intermediate subvolumes being created.
     After mounting, if a directory like file is found where the subvolume would have been created, the operation is skipped.
 
 author:
@@ -200,7 +191,7 @@ modifications:
 
 target_subvolume_id:
     description:
-    - The id of the subvolume specified with the name parameter, either pre-existing or created as part of module execution
+    - The id of the subvolume specified with the I(name) parameter, either pre-existing or created as part of module execution
     type: int
     sample: 257
     returned: Success and subvolume exists after module execution
@@ -292,7 +283,7 @@ class BtrfsSubvolumeModule(object):
         criteria = {
             'uuid': self.__filesystem_uuid,
             'label': self.__filesystem_label,
-            'device': self.__filesystem_device
+            'device': self.__filesystem_device,
         }
         return self.__provider.get_matching_filesystem(criteria)
 
@@ -311,7 +302,7 @@ class BtrfsSubvolumeModule(object):
             return filesystem
         else:
             self.module.fail_json(
-                msg="Failed to automatically identify targetted filesystem. "
+                msg="Failed to automatically identify targeted filesystem. "
                 "No explicit device indicated and found %d available filesystems." % len(filesystems))
 
     # Prepare unit of work
@@ -418,7 +409,7 @@ class BtrfsSubvolumeModule(object):
         self.__unit_of_work.append({
             'action': self.__CREATE_SUBVOLUME_OPERATION,
             'target': normalize_subvolume_path(subvolume_path),
-            'intermediate': intermediate
+            'intermediate': intermediate,
         })
 
     def __stage_create_snapshot(self, source_subvolume, target_subvolume_path):
@@ -427,7 +418,7 @@ class BtrfsSubvolumeModule(object):
             'action': self.__CREATE_SNAPSHOT_OPERATION,
             'source': source_subvolume.path,
             'source_id': source_subvolume.id,
-            'target': normalize_subvolume_path(target_subvolume_path)
+            'target': normalize_subvolume_path(target_subvolume_path),
         })
 
     def __stage_delete_subvolume(self, subvolume):
@@ -435,7 +426,7 @@ class BtrfsSubvolumeModule(object):
         self.__unit_of_work.append({
             'action': self.__DELETE_SUBVOLUME_OPERATION,
             'target': subvolume.path,
-            'target_id': subvolume.id
+            'target_id': subvolume.id,
         })
 
     def __stage_set_default_subvolume(self, subvolume_path, subvolume_id=None):
@@ -443,7 +434,7 @@ class BtrfsSubvolumeModule(object):
         self.__unit_of_work.append({
             'action': self.__SET_DEFAULT_SUBVOLUME_OPERATION,
             'target': normalize_subvolume_path(subvolume_path),
-            'target_id': subvolume_id
+            'target_id': subvolume_id,
         })
 
     # Execute the unit of work
