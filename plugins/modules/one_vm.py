@@ -1683,7 +1683,7 @@ def main():
     if owner_id is not None or group_id is not None:
         changed = set_vm_ownership(module, one_client, vms, owner_id, group_id) or changed
 
-    if template_id is None and instance_ids is not None and updateconf is not None:
+    if template_id is None and updateconf is not None:
         changed = update_vms(module, one_client, vms, updateconf) or changed
 
     if wait and not module.check_mode and state != 'present':
