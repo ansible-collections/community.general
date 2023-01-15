@@ -37,7 +37,9 @@ options:
         description:
             - State of the group.
             - On C(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the group will be removed if it exists. Be aware that absenting a group with subgroups will automatically delete all its subgroups too.
+            - >-
+              On C(absent), the group will be removed if it exists. Be aware that absenting
+              a group with subgroups will automatically delete all its subgroups too.
         default: 'present'
         type: str
         choices:
