@@ -97,7 +97,7 @@ python_system_path:
     - /usr/lib/python/site-packages/
 valid:
   description:
-  - A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be null
+  - A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be C(null).
   - The dependency name will be normalised to no-spaces.
   returned: always
   type: dict
