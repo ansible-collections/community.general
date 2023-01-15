@@ -110,7 +110,7 @@ valid:
       installed: 1.10.60
 mismatched:
   description:
-  - A dictionary of dependencies that did not satisfy the desired version
+  - A dictionary of dependencies that did not satisfy the desired version.
   - The dependency name will be normalised to no-spaces.
   returned: always
   type: dict
