@@ -1,0 +1,2 @@
+bugfixes:
+  - yarn - fix state=latest not working with global=true https://github.com/ansible-collections/community.general/pull/5829).
