@@ -61,7 +61,7 @@ def test_proxmox_snap_info_without_argument(capfd):
 
 
 @patch('ansible_collections.community.general.plugins.modules.proxmox_snap_info.get_proxmox_snapshotlist', return_value=SNAPS)
-def test_snapshot_get(mocker,capfd):
+def test_snapshot_get(mocker, capfd):
     set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
@@ -79,7 +79,7 @@ def test_snapshot_get(mocker,capfd):
 
 
 @patch('ansible_collections.community.general.plugins.modules.proxmox_snap_info.get_proxmox_snapshotlist', return_value=SNAPS)
-def test_proxmox_snap_info_getsnapshots_older_than_2days(mocker,capfd):
+def test_proxmox_snap_info_getsnapshots_older_than_2days(mocker, capfd):
     set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
@@ -98,7 +98,7 @@ def test_proxmox_snap_info_getsnapshots_older_than_2days(mocker,capfd):
 
 
 @patch('ansible_collections.community.general.plugins.modules.proxmox_snap_info.get_proxmox_snapshotlist', return_value=SNAPS)
-def test_proxmox_snap_info_getsnapshots_only_snaps_with_name(mocker,capfd):
+def test_proxmox_snap_info_getsnapshots_only_snaps_with_name(mocker, capfd):
     set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
