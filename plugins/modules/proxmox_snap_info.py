@@ -6,6 +6,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
+import traceback
+from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import time
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -75,15 +81,10 @@ EXAMPLES = r'''
 
 RETURN = r'''#'''
 
-import time
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
-
-import traceback
 
 try:
-    from ansible_collections.community.general.plugins.modules.proxmox_snap import (ProxmoxSnapAnsible)
+    from ansible_collections.community.general.plugins.modules.proxmox_snap import (
+        ProxmoxSnapAnsible)
 
     HAS_PROXMOX_SNAP = True
     PROXMOX_SNAP_IMPORT_ERROR = None
@@ -93,20 +94,18 @@ except ImportError:
 else:
     HAS_PROXMOX_SNAP = True
 
-from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
 
-def get_proxmox_snapshotlist(module,hostname,vmid):
+def get_proxmox_snapshotlist(module, hostname, vmid):
     proxmox = ProxmoxSnapAnsible(module)
-    # If hostname is set get the VM id from ProxmoxAPI
     if not vmid and hostname:
         vmid = proxmox.get_vmid(hostname)
-    #elif not vmid:
+    elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched")
 
-    vm = get_proxmox_vm(proxmox,vmid)
+    vm = get_proxmox_vm(proxmox, vmid)
     snapshotlist = proxmox.snapshot(vm, vmid).get()
     return snapshotlist
+
 
 def main():
     module_args = proxmox_auth_argument_spec()
@@ -131,7 +130,6 @@ def main():
             msg=missing_required_lib('proxmox_snap'),
             exception=PROXMOX_SNAP_IMPORT_ERROR)
 
-
     vmid = module.params['vmid']
     hostname = module.params['hostname']
     snapname = module.params['snapname']
@@ -140,7 +138,7 @@ def main():
     older_than = module.params['older_than']
 
     if getsnapshots:
-        snapshotlist = get_proxmox_snapshotlist(module,hostname,vmid)
+        snapshotlist = get_proxmox_snapshotlist(module, hostname, vmid)
         oldsnapshotlist = []
 
         for s in snapshotlist:
@@ -152,7 +150,10 @@ def main():
             if ((time.time() - s["snaptime"]) / 60 / 60 / 24) > older_than:
                 oldsnapshotlist.append(s["name"])
 
-        snapshotdict = {"changed":False, "results": oldsnapshotlist, "older_than": older_than}
+        snapshotdict = {
+            "changed": False,
+            "results": oldsnapshotlist,
+            "older_than": older_than}
 
         module.exit_json(**snapshotdict)
     else:
@@ -160,7 +161,6 @@ def main():
 
         result['msg'] = 'No query requested: try "getsnapshot"'
         module.fail_json(**result)
-
 
 
 if __name__ == '__main__':
