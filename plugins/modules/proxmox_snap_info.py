@@ -6,12 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
-import traceback
-from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import time
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -81,6 +75,12 @@ EXAMPLES = r'''
 
 RETURN = r'''#'''
 
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
+import traceback
+from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import time
 
 try:
     from ansible_collections.community.general.plugins.modules.proxmox_snap import (
