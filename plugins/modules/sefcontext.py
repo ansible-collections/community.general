@@ -87,7 +87,7 @@ options:
 notes:
 - The changes are persistent across reboots.
 - I(setype) and I(equal) are mutually exclusive.
-- If I(state) is C(present) then one of I(setype) or I(equal) is mandatory.
+- If I(state=present) then one of I(setype) or I(equal) is mandatory.
 - The M(community.general.sefcontext) module does not modify existing files to the new
   SELinux context(s), so it is advisable to first create the SELinux
   file contexts before creating files, or run C(restorecon) manually
