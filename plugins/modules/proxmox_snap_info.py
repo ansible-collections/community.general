@@ -34,7 +34,6 @@ options:
   snapname:
     description:
       - Beginning of the snapshot name getsnapshots takes care of.
-    default: ''
     type: str
   getsnapshots:
     description:
@@ -97,6 +96,17 @@ else:
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
 
+def get_proxmox_snapshotlist(module,hostname,vmid):
+    proxmox = ProxmoxSnapAnsible(module)
+    # If hostname is set get the VM id from ProxmoxAPI
+    if not vmid and hostname:
+        vmid = proxmox.get_vmid(hostname)
+    #elif not vmid:
+        module.exit_json(changed=False, msg="Vmid could not be fetched")
+
+    vm = get_proxmox_vm(proxmox,vmid)
+    snapshotlist = proxmox.snapshot(vm, vmid).get()
+    return snapshotlist
 
 def main():
     module_args = proxmox_auth_argument_spec()
@@ -104,7 +114,7 @@ def main():
         vmid=dict(required=False),
         hostname=dict(),
         timeout=dict(type='int', default=30),
-        snapname=dict(type='str', default=''),
+        snapname=dict(type='str', required=False),
         getsnapshots=dict(type='bool', default=False),
         older_than=dict(type='int', default=0)
     )
@@ -121,7 +131,6 @@ def main():
             msg=missing_required_lib('proxmox_snap'),
             exception=PROXMOX_SNAP_IMPORT_ERROR)
 
-    proxmox = ProxmoxSnapAnsible(module)
 
     vmid = module.params['vmid']
     hostname = module.params['hostname']
@@ -130,30 +139,28 @@ def main():
     getsnapshots = module.params['getsnapshots']
     older_than = module.params['older_than']
 
-    # If hostname is set get the VM id from ProxmoxAPI
-    if not vmid and hostname:
-        vmid = proxmox.get_vmid(hostname)
-    elif not vmid:
-        module.exit_json(changed=False, msg="Vmid could not be fetched")
-
-    vm = proxmox.get_vm(vmid)
-
     if getsnapshots:
-        snapshotlist = proxmox.snapshot(vm, vmid).get()
+        snapshotlist = get_proxmox_snapshotlist(module,hostname,vmid)
         oldsnapshotlist = []
 
         for s in snapshotlist:
             if s["name"] == "current":
                 continue
-            if snapname != '':
+            if snapname:
                 if not s["name"][0:len(snapname)] == snapname:
                     continue
             if ((time.time() - s["snaptime"]) / 60 / 60 / 24) > older_than:
                 oldsnapshotlist.append(s["name"])
 
-        snapshotdict = {"results": oldsnapshotlist, "older_than": older_than}
+        snapshotdict = {"changed":False, "results": oldsnapshotlist, "older_than": older_than}
 
         module.exit_json(**snapshotdict)
+    else:
+        result = dict(changed=False)
+
+        result['msg'] = 'No query requested: try "getsnapshot"'
+        module.fail_json(**result)
+
 
 
 if __name__ == '__main__':
