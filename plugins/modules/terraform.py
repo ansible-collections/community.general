@@ -299,9 +299,9 @@ def preflight_validation(bin_path, project_path, version, variables_args=None, p
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
     if LooseVersion(version) < LooseVersion('0.15.0'):
-        rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path)
+        module.run_command([bin_path, 'validate', '-no-color'] + variables_args, check_rc=True, cwd=project_path)
     else:
-        rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path)
+        module.run_command([bin_path, 'validate', '-no-color'], check_rc=True, cwd=project_path)
 
 
 def _state_args(state_file):
