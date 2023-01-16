@@ -17,6 +17,15 @@ import ansible_collections.community.general.plugins.module_utils.proxmox as pro
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.modules import proxmox_snap_info
 
+
+def total_seconds(td):
+    # Keep backward compatibility with Python 2.6 which doesn't have this method
+    if hasattr(td, 'total_seconds'):
+        return td.total_seconds()
+    else:
+        return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
+
+
 SNAPS = [
 
     {'description': '',
@@ -48,14 +57,6 @@ SNAPS = [
 ALL_SNAP_LIST = ['snapshot_3days_old', 'snapshot_2days_old', 'snapshot_1days_old', 'veryold']
 SNAP_2d_LIST = ['snapshot_3days_old', 'snapshot_2days_old', 'veryold']
 SNAP_SNAPNAME_LIST = ['snapshot_3days_old', 'snapshot_2days_old', 'snapshot_1days_old']
-
-
-def total_seconds(td):
-    # Keep backward compatibility with Python 2.6 which doesn't have this method
-    if hasattr(td, 'total_seconds'):
-        return td.total_seconds()
-    else:
-        return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
 
 
 def test_proxmox_snap_info_without_argument(capfd):
