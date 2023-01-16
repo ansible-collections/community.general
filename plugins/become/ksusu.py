@@ -12,7 +12,7 @@ DOCUMENTATION = """
         - This become plugins allows your remote/login user to execute commands as another user by calling C(su) through the C(ksu) utility.
     author:
         - Ed Schaller (@schallee)
-    version_added: 6.2.0
+    version_added: 6.3.0
     options:
         become_user_ksu:
             description: User you use with C(ksu) to run C(su).
