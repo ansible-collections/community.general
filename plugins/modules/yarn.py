@@ -206,9 +206,7 @@ class Yarn(object):
                 cmd.append(self.registry)
 
             # If path is specified, cd into that path and run the command.
-
             cwd = None
-
             if self.path and not with_global_arg:
                 if not os.path.exists(self.path):
                     # Module will make directory if not exists.
