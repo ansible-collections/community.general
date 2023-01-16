@@ -235,24 +235,21 @@ class Yarn(object):
             missing.append(self.name)
             return installed, missing
 
-        result, error = self._exec(cmd, run_in_check_mode=True, check_rc=False)
+        # `yarn global list` should be treated as "unsupported with global" even though it exists,
+        # because it only only lists binaries, but `yarn global add` can install libraries too.
+        result, error = self._exec(cmd, run_in_check_mode=True, check_rc=False, unsupported_with_global=True)
 
         if error:
             self.module.fail_json(msg=error)
 
         for json_line in result.strip().split('\n'):
             data = json.loads(json_line)
-            if self.globally:
-                if data['type'] == 'list' and data['data']['type'].startswith('bins-'):
-                    # This is a string in format: 'bins-<PACKAGE_NAME>'
-                    installed.append(data['data']['type'][5:])
-            else:
-                if data['type'] == 'tree':
-                    dependencies = data['data']['trees']
+            if data['type'] == 'tree':
+                dependencies = data['data']['trees']
 
-                    for dep in dependencies:
-                        name, version = dep['name'].rsplit('@', 1)
-                        installed.append(name)
+                for dep in dependencies:
+                    name, version = dep['name'].rsplit('@', 1)
+                    installed.append(name)
 
         if self.name not in installed:
             missing.append(self.name)
