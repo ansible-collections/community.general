@@ -102,8 +102,11 @@ def get_proxmox_snapshotlist(module, hostname, vmid):
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched")
 
-    vm = get_proxmox_vm(proxmox, vmid)
+    vm = proxmox.get_vm(vmid)
     snapshotlist = proxmox.snapshot(vm, vmid).get()
+    if not snapshotlist:
+        module.exit_json(changed=False, msg="Snapshots could not be fetched")
+
     return snapshotlist
 
 
