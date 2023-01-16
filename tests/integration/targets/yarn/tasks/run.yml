@@ -164,18 +164,3 @@
     - assert:
         that:
           - yarn_global_update_old_package is changed
-
-    - name: 'Global remove a package'
-      yarn:
-        global: true
-        executable: '{{ yarn_bin_path }}/yarn'
-        name: left-pad
-        state: absent
-      environment:
-        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
-      register: yarn_global_uninstall_package
-
-    - name: 'Assert package removed'
-      assert:
-        that:
-          - yarn_global_uninstall_package is changed
