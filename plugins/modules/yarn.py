@@ -163,8 +163,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 class Yarn(object):
 
-    DEFAULT_GLOBAL_INSTALLATION_PATH = os.path.expanduser('~/.config/yarn/global')
-
     def __init__(self, module, **kwargs):
         self.module = module
         self.globally = kwargs['globally']
@@ -209,22 +207,17 @@ class Yarn(object):
 
             # If path is specified, cd into that path and run the command.
 
-            path = self.path
             cwd = None
 
-            if self.globally and unsupported_with_global:
-                _rc, out, _err = self.module.run_command(self.executable + ['global', 'dir'], check_rc=check_rc)
-                path = out.strip()
-
-            if path and not with_global_arg:
-                if not os.path.exists(path):
+            if self.path and not with_global_arg:
+                if not os.path.exists(self.path):
                     # Module will make directory if not exists.
-                    os.makedirs(path)
-                if not os.path.isdir(path):
-                    self.module.fail_json(msg="Path provided %s is not a directory" % path)
-                cwd = path
+                    os.makedirs(self.path)
+                if not os.path.isdir(self.path):
+                    self.module.fail_json(msg="Path provided %s is not a directory" % self.path)
+                cwd = self.path
 
-                if not os.path.isfile(os.path.join(path, 'package.json')):
+                if not os.path.isfile(os.path.join(self.path, 'package.json')):
                     self.module.fail_json(msg="Package.json does not exist in provided path.")
 
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
@@ -242,7 +235,7 @@ class Yarn(object):
             missing.append(self.name)
             return installed, missing
 
-        result, error = self._exec(cmd, True, False)
+        result, error = self._exec(cmd, run_in_check_mode=True, check_rc=False)
 
         if error:
             self.module.fail_json(msg=error)
@@ -352,7 +345,8 @@ def main():
 
     # When installing globally, use the defined path for global node_modules
     if globally:
-        path = Yarn.DEFAULT_GLOBAL_INSTALLATION_PATH
+        _rc, out, _err = module.run_command([executable, 'global', 'dir'], check_rc=True)
+        path = out.strip()
 
     yarn = Yarn(module,
                 name=name,
