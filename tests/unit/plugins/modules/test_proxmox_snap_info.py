@@ -18,35 +18,36 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from ansible_collections.community.general.plugins.modules import proxmox_snap_info
 
 SNAPS = [
- {'description': '',
-  'name': 'snapshot_3days_old',
-  'parent': 'xyz',
-  'snaptime': int(time.time() - timedelta(3).total_seconds()),
-  'vmstate': 0},
- {'description': '',
-  'name': 'snapshot_2days_old',
-  'parent': 'xyyz',
-  'snaptime': int(time.time() - timedelta(2).total_seconds()),
-  'vmstate': 0},
- {'description': '',
-  'name': 'snapshot_1days_old',
-  'parent': 'xyyz',
-  'snaptime': int(time.time() - timedelta(1).total_seconds()),
-  'vmstate': 0},
- {'description': '',
-  'name': 'veryold',
-  'parent': 'before_automated_upgrade',
-  'snaptime': 1669907928,
-  'vmstate': 0},
- {'description': 'You are here!',
-  'digest': 'd8ed9284b2b32a3f0ae3eb925b43599f56b59078',
-  'name': 'current',
-  'parent': 'snapshot_2022-12-11',
-  'running': 1}]
 
-ALL_SNAP_LIST = ['snapshot_3days_old','snapshot_2days_old','snapshot_1days_old','veryold']
-SNAP_2d_LIST = ['snapshot_3days_old','snapshot_2days_old','veryold']
-SNAP_SNAPNAME_LIST = ['snapshot_3days_old','snapshot_2days_old','snapshot_1days_old']
+    {'description': '',
+     'name': 'snapshot_3days_old',
+     'parent': 'xyz',
+     'snaptime': int(time.time() - timedelta(3).total_seconds()),
+     'vmstate': 0},
+    {'description': '',
+     'name': 'snapshot_2days_old',
+     'parent': 'xyyz',
+     'snaptime': int(time.time() - timedelta(2).total_seconds()),
+     'vmstate': 0},
+    {'description': '',
+     'name': 'snapshot_1days_old',
+     'parent': 'xyyz',
+     'snaptime': int(time.time() - timedelta(1).total_seconds()),
+     'vmstate': 0},
+    {'description': '',
+     'name': 'veryold',
+     'parent': 'before_automated_upgrade',
+     'snaptime': 1669907928,
+     'vmstate': 0},
+    {'description': 'You are here!',
+     'digest': 'd8ed9284b2b32a3f0ae3eb925b43599f56b59078',
+     'name': 'current',
+     'parent': 'snapshot_2022-12-11',
+     'running': 1}]
+
+ALL_SNAP_LIST = ['snapshot_3days_old', 'snapshot_2days_old', 'snapshot_1days_old', 'veryold']
+SNAP_2d_LIST = ['snapshot_3days_old', 'snapshot_2days_old', 'veryold']
+SNAP_SNAPNAME_LIST = ['snapshot_3days_old', 'snapshot_2days_old', 'snapshot_1days_old']
 
 
 def test_proxmox_snap_info_without_argument(capfd):
