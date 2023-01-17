@@ -107,6 +107,8 @@ class Bitwarden(object):
     def _get_matches(self, search_value, search_field, collection_id):
         """Return matching records whose search_field is equal to key.
         """
+
+        # Prepare set of params for Bitwarden CLI
         params = ['list', 'items', '--search', search_value]
 
         if collection_id:
@@ -121,7 +123,8 @@ class Bitwarden(object):
         return [item for item in initial_matches if item[search_field] == search_value]
 
     def get_field(self, field, search_value, search_field="name", collection_id=None):
-        """Return a list of the specified field for records whose search_field match search_value and filtered by collection.
+        """Return a list of the specified field for records whose search_field match search_value
+        and filtered by collection if collection has been provided.
 
         If field is None, return the whole record for each match.
         """
