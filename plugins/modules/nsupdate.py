@@ -269,12 +269,16 @@ class RecordManager(object):
             if lookup.rcode() in [dns.rcode.SERVFAIL, dns.rcode.REFUSED]:
                 self.module.fail_json(msg='Zone lookup failure: \'%s\' will not respond to queries regarding \'%s\'.' % (
                     self.module.params['server'], self.module.params['record']))
-            try:
-                zone = lookup.authority[0].name
-                if zone == name:
-                    return zone.to_text()
-            except IndexError:
-                pass
+            # If the response contains an Answer SOA RR whose name matches the queried name,
+            # this is the name of the zone in which the record needs to be inserted.
+            for rr in lookup.answer:
+                if rr.rdtype == dns.rdatatype.SOA and rr.name == name:
+                    return rr.name.to_text()
+            # If the response contains an Authority SOA RR whose name is a subdomain of the queried name,
+            # this SOA name is the zone in which the record needs to be inserted.
+            for rr in lookup.authority:
+                if rr.rdtype == dns.rdatatype.SOA and name.fullcompare(rr.name)[0] == dns.name.NAMERELN_SUBDOMAIN:
+                    return rr.name.to_text()
             try:
                 name = name.parent()
             except dns.name.NoParent:
