@@ -147,6 +147,8 @@ class LookupModule(LookupBase):
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
 
+        raise AnsibleError(collection_id)
+
         return [_bitwarden.get_field(field, term, search_field, collection_id) for term in terms]
 
 
