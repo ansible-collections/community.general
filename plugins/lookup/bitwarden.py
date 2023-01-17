@@ -28,11 +28,12 @@ DOCUMENTATION = """
         default: name
         version_added: 5.7.0
       field:
-        description: Field to fetch; leave unset to fetch whole response.
+        description: Field to fetch. Leave unset to fetch whole response.
         type: str
       collectionId:
-        description: Collection ID to filter results by collection; leave unset to skip filtering.
+        description: Collection ID to filter results by collection. Leave unset to skip filtering.
         type: str
+        version_added: 6.3.0
 """
 
 EXAMPLES = """
