@@ -451,8 +451,9 @@ options:
 
             providerType:
                 description:
-                    - Component type for this mapper (only supported value is C(org.keycloak.storage.ldap.mappers.LDAPStorageMapper)).
+                    - Component type for this mapper.
                 type: str
+                default: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
 
             config:
                 description:
@@ -776,7 +777,7 @@ def main():
         name=dict(type='str'),
         parentId=dict(type='str'),
         providerId=dict(type='str'),
-        providerType=dict(type='str'),
+        providerType=dict(type='str', default='org.keycloak.storage.ldap.mappers.LDAPStorageMapper'),
         config=dict(type='dict'),
     )
 
