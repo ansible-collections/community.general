@@ -50,7 +50,7 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='password', collectionId='bafba515-af11-47e6-abe3-af1200cd18b2') }}
-      
+
 - name: "Get full Bitwarden record named 'a_test'"
   ansible.builtin.debug:
     msg: >-
