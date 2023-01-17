@@ -107,7 +107,12 @@ class Bitwarden(object):
     def _get_matches(self, search_value, search_field, collection_id):
         """Return matching records whose search_field is equal to key.
         """
-        out, err = self._run(['list', 'items', '--search', search_value, '--collectionid', collection_id])
+        params = ['list', 'items', '--search', search_value]
+
+        if collection_id:
+            params.extend(['--collectionid', collection_id])
+
+        out, err = self._run(params)
 
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
@@ -115,7 +120,7 @@ class Bitwarden(object):
         # Filter to only include results from the right field.
         return [item for item in initial_matches if item[search_field] == search_value]
 
-    def get_field(self, field, search_value, search_field="name", collection_id=""):
+    def get_field(self, field, search_value, search_field="name", collection_id=None):
         """Return a list of the specified field for records whose search_field match search_value and filtered by collection.
 
         If field is None, return the whole record for each match.
@@ -146,8 +151,6 @@ class LookupModule(LookupBase):
         collection_id = self.get_option('collectionId')
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
-
-        raise AnsibleError(collection_id)
 
         return [_bitwarden.get_field(field, term, search_field, collection_id) for term in terms]
 
