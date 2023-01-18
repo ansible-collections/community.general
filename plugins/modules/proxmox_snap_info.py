@@ -67,7 +67,17 @@ EXAMPLES = r'''
 
 '''
 
-RETURN = r'''#'''
+RETURN = r'''
+snaplist:
+    description: List of Snapshots
+    returned: on success
+    type: list
+    elements: string
+msg:
+    description: Short message
+    returned: on failure
+    type: str
+'''
 
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
