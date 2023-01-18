@@ -916,6 +916,8 @@ files:
   $modules/pear.py:
     ignore: jle64
     labels: pear
+  $modules/pf.py:
+    maintainers: gyptazy
   $modules/pids.py:
     maintainers: saranyasridharan
   $modules/pingdom.py:
