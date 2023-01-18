@@ -23,7 +23,7 @@ options:
     type: str
   vmid:
     description:
-      - The instance id.
+      - The instance ID.
       - If not set, will be fetched from PromoxAPI based on the hostname.
     type: str
   timeout:
