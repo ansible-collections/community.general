@@ -113,7 +113,7 @@ class Bitwarden(object):
         params = ['list', 'items', '--search', search_value]
 
         if collection_id:
-            params.extend(['--collection_id', collection_id])
+            params.extend(['--collectionid', collection_id])
 
         out, err = self._run(params)
 
