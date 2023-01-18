@@ -84,6 +84,10 @@ def parse_pagination_link(header):
 
 
 def filter_sensitive_attributes(container, attributes):
+    '''
+    WARNING: This function is effectively private, **do not use it**!
+    It will be removed or renamed once changing its name no longer triggers a pylint bug.
+    '''
     for attr in attributes:
         container[attr] = "SENSITIVE_VALUE"
 
