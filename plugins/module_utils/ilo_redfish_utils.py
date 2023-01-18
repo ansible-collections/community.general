@@ -85,17 +85,16 @@ class iLORedfishUtils(RedfishUtils):
 
         datetime_uri = self.manager_uri + "DateTime"
 
-        response = self.get_request(self.root_uri + datetime_uri)
-        if not response['ret']:
-            return response
+        listofips = mgr_attributes['mgr_attr_value'].split(" ")
+        if len(listofips) > 2:
+            return {'ret': False, 'changed': False, 'msg': "More than 2 NTP Servers mentioned"}
 
-        data = response['data']
+        ntp_list = []
+        for ips in listofips:
+            ntp_list.append(ips)
 
-        ntp_list = data[setkey]
-        if len(ntp_list) == 2:
-            ntp_list.pop(0)
-
-        ntp_list.append(mgr_attributes['mgr_attr_value'])
+        while len(ntp_list) < 2:
+            ntp_list.append("0.0.0.0")
 
         payload = {setkey: ntp_list}
 
@@ -137,18 +136,16 @@ class iLORedfishUtils(RedfishUtils):
         nic_info = self.get_manager_ethernet_uri()
         uri = nic_info["nic_addr"]
 
-        response = self.get_request(self.root_uri + uri)
-        if not response['ret']:
-            return response
+        listofips = attr['mgr_attr_value'].split(" ")
+        if len(listofips) > 3:
+            return {'ret': False, 'changed': False, 'msg': "More than 3 DNS Servers mentioned"}
 
-        data = response['data']
+        dns_list = []
+        for ips in listofips:
+            dns_list.append(ips)
 
-        dns_list = data["Oem"]["Hpe"]["IPv4"][key]
-
-        if len(dns_list) == 3:
-            dns_list.pop(0)
-
-        dns_list.append(attr['mgr_attr_value'])
+        while len(dns_list) < 3:
+            dns_list.append("0.0.0.0")
 
         payload = {
             "Oem": {

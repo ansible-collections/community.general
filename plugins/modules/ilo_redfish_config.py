@@ -125,7 +125,7 @@ def main():
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
             attribute_name=dict(required=True),
-            attribute_value=dict(),
+            attribute_value=dict(type='str'),
             timeout=dict(type='int', default=10)
         ),
         required_together=[
