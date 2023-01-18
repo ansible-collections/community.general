@@ -70,13 +70,9 @@ EXAMPLES = r'''
 RETURN = r'''
 snaplist:
     description: List of Snapshots
-    returned: on success
+    returned: always, but can be empty
     type: list
-    elements: string
-msg:
-    description: Short message
-    returned: on failure
-    type: str
+    elements: str
 '''
 
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
