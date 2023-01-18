@@ -30,7 +30,7 @@ DOCUMENTATION = """
       field:
         description: Field to fetch. Leave unset to fetch whole response.
         type: str
-      collectionId:
+      collection_id:
         description: Collection ID to filter results by collection. Leave unset to skip filtering.
         type: str
         version_added: 6.3.0
@@ -50,7 +50,7 @@ EXAMPLES = """
 - name: "Get 'password' from Bitwarden record named 'a_test' from collection"
   ansible.builtin.debug:
     msg: >-
-      {{ lookup('community.general.bitwarden', 'a_test', field='password', collectionId='bafba515-af11-47e6-abe3-af1200cd18b2') }}
+      {{ lookup('community.general.bitwarden', 'a_test', field='password', collection_id='bafba515-af11-47e6-abe3-af1200cd18b2') }}
 
 - name: "Get full Bitwarden record named 'a_test'"
   ansible.builtin.debug:
@@ -113,7 +113,7 @@ class Bitwarden(object):
         params = ['list', 'items', '--search', search_value]
 
         if collection_id:
-            params.extend(['--collectionid', collection_id])
+            params.extend(['--collection_id', collection_id])
 
         out, err = self._run(params)
 
@@ -152,7 +152,7 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         field = self.get_option('field')
         search_field = self.get_option('search')
-        collection_id = self.get_option('collectionId')
+        collection_id = self.get_option('collection_id')
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
 
