@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_snap_info
 short_description: Snapshot management of instances in Proxmox VE cluster
-version_added: 6.1.0
+version_added: 6.3.0
 description:
   - Allows you to create/delete/restore snapshots from instances in Proxmox VE cluster.
   - Supports both KVM and LXC, OpenVZ has not been tested, as it is no longer supported on Proxmox VE.
