@@ -260,10 +260,7 @@ def read_state(b_path):
     '''
     with open(b_path, 'r') as f:
         text = f.read()
-    lines = text.splitlines()
-    while '' in lines:
-        lines.remove('')
-    return lines
+    return [t for t in text.splitlines() if t != '']
 
 
 def write_state(b_path, lines, changed):
@@ -273,8 +270,7 @@ def write_state(b_path, lines, changed):
     # Populate a temporary file
     tmpfd, tmpfile = tempfile.mkstemp()
     with os.fdopen(tmpfd, 'w') as f:
-        for line in lines:
-            f.write('%s\n' % line)
+        f.write("{0}\n".format("\n".join(lines)))
 
     # Prepare to copy temporary file to the final destination
     if not os.path.exists(b_path):
@@ -335,9 +331,7 @@ def filter_and_format_state(string):
     string = re.sub(r'((^|\n)# (Generated|Completed)[^\n]*) on [^\n]*', r'\1', string)
     if not module.params['counters']:
         string = re.sub(r'\[[0-9]+:[0-9]+\]', r'[0:0]', string)
-    lines = string.splitlines()
-    while '' in lines:
-        lines.remove('')
+    lines = [line for line in string.splitlines() if line != '']
     return lines
 
 
@@ -354,10 +348,7 @@ def per_table_state(command, state):
             dummy, out, dummy = module.run_command(COMMAND, check_rc=True)
             out = re.sub(r'(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, r'', out)
             out = re.sub(r' *\[[0-9]+:[0-9]+\] *', r'', out)
-            table = out.splitlines()
-            while '' in table:
-                table.remove('')
-            tables[t] = table
+            tables[t] = [tt for tt in out.splitlines() if tt != '']
     return tables
 
 
@@ -548,8 +539,7 @@ def main():
     if module.check_mode:
         tmpfd, tmpfile = tempfile.mkstemp()
         with os.fdopen(tmpfd, 'w') as f:
-            for line in initial_state:
-                f.write('%s\n' % line)
+            f.write("{0}\n".format("\n".join(initial_state)))
 
         if filecmp.cmp(tmpfile, b_path):
             restored_state = initial_state
