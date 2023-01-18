@@ -46,8 +46,8 @@ body:
   attributes:
     label: Component Name
     description: >-
-      Write the short name of the rst file, module, plugin, task or
-      feature below, *use your best guess if unsure*.
+      Write the short name of the file, module, plugin, task or feature below,
+      *use your best guess if unsure*. Do not include `community.general.`!
     placeholder: mysql_user
   validations:
     required: true
