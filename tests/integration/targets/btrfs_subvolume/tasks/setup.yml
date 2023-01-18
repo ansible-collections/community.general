@@ -3,12 +3,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Install required packages
-  ansible.builtin.package:
-    name:
-      - btrfs-progs # btrfs userspace
-      - util-linux # losetup
-
 - name: "Create file {{ item.file }} to back loop device {{ item.loop }}"
   ansible.builtin.command:
     cmd: "dd if=/dev/zero of={{ item.file }} bs=1M count=200"  ## minimum count 109
