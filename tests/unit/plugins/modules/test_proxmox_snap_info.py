@@ -75,7 +75,6 @@ def test_snapshot_get(mocker, capfd):
                      "api_user": "root@pam",
                      "api_password": "secret",
                      "api_host": "127.0.0.1",
-                     "getsnapshots": True,
                      "timeout": "1",
                      "_ansible_check_mode": True})
 
@@ -93,7 +92,6 @@ def test_proxmox_snap_info_getsnapshots_older_than_2days(mocker, capfd):
                      "api_user": "root@pam",
                      "api_password": "secret",
                      "api_host": "127.0.0.1",
-                     "getsnapshots": True,
                      "older_than": 2,
                      "timeout": "1",
                      "_ansible_check_mode": True})
@@ -112,7 +110,6 @@ def test_proxmox_snap_info_getsnapshots_only_snaps_with_name(mocker, capfd):
                      "api_user": "root@pam",
                      "api_password": "secret",
                      "api_host": "127.0.0.1",
-                     "getsnapshots": True,
                      "snapname": "snapshot_",
                      "timeout": "1",
                      "_ansible_check_mode": True})
