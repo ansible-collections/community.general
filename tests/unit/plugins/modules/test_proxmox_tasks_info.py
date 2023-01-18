@@ -18,75 +18,92 @@ import ansible_collections.community.general.plugins.module_utils.proxmox as pro
 from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
-    AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args)
+    AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+)
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.module_utils import proxmox
 
 NODE = 'node01'
 TASK_UPID = 'UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:'
-TASKS = [{"endtime": 1629092710,
-          "id": "networking",
-          "node": "iaclab-01-01",
-          "pid": 3539,
-          "pstart": 474062216,
-          "starttime": 1629092709,
-          "status": "OK",
-          "type": "srvreload",
-          "upid": "UPID:iaclab-01-01:00000DD3:1C419D88:6119FB65:srvreload:networking:root@pam:",
-          "user": "root@pam"},
-         {"endtime": 1627975785,
-          "id": "networking",
-          "node": "iaclab-01-01",
-          "pid": 10717,
-          "pstart": 362369675,
-          "starttime": 1627975784,
-          "status": "command 'ifreload -a' failed: exit code 1",
-          "type": "srvreload",
-          "upid": "UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:",
-          "user": "root@pam"},
-         {"endtime": 1627975503,
-          "id": "networking",
-          "node": "iaclab-01-01",
-          "pid": 6778,
-          "pstart": 362341540,
-          "starttime": 1627975503,
-          "status": "OK",
-          "type": "srvreload",
-          "upid": "UPID:iaclab-01-01:00001A7A:1598E4A4:6108EF4F:srvreload:networking:root@pam:",
-          "user": "root@pam"}]
-EXPECTED_TASKS = [{"endtime": 1629092710,
-                   "id": "networking",
-                   "node": "iaclab-01-01",
-                   "pid": 3539,
-                   "pstart": 474062216,
-                   "starttime": 1629092709,
-                   "status": "OK",
-                   "type": "srvreload",
-                   "upid": "UPID:iaclab-01-01:00000DD3:1C419D88:6119FB65:srvreload:networking:root@pam:",
-                   "user": "root@pam",
-                   "failed": False},
-                  {"endtime": 1627975785,
-                   "id": "networking",
-                   "node": "iaclab-01-01",
-                   "pid": 10717,
-                   "pstart": 362369675,
-                   "starttime": 1627975784,
-                   "status": "command 'ifreload -a' failed: exit code 1",
-                   "type": "srvreload",
-                   "upid": "UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:",
-                   "user": "root@pam",
-                   "failed": True},
-                  {"endtime": 1627975503,
-                   "id": "networking",
-                   "node": "iaclab-01-01",
-                   "pid": 6778,
-                   "pstart": 362341540,
-                   "starttime": 1627975503,
-                   "status": "OK",
-                   "type": "srvreload",
-                   "upid": "UPID:iaclab-01-01:00001A7A:1598E4A4:6108EF4F:srvreload:networking:root@pam:",
-                   "user": "root@pam",
-                   "failed": False}]
+TASKS = [
+    {
+        "endtime": 1629092710,
+        "id": "networking",
+        "node": "iaclab-01-01",
+        "pid": 3539,
+        "pstart": 474062216,
+        "starttime": 1629092709,
+        "status": "OK",
+        "type": "srvreload",
+        "upid": "UPID:iaclab-01-01:00000DD3:1C419D88:6119FB65:srvreload:networking:root@pam:",
+        "user": "root@pam"
+    },
+    {
+        "endtime": 1627975785,
+        "id": "networking",
+        "node": "iaclab-01-01",
+        "pid": 10717,
+        "pstart": 362369675,
+        "starttime": 1627975784,
+        "status": "command 'ifreload -a' failed: exit code 1",
+        "type": "srvreload",
+        "upid": "UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:",
+        "user": "root@pam"
+    },
+    {
+        "endtime": 1627975503,
+        "id": "networking",
+        "node": "iaclab-01-01",
+        "pid": 6778,
+        "pstart": 362341540,
+        "starttime": 1627975503,
+        "status": "OK",
+        "type": "srvreload",
+        "upid": "UPID:iaclab-01-01:00001A7A:1598E4A4:6108EF4F:srvreload:networking:root@pam:",
+        "user": "root@pam"
+    }
+]
+EXPECTED_TASKS = [
+    {
+        "endtime": 1629092710,
+        "id": "networking",
+        "node": "iaclab-01-01",
+        "pid": 3539,
+        "pstart": 474062216,
+        "starttime": 1629092709,
+        "status": "OK",
+        "type": "srvreload",
+        "upid": "UPID:iaclab-01-01:00000DD3:1C419D88:6119FB65:srvreload:networking:root@pam:",
+        "user": "root@pam",
+        "failed": False
+    },
+    {
+        "endtime": 1627975785,
+        "id": "networking",
+        "node": "iaclab-01-01",
+        "pid": 10717,
+        "pstart": 362369675,
+        "starttime": 1627975784,
+        "status": "command 'ifreload -a' failed: exit code 1",
+        "type": "srvreload",
+        "upid": "UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:",
+        "user": "root@pam",
+        "failed": True
+    },
+    {
+        "endtime": 1627975503,
+        "id": "networking",
+        "node": "iaclab-01-01",
+        "pid": 6778,
+        "pstart": 362341540,
+        "starttime": 1627975503,
+        "status": "OK",
+        "type": "srvreload",
+        "upid": "UPID:iaclab-01-01:00001A7A:1598E4A4:6108EF4F:srvreload:networking:root@pam:",
+        "user": "root@pam",
+        "failed": False
+    }
+]
 
 EXPECTED_SINGLE_TASK = [
     {
@@ -100,7 +117,8 @@ EXPECTED_SINGLE_TASK = [
         "type": "srvreload",
         "upid": "UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:",
         "user": "root@pam",
-        "failed": True},
+        "failed": True
+    },
 ]
 
 
