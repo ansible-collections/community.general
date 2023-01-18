@@ -198,7 +198,7 @@ target_subvolume_id:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.btrfs import BtrfsFilesystemsProvider, BtrfsCommands, BtrfsModuleException
-from ansible_collections.community.general.plugins.module_utils.btrfs import normalize_subvolume_path, find_common_path_prefix
+from ansible_collections.community.general.plugins.module_utils.btrfs import normalize_subvolume_path
 from ansible.module_utils.basic import AnsibleModule
 from datetime import datetime
 import os
@@ -241,10 +241,10 @@ class BtrfsSubvolumeModule(object):
 
         # execution state
         self.__filesystem = None
+        self.__required_mounts = []
         self.__unit_of_work = []
         self.__completed_work = []
         self.__temporary_mounts = dict()
-        self.__messages = []
 
     def run(self):
         error = None
@@ -253,10 +253,12 @@ class BtrfsSubvolumeModule(object):
             self.__prepare_unit_of_work()
 
             if not self.module.check_mode:
+                # check required mounts & mount
                 if len(self.__unit_of_work) > 0:
                     self.__execute_unit_of_work()
                     self.__filesystem.refresh()
             else:
+                # check required mounts
                 self.__completed_work.extend(self.__unit_of_work)
         except Exception as e:
             error = e
@@ -276,8 +278,18 @@ class BtrfsSubvolumeModule(object):
 
         # The filesystem must be mounted to obtain the current state (subvolumes, default, etc)
         if not filesystem.is_mounted():
-            self.__mount_subvolume_id_to_tempdir(filesystem, self.__BTRFS_ROOT_SUBVOLUME_ID)
-            filesystem.refresh()
+            if not self.__automount:
+                raise BtrfsModuleException(
+                    "Target filesystem uuid=%s is not currently mounted and automount=False."
+                    "Mount explicitly before module execution or pass automount=True" % filesystem.uuid)
+            elif self.module.check_mode:
+                # TODO is failing the module an appropriate outcome in this scenario?
+                raise BtrfsModuleException(
+                    "Target filesystem uuid=%s is not currently mounted. Unable to validate the current"
+                    "state while running with check_mode=True" % filesystem.uuid)
+            else:
+                self.__mount_subvolume_id_to_tempdir(filesystem, self.__BTRFS_ROOT_SUBVOLUME_ID)
+                filesystem.refresh()
         self.__filesystem = filesystem
 
     def __has_filesystem_criteria(self):
@@ -326,12 +338,16 @@ class BtrfsSubvolumeModule(object):
     def __prepare_subvolume_present(self):
         subvolume = self.__filesystem.get_subvolume_by_name(self.__name)
         if subvolume is None:
-            if self.__recursive:
-                self.__prepare_subvolume_intermediates_present(self.__name)
+            self.__prepare_before_create_subvolume(self.__name)
             self.__stage_create_subvolume(self.__name)
 
-    def __prepare_subvolume_intermediates_present(self, subvolume_name):
-        closest_subvolume = self.__filesystem.get_nearest_subvolume(subvolume_name)
+    def __prepare_before_create_subvolume(self, subvolume_name):
+        closest_parent = self.__filesystem.get_nearest_subvolume(subvolume_name)
+        self.__stage_required_mount(closest_parent)
+        if self.__recursive:
+            self.__prepare_create_intermediates(closest_parent, subvolume_name)
+
+    def __prepare_create_intermediates(self, closest_subvolume, subvolume_name):
         relative_path = closest_subvolume.get_child_relative_path(self.__name)
         missing_subvolumes = [x for x in relative_path.split(os.path.sep) if len(x) > 0]
         if len(missing_subvolumes) > 1:
@@ -357,19 +373,22 @@ class BtrfsSubvolumeModule(object):
             raise BtrfsModuleException("Source subvolume %s does not exist" % self.__snapshot_source)
         elif subvolume is not None and source_subvolume.id == subvolume.id:
             raise BtrfsModuleException("Snapshot source and target are the same.")
+        else:
+            self.__stage_required_mount(source_subvolume)
 
         if subvolume_exists and self.__snapshot_conflict == "clobber":
-            self.__prepare_subvolume_tree_absent(subvolume)
-        elif not subvolume_exists and self.__recursive:
-            self.__prepare_subvolume_intermediates_present(self.__name)
+            self.__prepare_delete_subvolume_tree(subvolume)
+        elif not subvolume_exists:
+            self.__prepare_before_create_subvolume(self.__name)
+
         self.__stage_create_snapshot(source_subvolume, self.__name)
 
     def __prepare_subvolume_absent(self):
         subvolume = self.__filesystem.get_subvolume_by_name(self.__name)
         if subvolume is not None:
-            self.__prepare_subvolume_tree_absent(subvolume)
+            self.__prepare_delete_subvolume_tree(subvolume)
 
-    def __prepare_subvolume_tree_absent(self, subvolume):
+    def __prepare_delete_subvolume_tree(self, subvolume):
         if subvolume.is_filesystem_root():
             raise BtrfsModuleException("Can not delete the filesystem's root subvolume")
         if not self.__recursive and len(subvolume.get_child_subvolumes()) > 0:
@@ -377,6 +396,7 @@ class BtrfsSubvolumeModule(object):
                                        "Either explicitly delete the child subvolumes first or pass "
                                        "parameter recursive=True." % subvolume.path)
 
+        self.__stage_required_mount(subvolume.get_parent_subvolume())
         queue = self.__prepare_recursive_delete_order(subvolume) if self.__recursive else [subvolume]
         # prepare unit of work
         for s in queue:
@@ -406,6 +426,13 @@ class BtrfsSubvolumeModule(object):
             self.__stage_set_default_subvolume(self.__name, subvolume_id)
 
     # Stage operations to the unit of work
+    def __stage_required_mount(self, subvolume):
+        if subvolume.get_mounted_path() is None:
+            if self.__automount:
+                self.__required_mounts.append(subvolume)
+            else:
+                raise BtrfsModuleException("The requested changes will require the subvolume '%s' to be mounted, but automount=False" % subvolume.path)
+
     def __stage_create_subvolume(self, subvolume_path, intermediate=False):
         """
         Add required creation of an intermediate subvolume to the unit of work
@@ -445,12 +472,7 @@ class BtrfsSubvolumeModule(object):
 
     # Execute the unit of work
     def __execute_unit_of_work(self):
-        # TODO mount only as close as required for each operation (many mountpoints)?
-        # TODO check if anything needs to be mounted during __prepare* so that check_mode will fail when automount=False
-        if self.__automount:
-            parent = self.__find_common_parent_subvolume(self.__unit_of_work)
-            self.__get_btrfs_subvolume_mountpoint(parent)
-
+        self.__check_required_mounts()
         for op in self.__unit_of_work:
             if op['action'] == self.__CREATE_SUBVOLUME_OPERATION:
                 self.__execute_create_subvolume(op)
@@ -462,35 +484,6 @@ class BtrfsSubvolumeModule(object):
                 self.__execute_set_default_subvolume(op)
             else:
                 raise ValueError("Unknown operation type '%s'" % op['action'])
-
-    def __find_common_parent_subvolume(self, unit_of_work):
-        """
-        As most operations require a parent subvolume to be mounted, this finds the
-        first currently existing, common ancestor
-        """
-        paths = []
-        for operation in unit_of_work:
-            if operation['action'] == self.__SET_DEFAULT_SUBVOLUME_OPERATION:
-                # set default (by subvolid) doesn't require any specific subvolume to be available
-                continue
-            if 'target' in operation:
-                parent = os.path.dirname(operation['target'])
-                paths.append(parent)
-            if 'source' in operation:
-                paths.append(operation['source'])
-
-        if len(paths) > 0:
-            prefix = find_common_path_prefix(paths)
-            prefix = prefix if len(prefix) > 0 else self.__BTRFS_ROOT_SUBVOLUME
-            common_parent = self.__filesystem.get_subvolume_by_name(prefix)
-            if common_parent is not None:
-                return common_parent
-            else:
-                raise BtrfsModuleException("Failed to find common parent subvolume '%s' in filesystem '%s'." % (prefix, self.__filesystem.uuid))
-        else:
-            # There are no operations requiring specific subvolume(s) to be mounted, but there should be something already available
-            # There should be something already available as the filesystem needs to be online to query metadata
-            return self.__filesystem.get_any_mounted_subvolume()
 
     def __execute_create_subvolume(self, operation):
         target_mounted_path = self.__filesystem.get_mountpath_as_child(operation['target'])
@@ -536,30 +529,39 @@ class BtrfsSubvolumeModule(object):
             os.stat(path).st_ino == self.__BTRFS_SUBVOLUME_INODE_NUMBER
         )
 
-    # Get subvolume mountpoints (or mount if none exists)
-    def __get_btrfs_subvolume_mountpoint(self, subvolume):
-        subvolume = self.__filesystem.get_subvolume_by_name(subvolume) if isinstance(subvolume, str) else subvolume
-        mounted_path = subvolume.get_mounted_path()
-        if mounted_path is None:
-            mounted_path = self.__mount_subvolume_id_to_tempdir(self.__filesystem, subvolume.id)
-            self.__filesystem.refresh()
-        return mounted_path
+    def __check_required_mounts(self):
+        filtered = self.__filter_child_subvolumes(self.__required_mounts)
+        if len(filtered) > 0:
+            for subvolume in filtered:
+                self.__mount_subvolume_id_to_tempdir(self.__filesystem, subvolume.id)
+            self.__filesystem.refresh_mountpoints()
+
+    def __filter_child_subvolumes(self, subvolumes):
+        """Filter the provided list of subvolumes to remove any that are a child of another item in the list"""
+        filtered = []
+        last = None
+        ordered = sorted(subvolumes, key=lambda x: x.path)
+        for next in ordered:
+            if last is None or not next.path[0:len(last)] == last:
+                filtered.append(next)
+                last = next.path
+        return filtered
 
     # Create/cleanup temporary mountpoints
     def __mount_subvolume_id_to_tempdir(self, filesystem, subvolid):
-        if not self.__automount:
-            raise BtrfsModuleException(
-                "Subvolid=%d needs to be mounted to proceed but automount=%s. "
-                "Mount explicitly before module execution or pass automount=True "
-                "to temporarily mount as part of module execution." % (subvolid, self.__automount))
+        # this check should be redundant
+        if self.module.check_mode or not self.__automount:
+            raise BtrfsModuleException("Unable to temporarily mount required subvolumes"
+                                       "with automount=%s and check_mode=%s" % (self.__automount, self.module.check_mode))
 
+        cache_key = "%s:%d" % (filesystem.uuid, subvolid)
         # The subvolume was already mounted, so return the current path
-        if subvolid in self.__temporary_mounts:
-            return self.__temporary_mounts[subvolid]
+        if cache_key in self.__temporary_mounts:
+            return self.__temporary_mounts[cache_key]
 
         device = filesystem.devices[0]
         mountpoint = tempfile.mkdtemp(dir="/tmp")
-        self.__temporary_mounts[subvolid] = mountpoint
+        self.__temporary_mounts[cache_key] = mountpoint
 
         mount = self.module.get_bin_path("mount", required=True)
         command = "%s -o noatime,subvolid=%d %s %s " % (mount,
@@ -568,7 +570,6 @@ class BtrfsSubvolumeModule(object):
                                                         mountpoint)
         result = self.module.run_command(command, check_rc=True)
 
-        self.__messages.append("Created temporary mountpoint for subvolid=%d at path=%s" % (subvolid, mountpoint))
         return mountpoint
 
     def __cleanup_mounts(self):

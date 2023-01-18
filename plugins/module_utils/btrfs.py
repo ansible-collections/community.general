@@ -20,21 +20,6 @@ def normalize_subvolume_path(path):
     return result if len(result) > 0 else '/'
 
 
-def find_common_path_prefix(paths):
-    """
-    Find the common prefix among all provided paths.
-    Assumes all paths are already normalized as by normalize_subvolume_path
-    """
-    pieces = [p.split(os.path.sep) for p in paths]
-    least = min(pieces)
-    most = max(pieces)
-
-    for i, c in enumerate(least):
-        if c != most[i]:
-            return os.path.sep.join(least[:i])
-    return os.path.sep.join(least)
-
-
 class BtrfsModuleException(Exception):
     pass
 
@@ -238,7 +223,7 @@ class BtrfsSubvolume(object):
             relative = absolute_child_path[len(path):]
             return re.sub(r'^/*', '', relative)
         else:
-            raise BtrfsModuleException("Path '%s' doesn't start with '%s'" % (normalized, path))
+            raise BtrfsModuleException("Path '%s' doesn't start with '%s'" % (absolute_child_path, path))
 
     def get_parent_subvolume(self):
         parent_id = self.parent
