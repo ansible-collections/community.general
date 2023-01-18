@@ -35,6 +35,10 @@ def find_common_path_prefix(paths):
     return os.path.sep.join(least)
 
 
+class BtrfsModuleException(Exception):
+    pass
+
+
 class BtrfsCommands(object):
 
     """
@@ -177,13 +181,13 @@ class BtrfsInfoProvider(object):
                 'subvolid': self.__extract_mount_subvolid(groups['options']),
             }
         else:
-            raise Exception("Failed to parse findmnt result for line: '%s'" % line)
+            raise BtrfsModuleException("Failed to parse findmnt result for line: '%s'" % line)
 
     def __extract_mount_subvolid(self, mount_options):
         for option in mount_options.split(','):
             if option.startswith('subvolid='):
                 return int(option[len('subvolid='):])
-        raise Exception("Failed to find subvolid for mountpoint in options '%s'" % mount_options)
+        raise BtrfsModuleException("Failed to find subvolid for mountpoint in options '%s'" % mount_options)
 
 
 class BtrfsSubvolume(object):
@@ -224,14 +228,17 @@ class BtrfsSubvolume(object):
     def get_mountpoints(self):
         return self.__filesystem.get_mountpoints_by_subvolume_id(self.__subvolume_id)
 
-    def get_child_relative_path(self, absolute_subvolume_path):
-        normalized = normalize_subvolume_path(absolute_subvolume_path)
+    def get_child_relative_path(self, absolute_child_path):
+        """
+        Get the relative path from this subvolume to the named child subvolume.
+        The provided parameter is expected to be normalized as by normalize_subvolume_path.
+        """
         path = self.path
-        if normalized.startswith(path):
-            relative = normalized[len(path):]
+        if absolute_child_path.startswith(path):
+            relative = absolute_child_path[len(path):]
             return re.sub(r'^/*', '', relative)
         else:
-            raise Exception("Path '%s' doesn't start with '%s'" % (normalized, path))
+            raise BtrfsModuleException("Path '%s' doesn't start with '%s'" % (normalized, path))
 
     def get_parent_subvolume(self):
         parent_id = self.parent
@@ -344,9 +351,8 @@ class BtrfsFilesystem(object):
         return self.__subvolumes[subvolume_id] if subvolume_id in self.__subvolumes else None
 
     def get_subvolume_by_name(self, subvolume):
-        search = normalize_subvolume_path(subvolume)
         for subvolume_info in self.__subvolumes.values():
-            if subvolume_info['path'] == search:
+            if subvolume_info['path'] == subvolume:
                 return BtrfsSubvolume(self, subvolume_info['id'])
         return None
 
@@ -368,13 +374,12 @@ class BtrfsFilesystem(object):
 
     def get_nearest_subvolume(self, subvolume):
         """Return the identified subvolume if existing, else the closest matching parent"""
-        search = normalize_subvolume_path(subvolume)
         subvolumes_by_path = self.__get_subvolumes_by_path()
-        while len(search) > 1:
-            if search in subvolumes_by_path:
-                return BtrfsSubvolume(self, subvolumes_by_path[search]['id'])
+        while len(subvolume) > 1:
+            if subvolume in subvolumes_by_path:
+                return BtrfsSubvolume(self, subvolumes_by_path[subvolume]['id'])
             else:
-                search = re.sub(r'/[^/]+$', '', search)
+                subvolume = re.sub(r'/[^/]+$', '', subvolume)
 
         return BtrfsSubvolume(self, 5)
 
@@ -384,7 +389,7 @@ class BtrfsFilesystem(object):
         if nearest.path == subvolume_name:
             nearest = nearest.get_parent_subvolume()
         if nearest is None or nearest.get_mounted_path() is None:
-            raise Exception("Failed to find a path '%s' through a mounted parent subvolume" % subvolume_name)
+            raise BtrfsModuleException("Failed to find a path '%s' through a mounted parent subvolume" % subvolume_name)
         else:
             return nearest.get_mounted_path() + os.path.sep + nearest.get_child_relative_path(subvolume_name)
 
@@ -442,7 +447,7 @@ class BtrfsFilesystemsProvider(object):
         if len(matching) == 1:
             return matching[0]
         else:
-            raise Exception("Found %d filesystems matching criteria uuid=%s label=%s device=%s" % (
+            raise BtrfsModuleException("Found %d filesystems matching criteria uuid=%s label=%s device=%s" % (
                 len(matching),
                 criteria['uuid'],
                 criteria['label'],
