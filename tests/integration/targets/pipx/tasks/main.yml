@@ -230,3 +230,30 @@
         that:
           - install_jupyter is changed
           - '"ipython" in install_jupyter.stdout'
+
+##############################################################################
+- name: ensure /opt/pipx
+  ansible.builtin.file:
+    path: /opt/pipx
+    state: directory
+    mode: 0755
+
+- name: install tox site-wide
+  community.general.pipx:
+    name: tox
+    state: latest
+  register: install_tox_sitewide
+  environment:
+    PIPX_HOME: /opt/pipx
+    PIPX_BIN_DIR: /usr/local/bin
+
+- name: stat /usr/local/bin/tox
+  ansible.builtin.stat:
+    path: /usr/local/bin/tox
+  register: usrlocaltox
+
+- name: check assertions
+  ansible.builtin.assert:
+    that:
+      - install_tox_sitewide is changed
+      - usrlocaltox.stat.exists
