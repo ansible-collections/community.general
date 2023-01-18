@@ -42,8 +42,8 @@ body:
   attributes:
     label: Component Name
     description: >-
-      Write the short name of the module, plugin, task or feature below,
-      *use your best guess if unsure*.
+      Write the short name of the module or plugin, or which other part(s) of the collection this feature affects.
+      *use your best guess if unsure*. Do not include `community.general.`!
     placeholder: dnf, apt, yum, pip, user etc.
   validations:
     required: true
