@@ -69,7 +69,7 @@ options:
   state:
     description:
     - Whether the SELinux file context must be C(absent) or C(present).
-    - Specifying C(absent) deletes labeling mappings to both SELinux types and path substitutions.
+    - Specifying C(absent) without either I(setype) or I(equal) deletes both SELinux type or path substitution mappings that match I(target).
     type: str
     choices: [ absent, present ]
     default: present
@@ -280,7 +280,7 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, equal, do_re
     module.exit_json(changed=changed, seuser=seuser, serange=serange, **result)
 
 
-def semanage_fcontext_delete(module, result, target, ftype, equal, do_reload, sestore=''):
+def semanage_fcontext_delete(module, result, target, ftype, setype, equal, do_reload, sestore=''):
     ''' Delete SELinux file context mapping definition from the policy. '''
 
     changed = False
@@ -291,7 +291,7 @@ def semanage_fcontext_delete(module, result, target, ftype, equal, do_reload, se
         sefcontext.set_reload(do_reload)
         exists = semanage_fcontext_exists(sefcontext, target, ftype)
         equal_exists = semanage_fcontext_equal_exists(sefcontext, target)
-        if exists and equal is None:
+        if exists and equal is None and ((setype is not None and exists[2] == setype) or setype is None):
             # Remove existing entry
             orig_seuser, orig_serole, orig_setype, orig_serange = exists
 
@@ -302,7 +302,7 @@ def semanage_fcontext_delete(module, result, target, ftype, equal, do_reload, se
             if module._diff:
                 prepared_diff += '# Deletion to semanage file context mappings\n'
                 prepared_diff += '-%s      %s      %s:%s:%s:%s\n' % (target, ftype, exists[0], exists[1], exists[2], exists[3])
-        if (equal_exists and (equal is not None and equal_exists == equal)) or (equal_exists and equal is None):
+        if equal_exists and setype is None and ((equal is not None and equal_exists == equal) or equal is None):
             # Remove existing path substitution entry
             orig_equal = equal_exists
 
@@ -373,7 +373,7 @@ def main():
     if state == 'present':
         semanage_fcontext_modify(module, result, target, ftype, setype, equal, do_reload, serange, seuser)
     elif state == 'absent':
-        semanage_fcontext_delete(module, result, target, ftype, equal, do_reload)
+        semanage_fcontext_delete(module, result, target, ftype, setype, equal, do_reload)
     else:
         module.fail_json(msg='Invalid value of argument "state": {0}'.format(state))
 
