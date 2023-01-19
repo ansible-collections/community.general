@@ -142,7 +142,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message with action result or error description
+    description: Message with action result or error description.
     returned: always
     type: str
     sample: "Action was successful"
@@ -154,7 +154,7 @@ jobUri:
     sample: "https://ioma.wdc.com/Storage/Devices/openflex-data24-usalp03020qb0003/Jobs/FirmwareUpdate/"
 
 operationStatusId:
-    description: OCAPI State ID (see OCAPI documentation for possible values)
+    description: OCAPI State ID (see OCAPI documentation for possible values).
     returned: when supported
     type: int
     sample: 2

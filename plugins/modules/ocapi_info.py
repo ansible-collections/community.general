@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: ocapi_info
 version_added: 6.3.0
-short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI).
+short_description: Manages Out-Of-Band controllers using Open Composable API (OCAPI)
 description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to
     get information back.
