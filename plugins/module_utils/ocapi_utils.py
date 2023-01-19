@@ -15,10 +15,8 @@ from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
-try:
-    from urlparse import urlparse  # Python 2
-except ImportError:
-    from urllib.parse import urlparse  # Python 3+
+from ansible.module_utils.six.moves.urllib.parse import urlparse
+
 
 GET_HEADERS = {'accept': 'application/json'}
 PUT_HEADERS = {'content-type': 'application/json', 'accept': 'application/json'}
