@@ -74,7 +74,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message with action result or error description
+    description: Message with action result or error description.
     returned: always
     type: str
     sample: "Action was successful"
