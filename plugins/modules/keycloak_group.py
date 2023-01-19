@@ -323,7 +323,8 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         attributes=dict(type='dict'),
-        parents=dict(type='list', elements='dict',
+        parents=dict(
+            type='list', elements='dict',
             options=dict(
                 id=dict(type='str'),
                 name=dict(type='str')
