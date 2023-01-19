@@ -323,10 +323,12 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         attributes=dict(type='dict'),
-        parents=dict(type='list', elements='dict', options=dict(
-          id=dict(type='str'),
-          name=dict(type='str')
-        )),
+        parents=dict(type='list', elements='dict',
+            options=dict(
+                id=dict(type='str'),
+                name=dict(type='str')
+            )
+        ),
     )
 
     argument_spec.update(meta_args)

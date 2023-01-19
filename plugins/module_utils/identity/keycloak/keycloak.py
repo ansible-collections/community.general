@@ -1365,7 +1365,7 @@ class KeycloakAPI(object):
             return self.get_subgroup_by_chain(list(reversed(childs_to_resolve)), realm=realm)
 
         cp = parents[0]
-        _, is_id = self._get_normed_group_parent(cp)
+        unused, is_id = self._get_normed_group_parent(cp)
 
         if is_id:
             # current parent is given as ID, we can stop walking
