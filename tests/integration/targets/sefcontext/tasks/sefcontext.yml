@@ -109,7 +109,7 @@
 - name: Set SELinux file context path substitution of foo
   sefcontext:
     path: /tmp/foo
-    equal: /home
+    substitute: /home
     state: present
     reload: no
   register: subst_first
@@ -117,12 +117,12 @@
 - assert:
     that:
     - subst_first is changed
-    - subst_first.equal == '/home'
+    - subst_first.substitute == '/home'
 
 - name: Set SELinux file context path substitution of foo (again)
   sefcontext:
     path: /tmp/foo
-    equal: /home
+    substitute: /home
     state: present
     reload: no
   register: subst_second
@@ -130,12 +130,12 @@
 - assert:
     that:
     - subst_second is not changed
-    - subst_second.equal == '/home'
+    - subst_second.substitute == '/home'
 
 - name: Change SELinux file context path substitution of foo
   sefcontext:
     path: /tmp/foo
-    equal: /boot
+    substitute: /boot
     state: present
     reload: no
   register: subst_third
@@ -143,12 +143,12 @@
 - assert:
     that:
     - subst_third is changed
-    - subst_third.equal == '/boot'
+    - subst_third.substitute == '/boot'
 
 - name: Change SELinux file context path substitution of foo (again)
   sefcontext:
     path: /tmp/foo
-    equal: /boot
+    substitute: /boot
     state: present
     reload: no
   register: subst_fourth
@@ -156,12 +156,12 @@
 - assert:
     that:
     - subst_fourth is not changed
-    - subst_fourth.equal == '/boot'
+    - subst_fourth.substitute == '/boot'
 
 - name: Try to delete non-existing SELinux file context path substitution of foo
   sefcontext:
     path: /tmp/foo
-    equal: /dev
+    substitute: /dev
     state: absent
     reload: no
   register: subst_fifth
@@ -169,12 +169,12 @@
 - assert:
     that:
     - subst_fifth is not changed
-    - subst_fifth.equal == '/dev'
+    - subst_fifth.substitute == '/dev'
 
 - name: Delete SELinux file context path substitution of foo
   sefcontext:
     path: /tmp/foo
-    equal: /boot
+    substitute: /boot
     state: absent
     reload: no
   register: subst_sixth
@@ -182,12 +182,12 @@
 - assert:
     that:
     - subst_sixth is changed
-    - subst_sixth.equal == '/boot'
+    - subst_sixth.substitute == '/boot'
 
 - name: Delete SELinux file context path substitution of foo (again)
   sefcontext:
     path: /tmp/foo
-    equal: /boot
+    substitute: /boot
     state: absent
     reload: no
   register: subst_seventh
@@ -195,12 +195,12 @@
 - assert:
     that:
     - subst_seventh is not changed
-    - subst_seventh.equal == '/boot'
+    - subst_seventh.substitute == '/boot'
 
 - name: Set SELinux file context path substitution of foo
   sefcontext:
     path: /tmp/foo
-    equal: /home
+    substitute: /home
     state: present
     reload: no
   register: subst_eighth
@@ -208,7 +208,7 @@
 - assert:
     that:
     - subst_eighth is changed
-    - subst_eighth.equal == '/home'
+    - subst_eighth.substitute == '/home'
 
 - name: Delete SELinux file context path substitution of foo
   sefcontext:
