@@ -468,31 +468,20 @@ class OcapiUtils(object):
                     'msg': 'Cannot delete job because it is in progress.'
                 }
 
-        if self.module.check_mode:
-            if response['ret'] is False:
-                if response['status'] == 404:
-                    return {
-                        'ret': True,
-                        'changed': False,
-                        'msg': 'Job already deleted.'
-                    }
-                else:
-                    return response
-            else:
-                return {
-                    'ret': True,
-                    'changed': True,
-                    'msg': 'Update not performed in check mode.'
-                }
-        elif response['ret'] is False:
-            # Not check mode
+        if response['ret'] is False:
             if response['status'] == 404:
                 return {
-                    # Cannot delete job because it's already gone.
                     'ret': True,
-                    'changed': False
+                    'changed': False,
+                    'msg': 'Job already deleted.'
                 }
             return response
+        if self.module.check_mode:
+            return {
+                'ret': True,
+                'changed': True,
+                'msg': 'Update not performed in check mode.'
+            }
 
         # Do the DELETE (unless we are in check mode)
         response = self.delete_request(job_uri, etag)
