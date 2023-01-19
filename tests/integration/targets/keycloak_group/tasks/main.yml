@@ -179,7 +179,7 @@
     realm: "{{ realm }}"
     name: subgrp1
     parents:
-      - "id:{{ subgrp_basegrp_result.end_state.id }}"
+      - id: "{{ subgrp_basegrp_result.end_state.id }}"
   register: result
 
 - name: Assert that subgroup was correctly created
@@ -203,7 +203,7 @@
     realm: "{{ realm }}"
     name: subgrp1
     parents:
-      - "id:{{ subgrp_basegrp_result.end_state.id }}"
+      - id: "{{ subgrp_basegrp_result.end_state.id }}"
   register: result
 
 - name: Assert that nothing has changed
@@ -228,7 +228,7 @@
     id: "{{ result.end_state.id }}"
     name: new-subgrp1
     parents:
-      - "id:{{ subgrp_basegrp_result.end_state.id }}"
+      - id: "{{ subgrp_basegrp_result.end_state.id }}"
   register: result
 
 - name: Assert that subgroup name has changed correctly
@@ -252,7 +252,7 @@
     realm: "{{ realm }}"
     name: subgrp2
     parents:
-      - rootgrp
+      - name: rootgrp
   register: result
 
 - name: Assert that subgroup was correctly created
@@ -276,7 +276,7 @@
     realm: "{{ realm }}"
     name: subgrp2
     parents:
-      - rootgrp
+      - name: rootgrp
   register: result
 
 - name: Assert that nothing has changed
@@ -301,8 +301,8 @@
     realm: "{{ realm }}"
     name: subsubgrp
     parents:
-      - rootgrp
-      - subgrp2
+      - name: rootgrp
+      - name: subgrp2
   register: result
 
 - name: Assert subgroup of subgroup was created
@@ -326,8 +326,8 @@
     realm: "{{ realm }}"
     name: subsubgrp
     parents:
-      - rootgrp
-      - subgrp2
+      - name: rootgrp
+      - name: subgrp2
   register: result_subsubgrp
 
 - name: Assert that nothing has changed
@@ -351,7 +351,7 @@
     realm: "{{ realm }}"
     name: subsubsubgrp
     parents:
-      - "id:{{ result_subsubgrp.end_state.id }}"
+      - id: "{{ result_subsubgrp.end_state.id }}"
   register: result
 
 - name: Assert subgroup of subgroup was created
@@ -375,7 +375,7 @@
     realm: "{{ realm }}"
     name: subsubsubgrp
     parents:
-      - "id:{{ result_subsubgrp.end_state.id }}"
+      - id: "{{ result_subsubgrp.end_state.id }}"
   register: result_subsubsubgrp
 
 - name: Assert that nothing changed
@@ -437,7 +437,7 @@
     realm: "{{ realm }}"
     name: new-subgrp1
     parents:
-      - rootgrp
+      - name: rootgrp
     state: absent
   register: result
 
@@ -456,7 +456,7 @@
     realm: "{{ realm }}"
     name: new-subgrp1
     parents:
-      - rootgrp
+      - name: rootgrp
     state: absent
   register: result
 

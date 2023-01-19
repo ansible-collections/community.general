@@ -1284,6 +1284,16 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not fetch group %s in realm %s: %s"
                                       % (name, realm, str(e)))
 
+    def _get_normed_group_parent(self, parent):
+        """ Converts parent dict information into a more easy to use form.
+
+        :param parent: parent describing dict
+        """
+        if parent['id']:
+            return (parent['id'], True)
+
+        return (parent['name'], False)
+
     def get_subgroup_by_chain(self, name_chain, realm="master"):
         """ Access a subgroup API object by walking down a given name/id chain.
 
@@ -1297,8 +1307,10 @@ class KeycloakAPI(object):
         cp = name_chain[0]
 
         # for 1st parent in chain we must query the server
-        if cp.startswith("id:"):
-            tmp = self.get_group_by_groupid(cp[len("id:"):], realm=realm)
+        cp, is_id = self._get_normed_group_parent(cp)
+
+        if is_id:
+            tmp = self.get_group_by_groupid(cp, realm=realm)
         else:
             # given as name, assume toplvl group
             tmp = self.get_group_by_name(cp, realm=realm)
@@ -1308,14 +1320,14 @@ class KeycloakAPI(object):
 
         for p in name_chain[1:]:
             for sg in tmp['subGroups']:
-                equals = False
+                pv, is_id = self._get_normed_group_parent(p)
 
-                if p.startswith("id:"):
-                    equals = p[len("id:"):] == sg["id"]
+                if is_id:
+                    cmpkey = "id"
                 else:
-                    equals = p == sg["name"]
+                    cmpkey = "name"
 
-                if equals:
+                if pv == sg[cmpkey]:
                     tmp = sg
                     break
 
@@ -1353,8 +1365,9 @@ class KeycloakAPI(object):
             return self.get_subgroup_by_chain(list(reversed(childs_to_resolve)), realm=realm)
 
         cp = parents[0]
+        _, is_id = self._get_normed_group_parent(cp)
 
-        if cp.startswith("id:"):
+        if is_id:
             # current parent is given as ID, we can stop walking
             # upwards searching for an entry point
             return self.get_subgroup_by_chain([cp] + list(reversed(childs_to_resolve)), realm=realm)

@@ -77,11 +77,26 @@ options:
         description:
             - List of parent groups for the group to handle sorted top to bottom.
             - Set this to create a group as a subgroup of another group or groups (parents).
-            - Each element can describe a parent either by name or ID, both is
-              fine but using names needs some more internal API calls (to map
-              to ID's internally). On default given strings are interpreted as
-              names, to mark them as ID's prefix them with C(id:).
-        elements: str
+        elements: dict
+        suboptions:
+          id:
+            type: str
+            description:
+              - Identify parent by ID
+              - Needs less API calls than using I(name)
+              - A deep parent chain can be started at any point when first given parent is given as ID
+              - Note that in principle both ID and name can be specified at the same time
+                but current implementation only always use just one of them, with ID
+                being prefered
+          name:
+            type: str
+            description:
+              - Identify parent by name
+              - Needs more internal API calls than using I(id) to map names to ID's under the hood
+              - When giving a parent chain with only names it must be complete up to the top
+              - Note that in principle both ID and name can be specified at the same time
+                but current implementation only always use just one of them, with ID
+                being prefered
 
 notes:
     - Presently, the I(realmRoles), I(clientRoles) and I(access) attributes returned by the Keycloak API
@@ -184,7 +199,7 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     parents:
-      - my-new-kc-group
+      - name: my-new-kc-group
   register: result_new_kcgrp_sub
   delegate_to: localhost
 
@@ -199,7 +214,7 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     parents:
-      - "id:{{ result_new_kcgrp.end_state.id }}"
+      - id: "{{ result_new_kcgrp.end_state.id }}"
   delegate_to: localhost
 
 - name: Create a Keycloak subgroup of a subgroup (using parent names)
@@ -213,8 +228,8 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     parents:
-      - my-new-kc-group
-      - my-new-kc-group-sub
+      - name: my-new-kc-group
+      - name: my-new-kc-group-sub
   delegate_to: localhost
 
 - name: Create a Keycloak subgroup of a subgroup (using direct parent id)
@@ -228,7 +243,7 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     parents:
-      - "id:{{  result_new_kcgrp_sub }}"
+      - id: "{{ result_new_kcgrp_sub.end_state.id }}"
   delegate_to: localhost
 '''
 
@@ -308,7 +323,10 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         attributes=dict(type='dict'),
-        parents=dict(type='list', elements='str'),
+        parents=dict(type='list', elements='dict', options=dict(
+          id=dict(type='str'),
+          name=dict(type='str')
+        )),
     )
 
     argument_spec.update(meta_args)
