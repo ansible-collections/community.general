@@ -104,7 +104,9 @@ operationHealth:
     sample: "OK"
 
 operationHealthId:
-    description: Integer value for health of the operation (corresponds to C(operationHealth)). Applies to C(JobStatus) command. See OCAPI documentation for details.
+    description: >
+     Integer value for health of the operation (corresponds to C(operationHealth)). Applies to C(JobStatus) command.
+     See OCAPI documentation for details.
     returned: when supported
     type: str
     sample: "OK"
