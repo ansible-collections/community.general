@@ -39,12 +39,12 @@ options:
   update_image_path:
     required: false
     description:
-      - For FWUpload, the path on the local filesystem of the firmware update image.
+      - For C(FWUpload), the path on the local filesystem of the firmware update image.
     type: str
   job_name:
     required: false
     description:
-      - For DeleteJob command, the name of the job to delete.
+      - For C(DeleteJob) command, the name of the job to delete.
     type: str
   username:
     required: true
@@ -73,6 +73,7 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
   - name: Set the power state to normal
     community.general.ocapi_command:
       category: Chassis

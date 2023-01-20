@@ -35,7 +35,7 @@ options:
       - Base URI of OOB controller.
     type: str
   proxy_slot_number:
-    description: For proxied inband requests, the slot number of the IOM.  Only applies if baseuri is a proxy server.
+    description: For proxied inband requests, the slot number of the IOM.  Only applies if I(baseuri) is a proxy server.
     type: int
   username:
     required: true
@@ -80,37 +80,37 @@ msg:
     sample: "Action was successful"
 
 percentComplete:
-    description: Percent complete of the relevant operation.  Applies to JobStatus command.
+    description: Percent complete of the relevant operation.  Applies to C(JobStatus) command.
     returned: when supported
     type: int
     sample: 99
 
 operationStatus:
-    description: Status of the relevant operation.  Applies to JobStatus command.  See OCAPI documentation for details.
+    description: Status of the relevant operation.  Applies to C(JobStatus) command.  See OCAPI documentation for details.
     returned: when supported
     type: str
     sample: "Activate needed"
 
 operationStatusId:
-    description: Integer value of status (corresponds to operationStatus).  Applies to JobStatus command.  See OCAPI documentation for details.
+    description: Integer value of status (corresponds to operationStatus).  Applies to C(JobStatus) command.  See OCAPI documentation for details.
     returned: when supported
     type: int
     sample: 65540
 
 operationHealth:
-    description: Health of the operation.  Applies to JobStatus command.  See OCAPI documentation for details.
+    description: Health of the operation.  Applies to C(JobStatus) command.  See OCAPI documentation for details.
     returned: when supported
     type: str
     sample: "OK"
 
 operationHealthId:
-    description: Integer value for health of the operation (corresponds to operationHealth). Applies to JobStatus command. See OCAPI documentation for details.
+    description: Integer value for health of the operation (corresponds to C(operationHealth)). Applies to C(JobStatus) command. See OCAPI documentation for details.
     returned: when supported
     type: str
     sample: "OK"
 
 details:
-    description: Details of the relevant operation.  Applies to JobStatus command.
+    description: Details of the relevant operation.  Applies to C(JobStatus) command.
     returned: when supported
     type: list
     elements: str
