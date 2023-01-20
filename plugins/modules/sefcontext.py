@@ -255,7 +255,7 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, substitute, 
 
                 if substitute != orig_substitute:
                     if not module.check_mode:
-                        sefcontext.modify_substitute(target, substitute)
+                        sefcontext.modify_equal(target, substitute)
                     changed = True
 
                     if module._diff:
@@ -265,7 +265,7 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, substitute, 
             else:
                 # Add missing path substitution entry
                 if not module.check_mode:
-                    sefcontext.add_substitute(target, substitute)
+                    sefcontext.add_equal(target, substitute)
                 changed = True
                 if module._diff:
                     prepared_diff += '# Addition to semanage file context path substitutions\n'
