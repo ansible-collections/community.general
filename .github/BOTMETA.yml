@@ -828,6 +828,10 @@ files:
     maintainers: shane-walker xcambar
   $modules/nsupdate.py:
     maintainers: nerzhul
+  $modules/ocapi_command.py:
+    maintainers: $team_wdc
+  $modules/ocapi_info.py:
+    maintainers: $team_wdc
   $modules/oci_vcn.py:
     maintainers: $team_oracle rohitChaware
   $modules/odbc.py:
