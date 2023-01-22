@@ -111,7 +111,7 @@ MOCK_RECORDS = [
 
 class MockBitwarden(Bitwarden):
 
-    logged_in = True
+    unlocked = True
 
     def _get_matches(self, search_value, search_field="name"):
         return list(filter(lambda record: record[search_field] == search_value, MOCK_RECORDS))
@@ -119,7 +119,7 @@ class MockBitwarden(Bitwarden):
 
 class LoggedOutMockBitwarden(MockBitwarden):
 
-    logged_in = False
+    unlocked = False
 
 
 class TestLookupModule(unittest.TestCase):
@@ -155,7 +155,7 @@ class TestLookupModule(unittest.TestCase):
                          self.lookup.run(['a_test'])[0])
 
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', LoggedOutMockBitwarden())
-    def test_bitwarden_plugin_logged_out(self):
+    def test_bitwarden_plugin_unlocked(self):
         record = MOCK_RECORDS[0]
         record_name = record['name']
         with self.assertRaises(AnsibleError):

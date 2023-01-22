@@ -83,7 +83,7 @@ class Bitwarden(object):
         return self._cli_path
 
     @property
-    def logged_in(self):
+    def unlocked(self):
         out, err = self._run(['status'], stdin="")
         decoded = AnsibleJSONDecoder().raw_decode(out)[0]
         return decoded['status'] == 'unlocked'
@@ -135,8 +135,8 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         field = self.get_option('field')
         search_field = self.get_option('search')
-        if not _bitwarden.logged_in:
-            raise AnsibleError("Not logged into Bitwarden. Run 'bw login'.")
+        if not _bitwarden.unlocked:
+            raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
 
         return [_bitwarden.get_field(field, term, search_field) for term in terms]
 
