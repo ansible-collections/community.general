@@ -66,6 +66,59 @@
       - result.existing == {}
       - result.end_state.name == "{{ federation }}"
 
+- name: Create new user federation in admin realm
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ admin_realm }}"
+    name: "{{ federation }}"
+    state: present
+    provider_id: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      enabled: true
+      priority: 0
+      fullSyncPeriod: -1
+      changedSyncPeriod: -1
+      cachePolicy: DEFAULT
+      batchSizeForSync: 1000
+      editMode: READ_ONLY
+      importEnabled: true
+      syncRegistrations: false
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: "inetOrgPerson, organizationalPerson"
+      connectionUrl: "ldaps://ldap.example.com:636"
+      usersDn: "ou=Users,dc=example,dc=com"
+      authType: simple
+      bindDn: cn=directory reader
+      bindCredential: secret
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: "ldapsOnly"
+      connectionPooling: true
+      pagination: true
+      allowKerberosAuthentication: false
+      useKerberosForPasswordAuthentication: false
+      debug: false
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert user federation created (admin realm)
+  assert:
+    that:
+      - result is changed
+      - result.existing == {}
+      - result.end_state.name == "{{ federation }}"
+
 - name: Update existing user federation (no change)
   community.general.keycloak_user_federation:
     auth_keycloak_url: "{{ url }}"
@@ -113,6 +166,61 @@
     var: result
 
 - name: Assert user federation unchanged
+  assert:
+    that:
+      - result is not changed
+      - result.existing != {}
+      - result.existing.name == "{{ federation }}"
+      - result.end_state != {}
+      - result.end_state.name == "{{ federation }}"
+
+- name: Update existing user federation (no change, admin realm)
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ admin_realm }}"
+    name: "{{ federation }}"
+    state: present
+    provider_id: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      enabled: true
+      priority: 0
+      fullSyncPeriod: -1
+      changedSyncPeriod: -1
+      cachePolicy: DEFAULT
+      batchSizeForSync: 1000
+      editMode: READ_ONLY
+      importEnabled: true
+      syncRegistrations: false
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: "inetOrgPerson, organizationalPerson"
+      connectionUrl: "ldaps://ldap.example.com:636"
+      usersDn: "ou=Users,dc=example,dc=com"
+      authType: simple
+      bindDn: cn=directory reader
+      bindCredential: "**********"
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: "ldapsOnly"
+      connectionPooling: true
+      pagination: true
+      allowKerberosAuthentication: false
+      useKerberosForPasswordAuthentication: false
+      debug: false
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert user federation unchanged (admin realm)
   assert:
     that:
       - result is not changed
