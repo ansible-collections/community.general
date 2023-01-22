@@ -1,0 +1,7 @@
+bugfixes:
+  - >-
+    keycloak_user_federation - fixes federation creation issue. When a new
+    federation was created and at the same time a default / standard mapper
+    was also changed / updated the creation process failed as a bad None
+    set variable led to a bad malformed url request
+    (https://github.com/ansible-collections/community.general/pull/5750).
