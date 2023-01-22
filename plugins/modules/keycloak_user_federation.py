@@ -923,6 +923,8 @@ def main():
         updated_mappers = desired_comp.pop('mappers', [])
         after_comp = kc.create_component(desired_comp, realm)
 
+        cid = after_comp['id']
+
         for mapper in updated_mappers:
             found = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)
             if len(found) > 1:
