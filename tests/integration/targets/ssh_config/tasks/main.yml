@@ -5,7 +5,9 @@
 
 - name: Install required libs
   pip:
-    name: stormssh
+    name:
+      - stormssh
+      - 'paramiko<3.0.0'
     state: present
     extra_args: "-c {{ remote_constraints }}"
 
