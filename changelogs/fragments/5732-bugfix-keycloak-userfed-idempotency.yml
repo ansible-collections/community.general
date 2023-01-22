@@ -1,0 +1,6 @@
+bugfixes:
+  - >
+    keycloak_user_federation - fixes idempotency detection issues. In some
+    cases the module could fail to properly detect already existing user
+    federations because of a buggy seemingly superflous extra query parameter
+    (https://github.com/ansible-collections/community.general/pull/5732).
