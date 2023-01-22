@@ -666,16 +666,9 @@ class LXDContainerManagement(object):
         if key not in self.config:
             return False
 
-        if key == 'config' and self.ignore_volatile_options:  # the old behavior is to ignore configurations by keyword "volatile"
-            old_configs = dict((k, v) for k, v in self.old_sections.get(key, {}).items() if not k.startswith('volatile.'))
-            for k, v in self.config['config'].items():
-                if k not in old_configs:
-                    return True
-                if old_configs[k] != v:
-                    return True
-            return False
-        elif key == 'config':  # next default behavior
-            old_configs = dict((k, v) for k, v in self.old_sections.get(key, {}).items())
+        if key == 'config':
+            # self.old_sections is already filtered for volatile keys if necessary
+            old_configs = dict(self.old_sections.get(key, None) or {})
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
