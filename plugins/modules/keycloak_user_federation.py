@@ -24,7 +24,7 @@ description:
       to your needs and a user having the expected roles.
 
     - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
+      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
 
 
 options:
@@ -835,7 +835,7 @@ def main():
 
     # See if it already exists in Keycloak
     if cid is None:
-        found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', parent=realm, name=name)), realm)
+        found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', name=name)), realm)
         if len(found) > 1:
             module.fail_json(msg='No ID given and found multiple user federations with name `{name}`. Cannot continue.'.format(name=name))
         before_comp = next(iter(found), None)
