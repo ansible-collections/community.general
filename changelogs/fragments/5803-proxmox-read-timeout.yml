@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_disk - fixed issue with read timeout on import action (https://github.com/ansible-collections/community.general/pull/5803).
