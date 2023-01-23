@@ -623,7 +623,7 @@ class iLORedfishUtils(RedfishUtils):
 
     def verify_logical_drives(self, raid_details, check_length=False):
         # This method verifies logical drives present in the OOB controller against the provided input
-        result = self.get_logical_drives_details()
+        result = self.get_smartstorage_logical_drives()
         if not result["ret"]:
             return result
 
@@ -736,7 +736,7 @@ class iLORedfishUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_logical_drives_details()
+        response = self.get_smartstorage_logical_drives()
         if not response["ret"]:
             return response
 
@@ -1163,7 +1163,7 @@ class iLORedfishUtils(RedfishUtils):
             return response
 
         # Get logical drives from server
-        logical_drives_details_response = self.get_logical_drives_details()
+        logical_drives_details_response = self.get_smartstorage_logical_drives()
         if not logical_drives_details_response["ret"]:
             return logical_drives_details_response
 
@@ -1236,7 +1236,7 @@ class iLORedfishUtils(RedfishUtils):
             return response
 
         # Get logical drives from server
-        logical_drives_details_response = self.get_logical_drives_details()
+        logical_drives_details_response = self.get_smartstorage_logical_drives()
         if not logical_drives_details_response["ret"]:
             return logical_drives_details_response
 
@@ -1363,7 +1363,7 @@ class iLORedfishUtils(RedfishUtils):
 
         url = self.systems_uri + "smartstorageconfig/settings/"
 
-        logical_drives_details_response = self.get_logical_drives_details()
+        logical_drives_details_response = self.get_smartstorage_logical_drives()
         if not logical_drives_details_response["ret"]:
             return logical_drives_details_response
 
@@ -1584,7 +1584,7 @@ class iLORedfishUtils(RedfishUtils):
         # This method returns logical drives details for provided logical drive names
         result = {}
         logical_drives_names_list = logical_drives_names[:]
-        response = self.get_logical_drives_details()
+        response = self.get_smartstorage_logical_drives()
         if not response["ret"]:
             return response
 
