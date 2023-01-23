@@ -104,6 +104,7 @@ options:
       - Move the disk to this storage when I(state=moved).
       - You can move between storages only in scope of one VM.
       - Mutually exclusive with I(target_vmid).
+      - Consider increasing I(timeout) in case of large disk images or slow storage backend.
     type: str
   target_vmid:
     description:
@@ -113,8 +114,8 @@ options:
     type: int
   timeout:
     description:
-      - Timeout in seconds to wait when moving disk.
-      - Used only when I(state=moved).
+      - Timeout in seconds to wait for slow operations such as importing disk or moving disk between storages.
+      - Used only when I(state) is C(present) or C(moved).
     type: int
     default: 600
   aio:
@@ -172,6 +173,7 @@ options:
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
       - This parameter is mutually exclusive with I(size).
+      - Increase I(timeout) parameter when importing large disk images or using slow storage.
     type: str
   iops:
     description:
@@ -471,6 +473,16 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         params.update(dict((k, int(v)) for k, v in params.items() if isinstance(v, bool)))
         return params
 
+    def wait_till_complete_or_timeout(self, node_name, task_id):
+        timeout = self.module.params['timeout']
+        while timeout:
+            if self.api_task_ok(node_name, task_id):
+                return True
+            timeout -= 1
+            if timeout <= 0:
+                return False
+            sleep(1)
+
     def create_disk(self, disk, vmid, vm, vm_config):
         create = self.module.params['create']
         if create == 'disabled' and disk not in vm_config:
@@ -484,20 +496,23 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
 
             if import_string:
                 config_str = "%s:%s,import-from=%s" % (self.module.params["storage"], "0", import_string)
+                timeout_str = "Reached timeout while importing VM disk. Last line in task before timeout: %s"
+                ok_str = "Disk %s imported into VM %s"
             else:
                 config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
+                ok_str = "Disk %s created in VM %s"
+                timeout_str = "Reached timeout while creating VM disk. Last line in task before timeout: %s"
 
             for k, v in attributes.items():
                 config_str += ',%s=%s' % (k, v)
 
-            create_disk = {self.module.params["disk"]: config_str}
-            self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**create_disk)
-            return True, "Disk %s created in VM %s" % (disk, vmid)
+            disk_config_to_apply = {self.module.params["disk"]: config_str}
 
         if create in ['disabled', 'regular'] and disk in vm_config:
             # UPDATE
             disk_config = disk_conf_str_to_dict(vm_config[disk])
             config_str = disk_config["volume"]
+            ok_str = "Disk %s updated in VM %s"
             attributes = self.get_create_attributes()
             # 'import_from' fails on disk updates
             attributes.pop('import_from', None)
@@ -513,9 +528,16 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             if disk_config == attributes:
                 return False, "Disk %s is up to date in VM %s" % (disk, vmid)
 
-            update_disk = {self.module.params["disk"]: config_str}
-            self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**update_disk)
-            return True, "Disk %s updated in VM %s" % (disk, vmid)
+            disk_config_to_apply = {self.module.params["disk"]: config_str}
+
+        current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.post(**disk_config_to_apply)
+        task_success = self.wait_till_complete_or_timeout(vm['node'], current_task_id)
+        if task_success:
+            return True, ok_str % (disk, vmid)
+        else:
+            self.module.fail_json(
+                msg=timeout_str % self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+            )
 
     def move_disk(self, disk, vmid, vm, vm_config):
         params = dict()
@@ -535,20 +557,15 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             if params['storage'] == disk_config['storage_name']:
                 return False
 
-        taskid = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
-        timeout = self.module.params['timeout']
-        while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
-                return True
-            if timeout <= 0:
-                self.module.fail_json(
-                    msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
-                        self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-
-            sleep(1)
-            timeout -= 1
-        return True
+        task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
+        task_success = self.wait_till_complete_or_timeout(vm['node'], task_id)
+        if task_success:
+            return True
+        else:
+            self.module.fail_json(
+                msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
+                    self.proxmox_api.nodes(vm['node']).tasks(task_id).log.get()[:1]
+            )
 
 
 def main():
