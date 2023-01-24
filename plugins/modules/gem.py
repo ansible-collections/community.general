@@ -105,7 +105,7 @@ options:
     required: false
   force:
     description:
-      - Force gem to install, bypassing dependency checks.
+      - Force gem to (un-)install, bypassing dependency checks.
     required: false
     default: false
     type: bool
@@ -235,6 +235,8 @@ def uninstall(module):
     else:
         cmd.append('--all')
     cmd.append('--executable')
+    if module.params['force']:
+        cmd.append('--force')
     cmd.append(module.params['name'])
     module.run_command(cmd, environ_update=environ, check_rc=True)
 
