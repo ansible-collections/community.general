@@ -1,0 +1,2 @@
+bugfixes:
+  - gem - fix force parameter not being passed to gem command when uninstalling (https://github.com/ansible-collections/community.general/pull/5822).
