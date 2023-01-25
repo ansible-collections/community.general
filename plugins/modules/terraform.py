@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ryan Scott Brown <ryansb@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -48,9 +47,7 @@ options:
     version_added: 3.0.0
   workspace:
     description:
-      - The terraform workspace to work with. This sets the C(TF_WORKSPACE) environmental variable
-        that is used to override workspace selection. For more information about workspaces
-        have a look at U(https://developer.hashicorp.com/terraform/language/state/workspaces).
+      - The terraform workspace to work with.
     type: str
     default: default
   purge_workspace:
@@ -63,8 +60,9 @@ options:
   plan_file:
     description:
       - The path to an existing Terraform plan file to apply. If this is not
-        specified, Ansible will build a new TF plan and execute it.
-        Note that this option is required if 'state' has the 'planned' value.
+        specified, Ansible will build a new TF plan and execute it. The path
+        to created plan file is added into output. It can be used for
+        an inspection with terraform show command.
     type: path
   state_file:
     description:
@@ -285,23 +283,17 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 module = None
 
 
-def get_version(bin_path):
-    extract_version = module.run_command([bin_path, 'version', '-json'])
-    terraform_version = (json.loads(extract_version[1]))['terraform_version']
-    return terraform_version
-
-
-def preflight_validation(bin_path, project_path, version, variables_args=None, plan_file=None):
+def preflight_validation(bin_path, project_path):
     if project_path is None or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
+
     if not os.path.exists(bin_path):
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
+
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
-    if LooseVersion(version) < LooseVersion('0.15.0'):
-        module.run_command([bin_path, 'validate', '-no-color'] + variables_args, check_rc=True, cwd=project_path)
-    else:
-        module.run_command([bin_path, 'validate', '-no-color'], check_rc=True, cwd=project_path)
+
+    module.run_command([bin_path, 'validate', '-no-color'], check_rc=True, cwd=project_path)
 
 
 def _state_args(state_file):
@@ -312,7 +304,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths):
     command = [bin_path, 'init', '-input=false', '-no-color']
     if backend_config:
         for key, val in backend_config.items():
@@ -330,7 +322,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
     if plugin_paths:
         for plugin_path in plugin_paths:
             command.extend(['-plugin-dir', plugin_path])
-    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path, environ_update={"TF_WORKSPACE": workspace})
+    module.run_command(command, check_rc=True, cwd=project_path)
 
 
 def get_workspace_context(bin_path, project_path):
@@ -369,57 +361,63 @@ def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
-def build_plan(command, project_path, variables_args, state_file, targets, state, apply_args, plan_path=None):
-    if plan_path is None:
-        f, plan_path = tempfile.mkstemp(suffix='.tfplan')
-
-    local_command = command[:]
-
-    plan_command = [command[0], 'plan']
-
-    if state == "planned":
-        for c in local_command[1:]:
-            plan_command.append(c)
-
-    if state == "present":
-        for a in apply_args:
-            local_command.remove(a)
-        for c in local_command[1:]:
-            plan_command.append(c)
-
-    plan_command.extend(['-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path])
-
-    for t in targets:
-        plan_command.extend(['-target', t])
-
+def build_plan(command, project_path, state_file, state, plan_file=None):
+    plan_command = command[:]
+    plan_command.extend(['-out', plan_file])
     plan_command.extend(_state_args(state_file))
 
-    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path)
+    if state == 'absent':
+        plan_command.append('-destroy')
+
+    rc, out, err = module.run_command(plan_command, cwd=project_path)
 
     if rc == 0:
         # no changes
-        return plan_path, False, out, err, plan_command if state == 'planned' else command
+        return False, out, err
     elif rc == 1:
         # failure to plan
         module.fail_json(
-            msg='Terraform plan could not be created\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
+            msg='Terraform plan could not be created\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd}'.format(
                 out=out,
                 err=err,
                 cmd=' '.join(plan_command),
-                args=' '.join([shlex_quote(arg) for arg in variables_args])
             )
         )
     elif rc == 2:
         # changes, but successful
-        return plan_path, True, out, err, plan_command if state == 'planned' else command
+        return True, out, err
 
-    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}.\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
+    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}.\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd}'.format(
         rc=rc,
         out=out,
         err=err,
         cmd=' '.join(plan_command),
-        args=' '.join([shlex_quote(arg) for arg in variables_args])
     ))
+
+
+def plan_file_exists(plan_file):
+    if any([os.path.isfile(project_path + "/" + plan_file), os.path.isfile(plan_file)]):
+        return True
+
+    return False
+
+
+def init_plan_file(plan_file):
+    if not plan_file:
+        _, plan_file = tempfile.mkstemp(
+            suffix='.tfplan',
+            prefix='ansible-terraform',
+        )
+
+        return plan_file
+
+    if plan_file_exists(plan_file):
+        return plan_file
+    else:
+        module.fail_json(
+            msg='Could not find plan_file "{0}", check the path and try'
+                'again.'.format(plan_file),
+        )
 
 
 def main():
@@ -449,7 +447,6 @@ def main():
             parallelism=dict(type='int'),
             provider_upgrade=dict(type='bool', default=False),
         ),
-        required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
     )
 
@@ -462,7 +459,7 @@ def main():
     variables = module.params.get('variables') or {}
     complex_vars = module.params.get('complex_vars')
     variables_files = module.params.get('variables_files')
-    plan_file = module.params.get('plan_file')
+    plan_file = module.params.get('plan_file', None)
     state_file = module.params.get('state_file')
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
@@ -476,19 +473,9 @@ def main():
         command = [bin_path]
     else:
         command = [module.get_bin_path('terraform', required=True)]
-
-    checked_version = get_version(command[0])
-
-    if LooseVersion(checked_version) < LooseVersion('0.15.0'):
-        DESTROY_ARGS = ('destroy', '-no-color', '-force')
-        APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
-    else:
-        DESTROY_ARGS = ('destroy', '-no-color', '-auto-approve')
-        APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve')
-
-    if force_init:
-        if overwrite_init or not os.path.isfile(os.path.join(project_path, ".terraform", "terraform.tfstate")):
-            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace)
+    
+    command.extend(['apply', '-no-color', '-input=false'])
+    plan_command = [command[0], 'plan', '-no-color', '-input=false', '-detailed-exitcode']
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
@@ -497,13 +484,9 @@ def main():
         else:
             select_workspace(command[0], project_path, workspace)
 
-    if state == 'present':
-        command.extend(APPLY_ARGS)
-    elif state == 'absent':
-        command.extend(DESTROY_ARGS)
-
-    if state == 'present' and module.params.get('parallelism') is not None:
-        command.append('-parallelism=%d' % module.params.get('parallelism'))
+    if force_init:
+        if overwrite_init or not os.path.isfile(os.path.join(project_path, ".terraform", "terraform.tfstate")):
+            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths)
 
     def format_args(vars):
         if isinstance(vars, str):
@@ -580,48 +563,81 @@ def main():
         for f in variables_files:
             variables_args.extend(['-var-file', f])
 
-    preflight_validation(command[0], project_path, checked_version, variables_args)
+    preflight_validation(command[0], project_path)
 
-    if module.params.get('lock') is not None:
-        if module.params.get('lock'):
-            command.append('-lock=true')
-        else:
-            command.append('-lock=false')
+    # Variables are needed only during plan.
+    plan_command.extend(variables_args)
+
+    common_args = []
+    if module.params.get('parallelism') is not None:
+        common_args.append('-parallelism=%d' % module.params.get('parallelism'))
+
+    if module.params.get('lock'):
+        common_args.append('-lock=true')
+    else:
+        common_args.append('-lock=false')
+
     if module.params.get('lock_timeout') is not None:
-        command.append('-lock-timeout=%ds' % module.params.get('lock_timeout'))
+        common_args.append('-lock-timeout=%ds' % module.params.get('lock_timeout'))
 
     for t in (module.params.get('targets') or []):
-        command.extend(['-target', t])
+        common_args.extend(['-target', t])
+
+    command.extend(common_args)
+    plan_command.extend(common_args)
 
     # we aren't sure if this plan will result in changes, so assume yes
     needs_application, changed = True, False
 
     out, err = '', ''
 
-    if state == 'absent':
-        command.extend(variables_args)
-    elif state == 'present' and plan_file:
-        if any([os.path.isfile(project_path + "/" + plan_file), os.path.isfile(plan_file)]):
+    # We want to run plan every-time beside the case when plan file was
+    # provided for present state. We can store plan file also in a case of
+    # destroy action so a client can review it afterwards.
+    if state == 'present' and plan_file:
+        if plan_file_exists(plan_file) :
             command.append(plan_file)
         else:
             module.fail_json(msg='Could not find plan_file "{0}", check the path and try again.'.format(plan_file))
     else:
-        plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
-                                                                     module.params.get('targets'), state, APPLY_ARGS, plan_file)
+        plan_file = init_plan_file(plan_file)
+
+        needs_application, out, err = build_plan(
+            plan_command,
+            project_path,
+            state_file,
+            state,
+            plan_file,
+        )
+
         if state == 'present' and check_destroy and '- destroy' in out:
-            module.fail_json(msg="Aborting command because it would destroy some resources. "
-                                 "Consider switching the 'check_destroy' to false to suppress this error")
+            module.fail_json(
+                msg="Aborting command because it would destroy some resources. "
+                    "Consider switching the 'check_destroy' to false to suppress this error",
+            )
+
+        # Older Terraform versions 
+        #if state == 'present':
         command.append(plan_file)
 
     if needs_application and not module.check_mode and state != 'planned':
         rc, out, err = module.run_command(command, check_rc=False, cwd=project_path)
+
         if rc != 0:
             if workspace_ctx["current"] != workspace:
                 select_workspace(command[0], project_path, workspace_ctx["current"])
-            module.fail_json(msg=err.rstrip(), rc=rc, stdout=out,
-                             stdout_lines=out.splitlines(), stderr=err,
-                             stderr_lines=err.splitlines(),
-                             cmd=' '.join(command))
+
+            module.fail_json(
+                msg=err.rstrip(),
+                rc=rc,
+                stdout=out,
+                stdout_lines=out.splitlines(),
+                stderr=err,
+                stderr_lines=err.splitlines(),
+                cmd=' '.join(command),
+                plan_file=plan_file,
+            )
+
         # checks out to decide if changes were made during execution
         if ' 0 added, 0 changed' not in out and not state == "absent" or ' 0 destroyed' not in out:
             changed = True
@@ -635,7 +651,9 @@ def main():
         module.fail_json(
             msg="Failure when getting Terraform outputs. "
                 "Exited {0}.\nstdout: {1}\nstderr: {2}".format(rc, outputs_text, outputs_err),
-            command=' '.join(outputs_command))
+            command=' '.join(outputs_command),
+            plan_file=plan_file,
+        )
     else:
         outputs = json.loads(outputs_text)
 
@@ -645,7 +663,16 @@ def main():
     if state == 'absent' and workspace != 'default' and purge_workspace is True:
         remove_workspace(command[0], project_path, workspace)
 
-    module.exit_json(changed=changed, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
+    module.exit_json(
+        changed=changed,
+        state=state,
+        workspace=workspace,
+        outputs=outputs,
+        stdout=out,
+        stderr=err,
+        command=' '.join(command),
+        plan_file=plan_file,
+    )
 
 
 if __name__ == '__main__':
