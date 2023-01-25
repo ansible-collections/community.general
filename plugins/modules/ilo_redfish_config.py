@@ -284,14 +284,6 @@ EXAMPLES = '''
       password: "******"
       logical_drives_names: ["LD1", "LD2"]
 
-  - name: Enable secure boot
-    community.general.ilo_redfish_config:
-      category: Systems
-      command: EnableSecureBoot
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-
   - name: Deleting all the SNMPv3 users
     community.general.ilo_redfish_config:
       category: Manager
@@ -400,8 +392,7 @@ CATEGORY_COMMANDS_ALL = {
         "DeleteAllLogicalDrives",
         "DeleteSpecifiedLogicalDrives",
         "CreateLogicalDrives",
-        "CreateLogicalDrivesWithParticularPhysicalDrives",
-        "EnableSecureBoot"
+        "CreateLogicalDrivesWithParticularPhysicalDrives"
     ]
 }
 
@@ -562,8 +553,7 @@ def main():
             DeleteAllLogicalDrives=rf_utils.delete_all_logical_drives,
             DeleteSpecifiedLogicalDrives=rf_utils.delete_specified_logical_drives,
             CreateLogicalDrives=rf_utils.create_logical_drives,
-            CreateLogicalDrivesWithParticularPhysicalDrives=rf_utils.create_logical_drives_with_particular_physical_drives,
-            EnableSecureBoot=rf_utils.enable_secure_boot
+            CreateLogicalDrivesWithParticularPhysicalDrives=rf_utils.create_logical_drives_with_particular_physical_drives
 
         )
 
@@ -576,8 +566,6 @@ def main():
                 result[command] = dispatch[command](module.params["raid_details"])
             elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
                 result[command] = dispatch[command](module.params["raid_details"])
-            elif command == "EnableSecureBoot":
-                result[command] = dispatch[command]()
             if "changed" in result[command]:
                 changed |= result[command]["changed"]
 
