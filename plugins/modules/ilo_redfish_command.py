@@ -54,11 +54,6 @@ options:
       - Timeout in seconds for HTTP requests to iLO.
     default: 60
     type: int
-  bios_attributes:
-    required: false
-    description:
-      - BIOS attributes that needs to be verified in the given server
-    type: dict
   raid_details:
     required: false
     description:
@@ -131,17 +126,6 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Verify bios attributes
-    community.general.ilo_redfish_command:
-      category: Systems
-      command: VerifyBiosAttributes
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "*****"
-      bios_attributes:
-        SubNumaClustering: "Disabled"
-        WorkloadProfile: "Virtualization-MaxPerformance"
-
   - name: Verify logical drives
     community.general.ilo_redfish_command:
       category: Systems
@@ -170,7 +154,7 @@ EXAMPLES = '''
   - name: Verify specified logical drives
     community.general.ilo_redfish_command:
       category: Systems
-      command: VerifySpecifiedLogicalDrives
+      command: VerifySpecifiedSmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -194,7 +178,7 @@ EXAMPLES = '''
   - name: Get specified logical drives details
     community.general.ilo_redfish_command:
       category: Systems
-      command: GetSpecifiedLogicalDrives
+      command: GetSpecifiedSmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -235,8 +219,8 @@ except ImportError as e:
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["VerifyBiosAttributes", "VerifySmartStorageLogicalDrives", "VerifyUefiBootOrder",
-                "VerifySpecifiedLogicalDrives", "CheckiLORebootStatus", "GetSpecifiedLogicalDrives"]
+    "Systems": ["VerifySmartStorageLogicalDrives", "VerifyUefiBootOrder",
+                "VerifySpecifiedSmartStorageLogicalDrives", "CheckiLORebootStatus", "GetSpecifiedSmartStorageLogicalDrives"]
 }
 
 
@@ -251,7 +235,6 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
-            bios_attributes=dict(type="dict"),
             raid_details=dict(type="list", elements='dict'),
             uefi_boot_order=dict(type='list', elements='str'),
             logical_drives_names=dict(type='list', elements='str'),
@@ -317,19 +300,13 @@ def main():
                 result[command] = res
                 module.fail_json(msg=to_native(result))
 
-            if command == "VerifyBiosAttributes":
-                if not module.params.get("bios_attributes") and module.params.get("bios_attributes") != {}:
-                    result[command]['ret'] = False
-                    result[command]['msg'] = "bios_attributes params is required"
-                    module.fail_json(result)
-                result[command] = rf_utils.verify_bios_attributes(module.params["bios_attributes"])
-            elif command == "VerifySmartStorageLogicalDrives":
+            if command == "VerifySmartStorageLogicalDrives":
                 if not module.params.get("raid_details") and module.params.get("raid_details") != []:
                     result[command]['ret'] = False
                     result[command]['msg'] = "raid_details params is required"
                     module.fail_json(result)
                 result[command] = rf_utils.verify_logical_drives(module.params["raid_details"], True)
-            elif command == "VerifySpecifiedLogicalDrives":
+            elif command == "VerifySpecifiedSmartStorageLogicalDrives":
                 if not module.params.get("raid_details") and module.params.get("raid_details") != []:
                     result[command]['ret'] = False
                     result[command]['msg'] = "raid_details params is required"
@@ -343,7 +320,7 @@ def main():
                 result[command] = rf_utils.verify_uefi_boot_order(module.params["uefi_boot_order"])
             elif command == "CheckiLORebootStatus":
                 result[command] = rf_utils.check_reboot_status()
-            elif command == "GetSpecifiedLogicalDrives":
+            elif command == "GetSpecifiedSmartStorageLogicalDrives":
                 if not module.params["logical_drives_names"]:
                     result[command]['ret'] = False
                     result[command]['msg'] = "logical_drives_names params is required"
