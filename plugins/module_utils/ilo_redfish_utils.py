@@ -386,40 +386,6 @@ class iLORedfishUtils(RedfishUtils):
             "msg": alert_destinations
         }
 
-    def verify_bios_attributes(self, bios_attributes):
-        # This method verifies BIOS attributes against the provided input
-        server_bios = self.get_multi_bios_attributes()
-        if not server_bios["ret"]:
-            return server_bios
-
-        bios_dict = {}
-        wrong_param = {}
-
-        # Verify bios_attributes with BIOS settings available in the server
-        for key, value in bios_attributes.items():
-            if key in server_bios["entries"][0][1]:
-                if server_bios["entries"][0][1][key] != value:
-                    bios_dict.update({key: value})
-            else:
-                wrong_param.update({key: value})
-
-        if wrong_param:
-            return {
-                "ret": False,
-                "msg": "Wrong parameters are provided: %s" % wrong_param
-            }
-        if bios_dict:
-            return {
-                "ret": False,
-                "msg": "BIOS parameters are not matching: %s" % bios_dict
-            }
-
-        return {
-            "ret": True,
-            "changed": False,
-            "msg": "BIOS verification completed"
-        }
-
     def remove_odata(self, output):
         # Remove odata variables given in the list
         remove_list = ["@odata.context", "@odata.etag", "@odata.id", "@odata.type"]
@@ -1300,56 +1266,6 @@ class iLORedfishUtils(RedfishUtils):
             "changed": True,
             "msg": "Create logical drives request sent for %s. System Reset required." % str(ld_names)
         }
-
-    def enable_secure_boot(self):
-        # This function enable Secure Boot on an OOB controller
-
-        # Get server details
-        response = self.get_request(self.root_uri + self.systems_uri)
-        if not response["ret"]:
-            return response
-
-        # Check secure boot state
-        server_details = response["msg"]["data"]
-        secure_boot_url = server_details["SecureBoot"]["@odata.id"]
-
-        response = self.get_request(self.root_uri + secure_boot_url)
-        if not response["ret"]:
-            return response
-
-        secure_boot_details = response["data"]
-
-        if secure_boot_details["SecureBootEnable"]:
-            return {
-                "ret": True,
-                "changed": False,
-                "msg": "Secure boot is already enabled"
-            }
-        else:
-            # Check server poststate
-            state = server_details["PowerState"]
-
-            # If server is not powered OFF, then failing with message
-            if state != "Off":
-                return {
-                    "ret": False,
-                    "changed": False,
-                    "msg": "Server is not powered OFF, Power OFF the server to enable secure boot"
-                }
-
-            body = {}
-            body["SecureBootEnable"] = True
-
-            res = self.patch_request(self.root_uri + secure_boot_url, body)
-
-            if not res["ret"]:
-                return res
-
-            return {
-                "ret": True,
-                "changed": True,
-                "msg": "Secure boot enabled. Server Power On required."
-            }
 
     def delete_specified_logical_drives(self, logical_drives_names):
         # This function makes call to Server through redfish client to delete logical drives
