@@ -1,2 +1,2 @@
 minor_changes:
-  - implement adding external users in ipa_group module
+  - ipa_group - allow to add and remove external users with the ``external_user`` option (https://github.com/ansible-collections/community.general/pull/5897).
