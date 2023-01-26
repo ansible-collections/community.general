@@ -69,7 +69,7 @@ options:
     - List of external users assigned to this group
     - Behaves identically to I(user) with respect to I(append) attribute
     - List entries can be in C(DOMAIN\\username) or SID format.
-    - Unless SIDs are provided, ipa_group will always attempt to make changes even if the group already has all the users.
+    - Unless SIDs are provided, the module will always attempt to make changes even if the group already has all the users.
     - This is because only SIDs are returned by IPA query.
     - I(external=true) is needed for this option to work.
     type: list
