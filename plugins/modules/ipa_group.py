@@ -68,10 +68,12 @@ options:
     description:
     - List of external users assigned to this group
     - Behaves identically to I(user) with respect to I(append) attribute
-    - List entries can be in DOMAIN\username format but unless SIDs are provided, this module will always attempt to make changes even if the group already has all the users. This is because only SIDs are returned by IPA query.
+    - List entries can be in DOMAIN\username or SID format.
+    - Unless SIDs are provided, ipa_group will always attempt to make changes even if the group already has all the users.
+    - This is because only SIDs are returned by IPA query.
     - I(external=true) is needed for this option to work.
     type: list
-    elements: str   
+    elements: str
   state:
     description:
     - State to ensure
@@ -205,7 +207,7 @@ class GroupIPAClient(IPAClient):
 
     def group_remove_member_user(self, name, item):
         return self.group_remove_member(name=name, item={'user': item})
-    
+
     def group_remove_member_externaluser(self, name, item):
         return self.group_remove_member(name=name, item={'ipaexternalmember': item})
 
@@ -286,11 +288,10 @@ def ensure(module, client):
                                             append=append) or changed
 
         if external_user is not None:
-            changed = client.modify_if_diff(name,
-                ipa_group.get('ipaexternalmember', []), external_user,
+            changed = client.modify_if_diff(name, ipa_group.get('ipaexternalmember', []), external_user,
                                             client.group_add_member_externaluser,
                                             client.group_remove_member_externaluser,
-                                            append=append) or changed                                    
+                                            append=append) or changed                                
     else:
         if ipa_group:
             changed = True
