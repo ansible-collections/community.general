@@ -3216,4 +3216,38 @@ class RedfishUtils(object):
         body = {}
         body["SecureBootEnable"] = True
 
+<<<<<<< HEAD
         return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)
+=======
+        if secure_boot_details["SecureBootEnable"]:
+            return {
+                "ret": True,
+                "changed": False,
+                "msg": "Secure boot is already enabled"
+            }
+        else:
+            # Check server power state
+            state = server_details["PowerState"]
+
+            # If server is not powered OFF, then failing with message
+            if state != "Off":
+                return {
+                    "ret": False,
+                    "changed": False,
+                    "msg": "Server is not powered OFF, Power OFF the server to enable SecureBoot"
+                }
+
+            body = {}
+            body["SecureBootEnable"] = True
+
+            res = self.patch_request(self.root_uri + secure_boot_url, body)
+
+            if not res["ret"]:
+                return res
+
+            return {
+                "ret": True,
+                "changed": True,
+                "msg": "SecureBoot enabled. Server Power On required."
+            }
+>>>>>>> a6039bbf (Sanity fixes)
