@@ -66,8 +66,8 @@ options:
     elements: str
   external_user:
     description:
-    - List of external users assigned to this group
-    - Behaves identically to I(user) with respect to I(append) attribute
+    - List of external users assigned to this group.
+    - Behaves identically to I(user) with respect to I(append) attribute.
     - List entries can be in C(DOMAIN\\username) or SID format.
     - Unless SIDs are provided, the module will always attempt to make changes even if the group already has all the users.
     - This is because only SIDs are returned by IPA query.
