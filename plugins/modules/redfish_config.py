@@ -263,7 +263,7 @@ EXAMPLES = '''
 
   - name: Enable SecureBoot
     community.general.redfish_config:
-      category: Sessions
+      category: Systems
       command: EnableSecureBoot
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
