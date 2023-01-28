@@ -113,7 +113,7 @@ class MockBitwarden(Bitwarden):
 
     unlocked = True
 
-    def _get_matches(self, search_value, search_field="name"):
+    def _get_matches(self, search_value, search_field="name", collection_id=None):
         return list(filter(lambda record: record[search_field] == search_value, MOCK_RECORDS))
 
 
