@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Ryan Scott Brown <ryansb@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -395,23 +396,23 @@ def build_plan(command, project_path, state_file, state, plan_file=None):
     ))
 
 
-def plan_file_exists(plan_file):
+def plan_file_exists(project_path, plan_file):
     if any([os.path.isfile(project_path + "/" + plan_file), os.path.isfile(plan_file)]):
         return True
 
     return False
 
 
-def init_plan_file(plan_file):
+def init_plan_file(project_path, plan_file):
     if not plan_file:
-        _, plan_file = tempfile.mkstemp(
+        f, plan_file = tempfile.mkstemp(
             suffix='.tfplan',
             prefix='ansible-terraform',
         )
 
         return plan_file
 
-    if plan_file_exists(plan_file):
+    if plan_file_exists(project_path, plan_file):
         return plan_file
     else:
         module.fail_json(
@@ -473,7 +474,7 @@ def main():
         command = [bin_path]
     else:
         command = [module.get_bin_path('terraform', required=True)]
-    
+
     command.extend(['apply', '-no-color', '-input=false'])
     plan_command = [command[0], 'plan', '-no-color', '-input=false', '-detailed-exitcode']
 
@@ -595,12 +596,12 @@ def main():
     # provided for present state. We can store plan file also in a case of
     # destroy action so a client can review it afterwards.
     if state == 'present' and plan_file:
-        if plan_file_exists(plan_file) :
+        if plan_file_exists(project_path, plan_file):
             command.append(plan_file)
         else:
             module.fail_json(msg='Could not find plan_file "{0}", check the path and try again.'.format(plan_file))
     else:
-        plan_file = init_plan_file(plan_file)
+        plan_file = init_plan_file(project_path, plan_file)
 
         needs_application, out, err = build_plan(
             plan_command,
@@ -616,8 +617,6 @@ def main():
                     "Consider switching the 'check_destroy' to false to suppress this error",
             )
 
-        # Older Terraform versions 
-        #if state == 'present':
         command.append(plan_file)
 
     if needs_application and not module.check_mode and state != 'planned':
