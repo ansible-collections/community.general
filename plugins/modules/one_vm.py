@@ -196,6 +196,13 @@ options:
       - Name of Datastore to use to create a new instace
     version_added: '0.2.0'
     type: str
+  updateconf:
+    description:
+      - When I(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
+      - When new VMs are being created, emulates the C(updateconf) API call via direct template merge.
+      - Allows for complete modifications of the C(CONTEXT) attribute.
+    type: dict
+    version_added: 6.3.0
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"
@@ -403,6 +410,30 @@ EXAMPLES = '''
     disk_saveas:
       name: bar-image
       disk_id: 1
+
+- name: "Deploy 2 new instances with a custom 'start script'"
+  community.general.one_vm:
+    template_name: app_template
+    count: 2
+    updateconf:
+      CONTEXT:
+        START_SCRIPT: ip r r 169.254.16.86/32 dev eth0
+
+- name: "Add a custom 'start script' to a running VM"
+  community.general.one_vm:
+    instance_ids: 351
+    updateconf:
+      CONTEXT:
+        START_SCRIPT: ip r r 169.254.16.86/32 dev eth0
+
+- name: "Update SSH public keys inside the VM's context"
+  community.general.one_vm:
+    instance_ids: 351
+    updateconf:
+      CONTEXT:
+        SSH_PUBLIC_KEY: |-
+          ssh-rsa ...
+          ssh-ed25519 ...
 '''
 
 RETURN = '''
@@ -510,6 +541,17 @@ instances:
                         "TE_GALAXY": "bar",
                         "USER_INPUTS": null
                     }
+        updateconf:
+            description: A dictionary of key/values attributes that are set with the updateconf API call.
+            type: dict
+            version_added: 6.3.0
+            sample: {
+                        "OS": { "ARCH": "x86_64" },
+                        "CONTEXT": {
+                            "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
+                            "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
+                        }
+                    }
 tagged_instances:
     description:
         - A list of instances info based on a specific attributes and/or
@@ -615,6 +657,17 @@ tagged_instances:
                         "TE_GALAXY": "bar",
                         "USER_INPUTS": null
                     }
+        updateconf:
+            description: A dictionary of key/values attributes that are set with the updateconf API call
+            type: dict
+            version_added: 6.3.0
+            sample: {
+                        "OS": { "ARCH": "x86_64" },
+                        "CONTEXT": {
+                            "START_SCRIPT": "ip r r 169.254.16.86/32 dev eth0",
+                            "SSH_PUBLIC_KEY": "ssh-rsa ...\\nssh-ed25519 ..."
+                        }
+                    }
 '''
 
 try:
@@ -623,8 +676,51 @@ try:
 except ImportError:
     HAS_PYONE = False
 
-from ansible.module_utils.basic import AnsibleModule
+
 import os
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.dict_transformations import dict_merge
+
+from ansible_collections.community.general.plugins.module_utils.opennebula import flatten, render
+
+
+UPDATECONF_ATTRIBUTES = {
+    "OS": ["ARCH", "MACHINE", "KERNEL", "INITRD", "BOOTLOADER", "BOOT", "SD_DISK_BUS", "UUID"],
+    "FEATURES": ["ACPI", "PAE", "APIC", "LOCALTIME", "HYPERV", "GUEST_AGENT"],
+    "INPUT": ["TYPE", "BUS"],
+    "GRAPHICS": ["TYPE", "LISTEN", "PASSWD", "KEYMAP"],
+    "RAW": ["DATA", "DATA_VMX", "TYPE"],
+    "CONTEXT": [],
+}
+
+
+def check_updateconf(module, to_check):
+    '''Checks if attributes are compatible with one.vm.updateconf API call.'''
+    for attr, subattributes in to_check.items():
+        if attr not in UPDATECONF_ATTRIBUTES:
+            module.fail_json(msg="'{0:}' is not a valid VM attribute.".format(attr))
+        if not UPDATECONF_ATTRIBUTES[attr]:
+            continue
+        for subattr in subattributes:
+            if subattr not in UPDATECONF_ATTRIBUTES[attr]:
+                module.fail_json(msg="'{0:}' is not a valid VM subattribute of '{1:}'".format(subattr, attr))
+
+
+def parse_updateconf(vm_template):
+    '''Extracts 'updateconf' attributes from a VM template.'''
+    updateconf = {}
+    for attr, subattributes in vm_template.items():
+        if attr not in UPDATECONF_ATTRIBUTES:
+            continue
+        tmp = {}
+        for subattr, value in subattributes.items():
+            if UPDATECONF_ATTRIBUTES[attr] and subattr not in UPDATECONF_ATTRIBUTES[attr]:
+                continue
+            tmp[subattr] = value
+        if tmp:
+            updateconf[attr] = tmp
+    return updateconf
 
 
 def get_template(module, client, predicate):
@@ -767,6 +863,8 @@ def get_vm_info(client, vm):
 
     vm_labels, vm_attributes = get_vm_labels_and_attributes_dict(client, vm.ID)
 
+    updateconf = parse_updateconf(vm.TEMPLATE)
+
     info = {
         'template_id': int(vm.TEMPLATE['TEMPLATE_ID']),
         'vm_id': vm.ID,
@@ -785,7 +883,8 @@ def get_vm_info(client, vm):
         'uptime_h': int(vm_uptime),
         'attributes': vm_attributes,
         'mode': permissions_str,
-        'labels': vm_labels
+        'labels': vm_labels,
+        'updateconf': updateconf,
     }
 
     return info
@@ -844,6 +943,28 @@ def set_vm_ownership(module, client, vms, owner_id, group_id):
     return changed
 
 
+def update_vm(module, client, vm, updateconf_dict):
+    changed = False
+    if not updateconf_dict:
+        return changed
+
+    before = client.vm.info(vm.ID).TEMPLATE
+
+    client.vm.updateconf(vm.ID, render(updateconf_dict), 1)  # 1: Merge new template with the existing one.
+
+    after = client.vm.info(vm.ID).TEMPLATE
+
+    changed = before != after
+    return changed
+
+
+def update_vms(module, client, vms, *args):
+    changed = False
+    for vm in vms:
+        changed = update_vm(module, client, vm, *args) or changed
+    return changed
+
+
 def get_size_in_MB(module, size_str):
 
     SYMBOLS = ['B', 'KB', 'MB', 'GB', 'TB']
@@ -871,81 +992,46 @@ def get_size_in_MB(module, size_str):
     return size_in_MB
 
 
-def create_disk_str(module, client, template_id, disk_size_list):
-
-    if not disk_size_list:
-        return ''
-
-    template = client.template.info(template_id)
-    if isinstance(template.TEMPLATE['DISK'], list):
-        # check if the number of disks is correct
-        if len(template.TEMPLATE['DISK']) != len(disk_size_list):
-            module.fail_json(msg='This template has ' + str(len(template.TEMPLATE['DISK'])) + ' disks but you defined ' + str(len(disk_size_list)))
-        result = ''
-        index = 0
-        for DISKS in template.TEMPLATE['DISK']:
-            disk = {}
-            diskresult = ''
-            # Get all info about existed disk e.g. IMAGE_ID,...
-            for key, value in DISKS.items():
-                disk[key] = value
-            # copy disk attributes if it is not the size attribute
-            diskresult += 'DISK = [' + ','.join('{key}="{val}"'.format(key=key, val=val) for key, val in disk.items() if key != 'SIZE')
-            # Set the Disk Size
-            diskresult += ', SIZE=' + str(int(get_size_in_MB(module, disk_size_list[index]))) + ']\n'
-            result += diskresult
-            index += 1
-    else:
-        if len(disk_size_list) > 1:
-            module.fail_json(msg='This template has one disk but you defined ' + str(len(disk_size_list)))
-        disk = {}
-        # Get all info about existed disk e.g. IMAGE_ID,...
-        for key, value in template.TEMPLATE['DISK'].items():
-            disk[key] = value
-        # copy disk attributes if it is not the size attribute
-        result = 'DISK = [' + ','.join('{key}="{val}"'.format(key=key, val=val) for key, val in disk.items() if key != 'SIZE')
-        # Set the Disk Size
-        result += ', SIZE=' + str(int(get_size_in_MB(module, disk_size_list[0]))) + ']\n'
-
-    return result
-
-
-def create_attributes_str(attributes_dict, labels_list):
-
-    attributes_str = ''
-
-    if labels_list:
-        attributes_str += 'LABELS="' + ','.join('{label}'.format(label=label) for label in labels_list) + '"\n'
-    if attributes_dict:
-        attributes_str += '\n'.join('{key}="{val}"'.format(key=key.upper(), val=val) for key, val in attributes_dict.items()) + '\n'
-
-    return attributes_str
-
-
-def create_nics_str(network_attrs_list):
-    nics_str = ''
-
-    for network in network_attrs_list:
-        # Packing key-value dict in string with format key="value", key="value"
-        network_str = ','.join('{key}="{val}"'.format(key=key, val=val) for key, val in network.items())
-        nics_str = nics_str + 'NIC = [' + network_str + ']\n'
-
-    return nics_str
-
-
-def create_vm(module, client, template_id, attributes_dict, labels_list, disk_size, network_attrs_list, vm_start_on_hold, vm_persistent):
-
+def create_vm(module, client, template_id, attributes_dict, labels_list, disk_size, network_attrs_list, vm_start_on_hold, vm_persistent, updateconf_dict):
     if attributes_dict:
         vm_name = attributes_dict.get('NAME', '')
 
-    disk_str = create_disk_str(module, client, template_id, disk_size)
-    vm_extra_template_str = create_attributes_str(attributes_dict, labels_list) + create_nics_str(network_attrs_list) + disk_str
+    template = client.template.info(template_id).TEMPLATE
+
+    disk_count = len(flatten(template.get('DISK', [])))
+    if disk_size:
+        size_count = len(flatten(disk_size))
+        # check if the number of disks is correct
+        if disk_count != size_count:
+            module.fail_json(msg='This template has ' + str(disk_count) + ' disks but you defined ' + str(size_count))
+
+    vm_extra_template = dict_merge(template or {}, attributes_dict or {})
+    vm_extra_template = dict_merge(vm_extra_template, {
+        'LABELS': ','.join(labels_list),
+        'NIC': flatten(network_attrs_list, extract=True),
+        'DISK': flatten([
+            disk if not size else dict_merge(disk, {
+                'SIZE': str(int(get_size_in_MB(module, size))),
+            })
+            for disk, size in zip(
+                flatten(template.get('DISK', [])),
+                flatten(disk_size or [None] * disk_count),
+            )
+            if disk is not None
+        ], extract=True)
+    })
+    vm_extra_template = dict_merge(vm_extra_template, updateconf_dict or {})
+
     try:
-        vm_id = client.template.instantiate(template_id, vm_name, vm_start_on_hold, vm_extra_template_str, vm_persistent)
+        vm_id = client.template.instantiate(template_id,
+                                            vm_name,
+                                            vm_start_on_hold,
+                                            render(vm_extra_template),
+                                            vm_persistent)
     except pyone.OneException as e:
         module.fail_json(msg=str(e))
-    vm = get_vm_by_id(client, vm_id)
 
+    vm = get_vm_by_id(client, vm_id)
     return get_vm_info(client, vm)
 
 
@@ -1028,8 +1114,10 @@ def get_all_vms_by_attributes(client, attributes_dict, labels_list):
     return vm_list
 
 
-def create_count_of_vms(
-        module, client, template_id, count, attributes_dict, labels_list, disk_size, network_attrs_list, wait, wait_timeout, vm_start_on_hold, vm_persistent):
+def create_count_of_vms(module, client,
+                        template_id, count,
+                        attributes_dict, labels_list, disk_size, network_attrs_list,
+                        wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
     new_vms_list = []
 
     vm_name = ''
@@ -1058,7 +1146,9 @@ def create_count_of_vms(
             new_vm_name += next_index
         # Update NAME value in the attributes in case there is index
         attributes_dict['NAME'] = new_vm_name
-        new_vm_dict = create_vm(module, client, template_id, attributes_dict, labels_list, disk_size, network_attrs_list, vm_start_on_hold, vm_persistent)
+        new_vm_dict = create_vm(module, client,
+                                template_id, attributes_dict, labels_list, disk_size, network_attrs_list,
+                                vm_start_on_hold, vm_persistent, updateconf_dict)
         new_vm_id = new_vm_dict.get('vm_id')
         new_vm = get_vm_by_id(client, new_vm_id)
         new_vms_list.append(new_vm)
@@ -1076,9 +1166,10 @@ def create_count_of_vms(
     return True, new_vms_list, []
 
 
-def create_exact_count_of_vms(module, client, template_id, exact_count, attributes_dict, count_attributes_dict,
-                              labels_list, count_labels_list, disk_size, network_attrs_list, hard, wait, wait_timeout, vm_start_on_hold, vm_persistent):
-
+def create_exact_count_of_vms(module, client,
+                              template_id, exact_count, attributes_dict, count_attributes_dict,
+                              labels_list, count_labels_list, disk_size, network_attrs_list,
+                              hard, wait, wait_timeout, vm_start_on_hold, vm_persistent, updateconf_dict):
     vm_list = get_all_vms_by_attributes(client, count_attributes_dict, count_labels_list)
 
     vm_count_diff = exact_count - len(vm_list)
@@ -1095,7 +1186,7 @@ def create_exact_count_of_vms(module, client, template_id, exact_count, attribut
         # Add more VMs
         changed, instances_list, tagged_instances = create_count_of_vms(module, client, template_id, vm_count_diff, attributes_dict,
                                                                         labels_list, disk_size, network_attrs_list, wait, wait_timeout,
-                                                                        vm_start_on_hold, vm_persistent)
+                                                                        vm_start_on_hold, vm_persistent, updateconf_dict)
 
         tagged_instances_list += instances_list
     elif vm_count_diff < 0:
@@ -1398,7 +1489,8 @@ def main():
         "labels": {"default": [], "type": "list", "elements": "str"},
         "count_labels": {"required": False, "type": "list", "elements": "str"},
         "disk_saveas": {"type": "dict"},
-        "persistent": {"default": False, "type": "bool"}
+        "persistent": {"default": False, "type": "bool"},
+        "updateconf": {"type": "dict"},
     }
 
     module = AnsibleModule(argument_spec=fields,
@@ -1452,6 +1544,7 @@ def main():
     count_labels = params.get('count_labels')
     disk_saveas = params.get('disk_saveas')
     persistent = params.get('persistent')
+    updateconf = params.get('updateconf')
 
     if not (auth.username and auth.password):
         module.warn("Credentials missing")
@@ -1469,6 +1562,9 @@ def main():
             module.warn('When you pass `count_attributes` without `attributes` option when deploying, `attributes` option will have same values implicitly.')
             attributes = copy.copy(count_attributes)
         check_attributes(module, count_attributes)
+
+    if updateconf:
+        check_updateconf(module, updateconf)
 
     if count_labels and not labels:
         module.warn('When you pass `count_labels` without `labels` option when deploying, `labels` option will have same values implicitly.')
@@ -1529,13 +1625,13 @@ def main():
         # Deploy an exact count of VMs
         changed, instances_list, tagged_instances_list = create_exact_count_of_vms(module, one_client, template_id, exact_count, attributes,
                                                                                    count_attributes, labels, count_labels, disk_size,
-                                                                                   networks, hard, wait, wait_timeout, put_vm_on_hold, persistent)
+                                                                                   networks, hard, wait, wait_timeout, put_vm_on_hold, persistent, updateconf)
         vms = tagged_instances_list
     elif template_id is not None and state == 'present':
         # Deploy count VMs
         changed, instances_list, tagged_instances_list = create_count_of_vms(module, one_client, template_id, count,
                                                                              attributes, labels, disk_size, networks, wait, wait_timeout,
-                                                                             put_vm_on_hold, persistent)
+                                                                             put_vm_on_hold, persistent, updateconf)
         # instances_list - new instances
         # tagged_instances_list - all instances with specified `count_attributes` and `count_labels`
         vms = instances_list
@@ -1586,6 +1682,9 @@ def main():
 
     if owner_id is not None or group_id is not None:
         changed = set_vm_ownership(module, one_client, vms, owner_id, group_id) or changed
+
+    if template_id is None and updateconf is not None:
+        changed = update_vms(module, one_client, vms, updateconf) or changed
 
     if wait and not module.check_mode and state != 'present':
         wait_for = {
