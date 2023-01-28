@@ -362,7 +362,7 @@ def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
-def build_plan(command, project_path, state_file, state, plan_file=None):
+def build_plan(command, project_path, state_file, state, plan_file):
     plan_command = command[:]
     plan_command.extend(['-out', plan_file])
     plan_command.extend(_state_args(state_file))
