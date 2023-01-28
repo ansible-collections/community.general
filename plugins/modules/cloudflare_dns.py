@@ -48,12 +48,11 @@ options:
     type: int
   caa_tag:
     description:
+    - defines the scope of the record/uri posible options are C(issue) only allow specific hostnames
+    - or C(issuewild) to only allow wildcards or C(iodef) Send violation reports to URL (http:, https:, or mailto:)
     - Required for I(type=CAA)
-    - issue: Only allow specific hostnames
-    - issuewild: Only allow wildcards
-    - iodef: Send violation reports to URL (http:, https:, or mailto:)
     type: str
-    choices: [ issue, issuewild, iodef ]
+    choices: [ 'issue', 'issuewild', 'iodef' ]
     default: issue
   cert_usage:
     description:
@@ -426,7 +425,7 @@ class CloudflareAPI(object):
         if (self.type in ['CNAME', 'NS', 'MX', 'SRV']) and (self.value is not None):
             self.value = self.value.rstrip('.').lower()
 
-        if (self.type in ['AAAA','CAA']) and (self.value is not None):
+        if (self.type in ['AAAA', 'CAA']) and (self.value is not None):
             self.value = self.value.lower()
 
         if (self.type == 'SRV'):
@@ -649,7 +648,7 @@ class CloudflareAPI(object):
                         result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(rr['zone_id'], rr['id']), 'DELETE')
             else:
                 if ((rr['type'] == 'CAA') and (rr['data']['tag'] != params['caa_tag'])):
-                  break
+                    break
 
                 self.changed = True
                 if not self.module.check_mode:
