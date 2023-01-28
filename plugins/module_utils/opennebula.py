@@ -26,6 +26,36 @@ except ImportError:
     HAS_PYONE = False
 
 
+# A helper function to mitigate https://github.com/OpenNebula/one/issues/6064.
+# It allows for easily handling lists like "NIC" or "DISK" in the JSON-like template representation.
+# There are either lists of dictionaries (length > 1) or just dictionaries.
+def flatten(to_flatten, extract=False):
+    """Flattens nested lists (with optional value extraction)."""
+    def recurse(to_flatten):
+        return sum(map(recurse, to_flatten), []) if isinstance(to_flatten, list) else [to_flatten]
+    value = recurse(to_flatten)
+    if extract and len(value) == 1:
+        return value[0]
+    return value
+
+
+# A helper function to mitigate https://github.com/OpenNebula/one/issues/6064.
+# It renders JSON-like template representation into OpenNebula's template syntax (string).
+def render(to_render):
+    """Converts dictionary to OpenNebula template."""
+    def recurse(to_render):
+        for key, value in sorted(to_render.items()):
+            if isinstance(value, dict):
+                yield '{0:}=[{1:}]'.format(key, ','.join(recurse(value)))
+                continue
+            if isinstance(value, list):
+                for item in value:
+                    yield '{0:}=[{1:}]'.format(key, ','.join(recurse(item)))
+                continue
+            yield '{0:}="{1:}"'.format(key, value)
+    return '\n'.join(recurse(to_render))
+
+
 class OpenNebulaModule:
     """
     Base class for all OpenNebula Ansible Modules.
