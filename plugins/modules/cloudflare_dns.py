@@ -46,6 +46,15 @@ options:
     - Algorithm number.
     - Required for I(type=DS) and I(type=SSHFP) when I(state=present).
     type: int
+  caa_tag:
+    description:
+    - Required for I(type=CAA)
+    - issue: Only allow specific hostnames
+    - issuewild: Only allow wildcards
+    - iodef: Send violation reports to URL (http:, https:, or mailto:)
+    type: str
+    choices: [ issue, issuewild, iodef ]
+    default: issue
   cert_usage:
     description:
     - Certificate usage number.
@@ -132,7 +141,7 @@ options:
       - The type of DNS record to create. Required if I(state=present).
       - I(type=DS), I(type=SSHFP) and I(type=TLSA) added in Ansible 2.7.
     type: str
-    choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, TXT ]
+    choices: [ A, AAAA, CAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, TXT ]
   value:
     description:
     - The record value.
@@ -264,6 +273,15 @@ EXAMPLES = r'''
     algorithm: 8
     hash_type: 2
     value: B4EB5AC4467D2DFB3BAF9FB9961DC1B6FED54A58CDFAA3E465081EC86F89BFAB
+
+- name: Create a CAA
+  community.general.cloudflare_dns:
+    api_token: dummyapitoken
+    zone: example.net
+    record: example.net
+    type: CAA
+    caa_tag: issue
+    value: letsencrypt.org
 '''
 
 RETURN = r'''
@@ -382,6 +400,7 @@ class CloudflareAPI(object):
         self.account_api_key = module.params['account_api_key']
         self.account_email = module.params['account_email']
         self.algorithm = module.params['algorithm']
+        self.caa_tag = module.params['caa_tag']
         self.cert_usage = module.params['cert_usage']
         self.hash_type = module.params['hash_type']
         self.key_tag = module.params['key_tag']
@@ -407,7 +426,7 @@ class CloudflareAPI(object):
         if (self.type in ['CNAME', 'NS', 'MX', 'SRV']) and (self.value is not None):
             self.value = self.value.rstrip('.').lower()
 
-        if (self.type == 'AAAA') and (self.value is not None):
+        if (self.type in ['AAAA','CAA']) and (self.value is not None):
             self.value = self.value.lower()
 
         if (self.type == 'SRV'):
@@ -588,7 +607,7 @@ class CloudflareAPI(object):
     def delete_dns_records(self, **kwargs):
         params = {}
         for param in ['port', 'proto', 'service', 'solo', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag']:
+                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'caa_tag']:
             if param in kwargs:
                 params[param] = kwargs[param]
             else:
@@ -611,6 +630,10 @@ class CloudflareAPI(object):
             if not (params['value'] is None or params['value'] == ''):
                 content = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
             search_record = params['port'] + '.' + params['proto'] + '.' + params['record']
+        elif params['type'] == 'CAA':
+            search_record = params['record']
+            content = None
+
         if params['solo']:
             search_value = None
         else:
@@ -625,6 +648,9 @@ class CloudflareAPI(object):
                     if not self.module.check_mode:
                         result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(rr['zone_id'], rr['id']), 'DELETE')
             else:
+                if ((rr['type'] == 'CAA') and (rr['data']['tag'] != params['caa_tag'])):
+                  break
+
                 self.changed = True
                 if not self.module.check_mode:
                     result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(rr['zone_id'], rr['id']), 'DELETE')
@@ -633,7 +659,7 @@ class CloudflareAPI(object):
     def ensure_dns_record(self, **kwargs):
         params = {}
         for param in ['port', 'priority', 'proto', 'proxied', 'service', 'ttl', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag']:
+                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'caa_tag']:
             if param in kwargs:
                 params[param] = kwargs[param]
             else:
@@ -749,6 +775,22 @@ class CloudflareAPI(object):
             }
             search_value = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
 
+        if params['type'] == 'CAA':
+            caa_data = {
+                "flags": 0,
+                "tag": params['caa_tag'],
+                "value": params['value'],
+            }
+            new_record = {
+                "type": params['type'],
+                "name": params['record'],
+                'data': caa_data,
+                "ttl": params['ttl'],
+                "proxied": False,
+            }
+            search_record = params['record']
+            search_value = None
+
         zone_id = self._get_zone_id(params['zone'])
         records = self.get_dns_records(params['zone'], params['type'], search_record, search_value)
         # in theory this should be impossible as cloudflare does not allow
@@ -799,6 +841,7 @@ def main():
             account_api_key=dict(type='str', required=False, no_log=True, aliases=['account_api_token']),
             account_email=dict(type='str', required=False),
             algorithm=dict(type='int'),
+            caa_tag=dict(type='str', default='issue', choices=['issue', 'issuewild', 'iodef']),
             cert_usage=dict(type='int', choices=[0, 1, 2, 3]),
             hash_type=dict(type='int', choices=[1, 2]),
             key_tag=dict(type='int', no_log=False),
@@ -813,7 +856,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present']),
             timeout=dict(type='int', default=30),
             ttl=dict(type='int', default=1),
-            type=dict(type='str', choices=['A', 'AAAA', 'CNAME', 'DS', 'MX', 'NS', 'SPF', 'SRV', 'SSHFP', 'TLSA', 'TXT']),
+            type=dict(type='str', choices=['A', 'AAAA', 'CAA', 'CNAME', 'DS', 'MX', 'NS', 'SPF', 'SRV', 'SSHFP', 'TLSA', 'TXT']),
             value=dict(type='str', aliases=['content']),
             weight=dict(type='int', default=1),
             zone=dict(type='str', required=True, aliases=['domain']),
@@ -824,6 +867,7 @@ def main():
             ('state', 'absent', ['record']),
             ('type', 'SRV', ['proto', 'service']),
             ('type', 'TLSA', ['proto', 'port']),
+            ('type', 'CAA', ['caa_tag']),
         ],
     )
 
