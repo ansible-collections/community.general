@@ -21,6 +21,8 @@ attributes:
 '''
 
     PLATFORM = r'''
+options: {}
+attributes:
     platform:
       description: Target OS/families that can be operated against.
       support: N/A
