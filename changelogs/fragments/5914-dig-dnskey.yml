@@ -1,0 +1,2 @@
+bugfixes:
+  - "dig lookup plugin - correctly handle DNSKEY record type's ``algorithm`` field (https://github.com/ansible-collections/community.general/pull/5914)."

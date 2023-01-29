@@ -230,7 +230,7 @@ def make_rdata_dict(rdata):
         NSEC3PARAM: ['algorithm', 'flags', 'iterations', 'salt'],
         PTR: ['target'],
         RP: ['mbox', 'txt'],
-        # RRSIG: ['algorithm', 'labels', 'original_ttl', 'expiration', 'inception', 'signature'],
+        # RRSIG: ['type_covered', 'algorithm', 'labels', 'original_ttl', 'expiration', 'inception', 'key_tag', 'signer', 'signature'],
         SOA: ['mname', 'rname', 'serial', 'refresh', 'retry', 'expire', 'minimum'],
         SPF: ['strings'],
         SRV: ['priority', 'weight', 'port', 'target'],
@@ -251,6 +251,8 @@ def make_rdata_dict(rdata):
 
             if rdata.rdtype == DS and f == 'digest':
                 val = dns.rdata._hexify(rdata.digest).replace(' ', '')
+            if rdata.rdtype == DNSKEY and f == 'algorithm':
+                val = int(val)
             if rdata.rdtype == DNSKEY and f == 'key':
                 val = dns.rdata._base64ify(rdata.key).replace(' ', '')
             if rdata.rdtype == NSEC3PARAM and f == 'salt':
