@@ -74,6 +74,7 @@ options:
     - I(external=true) is needed for this option to work.
     type: list
     elements: str
+    version_added: 6.3.0
   state:
     description:
     - State to ensure
