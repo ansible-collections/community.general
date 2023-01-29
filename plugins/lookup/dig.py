@@ -130,6 +130,12 @@ RETURN = """
        AAAA:
            description:
                - address
+       CAA:
+           description:
+               - flags
+               - tag
+               - value
+           version_added: 6.3.0
        CNAME:
            description:
                - target
