@@ -144,7 +144,7 @@ EXAMPLES = r'''
    external: true
    append: true
    external_user:
-   - MYDOMAIN\john
+   - MYDOMAIN\\john
    ipa_host: ipa.example.com
    ipa_user: admin
    ipa_pass: topsecret
