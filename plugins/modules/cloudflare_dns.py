@@ -48,12 +48,14 @@ options:
     type: int
   caa_tag:
     description:
-    - defines the scope of the record/uri posible options are C(issue) only allow specific hostnames
-    - or C(issuewild) to only allow wildcards or C(iodef) Send violation reports to URL (http:, https:, or mailto:)
-    - Required for I(type=CAA)
+    - Defines the scope of the record.
+    - Posible options are C(issue) to only allow specific hostnames, C(issuewild) to only allow wildcards,
+      or C(iodef) to send violation reports to a URI (C(http:), C(https:), or C(mailto:)).
+    - Required for I(type=CAA).
     type: str
     choices: [ 'issue', 'issuewild', 'iodef' ]
     default: issue
+    version_added: 6.3.0
   cert_usage:
     description:
     - Certificate usage number.
@@ -139,6 +141,7 @@ options:
     description:
       - The type of DNS record to create. Required if I(state=present).
       - I(type=DS), I(type=SSHFP) and I(type=TLSA) added in Ansible 2.7.
+      - I(type=CAA) was added in community.general 6.3.0.
     type: str
     choices: [ A, AAAA, CAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, TXT ]
   value:
@@ -273,7 +276,7 @@ EXAMPLES = r'''
     hash_type: 2
     value: B4EB5AC4467D2DFB3BAF9FB9961DC1B6FED54A58CDFAA3E465081EC86F89BFAB
 
-- name: Create a CAA
+- name: Create a CAA record to allow certificate issuance from Let's Encrypt
   community.general.cloudflare_dns:
     api_token: dummyapitoken
     zone: example.net
@@ -866,7 +869,6 @@ def main():
             ('state', 'absent', ['record']),
             ('type', 'SRV', ['proto', 'service']),
             ('type', 'TLSA', ['proto', 'port']),
-            ('type', 'CAA', ['caa_tag']),
         ],
     )
 
