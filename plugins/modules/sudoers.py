@@ -43,6 +43,12 @@ options:
       - Whether a password will be required to run the sudo'd command.
     default: true
     type: bool
+  setenv:
+    description:
+      - Whether to allow keeping the environment when command is run with sudo.
+    default: false
+    type: bool
+    version_added: 6.3.0
   host:
     description:
       - Specify the host the rule is for.
@@ -123,6 +129,13 @@ EXAMPLES = '''
   community.general.sudoers:
     name: alice-service
     state: absent
+
+- name: Allow alice to sudo /usr/local/bin/upload and keep env variables
+  community.general.sudoers:
+    name: allow-alice-upload
+    user: alice
+    commands: /usr/local/bin/upload
+    setenv: true
 '''
 
 import os
@@ -143,6 +156,7 @@ class Sudoers(object):
         self.group = module.params['group']
         self.state = module.params['state']
         self.nopassword = module.params['nopassword']
+        self.setenv = module.params['setenv']
         self.host = module.params['host']
         self.runas = module.params['runas']
         self.sudoers_path = module.params['sudoers_path']
@@ -185,12 +199,14 @@ class Sudoers(object):
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
+        setenv_str = 'SETENV:' if self.setenv else ''
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
-        return "{owner} {host}={runas}{nopasswd} {commands}\n".format(
+        return "{owner} {host}={runas}{nopasswd}{setenv} {commands}\n".format(
             owner=owner,
             host=self.host,
             runas=runas_str,
             nopasswd=nopasswd_str,
+            setenv=setenv_str,
             commands=commands_str
         )
 
@@ -238,6 +254,10 @@ def main():
         'nopassword': {
             'type': 'bool',
             'default': True,
+        },
+        'setenv': {
+            'type': 'bool',
+            'default': False,
         },
         'host': {
             'type': 'str',
