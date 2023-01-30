@@ -84,12 +84,23 @@ options:
   access_level:
     description:
       - Determines if a runner can pick up jobs only from protected branches.
+      - If I(access_level_on_creation) is not explicitly set to C(true), this option is ignored on registration and
+        is only applied on updates.
       - If set to C(ref_protected), runner can pick up jobs only from protected branches.
       - If set to C(not_protected), runner can pick up jobs from both protected and unprotected branches.
     required: false
     default: ref_protected
     choices: ["ref_protected", "not_protected"]
     type: str
+  access_level_on_creation:
+    description:
+      - Whether the runner should be registered with an access level or not.
+      - If set to C(true), the value of I(access_level) is used for runner registration.
+      - If set to C(false), GitLab registers the runner with the default access level.
+      - The current default of this option is C(false). This default is deprecated and will change to C(true) in commuinty.general 7.0.0.
+    required: false
+    type: bool
+    version_added: 6.3.0
   maximum_timeout:
     description:
       - The maximum time that a runner has to complete a specific job.
@@ -207,27 +218,34 @@ class GitLabRunner(object):
     def create_or_update_runner(self, description, options):
         changed = False
 
+        arguments = {
+            'active': options['active'],
+            'locked': options['locked'],
+            'run_untagged': options['run_untagged'],
+            'maximum_timeout': options['maximum_timeout'],
+            'tag_list': options['tag_list'],
+        }
         # Because we have already call userExists in main()
         if self.runner_object is None:
-            runner = self.create_runner({
-                'description': description,
-                'active': options['active'],
-                'token': options['registration_token'],
-                'locked': options['locked'],
-                'run_untagged': options['run_untagged'],
-                'maximum_timeout': options['maximum_timeout'],
-                'tag_list': options['tag_list'],
-            })
+            arguments['description'] = description
+            arguments['token'] = options['registration_token']
+
+            access_level_on_creation = self._module.params['access_level_on_creation']
+            if access_level_on_creation is None:
+                message = "The option 'access_level_on_creation' is unspecified, so 'false' is assumed. "\
+                          "That means any value of 'access_level' is ignored and GitLab registers the runner with its default value. "\
+                          "The option 'access_level_on_creation' will switch to 'true' in community.general 7.0.0"
+                self._module.deprecate(message, version='7.0.0', collection_name='community.general')
+                access_level_on_creation = False
+
+            if access_level_on_creation:
+                arguments['access_level'] = options['access_level']
+
+            runner = self.create_runner(arguments)
             changed = True
         else:
-            changed, runner = self.update_runner(self.runner_object, {
-                'active': options['active'],
-                'locked': options['locked'],
-                'run_untagged': options['run_untagged'],
-                'maximum_timeout': options['maximum_timeout'],
-                'access_level': options['access_level'],
-                'tag_list': options['tag_list'],
-            })
+            arguments['access_level'] = options['access_level']
+            changed, runner = self.update_runner(self.runner_object, arguments)
 
         self.runner_object = runner
         if changed:
@@ -328,6 +346,7 @@ def main():
         run_untagged=dict(type='bool', default=True),
         locked=dict(type='bool', default=False),
         access_level=dict(type='str', default='ref_protected', choices=["not_protected", "ref_protected"]),
+        access_level_on_creation=dict(type='bool'),
         maximum_timeout=dict(type='int', default=3600),
         registration_token=dict(type='str', no_log=True),
         project=dict(type='str'),
