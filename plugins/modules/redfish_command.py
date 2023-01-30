@@ -242,7 +242,7 @@ options:
   bios_attributes:
     required: false
     description:
-      - BIOS attributes that needs to be verified in the given server
+      - BIOS attributes that needs to be verified in the given server.
     type: dict
     version_added: 6.4.0
 
