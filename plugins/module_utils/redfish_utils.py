@@ -38,6 +38,8 @@ class RedfishUtils(object):
         self.timeout = timeout
         self.module = module
         self.service_root = '/redfish/v1/'
+        self.session_service_uri = '/redfish/v1/SessionService'
+        self.sessions_uri = '/redfish/v1/SessionService/Sessions'
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
@@ -125,6 +127,10 @@ class RedfishUtils(object):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
+            # Service root is an unauthenticated resource; remove credentials
+            # in case the caller will be using sessions later.
+            if uri == (self.root_uri + self.service_root):
+                basic_auth = False
             resp = open_url(uri, method="GET", headers=req_headers,
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
@@ -151,6 +157,11 @@ class RedfishUtils(object):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
+            # When performing a POST to the session collection, credentials are
+            # provided in the request body.  Do not provide the basic auth
+            # header since this can cause conflicts with some services
+            if self.sessions_uri is not None and uri == (self.root_uri + self.sessions_uri):
+                basic_auth = False
             resp = open_url(uri, data=json.dumps(pyld),
                             headers=req_headers, method="POST",
                             url_username=username, url_password=password,
@@ -363,23 +374,23 @@ class RedfishUtils(object):
         return {'ret': True}
 
     def _find_sessionservice_resource(self):
+        # Get the service root
         response = self.get_request(self.root_uri + self.service_root)
         if response['ret'] is False:
             return response
         data = response['data']
-        if 'SessionService' not in data:
+
+        # Check for the session service and session collection.  Well-known
+        # defaults are provided in the constructor, but services that predate
+        # Redfish 1.6.0 might contain different values.
+        self.session_service_uri = data.get('SessionService', {}).get('@odata.id')
+        self.sessions_uri = data.get('Links', {}).get('Sessions', {}).get('@odata.id')
+
+        # If one isn't found, return an error
+        if self.session_service_uri is None:
             return {'ret': False, 'msg': "SessionService resource not found"}
-        else:
-            session_service = data["SessionService"]["@odata.id"]
-            self.session_service_uri = session_service
-            response = self.get_request(self.root_uri + session_service)
-            if response['ret'] is False:
-                return response
-            data = response['data']
-            sessions = data['Sessions']['@odata.id']
-            if sessions[-1:] == '/':
-                sessions = sessions[:-1]
-            self.sessions_uri = sessions
+        if self.sessions_uri is None:
+            return {'ret': False, 'msg': "SessionCollection resource not found"}
         return {'ret': True}
 
     def _get_resource_uri_by_id(self, uris, id_prop):
