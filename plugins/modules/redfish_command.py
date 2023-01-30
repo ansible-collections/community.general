@@ -244,14 +244,11 @@ options:
     description:
       - BIOS attributes that needs to be verified in the given server
     type: dict
-    version_added: 6.1.0
+    version_added: 6.4.0
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
-  - "Gayathiri Devi Ramasamy (@Gayathirideviramasamy)"
   - "T S Kushal (@TSKushal)"
-  - "Varni H P (@varini-hp)"
-  - "Prativa Nayak (@prativa-n)"
 '''
 
 EXAMPLES = '''

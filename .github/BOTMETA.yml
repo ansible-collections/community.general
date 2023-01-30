@@ -1036,7 +1036,7 @@ files:
   $modules/read_csv.py:
     maintainers: dagwieers
   $modules/redfish_:
-    ignore: jose-delarosa varini-hp prativa-n Gayathirideviramasamy TSKushal
+    ignore: jose-delarosa TSKushal
     maintainers: $team_redfish
   $modules/redhat_subscription.py:
     labels: redhat_subscription
