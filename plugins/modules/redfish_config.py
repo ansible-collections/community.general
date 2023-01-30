@@ -126,10 +126,7 @@ options:
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
-  - "Gayathiri Devi Ramasamy (@Gayathirideviramasamy)"
   - "T S Kushal (@TSKushal)"
-  - "Varni H P (@varini-hp)"
-  - "Prativa Nayak (@prativa-n)"
 '''
 
 EXAMPLES = '''
