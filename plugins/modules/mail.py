@@ -246,6 +246,7 @@ def main():
             subtype=dict(type='str', default='plain', choices=['html', 'plain']),
             secure=dict(type='str', default='try', choices=['always', 'never', 'starttls', 'try']),
             timeout=dict(type='int', default=20),
+            message_id=dict(type='str', aliases=['Message-ID'])
         ),
         required_together=[['password', 'username']],
     )
@@ -267,7 +268,8 @@ def main():
     subtype = module.params.get('subtype')
     secure = module.params.get('secure')
     timeout = module.params.get('timeout')
-
+    message_id = module.params.get('message_id')
+    
     code = 0
     secure_state = False
     sender_phrase, sender_addr = parseaddr(sender)
@@ -341,6 +343,8 @@ def main():
     msg['From'] = formataddr((sender_phrase, sender_addr))
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = Header(subject, charset)
+    if message_id:
+      msg['Message-ID'] = make_msgid(domain=message_id)    
     msg.preamble = "Multipart message"
 
     for header in headers:
