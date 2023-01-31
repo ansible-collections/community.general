@@ -81,7 +81,7 @@ options:
   icon_url:
     type: str
     description:
-      - Url for the message sender's icon (default C(https://docs.ansible.com/favicon.ico))
+      - URL for the message sender's icon (default C(https://docs.ansible.com/favicon.ico))
     default: https://docs.ansible.com/favicon.ico
   icon_emoji:
     type: str
