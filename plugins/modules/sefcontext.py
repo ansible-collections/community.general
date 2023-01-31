@@ -54,7 +54,7 @@ options:
   substitute:
     description:
     - Path to use to substitute file context(s) for the specified I(target). The context labeling for the I(target) subtree is made equivalent to this path.
-    version_added: 6.3.0
+    version_added: 6.4.0
     type: str
   seuser:
     description:
