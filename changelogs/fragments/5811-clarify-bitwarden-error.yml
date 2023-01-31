@@ -1,2 +1,0 @@
-bugfixes:
-  - bitwarden lookup plugin - clarify what to do, if the bitwarden vault is not unlocked (https://github.com/ansible-collections/community.general/pull/5811).

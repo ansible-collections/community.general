@@ -1,2 +1,0 @@
-bugfixes:
-  - gitlab_deploy_key - also update ``title`` and not just ``can_push`` (https://github.com/ansible-collections/community.general/pull/5888).

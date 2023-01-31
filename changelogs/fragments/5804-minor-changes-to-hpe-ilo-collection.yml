@@ -1,2 +1,0 @@
-minor_changes:
-  - ilo_redfish_utils module utils - change implementation of DNS Server IP and NTP Server IP update (https://github.com/ansible-collections/community.general/pull/5804).
