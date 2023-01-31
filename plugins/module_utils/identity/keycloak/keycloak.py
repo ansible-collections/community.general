@@ -1336,7 +1336,7 @@ class KeycloakAPI(object):
 
         return tmp
 
-    def get_subgroup_direct_parent(self, parents, realm="master", childs_to_resolve=None):
+    def get_subgroup_direct_parent(self, parents, realm="master", children_to_resolve=None):
         """ Get keycloak direct parent group API object for a given chain of parents.
 
         To succesfully work the API for subgroups we actually dont need
@@ -1352,17 +1352,17 @@ class KeycloakAPI(object):
         :param parents: Topdown ordered list of subgroup parents
         :param realm: Realm in which the group resides; default 'master'
         """
-        if childs_to_resolve is None:
+        if children_to_resolve is None:
             # start recursion by reversing parents (in optimal cases
             # we dont need to walk the whole tree upwarts)
             parents = list(reversed(parents))
-            childs_to_resolve = []
+            children_to_resolve = []
 
         if not parents:
             # walk complete parents list to the top, all names, no id's,
             # try to resolve it assuming list is complete and 1st
             # element is a toplvl group
-            return self.get_subgroup_by_chain(list(reversed(childs_to_resolve)), realm=realm)
+            return self.get_subgroup_by_chain(list(reversed(children_to_resolve)), realm=realm)
 
         cp = parents[0]
         unused, is_id = self._get_normed_group_parent(cp)
@@ -1370,14 +1370,14 @@ class KeycloakAPI(object):
         if is_id:
             # current parent is given as ID, we can stop walking
             # upwards searching for an entry point
-            return self.get_subgroup_by_chain([cp] + list(reversed(childs_to_resolve)), realm=realm)
+            return self.get_subgroup_by_chain([cp] + list(reversed(children_to_resolve)), realm=realm)
         else:
             # current parent is given as name, it must be resolved
             # later, try next parent (recurse)
-            childs_to_resolve.append(cp)
+            children_to_resolve.append(cp)
             return self.get_subgroup_direct_parent(
                 parents[1:],
-                realm=realm, childs_to_resolve=childs_to_resolve
+                realm=realm, children_to_resolve=children_to_resolve
             )
 
     def create_group(self, grouprep, realm="master"):

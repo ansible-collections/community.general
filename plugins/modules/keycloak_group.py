@@ -76,27 +76,32 @@ options:
         type: list
         description:
             - List of parent groups for the group to handle sorted top to bottom.
-            - Set this to create a group as a subgroup of another group or groups (parents).
+            - >-
+              Set this to create a group as a subgroup of another group or groups (parents) or
+              when accessing an existing subgroup by name.
+            - >-
+              Not necessary to set when accessing an existing subgroup by its C(ID) because in
+              that case the group can be directly queried without necessarily knowing its parent(s).
         elements: dict
         suboptions:
           id:
             type: str
             description:
-              - Identify parent by ID
-              - Needs less API calls than using I(name)
-              - A deep parent chain can be started at any point when first given parent is given as ID
+              - Identify parent by ID.
+              - Needs less API calls than using I(name).
+              - A deep parent chain can be started at any point when first given parent is given as ID.
               - Note that in principle both ID and name can be specified at the same time
                 but current implementation only always use just one of them, with ID
-                being prefered
+                being preferred.
           name:
             type: str
             description:
-              - Identify parent by name
-              - Needs more internal API calls than using I(id) to map names to ID's under the hood
-              - When giving a parent chain with only names it must be complete up to the top
+              - Identify parent by name.
+              - Needs more internal API calls than using I(id) to map names to ID's under the hood.
+              - When giving a parent chain with only names it must be complete up to the top.
               - Note that in principle both ID and name can be specified at the same time
                 but current implementation only always use just one of them, with ID
-                being prefered
+                being preferred.
 
 notes:
     - Presently, the I(realmRoles), I(clientRoles) and I(access) attributes returned by the Keycloak API
@@ -328,7 +333,7 @@ def main():
             options=dict(
                 id=dict(type='str'),
                 name=dict(type='str')
-            )
+            ),
         ),
     )
 
