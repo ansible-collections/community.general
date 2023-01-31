@@ -60,7 +60,7 @@ options:
   icon_url:
     type: str
     description:
-      - Url for the message sender's icon.
+      - URL for the message sender's icon.
     default: https://docs.ansible.com/favicon.ico
   validate_certs:
     description:
