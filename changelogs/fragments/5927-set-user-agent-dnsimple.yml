@@ -1,2 +1,2 @@
 minor_changes:
-  - "Set custom User-Agent for API requests to DNSimple (https://github.com/ansible-collections/community.general/pull/5927)."
+  - "dnsimple - set custom User-Agent for API requests to DNSimple (https://github.com/ansible-collections/community.general/pull/5927)."
