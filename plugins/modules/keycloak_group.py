@@ -76,12 +76,6 @@ options:
         type: list
         description:
             - List of parent groups for the group to handle sorted top to bottom.
-            - >-
-              Set this to create a group as a subgroup of another group or groups (parents) or
-              when accessing an existing subgroup by name.
-            - >-
-              Not necessary to set when accessing an existing subgroup by its C(ID) because in
-              that case the group can be directly queried without necessarily knowing its parent(s).
         elements: dict
         suboptions:
           id:

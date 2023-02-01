@@ -1336,9 +1336,7 @@ class KeycloakAPI(object):
 
         return tmp
 
-    def get_subgroup_direct_parent(
-        self, parents, realm="master", children_to_resolve=None
-    ):
+    def get_subgroup_direct_parent(self, parents, realm="master", children_to_resolve=None):
         """ Get keycloak direct parent group API object for a given chain of parents.
 
         To succesfully work the API for subgroups we actually dont need
