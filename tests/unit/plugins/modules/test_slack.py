@@ -142,7 +142,7 @@ class TestSlackModule(ModuleTestCase):
                 },
                 'accessory': {
                     'type': 'image',
-                    'image_url': 'https://www.ansible.com/favicon.ico',
+                    'image_url': 'https://docs.ansible.com/favicon.ico',
                     'alt_text': 'test'
                 }
             }, {
