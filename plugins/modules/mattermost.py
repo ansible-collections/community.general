@@ -60,8 +60,8 @@ options:
   icon_url:
     type: str
     description:
-      - Url for the message sender's icon.
-    default: https://www.ansible.com/favicon.ico
+      - URL for the message sender's icon.
+    default: https://docs.ansible.com/favicon.ico
   validate_certs:
     description:
       - If C(false), SSL certificates will not be validated. This should only be used
@@ -127,7 +127,7 @@ def main():
             text=dict(type='str'),
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
-            icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
+            icon_url=dict(type='str', default='https://docs.ansible.com/favicon.ico'),
             validate_certs=dict(default=True, type='bool'),
             attachments=dict(type='list', elements='dict'),
         ),
