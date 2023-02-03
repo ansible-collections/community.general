@@ -1,2 +1,2 @@
 minor_changes:
-  - proxmox - Suppress urllib3 InsecureRequestWarnings when validate_certs option is false.
+  - proxmox - suppress urllib3 ``InsecureRequestWarnings`` when ``validate_certs`` option is ``false`` (https://github.com/ansible-collections/community.general/pull/5931).
