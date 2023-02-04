@@ -67,9 +67,6 @@ DOCUMENTATION = '''
             type: string
 '''
 
-import os
-import json
-
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import open_url

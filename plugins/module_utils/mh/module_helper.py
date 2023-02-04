@@ -9,7 +9,7 @@ __metaclass__ = type
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase, AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin

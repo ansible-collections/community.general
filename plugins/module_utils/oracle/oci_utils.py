@@ -10,13 +10,12 @@ import logging
 import logging.config
 import os
 import tempfile
-from datetime import datetime
 from operator import eq
 
 import time
 
 try:
-    import yaml
+    import yaml  # pylint: disable=unused-import
 
     import oci
     from oci.constants import HEADER_NEXT_PAGE

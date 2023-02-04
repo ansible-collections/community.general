@@ -16,7 +16,6 @@ __metaclass__ = type
 import abc
 import collections
 import json
-import os
 import traceback
 
 HPE_ONEVIEW_IMP_ERR = None

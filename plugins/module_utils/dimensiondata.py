@@ -19,15 +19,15 @@ import os
 import re
 import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.six.moves import configparser
 from os.path import expanduser
 from uuid import UUID
 
 LIBCLOUD_IMP_ERR = None
 try:
-    from libcloud.common.dimensiondata import API_ENDPOINTS, DimensionDataAPIException, DimensionDataStatus
-    from libcloud.compute.base import Node, NodeLocation
+    from libcloud.common.dimensiondata import API_ENDPOINTS, DimensionDataAPIException, DimensionDataStatus  # pylint: disable=unused-import
+    from libcloud.compute.base import Node, NodeLocation  # pylint: disable=unused-import
     from libcloud.compute.providers import get_driver
     from libcloud.compute.types import Provider
 

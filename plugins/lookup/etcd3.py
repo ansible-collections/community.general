@@ -141,7 +141,7 @@ from ansible.utils.display import Display
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.lookup import LookupBase
-from ansible.errors import AnsibleError, AnsibleLookupError
+from ansible.errors import AnsibleLookupError
 
 try:
     import etcd3
