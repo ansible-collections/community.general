@@ -336,7 +336,7 @@ def main():
             user_gravatar=dict(required=False, type="bool", default=None),
             user_mac_addresses=dict(required=False, type="list", elements="str", default=None),
         )
-    ),
+    )
 
     module = AnsibleModule(argument_spec=argument_spec)
 

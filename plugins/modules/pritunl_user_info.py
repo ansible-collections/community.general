@@ -160,7 +160,7 @@ def main():
                 default="client",
             ),
         )
-    ),
+    )
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 

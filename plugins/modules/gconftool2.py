@@ -88,8 +88,8 @@ from ansible_collections.community.general.plugins.module_utils.gconftool2 impor
 
 
 class GConftool(StateModuleHelper):
-    change_params = 'value',
-    diff_params = 'value',
+    change_params = ('value', )
+    diff_params = ('value', )
     output_params = ('key', 'value_type')
     facts_params = ('key', 'value_type')
     facts_name = 'gconftool2'

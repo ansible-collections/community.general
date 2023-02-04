@@ -181,7 +181,7 @@ def main():
                 required=False, choices=["present", "absent"], default="present"
             ),
         )
-    ),
+    )
 
     module = AnsibleModule(argument_spec=argument_spec)
 
