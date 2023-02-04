@@ -136,7 +136,7 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 try:
-    from ipaddress import ip_network  # pylint: disable=unused-import
+    from ipaddress import ip_network  # noqa: F401, pylint: disable=unused-import
 except ImportError:
     IPADDRESS_IMP_ERR = traceback.format_exc()
     HAS_IPADDRESS = False

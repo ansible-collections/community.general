@@ -173,7 +173,7 @@ instance:
 
 HAS_XENAPI = False
 try:
-    import XenAPI  # pylint: disable=unused-import
+    import XenAPI  # noqa: F401, pylint: disable=unused-import
     HAS_XENAPI = True
 except ImportError:
     pass
