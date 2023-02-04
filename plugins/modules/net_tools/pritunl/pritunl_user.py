@@ -324,7 +324,7 @@ def main():
             user_disabled=dict(required=False, type="bool", default=None),
             user_gravatar=dict(required=False, type="bool", default=None),
         )
-    ),
+    )
 
     module = AnsibleModule(argument_spec=argument_spec)
 

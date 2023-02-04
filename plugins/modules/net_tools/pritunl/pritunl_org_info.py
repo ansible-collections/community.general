@@ -115,7 +115,7 @@ def main():
         dict(
             organization=dict(required=False, type="str", default=None, aliases=["org"])
         )
-    ),
+    )
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 

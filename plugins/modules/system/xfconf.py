@@ -172,8 +172,8 @@ class XFConfException(Exception):
 
 
 class XFConfProperty(CmdStateModuleHelper):
-    change_params = 'value',
-    diff_params = 'value',
+    change_params = ('value', )
+    diff_params = ('value', )
     output_params = ('property', 'channel', 'value')
     facts_params = ('property', 'channel', 'value')
     module = dict(
