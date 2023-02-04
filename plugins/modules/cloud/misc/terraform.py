@@ -628,9 +628,9 @@ def main():
 
     outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(state_file)
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)
+    outputs = {}
     if rc == 1:
         module.warn("Could not get Terraform outputs. This usually means none have been defined.\nstdout: {0}\nstderr: {1}".format(outputs_text, outputs_err))
-        outputs = {}
     elif rc != 0:
         module.fail_json(
             msg="Failure when getting Terraform outputs. "
