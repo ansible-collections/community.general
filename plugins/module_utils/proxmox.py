@@ -7,6 +7,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import atexit  # (TODO: remove!) pylint: disable=unused-import
+import time  # (TODO: remove!) pylint: disable=unused-import
+import re  # (TODO: remove!) pylint: disable=unused-import
 import traceback
 
 PROXMOXER_IMP_ERR = None
@@ -19,6 +22,7 @@ except ImportError:
 
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native  # (TODO: remove!) pylint: disable=unused-import
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 

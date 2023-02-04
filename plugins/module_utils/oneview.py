@@ -16,6 +16,7 @@ __metaclass__ = type
 import abc
 import collections
 import json
+import os  # (TODO: remove!) pylint: disable=unused-import
 import traceback
 
 HPE_ONEVIEW_IMP_ERR = None

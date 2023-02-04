@@ -25,7 +25,9 @@ try:
 except ImportError:
     HAS_PURITY_FB = False
 
+from functools import wraps  # (TODO: remove!) pylint: disable=unused-import
 from os import environ
+from os import path  # (TODO: remove!) pylint: disable=unused-import
 import platform
 
 VERSION = 1.2

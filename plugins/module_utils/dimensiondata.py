@@ -19,7 +19,7 @@ import os
 import re
 import traceback
 
-from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib  # (TODO: remove AnsibleModule!) pylint: disable=unused-import
 from ansible.module_utils.six.moves import configparser
 from os.path import expanduser
 from uuid import UUID
