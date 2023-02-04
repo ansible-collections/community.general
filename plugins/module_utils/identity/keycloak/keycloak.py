@@ -1370,9 +1370,7 @@ class KeycloakAPI(object):
         if is_id:
             # current parent is given as ID, we can stop walking
             # upwards searching for an entry point
-            return self.get_subgroup_by_chain(
-                [cp] + list(reversed(children_to_resolve)), realm=realm
-            )
+            return self.get_subgroup_by_chain([cp] + list(reversed(children_to_resolve)), realm=realm)
         else:
             # current parent is given as name, it must be resolved
             # later, try next parent (recurse)
