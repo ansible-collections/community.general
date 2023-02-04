@@ -1,0 +1,2 @@
+bugfixes:
+  - "terraform and timezone - slight refactoring to avoid linter reporting potentially undefined variables (https://github.com/ansible-collections/community.general/pull/5933)."

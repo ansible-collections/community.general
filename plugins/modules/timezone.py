@@ -356,6 +356,7 @@ class NosystemdTimezone(Timezone):
     def __init__(self, module):
         super(NosystemdTimezone, self).__init__(module)
         # Validate given timezone
+        planned_tz = ''
         if 'name' in self.value:
             tzfile = self._verify_timezone()
             planned_tz = self.value['name']['planned']
