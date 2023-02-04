@@ -8,8 +8,8 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible_collections.community.general.plugins.module_utils.mh.module_helper import (
-    ModuleHelper, StateModuleHelper, CmdModuleHelper, CmdStateModuleHelper, AnsibleModule  # pylint: disable=unused-import
+from ansible_collections.community.general.plugins.module_utils.mh.module_helper import (  # pylint: disable=unused-import
+    ModuleHelper, StateModuleHelper, CmdModuleHelper, CmdStateModuleHelper, AnsibleModule
 )
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin, ArgFormat  # pylint: disable=unused-import
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin  # pylint: disable=unused-import
