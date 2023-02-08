@@ -66,6 +66,7 @@ URL_AUTHENTICATION_FLOW_COPY = "{url}/admin/realms/{realm}/authentication/flows/
 URL_AUTHENTICATION_FLOW_EXECUTIONS = "{url}/admin/realms/{realm}/authentication/flows/{flowalias}/executions"
 URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION = "{url}/admin/realms/{realm}/authentication/flows/{flowalias}/executions/execution"
 URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW = "{url}/admin/realms/{realm}/authentication/flows/{flowalias}/executions/flow"
+URL_AUTHENTICATION_EXECUTION = "{url}/admin/realms/{realm}/authentication/executions/{id}"
 URL_AUTHENTICATION_EXECUTION_CONFIG = "{url}/admin/realms/{realm}/authentication/executions/{id}/config"
 URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/raise-priority"
 URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/lower-priority"
@@ -1805,6 +1806,26 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
+                                  
+        
+    def delete_authentication_execution(self, executionId, realm='master'):
+        """Delete an execution of an authentication flow.
+        :param executionId: id of execution
+        :param authenticationConfig: config to add to the execution
+        :return: HTTPResponse object on success
+        """
+        try:
+            open_url(
+                URL_AUTHENTICATION_EXECUTION.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=executionId),
+                method='DELETE',
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Unable to update executions %s: %s" % (executionId, str(e)))
 
     def get_identity_providers(self, realm='master'):
         """ Fetch representations for identity providers in a realm
