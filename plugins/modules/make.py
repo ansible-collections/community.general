@@ -13,10 +13,17 @@ DOCUMENTATION = r'''
 module: make
 short_description: Run targets in a Makefile
 requirements:
-- make
+  - make
 author: Linus Unnebäck (@LinusU) <linus@folkdatorn.se>
 description:
   - Run targets in a Makefile.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   target:
     description:

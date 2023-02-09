@@ -18,6 +18,13 @@ description:
   - The C(pam_limits) module modifies PAM limits.
   - The default file is C(/etc/security/limits.conf).
   - For the full documentation, see C(man 5 limits.conf).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   domain:
     type: str

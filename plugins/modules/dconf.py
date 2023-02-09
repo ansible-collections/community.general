@@ -44,6 +44,13 @@ notes:
     key is by making the configuration change in application affected by the
     key, and then having a look at value set via commands C(dconf dump
     /path/to/dir/) or C(dconf read /path/to/key).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   key:
     type: str

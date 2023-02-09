@@ -22,6 +22,13 @@ description:
   - macOS applications and other programs use the defaults system to record user preferences and other
     information that must be maintained when the applications are not running (such as default font for new
     documents, or the position of an Info panel).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   domain:
     description:
