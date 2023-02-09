@@ -1,3 +1,5 @@
+extends_documentation_fragment:
+  - community.general.attributes
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
@@ -22,6 +24,13 @@ author:
     - "Bruce Pennypacker (@bpennypacker)"
 requirements:
     - PagerDuty API access
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     state:
         type: str
