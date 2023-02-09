@@ -245,7 +245,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
         changed = False
         after = ""
         before = ""
-        err_msg = ""
+        err_msg = {"lines":[]}
         if "authenticationExecutions" in config:
             # Get existing executions on the Keycloak server for this alias
             existing_executions = kc.get_executions_representation(config, realm=realm)
@@ -281,21 +281,31 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     id_to_update = existing_executions[exec_index]["id"]
                     # Remove exec from list in case 2 exec with same name
                     existing_executions[exec_index].clear()
-                elif new_exec["providerId"] is not None and not check_mode:
-                    kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
+                elif new_exec["providerId"] is not None:
+                    # Create a new execution
+                    if not check_mode:
+                        kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
+                        id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
+                    else:
+                        id_to_update = "N/A"
                     exec_found = True
                     exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
+                    err_msg["lines"] += ["Flow {flow} is missing execution {exec_name}{subflow}".format(flow=config["alias"],\
+                        exec_name=new_exec["providerId"], \
+                        subflow = (" in subflow " + new_exec["flowAlias"]) if new_exec["flowAlias"] is not None else "")]
                 elif new_exec["displayName"] is not None:
-                    subflow_index = find_subflow_in_executions(new_exec, existing_executions)
-                    if subflow_index != -1 and not check_mode:
-                        kc.delete_authentication_execution(existing_executions[subflow_index]["id"], isFlow=True)
+                    # Create a new subflow
                     if not check_mode:
                         kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm)
+                        id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
+                    else:
+                        id_to_update = "N/A"
                     exec_found = True
                     exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
+                    err_msg["lines"] += ["Flow {flow} is missing subflow {exec_name}{subflow}".format(flow=config["alias"],\
+                        exec_name=new_exec["displayName"], \
+                        subflow = (" in subflow " + new_exec["flowAlias"]) if new_exec["flowAlias"] is not None else "")]
                     after += str(new_exec) + '\n'
                 if exec_found:
                     changed = True
@@ -305,10 +315,14 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             "id": id_to_update
                         }
                         # add the execution configuration
-                        if new_exec["authenticationConfig"] is not None and not check_mode:
-                            kc.add_authenticationConfig_to_execution(updated_exec["id"], new_exec["authenticationConfig"], realm=realm)
+                        if new_exec["authenticationConfig"] is not None:
+                            if not check_mode:
+                                kc.add_authenticationConfig_to_execution(updated_exec["id"], new_exec["authenticationConfig"], realm=realm)
+                            else:
+                                # We still want to see something changed if we are in check mode
+                                updated_exec["authenticationConfig"] = new_exec["authenticationConfig"]
                         for key in new_exec:
-                            # remove unwanted key for the next API call
+                            # Prepare updated execution. Configuration has been updated already.
                             if key != "flowAlias" and key != "authenticationConfig":
                                 updated_exec[key] = new_exec[key]
                         if new_exec["requirement"] is not None and not check_mode:
@@ -318,16 +332,18 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
                         after += str(updated_exec) + '\n'
                         if diff != 0:
-                            err_msg += "Flow {flow} has execution {exec_name} at wrong index. Expected {exp_index}, was {found_index} \n ".format(\
-                                flow=config["alias"], exec_name=updated_exec["displayName" if updated_exec["displayName"] is not None else "providerId"],\
-                                exp_index=new_exec_index, found_index=exec_index\
-                            )
+                            err_msg["lines"] += ["Flow {flow} has execution {exec_name} at wrong index. Expected {exp_index}, was {found_index}".format(\
+                                flow=config["alias"], exec_name=get_identifier(updated_exec),\
+                                exp_index=new_exec_index, found_index=exec_index)]
+                        else:
+                            err_msg["lines"] += ["Flow {flow} has invalid execution {exec_name} (wrong config/requirement)".format(\
+                                flow=config["alias"], exec_name=get_identifier(updated_exec))]
             # Remove extra executions if any
             for existing_exec in existing_executions:
                 if existing_exec != {} :
                     changed = True
                     before += "{existing_exec}\n".format(existing_exec=existing_exec)
-                    err_msg += "Flow {flow} has extra execution {exec_name} at depth level {level}".format(flow=config["alias"], exec_name=existing_exec["displayName"], level=existing_exec["level"])
+                    err_msg["lines"] += ["Flow {flow} has extra execution {exec_name} at depth level {level}".format(flow=config["alias"], exec_name=existing_exec["displayName"], level=existing_exec["level"])]
                     if not check_mode:
                         kc.delete_authentication_execution(existing_exec["id"], realm=realm)
         return changed, dict(before=before, after=after), err_msg
@@ -473,7 +489,7 @@ def main():
                 auth_repr["authenticationExecutions"] = exec_repr
             result['end_state'] = auth_repr
             
-            result['msg'] = err_msg
+            result['msg'] = err_msg["lines"]
 
         else:
             # Process a deletion (because state was not 'present')
