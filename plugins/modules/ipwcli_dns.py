@@ -25,6 +25,15 @@ requirements:
 notes:
     - To make the DNS record changes effective, you need to run C(update dnsserver) on the ipwcli.
 
+extends_documentation_fragment:
+    - community.general.attributes
+
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
+
 options:
     dnsname:
         description:

@@ -16,6 +16,13 @@ short_description: Manage SmartOS images
 description:
     - Manage SmartOS virtual machine images through imgadm(1M)
 author: Jasper Lievisse Adriaanse (@jasperla)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     force:
         required: false
