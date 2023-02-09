@@ -12,21 +12,27 @@ DOCUMENTATION = '''
 ---
 module: pacman_key
 author:
-- George Rawlinson (@grawlinson)
+    - George Rawlinson (@grawlinson)
 version_added: "3.2.0"
 short_description: Manage pacman's list of trusted keys
 description:
-- Add or remove gpg keys from the pacman keyring.
+    - Add or remove gpg keys from the pacman keyring.
 notes:
-- Use full-length key ID (40 characters).
-- Keys will be verified when using I(data), I(file), or I(url) unless I(verify) is overridden.
-- Keys will be locally signed after being imported into the keyring.
-- If the key ID exists in the keyring, the key will not be added unless I(force_update) is specified.
-- I(data), I(file), I(url), and I(keyserver) are mutually exclusive.
-- Supports C(check_mode).
+    - Use full-length key ID (40 characters).
+    - Keys will be verified when using I(data), I(file), or I(url) unless I(verify) is overridden.
+    - Keys will be locally signed after being imported into the keyring.
+    - If the key ID exists in the keyring, the key will not be added unless I(force_update) is specified.
+    - I(data), I(file), I(url), and I(keyserver) are mutually exclusive.
 requirements:
-- gpg
-- pacman-key
+    - gpg
+    - pacman-key
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     id:
         description:
