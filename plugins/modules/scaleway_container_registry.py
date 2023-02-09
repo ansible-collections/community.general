@@ -22,7 +22,13 @@ description:
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.scaleway_waitable_resource
+  - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
