@@ -23,8 +23,10 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
+    version_added: 2.0.0
   diff_mode:
     support: full
+    version_added: 2.0.0
 options:
   domain:
     type: str
