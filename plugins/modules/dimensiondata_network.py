@@ -19,12 +19,18 @@ DOCUMENTATION = '''
 module: dimensiondata_network
 short_description: Create, update, and delete MCP 1.0 & 2.0 networks
 extends_documentation_fragment:
-- community.general.dimensiondata
-- community.general.dimensiondata_wait
+  - community.general.dimensiondata
+  - community.general.dimensiondata_wait
+  - community.general.attributes
 
 description:
   - Create, update, and delete MCP 1.0 & 2.0 networks
 author: 'Aimon Bustardo (@aimonb)'
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:
