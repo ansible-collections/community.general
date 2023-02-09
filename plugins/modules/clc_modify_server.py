@@ -14,6 +14,13 @@ module: clc_modify_server
 short_description: Modify servers in CenturyLink Cloud
 description:
   - An Ansible module to modify servers in CenturyLink Cloud.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   server_ids:
     description:
