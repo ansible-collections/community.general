@@ -13,6 +13,13 @@ module: syslogger
 short_description: Log messages in the syslog
 description:
     - Uses syslog to add log entries to the host.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     msg:
         type: str

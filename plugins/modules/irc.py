@@ -14,7 +14,14 @@ DOCUMENTATION = '''
 module: irc
 short_description: Send a message to an IRC channel or a nick
 description:
-   - Send a message to an IRC channel or a nick. This is a very simplistic implementation.
+  - Send a message to an IRC channel or a nick. This is a very simplistic implementation.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   server:
     type: str
