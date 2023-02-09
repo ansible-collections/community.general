@@ -1,5 +1,3 @@
-extends_documentation_fragment:
-  - community.general.attributes
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
