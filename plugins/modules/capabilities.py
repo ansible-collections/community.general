@@ -14,6 +14,13 @@ module: capabilities
 short_description: Manage Linux capabilities
 description:
     - This module manipulates files privileges using the Linux capabilities(7) system.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     path:
         description:

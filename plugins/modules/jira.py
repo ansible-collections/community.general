@@ -20,6 +20,15 @@ short_description: Create and modify issues in a JIRA instance
 description:
   - Create and modify issues in a JIRA instance.
 
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
 options:
   uri:
     type: str
