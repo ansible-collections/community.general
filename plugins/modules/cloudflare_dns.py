@@ -698,6 +698,11 @@ class CloudflareAPI(object):
                 "proto": params['proto'],
                 "service": params['service']
             }
+
+            if len(srv_data['name']) == 0:
+                # Name is a required API field that needs to be set in case of a root record entry
+                srv_data['name'] = params['zone']
+
             new_record = {"type": params['type'], "ttl": params['ttl'], 'data': srv_data}
             search_value = str(params['weight']) + '\t' + str(params['port']) + '\t' + params['value']
             search_record = params['service'] + '.' + params['proto'] + '.' + params['record']
