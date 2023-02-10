@@ -16,7 +16,7 @@ description:
   - Provides direct access to the Cisco IMC REST API.
   - Perform any configuration changes and actions that the Cisco IMC supports.
   - More information about the IMC REST API is available from
-    U(http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/sw/api/3_0/b_Cisco_IMC_api_301.html)
+    U(http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/sw/api/3_0/b_Cisco_IMC_api_301.html).
 author:
   - Dag Wieers (@dagwieers)
 requirements:

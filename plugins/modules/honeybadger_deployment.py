@@ -14,7 +14,7 @@ module: honeybadger_deployment
 author: "Benjamin Curtis (@stympy)"
 short_description: Notify Honeybadger.io about app deployments
 description:
-  - Notify Honeybadger.io about app deployments (see http://docs.honeybadger.io/article/188-deployment-tracking)
+  - Notify Honeybadger.io about app deployments (see U(http://docs.honeybadger.io/article/188-deployment-tracking)).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

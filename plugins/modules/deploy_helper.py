@@ -118,7 +118,7 @@ notes:
     unless you pass your own release name with I(release). Due to the nature of deploying software, this should not
     be much of a problem.
 extends_documentation_fragment:
-  - files
+  - ansible.builtin.files
   - community.general.attributes
 '''
 

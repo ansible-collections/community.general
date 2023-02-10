@@ -22,7 +22,7 @@ description:
   - "This module allows Ansible to interface with the PubNub BLOCKS
     infrastructure by providing the following operations: create / remove,
     start / stop and rename for blocks and create / modify / remove for event
-    handlers"
+    handlers."
 author:
   - PubNub <support@pubnub.com> (@pubnub)
   - Sergey Mamontov <sergey@pubnub.com> (@parfeon)
