@@ -86,11 +86,13 @@ options:
       - Determines if a runner can pick up jobs only from protected branches.
       - If I(access_level_on_creation) is not explicitly set to C(true), this option is ignored on registration and
         is only applied on updates.
-      - If set to C(ref_protected), runner can pick up jobs only from protected branches.
       - If set to C(not_protected), runner can pick up jobs from both protected and unprotected branches.
+      - If set to C(ref_protected), runner can pick up jobs only from protected branches.
+      - The current default is C(ref_protected). This will change to no default in community.general 8.0.0.
+        From that version on, if this option is not specified explicitly, GitLab will use C(not_protected)
+        on creation, and the value set will not be changed on any updates.
     required: false
-    default: ref_protected
-    choices: ["ref_protected", "not_protected"]
+    choices: ["not_protected", "ref_protected"]
     type: str
   access_level_on_creation:
     description:
@@ -225,6 +227,9 @@ class GitLabRunner(object):
             'maximum_timeout': options['maximum_timeout'],
             'tag_list': options['tag_list'],
         }
+        if arguments['access_level'] is not None:
+            arguments['access_level'] = options['access_level']
+
         # Because we have already call userExists in main()
         if self.runner_object is None:
             arguments['description'] = description
@@ -238,13 +243,12 @@ class GitLabRunner(object):
                 self._module.deprecate(message, version='7.0.0', collection_name='community.general')
                 access_level_on_creation = False
 
-            if access_level_on_creation:
-                arguments['access_level'] = options['access_level']
+            if not access_level_on_creation:
+                del arguments['access_level']
 
             runner = self.create_runner(arguments)
             changed = True
         else:
-            arguments['access_level'] = options['access_level']
             changed, runner = self.update_runner(self.runner_object, arguments)
 
         self.runner_object = runner
@@ -345,7 +349,7 @@ def main():
         tag_list=dict(type='list', elements='str', default=[]),
         run_untagged=dict(type='bool', default=True),
         locked=dict(type='bool', default=False),
-        access_level=dict(type='str', default='ref_protected', choices=["not_protected", "ref_protected"]),
+        access_level=dict(type='str', choices=["not_protected", "ref_protected"]),
         access_level_on_creation=dict(type='bool'),
         maximum_timeout=dict(type='int', default=3600),
         registration_token=dict(type='str', no_log=True),
@@ -386,6 +390,15 @@ def main():
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
     project = module.params['project']
+
+    if access_level is None:
+        message = "The option 'access_level' is unspecified, so 'ref_protected' is assumed. "\
+                  "In order to align the module with GitLab's runner API, this option will lose "\
+                  "its default value in community.general 8.0.0. From that version on, you must set "\
+                  "this option to 'ref_protected' explicitly, if you want to have a protected runner, "\
+                  "otherwise GitLab's default access level gets applied, which is 'not_protected'"
+        module.deprecate(message, version='8.0.0', collection_name='community.general')
+        access_level = 'ref_protected'
 
     gitlab_instance = gitlab_authentication(module)
     gitlab_project = None
