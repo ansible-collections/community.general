@@ -54,9 +54,6 @@ DOCUMENTATION = '''
         version_added: 4.5.0
 '''
 
-import os
-import json
-
 import logging
 import logging.handlers
 
