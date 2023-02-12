@@ -11,7 +11,7 @@ import json
 import pytest
 
 from .xenserver_common import fake_xenapi_ref
-from .xenserver_conftest import fake_ansible_module, XenAPI, xenserver_guest_powerstate
+from .xenserver_conftest import fake_ansible_module, XenAPI, xenserver_guest_powerstate  # noqa: F401, pylint: disable=unused-import
 
 
 testcase_set_powerstate = {
