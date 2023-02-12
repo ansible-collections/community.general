@@ -8,10 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-import pytest
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
-from ansible.errors import AnsibleError
 from ansible_collections.community.general.plugins.lookup import etcd3
 from ansible.plugins.loader import lookup_loader
 

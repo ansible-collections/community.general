@@ -10,7 +10,7 @@ import json
 
 from ansible_collections.community.general.plugins.modules import rhn_channel
 
-from .rhn_conftest import mock_request
+from .rhn_conftest import mock_request  # noqa: F401, pylint: disable=unused-import
 
 import pytest
 

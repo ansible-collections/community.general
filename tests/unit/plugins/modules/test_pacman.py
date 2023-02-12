@@ -6,12 +6,9 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import sys
-
 
 from ansible.module_utils import basic
-from ansible_collections.community.general.tests.unit.compat import mock, unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat import mock
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
@@ -27,7 +24,6 @@ from ansible_collections.community.general.plugins.modules.pacman import (
 )
 
 import pytest
-import json
 
 
 def get_bin_path(self, arg, required=False):

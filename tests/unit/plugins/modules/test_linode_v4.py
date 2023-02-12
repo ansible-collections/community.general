@@ -25,7 +25,7 @@ from ansible_collections.community.general.plugins.module_utils.linode import ge
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.tests.unit.compat import mock
 
-from .linode_conftest import access_token, no_access_token_in_env, default_args, mock_linode
+from .linode_conftest import access_token, no_access_token_in_env, default_args, mock_linode  # noqa: F401, pylint: disable=unused-import
 
 
 def test_mandatory_state_is_validated(capfd):
