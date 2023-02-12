@@ -13,10 +13,10 @@ DOCUMENTATION = r'''
 module: terraform
 short_description: Manages a Terraform deployment (and plans)
 description:
-    - Provides support for deploying resources with Terraform and pulling
-      resource information back into Ansible.
+  - Provides support for deploying resources with Terraform and pulling
+    resource information back into Ansible.
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
