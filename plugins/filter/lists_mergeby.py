@@ -102,8 +102,6 @@ from ansible.errors import AnsibleFilterError
 from ansible.module_utils.six import string_types
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible.utils.vars import merge_hash
-from ansible.release import __version__ as ansible_version
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from collections import defaultdict
 from operator import itemgetter

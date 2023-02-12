@@ -10,13 +10,14 @@ import logging
 import logging.config
 import os
 import tempfile
-from datetime import datetime
+# (TODO: remove next line!)
+from datetime import datetime  # noqa: F401, pylint: disable=unused-import
 from operator import eq
 
 import time
 
 try:
-    import yaml
+    import yaml  # noqa: F401, pylint: disable=unused-import
 
     import oci
     from oci.constants import HEADER_NEXT_PAGE

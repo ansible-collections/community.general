@@ -133,11 +133,10 @@ data:
 import traceback
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway, payload_from_object
-from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 try:
-    from ipaddress import ip_network
+    from ipaddress import ip_network  # noqa: F401, pylint: disable=unused-import
 except ImportError:
     IPADDRESS_IMP_ERR = traceback.format_exc()
     HAS_IPADDRESS = False

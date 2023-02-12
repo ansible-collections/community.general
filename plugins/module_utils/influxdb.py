@@ -15,7 +15,7 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 
 REQUESTS_IMP_ERR = None
 try:
-    import requests.exceptions
+    import requests.exceptions  # noqa: F401, pylint: disable=unused-import
     HAS_REQUESTS = True
 except ImportError:
     REQUESTS_IMP_ERR = traceback.format_exc()
@@ -25,7 +25,7 @@ INFLUXDB_IMP_ERR = None
 try:
     from influxdb import InfluxDBClient
     from influxdb import __version__ as influxdb_version
-    from influxdb import exceptions
+    from influxdb import exceptions  # noqa: F401, pylint: disable=unused-import
     HAS_INFLUXDB = True
 except ImportError:
     INFLUXDB_IMP_ERR = traceback.format_exc()

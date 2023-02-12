@@ -69,7 +69,6 @@ from ansible.utils.display import Display
 from traceback import format_exception
 import json
 import sys
-import os
 
 display = Display()
 

@@ -54,7 +54,6 @@ examples: |
 import hashlib
 import hmac
 import base64
-import logging
 import json
 import uuid
 import socket

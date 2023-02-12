@@ -101,10 +101,6 @@ import os
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat
-)
-
 
 class MkSysB(ModuleHelper):
     module = dict(
