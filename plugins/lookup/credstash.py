@@ -85,6 +85,8 @@ RETURN = """
     type: str
 """
 
+import os
+
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 

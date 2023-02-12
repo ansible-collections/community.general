@@ -121,6 +121,8 @@ compose:
   ansible_host: "ipv4 | community.general.json_query('[?public==`false`].address') | first"
 '''
 
+import os
+
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.template import Templar
