@@ -12,7 +12,7 @@ from ansible.module_utils.urls import ConnectionError, SSLValidationError
 from ansible.module_utils.six.moves.urllib.error import HTTPError, URLError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.manifold import ManifoldApiClient, LookupModule, ApiError
+from ansible_collections.community.general.plugins.lookup.manifold import ManifoldApiClient, ApiError
 import json
 import os
 
