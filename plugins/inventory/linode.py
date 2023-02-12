@@ -123,8 +123,7 @@ compose:
 
 import os
 
-from ansible.errors import AnsibleError, AnsibleParserError
-from ansible.module_utils.six import string_types
+from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.template import Templar
 

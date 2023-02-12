@@ -68,8 +68,8 @@ from ansible.module_utils import six
 from ansible.utils.display import Display
 from traceback import format_exception
 import json
-import sys
 import os
+import sys
 
 display = Display()
 
