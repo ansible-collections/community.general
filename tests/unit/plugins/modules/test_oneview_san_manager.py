@@ -7,7 +7,6 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest, mock
 from .oneview_module_loader import SanManagerModule
-from .oneview_conftest import mock_ov_client, mock_ansible_module
 from .hpe_test_utils import OneViewBaseTestCase
 from copy import deepcopy
 

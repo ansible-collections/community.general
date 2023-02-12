@@ -8,9 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
-import os
 
-from ansible.errors import AnsibleError
 from ansible.inventory.data import InventoryData
 from ansible_collections.community.general.plugins.inventory.lxd import InventoryModule
 

@@ -95,14 +95,14 @@ def test_arg_format_fail(fmt, style, stars, value, expected):
 def test_dependency_ctxmgr():
     ctx = DependencyCtxMgr("POTATOES", "Potatoes must be installed")
     with ctx:
-        import potatoes_that_will_never_be_there
+        import potatoes_that_will_never_be_there  # noqa: F401, pylint: disable=unused-import
     print("POTATOES: ctx.text={0}".format(ctx.text))
     assert ctx.text == "Potatoes must be installed"
     assert not ctx.has_it
 
     ctx = DependencyCtxMgr("POTATOES2")
     with ctx:
-        import potatoes_that_will_never_be_there_again
+        import potatoes_that_will_never_be_there_again  # noqa: F401, pylint: disable=unused-import
     assert not ctx.has_it
     print("POTATOES2: ctx.text={0}".format(ctx.text))
     assert ctx.text.startswith("No module named")
@@ -110,7 +110,7 @@ def test_dependency_ctxmgr():
 
     ctx = DependencyCtxMgr("TYPING")
     with ctx:
-        import sys
+        import sys  # noqa: F401, pylint: disable=unused-import
     assert ctx.has_it
 
 

@@ -11,7 +11,6 @@ import yaml
 
 from ansible_collections.community.general.tests.unit.compat import unittest, mock
 from .oneview_module_loader import EthernetNetworkModule
-from .oneview_conftest import mock_ov_client, mock_ansible_module
 from .hpe_test_utils import OneViewBaseTestCase
 
 FAKE_MSG_ERROR = 'Fake message error'

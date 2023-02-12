@@ -34,7 +34,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 from ansible.module_utils.basic import missing_required_lib
 
 with ModuleHelper.dependency("nopackagewiththisname", missing_required_lib("nopackagewiththisname")):
-    import nopackagewiththisname
+    import nopackagewiththisname  # noqa: F401, pylint: disable=unused-import
 
 
 class MSimple(ModuleHelper):

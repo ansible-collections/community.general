@@ -6,7 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-import collections
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -26,7 +25,9 @@ EXAMPLES = ""
 RETURN = ""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import (  # noqa: F401, pylint: disable=unused-import
+    DeprecateAttrsMixin
+)
 
 
 class MSimpleDA(ModuleHelper):

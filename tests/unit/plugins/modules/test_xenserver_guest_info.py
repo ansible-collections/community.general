@@ -12,7 +12,7 @@ import json
 import pytest
 
 from .xenserver_common import fake_xenapi_ref
-from .xenserver_conftest import XenAPI, xenserver_guest_info
+from .xenserver_conftest import XenAPI, xenserver_guest_info  # noqa: F401, pylint: disable=unused-import
 
 pytestmark = pytest.mark.usefixtures('patch_ansible_module')
 
