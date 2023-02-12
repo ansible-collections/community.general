@@ -21,13 +21,15 @@ except ImportError:
 
 HAS_PURITY_FB = True
 try:
-    from purity_fb import PurityFb, FileSystem, FileSystemSnapshot, SnapshotSuffix, rest
+    from purity_fb import PurityFb, FileSystem, FileSystemSnapshot, SnapshotSuffix, rest  # noqa: F401, pylint: disable=unused-import
 except ImportError:
     HAS_PURITY_FB = False
 
-from functools import wraps
+# (TODO: remove next line!)
+from functools import wraps  # noqa: F401, pylint: disable=unused-import
 from os import environ
-from os import path
+# (TODO: remove next line!)
+from os import path  # noqa: F401, pylint: disable=unused-import
 import platform
 
 VERSION = 1.2

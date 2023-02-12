@@ -73,8 +73,6 @@ _raw:
   elements: str
 """
 
-import os
-
 HAVE_REDIS = False
 try:
     import redis
