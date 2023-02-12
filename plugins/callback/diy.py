@@ -786,10 +786,6 @@ playbook.yml: >
 
 import sys
 from contextlib import contextmanager
-from ansible import constants as C
-from ansible.playbook.task_include import TaskInclude
-from ansible.plugins.callback import CallbackBase
-from ansible.utils.color import colorize, hostcolor
 from ansible.template import Templar
 from ansible.vars.manager import VariableManager
 from ansible.plugins.callback.default import CallbackModule as Default

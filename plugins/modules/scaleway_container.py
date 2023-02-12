@@ -200,7 +200,7 @@ container:
 from copy import deepcopy
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
+    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
     scaleway_waitable_resource_argument_spec, resource_attributes_should_be_changed,
     SecretVariables
 )

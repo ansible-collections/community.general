@@ -97,7 +97,6 @@ EXAMPLES = '''
 RETURN = r''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 import os
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion

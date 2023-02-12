@@ -99,7 +99,6 @@ EXAMPLES = '''
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
 
 
 def selfupdate(module, port_path):

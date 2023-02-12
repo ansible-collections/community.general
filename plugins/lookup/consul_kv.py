@@ -105,7 +105,6 @@ RETURN = """
     type: dict
 """
 
-import os
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.errors import AnsibleError, AnsibleAssertionError
 from ansible.plugins.lookup import LookupBase

@@ -80,13 +80,13 @@ from ansible.errors import AnsibleError, AnsibleFilterError
 import importlib
 
 try:
-    import jc
+    import jc  # noqa: F401, pylint: disable=unused-import
     HAS_LIB = True
 except ImportError:
     HAS_LIB = False
 
 
-def jc(data, parser, quiet=True, raw=False):
+def jc_filter(data, parser, quiet=True, raw=False):
     """Convert returned command output to JSON using the JC library
 
     Arguments:
@@ -150,5 +150,5 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'jc': jc
+            'jc': jc_filter,
         }

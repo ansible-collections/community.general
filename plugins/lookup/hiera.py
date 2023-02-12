@@ -61,8 +61,6 @@ RETURN = """
         elements: str
 """
 
-import os
-
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.cmd_functions import run_cmd
 from ansible.module_utils.common.text.converters import to_text
