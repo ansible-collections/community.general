@@ -8,7 +8,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.errors import AnsibleError
 from ansible.plugins.loader import become_loader, get_shell_plugin
 
 

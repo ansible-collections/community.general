@@ -21,7 +21,7 @@ HAS_REDIS_USERNAME_OPTION = True
 if tuple(map(int, __version__.split('.'))) < (3, 4, 0):
     HAS_REDIS_USERNAME_OPTION = False
 if HAS_REDIS_USERNAME_OPTION:
-    from redis.exceptions import NoPermissionError, RedisError, ResponseError
+    from redis.exceptions import NoPermissionError
 
 
 def test_redis_data_incr_without_arguments(capfd):
