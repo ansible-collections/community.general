@@ -9,7 +9,7 @@ __metaclass__ = type
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-# (TODO: remove AnsibleModule!) pylint: disable-next-line=unused-import
+# (TODO: remove AnsibleModule!) pylint: disable-next=unused-import
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase, AnsibleModule  # noqa: F401
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
