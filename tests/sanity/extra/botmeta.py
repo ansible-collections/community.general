@@ -13,8 +13,7 @@ import sys
 
 import yaml
 
-from voluptuous import All, Any, MultipleInvalid, PREVENT_EXTRA
-from voluptuous import Required, Schema, Invalid
+from voluptuous import Any, MultipleInvalid, PREVENT_EXTRA, Schema
 from voluptuous.humanize import humanize_error
 
 
