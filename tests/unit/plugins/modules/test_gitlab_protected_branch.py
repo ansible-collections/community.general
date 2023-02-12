@@ -31,7 +31,7 @@ try:
 
     # GitLab module requirements
     if python_version_match_requirement():
-        from gitlab.v4.objects import Project
+        from gitlab.v4.objects import Project  # noqa: F401, pylint: disable=unused-import
     gitlab_req_version = python_gitlab_version_match_requirement()
     gitlab_module_version = python_gitlab_module_version()
     if LooseVersion(gitlab_module_version) < LooseVersion(gitlab_req_version):

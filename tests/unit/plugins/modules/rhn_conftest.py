@@ -5,7 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils.six.moves import xmlrpc_client
 
 import pytest

@@ -15,13 +15,8 @@ import json
 
 from ansible_collections.community.general.plugins.modules import proxmox_tasks_info
 import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
-from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
-from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
-    AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
-)
+from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
-from ansible_collections.community.general.plugins.module_utils import proxmox
 
 NODE = 'node01'
 TASK_UPID = 'UPID:iaclab-01-01:000029DD:1599528B:6108F068:srvreload:networking:root@pam:'

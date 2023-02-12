@@ -5,7 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.modules import macports
 
 import pytest

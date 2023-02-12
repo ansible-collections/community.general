@@ -7,7 +7,7 @@ __metaclass__ = type
 
 from ansible.executor.task_result import TaskResult
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch, call, MagicMock, Mock
+from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock
 from ansible_collections.community.general.plugins.callback.loganalytics import AzureLogAnalyticsSource
 from datetime import datetime
 

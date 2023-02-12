@@ -15,7 +15,7 @@ import ansible.module_utils.six
 from ansible.module_utils.six.moves import xmlrpc_client
 from ansible_collections.community.general.plugins.modules import rhn_register
 
-from .rhn_conftest import mock_request
+from .rhn_conftest import mock_request  # noqa: F401, pylint: disable=unused-import
 
 import pytest
 

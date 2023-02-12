@@ -7,9 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
-import sys
 
-from ansible.errors import AnsibleError, AnsibleParserError
 from ansible_collections.community.general.plugins.inventory.cobbler import InventoryModule
 
 

@@ -6,15 +6,13 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from argparse import ArgumentParser
-
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.bitwarden import LookupModule, Bitwarden, BitwardenException
+from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden
 
 
 MOCK_RECORDS = [

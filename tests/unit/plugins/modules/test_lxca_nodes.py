@@ -10,8 +10,6 @@ import json
 import pytest
 from ansible_collections.community.general.tests.unit.compat import mock
 from ansible_collections.community.general.plugins.modules import lxca_nodes
-from ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common import setup_conn
-from ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common import close_conn
 
 
 @pytest.fixture(scope='module')

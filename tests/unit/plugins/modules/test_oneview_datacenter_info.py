@@ -8,7 +8,7 @@ __metaclass__ = type
 import pytest
 
 from .hpe_test_utils import FactsParamsTest
-from .oneview_conftest import mock_ov_client, mock_ansible_module
+from .oneview_conftest import mock_ov_client, mock_ansible_module  # noqa: F401, pylint: disable=unused-import
 
 from ansible_collections.community.general.plugins.modules.oneview_datacenter_info import DatacenterInfoModule
 

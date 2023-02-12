@@ -14,7 +14,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.errors import AnsibleError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.lastpass import LookupModule, LPass, LPassException
+from ansible_collections.community.general.plugins.lookup.lastpass import LPass, LPassException
 
 
 MOCK_ENTRIES = [{'username': 'user',
