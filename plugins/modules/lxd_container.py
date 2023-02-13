@@ -421,7 +421,7 @@ LXD_ANSIBLE_STATES = {
     'stopped': '_stopped',
     'restarted': '_restarted',
     'absent': '_destroyed',
-    'frozen': '_frozen'
+    'frozen': '_frozen',
 }
 
 # ANSIBLE_LXD_STATES is a map of states of lxd containers to the Ansible
@@ -750,7 +750,7 @@ class LXDContainerManagement(object):
                 'changed': state_changed,
                 'old_state': self.old_state,
                 'actions': self.actions,
-                'diff': self.diff
+                'diff': self.diff,
             }
             if self.client.debug:
                 result_json['logs'] = self.client.logs
@@ -763,7 +763,7 @@ class LXDContainerManagement(object):
                 'msg': e.msg,
                 'changed': state_changed,
                 'actions': self.actions,
-                'diff': self.diff
+                'diff': self.diff,
             }
             if self.client.debug:
                 fail_params['logs'] = e.kwargs['logs']
@@ -777,7 +777,7 @@ def main():
         argument_spec=dict(
             name=dict(
                 type='str',
-                required=True
+                required=True,
             ),
             project=dict(
                 type='str',
@@ -807,7 +807,7 @@ def main():
             ),
             state=dict(
                 choices=list(LXD_ANSIBLE_STATES.keys()),
-                default='started'
+                default='started',
             ),
             target=dict(
                 type='str',
@@ -823,33 +823,33 @@ def main():
             ),
             wait_for_container=dict(
                 type='bool',
-                default=False
+                default=False,
             ),
             wait_for_ipv4_addresses=dict(
                 type='bool',
-                default=False
+                default=False,
             ),
             force_stop=dict(
                 type='bool',
-                default=False
+                default=False,
             ),
             url=dict(
                 type='str',
-                default=ANSIBLE_LXD_DEFAULT_URL
+                default=ANSIBLE_LXD_DEFAULT_URL,
             ),
             snap_url=dict(
                 type='str',
-                default='unix:/var/snap/lxd/common/lxd/unix.socket'
+                default='unix:/var/snap/lxd/common/lxd/unix.socket',
             ),
             client_key=dict(
                 type='path',
-                aliases=['key_file']
+                aliases=['key_file'],
             ),
             client_cert=dict(
                 type='path',
-                aliases=['cert_file']
+                aliases=['cert_file'],
             ),
-            trust_password=dict(type='str', no_log=True)
+            trust_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
