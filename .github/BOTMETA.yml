@@ -440,7 +440,7 @@ files:
     labels: datadog_event
     maintainers: n0ts
   $modules/datadog_monitor.py:
-    maintainers: skornehl
+    ignore: skornehl
   $modules/dconf.py:
     maintainers: azaghal
   $modules/deploy_helper.py:
