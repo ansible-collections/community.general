@@ -136,7 +136,7 @@ EXAMPLES = r'''
     project: projectname
     gitlab_user: username
     access_level: developer
-    pruge_users: developer
+    purge_users: developer
     state: present
 
 - name: Remove a list of Users with Dedicated Access Levels to A GitLab project
