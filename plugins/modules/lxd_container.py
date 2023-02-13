@@ -582,7 +582,7 @@ class LXDContainerManagement(object):
 
     def _unfreeze_instance(self):
         self._change_state('unfreeze')
-        self.actions.append('unfreez')
+        self.actions.append('unfreeze')
 
     def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
