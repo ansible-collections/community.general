@@ -221,7 +221,8 @@ def find_exec_in_executions(searched_exec, executions):
                 existing_exec["providerId"] == searched_exec["providerId"] or\
                 "displayName" in existing_exec and "displayName" in searched_exec and\
                 existing_exec["displayName"] == searched_exec["displayName"]) and\
-                existing_exec["level"] == searched_exec["level"]:
+                ("level" not in existing_exec or \
+                existing_exec["level"] == searched_exec["level"]):
             return i
     return -1
 
@@ -288,13 +289,27 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
         before = ""
         err_msg = {"lines":[]}
         added_executions_offset = 0
-        flow_renaming = {}
         if "authenticationExecutions" in config:
             # Get existing executions on the Keycloak server for this alias
             existing_executions = kc.get_executions_representation(config, realm=realm)
+            new_executions = config["authenticationExecutions"] if config["authenticationExecutions"] is not None else []
             curr_existing_index = 0
             levels = {}
-            for new_exec_index, new_exec in enumerate(config["authenticationExecutions"], start=0) if config["authenticationExecutions"] is not None else []:
+            
+            # Remove extra executions if any
+            for existing_exec_index, existing_exec in enumerate(existing_executions):
+                if find_exec_in_executions(existing_exec, new_executions) == -1:
+                    changed = True
+                    before += "{existing_exec}\n".format(existing_exec=existing_exec)
+                    add_error_line(err_msg_lines=err_msg, err_msg="extra execution", flow=config["alias"],\
+                        exec_name=get_identifier(existing_exec)) 
+                    if not check_mode:
+                        kc.delete_authentication_execution(existing_exec["id"], realm=realm)
+                if not check_mode:
+                    existing_executions = kc.get_executions_representation(config, realm=realm)
+                
+            
+            for new_exec_index, new_exec in enumerate(new_executions):
                 # if get_identifier(new_exec) == "auth-otp-push-firebase":
                     # err_msg["lines"] += [str(existing_executions) + str(kc.get_executions_representation(config, realm=realm))]
                 if new_exec["index"] is not None:
@@ -303,10 +318,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     new_exec["index"]=new_exec_index
                 # Get flowalias parent if given
                 if new_exec["flowAlias"] is not None:
-                    if new_exec["flowAlias"] in flow_renaming:
-                        flow_alias_parent = flow_renaming[new_exec["flowAlias"]]
-                    else:
-                        flow_alias_parent = new_exec["flowAlias"]                        
+                    flow_alias_parent = new_exec["flowAlias"]                        
                 else:
                     flow_alias_parent = config["alias"]
 
@@ -384,17 +396,8 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\
                             exec_name=get_identifier(new_exec))
                         changed = True
-                        after += str(new_exec) + '\n'
+                        after += str(new_exec) + '\n'            
             
-            # Remove extra executions if any
-            for existing_exec in existing_executions:
-                if existing_exec != {} :
-                    changed = True
-                    before += "{existing_exec}\n".format(existing_exec=existing_exec)
-                    add_error_line(err_msg_lines=err_msg, err_msg="extra execution", flow=config["alias"],\
-                        exec_name=get_identifier(existing_exec)) 
-                    if not check_mode:
-                        kc.delete_authentication_execution(existing_exec["id"], realm=realm)
         return changed, dict(before=before, after=after), err_msg
 
     except Exception as e:
