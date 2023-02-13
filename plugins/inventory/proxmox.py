@@ -277,6 +277,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
             a = self._get_session()
+
+            if a.verify is False:
+                from requests.packages.urllib3 import disable_warnings
+                disable_warnings()
+
             ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
 
             json = ret.json()
