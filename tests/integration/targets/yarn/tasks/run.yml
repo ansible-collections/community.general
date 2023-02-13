@@ -39,6 +39,7 @@
     package: 'iconv-lite'
   environment:
     PATH: "{{ node_bin_path }}:{{ansible_env.PATH}}"
+    YARN_IGNORE_ENGINES: true
   block:
 
     # Get the version of Yarn and register to a variable
@@ -135,3 +136,89 @@
       assert:
         that:
           - yarn_uninstall_package is changed
+
+    - name: 'Global install binary with explicit version (older version of package)'
+      yarn:
+        global: true
+        executable: '{{ yarn_bin_path }}/yarn'
+        name: prettier
+        version: 2.0.0
+        state: present
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      register: yarn_global_install_old_binary
+
+    - assert:
+        that:
+          - yarn_global_install_old_binary is changed
+
+    - name: 'Global upgrade old binary'
+      yarn:
+        global: true
+        executable: '{{ yarn_bin_path }}/yarn'
+        name: prettier
+        state: latest
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      register: yarn_global_update_old_binary
+
+    - assert:
+        that:
+          - yarn_global_update_old_binary is changed
+
+    - name: 'Global remove a binary'
+      yarn:
+        global: true
+        executable: '{{ yarn_bin_path }}/yarn'
+        name: prettier
+        state: absent
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      register: yarn_global_uninstall_binary
+
+    - assert:
+        that:
+          - yarn_global_uninstall_binary is changed
+
+    - name: 'Global install package with no binary with explicit version (older version of package)'
+      yarn:
+        global: true
+        executable: '{{ yarn_bin_path }}/yarn'
+        name: left-pad
+        version: 1.1.0
+        state: present
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      register: yarn_global_install_old_package
+
+    - assert:
+        that:
+          - yarn_global_install_old_package is changed
+
+    - name: 'Global upgrade old package with no binary'
+      yarn:
+        global: true
+        executable: '{{ yarn_bin_path }}/yarn'
+        name: left-pad
+        state: latest
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      register: yarn_global_update_old_package
+
+    - assert:
+        that:
+          - yarn_global_update_old_package is changed
+
+    - name: 'Global remove a package with no binary'
+      yarn:
+        global: true
+        executable: '{{ yarn_bin_path }}/yarn'
+        name: left-pad
+        state: absent
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      register: yarn_global_uninstall_package
+
+    - assert:
+        that:
+          - yarn_global_uninstall_package is changed
