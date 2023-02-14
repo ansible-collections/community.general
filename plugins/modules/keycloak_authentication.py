@@ -351,13 +351,15 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     # Determine if config is different
                     if "authenticationConfig" in new_exec and new_exec["authenticationConfig"] is not None:
                         config_changed = "authenticationConfig" not in existing_exec or \
-                            new_exec["authenticationConfig"]["alias"] != existing_exec["authenticationConfig"]["alias"]# "alias" not in existing_exec["authenticationConfig"] or \
+                            "alias" not in existing_exec["authenticationConfig"] or \
+                            new_exec["authenticationConfig"]["alias"] != existing_exec["authenticationConfig"]["alias"] 
                                         
                         if not config_changed and "config" in new_exec["authenticationConfig"] and new_exec["authenticationConfig"]["config"] is not None:
                             for key in new_exec["authenticationConfig"]["config"]:
                                 config_changed |= new_exec["authenticationConfig"]["config"][key] is not None and\
-                                    (new_exec["authenticationConfig"]["config"][key] != existing_exec["authenticationConfig"]["config"][key] or \
-                                    key not in existing_exec["authenticationConfig"]["config"])
+                                    len(str(new_exec["authenticationConfig"]["config"][key])) > 0 and\
+                                    (key not in existing_exec["authenticationConfig"]["config"] or \
+                                    new_exec["authenticationConfig"]["config"][key] != existing_exec["authenticationConfig"]["config"][key])
                         if config_changed:
                             before += str(existing_exec)
                             if not check_mode:
@@ -365,6 +367,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             changed = True
                             add_error_line(err_msg_lines=err_msg, err_msg= "wrong config", flow = config["alias"], exec_name=get_identifier(new_exec), \
                             expected = str(new_exec["authenticationConfig"]), actual = str(existing_exec["authenticationConfig"] if "authenticationConfig" in existing_exec else None))
+                            after += str(new_exec)
                     # Check if there has been some reordering
                     shift = exec_index - new_exec_index + added_executions_offset
                     if shift != 0:
@@ -372,7 +375,8 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         if not check_mode:
                             kc.change_execution_priority(new_exec["id"], shift, realm=realm)
                         add_error_line(err_msg_lines=err_msg, err_msg="wrong index", flow=config["alias"], exec_name=get_identifier(new_exec))
-                    elif added_executions_offset > 0 :
+                        after += str(new_exec)
+                    elif added_executions_offset > 0:
                         added_executions_offset -= 1
                     # Update execution
                     if exec_need_changes:
@@ -381,7 +385,6 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         if new_exec["requirement"] != existing_exec["requirement"]:
                             add_error_line(err_msg_lines=err_msg, err_msg="wrong requirement", flow=config["alias"], exec_name=get_identifier(new_exec),\
                             expected = new_exec["requirement"], actual = existing_exec["requirement"])
-                    if changed:
                         after += str(new_exec)
                     # Remove existing execution from the list
                     existing_executions[exec_index].clear()
@@ -403,7 +406,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             exec_name=get_identifier(new_exec))
                         changed = True
                         after += str(new_exec) + '\n'            
-            
+        after += str(err_msg["lines"])
         return changed, dict(before=before, after=after), err_msg
 
     except Exception as e:
