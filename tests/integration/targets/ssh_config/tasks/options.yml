@@ -18,7 +18,7 @@
     host_key_algorithms: "+ssh-rsa"
     state: present
   register: options_add
-  check_mode: yes
+  check_mode: true
 
 - name: Options - Check if changes are made in check mode
   assert:
@@ -91,7 +91,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
-    forward_agent: no
+    forward_agent: false
     host_key_algorithms: "+ssh-ed25519"
     state: present
   register: options_update
@@ -111,7 +111,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
-    forward_agent: no
+    forward_agent: false
     host_key_algorithms: "+ssh-ed25519"
     state: present
   register: options_update

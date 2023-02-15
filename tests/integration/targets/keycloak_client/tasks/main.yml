@@ -45,7 +45,7 @@
 
 - name: Check client again with same props
   community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
-  check_mode: yes
+  check_mode: true
   vars:
     call_args:
       realm: "{{ realm }}"

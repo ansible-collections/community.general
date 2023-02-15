@@ -20,7 +20,7 @@
 
 - block:
   - name: Create a server with security_group (Check)
-    check_mode: yes
+    check_mode: true
     scaleway_compute:
       name: '{{ scaleway_name }}'
       state: present
@@ -80,7 +80,7 @@
         - server_creation_confirmation_task is not changed
 
   - name: Keep current security_group (Check)
-    check_mode: yes
+    check_mode: true
     scaleway_compute:
       name: '{{ scaleway_name }}'
       state: present

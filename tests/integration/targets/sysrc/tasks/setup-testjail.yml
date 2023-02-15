@@ -36,11 +36,11 @@
     line: ezjail_ftphost=http://ftp-archive.freebsd.org
 
 - name: Start ezjail
-  ignore_errors: yes
+  ignore_errors: true
   service:
     name: ezjail
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Has ezjail
   register: ezjail_base_jail

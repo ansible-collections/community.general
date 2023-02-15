@@ -28,7 +28,7 @@
     path: '/tmp/foo/bar(/.*)?'
     setype: httpd_sys_content_t
     state: present
-    reload: no
+    reload: false
   register: first
 
 - assert:
@@ -41,7 +41,7 @@
     path: '/tmp/foo/bar(/.*)?'
     setype: httpd_sys_content_t
     state: present
-    reload: no
+    reload: false
   register: second
 
 - assert:
@@ -54,7 +54,7 @@
     path: '/tmp/foo/bar(/.*)?'
     setype: unlabeled_t
     state: present
-    reload: no
+    reload: false
   register: third
 
 - assert:
@@ -67,7 +67,7 @@
     path: '/tmp/foo/bar(/.*)?'
     setype: unlabeled_t
     state: present
-    reload: no
+    reload: false
   register: fourth
 
 - assert:
@@ -80,7 +80,7 @@
     path: '/tmp/foo/bar(/.*)?'
     setype: httpd_sys_content_t
     state: absent
-    reload: no
+    reload: false
   register: fifth
 
 - assert:
@@ -93,7 +93,7 @@
     path: '/tmp/foo/bar(/.*)?'
     setype: unlabeled_t
     state: absent
-    reload: no
+    reload: false
   register: sixth
 
 - assert:

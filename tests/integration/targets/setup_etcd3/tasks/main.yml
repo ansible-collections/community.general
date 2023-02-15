@@ -86,7 +86,7 @@
       unarchive:
         src: "{{ etcd3_download_url }}"
         dest: "{{ etcd3_download_location }}"
-        remote_src: yes
+        remote_src: true
 
     # Running etcd3 and kill afterwards if it wasn't running before.
     - name: Run etcd3
