@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a function namespace (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function_namespace:
     state: present
     name: '{{ name }}'
@@ -74,7 +74,7 @@
       - "'hashed_value' in fn_creation_task.function_namespace.secret_environment_variables[0]"
 
 - name: Update function namespace (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function_namespace:
     state: present
     name: '{{ name }}'
@@ -139,7 +139,7 @@
       - "'hashed_value' in fn_creation_task.function_namespace.secret_environment_variables[0]"
 
 - name: Update function namespace secret variables (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function_namespace:
     state: present
     name: '{{ name }}'
@@ -204,7 +204,7 @@
       - "'hashed_value' in fn_update_secret_confirmation_task.function_namespace.secret_environment_variables[0]"
 
 - name: Delete function namespace (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function_namespace:
     state: absent
     name: '{{ name }}'

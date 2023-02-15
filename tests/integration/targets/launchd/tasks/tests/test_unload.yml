@@ -9,7 +9,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result"
 
 
@@ -17,9 +17,9 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
-  become: yes
+  become: true
   register: "test_1_launchd_unloaded_result_check_mode"
-  check_mode: yes
+  check_mode: true
 
 - name: "[{{ item }}] Validate that service was unloaded in check mode"
   assert:
@@ -32,7 +32,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
-  become: yes
+  become: true
   register: "test_1_launchd_unloaded_result"
 
 - name: "[{{ item }}] Validate that service was unloaded"
@@ -51,7 +51,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
-  become: yes
+  become: true
   register: "test_2_launchd_unloaded_result"
 
 - name: "[{{ item }}] Validate that service did not change and is still unloaded"

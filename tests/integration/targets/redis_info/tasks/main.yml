@@ -24,7 +24,7 @@
     login_host: 127.0.0.1
     login_port: "{{ master_port }}"
     login_password: "{{ redis_password }}"
-  check_mode: yes
+  check_mode: true
   register: result
 
 - assert:

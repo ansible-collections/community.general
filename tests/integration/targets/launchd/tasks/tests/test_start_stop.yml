@@ -9,9 +9,9 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result_check_mode"
-  check_mode: yes
+  check_mode: true
 
 
 - name: "[{{ item }}] Validate that service was started in check mode"
@@ -25,7 +25,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result"
 
 
@@ -46,7 +46,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: stopped
-  become: yes
+  become: true
   register: "test_2_launchd_stop_result"
 
 - name: "[{{ item }}] Validate that service was stopped after it was started"
@@ -65,7 +65,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: stopped
-  become: yes
+  become: true
   register: "test_3_launchd_stop_result"
 
 - name: "[{{ item }}] Validate that service can be stopped after being already stopped"
@@ -84,7 +84,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_4_launchd_start_result"
 
 - name: "[{{ item }}] Validate that service was started..."
@@ -102,7 +102,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_5_launchd_start_result"
 
 - name: "[{{ item }}] Validate that service is still in the same state as before"
