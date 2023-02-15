@@ -722,7 +722,7 @@
   copy:
     content: ""
     dest: "{{ output_file }}"
-    force: yes
+    force: true
 
 - name: "test-values 25 - Ensure 'beverage=[coke, pepsi]' is created within no section"
   ini_file:

@@ -7,7 +7,7 @@
   template:
     src: "{{ launchd_service_name }}.plist.j2"
     dest: "{{ launchd_plist_location }}"
-  become: yes
+  become: true
 
 - name: install the test daemon script
   copy:
@@ -20,4 +20,4 @@
     path: /usr/local/sbin/ansible_test_service
     line: "#!{{ ansible_python_interpreter | realpath }}"
     insertbefore: BOF
-    firstmatch: yes
+    firstmatch: true

@@ -49,7 +49,7 @@
       size: 1
     port_id: "{{ port.id }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:
@@ -80,7 +80,7 @@
       size: 1
     port_id: "{{ port.id }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
   assert:
@@ -112,7 +112,7 @@
       size: 1
     port_id: "{{ port.id }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:
@@ -143,7 +143,7 @@
       size: 1
     port_id: "{{ port.id }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
   assert:

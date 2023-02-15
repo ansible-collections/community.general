@@ -13,7 +13,7 @@
       user:
         name: xfsquotauser
         state: present
-      become: yes
+      become: true
 
     - include_tasks: uquota.yml
     - include_tasks: gquota.yml
@@ -24,4 +24,4 @@
       user:
         name: xfsquotauser
         state: absent
-      become: yes
+      become: true

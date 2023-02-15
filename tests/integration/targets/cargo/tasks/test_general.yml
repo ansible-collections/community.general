@@ -18,7 +18,7 @@
   community.general.cargo:
     name: helloworld
   register: install_present_helloworld
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Uninstall application helloworld
   community.general.cargo:

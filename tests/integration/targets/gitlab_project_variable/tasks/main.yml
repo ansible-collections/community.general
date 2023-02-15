@@ -27,7 +27,7 @@
     project: "{{ gitlab_project_name }}"
     vars:
       ACCESS_KEY_ID: checkmode
-  check_mode: yes
+  check_mode: true
   register: gitlab_project_variable_state
 
 - name: check_mode state must be changed
@@ -202,7 +202,7 @@
     project: "{{ gitlab_project_name }}"
     vars:
       ACCESS_KEY_ID: checkmode
-  check_mode: yes
+  check_mode: true
   register: gitlab_project_variable_state
 
 - name: check_mode state must not be changed
@@ -660,7 +660,7 @@
     variables:
       - name: delete_me
   register: gitlab_project_variable_state
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: verify fail
   assert:

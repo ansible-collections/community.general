@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a load-balancer (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_lb:
     state: present
     name: '{{ name }}'
@@ -87,7 +87,7 @@
       - lb_creation_confirmation_task.scaleway_lb.status == "ready"
 
 - name: Update load-balancer (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_lb:
     state: present
     name: '{{ name }}'
@@ -165,7 +165,7 @@
       - lb_update_confirmation_task.scaleway_lb.status == "ready"
 
 - name: Delete load-balancer (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_lb:
     state: absent
     name: '{{ name }}'

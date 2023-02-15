@@ -72,8 +72,8 @@
 - name: Checkout non-existent repo clone
   hg:
     repo: "http://hg.pf.osdn.net/view/a/ak/akasurde/hg_project_test_1"
-    clone: no
-    update: no
+    clone: false
+    update: false
   register: hg_result3
   ignore_errors: true
 

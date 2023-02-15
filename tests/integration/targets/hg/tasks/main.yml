@@ -12,7 +12,7 @@
 - name: determine if mercurial is already installed
   command: which hg
   register: has_hg
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: warn if the underlying system is not capable of running these tests
   debug:

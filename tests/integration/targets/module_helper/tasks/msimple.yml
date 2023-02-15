@@ -18,7 +18,7 @@
 - name: test msimple 2
   msimple:
     a: 101
-  ignore_errors: yes
+  ignore_errors: true
   register: simple2
 
 - name: assert simple2

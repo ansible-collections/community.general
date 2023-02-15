@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create security group check
-  check_mode: yes
+  check_mode: true
   scaleway_security_group:
     state: present
     region: '{{ scaleway_region }}'
@@ -74,7 +74,7 @@
         - security_group_creation is not changed
 
   - name: Delete security group check
-    check_mode: yes
+    check_mode: true
     scaleway_security_group:
       state: absent
       region: '{{ scaleway_region }}'

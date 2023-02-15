@@ -13,7 +13,7 @@
     xml:
       path: /tmp/ansible-xml-beers-unicode.xml
       xpath: /business/beers/beer
-      count: yes
+      count: true
     register: beers
 
   - name: Test expected result

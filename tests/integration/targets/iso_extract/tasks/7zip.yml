@@ -7,7 +7,7 @@
 
 - name: Gather facts
   setup:
-  become: yes
+  become: true
 
 - name: Include distribution specific variables
   include_vars: "{{ lookup('first_found', params) }}"
@@ -45,8 +45,8 @@
       homebrew:
         name: p7zip
         state: present
-        update_homebrew: no
-      become: yes
+        update_homebrew: false
+      become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
       # Newer versions of brew want to compile a package which takes a long time. Do not upgrade homebrew until a
       # proper solution can be found

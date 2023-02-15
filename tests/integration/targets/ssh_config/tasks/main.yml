@@ -36,7 +36,7 @@
 - name: Fail for required argument
   community.general.ssh_config:
     ssh_config_file: "{{ ssh_config_test }}"
-  ignore_errors: yes
+  ignore_errors: true
   register: host_required
 
 - name: Check if ssh_config fails for required parameter host
@@ -53,7 +53,7 @@
     port: '2223'
     state: present
   register: host_add
-  check_mode: yes
+  check_mode: true
 
 - name: Check if changes are made in check mode
   assert:
@@ -179,7 +179,7 @@
     port: '2223'
     state: present
   register: mut_ex
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Check mutual exclusive test - user and ssh_config_file
   assert:

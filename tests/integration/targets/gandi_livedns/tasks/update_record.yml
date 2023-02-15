@@ -11,7 +11,7 @@
     values: "{{ item.update_values | default(item['values']) }}"
     ttl: "{{ item.update_ttl | default(item.ttl) }}"
     type: "{{ item.type }}"
-  check_mode: yes
+  check_mode: true
   register: result
 - name: verify test update in check mode
   assert:

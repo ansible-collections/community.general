@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a container namespace (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container_namespace:
     state: present
     name: '{{ name }}'
@@ -72,7 +72,7 @@
       - cn_creation_confirmation_task.container_namespace.status == "ready"
 
 - name: Update container namespace (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container_namespace:
     state: present
     name: '{{ name }}'
@@ -135,7 +135,7 @@
       - cn_update_confirmation_task.container_namespace.status == "ready"
 
 - name: Update container namespace secret variables (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container_namespace:
     state: present
     name: '{{ name }}'
@@ -200,7 +200,7 @@
       - "'hashed_value' in cn_update_secret_confirmation_task.container_namespace.secret_environment_variables[0]"
 
 - name: Delete container namespace (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container_namespace:
     state: absent
     name: '{{ name }}'

@@ -7,5 +7,5 @@
   community.general.homebrew:
     name: gnu-tar
     state: absent
-  become: yes
+  become: true
   become_user: "{{ brew_stat.stat.pw_name }}"

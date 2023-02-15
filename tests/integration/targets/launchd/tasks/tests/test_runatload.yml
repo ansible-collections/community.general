@@ -9,8 +9,8 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   register: test_1_launchd_start_result
 
 - name: "[{{ item }}] Validate that service was started"
@@ -31,6 +31,6 @@
       \s+<key>RunAtLoad</key>
       \s+<true/>
     replace: found_run_at_load
-  check_mode: yes
+  check_mode: true
   register: contents_would_have
   failed_when: not contents_would_have is changed

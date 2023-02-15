@@ -14,13 +14,13 @@ terraform_arch: "{{ ansible_system | lower }}_{{terraform_arch_map[ansible_archi
 terraform_url: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_{{ terraform_arch }}.zip"
 
 # Controls whether the unarchive task will validate TLS certs of the Terraform binary host
-validate_certs: yes
+validate_certs: true
 
 # Directory where Terraform tests will be created
 terraform_project_dir: "{{ remote_tmp_dir }}/tf_provider_test"
 
 # Controls whether terraform init will use the `-upgrade` flag
-terraform_provider_upgrade: yes
+terraform_provider_upgrade: true
 
 # list of dicts containing Terraform providers that will be tested
 # The null provider is a good candidate, as it's small and has no external dependencies

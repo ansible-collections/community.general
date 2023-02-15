@@ -14,7 +14,7 @@
 
 - name: Stop gpg-agent so we can remove any locks on the GnuPG dir
   command: gpgconf --kill gpg-agent
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Remove previous password files and directory
   file:

@@ -37,7 +37,7 @@
   msimple:
     a: 101
     m: a message in a bottle
-  ignore_errors: yes
+  ignore_errors: true
   register: simple3
 
 - name: assert simple3

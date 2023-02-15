@@ -24,7 +24,7 @@
         cert_alias: default
         keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
-        keystore_create: yes
+        keystore_create: true
         state: present
       register: result_success
 
@@ -41,7 +41,7 @@
         cert_alias: default_new
         keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
-        keystore_create: yes
+        keystore_create: true
         state: present
       ignore_errors: true
       register: result_wrong_pass
@@ -58,7 +58,7 @@
         cert_alias: default
         keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
-        keystore_create: yes
+        keystore_create: true
         state: present
       ignore_errors: true
       register: result_excl_params

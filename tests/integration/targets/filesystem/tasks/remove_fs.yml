@@ -28,7 +28,7 @@
     dev: '{{ dev }}'
     state: absent
   register: wipefs
-  check_mode: yes
+  check_mode: true
 
 - name: "Get filesystem UUID with 'blkid' (should remain the same)"
   ansible.builtin.shell:
@@ -81,7 +81,7 @@
     dev: '{{ dev }}'
     state: absent
   register: wipefs
-  check_mode: yes
+  check_mode: true
 
 - name: "Assert that the state did not change"
   ansible.builtin.assert:

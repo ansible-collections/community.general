@@ -14,7 +14,7 @@
     dn: "ou=users,dc=example,dc=com"
     scope: "onelevel"
     filter: "(uid=ldaptest)"
-  ignore_errors: yes
+  ignore_errors: true
   register: output
 
 - name: assert that test LDAP user can be found

@@ -104,7 +104,7 @@
 - name: Remove NFS filesystem /home/ftp
   aix_filesystem:
     filesystem: /home/ftp
-    rm_mount_point: yes
+    rm_mount_point: true
     state: absent
 
 - name: Mount filesystem /newfs
@@ -115,7 +115,7 @@
 - name: Remove mounted /newfs
   aix_filesystem:
     filesystem: /newfs
-    rm_mount_point: yes
+    rm_mount_point: true
     state: absent
 
 - name: Umount /newfs
@@ -126,5 +126,5 @@
 - name: Remove /newfs
   aix_filesystem:
     filesystem: /newfs
-    rm_mount_point: yes
+    rm_mount_point: true
     state: absent

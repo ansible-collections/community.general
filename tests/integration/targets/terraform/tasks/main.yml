@@ -43,7 +43,7 @@
       src: "{{ terraform_url }}"
       dest: "{{ remote_tmp_dir }}"
       mode: 0755
-      remote_src: yes
+      remote_src: true
       validate_certs: "{{ validate_certs }}"
 
   when: terraform_version_installed is not defined or terraform_version_installed != terraform_version

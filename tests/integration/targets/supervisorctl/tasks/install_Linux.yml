@@ -12,4 +12,4 @@
   service:
     name: '{{ supervisor_service_name }}'
     state: stopped
-    enabled: no
+    enabled: false

@@ -31,7 +31,7 @@
   unarchive:
     src: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
     dest: '{{ wf_tmp_dir }}'
-    remote_src: yes
+    remote_src: true
 
 - name: Remove tar
   file:
@@ -47,12 +47,12 @@
 - name: Create group for wildfly
   group:
     name: '{{ wf_user }}'
-    system: yes
+    system: true
 
 - name: Create user for wildfly
   user:
     name: '{{ wf_user }}'
-    system: yes
+    system: true
     group: '{{ wf_user }}'
     home: '{{ wf_homedir }}'
 
@@ -62,7 +62,7 @@
     state: directory
     owner: '{{ wf_user }}'
     group: '{{ wf_user }}'
-    recurse: yes
+    recurse: true
 
 - name: Create config file
   copy:
@@ -86,11 +86,11 @@
     mode: "0644"
 
 - name: Create directories for testing the default deploy_path
-  become: yes
+  become: true
   file:
     path: '{{ default_deploy_root }}'
     state: directory
-    recurse: yes
+    recurse: true
     owner: '{{ wf_user }}'
     group: '{{ wf_user }}'
 
@@ -102,6 +102,6 @@
 
 - name: Reload systemd and start wildfly
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
     name: wildfly
     state: started

@@ -23,7 +23,7 @@
   community.general.terraform:
     project_path: "{{ terraform_project_dir }}/complex_vars"
     binary_path: "{{ terraform_binary_path }}"
-    force_init: yes
+    force_init: true
     complex_vars: true
     variables:
       dictionaries:

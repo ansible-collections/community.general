@@ -53,7 +53,7 @@
 - name: use refresh option
   community.general.zypper_repository:
     name: testrefresh
-    refresh: no
+    refresh: false
     state: present
     repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_distribution_version }}/
 
@@ -94,7 +94,7 @@
 - name: check repo is updated by url
   command: zypper lr chrome1
   register: zypper_result1
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: check repo is updated by url
   command: zypper lr chrome2

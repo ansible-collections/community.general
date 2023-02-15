@@ -84,7 +84,7 @@
     root_volume:
       volume_type: "SAS"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:
@@ -139,7 +139,7 @@
     root_volume:
       volume_type: "SAS"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
   assert:
@@ -195,7 +195,7 @@
     root_volume:
       volume_type: "SAS"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:

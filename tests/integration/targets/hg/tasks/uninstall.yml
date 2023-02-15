@@ -25,7 +25,7 @@
   dnf:
     name: mercurial
     state: absent
-    autoremove: yes
+    autoremove: true
   when: ansible_facts.pkg_mgr == 'dnf'
 
 # the yum module does not have an autoremove parameter
@@ -37,7 +37,7 @@
   package:
     name: mercurial
     state: absent
-    autoremove: yes
+    autoremove: true
   when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
 
 - name: uninstall packages which were not originally installed (zypper)

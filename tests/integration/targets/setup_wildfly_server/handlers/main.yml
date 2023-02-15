@@ -7,7 +7,7 @@
   systemd:
     name: wildfly
     state: stopped
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Remove files
   file:

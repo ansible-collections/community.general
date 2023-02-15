@@ -68,7 +68,7 @@
   read_csv:
     path: users_nonunique.csv
     key: name
-    unique: no
+    unique: false
     delimiter: ';'
   register: users_nonunique
 
@@ -90,7 +90,7 @@
     path: users_nonunique.csv
     dialect: placebo
   register: users_placebo
-  ignore_errors: yes
+  ignore_errors: true
 
 - assert:
     that:
@@ -140,9 +140,9 @@
   read_csv:
     path: users_broken.csv
     key: name
-    strict: yes
+    strict: true
   register: users_broken
-  ignore_errors: yes
+  ignore_errors: true
 
 - assert:
     that:

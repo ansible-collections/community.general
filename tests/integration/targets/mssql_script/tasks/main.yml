@@ -169,7 +169,7 @@
     login_host: "{{ mssql_host }}"
     login_port: "{{ mssql_port }}"
     script: SELECT Invalid_Column FROM Does_Not_Exist WITH Invalid Syntax
-  check_mode: yes
+  check_mode: true
   register: check_mode
 - assert:
     that: check_mode.query_results is undefined

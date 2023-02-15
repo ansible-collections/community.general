@@ -9,9 +9,9 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result_check_mode"
-  check_mode: yes
+  check_mode: true
 
 - name: "[{{ item }}] Assert that everything work in check mode"
   assert:
@@ -23,7 +23,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result"
 
 
@@ -37,13 +37,13 @@
   template:
     src: "modified.{{ launchd_service_name }}.plist.j2"
     dest: "{{ launchd_plist_location }}"
-  become: yes
+  become: true
 
 - name: "[{{ item }}] When reloading the service..."
   launchd:
     name: "{{ launchd_service_name }}"
     state: reloaded
-  become: yes
+  become: true
   register: "test_1_launchd_reload_result"
 
 - name: "[{{ item }}] Validate that service was reloaded"
@@ -60,7 +60,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: started
-  become: yes
+  become: true
   register: "test_1_launchd_start_result"
 
 

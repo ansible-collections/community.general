@@ -18,7 +18,7 @@
   register: integration_function_namespace
 
 - name: Create a function (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function:
     state: present
     name: '{{ name }}'
@@ -84,7 +84,7 @@
       - fn_creation_confirmation_task.function.status in ["created", "ready"]
 
 - name: Update function (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function:
     state: present
     name: '{{ name }}'
@@ -150,7 +150,7 @@
       - fn_update_confirmation_task.function.status in ["created", "ready"]
 
 - name: Update function secret variables (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function:
     state: present
     name: '{{ name }}'
@@ -218,7 +218,7 @@
       - "'hashed_value' in fn_update_secret_confirmation_task.function.secret_environment_variables[0]"
 
 - name: Delete function (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_function:
     state: absent
     name: '{{ name }}'

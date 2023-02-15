@@ -23,7 +23,7 @@
     state: present
 
 - name: Create Badge (check)
-  check_mode: yes
+  check_mode: true
   gitlab_project_badge:
     api_url: "{{ gitlab_api_url }}"
     validate_certs: False
@@ -84,7 +84,7 @@
       - not gitlab_badge_create_confirmation_task.failed
 
 - name: Update Badge (check)
-  check_mode: yes
+  check_mode: true
   gitlab_project_badge:
     api_url: "{{ gitlab_api_url }}"
     validate_certs: False
@@ -145,7 +145,7 @@
       - not gitlab_badge_update_confirmation_task.failed
 
 - name: Delete Badge (check)
-  check_mode: yes
+  check_mode: true
   gitlab_project_badge:
     api_url: "{{ gitlab_api_url }}"
     validate_certs: False
