@@ -19,7 +19,7 @@
     limit_item: nofile
     value: '64000'
     dest: "{{ test_limit_file }}"
-  check_mode: yes
+  check_mode: true
   register: check_mode_test
 
 - name: Test that check mode is working

@@ -13,20 +13,20 @@
     xml:
       path: /tmp/ansible-xml-beers.xml
       xpath: '/business/beers/beer[text()="St. Bernardus Abbot 12"]'
-      insertbefore: yes
+      insertbefore: true
       add_children:
       - beer: Old Rasputin
       - beer: Old Motor Oil
       - beer: Old Curmudgeon
-      pretty_print: yes
+      pretty_print: true
     register: add_children_insertbefore
 
   - name: Compare to expected result
     copy:
       src: results/test-add-children-insertbefore.xml
       dest: /tmp/ansible-xml-beers.xml
-    check_mode: yes
-    diff: yes
+    check_mode: true
+    diff: true
     register: comparison
 
   - name: Test expected result

@@ -9,29 +9,29 @@
 - name: "create diversion for foobarrc (check mode, rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
   register: diversion_0
-  check_mode: yes
+  check_mode: true
 
 - name: "create diversion for foobarrc (rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
   register: diversion_1
 
 
 - name: "create diversion for foobarrc (rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
   register: diversion_2
 
 - name: "create diversion for foobarrc (check mode, rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
   register: diversion_3
-  check_mode: yes
+  check_mode: true
 
 
 # Get results
@@ -60,7 +60,7 @@
       - diversion_2.diversion == diversion_3.diversion
       - diversion_0.commands == diversion_1.commands
       - diversion_2.commands == diversion_3.commands
-    quiet: yes
+    quiet: true
 
 
 ################################################################################
@@ -69,15 +69,15 @@
 - name: "remove diversion for foobarrc (check mode, rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
     state: absent
   register: diversion_0
-  check_mode: yes
+  check_mode: true
 
 - name: "remove diversion for foobarrc (rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
     state: absent
   register: diversion_1
 
@@ -85,17 +85,17 @@
 - name: "remove diversion for foobarrc (rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
     state: absent
   register: diversion_2
 
 - name: "remove diversion for foobarrc (check mode, rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
     state: absent
   register: diversion_3
-  check_mode: yes
+  check_mode: true
 
 
 # Check results
@@ -124,7 +124,7 @@
       - diversion_2.diversion == diversion_3.diversion
       - diversion_0.commands == diversion_1.commands
       - diversion_2.commands == diversion_3.commands
-    quiet: yes
+    quiet: true
 
 
 ################################################################################
@@ -139,49 +139,49 @@
 - name: "create diversion for foobarrc (check mode, rename, must fail)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
   register: diversion_0
-  ignore_errors: yes
-  check_mode: yes
+  ignore_errors: true
+  check_mode: true
 
 - name: "create diversion for foobarrc (rename, must fail)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
+    rename: true
   register: diversion_1
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: "create diversion for foobarrc (check mode, force rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_2
-  check_mode: yes
+  check_mode: true
 
 - name: "create diversion for foobarrc (force rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_3
 
 
 - name: "create diversion for foobarrc (force rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_4
 
 - name: "create diversion for foobarrc (check mode, force rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_5
-  check_mode: yes
+  check_mode: true
 
 
 # Check results
@@ -213,7 +213,7 @@
       - diversion_4.diversion == diversion_5.diversion
       - diversion_2.commands == diversion_3.commands
       - diversion_4.commands == diversion_5.commands
-    quiet: yes
+    quiet: true
 
 
 ################################################################################
@@ -230,7 +230,7 @@
     path: "{{ foobarrc }}"
     divert: "{{ foobarrc_ansible }}"
   register: diversion_0
-  check_mode: yes
+  check_mode: true
 
 - name: "create diversion for foobarrc (update divert path, must report a change)"
   dpkg_divert:
@@ -250,7 +250,7 @@
     path: "{{ foobarrc }}"
     divert: "{{ foobarrc_ansible }}"
   register: diversion_3
-  check_mode: yes
+  check_mode: true
 
 
 # Check results
@@ -286,7 +286,7 @@
       - diversion_2.diversion == diversion_3.diversion
       - diversion_0.commands == diversion_1.commands
       - diversion_2.commands == diversion_3.commands
-    quiet: yes
+    quiet: true
 
 
 ################################################################################
@@ -296,35 +296,35 @@
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
-    rename: yes
+    rename: true
   register: diversion_0
-  ignore_errors: yes
-  check_mode: yes
+  ignore_errors: true
+  check_mode: true
 
 - name: "remove diversion for foobarrc (rename, must fail)"
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
-    rename: yes
+    rename: true
   register: diversion_1
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: "remove diversion for foobarrc (check mode, force rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_2
-  check_mode: yes
+  check_mode: true
 
 - name: "remove diversion for foobarrc (force rename, must report a change)"
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_3
 
 
@@ -332,18 +332,18 @@
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_4
 
 - name: "remove diversion for foobarrc (check mode, force rename, must NOT report a change, idempotency)"
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
-    rename: yes
-    force: yes
+    rename: true
+    force: true
   register: diversion_5
-  check_mode: yes
+  check_mode: true
 
 
 # Check results
@@ -381,4 +381,4 @@
       - diversion_4.diversion == diversion_5.diversion
       - diversion_2.commands == diversion_3.commands
       - diversion_4.commands == diversion_5.commands
-    quiet: yes
+    quiet: true

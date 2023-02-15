@@ -11,7 +11,7 @@
     values: "{{ item.update_values | default(item['values']) }}"
     type: "{{ item.type }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: verify test remove a dns record in check mode
   assert:

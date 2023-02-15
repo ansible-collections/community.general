@@ -28,8 +28,8 @@
     copy:
       src: results/test-remove-namespaced-attribute.xml
       dest: /tmp/ansible-xml-namespaced-beers.xml
-    check_mode: yes
-    diff: yes
+    check_mode: true
+    diff: true
     register: comparison
 
   - name: Test expected result

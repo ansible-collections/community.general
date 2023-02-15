@@ -57,28 +57,28 @@
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/testnormalelement
     value: xml tag with no special characters
-    pretty_print: yes
+    pretty_print: true
 
 - name: Add an element with dash
   xml:
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/test-with-dash
     value: xml tag with dashes
-    pretty_print: yes
+    pretty_print: true
 
 - name: Add an element with dot
   xml:
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/test-with-dash.and.dot
     value: xml tag with dashes and dots
-    pretty_print: yes
+    pretty_print: true
 
 - name: Add an element with underscore
   xml:
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/test-with.dash_and.dot_and-underscores
     value: xml tag with dashes, dots and underscores
-    pretty_print: yes
+    pretty_print: true
 
 - name: Add an attribute on a conditional element
   xml:
@@ -99,14 +99,14 @@
 - name: Pretty Print this!
   xml:
     file: /tmp/ansible-xml-beers-implicit.xml
-    pretty_print: yes
+    pretty_print: true
 
 - name: Compare to expected result
   copy:
     src: results/test-add-element-implicitly.xml
     dest: /tmp/ansible-xml-beers-implicit.xml
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: comparison
 
 - name: Test expected result
@@ -203,7 +203,7 @@
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/testnormalelement
     value: xml tag with no special characters
-    pretty_print: yes
+    pretty_print: true
     namespaces:
       a:  http://example.com/some/namespace
 
@@ -213,7 +213,7 @@
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/test-with-dash
     value: xml tag with dashes
-    pretty_print: yes
+    pretty_print: true
     namespaces:
       a:  http://example.com/some/namespace
 
@@ -222,7 +222,7 @@
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/test-with-dash.and.dot
     value: xml tag with dashes and dots
-    pretty_print: yes
+    pretty_print: true
     namespaces:
       a:  http://example.com/some/namespace
 
@@ -231,11 +231,11 @@
     file: /tmp/ansible-xml-beers-implicit.xml
     xpath: /business/test-with.dash_and.dot_and-underscores
     value: xml tag with dashes, dots and underscores
-    pretty_print: yes
+    pretty_print: true
     namespaces:
       a:  http://example.com/some/namespace
 
 - name: Pretty Print this!
   xml:
     file: /tmp/ansible-xml-beers-implicit.xml
-    pretty_print: yes
+    pretty_print: true

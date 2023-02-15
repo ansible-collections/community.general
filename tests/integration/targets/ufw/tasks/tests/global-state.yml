@@ -10,15 +10,15 @@
 # ############################################
 - name: Make sure logging is off
   ufw:
-    logging: no
+    logging: false
 - name: Logging (check mode)
   ufw:
-    logging: yes
-  check_mode: yes
+    logging: true
+  check_mode: true
   register: logging_check
 - name: Logging
   ufw:
-    logging: yes
+    logging: true
   register: logging
 - name: Get logging
   shell: |
@@ -28,17 +28,17 @@
     LC_ALL: C
 - name: Logging (idempotency)
   ufw:
-    logging: yes
+    logging: true
   register: logging_idem
 - name: Logging (idempotency, check mode)
   ufw:
-    logging: yes
-  check_mode: yes
+    logging: true
+  check_mode: true
   register: logging_idem_check
 - name: Logging (change, check mode)
   ufw:
     logging: full
-  check_mode: yes
+  check_mode: true
   register: logging_change_check
 - name: Logging (change)
   ufw:
@@ -66,7 +66,7 @@
   ufw:
     default: reject
     direction: incoming
-  check_mode: yes
+  check_mode: true
   register: default_check
 - name: Default
   ufw:
@@ -88,13 +88,13 @@
   ufw:
     default: reject
     direction: incoming
-  check_mode: yes
+  check_mode: true
   register: default_idem_check
 - name: Default (change, check mode)
   ufw:
     default: allow
     direction: incoming
-  check_mode: yes
+  check_mode: true
   register: default_change_check
 - name: Default (change)
   ufw:
@@ -115,7 +115,7 @@
 - name: Default (change incoming implicitly, check mode)
   ufw:
     default: allow
-  check_mode: yes
+  check_mode: true
   register: default_change_implicit_check
 - name: Default (change incoming implicitly)
   ufw:
@@ -130,7 +130,7 @@
 - name: Default (change incoming implicitly, idempotent, check mode)
   ufw:
     default: allow
-  check_mode: yes
+  check_mode: true
   register: default_change_implicit_idem_check
 - name: Default (change incoming implicitly, idempotent)
   ufw:

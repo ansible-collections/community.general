@@ -26,8 +26,8 @@
     copy:
       src: results/test-add-children-with-attributes.xml
       dest: /tmp/ansible-xml-beers.xml
-    check_mode: yes
-    diff: yes
+    check_mode: true
+    diff: true
     register: comparison
 
   # NOTE: This test may fail if lxml does not support predictable element attribute order

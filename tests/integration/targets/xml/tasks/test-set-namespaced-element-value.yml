@@ -40,8 +40,8 @@
     copy:
       src: results/test-set-namespaced-element-value.xml
       dest: /tmp/ansible-xml-namespaced-beers.xml
-    check_mode: yes
-    diff: yes
+    check_mode: true
+    diff: true
     register: comparison
     #command: diff -u {{ role_path }}/results/test-set-namespaced-element-value.xml /tmp/ansible-xml-namespaced-beers.xml
 

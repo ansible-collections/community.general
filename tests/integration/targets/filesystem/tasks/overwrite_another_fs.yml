@@ -42,7 +42,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
-    force: yes
+    force: true
   register: fs_result2
 
 - name: 'Get UUID of the new filesystem'

@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a backup (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_database_backup:
     name: '{{ scaleway_name }}'
     state: present
@@ -63,7 +63,7 @@
       - backup_creation_confirmation_task is not changed
 
 - name: Patch backup name (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_database_backup:
     name: '{{ scaleway_name }}-changed'
     state: present
@@ -115,7 +115,7 @@
       - backup_patching_confirmation_task is not changed
 
 - name: Export backup (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: exported
@@ -161,7 +161,7 @@
       - backup_export_confirmation_task.metadata.download_url != ""
 
 - name: Restore backup (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: restored
@@ -195,7 +195,7 @@
       - backup_restore_task is changed
 
 - name: Delete backup (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: absent

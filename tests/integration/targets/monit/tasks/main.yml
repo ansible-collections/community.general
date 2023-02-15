@@ -17,7 +17,7 @@
       - ansible_distribution_major_version is version('9', '<')
 
   - name: create required directories
-    become: yes
+    become: true
     file:
       path: "{{ item }}"
       state: directory
@@ -27,7 +27,7 @@
       - "{{ process_root }}"
 
   - name: install monit
-    become: yes
+    become: true
     package:
       name: monit
       state: present
@@ -40,13 +40,13 @@
           - 'defaults.yml'
 
   - name: monit config
-    become: yes
+    become: true
     template:
       src: "monitrc.j2"
       dest: "{{ monitrc }}"
 
   - name: copy process file
-    become: yes
+    become: true
     copy:
       src: httpd_echo.py
       dest: "{{ process_file }}"
@@ -73,7 +73,7 @@
       - python-daemon
 
   - name: restart monit
-    become: yes
+    become: true
     service:
       name: monit
       state: restarted
@@ -82,13 +82,13 @@
 
   always:
   - name: stop monit
-    become: yes
+    become: true
     service:
       name: monit
       state: stopped
 
   - name: uninstall monit
-    become: yes
+    become: true
     package:
       name: monit
       state: absent

@@ -20,13 +20,13 @@
     delay: 100
     msg: "Custom Message"
   register: shutdown_result
-  check_mode: yes
+  check_mode: true
 
 - name: Execute shutdown with minus delay
   community.general.shutdown:
     delay: -100
   register: shutdown_result_minus
-  check_mode: yes
+  check_mode: true
 
 - name: Verify Custom Message except Alpine, AIX
   assert:

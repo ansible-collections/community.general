@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create IP (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_ip:
     state: present
     region: '{{ scaleway_region }}'
@@ -78,7 +78,7 @@
       - '{{ ip_creation_task.scaleway_ip.server is none }}'
 
 - name: Assign reverse to server (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_ip:
     state: present
     id: '{{ ip_creation_task.scaleway_ip.id }}'
@@ -162,7 +162,7 @@
       - server_creation_task is success
 
 - name: Assign IP to server (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_ip:
     state: present
     id: '{{ ip_creation_task.scaleway_ip.id }}'
@@ -229,7 +229,7 @@
       - ip_assignation_confirmation_task is not changed
 
 - name: Unassign IP to server (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_ip:
     state: present
     id: '{{ ip_creation_task.scaleway_ip.id }}'
@@ -303,7 +303,7 @@
       - '{{ ip_unassignation_task.scaleway_ip.server is none }}'
 
 - name: Unassign reverse to IP (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_ip:
     state: present
     id: '{{ ip_creation_task.scaleway_ip.id }}'
@@ -397,7 +397,7 @@
       - server_destroy_task is changed
 
 - name: Delete IP (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_ip:
     state: absent
     region: '{{ scaleway_region }}'

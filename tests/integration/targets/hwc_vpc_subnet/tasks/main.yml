@@ -32,7 +32,7 @@
     name: "ansible_network_subnet_test"
     dhcp_enable: True
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:
@@ -62,7 +62,7 @@
     name: "ansible_network_subnet_test"
     dhcp_enable: True
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
   assert:
@@ -92,7 +92,7 @@
     name: "ansible_network_subnet_test"
     dhcp_enable: True
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:
@@ -121,7 +121,7 @@
     name: "ansible_network_subnet_test"
     dhcp_enable: True
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
   assert:

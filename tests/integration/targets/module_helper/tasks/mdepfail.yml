@@ -5,7 +5,7 @@
 - name: test failing dependency
   mdepfail:
     a: 123
-  ignore_errors: yes
+  ignore_errors: true
   register: result
 
 - name: assert failing dependency

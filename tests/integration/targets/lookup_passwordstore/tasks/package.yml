@@ -32,14 +32,14 @@
     package:
       name: password-store
       state: present
-      update_cache: yes
-      disable_gpg_check: yes
+      update_cache: true
+      disable_gpg_check: true
   when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
 
 # See https://github.com/gopasspw/gopass/issues/1849#issuecomment-802789285
 - name: Install gopass on Debian
   when: ansible_facts.os_family == 'Debian'
-  become: yes
+  become: true
   block:
   - name: Fetch gopass repo keyring
     ansible.builtin.get_url:
@@ -54,7 +54,7 @@
   - name: Update apt-cache and install gopass package
     ansible.builtin.apt:
       name: gopass
-      update_cache: yes
+      update_cache: true
 
 - name: Install on macOS
   when: ansible_facts.distribution == 'MacOSX'
@@ -75,8 +75,8 @@
           - pass
           - gopass
         state: present
-        update_homebrew: no
-      become: yes
+        update_homebrew: false
+      become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
       # Newer versions of brew want to compile a package which takes a long time. Do not upgrade homebrew until a
       # proper solution can be found

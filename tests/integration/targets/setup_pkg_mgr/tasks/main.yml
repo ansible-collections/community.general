@@ -11,19 +11,19 @@
 - set_fact:
     pkg_mgr: community.general.pkgng
     ansible_pkg_mgr: community.general.pkgng
-    cacheable: yes
+    cacheable: true
   when: ansible_os_family == "FreeBSD"
 
 - set_fact:
     pkg_mgr: community.general.zypper
     ansible_pkg_mgr: community.general.zypper
-    cacheable: yes
+    cacheable: true
   when: ansible_os_family == "Suse"
 
 - set_fact:
     pkg_mgr: community.general.pacman
     ansible_pkg_mgr: community.general.pacman
-    cacheable: yes
+    cacheable: true
   when: ansible_os_family == "Archlinux"
 
 - shell:

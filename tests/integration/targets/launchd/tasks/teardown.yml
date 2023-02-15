@@ -7,7 +7,7 @@
   launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
-  become: yes
+  become: true
   register: launchd_unloaded_result
 
 - name: "[{{ item }}] Validation"
@@ -21,10 +21,10 @@
   file:
     path: "{{ launchd_plist_location }}"
     state: absent
-  become: yes
+  become: true
 
 - name: "[{{ item }}] Remove test service server"
   file:
     path: "/usr/local/sbin/ansible_test_service"
     state: absent
-  become: yes
+  become: true

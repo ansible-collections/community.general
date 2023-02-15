@@ -34,7 +34,7 @@
       name: gist
       state: present
     register: install_gem_result
-    ignore_errors: yes
+    ignore_errors: true
 
   # when running as root on Fedora, '--install-dir' is set in the os defaults which is
   # incompatible with '--user-install', we ignore this error for this case only
@@ -79,7 +79,7 @@
       gem:
         name: gist
         state: present
-        user_install: no
+        user_install: false
       register: install_gem_result
 
     - name: List gems
@@ -115,7 +115,7 @@
       name: gist
       state: present
       install_dir: "{{ remote_tmp_dir }}/gems"
-    ignore_errors: yes
+    ignore_errors: true
     register: install_gem_fail_result
 
   - debug:
@@ -132,7 +132,7 @@
     gem:
       name: gist
       state: present
-      user_install: no
+      user_install: false
       install_dir: "{{ remote_tmp_dir }}/gems"
     register: install_gem_result
 
@@ -148,13 +148,13 @@
       that:
         - install_gem_result is changed
         - gem_search.files[0].path is search('gist-[0-9.]+')
-    ignore_errors: yes
+    ignore_errors: true
 
   - name: Remove a gem in a custom directory
     gem:
       name: gist
       state: absent
-      user_install: no
+      user_install: false
       install_dir: "{{ remote_tmp_dir }}/gems"
     register: install_gem_result
 
@@ -177,7 +177,7 @@
       name: gist
       state: present
       bindir: "{{ remote_tmp_dir }}/custom_bindir"
-      norc: yes
+      norc: true
       user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
     register: install_gem_result
 
@@ -197,7 +197,7 @@
       name: gist
       state: absent
       bindir: "{{ remote_tmp_dir }}/custom_bindir"
-      norc: yes
+      norc: true
       user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
     register: install_gem_result
 

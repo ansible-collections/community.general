@@ -64,7 +64,7 @@
     volume_type: "SATA"
     size: 10
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is true
   assert:
@@ -91,7 +91,7 @@
     volume_type: "SATA"
     size: 10
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: assert changed is false
   assert:

@@ -12,7 +12,7 @@
   package:
     name:
       - iptables
-  become: yes
+  become: true
 
 
 - name: include tasks
@@ -35,4 +35,4 @@
         - xtables_lock is undefined
         - ansible_connection in ['ssh', 'paramiko', 'smart']
 
-  become: yes
+  become: true

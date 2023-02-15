@@ -7,7 +7,7 @@
   apt:
     name: apt-transport-https
     state: latest
-    force: yes
+    force: true
 
 - name: Install Mosquitto Server
   apt:

@@ -117,7 +117,7 @@
     pkcs12_password: "{{ test_keystore2_password }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
-    keystore_create: yes
+    keystore_create: true
 
 - name: List newly created keystore content
   ansible.builtin.command:
@@ -138,8 +138,8 @@
     pkcs12_password: "{{ test_keystore2_password }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
-    keystore_create: yes
-  ignore_errors: yes
+    keystore_create: true
+  ignore_errors: true
   register: result_x509_changed
 
 - name: Verify the x509 status is failed
@@ -153,7 +153,7 @@
     cert_path: "{{ test_cert_path }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
-    keystore_create: yes
+    keystore_create: true
     state: present
   register: result_x509_changed
 

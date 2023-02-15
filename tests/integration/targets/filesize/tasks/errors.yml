@@ -11,24 +11,24 @@
   community.general.filesize:
     size: 1kB
   register: filesize_test_error_01
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to missing parameter (size)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
   register: filesize_test_error_02
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to conflicting parameters (force|sparse)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
     size: 1MB
-    force: yes
-    sparse: yes
+    force: true
+    sparse: true
   register: filesize_test_error_03
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid file path (not a file)
@@ -36,7 +36,7 @@
     path: "{{ filesize_testdir }}"
     size: 4096B
   register: filesize_test_error_04
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid file path (unexisting parent dir)
@@ -44,7 +44,7 @@
     path: "/unexistent/{{ filesize_testfile }}"
     size: 4096B
   register: filesize_test_error_05
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid size unit (b)"
@@ -52,7 +52,7 @@
     path: "{{ filesize_testfile }}"
     size: 4096b
   register: filesize_test_error_06
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid size value (bytes require integer)
@@ -60,7 +60,7 @@
     path: "{{ filesize_testfile }}"
     size: 1000.5B
   register: filesize_test_error_07
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid blocksize value (not an integer)
@@ -69,7 +69,7 @@
     size: 1M
     blocksize: "12.5"
   register: filesize_test_error_08
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid blocksize value type (dict)
@@ -79,7 +79,7 @@
     blocksize:
       bytes: 512
   register: filesize_test_error_09
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid source device (/dev/unexistent)
@@ -88,7 +88,7 @@
     size: 1M
     source: /dev/unexistent
   register: filesize_test_error_10
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Trigger an error due to invalid source device (/dev/null)
@@ -97,7 +97,7 @@
     size: 1M
     source: /dev/null
   register: filesize_test_error_11
-  ignore_errors: yes
+  ignore_errors: true
 
 
 - name: Assert that expected errors have been triggered

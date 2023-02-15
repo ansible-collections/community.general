@@ -29,7 +29,7 @@
 - name: Test dig lookup with non-existing domain and fail_on_error=yes
   set_fact:
     dig_nonexisting_fail_yes: "{{ lookup('community.general.dig', 'non-existing.domain.', 'fail_on_error=yes') }}"
-  ignore_errors: yes
+  ignore_errors: true
   register: dig_nonexisting_fail_yes_result
 
 - name: Verify that the task failed

@@ -63,7 +63,7 @@
           yum:
             name: '*'
             state: latest
-          check_mode: yes
+          check_mode: true
           register: update_all_packages
           when: yum_updates.results | length != 0
 

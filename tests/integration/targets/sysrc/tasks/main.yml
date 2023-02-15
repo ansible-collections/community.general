@@ -29,7 +29,7 @@
       sysrc:
         name: mysql_pidfile
         value: checkmode
-      check_mode: yes
+      check_mode: true
       register: sysrc_example1_checkmode
 
     - name: Configure mysql pid file (idempotent)
@@ -68,7 +68,7 @@
         state: present
         value: "NO"
         path: /boot/loader.conf
-      check_mode: yes
+      check_mode: true
       register: sysrc_example2_checkmode
 
     - name: Enable accf_http kld in /boot/loader.conf (idempotent)
@@ -112,7 +112,7 @@
         name: cloned_interfaces
         state: value_present
         value: "gif1"
-      check_mode: yes
+      check_mode: true
       register: sysrc_example3_checkmode
 
     - name: Add gif0 interface (idempotent)
@@ -159,7 +159,7 @@
             name: nginx_enable
             value: "NO"
             jail: testjail
-          check_mode: yes
+          check_mode: true
           register: sysrc_example4_checkmode
 
         - name: Enable nginx in test jail (idempotent)
@@ -198,7 +198,7 @@
       sysrc:
         name: sysrc_absent
         state: absent
-      check_mode: yes
+      check_mode: true
       register: sysrc_absent_checkmode
 
     - name: Remove sysrc_absent
@@ -255,7 +255,7 @@
         state: value_present
         delim: ","
         value: t4
-      check_mode: yes
+      check_mode: true
       register: sysrc_delim_checkmode
 
     - name: Add to value with delimiter (idempotent)
@@ -305,7 +305,7 @@
         state: value_absent
         value: t2
         delim: ","
-      check_mode: yes
+      check_mode: true
       register: sysrc_value_absent_checkmode
 
     - name: Remove value from sysrc_delim (idempotent

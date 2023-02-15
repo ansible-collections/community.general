@@ -144,7 +144,7 @@
     name: doesnotexist
     state: present
   register: zypper_result
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: verify package installation failed
   assert:
@@ -168,7 +168,7 @@
     name: "{{remote_tmp_dir | expanduser}}/zypper1/broken.rpm"
     state: present
   register: zypper_result
-  ignore_errors: yes
+  ignore_errors: true
 
 - debug: var=zypper_result
 
@@ -219,7 +219,7 @@
 - name: install empty rpm
   zypper:
     name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
-    disable_gpg_check: yes
+    disable_gpg_check: true
   register: zypper_result
 
 - name: check empty with rpm
@@ -243,7 +243,7 @@
   zypper:
     name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
     state: installed
-    disable_gpg_check: yes
+    disable_gpg_check: true
     extra_args_precommand: --root {{ remote_tmp_dir | expanduser }}/testdir/
 
 - name: check that dir var is exist
@@ -322,7 +322,7 @@
       - +hello
     state: absent
   register: zypper_res
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: verify simultaneous install/remove failed with absent
   assert:
@@ -335,7 +335,7 @@
     name: openSUSE-2016-128 
     type: patch
     state: absent
-  ignore_errors: yes
+  ignore_errors: true
   register: zypper_patch
 - assert:
     that: 
@@ -346,7 +346,7 @@
   zypper:
     name: "{{ hello_package_url }}"
     state: absent
-  ignore_errors: yes
+  ignore_errors: true
   register: zypper_rm
 - assert:
     that: 
@@ -440,7 +440,7 @@
 #   zypper:
 #     name: gnu-netcat
 #     state: present
-#   ignore_errors: yes
+#   ignore_errors: true
 #   register: zypper_pkg_conflict
 #
 # - assert:

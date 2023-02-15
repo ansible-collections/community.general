@@ -8,7 +8,7 @@
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_remove_source_files.{{ format }}"
     format: "{{ format }}"
-    remove: yes
+    remove: true
   register: archive_remove_source_files
 
 - name: Verify archive exists - remove source files ({{ format }})
@@ -64,7 +64,7 @@
     path: "{{ remote_tmp_dir }}/tmpdir"
     dest: "{{ remote_tmp_dir }}/archive_remove_source_directory.{{ format }}"
     format: "{{ format }}"
-    remove: yes
+    remove: true
   register: archive_remove_source_directory
 
 - name: Verify archive exists - remove source directory ({{ format }})
@@ -107,7 +107,7 @@
     path: "{{ remote_tmp_dir }}/tmpdir/*"
     dest: "{{ remote_tmp_dir }}/archive_remove_source_excluding_path.{{ format }}"
     format: "{{ format }}"
-    remove: yes
+    remove: true
     exclude_path: "{{ remote_tmp_dir }}/tmpdir/empty.txt"
   register: archive_remove_source_excluding_path
 
@@ -150,7 +150,7 @@
       - "{{ remote_tmp_dir }}/tmpdir/sub/*"
     dest: "{{ remote_tmp_dir }}/archive_remove_source_excluding_sub_path.{{ format }}"
     format: "{{ format }}"
-    remove: yes
+    remove: true
     exclude_path: "{{ remote_tmp_dir }}/tmpdir/sub/subfile.txt"
   register: archive_remove_source_excluding_sub_path
 
@@ -185,7 +185,7 @@
     path: "{{ remote_tmp_dir }}/tmpdir/"
     dest: "{{ remote_tmp_dir }}/archive_remove_source_nested_paths.{{ format }}"
     format: "{{ format }}"
-    remove: yes
+    remove: true
   register: archive_remove_nested_paths
 
 - name: Verify archive exists - remove source with nested paths ({{ format }})

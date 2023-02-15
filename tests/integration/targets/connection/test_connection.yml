@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - hosts: "{{ target_hosts }}"
-  gather_facts: no
+  gather_facts: false
   serial: 1
   tasks:
 

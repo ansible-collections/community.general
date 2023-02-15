@@ -42,7 +42,7 @@
 
   - name: test gather cloud-init facts in check mode
     cloud_init_data_facts:
-    check_mode: yes
+    check_mode: true
     register: result
   - name: verify test gather cloud-init facts in check mode
     assert:

@@ -14,7 +14,7 @@
     path: "{{ filesize_testfile }}"
     size: 0
   register: filesize_test_basic_01
-  check_mode: yes
+  check_mode: true
 
 - name: Stat the file (should not exist)
   ansible.builtin.stat:
@@ -39,7 +39,7 @@
     path: "{{ filesize_testfile }}"
     size: 0G
   register: filesize_test_basic_03
-  check_mode: yes
+  check_mode: true
 
 - name: Create an empty file (idempotency)
   community.general.filesize:
@@ -102,7 +102,7 @@
     size: 57kB
     source: /dev/urandom
   register: filesize_test_basic_11
-  check_mode: yes
+  check_mode: true
 
 - name: Stat the file (should still be unchanged)
   ansible.builtin.stat:
@@ -133,7 +133,7 @@
     size: 57000B
     source: /dev/urandom
   register: filesize_test_basic_13
-  check_mode: yes
+  check_mode: true
 
 - name: Fill the file up to 57000B (57kB) with random data (idempotency)
   community.general.filesize:
@@ -183,7 +183,7 @@
     path: "{{ filesize_testfile }}"
     size: 57001B
   register: filesize_test_basic_21
-  check_mode: yes
+  check_mode: true
 
 - name: Stat the file again (should remain the same)
   ansible.builtin.stat:
@@ -208,7 +208,7 @@
     path: "{{ filesize_testfile }}"
     size: 57.001 kB
   register: filesize_test_basic_23
-  check_mode: yes
+  check_mode: true
 
 - name: Expand the file with 1 byte (57.001 kB) (idempotency)
   community.general.filesize:
@@ -259,7 +259,7 @@
     path: "{{ filesize_testfile }}"
     size: 2 MiB
   register: filesize_test_basic_31
-  check_mode: yes
+  check_mode: true
 
 - name: Stat the file again (should remain the same)
   ansible.builtin.stat:
@@ -285,7 +285,7 @@
     size: 2
     blocksize: 1M
   register: filesize_test_basic_33
-  check_mode: yes
+  check_mode: true
 
 - name: Expand the file up to 2×1M (2*1024*1024 bytes) (idempotency)
   community.general.filesize:
@@ -333,7 +333,7 @@
     path: "{{ filesize_testfile }}"
     size: 57kB
   register: filesize_test_basic_41
-  check_mode: yes
+  check_mode: true
 
 - name: Stat the resulting file (should be unchanged)
   ansible.builtin.stat:
@@ -358,7 +358,7 @@
     path: "{{ filesize_testfile }}"
     size: 57000 B
   register: filesize_test_basic_43
-  check_mode: yes
+  check_mode: true
 
 - name: Truncate the file to 57000 B (57kB) (idempotency)
   community.general.filesize:

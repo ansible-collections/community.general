@@ -10,7 +10,7 @@
     name: "{{ option_name }}"
     scope: "{{ option_scope }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: unset_result
 
 - name: getting value

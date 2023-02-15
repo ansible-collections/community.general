@@ -18,7 +18,7 @@
   pkgutil:
     name: CSWtop
     state: present
-  check_mode: yes
+  check_mode: true
   register: cm_add_package
 
 - name: Verify cm_add_package
@@ -41,7 +41,7 @@
   pkgutil:
     name: CSWtop
     state: present
-  check_mode: yes
+  check_mode: true
   register: cm_add_package_again
 
 - name: Verify cm_add_package_again
@@ -66,7 +66,7 @@
   pkgutil:
     name: CSWtop
     state: absent
-  check_mode: yes
+  check_mode: true
   register: cm_remove_package
 
 - name: Verify cm_remove_package
@@ -89,7 +89,7 @@
   pkgutil:
     name: CSWtop
     state: absent
-  check_mode: yes
+  check_mode: true
   register: cm_remove_package_again
 
 - name: Verify cm_remove_package_again

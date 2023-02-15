@@ -18,7 +18,7 @@ options:
   a:
     description: aaaa
     type: int
-    required: yes
+    required: true
   b:
     description: bbbb
     type: str

@@ -15,7 +15,7 @@
   pip:
     name: smtpd-tls
     state: present
-  ignore_errors: yes
+  ignore_errors: true
   register: smtpd_tls
 
 - name: Install test smtpserver
@@ -70,7 +70,7 @@
     body: Test body 4
     attach: /etc/group
     secure: starttls
-  ignore_errors: yes
+  ignore_errors: true
   register: starttls_support
 
 # NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
@@ -83,7 +83,7 @@
     body: Test body 5
     attach: /etc/group
     secure: always
-  ignore_errors: yes
+  ignore_errors: true
   register: tls_support
 
 - fail:

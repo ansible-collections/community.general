@@ -14,7 +14,7 @@
   mas:
     id: 421879749
     state: absent
-  become: yes
+  become: true
 
 - name: Determine whether the app is installed
   stat:
@@ -36,7 +36,7 @@
     id: 421879749
     state: present
   register: install_check
-  check_mode: yes
+  check_mode: true
 
 - name: Ensure that the status would have changed
   assert:
@@ -98,8 +98,8 @@
     id: 421879749
     state: absent
   register: uninstall_check
-  become: yes
-  check_mode: yes
+  become: true
+  check_mode: true
 
 - name: Ensure that the status would have changed
   assert:
@@ -122,7 +122,7 @@
     id: 421879749
     state: absent
   register: uninstall
-  become: yes
+  become: true
 
 - name: Ensure that the status changed
   assert:
@@ -149,7 +149,7 @@
     id: 421879749
     state: absent
   register: uninstall_again
-  become: yes
+  become: true
 
 - name: Ensure that the status is unchanged (already uninstalled)
   assert:

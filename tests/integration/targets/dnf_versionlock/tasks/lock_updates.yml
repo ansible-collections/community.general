@@ -63,7 +63,7 @@
       dnf:
         name: "{{ _packages }}"
         state: latest
-      check_mode: yes
+      check_mode: true
       register: update_packages
 
     - assert:

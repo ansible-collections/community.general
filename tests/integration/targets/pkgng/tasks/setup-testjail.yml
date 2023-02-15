@@ -28,7 +28,7 @@
   service:
     name: pf
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Install ezjail
   pkgng:
@@ -49,11 +49,11 @@
     line: ezjail_ftphost=http://ftp-archive.freebsd.org
 
 - name: Start ezjail
-  ignore_errors: yes
+  ignore_errors: true
   service:
     name: ezjail
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Redirect logs depending on verbosity
   set_fact:
@@ -84,7 +84,7 @@
     dest: /usr/jails/testjail/etc/resolv.conf
     regexp: "^nameserver[[:blank:]]+{{ item }}$"
     line: "nameserver {{ item }}"
-    create: yes
+    create: true
   loop:
     - "1.1.1.1"
     - "1.0.0.1"
