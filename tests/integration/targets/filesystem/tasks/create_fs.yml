@@ -44,7 +44,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
-    force: yes
+    force: true
   register: fs3_result
 
 - name: "Get UUID of the new filesystem"
@@ -84,7 +84,7 @@
       community.general.filesystem:
         dev: '{{ dev }}'
         fstype: '{{ fstype }}'
-        resizefs: yes
+        resizefs: true
       register: fs4_result
 
     - name: "Get UUID of the filesystem"
@@ -109,7 +109,7 @@
       community.general.filesystem:
         dev: '{{ dev }}'
         fstype: '{{ fstype }}'
-        resizefs: yes
+        resizefs: true
       register: fs5_result
 
     - name: "Assert that the state did not change"

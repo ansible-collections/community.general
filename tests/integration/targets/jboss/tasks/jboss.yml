@@ -48,7 +48,7 @@
     test_deployment: helloworld-1.war
     task_parameters: &task_parameters
       become_user: '{{ wf_user }}'
-      become: yes
+      become: true
       register: result
 
   block:
@@ -67,7 +67,7 @@
     jboss:
       deployment: '{{ war_file_1 }}'
       src: '{{ war_file_1_path }}'
-    check_mode: yes
+    check_mode: true
 
   - assert:
       that:
@@ -78,7 +78,7 @@
     <<: *task_parameters
     file:
       path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
-    ignore_errors: yes
+    ignore_errors: true
 
   - assert:
       that:
@@ -113,7 +113,7 @@
       deployment: '{{ war_file_1 }}'
       src: '{{ war_file_1_path }}'
       deploy_path: '{{ deploy_dir }}'
-    check_mode: yes
+    check_mode: true
 
   - assert:
       that:
@@ -148,7 +148,7 @@
       deployment: '{{ war_file_1 }}'
       deploy_path: '{{ deploy_dir }}'
       state: absent
-    check_mode: yes
+    check_mode: true
 
   - assert:
       that:
@@ -191,7 +191,7 @@
       deployment: '{{ war_file_1 }}'
       deploy_path: '{{ deploy_dir }}'
       state: absent
-    check_mode: yes
+    check_mode: true
 
   - assert:
       that:
@@ -217,7 +217,7 @@
       deploy_path: '{{ deploy_dir }}'
       src: '{{ fake_src_path }}'
       state: present
-    ignore_errors: yes
+    ignore_errors: true
 
   - assert:
       that:
@@ -230,7 +230,7 @@
     jboss:
       deployment: '{{ war_file_1 }}'
       state: present
-    ignore_errors: yes
+    ignore_errors: true
 
   - assert:
       that:

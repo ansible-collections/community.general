@@ -10,7 +10,7 @@
 - name: Enable (check mode)
   ufw:
     state: enabled
-  check_mode: yes
+  check_mode: true
   register: enable_check
 - name: Enable
   ufw:
@@ -23,7 +23,7 @@
 - name: Enable (idempotency, check mode)
   ufw:
     state: enabled
-  check_mode: yes
+  check_mode: true
   register: enable_idem_check
 - assert:
     that:
@@ -38,7 +38,7 @@
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-  check_mode: yes
+  check_mode: true
   register: ipv4_allow_check
 - name: ipv4 allow
   ufw:
@@ -57,7 +57,7 @@
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-  check_mode: yes
+  check_mode: true
   register: ipv4_allow_idem_check
 - assert:
     that:
@@ -72,30 +72,30 @@
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv4_allow_check
 - name: delete ipv4 allow
   ufw:
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
+    delete: true
   register: delete_ipv4_allow
 - name: delete ipv4 allow (idempotency)
   ufw:
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
+    delete: true
   register: delete_ipv4_allow_idem
 - name: delete ipv4 allow (idempotency, check mode)
   ufw:
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv4_allow_idem_check
 - assert:
     that:
@@ -110,7 +110,7 @@
     rule: allow
     port: 23
     to_ip: "::"
-  check_mode: yes
+  check_mode: true
   register: ipv6_allow_check
 - name: ipv6 allow
   ufw:
@@ -129,7 +129,7 @@
     rule: allow
     port: 23
     to_ip: "::"
-  check_mode: yes
+  check_mode: true
   register: ipv6_allow_idem_check
 - assert:
     that:
@@ -144,30 +144,30 @@
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv6_allow_check
 - name: delete ipv6 allow
   ufw:
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
+    delete: true
   register: delete_ipv6_allow
 - name: delete ipv6 allow (idempotency)
   ufw:
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
+    delete: true
   register: delete_ipv6_allow_idem
 - name: delete ipv6 allow (idempotency, check mode)
   ufw:
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv6_allow_idem_check
 - assert:
     that:
@@ -183,7 +183,7 @@
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-  check_mode: yes
+  check_mode: true
   register: ipv4_allow_check
 - name: ipv4 allow
   ufw:
@@ -202,7 +202,7 @@
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-  check_mode: yes
+  check_mode: true
   register: ipv4_allow_idem_check
 - assert:
     that:
@@ -217,30 +217,30 @@
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv4_allow_check
 - name: delete ipv4 allow
   ufw:
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
+    delete: true
   register: delete_ipv4_allow
 - name: delete ipv4 allow (idempotency)
   ufw:
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
+    delete: true
   register: delete_ipv4_allow_idem
 - name: delete ipv4 allow (idempotency, check mode)
   ufw:
     rule: allow
     port: 23
     to_ip: 0.0.0.0
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv4_allow_idem_check
 - assert:
     that:
@@ -255,7 +255,7 @@
     rule: allow
     port: 23
     to_ip: "::"
-  check_mode: yes
+  check_mode: true
   register: ipv6_allow_check
 - name: ipv6 allow
   ufw:
@@ -274,7 +274,7 @@
     rule: allow
     port: 23
     to_ip: "::"
-  check_mode: yes
+  check_mode: true
   register: ipv6_allow_idem_check
 - assert:
     that:
@@ -289,30 +289,30 @@
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv6_allow_check
 - name: delete ipv6 allow
   ufw:
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
+    delete: true
   register: delete_ipv6_allow
 - name: delete ipv6 allow (idempotency)
   ufw:
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
+    delete: true
   register: delete_ipv6_allow_idem
 - name: delete ipv6 allow (idempotency, check mode)
   ufw:
     rule: allow
     port: 23
     to_ip: "::"
-    delete: yes
-  check_mode: yes
+    delete: true
+  check_mode: true
   register: delete_ipv6_allow_idem_check
 - assert:
     that:
@@ -329,7 +329,7 @@
 - name: Reload ufw (check mode)
   ufw:
     state: reloaded
-  check_mode: yes
+  check_mode: true
   register: reload_check
 - assert:
     that:
@@ -340,7 +340,7 @@
 - name: Disable (check mode)
   ufw:
     state: disabled
-  check_mode: yes
+  check_mode: true
   register: disable_check
 - name: Disable
   ufw:
@@ -353,7 +353,7 @@
 - name: Disable (idempotency, check mode)
   ufw:
     state: disabled
-  check_mode: yes
+  check_mode: true
   register: disable_idem_check
 - assert:
     that:
@@ -369,7 +369,7 @@
 - name: Reset (check mode)
   ufw:
     state: reset
-  check_mode: yes
+  check_mode: true
   register: reset_check
 - pause:
     # Should not be needed, but since ufw is ignoring --dry-run for reset
@@ -396,7 +396,7 @@
 - name: Reset (idempotency, check mode)
   ufw:
     state: reset
-  check_mode: yes
+  check_mode: true
   register: reset_idem_check
 - assert:
     that:

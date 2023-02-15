@@ -61,7 +61,7 @@
     - name: Remove {{ package_name }} - nosave
       pacman:
         name: '{{ package_name }}'
-        remove_nosave: yes
+        remove_nosave: true
         state: absent
 
     - name: Make sure {{config_file}}.pacsave does not exist
