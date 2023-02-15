@@ -43,7 +43,7 @@
     vpc_id: "{{ vpc1.id }}"
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"
-  check_mode: yes
+  check_mode: true
   register: result
 - assert:
     that:
@@ -68,7 +68,7 @@
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: result
 - name: idemponent
   assert:
@@ -94,7 +94,7 @@
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"
     state: absent
-  check_mode: yes
+  check_mode: true
 #----------------------------------------------------------
 - name: delete a route
   hwc_vpc_route:
@@ -114,7 +114,7 @@
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"
     state: absent
-  check_mode: yes
+  check_mode: true
   register: result
 - name: not changed
   assert:

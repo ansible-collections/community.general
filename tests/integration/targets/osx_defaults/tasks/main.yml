@@ -16,7 +16,7 @@
     type: string
     state: present
   register: missing_value
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Test if state and value are required together
   assert:
@@ -31,7 +31,7 @@
     value: Centimeter
     state: present
   register: measure_task_check_mode
-  check_mode: yes
+  check_mode: true
 
 - name: Test if AppleMeasurementUnits value is changed to Centimeters in check_mode
   assert:
@@ -163,7 +163,7 @@
     key: ExampleKeyToRemove
     state: absent
   register: absent_check_mode_task
-  check_mode: yes
+  check_mode: true
 
 - debug:
     msg: "{{ absent_check_mode_task }}"
@@ -225,7 +225,7 @@
     value:
       - 'Value with spaces'
     type: array
-    array_add: yes
+    array_add: true
   register: test_array_add
 
 - assert:
@@ -238,7 +238,7 @@
     value:
       - 'Value with spaces'
     type: array
-    array_add: yes
+    array_add: true
   register: test_array_add
 
 - assert:

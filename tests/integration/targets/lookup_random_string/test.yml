@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Call plugin
     set_fact:
@@ -25,7 +25,7 @@
   - name: Raise error when impossible constraints are provided
     set_fact:
       impossible: "{{ query('community.general.random_string', upper=false, lower=false, special=false, numbers=false) }}"
-    ignore_errors: yes
+    ignore_errors: true
     register: impossible_result
 
   - name: Check results

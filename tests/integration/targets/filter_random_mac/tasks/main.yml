@@ -13,7 +13,7 @@
   debug:
     var: "0 | community.general.random_mac"
   register: _bad_random_mac_filter
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Verify random_mac filter showed a bad argument type error message
   assert:
@@ -25,7 +25,7 @@
   debug:
     var: "'dummy' | community.general.random_mac"
   register: _bad_random_mac_filter
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Verify random_mac filter showed a bad argument value error message
   assert:
@@ -37,7 +37,7 @@
   debug:
     var: "'00:00:00:00:00:00' | community.general.random_mac"
   register: _bad_random_mac_filter
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Verify random_mac filter showed a prefix too big error message
   assert:

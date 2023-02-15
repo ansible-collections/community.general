@@ -18,7 +18,7 @@
     path: "{{ iptables_tests }}"
     state: restored
   register: iptables_state
-  check_mode: yes
+  check_mode: true
 
 - name: "assert that results are as expected"
   assert:

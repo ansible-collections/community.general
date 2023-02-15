@@ -35,7 +35,7 @@
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
   register: iso_result
-  check_mode: yes
+  check_mode: true
 - debug: var=iso_result
 
 - name: Check if iso file created
