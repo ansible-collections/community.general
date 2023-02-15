@@ -565,7 +565,7 @@
 
     - name: ensure that the timezone is actually set
       command: cmp /etc/localtime /usr/share/zoneinfo/Europe/Belgrade
-      changed_when: falses
+      changed_when: false
 
     - block:
         - name: ensure that the timezone is updated in the config file
