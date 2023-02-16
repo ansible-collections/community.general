@@ -10,7 +10,7 @@
     list_all: true
     state: absent
   register: result
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: assert git_config failed
   assert:

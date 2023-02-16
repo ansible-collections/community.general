@@ -34,7 +34,7 @@
         - result.info == 'Please note that this repository is not part of the main distribution'
 
   - name: enable copr project
-    check_mode: yes
+    check_mode: true
     copr:
       state: enabled
       name: '{{ copr_fullname }}'

@@ -25,7 +25,7 @@
     values: "{{ item['values'] }}"
     ttl: "{{ item.ttl }}"
     type: "{{ item.type }}"
-  check_mode: yes
+  check_mode: true
   register: result
 - name: verify test create a dns record in check mode
   assert:

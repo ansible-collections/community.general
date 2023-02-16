@@ -14,15 +14,15 @@
   - name: Pretty print without modification
     xml:
       path: /tmp/ansible-xml-beers.xml
-      pretty_print: yes
+      pretty_print: true
     register: pretty_print_only
 
   - name: Compare to expected result
     copy:
       src: results/test-pretty-print-only.xml
       dest: /tmp/ansible-xml-beers.xml
-    check_mode: yes
-    diff: yes
+    check_mode: true
+    diff: true
     register: comparison
 
   - name: Test expected result
