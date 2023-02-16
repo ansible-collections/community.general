@@ -161,7 +161,7 @@ def _create_hook_config(module):
     }
 
     secret = module.params.get("secret")
-    if secret is not None and len(secret) > 0:
+    if secret:
         hook_config["secret"] = secret
 
     return hook_config
