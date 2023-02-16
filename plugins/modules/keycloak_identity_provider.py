@@ -535,14 +535,14 @@ def main():
                     old_mapper = dict()
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            changeset['mappers'].append(new_mapper)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_idp = before_idp.copy()
     desired_idp.update(changeset)
+
 
     result['proposed'] = sanitize(changeset)
     result['existing'] = sanitize(before_idp)
