@@ -535,10 +535,9 @@ def main():
                     old_mapper = dict()
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            changeset['mappers'].append(new_mapper)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_idp = before_idp.copy()
@@ -603,9 +602,9 @@ def main():
                 module.exit_json(**result)
 
             # do the update
-            desired_idp = desired_idp.copy()
-            updated_mappers = desired_idp.pop('mappers', [])
-            kc.update_identity_provider(desired_idp, realm)
+            desired_idp_without_mappers = desired_idp.copy()
+            updated_mappers = desired_idp_without_mappers.pop('mappers', [])
+            kc.update_identity_provider(desired_idp_without_mappers, realm)
             for mapper in updated_mappers:
                 if mapper.get('id') is not None:
                     kc.update_identity_provider_mapper(mapper, alias, realm)
@@ -614,7 +613,7 @@ def main():
                         mapper['identityProviderAlias'] = alias
                     kc.create_identity_provider_mapper(mapper, alias, realm)
             for mapper in [x for x in before_idp['mappers']
-                           if [y for y in updated_mappers if y["name"] == x['name']] == []]:
+                           if [y for y in desired_idp['mappers'] if y["name"] == x['name']] == []]:
                 kc.delete_identity_provider_mapper(mapper['id'], alias, realm)
 
             after_idp = get_identity_provider_with_mappers(kc, alias, realm)
