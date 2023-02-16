@@ -412,8 +412,7 @@ class KeycloakAPI(object):
             return open_url(client_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(clientrep), validate_certs=self.validate_certs)
         except Exception as e:
-            self.module.fail_json(msg='Could not update client %s in realm %s: %s'
-                                      % (id, realm, str(e)))
+            self.module.fail_json(msg='{} -- Could not update client {} in realm {}: {}'.format(clientrep, id, realm, str(e)))
 
     def create_client(self, clientrep, realm="master"):
         """ Create a client in keycloak
@@ -1530,11 +1529,14 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Unable to delete role %s for client %s in realm %s: %s'
                                       % (name, clientid, realm, str(e)))
 
-    def get_authentication_flow_by_alias(self, alias, realm='master'):
+    def get_authentication_flow_by_alias(self, alias, realm='master',
+            case_sensitive=True):
         """
         Get an authentication flow by it's alias
         :param alias: Alias of the authentication flow to get.
         :param realm: Realm.
+        :param case_sensitive: if false, all aliases will be lowercased before
+        they are compared
         :return: Authentication flow representation.
         """
         try:
@@ -1544,6 +1546,9 @@ class KeycloakAPI(object):
                                                  http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout, validate_certs=self.validate_certs))
             for authentication in authentications:
+                if not case_sensitive:
+                    alias = alias.lower()
+                    authentication["alias"] = authentication["alias"].lower()
                 if authentication["alias"] == alias:
                     authentication_flow = authentication
                     break

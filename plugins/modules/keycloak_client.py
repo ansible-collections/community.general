@@ -6,9 +6,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: keycloak_client
 
@@ -543,9 +544,9 @@ extends_documentation_fragment:
 
 author:
     - Eike Frost (@eikef)
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: Create or update Keycloak client (minimal example), authentication with credentials
   community.general.keycloak_client:
     auth_keycloak_url: https://auth.example.com/auth
@@ -669,9 +670,9 @@ EXAMPLES = '''
       jwks.url: JWKS_URL_FOR_CLIENT_AUTH_JWT
       jwt.credential.certificate: JWT_CREDENTIAL_CERTIFICATE_FOR_CLIENT_AUTH
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = """
 msg:
     description: Message as to what action was taken.
     returned: always
@@ -707,15 +708,20 @@ end_state:
             "request.object.signature.alg": "RS256",
         }
     }
-'''
+"""
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
 def normalise_cr(clientrep, remove_ids=False):
-    """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
+    """Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
     the change detection is more effective.
 
     :param clientrep: the clientrep dict to be sanitized
@@ -726,36 +732,39 @@ def normalise_cr(clientrep, remove_ids=False):
     # Avoid the dict passed in to be modified
     clientrep = clientrep.copy()
 
-    if 'attributes' in clientrep:
-        clientrep['attributes'] = list(sorted(clientrep['attributes']))
+    if "attributes" in clientrep:
+        clientrep["attributes"] = list(sorted(clientrep["attributes"]))
 
-    if 'redirectUris' in clientrep:
-        clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
+    if "redirectUris" in clientrep:
+        clientrep["redirectUris"] = list(sorted(clientrep["redirectUris"]))
 
-    if 'protocolMappers' in clientrep:
-        clientrep['protocolMappers'] = sorted(clientrep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
-        for mapper in clientrep['protocolMappers']:
+    if "protocolMappers" in clientrep:
+        clientrep["protocolMappers"] = sorted(
+            clientrep["protocolMappers"],
+            key=lambda x: (x.get("name"), x.get("protocol"), x.get("protocolMapper")),
+        )
+        for mapper in clientrep["protocolMappers"]:
             if remove_ids:
-                mapper.pop('id', None)
+                mapper.pop("id", None)
 
             # Set to a default value.
-            mapper['consentRequired'] = mapper.get('consentRequired', False)
+            mapper["consentRequired"] = mapper.get("consentRequired", False)
 
     return clientrep
 
 
 def sanitize_cr(clientrep):
-    """ Removes probably sensitive details from a client representation.
+    """Removes probably sensitive details from a client representation.
 
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict
     """
     result = clientrep.copy()
-    if 'secret' in result:
-        result['secret'] = 'no_log'
-    if 'attributes' in result:
-        if 'saml.signing.private.key' in result['attributes']:
-            result['attributes']['saml.signing.private.key'] = 'no_log'
+    if "secret" in result:
+        result["secret"] = "no_log"
+    if "attributes" in result:
+        if "saml.signing.private.key" in result["attributes"]:
+            result["attributes"]["saml.signing.private.key"] = "no_log"
     return normalise_cr(result)
 
 
@@ -768,70 +777,100 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     protmapper_spec = dict(
-        consentRequired=dict(type='bool'),
-        consentText=dict(type='str'),
-        id=dict(type='str'),
-        name=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml']),
-        protocolMapper=dict(type='str'),
-        config=dict(type='dict'),
+        consentRequired=dict(type="bool"),
+        consentText=dict(type="str"),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        protocol=dict(type="str", choices=["openid-connect", "saml"]),
+        protocolMapper=dict(type="str"),
+        config=dict(type="dict"),
     )
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(type='str', default='master'),
-
-        id=dict(type='str'),
-        client_id=dict(type='str', aliases=['clientId']),
-        name=dict(type='str'),
-        description=dict(type='str'),
-        root_url=dict(type='str', aliases=['rootUrl']),
-        admin_url=dict(type='str', aliases=['adminUrl']),
-        base_url=dict(type='str', aliases=['baseUrl']),
-        surrogate_auth_required=dict(type='bool', aliases=['surrogateAuthRequired']),
-        enabled=dict(type='bool'),
-        client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt'], aliases=['clientAuthenticatorType']),
-        secret=dict(type='str', no_log=True),
-        registration_access_token=dict(type='str', aliases=['registrationAccessToken'], no_log=True),
-        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
-        redirect_uris=dict(type='list', elements='str', aliases=['redirectUris']),
-        web_origins=dict(type='list', elements='str', aliases=['webOrigins']),
-        not_before=dict(type='int', aliases=['notBefore']),
-        bearer_only=dict(type='bool', aliases=['bearerOnly']),
-        consent_required=dict(type='bool', aliases=['consentRequired']),
-        standard_flow_enabled=dict(type='bool', aliases=['standardFlowEnabled']),
-        implicit_flow_enabled=dict(type='bool', aliases=['implicitFlowEnabled']),
-        direct_access_grants_enabled=dict(type='bool', aliases=['directAccessGrantsEnabled']),
-        service_accounts_enabled=dict(type='bool', aliases=['serviceAccountsEnabled']),
-        authorization_services_enabled=dict(type='bool', aliases=['authorizationServicesEnabled']),
-        public_client=dict(type='bool', aliases=['publicClient']),
-        frontchannel_logout=dict(type='bool', aliases=['frontchannelLogout']),
-        protocol=dict(type='str', choices=['openid-connect', 'saml']),
-        attributes=dict(type='dict'),
-        full_scope_allowed=dict(type='bool', aliases=['fullScopeAllowed']),
-        node_re_registration_timeout=dict(type='int', aliases=['nodeReRegistrationTimeout']),
-        registered_nodes=dict(type='dict', aliases=['registeredNodes']),
-        client_template=dict(type='str', aliases=['clientTemplate']),
-        use_template_config=dict(type='bool', aliases=['useTemplateConfig']),
-        use_template_scope=dict(type='bool', aliases=['useTemplateScope']),
-        use_template_mappers=dict(type='bool', aliases=['useTemplateMappers']),
-        always_display_in_console=dict(type='bool', aliases=['alwaysDisplayInConsole']),
-        authentication_flow_binding_overrides=dict(type='dict', aliases=['authenticationFlowBindingOverrides']),
-        protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
-        authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
-        default_client_scopes=dict(type='list', elements='str', aliases=['defaultClientScopes']),
-        optional_client_scopes=dict(type='list', elements='str', aliases=['optionalClientScopes']),
+        state=dict(default="present", choices=["present", "absent"]),
+        realm=dict(type="str", default="master"),
+        id=dict(type="str"),
+        client_id=dict(type="str", aliases=["clientId"]),
+        name=dict(type="str"),
+        description=dict(type="str"),
+        root_url=dict(type="str", aliases=["rootUrl"]),
+        admin_url=dict(type="str", aliases=["adminUrl"]),
+        base_url=dict(type="str", aliases=["baseUrl"]),
+        surrogate_auth_required=dict(type="bool", aliases=["surrogateAuthRequired"]),
+        enabled=dict(type="bool"),
+        client_authenticator_type=dict(
+            type="str",
+            choices=["client-secret", "client-jwt"],
+            aliases=["clientAuthenticatorType"],
+        ),
+        secret=dict(type="str", no_log=True),
+        registration_access_token=dict(
+            type="str", aliases=["registrationAccessToken"], no_log=True
+        ),
+        default_roles=dict(type="list", elements="str", aliases=["defaultRoles"]),
+        redirect_uris=dict(type="list", elements="str", aliases=["redirectUris"]),
+        web_origins=dict(type="list", elements="str", aliases=["webOrigins"]),
+        not_before=dict(type="int", aliases=["notBefore"]),
+        bearer_only=dict(type="bool", aliases=["bearerOnly"]),
+        consent_required=dict(type="bool", aliases=["consentRequired"]),
+        standard_flow_enabled=dict(type="bool", aliases=["standardFlowEnabled"]),
+        implicit_flow_enabled=dict(type="bool", aliases=["implicitFlowEnabled"]),
+        direct_access_grants_enabled=dict(
+            type="bool", aliases=["directAccessGrantsEnabled"]
+        ),
+        service_accounts_enabled=dict(type="bool", aliases=["serviceAccountsEnabled"]),
+        authorization_services_enabled=dict(
+            type="bool", aliases=["authorizationServicesEnabled"]
+        ),
+        public_client=dict(type="bool", aliases=["publicClient"]),
+        frontchannel_logout=dict(type="bool", aliases=["frontchannelLogout"]),
+        protocol=dict(type="str", choices=["openid-connect", "saml"]),
+        attributes=dict(type="dict"),
+        full_scope_allowed=dict(type="bool", aliases=["fullScopeAllowed"]),
+        node_re_registration_timeout=dict(
+            type="int", aliases=["nodeReRegistrationTimeout"]
+        ),
+        registered_nodes=dict(type="dict", aliases=["registeredNodes"]),
+        client_template=dict(type="str", aliases=["clientTemplate"]),
+        use_template_config=dict(type="bool", aliases=["useTemplateConfig"]),
+        use_template_scope=dict(type="bool", aliases=["useTemplateScope"]),
+        use_template_mappers=dict(type="bool", aliases=["useTemplateMappers"]),
+        always_display_in_console=dict(type="bool", aliases=["alwaysDisplayInConsole"]),
+        authentication_flow_binding_overrides=dict(
+            type="dict", aliases=["authenticationFlowBindingOverrides"]
+        ),
+        protocol_mappers=dict(
+            type="list",
+            elements="dict",
+            options=protmapper_spec,
+            aliases=["protocolMappers"],
+        ),
+        authorization_settings=dict(type="dict", aliases=["authorizationSettings"]),
+        default_client_scopes=dict(
+            type="list", elements="str", aliases=["defaultClientScopes"]
+        ),
+        optional_client_scopes=dict(
+            type="list", elements="str", aliases=["optionalClientScopes"]
+        ),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['client_id', 'id'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["client_id", "id"],
+                ["token", "auth_realm", "auth_username", "auth_password"],
+            ]
+        ),
+        required_together=([["auth_realm", "auth_username", "auth_password"]]),
+    )
 
-    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
+    result = dict(
+        changed=False, msg="", diff={}, proposed={}, existing={}, end_state={}
+    )
 
     # Obtain access token, initialize API
     try:
@@ -841,20 +880,25 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    cid = module.params.get('id')
-    state = module.params.get('state')
+    realm = module.params.get("realm")
+    cid = module.params.get("id")
+    state = module.params.get("state")
 
     # Filter and map the parameters names that apply to the client
-    client_params = [x for x in module.params
-                     if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                     module.params.get(x) is not None]
+    client_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm"]
+        and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     if cid is None:
-        before_client = kc.get_client_by_clientid(module.params.get('client_id'), realm=realm)
+        before_client = kc.get_client_by_clientid(
+            module.params.get("client_id"), realm=realm
+        )
         if before_client is not None:
-            cid = before_client['id']
+            cid = before_client["id"]
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
 
@@ -869,15 +913,29 @@ def main():
 
         # some lists in the Keycloak API are sorted, some are not.
         if isinstance(new_param_value, list):
-            if client_param in ['attributes']:
+            if client_param in ["attributes"]:
                 try:
                     new_param_value = sorted(new_param_value)
                 except TypeError:
                     pass
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
-        if client_param == 'protocol_mappers':
-            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
+        if client_param == "protocol_mappers":
+            new_param_value = [
+                dict((k, v) for k, v in x.items() if x[k] is not None)
+                for x in new_param_value
+            ]
+
+        # translate flow alias to flow id
+        if client_param == "authentication_flow_binding_overrides":
+            final_param_value = {}
+            for binding in new_param_value:
+                flow_id = kc.get_authentication_flow_by_alias(
+                    alias=new_param_value[binding], realm=realm, case_sensitive=False
+                )["id"]
+                print(flow_id)
+                final_param_value[binding] = flow_id
+            new_param_value = final_param_value
 
         changeset[camel(client_param)] = new_param_value
 
@@ -885,54 +943,59 @@ def main():
     desired_client = before_client.copy()
     desired_client.update(changeset)
 
-    result['proposed'] = sanitize_cr(changeset)
-    result['existing'] = sanitize_cr(before_client)
+    result["proposed"] = sanitize_cr(changeset)
+    result["existing"] = sanitize_cr(before_client)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_client:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Client does not exist; doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["msg"] = "Client does not exist; doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
+        result["changed"] = True
 
-        if 'clientId' not in desired_client:
-            module.fail_json(msg='client_id needs to be specified when creating a new client')
+        if "clientId" not in desired_client:
+            module.fail_json(
+                msg="client_id needs to be specified when creating a new client"
+            )
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(desired_client))
+            result["diff"] = dict(before="", after=sanitize_cr(desired_client))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # create it
         kc.create_client(desired_client, realm=realm)
-        after_client = kc.get_client_by_clientid(desired_client['clientId'], realm=realm)
+        after_client = kc.get_client_by_clientid(
+            desired_client["clientId"], realm=realm
+        )
 
-        result['end_state'] = sanitize_cr(after_client)
+        result["end_state"] = sanitize_cr(after_client)
 
-        result['msg'] = 'Client %s has been created.' % desired_client['clientId']
+        result["msg"] = "Client %s has been created." % desired_client["clientId"]
         module.exit_json(**result)
 
     else:
-        if state == 'present':
+        if state == "present":
             # Process an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
                 before_norm = normalise_cr(before_client, remove_ids=True)
                 desired_norm = normalise_cr(desired_client, remove_ids=True)
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_norm),
-                                          after=sanitize_cr(desired_norm))
-                result['changed'] = (before_norm != desired_norm)
+                    result["diff"] = dict(
+                        before=sanitize_cr(before_norm), after=sanitize_cr(desired_norm)
+                    )
+                result["changed"] = before_norm != desired_norm
 
                 module.exit_json(**result)
 
@@ -941,36 +1004,37 @@ def main():
 
             after_client = kc.get_client_by_id(cid, realm=realm)
             if before_client == after_client:
-                result['changed'] = False
+                result["changed"] = False
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_client),
-                                      after=sanitize_cr(after_client))
+                result["diff"] = dict(
+                    before=sanitize_cr(before_client), after=sanitize_cr(after_client)
+                )
 
-            result['end_state'] = sanitize_cr(after_client)
+            result["end_state"] = sanitize_cr(after_client)
 
-            result['msg'] = 'Client %s has been updated.' % desired_client['clientId']
+            result["msg"] = "Client %s has been updated." % desired_client["clientId"]
             module.exit_json(**result)
 
         else:
             # Process a deletion (because state was not 'present')
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_client), after='')
+                result["diff"] = dict(before=sanitize_cr(before_client), after="")
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # delete it
             kc.delete_client(cid, realm=realm)
-            result['proposed'] = {}
+            result["proposed"] = {}
 
-            result['end_state'] = {}
+            result["end_state"] = {}
 
-            result['msg'] = 'Client %s has been deleted.' % before_client['clientId']
+            result["msg"] = "Client %s has been deleted." % before_client["clientId"]
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
