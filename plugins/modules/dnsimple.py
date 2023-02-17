@@ -168,7 +168,7 @@ class DNSimpleV2():
     def dnsimple_client(self):
         """creates a dnsimple client object"""
         if self.account_email and self.account_api_token:
-            client = Client(sandbox=self.sandbox, email=self.account_email, access_token=self.account_api_token)
+            client = Client(sandbox=self.sandbox, email=self.account_email, access_token=self.account_api_token, user_agent="ansible/community.general")
         else:
             msg = "Option account_email or account_api_token not provided. " \
                   "Dnsimple authentiction with a .dnsimple config file is not " \
