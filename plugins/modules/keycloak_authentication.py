@@ -284,12 +284,12 @@ def add_diff_entry(new_exec, old_exec, before, after):
     for key in new_exec:
         if new_exec[key] is not None and key != "flowAlias":
             if key == "authenticationConfig":
-                old_config = {"alias":old_exec["authenticationConfig"]["alias"]}
-                new_config = {"alias":new_exec["authenticationConfig"]["alias"]}
+                old_config = {"alias":old_exec["authenticationConfig"]["alias"], "config":{}}
+                new_config = {"alias":new_exec["authenticationConfig"]["alias"], "config":{}}
                 for configKey in new_exec["authenticationConfig"]["config"]:
-                    if new_exec.get(configKey) != "":
-                        old_config.update({configKey:old_exec["authenticationConfig"].get(configKey)})
-                        new_config.update({configKey:new_exec["authenticationConfig"].get(configKey)})
+                    if new_exec["authenticationConfig"]["config"].get(configKey) != "":
+                        old_config["config"].update({configKey:old_exec["authenticationConfig"]["config"].get(configKey)})
+                        new_config["config"].update({configKey:new_exec["authenticationConfig"]["config"].get(configKey)})
                 old_values.update({key:old_config})
                 new_values.update({key:new_config})
             else:
@@ -437,9 +437,12 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         if not check_mode:
                             create_authentication_execution(kc, config, new_exec, flow_alias_parent, isFlow, realm)
                             existing_executions = kc.get_executions_representation(config, realm=realm)
-                            created_index = find_exec_in_executions(new_exec, existing_executions, changed_executions_ids)
-                            new_exec["id"] = existing_executions[created_index]["id"]
-                            changed_executions_ids.append(new_exec["id"])
+                            created_list = [execution for execution in existing_executions if hasSameName(new_exec, execution) and\
+                            execution["id"] not in changed_executions_ids]
+                            if len(created_list) != 1:
+                                raise Exception("could not find newly created execution")
+                            created = created_list[0]
+                            new_exec["id"] = created["id"]
                             update_authentication_execution(kc, flow_alias_parent, new_exec, check_mode, realm)
                             shift = created["index"] - level_indices[current_level]
                             if shift != 0:
@@ -447,8 +450,6 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             existing_executions = kc.get_executions_representation(config, realm=realm)
                             if new_exec.get("authenticationConfig") is not None:
                                 kc.add_authenticationConfig_to_execution(new_exec["id"], new_exec["authenticationConfig"], realm=realm)
-                            raise Exception(existing_executions)
-
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\
                             exec_name=get_identifier(new_exec))
                         changed = True
