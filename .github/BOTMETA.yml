@@ -1037,7 +1037,7 @@ files:
     maintainers: dagwieers
   $modules/redfish_:
     ignore: jose-delarosa
-    maintainers: $team_redfish
+    maintainers: $team_redfish TSKushal
   $modules/redhat_subscription.py:
     labels: redhat_subscription
     maintainers: barnabycourt alikins kahowell
