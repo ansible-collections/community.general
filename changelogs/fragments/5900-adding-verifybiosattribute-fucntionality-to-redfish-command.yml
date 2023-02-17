@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_command - adding ``VerifyBiosAttributes`` functionality (https://github.com/ansible-collections/community.general/pull/5900).
