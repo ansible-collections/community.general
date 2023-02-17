@@ -124,7 +124,12 @@ options:
     default: {}
     version_added: '5.7.0'
 
-author: "Jose Delarosa (@jose-delarosa)"
+author:
+  - "Jose Delarosa (@jose-delarosa)"
+  - "Gayathiri Devi Ramasamy (@Gayathirideviramasamy)"
+  - "T S Kushal (@TSKushal)"
+  - "Varni H P (@varini-hp)"
+  - "Prativa Nayak (@prativa-n)"
 '''
 
 EXAMPLES = '''
@@ -255,6 +260,14 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Enable SecureBoot
+    community.general.redfish_config:
+      category: Sessions
+      command: EnableSecureBoot
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -273,7 +286,7 @@ from ansible.module_utils.common.text.converters import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
-                "SetDefaultBootOrder"],
+                "SetDefaultBootOrder", "EnableSecureBoot"],
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
     "Sessions": ["SetSessionService"],
 }
@@ -386,6 +399,8 @@ def main():
                 result = rf_utils.set_boot_order(boot_order)
             elif command == "SetDefaultBootOrder":
                 result = rf_utils.set_default_boot_order()
+            elif command == "EnableSecureBoot":
+                result = rf_utils.enable_secure_boot()
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
