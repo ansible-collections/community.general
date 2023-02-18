@@ -36,15 +36,20 @@ options:
             - Modules parameters.
         default: ''
     persistent:
-        type: bool
-        default: false
+        type: str
+        choices: [ disabled, absent, present ]
+        default: disabled
         description:
             - Persistency between reboots for configured module.
             - This option creates files in C(/etc/modules-load.d/) and C(/etc/modprobe.d/) that make your module configuration persistent during reboots.
+            - If C(present), module adds module name to C(/etc/modules-load.d/) and params to C(/etc/modprobe.d/) so module will be loaded on next reboot.
+            - If C(absent), module comment out module name from C(/etc/modules-load.d/) and comment out params from C(/etc/modprobe.d/) so module won't be
+              loaded on next reboot.
+            - If C(disabled), module won't toch anything and leave C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
             - Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar triggers encoded in the
               kernel modules themselves instead of configuration like this.
             - In fact, most modern kernel modules are prepared for automatic loading already.
-            - Also this options work only with distributives that uses systemd.
+            - This options work only with distributions that uses C(systemd).
 '''
 
 EXAMPLES = '''
@@ -275,7 +280,7 @@ def main():
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             params=dict(type='str', default=''),
-            persistent=dict(type='bool', default=False),
+            persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
         ),
         supports_check_mode=True,
     )
@@ -287,11 +292,10 @@ def main():
     elif modprobe.desired_state == 'absent' and modprobe.module_loaded():
         modprobe.unload_module()
 
-    if modprobe.persistent:
-        if modprobe.desired_state == 'present' and not (modprobe.module_is_loaded_persistently and modprobe.params_is_set):
-            modprobe.load_module_permanent()
-        elif modprobe.desired_state == 'absent' and (modprobe.module_is_loaded_persistently or modprobe.permanent_params):
-            modprobe.unload_module_permanent()
+    if modprobe.persistent == 'present' and not (modprobe.module_is_loaded_persistently and modprobe.params_is_set):
+        modprobe.load_module_permanent()
+    elif modprobe.persistent == 'absent' and (modprobe.module_is_loaded_persistently or modprobe.permanent_params):
+        modprobe.unload_module_permanent()
 
     module.exit_json(**modprobe.result)
 

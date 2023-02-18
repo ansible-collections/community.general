@@ -47,7 +47,7 @@ class TestLoadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -77,7 +77,7 @@ class TestLoadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -126,7 +126,7 @@ class TestUnloadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -156,7 +156,7 @@ class TestUnloadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -204,7 +204,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         set_module_args(dict(
             name='dummy',
             state='present',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -212,7 +212,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -233,7 +233,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         set_module_args(dict(
             name='dummy',
             state='present',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -241,7 +241,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -262,7 +262,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
         set_module_args(dict(
             name='dummy',
             state='present',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -270,7 +270,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -311,7 +311,7 @@ class TestPermanentParams(ModuleTestCase):
         set_module_args(dict(
             name='dummy',
             state='present',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -319,7 +319,7 @@ class TestPermanentParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -346,7 +346,7 @@ class TestPermanentParams(ModuleTestCase):
         set_module_args(dict(
             name='dummy',
             state='present',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -354,7 +354,7 @@ class TestPermanentParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -390,7 +390,7 @@ class TestCreateModuleFIle(ModuleTestCase):
         set_module_args(dict(
             name='dummy',
             state='present',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -398,7 +398,7 @@ class TestCreateModuleFIle(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -433,7 +433,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
             name='dummy',
             state='present',
             params='numdummies=4',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -441,7 +441,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -477,7 +477,7 @@ class TestDisableOldParams(ModuleTestCase):
             name='dummy',
             state='present',
             params='numdummies=4',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -485,7 +485,7 @@ class TestDisableOldParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -508,7 +508,7 @@ class TestDisableOldParams(ModuleTestCase):
             name='dummy',
             state='present',
             params='numdummies=4',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -516,7 +516,7 @@ class TestDisableOldParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -552,7 +552,7 @@ class TestDisableModulePermanent(ModuleTestCase):
             name='dummy',
             state='present',
             params='numdummies=4',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -560,7 +560,7 @@ class TestDisableModulePermanent(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
@@ -582,7 +582,7 @@ class TestDisableModulePermanent(ModuleTestCase):
             name='dummy',
             state='present',
             params='numdummies=4',
-            persistent=True
+            persistent='present'
         ))
 
         module = AnsibleModule(
@@ -590,7 +590,7 @@ class TestDisableModulePermanent(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False),
+                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
             ),
             supports_check_mode=True,
         )
