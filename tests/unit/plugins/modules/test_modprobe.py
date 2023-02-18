@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import sys
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import call, patch
+from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible_collections.community.general.tests.unit.compat.mock import mock_open
 from ansible.module_utils.basic import AnsibleModule
