@@ -262,7 +262,7 @@ class OSXDefaults(object):
 
         # If the RC is not 0, then terrible happened! Ooooh nooo!
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key type from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while reading key type from defaults: %s" % err)
 
         # Ok, lets parse the type from output
         data_type = out.strip().replace('Type is ', '')
@@ -273,9 +273,9 @@ class OSXDefaults(object):
         # Strip output
         out = out.strip()
 
-        # An non zero RC at this point is kinda strange...
+        # A non zero RC at this point is kinda strange...
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key value from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while reading key value from defaults: %s" % err)
 
         # Convert string to list when type is array
         if data_type == "array":
@@ -313,13 +313,13 @@ class OSXDefaults(object):
                                                expand_user_and_vars=False)
 
         if rc != 0:
-            raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % out)
+            raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % err)
 
     def delete(self):
         """ Deletes defaults key from domain """
         rc, out, err = self.module.run_command(self._base_command() + ['delete', self.domain, self.key])
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while deleting key from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while deleting key from defaults: %s" % err)
 
     # /commands ----------------------------------------------------------- }}}
 
