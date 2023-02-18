@@ -16,8 +16,18 @@
       Last ArchLinux system upgrade by integration tests was done on {{ ansible_facts.date_time.date }}.
   register: archlinux_upgrade_tag
 
-- name: Upgrade all packages
+- name: Update package cache
   pacman:
     update_cache: true
+  when: archlinux_upgrade_tag is changed
+
+- name: Make sure archlinux-keyring is up to date
+  pacman:
+    name: archlinux-keyring
+    state: latest
+  when: archlinux_upgrade_tag is changed
+
+- name: Upgrade all packages
+  pacman:
     upgrade: true
   when: archlinux_upgrade_tag is changed
