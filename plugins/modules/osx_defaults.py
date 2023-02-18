@@ -71,53 +71,53 @@ notes:
 '''
 
 EXAMPLES = r'''
-# Set Boolean Valued Key for Application Domain
-- community.general.osx_defaults:
+- name: Set boolean valued key for application domain
+  community.general.osx_defaults:
     domain: com.apple.Safari
     key: IncludeInternalDebugMenu
     type: bool
     value: true
     state: present
 
-# Set String Valued Key for Global Domain
-- community.general.osx_defaults:
+- name: Set string valued key for global domain
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
     state: present
 
-# Set Int Valued Key for arbitrary plist
-- community.general.osx_defaults:
+- name: Set int valued key for arbitrary plist
+  community.general.osx_defaults:
     domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticCheckEnabled
     type: int
     value: 1
   become: true
 
-# Set Int Valued Key only for the current host
-- community.general.osx_defaults:
+- name: Set int valued key only for the current host
+  community.general.osx_defaults:
     domain: com.apple.screensaver
     host: currentHost
     key: showClock
     type: int
     value: 1
 
-# Defaults to Global Domain and Setting value
-- community.general.osx_defaults:
+- name: Defaults to global domain and setting value
+  community.general.osx_defaults:
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
 
-# Setting an Array valued key
-- community.general.osx_defaults:
+- name: Setting an array valued key
+  community.general.osx_defaults:
     key: AppleLanguages
     type: array
     value:
       - en
       - nl
 
-# Removing a key
+- name: Removing a key
 - community.general.osx_defaults:
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
