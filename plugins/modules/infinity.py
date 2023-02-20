@@ -15,6 +15,13 @@ description:
   - Manage Infinity IPAM using REST API.
 author:
   - Meirong Liu (@MeganLiu)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   server_ip:
     description:

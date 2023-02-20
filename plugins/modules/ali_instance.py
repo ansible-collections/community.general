@@ -31,6 +31,11 @@ short_description: Create, Start, Stop, Restart or Terminate an Instance in ECS;
 description:
     - Create, start, stop, restart, modify or terminate ecs instances.
     - Add or remove ecs instances to/from security group.
+attributes:
+    check_mode:
+      support: none
+    diff_mode:
+      support: none
 options:
     state:
       description:
@@ -252,6 +257,7 @@ requirements:
     - "footmark >= 1.19.0"
 extends_documentation_fragment:
     - community.general.alicloud
+    - community.general.attributes
 '''
 
 EXAMPLES = '''

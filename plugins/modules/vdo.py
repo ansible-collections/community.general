@@ -24,6 +24,15 @@ description:
       provides inline block-level deduplication, compression, and
       thin provisioning capabilities to primary storage.
 
+extends_documentation_fragment:
+    - community.general.attributes
+
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     name:
         description:

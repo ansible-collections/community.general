@@ -18,6 +18,11 @@ short_description: Add or remove Pulp repos from a remote host
 description:
   - Add or remove Pulp repos from a remote host.
   - Note, this is for Pulp 2 only.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   add_export_distributor:
     description:
@@ -165,7 +170,8 @@ notes:
   - This module can currently only create distributors and importers on rpm
     repositories. Contributions to support other repo types are welcome.
 extends_documentation_fragment:
-  - url
+  - ansible.builtin.url
+  - community.general.attributes
 '''
 
 EXAMPLES = '''

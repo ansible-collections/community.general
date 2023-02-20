@@ -13,15 +13,22 @@ DOCUMENTATION = r'''
 module: imc_rest
 short_description: Manage Cisco IMC hardware through its REST API
 description:
-- Provides direct access to the Cisco IMC REST API.
-- Perform any configuration changes and actions that the Cisco IMC supports.
-- More information about the IMC REST API is available from
-  U(http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/sw/api/3_0/b_Cisco_IMC_api_301.html)
+  - Provides direct access to the Cisco IMC REST API.
+  - Perform any configuration changes and actions that the Cisco IMC supports.
+  - More information about the IMC REST API is available from
+    U(http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/sw/api/3_0/b_Cisco_IMC_api_301.html).
 author:
-- Dag Wieers (@dagwieers)
+  - Dag Wieers (@dagwieers)
 requirements:
-- lxml
-- xmljson >= 0.1.8
+  - lxml
+  - xmljson >= 0.1.8
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   hostname:
     description:

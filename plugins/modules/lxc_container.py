@@ -16,6 +16,13 @@ short_description: Manage LXC Containers
 description:
   - Management of LXC containers.
 author: "Kevin Carter (@cloudnull)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:

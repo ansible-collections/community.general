@@ -22,6 +22,13 @@ notes:
   - No Linode resizing is currently implemented. This module will, in time,
     replace the current Linode module which uses deprecated API bindings on the
     Linode side.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   region:
     description:
