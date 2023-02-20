@@ -16,6 +16,11 @@ description:
     - This module allows the user to create, delete and update virtual cloud networks(VCNs) in OCI.
       The complete Oracle Cloud Infrastructure Ansible Modules can be downloaded from
       U(https://github.com/oracle/oci-ansible-modules/releases).
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     cidr_block:
         description: The CIDR IP address block of the VCN. Required when creating a VCN with I(state=present).
@@ -48,10 +53,11 @@ options:
         aliases: [ 'id' ]
 author: "Rohit Chaware (@rohitChaware)"
 extends_documentation_fragment:
-- community.general.oracle
-- community.general.oracle_creatable_resource
-- community.general.oracle_wait_options
-- community.general.oracle_tags
+  - community.general.oracle
+  - community.general.oracle_creatable_resource
+  - community.general.oracle_wait_options
+  - community.general.oracle_tags
+  - community.general.attributes
 
 '''
 

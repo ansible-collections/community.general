@@ -18,6 +18,13 @@ short_description: Manage services with nosh
 description:
     - Control running and enabled state for system-wide or user services.
     - BSD and Linux systems are supported.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         type: str
