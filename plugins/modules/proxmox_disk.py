@@ -16,6 +16,11 @@ version_added: 5.7.0
 description:
   - Allows you to perform some supported operations on a disk in Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
 author: "Castor Sky (@castorsky) <csky57@gmail.com>"
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -311,6 +316,7 @@ options:
     type: str
 extends_documentation_fragment:
   - community.general.proxmox.documentation
+  - community.general.attributes
 '''
 
 EXAMPLES = '''
