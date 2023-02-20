@@ -22,6 +22,13 @@ author:
     - Marius Rieder (@jiuka)
     - David Wittman (@DavidWittman)
     - Gabe Mulley (@mulby)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   name:
     description:

@@ -16,6 +16,13 @@ description:
 - Read a CSV file and return a list or a dictionary, containing one dictionary per row.
 author:
 - Dag Wieers (@dagwieers)
+extends_documentation_fragment:
+- community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   path:
     description:

@@ -12,11 +12,18 @@ DOCUMENTATION = r'''
 ---
 module: launchd
 author:
-- Martin Migasiewicz (@martinm82)
+  - Martin Migasiewicz (@martinm82)
 short_description: Manage macOS services
 version_added: 1.0.0
 description:
-- Manage launchd services on target macOS hosts.
+  - Manage launchd services on target macOS hosts.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+      support: full
+    diff_mode:
+      support: none
 options:
     name:
       description:

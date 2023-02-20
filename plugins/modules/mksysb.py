@@ -17,6 +17,13 @@ module: mksysb
 short_description: Generates AIX mksysb rootvg backups
 description:
   - This module manages a basic AIX mksysb (image) of rootvg.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   backup_crypt_files:
     description:

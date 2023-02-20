@@ -13,16 +13,23 @@ DOCUMENTATION = r'''
 ---
 module: nmcli
 author:
-- Chris Long (@alcamie101)
+    - Chris Long (@alcamie101)
 short_description: Manage Networking
 requirements:
-- nmcli
+    - nmcli
+extends_documentation_fragment:
+    - community.general.attributes
 description:
     - 'Manage the network devices. Create, modify and manage various connection and device type e.g., ethernet, teams, bonds, vlans etc.'
     - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager.'
     - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: NetworkManager-tui.'
     - 'On Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager'
     - 'On openSUSE, the requirements can be met by installing the following packages: NetworkManager.'
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     state:
         description:

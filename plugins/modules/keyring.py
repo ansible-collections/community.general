@@ -26,6 +26,13 @@ requirements:
   - keyring (Python library)
   - gnome-keyring (application - required for headless Gnome keyring access)
   - dbus-run-session (application - required for headless Gnome keyring access)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   service:
     description: The name of the service.

@@ -20,6 +20,13 @@ description:
 author:
     - Björn Andersson (@gaqzi)
     - Abhijeet Kasurde (@Akasurde)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:
@@ -95,8 +102,6 @@ options:
     version_added: 6.1.0
 requirements:
 - StormSSH
-notes:
-- Supports check mode.
 '''
 
 EXAMPLES = r'''

@@ -16,6 +16,13 @@ short_description: Uses keytool to import/remove certificate to/from java keysto
 description:
   - This is a wrapper module around keytool, which can be used to import certificates
     and optionally private keys to a given java keystore, or remove them from it.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   cert_url:
     description:
