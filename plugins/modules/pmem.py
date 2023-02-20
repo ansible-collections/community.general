@@ -20,6 +20,13 @@ description:
 requirements:
  - ipmctl and ndctl command line tools
  - xmltodict
+extends_documentation_fragment:
+ - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   appdirect:
     description:

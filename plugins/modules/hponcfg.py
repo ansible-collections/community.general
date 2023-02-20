@@ -15,7 +15,14 @@ module: hponcfg
 author: Dag Wieers (@dagwieers)
 short_description: Configure HP iLO interface using hponcfg
 description:
- - This modules configures the HP iLO interface using hponcfg.
+  - This modules configures the HP iLO interface using hponcfg.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   path:
     description:

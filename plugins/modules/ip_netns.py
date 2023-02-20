@@ -15,6 +15,13 @@ short_description: Manage network namespaces
 requirements: [ ip ]
 description:
     - Create or delete network namespaces using the ip command.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         required: false

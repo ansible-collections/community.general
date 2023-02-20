@@ -14,6 +14,13 @@ module: znode
 short_description: Create, delete, retrieve, and update znodes using ZooKeeper
 description:
     - Create, delete, retrieve, and update znodes using ZooKeeper.
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+extends_documentation_fragment:
+    - community.general.attributes
 options:
     hosts:
         description:

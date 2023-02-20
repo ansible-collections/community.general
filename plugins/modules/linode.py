@@ -13,7 +13,14 @@ DOCUMENTATION = '''
 module: linode
 short_description: Manage instances on the Linode Public Cloud
 description:
-     - Manage Linode Public Cloud instances and optionally wait for it to be 'running'.
+  - Manage Linode Public Cloud instances and optionally wait for it to be 'running'.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     description:

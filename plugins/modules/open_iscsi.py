@@ -12,13 +12,20 @@ DOCUMENTATION = r'''
 ---
 module: open_iscsi
 author:
-- Serge van Ginderachter (@srvg)
+    - Serge van Ginderachter (@srvg)
 short_description: Manage iSCSI targets with Open-iSCSI
 description:
     - Discover targets on given portal, (dis)connect targets, mark targets to
       manually or auto start, return device nodes of connected targets.
 requirements:
     - open_iscsi library and tools (iscsiadm)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     portal:
         description:

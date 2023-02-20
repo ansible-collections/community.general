@@ -15,6 +15,13 @@ author:
 short_description: Manage services on OpenWrt
 description:
     - Controls OpenWrt services on remote hosts.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         type: str

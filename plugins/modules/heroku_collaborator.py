@@ -21,6 +21,13 @@ author:
   - Marcel Arns (@marns93)
 requirements:
   - heroku3
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   api_key:
     type: str

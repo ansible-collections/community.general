@@ -14,7 +14,14 @@ DOCUMENTATION = r'''
 module: wakeonlan
 short_description: Send a magic Wake-on-LAN (WoL) broadcast packet
 description:
-- The C(wakeonlan) module sends magic Wake-on-LAN (WoL) broadcast packets.
+  - The C(wakeonlan) module sends magic Wake-on-LAN (WoL) broadcast packets.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   mac:
     description:
