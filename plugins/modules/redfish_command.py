@@ -18,6 +18,13 @@ description:
   - Manages OOB controller ex. reboot, log management.
   - Manages OOB controller users ex. add, remove, update.
   - Manages system power ex. on, off, graceful and forced reboot.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true
