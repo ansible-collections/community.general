@@ -28,6 +28,13 @@ description:
     e.g., I(service=host). This keyword may not be given with other services at the same time.
     I(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
     To schedule downtime for all services on particular host use keyword "all", e.g., I(service=all).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   action:
     description:

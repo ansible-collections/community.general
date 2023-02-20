@@ -20,6 +20,13 @@ notes:
     prior to setting the RHSM release.
 requirements:
   - Red Hat Enterprise Linux 6+ with subscription-manager installed
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   release:
     description:

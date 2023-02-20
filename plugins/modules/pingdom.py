@@ -19,6 +19,13 @@ author:
     - "Justin Johns (!UNKNOWN)"
 requirements:
     - "This pingdom python library: https://github.com/mbabineau/pingdom-python"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     state:
         type: str

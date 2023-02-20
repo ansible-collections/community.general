@@ -15,10 +15,16 @@ short_description: Adds or removes Red Hat software channels
 description:
     - Adds or removes Red Hat software channels.
 author:
-- Vincent Van der Kussen (@vincentvdk)
+    - Vincent Van der Kussen (@vincentvdk)
 notes:
     - This module fetches the system id from RHN.
-    - This module doesn't support I(check_mode).
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:

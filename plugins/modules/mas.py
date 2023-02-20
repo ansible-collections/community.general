@@ -19,6 +19,13 @@ version_added: '0.2.0'
 author:
     - Michael Heap (@mheap)
     - Lukas Bestle (@lukasbestle)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     id:
         description:
@@ -46,8 +53,6 @@ requirements:
     - macOS 10.11+
     - "mas-cli (U(https://github.com/mas-cli/mas)) 1.5.0+ available as C(mas) in the bin path"
     - The Apple ID to use already needs to be signed in to the Mac App Store (check with C(mas account)).
-notes:
-    - This module supports C(check_mode).
 '''
 
 EXAMPLES = '''

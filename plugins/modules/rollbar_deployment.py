@@ -17,6 +17,13 @@ short_description: Notify Rollbar about app deployments
 description:
   - Notify Rollbar about app deployments
     (see https://rollbar.com/docs/deploys_other/)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   token:
     type: str

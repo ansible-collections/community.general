@@ -18,6 +18,13 @@ author: "Marc Sensenich (@marc-sensenich)"
 notes:
   - This module is not idempotent, therefore if the same task is run twice
     there will be two Connector Cards created
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   webhook:
     type: str
