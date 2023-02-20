@@ -15,6 +15,13 @@ module: ipmi_power
 short_description: Power management for machine
 description:
   - Use this module for power management
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:
