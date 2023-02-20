@@ -14,6 +14,13 @@ module: jboss
 short_description: Deploy applications to JBoss
 description:
   - Deploy applications to JBoss standalone using the filesystem.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   deployment:
     required: true

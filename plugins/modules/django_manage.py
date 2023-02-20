@@ -17,6 +17,13 @@ short_description: Manages a Django application
 description:
   - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
     I(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   command:
     description:
