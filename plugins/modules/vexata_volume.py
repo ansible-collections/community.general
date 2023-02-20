@@ -17,6 +17,11 @@ description:
     - Create, deletes or extend volumes on a Vexata VX100 array.
 author:
 - Sandeep Kasargod (@vexata)
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -35,6 +40,7 @@ options:
     type: str
 extends_documentation_fragment:
 - community.general.vexata.vx100
+- community.general.attributes
 
 '''
 

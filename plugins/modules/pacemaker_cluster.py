@@ -13,10 +13,17 @@ DOCUMENTATION = '''
 module: pacemaker_cluster
 short_description: Manage pacemaker clusters
 author:
-- Mathieu Bultel (@matbu)
+  - Mathieu Bultel (@matbu)
 description:
-   - This module can manage a pacemaker cluster and nodes from Ansible using
-     the pacemaker cli.
+  - This module can manage a pacemaker cluster and nodes from Ansible using
+    the pacemaker cli.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+      support: full
+    diff_mode:
+      support: none
 options:
     state:
       description:
