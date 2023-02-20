@@ -23,8 +23,14 @@ description:
     - "This module manages the members of an existing storage group."
 
 extends_documentation_fragment:
-- community.general.emc.emc_vnx
+    - community.general.emc.emc_vnx
+    - community.general.attributes
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 
 options:
     name:

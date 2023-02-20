@@ -20,6 +20,13 @@ seealso:
   - name: API documentation
     description: Documentation for Alerta API
     link: https://docs.alerta.io/api/reference.html#customers
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   customer:
     description:
