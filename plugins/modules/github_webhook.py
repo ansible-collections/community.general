@@ -16,6 +16,13 @@ description:
   - "Create and delete GitHub webhooks"
 requirements:
   - "PyGithub >= 1.3.5"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   repository:
     description:

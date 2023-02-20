@@ -14,7 +14,14 @@ DOCUMENTATION = '''
 module: github_issue
 short_description: View GitHub issue
 description:
-    - View GitHub issue for a given repository and organization.
+  - View GitHub issue for a given repository and organization.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   repo:
     description:
