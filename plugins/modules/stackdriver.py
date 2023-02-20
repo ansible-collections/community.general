@@ -15,6 +15,13 @@ short_description: Send code deploy and annotation events to stackdriver
 description:
   - Send code deploy and annotation events to Stackdriver
 author: "Ben Whaley (@bwhaley)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   key:
     type: str

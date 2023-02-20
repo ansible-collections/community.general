@@ -21,6 +21,13 @@ notes:
     capture API traffic
   - Use start_date and start_time with minutes to set future maintenance window
 author: Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     title:
         type: str
