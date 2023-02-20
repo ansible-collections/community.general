@@ -20,6 +20,13 @@ description:
   - Supports getting information back via GET method.
   - Supports updating a configuration attribute via PATCH method.
   - Supports performing an action via POST method.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true

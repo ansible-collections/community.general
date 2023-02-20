@@ -17,6 +17,13 @@ description:
     set or update a configuration attribute.
   - Manages BIOS configuration settings.
   - Manages OOB controller configuration settings.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true
