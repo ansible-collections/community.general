@@ -14,7 +14,14 @@ DOCUMENTATION = '''
 module: supervisorctl
 short_description: Manage the state of a program or group of programs running via supervisord
 description:
-     - Manage the state of a program or group of programs running via supervisord
+  - Manage the state of a program or group of programs running via supervisord
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     type: str

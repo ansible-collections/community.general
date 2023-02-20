@@ -16,6 +16,13 @@ short_description: Manage SmartOS virtual machines and zones
 description:
   - Manage SmartOS virtual machines through vmadm(1M).
 author: Jasper Lievisse Adriaanse (@jasperla)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   archive_on_delete:
     required: false

@@ -21,6 +21,13 @@ description:
 requirements:
   - python >= 2.7
   - spotinst_sdk >= 1.0.38
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
 
   credentials_path:
