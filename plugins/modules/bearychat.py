@@ -14,6 +14,13 @@ description:
     - The M(community.general.bearychat) module sends notifications to U(https://bearychat.com)
       via the Incoming Robot integration.
 author: "Jiangge Zhang (@tonyseek)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   url:
     type: str

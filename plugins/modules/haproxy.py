@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 module: haproxy
 short_description: Enable, disable, and set weights for HAProxy backend servers using socket commands
 author:
-- Ravi Bhure (@ravibhure)
+    - Ravi Bhure (@ravibhure)
 description:
     - Enable, disable, drain and set weights for HAProxy backend servers using socket commands.
 notes:
@@ -23,6 +23,13 @@ notes:
       haproxy.cfg. See U(http://haproxy.1wt.eu/download/1.5/doc/configuration.txt).
     - Depends on netcat (C(nc)) being available; you need to install the appropriate
       package for your operating system before this module can be used.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   backend:
     description:

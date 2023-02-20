@@ -16,6 +16,13 @@ requirements: [ lldpctl ]
 short_description: Get details reported by lldp
 description:
   - Reads data out of lldpctl
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options: {}
 author: "Andy Hill (@andyhky)"
 notes:

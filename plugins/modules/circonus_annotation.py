@@ -20,6 +20,13 @@ requirements:
     - requests (either >= 2.0.0 for Python 3, or >= 1.0.0 for Python 2)
 notes:
     - Check mode isn't supported.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     api_key:
         type: str

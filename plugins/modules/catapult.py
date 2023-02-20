@@ -16,7 +16,14 @@ DOCUMENTATION = '''
 module: catapult
 short_description: Send a sms / mms using the catapult bandwidth api
 description:
-     - Allows notifications to be sent using sms / mms via the catapult bandwidth api.
+    - Allows notifications to be sent using sms / mms via the catapult bandwidth api.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   src:
     type: str
