@@ -20,6 +20,13 @@ description:
     - Will install, upgrade and remove packages with swdepot package manager (HP-UX)
 notes: []
 author: "Raul Melo (@melodous)"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

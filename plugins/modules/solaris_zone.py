@@ -16,9 +16,16 @@ description:
   - Create, start, stop and delete Solaris zones.
   - This module does not currently allow changing of options for a zone that is already been created.
 author:
-- Paul Markham (@pmarkham)
+  - Paul Markham (@pmarkham)
 requirements:
   - Solaris 10 or 11
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:

@@ -15,6 +15,13 @@ short_description: Add or remove host to stacki front-end
 description:
   - Use this module to add or remove hosts to a stacki front-end via API.
   - Information on stacki can be found at U(https://github.com/StackIQ/stacki).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:
