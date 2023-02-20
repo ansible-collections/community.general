@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_identity_provider - fixed existing mappers being deleted if not changed (https://github.com/ansible-collections/community.general/issues/6002).
