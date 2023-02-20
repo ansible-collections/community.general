@@ -17,7 +17,16 @@ short_description: Local Backup Utility for Alpine Linux
 version_added: '0.2.0'
 
 description:
-- Manage Local Backup Utility of Alpine Linux in run-from-RAM mode
+  - Manage Local Backup Utility of Alpine Linux in run-from-RAM mode
+
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   commit:
@@ -36,7 +45,7 @@ options:
     elements: str
 
 author:
-- Kaarle Ritvanen (@kunkku)
+  - Kaarle Ritvanen (@kunkku)
 '''
 
 EXAMPLES = '''

@@ -18,6 +18,13 @@ requirements:
 short_description: Manage Cloudflare DNS records
 description:
    - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)."
+extends_documentation_fragment:
+   - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   api_token:
     description:

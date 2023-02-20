@@ -15,6 +15,13 @@ author: "Hagai Kariti (@hkariti)"
 short_description: Notify BigPanda about deployments
 description:
    - Notify BigPanda when deployments start and end (successfully or not). Returns a deployment object containing all the parameters for future module calls.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   component:
     type: str

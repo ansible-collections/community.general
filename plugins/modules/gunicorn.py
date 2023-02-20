@@ -14,14 +14,21 @@ DOCUMENTATION = '''
 module: gunicorn
 short_description: Run gunicorn with various settings
 description:
-     - Starts gunicorn with the parameters specified. Common settings for gunicorn
-       configuration are supported. For additional configuration use a config file
-       See U(https://gunicorn-docs.readthedocs.io/en/latest/settings.html) for more
-       options. It's recommended to always use the chdir option to avoid problems
-       with the location of the app.
+    - Starts gunicorn with the parameters specified. Common settings for gunicorn
+      configuration are supported. For additional configuration use a config file
+      See U(https://gunicorn-docs.readthedocs.io/en/latest/settings.html) for more
+      options. It's recommended to always use the chdir option to avoid problems
+      with the location of the app.
 requirements: [gunicorn]
 author:
     - "Alejandro Gomez (@agmezr)"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   app:
     type: str

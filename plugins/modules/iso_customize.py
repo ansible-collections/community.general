@@ -23,6 +23,15 @@ requirements:
   - "python >= 2.7"
 version_added: '5.8.0'
 
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   src_iso:
     description:

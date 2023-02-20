@@ -15,6 +15,11 @@ short_description: Manage user files for basic authentication
 description:
   - Add and remove username/password entries in a password file using htpasswd.
   - This is used by web servers such as Apache and Nginx for basic authentication.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   path:
     type: path
@@ -68,7 +73,9 @@ notes:
   - "On RHEL or CentOS: Enable EPEL, then install I(python-passlib)."
 requirements: [ passlib>=1.6 ]
 author: "Ansible Core Team"
-extends_documentation_fragment: files
+extends_documentation_fragment:
+  - files
+  - community.general.attributes
 '''
 
 EXAMPLES = """

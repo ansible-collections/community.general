@@ -16,6 +16,13 @@ short_description: Sends a notification to a grove.io channel
 description:
      - The C(grove) module sends a message for a service to a Grove.io
        channel.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   channel_token:
     type: str

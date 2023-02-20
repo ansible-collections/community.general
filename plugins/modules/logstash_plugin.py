@@ -15,6 +15,13 @@ short_description: Manage Logstash plugins
 description:
     - Manages Logstash plugins.
 author: Loic Blot (@nerzhul)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         type: str
