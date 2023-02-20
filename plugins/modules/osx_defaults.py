@@ -118,7 +118,7 @@ EXAMPLES = r'''
       - nl
 
 - name: Removing a key
-- community.general.osx_defaults:
+  community.general.osx_defaults:
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
     state: absent
