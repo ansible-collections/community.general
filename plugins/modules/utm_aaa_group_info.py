@@ -22,6 +22,10 @@ short_description: Get info for reverse_proxy frontend entry in Sophos UTM
 description:
     - get info for a reverse_proxy frontend entry in SOPHOS UTM.
 
+attributes:
+    check_mode:
+        version_added: 3.3.0
+        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 
 options:
     name:
