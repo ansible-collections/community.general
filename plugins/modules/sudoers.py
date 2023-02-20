@@ -19,6 +19,13 @@ description:
   - This module allows for the manipulation of sudoers files.
 author:
   - "Jon Ellis (@JonEllis) <ellis.jp@gmail.com>"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   commands:
     description:

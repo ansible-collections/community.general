@@ -16,6 +16,11 @@ module: java_keystore
 short_description: Create a Java keystore in JKS format
 description:
   - Bundle a x509 certificate and its private key into a Java Keystore in JKS format.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -124,7 +129,8 @@ author:
   - Guillaume Grossetie (@Mogztter)
   - quidame (@quidame)
 extends_documentation_fragment:
-  - files
+  - ansible.builtin.files
+  - community.general.attributes
 seealso:
   - module: community.crypto.openssl_pkcs12
   - module: community.general.java_cert

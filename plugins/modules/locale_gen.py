@@ -13,21 +13,28 @@ DOCUMENTATION = '''
 module: locale_gen
 short_description: Creates or removes locales
 description:
-     - Manages locales by editing /etc/locale.gen and invoking locale-gen.
+    - Manages locales by editing /etc/locale.gen and invoking locale-gen.
 author:
-- Augustus Kling (@AugustusKling)
+    - Augustus Kling (@AugustusKling)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         type: str
         description:
-             - Name and encoding of the locale, such as "en_GB.UTF-8".
+            - Name and encoding of the locale, such as "en_GB.UTF-8".
         required: true
     state:
-      type: str
-      description:
-           - Whether the locale shall be present.
-      choices: [ absent, present ]
-      default: present
+        type: str
+        description:
+            - Whether the locale shall be present.
+        choices: [ absent, present ]
+        default: present
 '''
 
 EXAMPLES = '''

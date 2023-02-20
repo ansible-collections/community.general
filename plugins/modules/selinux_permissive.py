@@ -15,6 +15,13 @@ module: selinux_permissive
 short_description: Change permissive domain in SELinux policy
 description:
   - Add and remove a domain from the list of permissive domains.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   domain:
     description:

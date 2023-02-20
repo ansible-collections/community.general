@@ -15,14 +15,21 @@ DOCUMENTATION = r'''
 ---
 module: ini_file
 short_description: Tweak settings in INI files
-extends_documentation_fragment: files
+extends_documentation_fragment:
+  - files
+  - community.general.attributes
 description:
-     - Manage (add, remove, change) individual settings in an INI-style file without having
-       to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
-     - Adds missing sections if they don't exist.
-     - Before Ansible 2.0, comments are discarded when the source file is read, and therefore will not show up in the destination file.
-     - Since Ansible 2.3, this module adds missing ending newlines to files to keep in line with the POSIX standard, even when
-       no other modifications need to be applied.
+  - Manage (add, remove, change) individual settings in an INI-style file without having
+    to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
+  - Adds missing sections if they don't exist.
+  - Before Ansible 2.0, comments are discarded when the source file is read, and therefore will not show up in the destination file.
+  - Since Ansible 2.3, this module adds missing ending newlines to files to keep in line with the POSIX standard, even when
+    no other modifications need to be applied.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   path:
     description:

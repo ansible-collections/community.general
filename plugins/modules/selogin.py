@@ -13,7 +13,14 @@ DOCUMENTATION = '''
 module: selogin
 short_description: Manages linux user to SELinux user mapping
 description:
-     - Manages linux user to SELinux user mapping
+  - Manages linux user to SELinux user mapping
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   login:
     type: str

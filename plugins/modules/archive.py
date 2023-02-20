@@ -14,11 +14,18 @@ DOCUMENTATION = r'''
 ---
 module: archive
 short_description: Creates a compressed archive of one or more files or trees
-extends_documentation_fragment: files
+extends_documentation_fragment:
+    - files
+    - community.general.attributes
 description:
     - Creates or extends an archive.
     - The source and archive are on the remote host, and the archive I(is not) copied to the local host.
     - Source files can be deleted after archival by specifying I(remove=True).
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   path:
     description:
