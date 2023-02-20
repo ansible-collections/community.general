@@ -21,6 +21,10 @@ short_description: Get info for a ca host_key_cert entry in Sophos UTM
 description:
     - Get info for a ca host_key_cert entry in SOPHOS UTM.
 
+attributes:
+    check_mode:
+        version_added: 3.3.0
+        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 
 options:
     name:
