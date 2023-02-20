@@ -15,6 +15,13 @@ author:
   - Saranya Sridharan (@saranyasridharan)
 requirements:
   - psutil(python module)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description: The name of the process(es) you want to get PID(s) for.
