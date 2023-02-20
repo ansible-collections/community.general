@@ -12,11 +12,18 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: gconftool2
 author:
-    - Kenneth D. Evensen (@kevensen)
+  - Kenneth D. Evensen (@kevensen)
 short_description: Edit GNOME Configurations
 description:
   - This module allows for the manipulation of GNOME 2 Configuration via
     gconftool-2.  Please see the gconftool-2(1) man pages for more details.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   key:
     type: str
