@@ -13,7 +13,14 @@ DOCUMENTATION = '''
 module: github_key
 short_description: Manage GitHub access keys
 description:
-    - Creates, removes, or updates GitHub access keys.
+  - Creates, removes, or updates GitHub access keys.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   token:
     description:

@@ -25,6 +25,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   project:
@@ -82,8 +89,6 @@ options:
     elements: str
     choices: ['guest', 'reporter', 'developer', 'maintainer']
     version_added: 3.7.0
-notes:
-  - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''

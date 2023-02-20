@@ -15,6 +15,13 @@ module: github_release
 short_description: Interact with GitHub Releases
 description:
     - Fetch metadata about GitHub Releases
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     token:
         description:
