@@ -16,6 +16,11 @@ version_added: 2.0.0
 description:
   - Allows you to create/delete/restore snapshots from instances in Proxmox VE cluster.
   - Supports both KVM and LXC, OpenVZ has not been tested, as it is no longer supported on Proxmox VE.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   hostname:
     description:
@@ -72,11 +77,11 @@ options:
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
-  - Supports C(check_mode).
 requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Jeffrey van Pelt (@Thulium-Drake)
 extends_documentation_fragment:
     - community.general.proxmox.documentation
+    - community.general.attributes
 '''
 
 EXAMPLES = r'''
