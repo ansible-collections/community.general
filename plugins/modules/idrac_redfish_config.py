@@ -16,6 +16,13 @@ description:
   - For use with Dell iDRAC operations that require Redfish OEM extensions
   - Builds Redfish URIs locally and sends them to remote iDRAC controllers to
     set or update a configuration attribute.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true
