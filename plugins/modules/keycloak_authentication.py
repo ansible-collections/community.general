@@ -274,29 +274,26 @@ def add_error_line(err_msg_lines, err_msg, flow, exec_name, subflow = None, expe
                         expected=" (Expected : " + str(expected) if expected is not None else "",\
                         actual=", Actual : " + str(actual) if actual is not None else "")]
 def create_diff_key(execution):
-    return "{subflow}{ex_id}".format(subflow=execution["flowAlias"]+"_" if execution.get("flowAlias") is not None else "",\
+    return "{ex_id}{subflow}".format(subflow=(" / " + execution["flowAlias"]) if execution.get("flowAlias") is not None else "",\
             ex_id=get_identifier(execution))
             
 def add_diff_entry(new_exec, old_exec, before, after):
     exec_key = create_diff_key(new_exec)
-    old_values = {}
-    new_values = {}
-    for key in new_exec:
-        if new_exec[key] is not None and key != "flowAlias":
-            if key == "authenticationConfig":
-                old_config = {"alias":old_exec["authenticationConfig"]["alias"], "config":{}}
-                new_config = {"alias":new_exec["authenticationConfig"]["alias"], "config":{}}
-                for configKey in new_exec["authenticationConfig"]["config"]:
-                    if new_exec["authenticationConfig"]["config"].get(configKey) != "":
-                        old_config["config"].update({configKey:old_exec["authenticationConfig"]["config"].get(configKey)})
-                        new_config["config"].update({configKey:new_exec["authenticationConfig"]["config"].get(configKey)})
-                old_values.update({key:old_config})
-                new_values.update({key:new_config})
-            else:
-                old_values.update({key:old_exec[key]})
-                new_values.update({key:new_exec[key]})
-    before.update({exec_key:old_values})
-    after.update({exec_key:new_values})
+    data = [(time, execution) for (time, execution) in [(after, new_exec), (before, old_exec)] if execution is not None and time is not None]
+    for time, execution in data:
+        if time.get("executions") is None:
+            time["executions"] = {}
+        time["executions"][exec_key] = {}
+        for key in new_exec:
+            if new_exec[key] is not None and key not in ["flowAlias", "requirementChoices", "configurable"]: # Remove key we know are only in one execution
+                if key == "authenticationConfig":
+                    config = {"alias":execution["authenticationConfig"]["alias"], "config" : {}}
+                    for configKey in new_exec["authenticationConfig"]["config"]:
+                        if new_exec["authenticationConfig"]["config"].get(configKey) != "":
+                            config["config"].update({configKey:execution["authenticationConfig"]["config"].get(configKey)})
+                    time["executions"][exec_key].update({key:config})
+                else:
+                    time["executions"][exec_key].update({key:execution[key]})
 
 
 def create_or_update_executions(kc, config, check_mode, realm='master'):
@@ -334,19 +331,24 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
             # Keep track of ids of execution we handled already to account for dupplicates
             changed_executions_ids = []
                 
-            # Remove extra executions if any
+            # Remove extra executions if any. Iterate backwards so we don't stumble upon concurrency issues
+            # when deleting subflows
             new_executions_copy = copy.deepcopy(new_executions)
-            for existing_exec_index, existing_exec in enumerate(existing_executions):
+            deleted_subflow_aliases = []
+            existing_exec_index = len(existing_executions) - 1
+            while existing_exec_index >= 0:
+                existing_exec = existing_executions[existing_exec_index]
                 found_index = find_exec_in_executions(existing_exec, new_executions_copy, [])
                 if found_index == -1:
                     changed = True
-                    before.update({create_diff_key(existing_exec):existing_exec})
+                    add_diff_entry(existing_exec, existing_exec, before, None)
                     add_error_line(err_msg_lines=err_msg, err_msg="extra execution", flow=config["alias"],\
                         exec_name=get_identifier(existing_exec)) 
                     if not check_mode:
                         kc.delete_authentication_execution(existing_exec["id"], realm=realm)
                 else:
                     new_executions_copy[found_index].clear()
+                existing_exec_index -= 1
             
             # Update existing executions after deletion
             if changed:
@@ -453,9 +455,12 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\
                             exec_name=get_identifier(new_exec))
                         changed = True
-                        after.update({create_diff_key(new_exec):new_exec})
+                        add_diff_entry(new_exec, None, before, after)
                 if new_exec.get("id") is not None:
                     changed_executions_ids.append(new_exec["id"])
+        for time in [before, after]:
+            if time.get("executions") is not None:
+                time["executions"] = dict(sorted(time["executions"].items()))
         return changed, dict(before=before, after=after), err_msg
 
     except Exception as e:
@@ -557,13 +562,14 @@ def main():
                 module.fail_json(**result)
 
             # Configure the executions for the flow
-            create_or_update_executions(kc=kc, config=new_auth_repr, check_mode=module.check_mode, realm=realm)
+            create_or_update_executions(kc=kc, config=new_auth_repr, check_mode=module.check_mode or module.params["check"], realm=realm)
 
             # Get executions created
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
             result['end_state'] = auth_repr
+            result['msg'] = "Flow {} was created.".format(auth_repr.get("alias"))
 
     else:
         if state == 'present':
