@@ -23,6 +23,11 @@ author: "Chris Schmidt (@chrisisbeef)"
 requirements:
     - lxml
     - boto if using a S3 repository (s3://...)
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     group_id:
         type: str
@@ -166,7 +171,8 @@ options:
         description:
             - Filesystem permission mode applied recursively to I(dest) when it is a directory.
 extends_documentation_fragment:
-    - files
+    - ansible.builtin.files
+    - community.general.attributes
 '''
 
 EXAMPLES = '''

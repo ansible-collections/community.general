@@ -14,7 +14,14 @@ DOCUMENTATION = '''
 module: mqtt
 short_description: Publish a message on an MQTT topic for the IoT
 description:
-   - Publish a message on an MQTT topic.
+  - Publish a message on an MQTT topic.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   server:
     type: str
