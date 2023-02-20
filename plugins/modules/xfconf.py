@@ -26,6 +26,15 @@ seealso:
     description: XFCE documentation for the Xfconf configuration system.
     link: 'https://docs.xfce.org/xfce/xfconf/start'
 
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+
 options:
   channel:
     description:

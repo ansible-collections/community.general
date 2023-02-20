@@ -13,8 +13,15 @@ DOCUMENTATION = r'''
 module: sefcontext
 short_description: Manages SELinux file context mapping definitions
 description:
-- Manages SELinux file context mapping definitions.
-- Similar to the C(semanage fcontext) command.
+  - Manages SELinux file context mapping definitions.
+  - Similar to the C(semanage fcontext) command.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   target:
     description:

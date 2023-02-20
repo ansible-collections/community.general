@@ -16,6 +16,13 @@ description:
   - Manages filesystem user defined extended attributes.
   - Requires that extended attributes are enabled on the target filesystem
     and that the setfattr/getfattr utilities are present.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   path:
     description:
