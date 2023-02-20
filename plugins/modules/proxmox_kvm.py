@@ -16,6 +16,11 @@ description:
   - Allows you to create/delete/stop Qemu(KVM) Virtual Machines in Proxmox VE cluster.
   - Since community.general 4.0.0 on, there are no more default values, see I(proxmox_default_behavior).
 author: "Abdoul Bah (@helldorado) <bahabdoul at gmail.com>"
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   acpi:
     description:
@@ -519,6 +524,7 @@ options:
 extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
+  - community.general.attributes
 '''
 
 EXAMPLES = '''

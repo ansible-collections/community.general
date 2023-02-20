@@ -28,6 +28,15 @@ author:
     - Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
     - Thibaud Morel l'Horset (@teebes) <teebes@gmail.com>
 
+extends_documentation_fragment:
+    - community.general.attributes
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
 options:
   auth_token:
     description:
@@ -148,9 +157,6 @@ options:
 
 requirements:
      - "packet-python >= 1.35"
-
-notes:
-     - Doesn't support check mode.
 
 '''
 

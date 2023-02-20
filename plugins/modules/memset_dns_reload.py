@@ -21,7 +21,14 @@ notes:
     I(dns.reload). If you wish to poll the job status to wait until the reload has
     completed, then I(job.status) is also required.
 description:
-    - Request a reload of Memset's DNS infrastructure, and optionally poll until it finishes.
+  - Request a reload of Memset's DNS infrastructure, and optionally poll until it finishes.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     api_key:
         required: true

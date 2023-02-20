@@ -21,7 +21,14 @@ notes:
   - Currently this module can only create one domain at a time. Multiple domains should
     be created using C(with_items).
 description:
-    - Manage DNS zone domains in a Memset account.
+  - Manage DNS zone domains in a Memset account.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         default: present

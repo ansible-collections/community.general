@@ -14,6 +14,13 @@ module: one_service
 short_description: Deploy and manage OpenNebula services
 description:
   - Manage OpenNebula services
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   api_url:
     description:

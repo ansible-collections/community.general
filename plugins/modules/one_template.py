@@ -23,6 +23,14 @@ requirements:
 description:
   - "Manages OpenNebula templates."
 
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually change.
+  diff_mode:
+    support: none
+
 options:
   id:
     description:
@@ -47,11 +55,9 @@ options:
     default: present
     type: str
 
-notes:
-  - Supports C(check_mode).  Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually change.
-
 extends_documentation_fragment:
   - community.general.opennebula
+  - community.general.attributes
 
 author:
   - "Georg Gadinger (@nilsding)"

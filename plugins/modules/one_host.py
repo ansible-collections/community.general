@@ -23,6 +23,12 @@ requirements:
 description:
     - "Manages OpenNebula Hosts"
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     name:
         description:
@@ -77,8 +83,8 @@ options:
         type: dict
 
 extends_documentation_fragment:
-- community.general.opennebula
-
+    - community.general.opennebula
+    - community.general.attributes
 
 author:
     - Rafael del Valle (@rvalle)

@@ -19,7 +19,14 @@ notes:
     Memset customer control panel is needed with the following minimum scope -
     I(dns.zone_create), I(dns.zone_delete), I(dns.zone_list).
 description:
-    - Manage DNS zones in a Memset account.
+  - Manage DNS zones in a Memset account.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         required: true
