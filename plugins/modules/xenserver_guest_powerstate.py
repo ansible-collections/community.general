@@ -30,6 +30,11 @@ notes:
 requirements:
 - python >= 2.6
 - XenAPI
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:
@@ -67,6 +72,7 @@ options:
     default: 0
 extends_documentation_fragment:
 - community.general.xenserver.documentation
+- community.general.attributes
 
 '''
 

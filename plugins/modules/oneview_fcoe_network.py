@@ -17,6 +17,11 @@ requirements:
     - "python >= 2.7.9"
     - "hpOneView >= 4.0.0"
 author: "Felipe Bulsoni (@fgbulsoni)"
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     state:
         description:
@@ -33,8 +38,9 @@ options:
         required: true
 
 extends_documentation_fragment:
-- community.general.oneview
-- community.general.oneview.validateetag
+    - community.general.oneview
+    - community.general.oneview.validateetag
+    - community.general.attributes
 
 '''
 
