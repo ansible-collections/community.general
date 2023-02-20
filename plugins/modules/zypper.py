@@ -512,8 +512,7 @@ def repo_refresh(m):
 
 
 def transactional_updates():
-    return os.path.exists('/var/lib/misc/transactional-update.state') \
-        or os.path.exists('/usr/sbin/transactional-update')
+    return os.path.exists('/usr/sbin/transactional-update')
 
 # ===========================================
 # Main control flow
