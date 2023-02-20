@@ -15,6 +15,11 @@ module: proxmox_template
 short_description: Management of OS templates in Proxmox VE cluster
 description:
   - allows you to upload/delete templates in Proxmox VE cluster
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   node:
     description:
@@ -62,7 +67,9 @@ options:
 notes:
   - Requires C(proxmoxer) and C(requests) modules on host. This modules can be installed with M(ansible.builtin.pip).
 author: Sergei Antipov (@UnderGreen)
-extends_documentation_fragment: community.general.proxmox.documentation
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.attributes
 '''
 
 EXAMPLES = '''

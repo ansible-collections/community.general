@@ -16,6 +16,11 @@ description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
   - Since community.general 4.0.0 on, there are no more default values, see I(proxmox_default_behavior).
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   password:
     description:
@@ -202,6 +207,7 @@ author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
+  - community.general.attributes
 '''
 
 EXAMPLES = r'''

@@ -26,6 +26,15 @@ author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
     - Nurfet Becirevic (@nurfet-becirevic) <nurfet.becirevic@gmail.com>
 
+extends_documentation_fragment:
+    - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   state:
     description:
