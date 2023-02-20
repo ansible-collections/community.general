@@ -33,6 +33,11 @@ description:
        The module must be called from within the ECS instance itself.
      - This module was called C(ali_instance_facts) before Ansible 2.9. The usage did not change.
 
+attributes:
+    check_mode:
+        version_added: 3.3.0
+        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+
 options:
     name_prefix:
       description:
