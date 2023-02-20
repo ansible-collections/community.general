@@ -17,6 +17,13 @@ short_description: Manage user accounts with systemd-homed
 version_added: 4.4.0
 description:
     - Manages a user's home directory managed by systemd-homed.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

@@ -16,7 +16,14 @@ DOCUMENTATION = r'''
 module: xml
 short_description: Manage bits and pieces of XML files or strings
 description:
-- A CRUD-like interface to managing bits of XML files.
+  - A CRUD-like interface to managing bits of XML files.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   path:
     description:

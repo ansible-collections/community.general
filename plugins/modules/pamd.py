@@ -20,6 +20,13 @@ description:
     module_path must match an existing rule. See man(5) pam.d for details.
 notes:
   - This module does not handle authselect profiles.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:
