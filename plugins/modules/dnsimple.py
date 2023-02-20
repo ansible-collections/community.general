@@ -16,6 +16,13 @@ module: dnsimple
 short_description: Interface with dnsimple.com (a DNS hosting service)
 description:
    - "Manages domains and records via the DNSimple API, see the docs: U(http://developer.dnsimple.com/)."
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   account_email:
     description:

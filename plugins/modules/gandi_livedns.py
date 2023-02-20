@@ -12,11 +12,18 @@ DOCUMENTATION = r'''
 ---
 module: gandi_livedns
 author:
-- Gregory Thiemonge (@gthiemonge)
+  - Gregory Thiemonge (@gthiemonge)
 version_added: "2.3.0"
 short_description: Manage Gandi LiveDNS records
 description:
-- "Manages DNS records by the Gandi LiveDNS API, see the docs: U(https://doc.livedns.gandi.net/)."
+  - "Manages DNS records by the Gandi LiveDNS API, see the docs: U(https://doc.livedns.gandi.net/)."
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   api_key:
     description:
@@ -55,8 +62,6 @@ options:
     - The name of the Domain to work with (for example, "example.com").
     required: true
     type: str
-notes:
-- Supports C(check_mode).
 '''
 
 EXAMPLES = r'''

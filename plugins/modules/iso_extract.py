@@ -14,22 +14,29 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 author:
-- Jeroen Hoekx (@jhoekx)
-- Matt Robinson (@ribbons)
-- Dag Wieers (@dagwieers)
+  - Jeroen Hoekx (@jhoekx)
+  - Matt Robinson (@ribbons)
+  - Dag Wieers (@dagwieers)
 module: iso_extract
 short_description: Extract files from an ISO image
 description:
-- This module has two possible ways of operation.
-- If 7zip is installed on the system, this module extracts files from an ISO
-  into a temporary directory and copies files to a given destination,
-  if needed.
-- If the user has mount-capabilities (CAP_SYS_ADMIN on Linux) this module
-  mounts the ISO image to a temporary location, and copies files to a given
-  destination, if needed.
+  - This module has two possible ways of operation.
+  - If 7zip is installed on the system, this module extracts files from an ISO
+    into a temporary directory and copies files to a given destination,
+    if needed.
+  - If the user has mount-capabilities (CAP_SYS_ADMIN on Linux) this module
+    mounts the ISO image to a temporary location, and copies files to a given
+    destination, if needed.
 requirements:
-- Either 7z (from C(7zip) or C(p7zip) package)
-- Or mount capabilities (root-access, or CAP_SYS_ADMIN capability on Linux)
+  - Either 7z (from C(7zip) or C(p7zip) package)
+  - Or mount capabilities (root-access, or CAP_SYS_ADMIN capability on Linux)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   image:
     description:

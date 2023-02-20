@@ -19,6 +19,13 @@ description:
     - If waiting for migrations is not desired, simply just poll until
       port 3000 if available or asinfo -v status returns ok
 author: "Albert Autin (@Alb0t)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
     host:
         description:
