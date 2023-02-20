@@ -14,11 +14,18 @@ DOCUMENTATION = '''
 module: pushover
 short_description: Send notifications via U(https://pushover.net)
 description:
-   - Send notifications via pushover, to subscriber list of devices, and email
-     addresses. Requires pushover app on devices.
+  - Send notifications via pushover, to subscriber list of devices, and email
+    addresses. Requires pushover app on devices.
 notes:
-   - You will require a pushover.net account to use this module. But no account
-     is required to receive messages.
+  - You will require a pushover.net account to use this module. But no account
+    is required to receive messages.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   msg:
     type: str

@@ -18,7 +18,14 @@ description: Manage OMAPI hosts into compatible DHCPd servers
 requirements:
   - pypureomapi
 author:
-- Loic Blot (@nerzhul)
+  - Loic Blot (@nerzhul)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     state:
         description:

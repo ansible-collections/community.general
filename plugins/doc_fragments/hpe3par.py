@@ -29,8 +29,7 @@ options:
       required: true
 
 requirements:
-  - hpe3par_sdk >= 1.0.2. Install using 'pip install hpe3par_sdk'
+  - hpe3par_sdk >= 1.0.2. Install using C(pip install hpe3par_sdk).
   - WSAPI service should be enabled on the 3PAR storage array.
 notes:
-  -  check_mode not supported
     '''

@@ -14,6 +14,13 @@ module: puppet
 short_description: Runs puppet
 description:
   - Runs I(puppet) agent or apply in a reliable manner.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   timeout:
     description:
