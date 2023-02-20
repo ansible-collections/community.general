@@ -18,6 +18,13 @@ requirements:
     - ejabberd with mod_admin_extra
 description:
     - This module provides user management for ejabberd servers
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     username:
         type: str
