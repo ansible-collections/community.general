@@ -15,6 +15,11 @@ short_description: Send a SMS via nexmo
 description:
     - Send a SMS message via nexmo
 author: "Matt Martz (@sivel)"
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   api_key:
     type: str
@@ -50,7 +55,8 @@ options:
     type: bool
     default: true
 extends_documentation_fragment:
-  - url
+  - ansible.builtin.url
+  - community.general.attributes
 '''
 
 EXAMPLES = """

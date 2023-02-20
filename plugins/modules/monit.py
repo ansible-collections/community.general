@@ -15,6 +15,13 @@ module: monit
 short_description: Manage the state of a program monitored via Monit
 description:
     - Manage the state of a program monitored via I(Monit).
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

@@ -24,6 +24,13 @@ description:
 requirements:
   - dnspython
 author: "Loic Blot (@nerzhul)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         description:

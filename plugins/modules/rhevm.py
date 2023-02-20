@@ -19,7 +19,14 @@ description:
 requirements:
     - ovirtsdk
 author:
-- Timothy Vandenbrande (@TimothyVandenbrande)
+    - Timothy Vandenbrande (@TimothyVandenbrande)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     user:
         description:

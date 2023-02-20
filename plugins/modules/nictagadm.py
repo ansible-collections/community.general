@@ -15,7 +15,14 @@ short_description: Manage nic tags on SmartOS systems
 description:
   - Create or delete nic tags on SmartOS systems.
 author:
-- Bruce Smith (@SmithX10)
+  - Bruce Smith (@SmithX10)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

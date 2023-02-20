@@ -12,10 +12,17 @@ DOCUMENTATION = r'''
 ---
 module: runit
 author:
-- James Sumners (@jsumners)
+    - James Sumners (@jsumners)
 short_description: Manage runit services
 description:
     - Controls runit services on remote hosts using the sv utility.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

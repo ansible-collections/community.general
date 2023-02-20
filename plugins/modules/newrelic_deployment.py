@@ -16,6 +16,13 @@ author: "Matt Coddington (@mcodd)"
 short_description: Notify New Relic about app deployments
 description:
   - Notify New Relic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   token:
     type: str
