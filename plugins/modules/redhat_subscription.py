@@ -25,6 +25,13 @@ notes:
       config file and default to None.
 requirements:
     - subscription-manager
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     state:
         description:
