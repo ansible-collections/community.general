@@ -18,6 +18,11 @@ author:
 description:
   - Create and delete CPG on HPE 3PAR.
 module: ss_3par_cpg
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   cpg_name:
     description:
@@ -88,6 +93,7 @@ options:
     default: false
 extends_documentation_fragment:
 - community.general.hpe3par
+- community.general.attributes
 
 '''
 
