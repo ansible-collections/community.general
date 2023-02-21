@@ -63,6 +63,13 @@ EXAMPLES = '''
     name: dummy
     state: present
     params: 'numdummies=2'
+
+- name: Add the dummy module
+  community.general.modprobe:
+    name: dummy
+    state: present
+    params: 'numdummies=2'
+    persistent: present
 '''
 
 import os.path
