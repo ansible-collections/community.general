@@ -54,6 +54,7 @@ options:
   substitute:
     description:
     - Path to use to substitute file context(s) for the specified I(target). The context labeling for the I(target) subtree is made equivalent to this path.
+    - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux management tools.
     version_added: 6.4.0
     type: str
   seuser:
