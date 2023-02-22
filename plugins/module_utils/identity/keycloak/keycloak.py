@@ -34,6 +34,10 @@ URL_REALM_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/users/{id}/role-m
 URL_REALM_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/users/{id}/role-mappings/realm/composite"
 URL_REALM_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/roles/{name}/composites"
 
+URL_REQUIRED_ACTIONS = "{url}/admin/realms/{realm}/authentication/required-actions/{alias}"
+URL_GET_REQUIRED_ACTIONS = "{url}/admin/realms/{realm}/authentication/required-actions"
+URL_REGISTER_REQUIRED_ACTIONS = "{url}/admin/realms/{realm}/authentication/register-required-action"
+
 URL_ROLES_BY_ID = "{url}/admin/realms/{realm}/roles-by-id/{id}"
 URL_ROLES_BY_ID_COMPOSITES_CLIENTS = "{url}/admin/realms/{realm}/roles-by-id/{id}/composites/clients/{cid}"
 URL_ROLES_BY_ID_COMPOSITES = "{url}/admin/realms/{realm}/roles-by-id/{id}/composites"
@@ -2082,3 +2086,129 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to delete component %s in realm %s: %s'
                                       % (cid, realm, str(e)))
+
+
+
+    def get_required_action_by_alias(self, alias, realm="master"):
+        """
+        Get a required action by its alias
+        :param alias: Alias of the required action to get.
+        :param realm: Realm.
+        :return: Required action representation.
+        """
+        try:
+            required_action = {}
+            # Check if the authentication flow exists on the Keycloak server
+            authentications = json.load(
+                open_url(
+                    URL_GET_REQUIRED_ACTIONS.format(url=self.baseurl,
+                                                    realm=realm),
+                    method="GET",
+                    http_agent=self.http_agent,
+                    headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs,
+                )
+            )
+            print(authentications)
+            for authentication in authentications:
+                if "alias" in authentication:
+                    if authentication["alias"] == alias:
+                        required_action = authentication
+                        break
+            return required_action
+        except Exception as e:
+            self.module.fail_json(msg="Unable get required action {}: {} - {}"
+                                  .format(alias, str(e), authentication))
+
+
+    def register_new_required_action(self, data, realm="master"):
+        """
+        Register a new required action.
+        :param data: dict containing 'providerId' and 'name' attributes
+        :param self: realm
+        :return: Representation of the new required action
+        """
+
+        try:
+            register_data = data
+            open_url(
+                URL_REGISTER_REQUIRED_ACTIONS.format(url=self.baseurl, realm=realm),
+                method="POST",
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs,
+                data=json.dumps(register_data),
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg="Could not register required action {} in realm {}: {} \
+                ({}, {})".format(data["alias"], realm, str(e),
+                URL_REGISTER_REQUIRED_ACTIONS, register_data)
+            )
+
+
+    def update_required_action(self, rep, realm="master"):
+        """
+        Update an existing required action.
+        :param rep: representation of the new state of the required action
+        :param realm: realm
+        :return: Representation of the new required action
+        """
+        try:
+            open_url(
+                URL_REQUIRED_ACTIONS.format(
+                    url=self.baseurl, realm=realm, alias=rep["alias"]
+                ),
+                method="PUT",
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs,
+                data=json.dumps(rep),
+            )
+            action_list = json.load(
+                open_url(
+                    URL_GET_REQUIRED_ACTIONS.format(url=self.baseurl,
+                                                    realm=realm),
+                    method="GET",
+                    http_agent=self.http_agent,
+                    headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs,
+                )
+            )
+            for action in action_list:
+                if action["alias"] == rep["alias"]:
+                    return action
+            return None
+        except Exception as e:
+            self.module.fail_json(
+                msg="Could not update required action {} in realm {}: {} "
+                .format(rep['alias'], realm, str(e))
+                )
+
+    def delete_required_action(self, alias, realm="master"):
+        """
+        Delete required action by alias.
+        :param alias: required action alias
+        :param realm: realm
+        """
+        try:
+            open_url(
+                URL_REQUIRED_ACTIONS.format(url=self.baseurl, realm=realm,
+                                            alias=alias),
+                method="DELETE",
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs,
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg="Could not delete required action %s in realm %s: %s"
+                % (alias, realm, str(e))
+            )
+
+
