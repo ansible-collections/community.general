@@ -35,7 +35,7 @@ options:
         type: str
     config:
         description:
-          - 'The config for the container (e.g. {"limits.memory": "4GB"}).
+          - 'The config for the instance (e.g. {"limits.memory": "4GB"}).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#patch-3)'
           - If the profile already exists and its "config" value in metadata
             obtained from
@@ -247,7 +247,7 @@ CONFIG_PARAMS = [
 
 class LXDProfileManagement(object):
     def __init__(self, module):
-        """Management of LXC containers via Ansible.
+        """Management of LXC profiles via Ansible.
 
         :param module: Processed Ansible Module.
         :type module: ``object``
