@@ -1,0 +1,2 @@
+bugfixes:
+  - "keycloak_client - fix accidental replacement of value for attribute ``saml.signing.private.key`` with ``no_log`` in wrong contexts (https://github.com/ansible-collections/community.general/pull/5934)."
