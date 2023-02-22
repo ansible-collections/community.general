@@ -511,10 +511,6 @@ def repo_refresh(m):
     return retvals
 
 
-def contains_readonly_opt(opts):
-    return re.match('^ro,|,ro,|,ro$|^ro$', opts) is not None
-
-
 def get_fs_type_and_readonly_state(mount_point):
     with open('/proc/mounts', 'r') as file:
         for line in file.readlines():
@@ -523,12 +519,12 @@ def get_fs_type_and_readonly_state(mount_point):
             if path == mount_point:
                 fs = fields[2]
                 opts = fields[3]
-                return fs, contains_readonly_opt(opts)
+                return fs, 'ro' in opts.split(',')
     return None
 
 
 def transactional_updates():
-    return get_fs_type_and_readonly_state('/') == ('btrfs', True) and os.path.exists('/usr/sbin/transactional-update')
+    return os.path.exists('/usr/sbin/transactional-update') and get_fs_type_and_readonly_state('/') == ('btrfs', True)
 
 
 # ===========================================
