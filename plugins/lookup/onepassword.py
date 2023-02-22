@@ -488,7 +488,7 @@ class OnePassCLIv2(OnePassCLIBase):
                 account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
                 args.extend(["--account", account])
 
-            rc, out, err = self._run(args)
+            rc, out, err = self._run(args, ignore_errors=True)
 
             return not bool(rc)
 
