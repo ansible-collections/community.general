@@ -224,7 +224,6 @@ EXAMPLES = '''
 
 import os.path
 import xml
-import psutil
 import re
 from xml.dom.minidom import parseString as parseXML
 from ansible.module_utils.common.text.converters import to_native
@@ -516,15 +515,21 @@ def contains_readonly_opt(opts):
     return re.match('^ro,|,ro,|,ro$|^ro$', opts) is not None
 
 
-def get_fs_type_and_readonly_state(path):
-    for part in psutil.disk_partitions():
-        if part.mountpoint == path:
-            return part.fstype, contains_readonly_opt(part.opts)
-    return 'unknown', False
+def get_fs_type_and_readonly_state(mount_point):
+    with open('/proc/mounts', 'r') as file:
+        for line in file.readlines():
+            fields = line.split()
+            path = fields[1]
+            if path == mount_point:
+                fs = fields[2]
+                opts = fields[3]
+                return fs, contains_readonly_opt(opts)
+    return None
 
 
 def transactional_updates():
     return get_fs_type_and_readonly_state('/') == ('btrfs', True) and os.path.exists('/usr/sbin/transactional-update')
+
 
 # ===========================================
 # Main control flow
