@@ -2100,7 +2100,10 @@ class Nmcli(object):
         diff_after = dict()
 
         for key, value in options.items():
-            if not value:
+            # We can't just do `if not value` because then if there's a value
+            # of 0 specified as an integer it'll be interpreted as empty when
+            # it actually isn't.
+            if value != 0 and not value:
                 continue
 
             if key in conn_info:
