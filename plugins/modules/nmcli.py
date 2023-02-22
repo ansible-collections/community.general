@@ -2105,6 +2105,10 @@ class Nmcli(object):
 
             if key in conn_info:
                 current_value = conn_info[key]
+                if key == '802-11-wireless.wake-on-wlan' and current_value is not None:
+                    match = re.match('0x([0-9A-Fa-f]+)', current_value)
+                    if match:
+                        current_value = str(int(match.group(1), 16))
                 if key in ('ipv4.routes', 'ipv6.routes') and current_value is not None:
                     current_value = self.get_route_params(current_value)
                 if key == self.mac_setting:
