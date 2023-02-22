@@ -15,6 +15,9 @@ module: iptables_state
 short_description: Save iptables state into a file or restore it from a file
 version_added: '1.1.0'
 author: quidame (@quidame)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.flow
 description:
   - C(iptables) is used to set up, maintain, and inspect the tables of IP
     packet filter rules in the Linux kernel.
@@ -36,7 +39,15 @@ notes:
     still happen if it shall happen, but you will experience a connection
     timeout instead of more relevant info returned by the module after its
     failure.
-  - This module supports I(check_mode).
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  action:
+    support: full
+  async:
+    support: full
 options:
   counters:
     description:
