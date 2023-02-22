@@ -16,6 +16,15 @@ short_description: Manage LXD instances
 description:
   - Management of LXD containers and virtual machines.
 author: "Hiroaki Nakamura (@hnakamur)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+    version_added: 6.4.0
+  diff_mode:
+    support: full
+    version_added: 6.4.0
 options:
     name:
         description:
@@ -396,6 +405,7 @@ actions:
   type: list
   sample: ["create", "start"]
 '''
+import copy
 import datetime
 import os
 import time
@@ -411,7 +421,7 @@ LXD_ANSIBLE_STATES = {
     'stopped': '_stopped',
     'restarted': '_restarted',
     'absent': '_destroyed',
-    'frozen': '_frozen'
+    'frozen': '_frozen',
 }
 
 # ANSIBLE_LXD_STATES is a map of states of lxd containers to the Ansible
@@ -429,6 +439,10 @@ ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 CONFIG_PARAMS = [
     'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
 ]
+
+# CONFIG_CREATION_PARAMS is a list of attribute names that are only applied
+# on instance creation.
+CONFIG_CREATION_PARAMS = ['source']
 
 
 class LXDContainerManagement(object):
@@ -488,6 +502,9 @@ class LXDContainerManagement(object):
             self.module.fail_json(msg=e.msg)
         self.trust_password = self.module.params.get('trust_password', None)
         self.actions = []
+        self.diff = {'before': {}, 'after': {}}
+        self.old_instance_json = {}
+        self.old_sections = {}
 
     def _build_config(self):
         self.config = {}
@@ -521,7 +538,8 @@ class LXDContainerManagement(object):
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', url, body_json=body_json)
+        if not self.module.check_mode:
+            return self.client.do('PUT', url, body_json=body_json)
 
     def _create_instance(self):
         url = self.api_endpoint
@@ -534,7 +552,8 @@ class LXDContainerManagement(object):
             url = '{0}?{1}'.format(url, urlencode(url_params))
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
+        if not self.module.check_mode:
+            self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
         self.actions.append('create')
 
     def _start_instance(self):
@@ -553,7 +572,8 @@ class LXDContainerManagement(object):
         url = '{0}/{1}'.format(self.api_endpoint, self.name)
         if self.project:
             url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        self.client.do('DELETE', url)
+        if not self.module.check_mode:
+            self.client.do('DELETE', url)
         self.actions.append('delete')
 
     def _freeze_instance(self):
@@ -562,15 +582,13 @@ class LXDContainerManagement(object):
 
     def _unfreeze_instance(self):
         self._change_state('unfreeze')
-        self.actions.append('unfreez')
+        self.actions.append('unfreeze')
 
     def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
-
-        resp_json = self._get_instance_state_json()
-        network = resp_json['metadata']['network'] or {}
-        network = dict((k, v) for k, v in network.items() if k not in ignore_devices) or {}
-        addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items()) or {}
+        data = (self._get_instance_state_json() or {}).get('metadata', None) or {}
+        network = dict((k, v) for k, v in (data.get('network', None) or {}).items() if k not in ignore_devices)
+        addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items())
         return addresses
 
     @staticmethod
@@ -583,7 +601,7 @@ class LXDContainerManagement(object):
             while datetime.datetime.now() < due:
                 time.sleep(1)
                 addresses = self._instance_ipv4_addresses()
-                if self._has_all_ipv4_addresses(addresses):
+                if self._has_all_ipv4_addresses(addresses) or self.module.check_mode:
                     self.addresses = addresses
                     return
         except LXDClientException as e:
@@ -656,16 +674,10 @@ class LXDContainerManagement(object):
     def _needs_to_change_instance_config(self, key):
         if key not in self.config:
             return False
-        if key == 'config' and self.ignore_volatile_options:  # the old behavior is to ignore configurations by keyword "volatile"
-            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items() if not k.startswith('volatile.'))
-            for k, v in self.config['config'].items():
-                if k not in old_configs:
-                    return True
-                if old_configs[k] != v:
-                    return True
-            return False
-        elif key == 'config':  # next default behavior
-            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items())
+
+        if key == 'config':
+            # self.old_sections is already filtered for volatile keys if necessary
+            old_configs = dict(self.old_sections.get(key, None) or {})
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -673,43 +685,35 @@ class LXDContainerManagement(object):
                     return True
             return False
         else:
-            old_configs = self.old_instance_json['metadata'][key]
+            old_configs = self.old_sections.get(key, {})
             return self.config[key] != old_configs
 
     def _needs_to_apply_instance_configs(self):
-        return (
-            self._needs_to_change_instance_config('architecture') or
-            self._needs_to_change_instance_config('config') or
-            self._needs_to_change_instance_config('ephemeral') or
-            self._needs_to_change_instance_config('devices') or
-            self._needs_to_change_instance_config('profiles')
-        )
+        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
+            if self._needs_to_change_instance_config(param):
+                return True
+        return False
 
     def _apply_instance_configs(self):
-        old_metadata = self.old_instance_json['metadata']
-        body_json = {
-            'architecture': old_metadata['architecture'],
-            'config': old_metadata['config'],
-            'devices': old_metadata['devices'],
-            'profiles': old_metadata['profiles']
-        }
+        old_metadata = copy.deepcopy(self.old_instance_json).get('metadata', None) or {}
+        body_json = {}
+        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
+            if param in old_metadata:
+                body_json[param] = old_metadata[param]
 
-        if self._needs_to_change_instance_config('architecture'):
-            body_json['architecture'] = self.config['architecture']
-        if self._needs_to_change_instance_config('config'):
-            for k, v in self.config['config'].items():
-                body_json['config'][k] = v
-        if self._needs_to_change_instance_config('ephemeral'):
-            body_json['ephemeral'] = self.config['ephemeral']
-        if self._needs_to_change_instance_config('devices'):
-            body_json['devices'] = self.config['devices']
-        if self._needs_to_change_instance_config('profiles'):
-            body_json['profiles'] = self.config['profiles']
-
+            if self._needs_to_change_instance_config(param):
+                if param == 'config':
+                    body_json['config'] = body_json.get('config', None) or {}
+                    for k, v in self.config['config'].items():
+                        body_json['config'][k] = v
+                else:
+                    body_json[param] = self.config[param]
+        self.diff['after']['instance'] = body_json
         url = '{0}/{1}'.format(self.api_endpoint, self.name)
         if self.project:
             url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        self.client.do('PUT', url, body_json=body_json)
+        if not self.module.check_mode:
+            self.client.do('PUT', url, body_json=body_json)
         self.actions.append('apply_instance_configs')
 
     def run(self):
@@ -721,7 +725,22 @@ class LXDContainerManagement(object):
             self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
             self.old_instance_json = self._get_instance_json()
+            self.old_sections = dict(
+                (section, content) if not isinstance(content, dict)
+                else (section, dict((k, v) for k, v in content.items()
+                                    if not (self.ignore_volatile_options and k.startswith('volatile.'))))
+                for section, content in (self.old_instance_json.get('metadata', None) or {}).items()
+                if section in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS)
+            )
+
+            self.diff['before']['instance'] = self.old_sections
+            # preliminary, will be overwritten in _apply_instance_configs() if called
+            self.diff['after']['instance'] = self.config
+
             self.old_state = self._instance_json_to_module_state(self.old_instance_json)
+            self.diff['before']['state'] = self.old_state
+            self.diff['after']['state'] = self.state
+
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
 
@@ -730,7 +749,8 @@ class LXDContainerManagement(object):
                 'log_verbosity': self.module._verbosity,
                 'changed': state_changed,
                 'old_state': self.old_state,
-                'actions': self.actions
+                'actions': self.actions,
+                'diff': self.diff,
             }
             if self.client.debug:
                 result_json['logs'] = self.client.logs
@@ -742,7 +762,8 @@ class LXDContainerManagement(object):
             fail_params = {
                 'msg': e.msg,
                 'changed': state_changed,
-                'actions': self.actions
+                'actions': self.actions,
+                'diff': self.diff,
             }
             if self.client.debug:
                 fail_params['logs'] = e.kwargs['logs']
@@ -756,7 +777,7 @@ def main():
         argument_spec=dict(
             name=dict(
                 type='str',
-                required=True
+                required=True,
             ),
             project=dict(
                 type='str',
@@ -786,7 +807,7 @@ def main():
             ),
             state=dict(
                 choices=list(LXD_ANSIBLE_STATES.keys()),
-                default='started'
+                default='started',
             ),
             target=dict(
                 type='str',
@@ -802,35 +823,35 @@ def main():
             ),
             wait_for_container=dict(
                 type='bool',
-                default=False
+                default=False,
             ),
             wait_for_ipv4_addresses=dict(
                 type='bool',
-                default=False
+                default=False,
             ),
             force_stop=dict(
                 type='bool',
-                default=False
+                default=False,
             ),
             url=dict(
                 type='str',
-                default=ANSIBLE_LXD_DEFAULT_URL
+                default=ANSIBLE_LXD_DEFAULT_URL,
             ),
             snap_url=dict(
                 type='str',
-                default='unix:/var/snap/lxd/common/lxd/unix.socket'
+                default='unix:/var/snap/lxd/common/lxd/unix.socket',
             ),
             client_key=dict(
                 type='path',
-                aliases=['key_file']
+                aliases=['key_file'],
             ),
             client_cert=dict(
                 type='path',
-                aliases=['cert_file']
+                aliases=['cert_file'],
             ),
-            trust_password=dict(type='str', no_log=True)
+            trust_password=dict(type='str', no_log=True),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     lxd_manage = LXDContainerManagement(module=module)
