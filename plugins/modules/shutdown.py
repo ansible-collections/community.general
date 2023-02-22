@@ -15,8 +15,20 @@ notes:
   - C(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use I(search_paths)
     to specify locations to search if the default paths do not work.
 description:
-    - Shut downs a machine.
+  - Shut downs a machine.
 version_added: "1.1.0"
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.flow
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  action:
+    support: full
+  async:
+    support: full
 options:
   delay:
     description:
