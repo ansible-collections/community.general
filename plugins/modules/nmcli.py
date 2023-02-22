@@ -2164,6 +2164,8 @@ class Nmcli(object):
         if not self.type:
             current_con_type = self.show_connection().get('connection.type')
             if current_con_type:
+                if current_con_type == '802-11-wireless':
+                    current_con_type = 'wifi'
                 self.type = current_con_type
 
         options.update(self.connection_options(detect_change=True))
