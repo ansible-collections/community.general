@@ -223,5 +223,22 @@
       - short_name.hosts_changed == []
       - short_name.hosts_removed == []
 
+- name: Add a wildcard (*) host to apply settings to all hosts.
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "*"
+    identity_file: '{{ ssh_private_key }}'
+    port: '2223'
+    state: present
+  register: wildcard_name
+
+- name: Check that wildcard name host is added and full and short name hosts are not updated
+  assert:
+    that:
+      - wildcard_name is changed
+      - wildcard_name.hosts_added == ["*"]
+      - wildcard_name.hosts_changed == []
+      - wildcard_name.hosts_removed == []
+
 - name: Include integration tests for additional options (e.g. proxycommand)
   include: 'options.yml'

@@ -49,8 +49,12 @@ options:
   host:
     description:
       - The endpoint this configuration is valid for.
-      - Can be an actual address on the internet or an alias that will
-        connect to the value of I(hostname).
+      - Can be an actual address on the internet, an alias that will
+        connect to the value of I(hostname), or "*" to match all hosts.
+      - If host is the wildcard "*" it is best to place it as the last
+        host since ssh goes with the first matching option. This will
+        make sure that any other host options take precedence over the
+        wildcard host.
     required: true
     type: str
   hostname:
@@ -112,6 +116,13 @@ EXAMPLES = r'''
     hostname: "github.com"
     identity_file: "/home/akasurde/.ssh/id_rsa"
     port: '2223'
+    state: present
+
+- name: Add a wildcard host in the configuration
+  community.general.ssh_config:
+    user: akasurde
+    host: "*"
+    forward_agent: true
     state: present
 
 - name: Delete a host from the configuration
