@@ -401,8 +401,8 @@ stages:
           targets:
             - name: Debian Bullseye
               test: debian-bullseye/3.9
-            #- name: ArchLinux
-            #  test: archlinux/3.10
+            - name: ArchLinux
+              test: archlinux/3.10
             - name: CentOS Stream 8
               test: centos-stream8/3.9
           groups:
