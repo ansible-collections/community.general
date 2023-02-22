@@ -12,19 +12,19 @@ from ansible_collections.community.general.plugins.lookup.onepassword import One
 
 
 @pytest.mark.parametrize(
-    ("args", "out", "expected_call_args", "expected"),
+    ("args", "out", "expected_call_args", "expected_call_kwargs", "expected"),
     (
-        ([], "list of accounts", ["account", "get"], True,),
-        (["acme"], "list of accounts", ["account", "get", "--account", "acme.1password.com"], True,),
-        ([], "", ["account", "list"], False,),
+        ([], "list of accounts", ["account", "get"], {"ignore_errors": True}, True,),
+        (["acme"], "list of accounts", ["account", "get", "--account", "acme.1password.com"], {"ignore_errors": True}, True,),
+        ([], "", ["account", "list"], {}, False,),
     )
 )
-def test_assert_logged_in(mocker, args, out, expected_call_args, expected):
+def test_assert_logged_in(mocker, args, out, expected_call_args, expected_call_kwargs, expected):
     mocker.patch.object(OnePassCLIv2, "_run", return_value=[0, out, ""])
     op_cli = OnePassCLIv2(*args)
     result = op_cli.assert_logged_in()
 
-    op_cli._run.assert_called_with(expected_call_args)
+    op_cli._run.assert_called_with(expected_call_args, **expected_call_kwargs)
     assert result == expected
 
 
