@@ -712,6 +712,7 @@ end_state:
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
+import copy
 
 
 def normalise_cr(clientrep, remove_ids=False):
@@ -750,7 +751,7 @@ def sanitize_cr(clientrep):
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict
     """
-    result = clientrep.copy()
+    result = copy.deepcopy(clientrep)
     if 'secret' in result:
         result['secret'] = 'no_log'
     if 'attributes' in result:
