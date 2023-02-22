@@ -93,6 +93,10 @@ options:
       - Sets the C(ForwardAgent) option.
     type: bool
     version_added: 4.0.0
+  add_keys_to_agent:
+    description:
+      - Sets the C(AddKeysToAgent) option.
+    type: bool
   ssh_config_file:
     description:
       - SSH config file.
@@ -122,7 +126,7 @@ EXAMPLES = r'''
   community.general.ssh_config:
     user: akasurde
     host: "*"
-    forward_agent: true
+    add_keys_to_agent: true
     state: present
 
 - name: Delete a host from the configuration
@@ -234,6 +238,10 @@ class SSHConfig():
             args['forward_agent'] = 'yes'
         if self.params['forward_agent'] is False:
             args['forward_agent'] = 'no'
+        if self.params['add_keys_to_agent'] is True:
+            args['add_keys_to_agent'] = 'yes'
+        if self.params['add_keys_to_agent'] is False:
+            args['add_keys_to_agent'] = 'no'
 
         config_changed = False
         hosts_changed = []
@@ -322,6 +330,7 @@ def main():
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
             forward_agent=dict(type='bool'),
+            add_keys_to_agent=dict(type='bool'),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),

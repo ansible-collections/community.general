@@ -15,6 +15,7 @@
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     state: present
   register: options_add
@@ -44,6 +45,7 @@
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     state: present
   register: options_add
@@ -62,6 +64,7 @@
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     state: present
   register: options_add_again
@@ -84,6 +87,7 @@
     that:
       - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent yes' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
@@ -92,6 +96,7 @@
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: false
+    add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     state: present
   register: options_update
@@ -112,6 +117,7 @@
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: false
+    add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     state: present
   register: options_update
@@ -135,6 +141,7 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
@@ -163,6 +170,7 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
@@ -209,4 +217,5 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' not in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
