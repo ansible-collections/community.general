@@ -26,6 +26,9 @@ URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
 URL_CLIENT_ROLES = "{url}/admin/realms/{realm}/clients/{id}/roles"
 URL_CLIENT_ROLE = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}"
 URL_CLIENT_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}/composites"
+URL_CLIENT_SCOPEMAPPINGS_CLIENT = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{client}"
+URL_CLIENT_SCOPEMAPPINGS_REALM = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/realm"
+URL_CLIENT_CLIENTSCOPES = "{url}/admin/realms/{realm}/clients/{id}/{default_or_optional}-client-scopes/{scope}"
 
 URL_REALM_ROLES = "{url}/admin/realms/{realm}/roles"
 URL_REALM_ROLE = "{url}/admin/realms/{realm}/roles/{name}"
@@ -478,7 +481,44 @@ class KeycloakAPI(object):
             if name == role['name']:
                 return role['id']
         return None
-
+        
+    def get_client_scope_mappings(self, cid, target_client, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT.format(url=self.baseurl, realm=realm, id=cid, client=target_client)
+        try:
+            return json.loads(to_native(open_url(client_scope_mappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+                                      
+    def add_client_scope_mapping(self, cid, target_client, scope_mapping_rep, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT.format(url=self.baseurl, realm=realm, id=cid, client=target_client)
+        try:
+            open_url(client_scope_mappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(scope_mapping_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not add scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+                                      
+    def delete_client_scope_mapping(self, cid, target_client, scope_mapping_rep, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT.format(url=self.baseurl, realm=realm, id=cid, client=target_client)
+        try:
+            open_url(client_scope_mappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(scope_mapping_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not add scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+                                      
     def get_client_group_rolemapping_by_id(self, gid, cid, rid, realm='master'):
         """ Obtain client representation by id
 
@@ -1062,7 +1102,39 @@ class KeycloakAPI(object):
 
         except Exception as e:
             self.module.fail_json(msg="Unable to delete clientscope %s: %s" % (cid, str(e)))
+            
+    def add_clientscope_to_client(self, cid, scope_id, default_or_optional, realm="master"):
+        """
+        TODO: doc
+        """
+        if default_or_optional not in ["default", "optional"]:
+            self.module.fail_json(msg="Invalid default_or_optional value for clientscope for client %s in realm %s: %s"
+                                      % (cid, realm, default_or_optional))
 
+        add_clientscope_url = URL_CLIENT_CLIENTSCOPES.format(url=self.baseurl, realm=realm, id=cid, scope=scope_id, default_or_optional=default_or_optional)
+        try:
+            open_url(add_clientscope_url, method="PUT", http_agent=self.http_agent, headers=self.restheaders,
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not add clientscope for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+    
+    def delete_clientscope_from_client(self, cid, scope_id, default_or_optional, realm="master"):
+        """
+        TODO: doc
+        """
+        if default_or_optional not in ["default", "optional"]:
+            self.module.fail_json(msg="Invalid default_or_optional value for clientscope for client %s in realm %s: %s"
+                                      % (cid, realm, default_or_optional))
+
+        add_clientscope_url = URL_CLIENT_CLIENTSCOPES.format(url=self.baseurl, realm=realm, id=cid, scope=scope_id, default_or_optional=default_or_optional)
+        try:
+            open_url(add_clientscope_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders,
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not delete clientscope for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+                                      
     def get_clientscope_protocolmappers(self, cid, realm="master"):
         """ Fetch the name and ID of all clientscopes on the Keycloak server.
 
@@ -2086,9 +2158,7 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to delete component %s in realm %s: %s'
                                       % (cid, realm, str(e)))
-
-
-
+                                      
     def get_required_action_by_alias(self, alias, realm="master"):
         """
         Get a required action by its alias
@@ -2210,5 +2280,3 @@ class KeycloakAPI(object):
                 msg="Could not delete required action %s in realm %s: %s"
                 % (alias, realm, str(e))
             )
-
-

@@ -767,6 +767,17 @@ def sanitize_cr(clientrep):
             result["attributes"]["saml.signing.private.key"] = "no_log"
     return normalise_cr(result)
 
+def get_clientscope_id(kc, clientscope_name, realm):
+    """Retrieves the id of a clientscope from its name
+    
+    :param kc: the keycloak module instance
+    :param clientscope_name: the name of the clientscope
+    :return: 
+    """
+    found_clientscope = kc.get_clientscope_by_name(clientscope_name, realm=realm)
+    if not found_clientscope:
+        raise Exception("The provided clientscope name was not found")
+    return found_clientscope["id"]
 
 def main():
     """
@@ -904,7 +915,6 @@ def main():
 
     if before_client is None:
         before_client = {}
-
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
@@ -1001,7 +1011,21 @@ def main():
 
             # do the update
             kc.update_client(cid, desired_client, realm=realm)
-
+            
+            # Handle clientscopes: unfortunately, they require other API calls
+            for opt in ["optional", "default"]:
+                before_scopes = before_client.get("{}ClientScopes".format(opt))
+                desired_scopes = desired_client.get("{}ClientScopes".format(opt))
+                if before_scopes != desired_scopes:
+                    if desired_scopes is not None:
+                        for scope in [s for s in desired_scopes if s not in before_scopes]:
+                            kc.add_clientscope_to_client(cid, get_clientscope_id(kc, scope, realm=realm), opt, realm=realm)
+                        for scope in [s for s in before_scopes if s not in desired_scopes]:
+                            kc.delete_clientscope_from_client(cid, get_clientscope_id(kc, scope, realm=realm), opt, realm=realm)
+                    else:
+                        for scope in before_scopes:
+                            kc.delete_clientscope_from_client(cid, get_clientscope_id(kc, scope, realm=realm), opt, realm=realm)
+                        
             after_client = kc.get_client_by_id(cid, realm=realm)
             if before_client == after_client:
                 result["changed"] = False
