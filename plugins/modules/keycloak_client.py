@@ -749,7 +749,12 @@ def normalise_cr(clientrep, remove_ids=False):
 
             # Set to a default value.
             mapper["consentRequired"] = mapper.get("consentRequired", False)
-
+    
+    if "defaultClientScopes" in clientrep:
+        clientrep["defaultClientScopes"] = list(sorted(clientrep["defaultClientScopes"]))
+    if "optionalClientScopes" in clientrep:
+        clientrep["optionalClientScopes"] = list(sorted(clientrep["optionalClientScopes"]))
+        
     return clientrep
 
 
