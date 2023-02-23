@@ -70,16 +70,11 @@ def update_mappings(kc, cid, before_mappings, desired_mappings, existing_clients
                 if not existing_sm or role not in existing_sm:
                     repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
                     kc.add_client_scope_mapping(cid, target_id, repr, realm=realm)
+        if existing_sm:
             for role in existing_sm:
-                if role not in roles:
+                if not roles or role not in roles:
                     repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
                     kc.delete_client_scope_mapping(cid, target_id, repr, realm=realm)
-        else:
-            if existing_sm:
-                for role in existing_sm:
-                    repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
-                    kc.delete_client_scope_mapping(cid, target_id, repr, realm=realm)
-
 def main():
     """
     Module execution
