@@ -24,7 +24,7 @@ attributes:
   diff_mode:
     support: full
   platform:
-    platforms: rhel
+    platforms: linux
 options:
   target:
     description:
