@@ -27,6 +27,11 @@ notes:
 requirements:
   - Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
 options:
+  token:
+    description:
+      - The Ansible Galaxy API key which can be found at https://galaxy.ansible.com/me/preferences.
+      - Can be used to install collections and roles from private git repositories.
+    type: str
   type:
     description:
       - The type of installation performed by C(ansible-galaxy).
@@ -113,9 +118,19 @@ EXAMPLES = """
     name: community.network:3.0.2
     force: true
 
+- name: Install collection from private git repository
+  community.general.ansible_galaxy_install:
+    token: "{{ token_variable }}"
+    type: collection
+    requirements_file: requirements.yml
+
 """
 
 RETURN = """
+  token:
+    description: The value of the I(token) parameter.
+    type: str
+    returned: always
   type:
     description: The value of the I(type) parameter.
     type: str
@@ -201,9 +216,10 @@ class AnsibleGalaxyInstall(ModuleHelper):
     ansible_version = None
     is_ansible29 = None
 
-    output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
+    output_params = ('token', 'type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
     module = dict(
         argument_spec=dict(
+            token=dict(type='str'),
             type=dict(type='str', choices=('collection', 'role', 'both'), required=True),
             name=dict(type='str'),
             requirements_file=dict(type='path'),
@@ -221,6 +237,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
 
     command = 'ansible-galaxy'
     command_args_formats = dict(
+        token=fmt.as_opt_val('--token'),
         type=fmt.as_func(lambda v: [] if v == 'both' else [v]),
         galaxy_cmd=fmt.as_list(),
         requirements_file=fmt.as_opt_val('-r'),
