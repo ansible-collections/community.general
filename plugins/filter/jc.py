@@ -138,8 +138,14 @@ def jc_filter(data, parser, quiet=True, raw=False):
         raise AnsibleError('You need to install "jc" as a Python library on the Ansible controller prior to running jc filter')
 
     try:
-        jc_parser = importlib.import_module('jc.parsers.' + parser)
-        return jc_parser.parse(data, quiet=quiet, raw=raw)
+        # new API (jc v1.18.0 and higher) allows use of plugin parsers
+        if hasattr(jc, 'parse'):
+            return jc.parse(parser, data, quiet=quiet, raw=raw)
+
+        # old API (jc v1.17.7 and lower)
+        else:
+            jc_parser = importlib.import_module('jc.parsers.' + parser)
+            return jc_parser.parse(data, quiet=quiet, raw=raw)
 
     except Exception as e:
         raise AnsibleFilterError('Error in jc filter plugin:  %s' % e)
