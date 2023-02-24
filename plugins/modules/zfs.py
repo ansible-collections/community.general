@@ -15,6 +15,19 @@ module: zfs
 short_description: Manage zfs
 description:
   - Manages ZFS file systems, volumes, clones and snapshots
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - In certain situations it may report a task as changed that will not be reported
+        as changed when C(check_mode) is disabled.
+      - For example, this might occur when the zpool C(altroot) option is set or when
+        a size is written using human-readable notation, such as C(1M) or C(1024K),
+        instead of as an unqualified byte count, such as C(1048576).
+  diff_mode:
+    support: full
 options:
   name:
     description:
@@ -39,12 +52,6 @@ options:
       - See the zfs(8) man page for more information.
     type: dict
     default: {}
-notes:
-  - C(check_mode) is supported, but in certain situations it may report a task
-    as changed that will not be reported as changed when C(check_mode) is disabled.
-    For example, this might occur when the zpool C(altroot) option is set or when
-    a size is written using human-readable notation, such as C(1M) or C(1024K),
-    instead of as an unqualified byte count, such as C(1048576).
 author:
 - Johan Wiren (@johanwiren)
 '''

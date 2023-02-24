@@ -25,6 +25,12 @@ author:
 
 version_added: "3.0.0"
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
+
 options:
   path:
     description:
@@ -93,14 +99,12 @@ options:
       - This option is silently ignored. This module always modifies file
         size in-place.
 
-notes:
-  - This module supports C(check_mode) and C(diff).
-
 requirements:
   - dd (Data Duplicator) in PATH
 
 extends_documentation_fragment:
   - ansible.builtin.files
+  - community.general.attributes
 
 seealso:
   - name: dd(1) manpage for Linux
