@@ -19,6 +19,12 @@ description:
 
 version_added: "3.3.0"
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+
 options:
     realm:
         description:
@@ -86,7 +92,8 @@ options:
             - If C(true), allows to remove the authentication flow and recreate it.
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Philippe Gauthier (@elfelip)

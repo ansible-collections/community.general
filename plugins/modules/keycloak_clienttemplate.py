@@ -14,7 +14,6 @@ module: keycloak_clienttemplate
 
 short_description: Allows administration of Keycloak client templates via Keycloak API
 
-
 description:
     - This module allows the administration of Keycloak client templates via the Keycloak REST API. It
       requires access to the REST API via OpenID Connect; the user connecting and the client being
@@ -28,6 +27,12 @@ description:
     - The Keycloak API does not always enforce for only sensible settings to be used -- you can set
       SAML-specific settings on an OpenID Connect client for instance and vice versa. Be careful.
       If you do not specify a setting, usually a sensible default is chosen.
+
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -155,14 +160,15 @@ options:
         type: dict
 
 notes:
-- The Keycloak REST API defines further fields (namely I(bearerOnly), I(consentRequired), I(standardFlowEnabled),
-  I(implicitFlowEnabled), I(directAccessGrantsEnabled), I(serviceAccountsEnabled), I(publicClient), and
-  I(frontchannelLogout)) which, while available with keycloak_client, do not have any effect on
-  Keycloak client-templates and are discarded if supplied with an API request changing client-templates. As such,
-  they are not available through this module.
+    - The Keycloak REST API defines further fields (namely I(bearerOnly), I(consentRequired), I(standardFlowEnabled),
+      I(implicitFlowEnabled), I(directAccessGrantsEnabled), I(serviceAccountsEnabled), I(publicClient), and
+      I(frontchannelLogout)) which, while available with keycloak_client, do not have any effect on
+      Keycloak client-templates and are discarded if supplied with an API request changing client-templates. As such,
+      they are not available through this module.
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Eike Frost (@eikef)

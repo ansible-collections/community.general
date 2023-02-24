@@ -14,6 +14,11 @@ author: Abhijeet Kasurde (@Akasurde)
 short_description: Manage FreeIPA Lightweight Sub Certificate Authorities
 description:
 - Add, modify, enable, disable and delete an IPA Lightweight Sub Certificate Authorities using IPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   subca_name:
     description:
@@ -39,7 +44,8 @@ options:
     choices: ["absent", "disabled", "enabled", "present"]
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 
