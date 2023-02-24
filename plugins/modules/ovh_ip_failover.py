@@ -23,6 +23,13 @@ notes:
       key as described into U(https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/)
 requirements:
     - ovh >=  0.4.8
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         required: true

@@ -14,6 +14,11 @@ module: rax_scaling_policy
 short_description: Manipulate Rackspace Cloud Autoscale Scaling Policy
 description:
     - Manipulate Rackspace Cloud Autoscale Scaling Policy
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   at:
     type: str
@@ -77,8 +82,9 @@ options:
     default: present
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

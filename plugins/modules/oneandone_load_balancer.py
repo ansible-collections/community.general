@@ -12,8 +12,15 @@ DOCUMENTATION = '''
 module: oneandone_load_balancer
 short_description: Configure 1&1 load balancer
 description:
-     - Create, remove, update load balancers.
-       This module has a dependency on 1and1 >= 1.0
+  - Create, remove, update load balancers.
+    This module has a dependency on 1and1 >= 1.0.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:

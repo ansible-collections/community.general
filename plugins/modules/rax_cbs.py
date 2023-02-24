@@ -14,6 +14,11 @@ module: rax_cbs
 short_description: Manipulate Rackspace Cloud Block Storage Volumes
 description:
      - Manipulate Rackspace Cloud Block Storage Volumes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   description:
     type: str
@@ -73,7 +78,8 @@ author:
     - "Christopher H. Laco (@claco)"
     - "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+    - community.general.rackspace.openstack
+    - community.general.attributes
 
 '''
 

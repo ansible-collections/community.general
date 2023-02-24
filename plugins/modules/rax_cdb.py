@@ -16,6 +16,11 @@ description:
   - creates / deletes or resize a Rackspace Cloud Databases instance
     and optionally waits for it to be 'running'. The name option needs to be
     unique since it's used to identify the instance.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     type: str
@@ -63,8 +68,9 @@ options:
     default: 300
 author: "Simon JAILLET (@jails)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

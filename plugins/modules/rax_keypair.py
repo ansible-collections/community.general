@@ -14,6 +14,11 @@ module: rax_keypair
 short_description: Create a keypair for use with Rackspace Cloud Servers
 description:
      - Create a keypair for use with Rackspace Cloud Servers
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     type: str
@@ -38,7 +43,8 @@ notes:
     keypair you must first delete and then recreate.
   - The ability to specify a file path for the public key was added in 1.7
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 
