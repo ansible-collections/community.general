@@ -16,6 +16,13 @@ short_description: Manages snap aliases
 version_added: 4.0.0
 description:
     - "Manages snaps aliases."
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     state:
         description:

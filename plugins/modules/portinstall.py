@@ -18,6 +18,13 @@ module: portinstall
 short_description: Installing packages from FreeBSD's ports system
 description:
     - Manage packages for FreeBSD using 'portinstall'.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:

@@ -26,6 +26,13 @@ notes:
     If that one also fails, the module will fail.
 requirements:
   - Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   type:
     description:

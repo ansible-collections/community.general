@@ -20,6 +20,13 @@ module: pkgng
 short_description: Package manager for FreeBSD >= 9.0
 description:
     - Manage binary packages for FreeBSD using 'pkgng' which is available in versions after 9.0.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

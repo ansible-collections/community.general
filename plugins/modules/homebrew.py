@@ -22,11 +22,17 @@ author:
     - "Daniel Jaouen (@danieljaouen)"
     - "Andrew Dunham (@andrew-d)"
 requirements:
-   - "python >= 2.6"
-   - homebrew must already be installed on the target system
+    - homebrew must already be installed on the target system
 short_description: Package manager for Homebrew
 description:
     - Manages Homebrew packages
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

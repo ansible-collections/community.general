@@ -22,6 +22,13 @@ short_description: Package manager for Slackware >= 12.2
 description:
     - Manage binary packages for Slackware using 'slackpkg' which
       is available in versions after 12.2.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

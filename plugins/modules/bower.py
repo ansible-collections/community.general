@@ -16,6 +16,13 @@ short_description: Manage bower packages with bower
 description:
   - Manage bower packages with bower
 author: "Michael Warkentin (@mwarkentin)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     type: str

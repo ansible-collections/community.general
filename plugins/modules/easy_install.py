@@ -14,7 +14,14 @@ DOCUMENTATION = '''
 module: easy_install
 short_description: Installs Python libraries
 description:
-     - Installs Python libraries, optionally in a I(virtualenv)
+    - Installs Python libraries, optionally in a I(virtualenv)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     type: str

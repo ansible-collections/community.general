@@ -15,13 +15,20 @@ DOCUMENTATION = r'''
 module: flatpak
 short_description: Manage flatpaks
 description:
-- Allows users to add or remove flatpaks.
-- See the M(community.general.flatpak_remote) module for managing flatpak remotes.
+  - Allows users to add or remove flatpaks.
+  - See the M(community.general.flatpak_remote) module for managing flatpak remotes.
 author:
-- John Kwiatkoski (@JayKayy)
-- Alexander Bethke (@oolongbrothers)
+  - John Kwiatkoski (@JayKayy)
+  - Alexander Bethke (@oolongbrothers)
 requirements:
-- flatpak
+  - flatpak
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   executable:
     description:

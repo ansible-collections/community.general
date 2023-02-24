@@ -17,6 +17,13 @@ version_added: 4.3.0
 description:
   - Manage Rust packages with cargo.
 author: "Radek Sprta (@radek-sprta)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

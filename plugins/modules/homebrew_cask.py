@@ -15,14 +15,19 @@ DOCUMENTATION = '''
 ---
 module: homebrew_cask
 author:
-- "Indrajit Raychaudhuri (@indrajitr)"
-- "Daniel Jaouen (@danieljaouen)"
-- "Enric Lluelles (@enriclluelles)"
-requirements:
-- "python >= 2.6"
+  - "Indrajit Raychaudhuri (@indrajitr)"
+  - "Daniel Jaouen (@danieljaouen)"
+  - "Enric Lluelles (@enriclluelles)"
 short_description: Install and uninstall homebrew casks
 description:
-- Manages Homebrew casks.
+  - Manages Homebrew casks.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

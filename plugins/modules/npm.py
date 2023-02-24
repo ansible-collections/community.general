@@ -15,6 +15,13 @@ short_description: Manage node.js packages with npm
 description:
   - Manage node.js packages with Node Package Manager (npm).
 author: "Chris Hoffman (@chrishoffman)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

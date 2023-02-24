@@ -14,12 +14,17 @@ DOCUMENTATION = '''
 ---
 module: openbsd_pkg
 author:
-- Patrik Lundin (@eest)
+  - Patrik Lundin (@eest)
 short_description: Manage packages on OpenBSD
 description:
-    - Manage packages on OpenBSD using the pkg tools.
-requirements:
-- python >= 2.5
+  - Manage packages on OpenBSD using the pkg tools.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:
