@@ -19,8 +19,15 @@ DOCUMENTATION = """
 module: slack
 short_description: Send Slack notifications
 description:
-    - The C(slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
+  - The C(slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
 author: "Ramon de la Fuente (@ramondelafuente)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   domain:
     type: str

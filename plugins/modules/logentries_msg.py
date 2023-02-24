@@ -14,9 +14,14 @@ DOCUMENTATION = '''
 module: logentries_msg
 short_description: Send a message to logentries
 description:
-   - Send a message to logentries
-requirements:
-  - "python >= 2.6"
+  - Send a message to logentries
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   token:
     type: str

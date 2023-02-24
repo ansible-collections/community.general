@@ -15,6 +15,13 @@ module: hipchat
 short_description: Send a message to Hipchat
 description:
    - Send a message to a Hipchat room, with options to control the formatting.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   token:
     type: str

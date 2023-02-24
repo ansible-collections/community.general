@@ -16,6 +16,13 @@ short_description: Send a message to Campfire
 description:
    - Send a message to Campfire.
    - Messages with newlines will result in a "Paste" message being sent.
+extends_documentation_fragment:
+   - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   subscription:
     type: str
