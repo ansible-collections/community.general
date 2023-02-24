@@ -18,6 +18,13 @@ description:
   - Most options do not have a default and will not be added to the check definition unless specified.
   - All defaults except I(path), I(state), I(backup) and I(metric) are not managed by this module,
   - they are simply specified for your convenience.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     type: str

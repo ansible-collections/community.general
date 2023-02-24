@@ -21,6 +21,11 @@ short_description: Manage Rundeck projects
 description:
     - Create and remove Rundeck projects through HTTP API.
 author: "Loic Blot (@nerzhul)"
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         type: str
@@ -67,7 +72,9 @@ options:
         version_added: '0.2.0'
     validate_certs:
         version_added: '0.2.0'
-extends_documentation_fragment: url
+extends_documentation_fragment:
+    - ansible.builtin.url
+    - community.general.attributes
 '''
 
 EXAMPLES = '''

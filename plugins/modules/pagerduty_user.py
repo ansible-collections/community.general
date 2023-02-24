@@ -19,6 +19,13 @@ author: Zainab Alsaffar (@zanssa)
 requirements:
     - pdpyras python module = 4.1.1
     - PagerDuty API Access
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     access_token:
         description:
@@ -56,8 +63,6 @@ options:
             - Required if I(state=present).
         type: list
         elements: str
-notes:
-    - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''

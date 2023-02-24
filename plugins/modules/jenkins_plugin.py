@@ -17,6 +17,12 @@ short_description: Add or remove Jenkins plugin
 description:
   - Ansible module which helps to manage Jenkins plugins.
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   group:
     type: str
@@ -129,8 +135,9 @@ notes:
     parameter to point to the Jenkins server. The module must be used on the
     host where Jenkins runs as it needs direct access to the plugin files.
 extends_documentation_fragment:
-  - url
-  - files
+  - ansible.builtin.url
+  - ansible.builtin.files
+  - community.general.attributes
 '''
 
 EXAMPLES = '''

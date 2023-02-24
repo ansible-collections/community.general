@@ -19,6 +19,13 @@ description:
   - The type C(event-v2) was added in community.general 4.8.0.
 author: Sebastian Kornehl (@skornehl)
 requirements: [datadog]
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     api_key:
         description:

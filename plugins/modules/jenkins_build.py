@@ -20,6 +20,13 @@ requirements:
 author:
   - Brett Milford (@brettmilford)
   - Tong He (@unnecessary-username)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   args:
     description:

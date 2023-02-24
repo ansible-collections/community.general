@@ -17,6 +17,13 @@ short_description: Manage Sensu silence entries
 description:
   - Create and clear (delete) a silence entries via the Sensu API
     for subscriptions and checks.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   check:
     type: str

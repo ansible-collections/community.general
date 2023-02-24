@@ -19,6 +19,15 @@ author:
   - Adam Vaughan (@adamvaughan)
 requirements:
   - PagerDuty integration key
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+    details:
+      - Check mode simply does nothing except returning C(changed=true) in case the I(url) seems to be correct.
+  diff_mode:
+    support: none
 options:
   integration_key:
     description:
@@ -78,8 +87,6 @@ options:
     required: false
     default: true
     type: bool
-notes:
-  - Supports C(check_mode). Note that check mode simply does nothing except returning C(changed=true) in case the I(url) seems to be correct.
 '''
 
 EXAMPLES = '''

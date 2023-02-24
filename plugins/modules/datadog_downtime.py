@@ -22,6 +22,13 @@ author:
 requirements:
   - datadog-api-client
   - Python 3.6+
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     api_key:
         description:
