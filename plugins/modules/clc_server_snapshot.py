@@ -14,6 +14,13 @@ module: clc_server_snapshot
 short_description: Create, Delete and Restore server snapshots in CenturyLink Cloud
 description:
   - An Ansible module to Create, Delete and Restore server snapshots in CenturyLink Cloud.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   server_ids:
     description:

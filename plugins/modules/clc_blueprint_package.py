@@ -14,6 +14,13 @@ module: clc_blueprint_package
 short_description: Deploys a blue print package on a set of servers in CenturyLink Cloud
 description:
   - An Ansible module to deploy blue print package on a set of servers in CenturyLink Cloud.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   server_ids:
     description:
