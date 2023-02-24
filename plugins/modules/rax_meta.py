@@ -14,6 +14,11 @@ module: rax_meta
 short_description: Manipulate metadata for Rackspace Cloud Servers
 description:
      - Manipulate metadata for Rackspace Cloud Servers
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   address:
     type: str
@@ -35,7 +40,8 @@ options:
       - A hash of metadata to associate with the instance
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

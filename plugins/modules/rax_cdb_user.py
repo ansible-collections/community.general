@@ -14,6 +14,11 @@ module: rax_cdb_user
 short_description: Create / delete a Rackspace Cloud Database
 description:
   - create / delete a database in the Cloud Databases.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   cdb_id:
     type: str
@@ -51,8 +56,9 @@ options:
     default: present
 author: "Simon JAILLET (@jails)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

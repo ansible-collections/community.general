@@ -14,6 +14,11 @@ module: rax_dns_record
 short_description: Manage DNS records on Rackspace Cloud DNS
 description:
      - Manage DNS records on Rackspace Cloud DNS
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   comment:
     type: str
@@ -92,8 +97,9 @@ notes:
   - C(PTR) record support was added in version 1.7
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

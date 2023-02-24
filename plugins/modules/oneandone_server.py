@@ -12,8 +12,15 @@ DOCUMENTATION = '''
 module: oneandone_server
 short_description: Create, destroy, start, stop, and reboot a 1&1 Host server
 description:
-     - Create, destroy, update, start, stop, and reboot a 1&1 Host server.
-       When the server is created it can optionally wait for it to be 'running' before returning.
+  - Create, destroy, update, start, stop, and reboot a 1&1 Host server.
+    When the server is created it can optionally wait for it to be 'running' before returning.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:

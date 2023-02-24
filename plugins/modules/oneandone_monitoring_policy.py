@@ -12,9 +12,16 @@ DOCUMENTATION = '''
 module: oneandone_monitoring_policy
 short_description: Configure 1&1 monitoring policy
 description:
-     - Create, remove, update monitoring policies
-       (and add/remove ports, processes, and servers).
-       This module has a dependency on 1and1 >= 1.0
+  - Create, remove, update monitoring policies
+    (and add/remove ports, processes, and servers).
+    This module has a dependency on 1and1 >= 1.0.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:

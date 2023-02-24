@@ -18,6 +18,13 @@ short_description: Manage OVH monthly billing
 description:
     - Enable monthly billing on OVH cloud intances (be aware OVH does not allow to disable it).
 requirements: [ "ovh" ]
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     project_id:
         required: true

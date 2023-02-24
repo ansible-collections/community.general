@@ -14,6 +14,11 @@ module: rax_dns
 short_description: Manage domains on Rackspace Cloud DNS
 description:
      - Manage domains on Rackspace Cloud DNS
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   comment:
     type: str
@@ -46,8 +51,9 @@ notes:
     the Rackspace CloudDNS API"
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

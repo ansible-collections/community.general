@@ -14,6 +14,11 @@ module: rax_files_objects
 short_description: Upload, download, and delete objects in Rackspace Cloud Files
 description:
   - Upload, download, and delete objects in Rackspace Cloud Files.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   clear_meta:
     description:
@@ -76,8 +81,9 @@ options:
     default: file
 author: "Paul Durivage (@angstwad)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

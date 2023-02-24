@@ -18,6 +18,11 @@ description:
   associating existing rax_mon_notifications with severity levels. Rackspace
   monitoring module flow | rax_mon_entity -> rax_mon_check ->
   rax_mon_notification -> *rax_mon_notification_plan* -> rax_mon_alarm
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     type: str
@@ -52,7 +57,8 @@ options:
       valid rax_mon_notification ids.
 author: Ash Wilson (@smashwilson)
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

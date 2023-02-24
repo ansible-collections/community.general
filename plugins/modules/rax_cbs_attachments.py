@@ -14,6 +14,11 @@ module: rax_cbs_attachments
 short_description: Manipulate Rackspace Cloud Block Storage Volume Attachments
 description:
      - Manipulate Rackspace Cloud Block Storage Volume Attachments
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   device:
     type: str
@@ -52,7 +57,8 @@ author:
     - "Christopher H. Laco (@claco)"
     - "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+    - community.general.rackspace.openstack
+    - community.general.attributes
 
 '''
 

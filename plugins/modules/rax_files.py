@@ -14,6 +14,11 @@ module: rax_files
 short_description: Manipulate Rackspace Cloud Files Containers
 description:
   - Manipulate Rackspace Cloud Files Containers
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   clear_meta:
     description:
@@ -75,8 +80,9 @@ options:
        - Sets an object to be presented as the HTTP index page when accessed by the CDN URL
 author: "Paul Durivage (@angstwad)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

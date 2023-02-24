@@ -14,6 +14,11 @@ module: rax_network
 short_description: Create / delete an isolated network in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud isolated network.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     type: str
@@ -36,7 +41,8 @@ author:
   - "Christopher H. Laco (@claco)"
   - "Jesse Keating (@omgjlk)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

@@ -12,8 +12,15 @@ DOCUMENTATION = '''
 module: oneandone_private_network
 short_description: Configure 1&1 private networking
 description:
-     - Create, remove, reconfigure, update a private network.
-       This module has a dependency on 1and1 >= 1.0
+  - Create, remove, reconfigure, update a private network.
+    This module has a dependency on 1and1 >= 1.0.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:
