@@ -24,6 +24,13 @@ requirements:
   - align option (except 'undefined') requires parted 2.1 and above
   - If the version of parted is below 3.1, it requires a Linux version running
     the sysfs file system C(/sys/).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   device:
     description: The block device (disk) where to operate.

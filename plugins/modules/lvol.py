@@ -19,6 +19,13 @@ module: lvol
 short_description: Configure LVM logical volumes
 description:
   - This module creates, removes or resizes logical volumes.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   vg:
     type: str

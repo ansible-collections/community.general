@@ -17,6 +17,13 @@ description:
     - Create, delete or activate ZFS boot environments.
     - Mount and unmount ZFS boot environments.
 author: Adam Števko (@xen0l)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

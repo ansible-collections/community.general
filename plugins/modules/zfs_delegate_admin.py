@@ -20,6 +20,13 @@ description:
 requirements:
   - "A ZFS/OpenZFS implementation that supports delegation with C(zfs allow), including: Solaris >= 10, illumos (all
     versions), FreeBSD >= 8.0R, ZFS on Linux >= 0.7.0."
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:
