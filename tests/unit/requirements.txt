@@ -12,7 +12,7 @@ linode-python  # APIv3
 linode_api4 ; python_version > '2.6'  # APIv4
 
 # requirement for the gitlab and github modules
-python-gitlab < 3.13.0
+python-gitlab
 PyGithub
 httmock
 
