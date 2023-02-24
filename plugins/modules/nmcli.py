@@ -2107,11 +2107,18 @@ class Nmcli(object):
         diff_after = dict()
 
         for key, value in options.items():
-            if not value:
+            # We can't just do `if not value` because then if there's a value
+            # of 0 specified as an integer it'll be interpreted as empty when
+            # it actually isn't.
+            if value != 0 and not value:
                 continue
 
             if key in conn_info:
                 current_value = conn_info[key]
+                if key == '802-11-wireless.wake-on-wlan' and current_value is not None:
+                    match = re.match('0x([0-9A-Fa-f]+)', current_value)
+                    if match:
+                        current_value = str(int(match.group(1), 16))
                 if key in ('ipv4.routes', 'ipv6.routes') and current_value is not None:
                     current_value = self.get_route_params(current_value)
                 if key == self.mac_setting:
@@ -2167,6 +2174,8 @@ class Nmcli(object):
         if not self.type:
             current_con_type = self.show_connection().get('connection.type')
             if current_con_type:
+                if current_con_type == '802-11-wireless':
+                    current_con_type = 'wifi'
                 self.type = current_con_type
 
         options.update(self.connection_options(detect_change=True))
