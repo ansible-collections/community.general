@@ -21,8 +21,14 @@ description:
     - This module add or remove a private network to a compute instance
       (U(https://developer.scaleway.com)).
 extends_documentation_fragment:
-- community.general.scaleway
+    - community.general.scaleway
+    - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:

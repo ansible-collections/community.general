@@ -22,7 +22,13 @@ description:
     - "This module manages SSH keys on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
 - community.general.scaleway
+- community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
