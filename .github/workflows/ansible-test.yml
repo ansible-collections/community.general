@@ -1,0 +1,193 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# For the comprehensive list of the inputs supported by the ansible-community/ansible-test-gh-action GitHub Action, see
+# https://github.com/marketplace/actions/ansible-test
+
+name: EOL CI
+on:
+  # Run EOL CI against all pushes (direct commits, also merged PRs), Pull Requests
+  push:
+    branches:
+      - main
+      - stable-*
+  pull_request:
+  # Run EOL CI once per day (at 10:00 UTC)
+  schedule:
+    - cron: '0 10 * * *'
+
+concurrency:
+  # Make sure there is at most one active run per PR, but do not cancel any non-PR runs
+  group: ${{ github.workflow }}-${{ (github.head_ref && github.event.number) || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  sanity:
+    name: EOL Sanity (Ⓐ${{ matrix.ansible }})
+    strategy:
+      matrix:
+        ansible:
+          - '2.11'
+    # Ansible-test on various stable branches does not yet work well with cgroups v2.
+    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
+    # image for these stable branches. The list of branches where this is necessary will
+    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
+    # for the latest list.
+    runs-on: >-
+      ${{ contains(fromJson(
+          '["2.9", "2.10", "2.11"]'
+      ), matrix.ansible) && 'ubuntu-20.04' || 'ubuntu-latest' }}
+    steps:
+      - name: Perform sanity testing
+        uses: felixfontein/ansible-test-gh-action@main
+        with:
+          ansible-core-github-repository-slug: felixfontein/ansible
+          ansible-core-version: stable-${{ matrix.ansible }}
+          coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
+          pull-request-change-detection: 'true'
+          testing-type: sanity
+
+  units:
+    # Ansible-test on various stable branches does not yet work well with cgroups v2.
+    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
+    # image for these stable branches. The list of branches where this is necessary will
+    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
+    # for the latest list.
+    runs-on: >-
+      ${{ contains(fromJson(
+          '["2.9", "2.10", "2.11"]'
+      ), matrix.ansible) && 'ubuntu-20.04' || 'ubuntu-latest' }}
+    name: EOL Units (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
+    strategy:
+      # As soon as the first unit test fails, cancel the others to free up the CI queue
+      fail-fast: true
+      matrix:
+        ansible:
+          - ''
+        python:
+          - ''
+        exclude:
+          - ansible: ''
+        include:
+          - ansible: '2.11'
+            python: '2.7'
+          - ansible: '2.11'
+            python: '3.5'
+
+    steps:
+      - name: >-
+          Perform unit testing against
+          Ansible version ${{ matrix.ansible }}
+        uses: felixfontein/ansible-test-gh-action@main
+        with:
+          ansible-core-github-repository-slug: felixfontein/ansible
+          ansible-core-version: stable-${{ matrix.ansible }}
+          coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
+          pre-test-cmd: >-
+            mkdir -p ../../ansible
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
+          pull-request-change-detection: 'true'
+          target-python-version: ${{ matrix.python }}
+          testing-type: units
+
+  integration:
+    # Ansible-test on various stable branches does not yet work well with cgroups v2.
+    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
+    # image for these stable branches. The list of branches where this is necessary will
+    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
+    # for the latest list.
+    runs-on: >-
+      ${{ contains(fromJson(
+          '["2.9", "2.10", "2.11"]'
+      ), matrix.ansible) && 'ubuntu-20.04' || 'ubuntu-latest' }}
+    name: EOL I (Ⓐ${{ matrix.ansible }}+${{ matrix.docker }}+py${{ matrix.python }}:${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible:
+          - ''
+        docker:
+          - ''
+        python:
+          - ''
+        target:
+          - ''
+        exclude:
+          - ansible: ''
+        include:
+          # 2.11
+          - ansible: '2.11'
+            docker: fedora32
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.11'
+            docker: fedora32
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.11'
+            docker: fedora32
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.11'
+            docker: fedora33
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.11'
+            docker: fedora33
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.11'
+            docker: fedora33
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.11'
+            docker: alpine3
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.11'
+            docker: alpine3
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.11'
+            docker: alpine3
+            python: ''
+            target: azp/posix/3/
+          # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
+          # - ansible: '2.11'
+          #   docker: default
+          #   python: '2.7'
+          #   target: azp/generic/1/
+          # - ansible: '2.11'
+          #   docker: default
+          #   python: '3.5'
+          #   target: azp/generic/2/
+
+    steps:
+      - name: >-
+          Perform integration testing against
+          Ansible version ${{ matrix.ansible }}
+          under Python ${{ matrix.python }}
+        uses: felixfontein/ansible-test-gh-action@main
+        with:
+          ansible-core-github-repository-slug: felixfontein/ansible
+          ansible-core-version: stable-${{ matrix.ansible }}
+          coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
+          docker-image: ${{ matrix.docker }}
+          integration-continue-on-error: 'false'
+          integration-diff: 'false'
+          integration-retry-on-error: 'true'
+          pre-test-cmd: >-
+            mkdir -p ../../ansible
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git ../../ansible/posix
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git ../../community/crypto
+            ;
+            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
+          pull-request-change-detection: 'true'
+          target: ${{ matrix.target }}
+          target-python-version: ${{ matrix.python }}
+          testing-type: integration
