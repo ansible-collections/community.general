@@ -17,6 +17,11 @@ description:
     - This module runs a Rundeck job specified by ID.
 author: "Phillipe Smith (@phsmith)"
 version_added: 3.8.0
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     job_id:
         type: str
@@ -68,7 +73,8 @@ options:
         default: false
 extends_documentation_fragment:
   - community.general.rundeck
-  - url
+  - ansible.builtin.url
+  - community.general.attributes
 '''
 
 EXAMPLES = '''

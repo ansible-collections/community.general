@@ -19,6 +19,13 @@ description:
 author:
   - Steve Gargan (@sgargan)
   - Colin Nolan (@colin-nolan)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   mgmt_token:
     description:
