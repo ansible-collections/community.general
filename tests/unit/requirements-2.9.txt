@@ -1,0 +1,41 @@
+unittest2 ; python_version < '2.7'
+importlib ; python_version < '2.7'
+
+# requirement for the memcached cache plugin
+python-memcached
+
+# requirement for the redis cache plugin
+redis
+
+# requirement for the linode module
+linode-python  # APIv3
+linode_api4 ; python_version > '2.6'  # APIv4
+
+# requirement for the gitlab and github modules
+python-gitlab
+PyGithub
+httmock
+
+# requirement for maven_artifact module
+lxml < 4.3.0 ; python_version < '2.7' # lxml 4.3.0 and later require python 2.7 or later
+lxml ; python_version >= '2.7'
+semantic_version
+
+# requirement for datadog_downtime module
+datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
+
+# requirement for dnsimple module
+dnsimple >= 2 ; python_version >= '3.6'
+dataclasses ; python_version == '3.6'
+
+# requirement for the opentelemetry callback plugin
+# WARNING: these libraries rely on Protobuf for Python, which regularly stops installing.
+#          That's why they are disabled for now.
+# opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
+
+# requirement for the elastic callback plugin
+elastic-apm < 6.13.0 ; python_version == '3.6'
+elastic-apm ; python_version >= '3.7'
+pynacl >= 1.4.0, < 1.5.0; python_version >= '3.6'
