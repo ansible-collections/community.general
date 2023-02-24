@@ -13,7 +13,12 @@ module: ipa_config
 author: Fran Fitzpatrick (@fxfitz)
 short_description: Manage Global FreeIPA Configuration Settings
 description:
-- Modify global configuration settings of a FreeIPA Server.
+  - Modify global configuration settings of a FreeIPA Server.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   ipaconfigstring:
     description: Extra hashes to generate in password plug-in.
@@ -93,7 +98,8 @@ options:
     elements: str
     version_added: '2.5.0'
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 
