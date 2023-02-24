@@ -21,8 +21,14 @@ author: Remy Leone (@remyleone)
 description:
     - "This module manages compute instances on Scaleway."
 extends_documentation_fragment:
-- community.general.scaleway
+    - community.general.scaleway
+    - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
 
