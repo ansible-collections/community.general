@@ -11,11 +11,18 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 author:
-- Joris Weijters (@molekuul)
+    - Joris Weijters (@molekuul)
 module: aix_inittab
 short_description: Manages the inittab on AIX
 description:
     - Manages the inittab on AIX.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

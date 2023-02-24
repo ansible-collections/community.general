@@ -18,6 +18,12 @@ short_description: Manages domains on IBM Spectrum Accelerate Family storage sys
 description:
     - "This module can be used to add domains to or removes them from IBM Spectrum Accelerate Family storage systems."
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     domain:
         description:
@@ -82,8 +88,8 @@ options:
         type: str
 
 extends_documentation_fragment:
-- community.general.ibm_storage
-
+  - community.general.ibm_storage
+  - community.general.attributes
 
 author:
     - Tzur Eliyahu (@tzure)
