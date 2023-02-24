@@ -205,7 +205,6 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
 
-
 def main():
     """
     Module execution
@@ -292,7 +291,7 @@ def main():
 
     # Get effective client-level role mappings
     available_roles_before = kc.get_client_group_available_rolemappings(gid, cid, realm=realm)
-    assigned_roles_before = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+    assigned_roles_before = kc.get_client_group_rolemappings(gid, cid, realm=realm) #kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
 
     result['existing'] = assigned_roles_before
     result['proposed'] = list(assigned_roles_before) if assigned_roles_before else []
@@ -318,18 +317,33 @@ def main():
                     })
                     if assigned_role in result['proposed']:  # Handle double removal
                         result['proposed'].remove(assigned_role)
+    
+    roles_names = [k["name"] for k in roles]
+    to_del = []                 
+    for role_mapping in [r for r in assigned_roles_before if r["name"] not in roles_names]:
+        to_del.append(role_mapping)
+        result["proposed"].remove(role_mapping)
 
-    if len(update_roles):
+    if len(update_roles) or len(to_del):
         if state == 'present':
             # Assign roles
             result['changed'] = True
+            before_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(assigned_roles_before, key = lambda r : r["name"]))]}
+            proposed_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(result["proposed"], key = lambda r : r["name"]))]}
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=result['proposed'])
+                result['diff'] = dict(before=before_names, after=proposed_names)
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_group_rolemapping(gid, cid, update_roles, realm=realm)
+            if len(to_del):
+                kc.delete_group_rolemapping(gid, cid, to_del, realm=realm)
             result['msg'] = 'Roles %s assigned to group %s.' % (update_roles, group_name)
-            assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+            assigned_roles_after = kc.get_client_group_rolemappings(gid, cid, realm=realm)
+            after_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(assigned_roles_after, key = lambda r : r["name"]))]}
+            
+            if module._diff:
+                result['diff'] = dict(before=before_names, after=after_names)
+                
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
         else:
@@ -344,6 +358,8 @@ def main():
             assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
+            
+        
     # Do nothing
     else:
         result['changed'] = False
