@@ -12,8 +12,15 @@ DOCUMENTATION = '''
 module: oneandone_public_ip
 short_description: Configure 1&1 public IPs
 description:
-     - Create, update, and remove public IPs.
-       This module has a dependency on 1and1 >= 1.0
+  - Create, update, and remove public IPs.
+    This module has a dependency on 1and1 >= 1.0.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:
