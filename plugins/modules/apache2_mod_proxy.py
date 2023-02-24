@@ -20,6 +20,13 @@ description:
     status page has to be enabled and accessible, as this module relies on parsing
     this page. This module supports ansible check_mode, and requires BeautifulSoup
     python module.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   balancer_url_suffix:
     type: str

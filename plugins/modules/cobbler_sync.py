@@ -13,7 +13,14 @@ DOCUMENTATION = r'''
 module: cobbler_sync
 short_description: Sync Cobbler
 description:
-- Sync Cobbler to commit changes.
+  - Sync Cobbler to commit changes.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   host:
     description:
