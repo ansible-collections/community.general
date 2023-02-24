@@ -103,6 +103,20 @@ jobs:
             mkdir -p ../../ansible
             ;
             git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
+            ;
+            if [ ${{ matrix.ansible }} == "2.9" ]; then
+              echo "pynacl >= 1.4.0, < 1.5.0; python_version >= '3.6'" >> tests/unit/requirements.txt
+              ;
+            fi
+            ;
+            if [ ${{ matrix.ansible }} == "2.10" ]; then
+              sed -i -E 's/^redis($| .*)/redis < 4.1.0/g' tests/unit/requirements.txt
+              ;
+              sed -i -E 's/^python-gitlab($| .*)/python-gitlab < 2.10.1 ; python_version >= '"'"3.6"'"'/g' tests/unit/requirements.txt
+              ;
+              echo "python-gitlab ; python_version < '3.6'" >> tests/unit/requirements.txt
+              ;
+            fi
           pull-request-change-detection: 'true'
           target-python-version: ${{ matrix.python }}
           testing-type: units
