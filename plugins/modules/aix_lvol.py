@@ -17,6 +17,13 @@ module: aix_lvol
 short_description: Configure AIX LVM logical volumes
 description:
   - This module creates, removes or resizes AIX logical volumes. Inspired by lvol module.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   vg:
     description:

@@ -18,6 +18,12 @@ short_description: Adds hosts to or removes them from IBM Spectrum Accelerate Fa
 description:
     - "This module adds hosts to or removes them from IBM Spectrum Accelerate Family storage systems."
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     host:
         description:
@@ -56,8 +62,8 @@ options:
         type: str
 
 extends_documentation_fragment:
-- community.general.ibm_storage
-
+  - community.general.ibm_storage
+  - community.general.attributes
 
 author:
     - Tzur Eliyahu (@tzure)

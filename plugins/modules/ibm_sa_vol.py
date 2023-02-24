@@ -18,6 +18,12 @@ short_description: Handle volumes on IBM Spectrum Accelerate Family storage syst
 description:
     - "This module creates or deletes volumes to be used on IBM Spectrum Accelerate Family storage systems."
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     vol:
         description:
@@ -42,8 +48,8 @@ options:
         type: str
 
 extends_documentation_fragment:
-- community.general.ibm_storage
-
+  - community.general.ibm_storage
+  - community.general.attributes
 
 author:
     - Tzur Eliyahu (@tzure)
