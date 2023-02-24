@@ -14,14 +14,19 @@ DOCUMENTATION = '''
 ---
 module: udm_share
 author:
-- Tobias Rüetschi (@keachi)
+    - Tobias Rüetschi (@keachi)
 short_description: Manage samba shares on a univention corporate server
 description:
     - "This module allows to manage samba shares on a univention corporate
        server (UCS).
        It uses the python API of the UCS to create a new object or edit it."
-requirements:
-    - Python >= 2.6
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: partial
 options:
     state:
         default: "present"
