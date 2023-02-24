@@ -16,6 +16,13 @@ short_description: Manage LXD profiles
 description:
   - Management of LXD profiles
 author: "Hiroaki Nakamura (@hnakamur)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:

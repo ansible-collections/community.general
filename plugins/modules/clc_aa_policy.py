@@ -14,6 +14,13 @@ module: clc_aa_policy
 short_description: Create or Delete Anti Affinity Policies at CenturyLink Cloud
 description:
   - An Ansible module to Create or Delete Anti Affinity Policies at CenturyLink Cloud.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

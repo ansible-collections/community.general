@@ -19,12 +19,12 @@ author: "Hiroaki Nakamura (@hnakamur)"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
-  check_mode:
-    support: full
-    version_added: 6.4.0
-  diff_mode:
-    support: full
-    version_added: 6.4.0
+    check_mode:
+        support: full
+        version_added: 6.4.0
+    diff_mode:
+        support: full
+        version_added: 6.4.0
 options:
     name:
         description:

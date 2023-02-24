@@ -22,6 +22,11 @@ version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         description:
@@ -150,7 +155,8 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-- community.general.hwc
+  - community.general.hwc
+  - community.general.attributes
 
 '''
 

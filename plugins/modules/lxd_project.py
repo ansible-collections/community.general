@@ -15,6 +15,13 @@ version_added: 4.8.0
 description:
   - Management of LXD projects.
 author: "Raymond Chang (@we10710aa)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:

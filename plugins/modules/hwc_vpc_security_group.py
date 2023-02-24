@@ -19,17 +19,22 @@ description:
     - vpc security group management.
 short_description: Creates a resource of Vpc/SecurityGroup in Huawei Cloud
 notes:
-  - If I(id) option is provided, it takes precedence over I(name),
-    I(enterprise_project_id) and I(vpc_id) for security group selection.
-  - I(name), I(enterprise_project_id) and I(vpc_id) are used for security
-    group selection. If more than one security group with this options exists,
-    execution is aborted.
-  - No parameter support updating. If one of option is changed, the module
-    will create a new resource.
+    - If I(id) option is provided, it takes precedence over I(name),
+      I(enterprise_project_id) and I(vpc_id) for security group selection.
+    - I(name), I(enterprise_project_id) and I(vpc_id) are used for security
+      group selection. If more than one security group with this options exists,
+      execution is aborted.
+    - No parameter support updating. If one of option is changed, the module
+      will create a new resource.
 version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         description:
@@ -58,7 +63,8 @@ options:
         type: str
         required: false
 extends_documentation_fragment:
-- community.general.hwc
+  - community.general.hwc
+  - community.general.attributes
 
 '''
 
