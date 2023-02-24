@@ -18,6 +18,13 @@ short_description: Send notifications to Rocket Chat
 description:
     - The C(rocketchat) module sends notifications to Rocket Chat via the Incoming WebHook integration
 author: "Ramon de la Fuente (@ramondelafuente)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   domain:
     type: str
