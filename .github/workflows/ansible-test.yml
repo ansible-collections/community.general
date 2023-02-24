@@ -136,57 +136,57 @@ jobs:
           - ansible: '2.11'
             docker: fedora33
             python: ''
-            target: azp/posix/2/
+            target: shippable/posix/group2/
           - ansible: '2.11'
             docker: fedora33
             python: ''
-            target: azp/posix/3/
+            target: shippable/posix/group3/
           - ansible: '2.11'
             docker: alpine3
             python: ''
-            target: azp/posix/2/
+            target: shippable/posix/group2/
           - ansible: '2.11'
             docker: alpine3
             python: ''
-            target: azp/posix/3/
+            target: shippable/posix/group3/
           - ansible: '2.11'
             docker: default
             python: '3.6'
-            target: azp/generic/1/
+            target: shippable/cloud/group1/
           # 2.10
           - ansible: '2.10'
             docker: fedora32
             python: ''
-            target: azp/posix/2/
+            target: shippable/posix/group2/
           - ansible: '2.10'
             docker: fedora32
             python: ''
-            target: azp/posix/3/
+            target: shippable/posix/group3/
           - ansible: '2.10'
             docker: ubuntu1604
             python: ''
-            target: azp/posix/2/
+            target: shippable/posix/group2/
           - ansible: '2.10'
             docker: ubuntu1604
             python: ''
-            target: azp/posix/3/
+            target: shippable/posix/group3/
           - ansible: '2.10'
             docker: default
             python: '3.5'
-            target: azp/generic/2/
+            target: shippable/cloud/group1/
           # 2.9
           - ansible: '2.9'
             docker: fedora31
             python: ''
-            target: azp/posix/2/
+            target: shippable/posix/group2/
           - ansible: '2.9'
             docker: fedora31
             python: ''
-            target: azp/posix/3/
+            target: shippable/posix/group3/
           - ansible: '2.9'
             docker: default
             python: '2.7'
-            target: azp/generic/2/
+            target: shippable/cloud/group1/
 
     steps:
       - name: >-
