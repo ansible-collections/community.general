@@ -14,13 +14,20 @@ module: manageiq_group
 
 short_description: Management of groups in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Evert Mulder (@evertmulder)
 description:
   - The manageiq_group module supports adding, updating and deleting groups in ManageIQ.
 requirements:
-- manageiq-client
+  - manageiq-client
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
   state:

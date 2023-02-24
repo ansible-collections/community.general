@@ -14,15 +14,21 @@ DOCUMENTATION = '''
 ---
 module: udm_dns_record
 author:
-- Tobias Rüetschi (@keachi)
+    - Tobias Rüetschi (@keachi)
 short_description: Manage dns entries on a univention corporate server
 description:
     - "This module allows to manage dns records on a univention corporate server (UCS).
        It uses the python API of the UCS to create a new object or edit it."
 requirements:
-    - Python >= 2.6
     - Univention
     - ipaddress (for I(type=ptr_record))
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: partial
 options:
     state:
         type: str

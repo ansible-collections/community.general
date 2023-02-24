@@ -15,11 +15,18 @@ module: manageiq_policies
 
 short_description: Management of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_policies module supports adding and deleting policy_profiles in ManageIQ.
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
   state:

@@ -14,13 +14,18 @@ DOCUMENTATION = '''
 ---
 module: udm_group
 author:
-- Tobias Rüetschi (@keachi)
+    - Tobias Rüetschi (@keachi)
 short_description: Manage of the posix group
 description:
     - "This module allows to manage user groups on a univention corporate server (UCS).
        It uses the python API of the UCS to create a new object or edit it."
-requirements:
-    - Python >= 2.6
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: partial
 options:
     state:
         required: false
