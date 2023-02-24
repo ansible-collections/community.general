@@ -28,6 +28,13 @@ description:
 - Of course sending out a mail can be equally useful as a way to notify
   one or more people in a team that a specific action has been
   (successfully) taken.
+extends_documentation_fragment:
+- community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   sender:
     description:

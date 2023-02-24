@@ -14,7 +14,14 @@ DOCUMENTATION = '''
 module: jabber
 short_description: Send a message to jabber user or chat room
 description:
-   - Send a message to jabber
+  - Send a message to jabber
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   user:
     type: str

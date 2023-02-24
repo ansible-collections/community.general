@@ -21,39 +21,46 @@ notes:
    - Like the other notification modules, this one requires an external
      dependency to work. In this case, you'll need a Twilio account with
      a purchased or verified phone number to send the text message.
+extends_documentation_fragment:
+   - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   account_sid:
     type: str
     description:
-      user's Twilio account token found on the account page
+      - User's Twilio account token found on the account page.
     required: true
   auth_token:
     type: str
-    description: user's Twilio authentication token
+    description:
+      - User's Twilio authentication token.
     required: true
   msg:
     type: str
     description:
-      the body of the text message
+      - The body of the text message.
     required: true
   to_numbers:
     type: list
     elements: str
     description:
-      one or more phone numbers to send the text message to,
-      format +15551112222
+      - One or more phone numbers to send the text message to, format C(+15551112222).
     required: true
     aliases: [ to_number ]
   from_number:
     type: str
     description:
-      the Twilio number to send the text message from, format +15551112222
+      - The Twilio number to send the text message from, format C(+15551112222).
     required: true
   media_url:
     type: str
     description:
-      a URL with a picture, video or sound clip to send with an MMS
-      (multimedia message) instead of a plain SMS
+      - A URL with a picture, video or sound clip to send with an MMS
+        (multimedia message) instead of a plain SMS.
     required: false
 
 author: "Matt Makai (@makaimc)"

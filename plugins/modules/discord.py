@@ -20,6 +20,13 @@ seealso:
   - name: API documentation
     description: Documentation for Discord API
     link: https://discord.com/developers/docs/resources/webhook#execute-webhook
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   webhook_id:
     description:
