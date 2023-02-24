@@ -13,7 +13,14 @@ DOCUMENTATION = r'''
 module: cobbler_system
 short_description: Manage system objects in Cobbler
 description:
-- Add, modify or remove systems in Cobbler
+  - Add, modify or remove systems in Cobbler
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   host:
     description:

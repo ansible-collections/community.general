@@ -23,6 +23,13 @@ notes:
     - Model creation and deletion are not possible with this module. For that use M(community.general.spectrum_device) instead.
 requirements:
     - 'python >= 2.7'
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+      support: full
+    diff_mode:
+      support: none
 options:
    url:
      description:

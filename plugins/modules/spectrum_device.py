@@ -14,9 +14,16 @@ DOCUMENTATION = '''
 module: spectrum_device
 short_description: Creates/deletes devices in CA Spectrum
 description:
-   - This module allows you to create and delete devices in CA Spectrum U(https://www.ca.com/us/products/ca-spectrum.html).
-   - Tested on CA Spectrum 9.4.2, 10.1.1 and 10.2.1
+    - This module allows you to create and delete devices in CA Spectrum U(https://www.ca.com/us/products/ca-spectrum.html).
+    - Tested on CA Spectrum 9.4.2, 10.1.1 and 10.2.1
 author: "Renato Orgito (@orgito)"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     device:
         type: str
