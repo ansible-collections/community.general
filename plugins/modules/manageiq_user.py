@@ -14,11 +14,18 @@ module: manageiq_user
 
 short_description: Management of users in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_user module supports adding, updating and deleting users in ManageIQ.
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
   state:

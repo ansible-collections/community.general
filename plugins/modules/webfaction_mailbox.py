@@ -24,6 +24,16 @@ notes:
       The location is not important. However, running them on multiple hosts I(simultaneously) is best avoided. If you don't specify I(localhost) as
       your host, you may want to add C(serial: 1) to the plays.
     - See `the webfaction API <https://docs.webfaction.com/xmlrpc-api/>`_ for more info.
+
+extends_documentation_fragment:
+    - community.general.attributes
+
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
+
 options:
 
     mailbox_name:

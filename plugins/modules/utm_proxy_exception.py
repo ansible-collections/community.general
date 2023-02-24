@@ -22,6 +22,11 @@ description:
     - Create, update or destroy a reverse_proxy exception entry in SOPHOS UTM.
     - This module needs to have the REST Ability of the UTM to be activated.
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 
 options:
     name:
@@ -123,6 +128,7 @@ options:
 
 extends_documentation_fragment:
 - community.general.utm
+- community.general.attributes
 
 '''
 
