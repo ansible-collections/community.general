@@ -14,7 +14,12 @@ author: justchris1 (@justchris1)
 short_description: Manage FreeIPA OTPs
 version_added: 2.5.0
 description:
-- Add, modify, and delete One Time Passwords in IPA.
+  - Add, modify, and delete One Time Passwords in IPA.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   uniqueid:
     description: Unique ID of the token in IPA.
@@ -100,7 +105,8 @@ options:
     - "B(Note:) Cannot be modified after OTP is created."
     type: int
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 '''
 
 EXAMPLES = r'''
