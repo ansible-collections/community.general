@@ -16,6 +16,13 @@ module: cpanm
 short_description: Manages Perl library dependencies
 description:
   - Manage Perl library dependencies using cpanminus.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     type: str
