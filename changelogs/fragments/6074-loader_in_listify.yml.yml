@@ -1,0 +1,2 @@
+minor_changes:
+  - calls to listify_lookup_plugin_terms in core do not pass in loader/dataloader anymore (https://github.com/ansible-collections/community.general/pull/6074).
