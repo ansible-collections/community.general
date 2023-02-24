@@ -18,6 +18,12 @@ short_description: Custom module for lxca cmms inventory utility
 description:
   - This module returns/displays a inventory details of cmms
 
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
 options:
   uuid:
     description:
@@ -40,7 +46,8 @@ options:
     type: str
 
 extends_documentation_fragment:
-- community.general.lxca_common
+  - community.general.lxca_common
+  - community.general.attributes
 
 '''
 
