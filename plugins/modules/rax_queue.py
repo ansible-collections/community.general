@@ -14,6 +14,11 @@ module: rax_queue
 short_description: Create / delete a queue in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud queue.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     type: str
@@ -31,8 +36,9 @@ author:
     - "Christopher H. Laco (@claco)"
     - "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

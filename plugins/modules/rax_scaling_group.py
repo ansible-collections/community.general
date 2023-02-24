@@ -14,6 +14,11 @@ module: rax_scaling_group
 short_description: Manipulate Rackspace Cloud Autoscale Groups
 description:
     - Manipulate Rackspace Cloud Autoscale Groups
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   config_drive:
     description:
@@ -122,8 +127,9 @@ options:
     default: 300
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 
