@@ -15,12 +15,18 @@ DOCUMENTATION = '''
 module: dimensiondata_vlan
 short_description: Manage a VLAN in a Cloud Control network domain
 extends_documentation_fragment:
-- community.general.dimensiondata
-- community.general.dimensiondata_wait
+  - community.general.dimensiondata
+  - community.general.dimensiondata_wait
+  - community.general.attributes
 
 description:
   - Manage VLANs in Cloud Control network domains.
 author: 'Adam Friedman (@tintoy)'
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:

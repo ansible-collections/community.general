@@ -19,6 +19,13 @@ author:
 short_description: Enables/disables a module of the Apache2 webserver
 description:
    - Enables or disables a specified module of the Apache2 webserver.
+extends_documentation_fragment:
+   - community.general.attributes
+attributes:
+   check_mode:
+     support: full
+   diff_mode:
+     support: none
 options:
    name:
      type: str

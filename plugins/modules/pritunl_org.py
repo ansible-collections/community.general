@@ -18,6 +18,12 @@ description:
     - A module to manage Pritunl organizations using the Pritunl API.
 extends_documentation_fragment:
     - community.general.pritunl
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         type: str

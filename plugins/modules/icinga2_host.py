@@ -19,6 +19,11 @@ description:
    - "Add or remove a host to Icinga2 through the API."
    - "See U(https://www.icinga.com/docs/icinga2/latest/doc/12-icinga2-api/)"
 author: "Jurgen Brand (@t794104)"
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   url:
     type: str
@@ -107,7 +112,8 @@ options:
     description:
       - Dictionary of variables.
 extends_documentation_fragment:
-  - url
+  - ansible.builtin.url
+  - community.general.attributes
 '''
 
 EXAMPLES = '''
