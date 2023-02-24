@@ -21,6 +21,11 @@ description:
     *rax_mon_alarm*.
   - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
   - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     type: str
@@ -73,7 +78,8 @@ options:
       keys and values between 1 and 255 characters long.
 author: Ash Wilson (@smashwilson)
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

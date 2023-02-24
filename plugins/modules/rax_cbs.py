@@ -16,6 +16,11 @@ description:
   - Manipulate Rackspace Cloud Block Storage Volumes
   - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
   - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   description:
     type: str
@@ -75,7 +80,8 @@ author:
     - "Christopher H. Laco (@claco)"
     - "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+    - community.general.rackspace.openstack
+    - community.general.attributes
 
 '''
 

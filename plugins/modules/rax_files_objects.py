@@ -16,6 +16,11 @@ description:
   - Upload, download, and delete objects in Rackspace Cloud Files.
   - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
   - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   clear_meta:
     description:
@@ -78,8 +83,9 @@ options:
     default: file
 author: "Paul Durivage (@angstwad)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

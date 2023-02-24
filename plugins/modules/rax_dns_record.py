@@ -16,6 +16,11 @@ description:
   - Manage DNS records on Rackspace Cloud DNS.
   - This module relies on the C(pyrax) package which is deprecated in favour of using Openstack API.
   - Unless maintainers step up to work on the module, it will be marked as deprecated in community.general 7.0.0 and removed in version 9.0.0.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   comment:
     type: str
@@ -94,8 +99,9 @@ notes:
   - C(PTR) record support was added in version 1.7
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 
