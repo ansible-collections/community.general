@@ -14,6 +14,11 @@ author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA users
 description:
 - Add, modify and delete user within IPA server.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   displayname:
     description: Display name.
@@ -99,7 +104,8 @@ options:
     elements: str
     version_added: '1.2.0'
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 requirements:
 - base64

@@ -14,7 +14,12 @@ module: ipa_dnsrecord
 author: Abhijeet Kasurde (@Akasurde)
 short_description: Manage FreeIPA DNS records
 description:
-- Add, modify and delete an IPA DNS Record using IPA API.
+  - Add, modify and delete an IPA DNS Record using IPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   zone_name:
     description:
@@ -78,7 +83,8 @@ options:
     choices: ["absent", "present"]
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 
