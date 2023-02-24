@@ -23,6 +23,15 @@ description:
 author:
 - Alexander Winkler (@dermute)
 - David Ponessa (@scathatheworm)
+extends_documentation_fragment:
+- community.general.attributes
+attributes:
+  check_mode:
+    support: full
+    details:
+      - In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even in check mode.
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -57,8 +66,6 @@ options:
     type: bool
     default: false
     version_added: 1.2.0
-notes:
-- In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even in check mode.
 '''
 
 EXAMPLES = r'''
