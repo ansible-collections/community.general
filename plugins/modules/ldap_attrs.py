@@ -40,6 +40,11 @@ author:
   - Maciej Delmanowski (@drybjed)
 requirements:
   - python-ldap
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     required: false
@@ -68,7 +73,8 @@ options:
         attributes specified in the current task. This is useful mostly with
         I(olcAccess) attribute to easily manage LDAP Access Control Lists.
 extends_documentation_fragment:
-- community.general.ldap.documentation
+  - community.general.ldap.documentation
+  - community.general.attributes
 
 '''
 

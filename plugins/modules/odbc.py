@@ -16,6 +16,13 @@ version_added: "1.0.0"
 short_description: Execute SQL via ODBC
 description:
     - Read/Write info via ODBC drivers.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     dsn:
       description:

@@ -30,6 +30,11 @@ author:
   - Jiri Tyr (@jtyr)
 requirements:
   - python-ldap
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   attributes:
     description:
@@ -59,7 +64,8 @@ options:
     default: false
     version_added: 4.6.0
 extends_documentation_fragment:
-- community.general.ldap.documentation
+  - community.general.ldap.documentation
+  - community.general.attributes
 
 '''
 

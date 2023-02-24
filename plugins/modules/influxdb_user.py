@@ -20,6 +20,11 @@ author: "Vitaliy Zhhuta (@zhhuta)"
 requirements:
   - "python >= 2.6"
   - "influxdb >= 0.9"
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   user_name:
     description:
@@ -52,7 +57,8 @@ options:
     type: list
     elements: dict
 extends_documentation_fragment:
-- community.general.influxdb
+  - community.general.influxdb
+  - community.general.attributes
 
 '''
 

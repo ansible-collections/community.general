@@ -16,8 +16,15 @@ short_description: Set or delete key value pairs from an etcd3 cluster
 requirements:
   - etcd3
 description:
-   - Sets or deletes values in etcd3 cluster using its v3 api.
-   - Needs python etcd3 lib to work
+  - Sets or deletes values in etcd3 cluster using its v3 api.
+  - Needs python etcd3 lib to work
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     key:
         type: str

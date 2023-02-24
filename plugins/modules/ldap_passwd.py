@@ -28,13 +28,19 @@ author:
   - Keller Fuchs (@KellerFuchs)
 requirements:
   - python-ldap
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   passwd:
     description:
       - The (plaintext) password to be set for I(dn).
     type: str
 extends_documentation_fragment:
-- community.general.ldap.documentation
+  - community.general.ldap.documentation
+  - community.general.attributes
 
 '''
 

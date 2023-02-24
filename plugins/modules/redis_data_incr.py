@@ -17,9 +17,17 @@ description:
    - Increment integers or float keys in Redis database and get new value.
    - Default increment for all keys is 1. For specific increments use the
      I(increment_int) and I(increment_float) options.
-   - When using I(check_mode) the module will try to calculate the value that
-     Redis would return. If the key is not present, 0.0 is used as value.
 author: "Andreas Botzner (@paginabianca)"
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - For C(check_mode) to work, the specified I(redis_user) needs permission to
+        run the C(GET) command on the key, otherwise the module will fail.
+      - When using I(check_mode) the module will try to calculate the value that
+        Redis would return. If the key is not present, 0.0 is used as value.
+  diff_mode:
+    support: none
 options:
   key:
     description:
@@ -42,10 +50,7 @@ options:
 
 extends_documentation_fragment:
   - community.general.redis.documentation
-
-notes:
-   - For C(check_mode) to work, the specified I(redis_user) needs permission to
-     run the C(GET) command on the key, otherwise the module will fail.
+  - community.general.attributes
 
 seealso:
     - module: community.general.redis_data

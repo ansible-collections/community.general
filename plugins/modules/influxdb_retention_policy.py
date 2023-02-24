@@ -20,6 +20,11 @@ requirements:
     - "python >= 2.6"
     - "influxdb >= 0.9"
     - requests
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     database_name:
         description:
@@ -64,7 +69,8 @@ options:
         type: str
         version_added: '2.0.0'
 extends_documentation_fragment:
-- community.general.influxdb
+  - community.general.influxdb
+  - community.general.attributes
 
 '''
 
