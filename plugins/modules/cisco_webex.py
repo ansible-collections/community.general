@@ -20,6 +20,14 @@ notes:
   - The C(recipient_id) type must be valid for the supplied C(recipient_id).
   - Full API documentation can be found at U(https://developer.webex.com/docs/api/basics).
 
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
 
   recipient_type:

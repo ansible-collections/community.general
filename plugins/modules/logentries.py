@@ -16,6 +16,13 @@ author: "Ivan Vanderbyl (@ivanvanderbyl)"
 short_description: Module for tracking logs via logentries.com
 description:
     - Sends logs to LogEntries in realtime
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     path:
         type: str

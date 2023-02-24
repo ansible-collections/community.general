@@ -15,6 +15,13 @@ module: typetalk
 short_description: Send a message to typetalk
 description:
   - Send a message to typetalk using typetalk API
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   client_id:
     type: str

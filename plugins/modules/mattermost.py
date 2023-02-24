@@ -21,6 +21,13 @@ short_description: Send Mattermost notifications
 description:
     - Sends notifications to U(http://your.mattermost.url) via the Incoming WebHook integration.
 author: "Benjamin Jolivot (@bjolivot)"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   url:
     type: str
