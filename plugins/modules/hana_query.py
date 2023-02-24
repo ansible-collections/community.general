@@ -13,6 +13,13 @@ module: hana_query
 short_description: Execute SQL on HANA
 version_added: 3.2.0
 description: This module executes SQL statements on HANA with hdbsql.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     sid:
         description: The system ID.
@@ -65,8 +72,6 @@ options:
           It is better to supply a one-element list instead to avoid mangled input.
         type: list
         elements: str
-notes:
-    - Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''
