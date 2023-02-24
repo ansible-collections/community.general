@@ -18,6 +18,13 @@ description:
     have these available.
   - Tasks in the task list which requires manual activities will be confirmed automatically.
   - This module will use the RFC package C(STC_TM_API).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 requirements:
   - pyrfc >= 2.4.0
@@ -87,8 +94,6 @@ options:
     default: false
     type: bool
 
-notes:
-    - Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''

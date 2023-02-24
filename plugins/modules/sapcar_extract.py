@@ -15,6 +15,15 @@ version_added: "3.2.0"
 description:
     - Provides support for unpacking C(sar)/C(car) files with the SAPCAR binary from SAP and pulling
       information back into Ansible.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - Always returns C(changed=true) in check mode.
+  diff_mode:
+    support: none
 options:
   path:
     description: The path to the SAR/CAR file.
@@ -51,8 +60,6 @@ options:
     type: bool
 author:
     - Rainer Leber (@RainerLeber)
-notes:
-    - Always returns C(changed=true) in C(check_mode).
 '''
 
 EXAMPLES = """
