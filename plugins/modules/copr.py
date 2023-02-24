@@ -20,6 +20,13 @@ requirements:
     - dnf-plugins-core
 notes:
     - Supports C(check_mode).
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     host:
         description: The Copr host to work with.
