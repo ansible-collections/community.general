@@ -18,6 +18,12 @@ short_description: Handles pools on IBM Spectrum Accelerate Family storage syste
 description:
     - "This module creates or deletes pools to be used on IBM Spectrum Accelerate Family storage systems"
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     pool:
         description:
@@ -52,8 +58,8 @@ options:
         type: str
 
 extends_documentation_fragment:
-- community.general.ibm_storage
-
+  - community.general.ibm_storage
+  - community.general.attributes
 
 author:
     - Tzur Eliyahu (@tzure)
