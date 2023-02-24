@@ -17,6 +17,13 @@ author:
 short_description: Deploy software (or files) from bzr branches
 description:
     - Manage I(bzr) branches to deploy files or software.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
     name:
         description:
