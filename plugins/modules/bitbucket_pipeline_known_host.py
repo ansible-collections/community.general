@@ -19,8 +19,14 @@ author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:
   - community.general.bitbucket
+  - community.general.attributes
 requirements:
-    - paramiko
+  - paramiko
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   repository:
     description:
