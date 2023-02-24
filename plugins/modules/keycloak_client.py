@@ -718,7 +718,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     KeycloakError,
 )
 from ansible.module_utils.basic import AnsibleModule
-
+import copy
 
 def normalise_cr(clientrep, remove_ids=False):
     """Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
@@ -733,7 +733,7 @@ def normalise_cr(clientrep, remove_ids=False):
     clientrep = clientrep.copy()
 
     if "attributes" in clientrep:
-        clientrep["attributes"] = list(sorted(clientrep["attributes"]))
+        clientrep["attributes"] = dict(sorted(clientrep["attributes"].items()))
 
     if "redirectUris" in clientrep:
         clientrep["redirectUris"] = list(sorted(clientrep["redirectUris"]))
@@ -764,7 +764,7 @@ def sanitize_cr(clientrep):
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict
     """
-    result = clientrep.copy()
+    result = copy.deepcopy(clientrep)
     if "secret" in result:
         result["secret"] = "no_log"
     if "attributes" in result:
@@ -917,7 +917,7 @@ def main():
             cid = before_client["id"]
     else:
         before_client = kc.get_client_by_id(cid, realm=realm)
-
+        
     if before_client is None:
         before_client = {}
     # Build a proposed changeset from parameters given to this module
@@ -1005,7 +1005,9 @@ def main():
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
                 before_norm = normalise_cr(before_client, remove_ids=True)
+                desired_client["attributes"] = before_norm["attributes"] | desired_client["attributes"]
                 desired_norm = normalise_cr(desired_client, remove_ids=True)
+                
                 if module._diff:
                     result["diff"] = dict(
                         before=sanitize_cr(before_norm), after=sanitize_cr(desired_norm)
