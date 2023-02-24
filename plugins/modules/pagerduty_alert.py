@@ -18,6 +18,13 @@ author:
     - "Amanpreet Singh (@ApsOps)"
 requirements:
     - PagerDuty API access
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         type: str

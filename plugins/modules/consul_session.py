@@ -20,7 +20,14 @@ requirements:
   - python-consul
   - requests
 author:
-- Steve Gargan (@sgargan)
+  - Steve Gargan (@sgargan)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     id:
         description:
