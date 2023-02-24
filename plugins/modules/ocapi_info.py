@@ -18,6 +18,9 @@ short_description: Manages Out-Of-Band controllers using Open Composable API (OC
 description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to
     get information back.
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   category:
     required: true
