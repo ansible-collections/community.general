@@ -23,7 +23,13 @@ description:
     - It can be used to configure cloud-init for instance.
 extends_documentation_fragment:
 - community.general.scaleway
+- community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
 
