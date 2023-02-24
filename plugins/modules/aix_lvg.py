@@ -11,11 +11,18 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 author:
-- Kairo Araujo (@kairoaraujo)
+  - Kairo Araujo (@kairoaraujo)
 module: aix_lvg
 short_description: Manage LVM volume groups on AIX
 description:
-- This module creates, removes or resize volume groups on AIX LVM.
+  - This module creates, removes or resize volume groups on AIX LVM.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   force:
     description:
