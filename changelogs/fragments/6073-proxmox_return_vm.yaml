@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox - return information about the VM
