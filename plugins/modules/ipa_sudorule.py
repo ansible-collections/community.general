@@ -14,6 +14,11 @@ author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA sudo rule
 description:
 - Add, modify or delete sudo rule within IPA server using IPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   cn:
     description:
@@ -115,7 +120,8 @@ options:
     choices: ['absent', 'disabled', 'enabled', 'present']
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

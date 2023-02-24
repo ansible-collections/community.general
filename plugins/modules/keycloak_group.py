@@ -31,6 +31,11 @@ description:
     - When updating a group, where possible provide the group ID to the module. This removes a lookup
       to the API to translate the name into the group ID.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -74,8 +79,8 @@ notes:
       are read-only for groups. This limitation will be removed in a later version of this module.
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Adam Goossens (@adamgoossens)

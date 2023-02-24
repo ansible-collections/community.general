@@ -32,6 +32,12 @@ description:
   - "Note that this module returns the client secret. To avoid this showing up in the logs,
      please add C(no_log: true) to the task."
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   realm:
     type: str
@@ -57,6 +63,7 @@ options:
 
 extends_documentation_fragment:
   - community.general.keycloak
+  - community.general.attributes
 
 author:
   - Fynn Chen (@fynncfchen)

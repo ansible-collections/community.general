@@ -14,7 +14,12 @@ module: ipa_dnszone
 author: Fran Fitzpatrick (@fxfitz)
 short_description: Manage FreeIPA DNS Zones
 description:
-- Add and delete an IPA DNS Zones using IPA API
+  - Add and delete an IPA DNS Zones using IPA API
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   zone_name:
     description:
@@ -37,7 +42,8 @@ options:
     type: bool
     version_added: 4.3.0
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

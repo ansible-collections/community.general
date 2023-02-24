@@ -13,7 +13,12 @@ module: ipa_hbacrule
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA HBAC rule
 description:
-- Add, modify or delete an IPA HBAC rule using IPA API.
+  - Add, modify or delete an IPA HBAC rule using IPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   cn:
     description:
@@ -104,7 +109,8 @@ options:
     type: list
     elements: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

@@ -30,6 +30,12 @@ description:
       SAML-specific settings on an OpenID Connect client for instance and vice versa. Be careful.
       If you do not specify a setting, usually a sensible default is chosen.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+
 options:
     state:
         description:
@@ -539,7 +545,8 @@ options:
                       client and signed by its key, base64-encoded.
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Eike Frost (@eikef)

@@ -17,7 +17,6 @@ short_description: Allows administration of Keycloak realm via Keycloak API
 
 version_added: 3.0.0
 
-
 description:
     - This module allows the administration of Keycloak realm via the Keycloak REST API. It
       requires access to the REST API via OpenID Connect; the user connecting and the realm being
@@ -32,6 +31,12 @@ description:
     - The Keycloak API does not always sanity check inputs e.g. you can set
       SAML-specific settings on an OpenID Connect client for instance and vice versa. Be careful.
       If you do not specify a setting, usually a sensible default is chosen.
+
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -503,8 +508,8 @@ options:
         type: int
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Christophe Gilles (@kris2kris)

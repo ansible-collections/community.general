@@ -32,6 +32,11 @@ description:
     - When updating a user_rolemapping, where possible provide the role ID to the module. This removes a lookup
       to the API to translate the name into the role ID.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -104,8 +109,8 @@ options:
                       providing it will reduce the number of API calls required.
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Dušan Marković (@bratwurzt)

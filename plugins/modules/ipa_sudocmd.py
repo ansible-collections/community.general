@@ -14,6 +14,11 @@ author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA sudo command
 description:
 - Add, modify or delete sudo command within FreeIPA server using FreeIPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   sudocmd:
     description:
@@ -31,7 +36,8 @@ options:
     choices: ['absent', 'disabled', 'enabled', 'present']
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

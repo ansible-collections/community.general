@@ -13,7 +13,12 @@ module: ipa_group
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA group
 description:
-- Add, modify and delete group within IPA server
+  - Add, modify and delete group within IPA server
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   append:
     description:
@@ -82,7 +87,8 @@ options:
     choices: ["absent", "present"]
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

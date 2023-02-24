@@ -15,7 +15,12 @@ author: justchris1 (@justchris1)
 short_description: Manage FreeIPA OTP Configuration Settings
 version_added: 2.5.0
 description:
-- Modify global configuration settings of a FreeIPA Server with respect to OTP (One Time Passwords).
+  - Modify global configuration settings of a FreeIPA Server with respect to OTP (One Time Passwords).
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   ipatokentotpauthwindow:
     description: TOTP authentication window in seconds.
@@ -34,7 +39,8 @@ options:
     aliases: ["hotpsyncwindow"]
     type: int
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

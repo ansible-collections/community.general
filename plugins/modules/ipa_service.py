@@ -14,6 +14,11 @@ author: Cédric Parent (@cprh)
 short_description: Manage FreeIPA service
 description:
 - Add and delete an IPA service using IPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   krbcanonicalname:
     description:
@@ -48,7 +53,8 @@ options:
     choices: ["absent", "present"]
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

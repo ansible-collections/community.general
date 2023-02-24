@@ -13,7 +13,12 @@ module: ipa_hostgroup
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA host-group
 description:
-- Add, modify and delete an IPA host-group using IPA API.
+  - Add, modify and delete an IPA host-group using IPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   cn:
     description:
@@ -49,7 +54,8 @@ options:
     choices: ["absent", "disabled", "enabled", "present"]
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

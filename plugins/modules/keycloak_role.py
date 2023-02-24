@@ -30,6 +30,11 @@ description:
       be returned that way by this module. You may pass single values for attributes when calling the module,
       and this will be translated into a list suitable for the API.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -74,8 +79,8 @@ options:
             - Values may be single values (e.g. a string) or a list of strings.
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Laurent Paumier (@laurpaum)

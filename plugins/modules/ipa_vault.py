@@ -15,6 +15,11 @@ short_description: Manage FreeIPA vaults
 description:
 - Add, modify and delete vaults and secret vaults.
 - KRA service should be enabled to use this module.
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     cn:
         description:
@@ -74,7 +79,8 @@ options:
         type: bool
         default: true
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 
