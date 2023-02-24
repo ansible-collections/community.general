@@ -14,6 +14,13 @@ module: vertica_configuration
 short_description: Updates Vertica configuration parameters
 description:
     - Updates Vertica configuration parameters.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   parameter:
     description:

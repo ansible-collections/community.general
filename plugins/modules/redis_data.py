@@ -16,6 +16,11 @@ version_added: 3.7.0
 description:
    - Set key value pairs in Redis database.
 author: "Andreas Botzner (@paginabianca)"
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     key:
         description:
@@ -59,6 +64,7 @@ options:
 
 extends_documentation_fragment:
   - community.general.redis.documentation
+  - community.general.attributes
 
 seealso:
     - module: community.general.redis_data_incr

@@ -18,6 +18,17 @@ version_added: "4.0.0"
 description:
   - Execute SQL scripts on a MSSQL database.
 
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+    check_mode:
+        support: partial
+        details:
+          - The script will not be executed in check mode.
+    diff_mode:
+        support: none
+
 options:
     name:
         description: Database to run script against.

@@ -18,6 +18,11 @@ author: "René Moser (@resmo)"
 requirements:
   - "python >= 2.6"
   - "influxdb >= 0.9"
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   query:
     description:
@@ -30,7 +35,8 @@ options:
     required: true
     type: str
 extends_documentation_fragment:
-- community.general.influxdb
+  - community.general.influxdb
+  - community.general.attributes
 
 '''
 

@@ -20,6 +20,13 @@ description:
   - In such a situation, if the module tries to remove the schema it
     will fail and only remove roles created for the schema if they have
     no dependencies.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   schema:
     description:

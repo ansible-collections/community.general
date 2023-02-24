@@ -16,6 +16,12 @@ description:
    - Unified utility to interact with redis instances.
 extends_documentation_fragment:
    - community.general.redis
+   - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     command:
         description:
