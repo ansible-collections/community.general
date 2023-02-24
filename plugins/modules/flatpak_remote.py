@@ -15,17 +15,24 @@ DOCUMENTATION = r'''
 module: flatpak_remote
 short_description: Manage flatpak repository remotes
 description:
-- Allows users to add or remove flatpak remotes.
-- The flatpak remotes concept is comparable to what is called repositories in other packaging
-  formats.
-- Currently, remote addition is only supported via I(flatpakrepo) file URLs.
-- Existing remotes will not be updated.
-- See the M(community.general.flatpak) module for managing flatpaks.
+  - Allows users to add or remove flatpak remotes.
+  - The flatpak remotes concept is comparable to what is called repositories in other packaging
+    formats.
+  - Currently, remote addition is only supported via I(flatpakrepo) file URLs.
+  - Existing remotes will not be updated.
+  - See the M(community.general.flatpak) module for managing flatpaks.
 author:
-- John Kwiatkoski (@JayKayy)
-- Alexander Bethke (@oolongbrothers)
+  - John Kwiatkoski (@JayKayy)
+  - Alexander Bethke (@oolongbrothers)
 requirements:
-- flatpak
+  - flatpak
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   executable:
     description:

@@ -21,6 +21,13 @@ description:
     - Note that this is a very basic packaging system. It will not enforce
       dependencies on install or remove.
 author: "Boyd Adamson (@brontitall)"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

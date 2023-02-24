@@ -27,6 +27,13 @@ description:
     C(dpkg-divert) commandline tool. It can either create or remove a
     diversion for a given file, but also update an existing diversion
     to modify its I(holder) and/or its I(divert) location.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   path:
     description:
@@ -79,8 +86,6 @@ options:
       - This parameter is ignored when I(rename=false).
     type: bool
     default: false
-notes:
-  - This module supports I(check_mode) and I(diff).
 requirements:
   - dpkg-divert >= 1.15.0 (Debian family)
 '''

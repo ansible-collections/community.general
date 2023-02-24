@@ -21,6 +21,13 @@ description:
       Composer is a tool for dependency management in PHP. It allows you to
       declare the dependent libraries your project needs and it will install
       them in your project for you.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     command:
         type: str

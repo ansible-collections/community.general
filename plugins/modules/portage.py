@@ -21,6 +21,15 @@ short_description: Package manager for Gentoo
 description:
   - Manages Gentoo packages
 
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   package:
     description:

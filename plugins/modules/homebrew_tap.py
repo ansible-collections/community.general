@@ -22,6 +22,13 @@ author:
 short_description: Tap a Homebrew repository
 description:
     - Tap external Homebrew repositories.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

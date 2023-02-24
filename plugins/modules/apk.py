@@ -19,6 +19,13 @@ short_description: Manages apk packages
 description:
   - Manages I(apk) packages for Alpine Linux.
 author: "Kevin Brebanov (@kbrebanov)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   available:
     description:

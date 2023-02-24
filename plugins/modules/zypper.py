@@ -31,6 +31,14 @@ short_description: Manage packages on SUSE and openSUSE
 description:
     - Manage packages on SUSE and openSUSE using the zypper and rpm tools.
     - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change --quiet run).
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     name:
         description:
