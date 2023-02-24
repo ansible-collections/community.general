@@ -17,6 +17,13 @@ description:
 requirements:
   - "python-jenkins >= 0.4.12"
 author: "Sergio Millan Rodriguez (@sermilrod)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   config:
     type: str
