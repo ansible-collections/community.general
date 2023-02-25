@@ -11,7 +11,6 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible_collections.community.general.tests.unit.compat.mock import mock_open
-from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.modules.modprobe import Modprobe, build_module
 
 
