@@ -67,7 +67,7 @@ class LookupModule(LookupBase):
 
             if isinstance(term, string_types):
                 # convert a variable to a list
-                term2 = listify_lookup_plugin_terms(term, templar=self._templar)
+                term2 = listify_lookup_plugin_terms(term, templar=self._templar, loader=None)
                 # but avoid converting a plain string to a list of one string
                 if term2 != [term]:
                     term = term2

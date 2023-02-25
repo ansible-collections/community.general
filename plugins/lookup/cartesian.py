@@ -66,7 +66,7 @@ class LookupModule(LookupBase):
         """
         results = []
         for x in terms:
-            intermediate = listify_lookup_plugin_terms(x, templar=self._templar)
+            intermediate = listify_lookup_plugin_terms(x, templar=self._templar, loader=None)
             results.append(intermediate)
         return results
 
