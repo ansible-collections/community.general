@@ -78,49 +78,54 @@ notes:
 '''
 
 EXAMPLES = r'''
-# TODO: Describe what happens in each example
-
-- community.general.osx_defaults:
+- name: Set boolean valued key for application domain
+  community.general.osx_defaults:
     domain: com.apple.Safari
     key: IncludeInternalDebugMenu
     type: bool
     value: true
     state: present
 
-- community.general.osx_defaults:
+- name: Set string valued key for global domain
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
     state: present
 
-- community.general.osx_defaults:
+- name: Set int valued key for arbitrary plist
+  community.general.osx_defaults:
     domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticCheckEnabled
     type: int
     value: 1
   become: true
 
-- community.general.osx_defaults:
+- name: Set int valued key only for the current host
+  community.general.osx_defaults:
     domain: com.apple.screensaver
     host: currentHost
     key: showClock
     type: int
     value: 1
 
-- community.general.osx_defaults:
+- name: Defaults to global domain and setting value
+  community.general.osx_defaults:
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
 
-- community.general.osx_defaults:
+- name: Setting an array valued key
+  community.general.osx_defaults:
     key: AppleLanguages
     type: array
     value:
       - en
       - nl
 
-- community.general.osx_defaults:
+- name: Removing a key
+  community.general.osx_defaults:
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
     state: absent
@@ -264,7 +269,7 @@ class OSXDefaults(object):
 
         # If the RC is not 0, then terrible happened! Ooooh nooo!
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key type from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while reading key type from defaults: %s" % err)
 
         # Ok, lets parse the type from output
         data_type = out.strip().replace('Type is ', '')
@@ -275,9 +280,9 @@ class OSXDefaults(object):
         # Strip output
         out = out.strip()
 
-        # An non zero RC at this point is kinda strange...
+        # A non zero RC at this point is kinda strange...
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key value from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while reading key value from defaults: %s" % err)
 
         # Convert string to list when type is array
         if data_type == "array":
@@ -315,13 +320,13 @@ class OSXDefaults(object):
                                                expand_user_and_vars=False)
 
         if rc != 0:
-            raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % out)
+            raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % err)
 
     def delete(self):
         """ Deletes defaults key from domain """
         rc, out, err = self.module.run_command(self._base_command() + ['delete', self.domain, self.key])
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while deleting key from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while deleting key from defaults: %s" % err)
 
     # /commands ----------------------------------------------------------- }}}
 
