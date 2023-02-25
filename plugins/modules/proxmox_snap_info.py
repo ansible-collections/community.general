@@ -70,7 +70,7 @@ EXAMPLES = r'''
 RETURN = r'''
 snaplist:
     description: List of Snapshots
-    returned: always, but can be empty
+    returned: always
     type: list
     elements: str
 '''
