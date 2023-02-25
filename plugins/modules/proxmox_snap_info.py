@@ -39,7 +39,7 @@ options:
     type: str
   older_than:
     description:
-      - Minimum age of backup to be listed by proxmox_snap_info in days
+      - Minimum age of backup to be listed by in days.
     default: 0
     type: int
 
