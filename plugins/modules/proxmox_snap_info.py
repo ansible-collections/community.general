@@ -153,7 +153,7 @@ def main():
     snapshotdict = {
         "changed": False,
         "results": oldsnapshotlist,
-        "older_than": older_than}
+    }
 
     module.exit_json(**snapshotdict)
 
