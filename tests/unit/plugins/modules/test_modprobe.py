@@ -12,7 +12,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible_collections.community.general.tests.unit.compat.mock import mock_open
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.modprobe import Modprobe
+from ansible_collections.community.general.plugins.modules.modprobe import Modprobe, build_module
 
 
 class TestLoadModule(ModuleTestCase):
@@ -42,15 +42,7 @@ class TestLoadModule(ModuleTestCase):
             state='present',
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
         self.module_loaded.side_effect = [True]
@@ -72,15 +64,7 @@ class TestLoadModule(ModuleTestCase):
             state='present',
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         module.warn = Mock()
 
@@ -121,15 +105,7 @@ class TestUnloadModule(ModuleTestCase):
             state='absent',
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
         self.module_loaded.side_effect = [False]
@@ -151,15 +127,7 @@ class TestUnloadModule(ModuleTestCase):
             state='absent',
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         module.fail_json = Mock()
 
@@ -207,15 +175,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -236,15 +196,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -265,15 +217,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -314,15 +258,7 @@ class TestPermanentParams(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -349,15 +285,7 @@ class TestPermanentParams(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -393,15 +321,7 @@ class TestCreateModuleFIle(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -436,15 +356,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -480,15 +392,7 @@ class TestDisableOldParams(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -511,15 +415,7 @@ class TestDisableOldParams(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -555,15 +451,7 @@ class TestDisableModulePermanent(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 
@@ -585,15 +473,7 @@ class TestDisableModulePermanent(ModuleTestCase):
             persistent='present'
         ))
 
-        module = AnsibleModule(
-            argument_spec=dict(
-                name=dict(type='str', required=True),
-                state=dict(type='str', default='present', choices=['absent', 'present']),
-                params=dict(type='str', default=''),
-                persistent=dict(type='str', default='disabled', choices=['disabled', 'present', 'absent']),
-            ),
-            supports_check_mode=True,
-        )
+        module = build_module()
 
         self.get_bin_path.side_effect = ['modprobe']
 

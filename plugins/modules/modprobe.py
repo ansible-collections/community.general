@@ -42,14 +42,14 @@ options:
         description:
             - Persistency between reboots for configured module.
             - This option creates files in C(/etc/modules-load.d/) and C(/etc/modprobe.d/) that make your module configuration persistent during reboots.
-            - If C(present), module adds module name to C(/etc/modules-load.d/) and params to C(/etc/modprobe.d/) so module will be loaded on next reboot.
-            - If C(absent), module comment out module name from C(/etc/modules-load.d/) and comment out params from C(/etc/modprobe.d/) so module won't be
+            - If C(present), adds module name to C(/etc/modules-load.d/) and params to C(/etc/modprobe.d/) so the module will be loaded on next reboot.
+            - If C(absent), will comment out module name from C(/etc/modules-load.d/) and comment out params from C(/etc/modprobe.d/) so the module will not be
               loaded on next reboot.
-            - If C(disabled), module won't toch anything and leave C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
+            - If C(disabled), will not toch anything and leave C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
             - Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar triggers encoded in the
               kernel modules themselves instead of configuration like this.
             - In fact, most modern kernel modules are prepared for automatic loading already.
-            - This options work only with distributions that uses C(systemd).
+            - "B(Note:) This option works only with distributions that use C(systemd) when set to values other than C(disabled)."
 '''
 
 EXAMPLES = '''
@@ -64,7 +64,7 @@ EXAMPLES = '''
     state: present
     params: 'numdummies=2'
 
-- name: Add the dummy module
+- name: Add the dummy module and make sure it is loaded after reboots
   community.general.modprobe:
     name: dummy
     state: present
@@ -87,6 +87,7 @@ PARAMETERS_FILES_LOCATION = '/etc/modprobe.d'
 
 
 class Modprobe(object):
+
     def __init__(self, module):
         self.module = module
         self.modprobe_bin = module.get_bin_path('modprobe', True)
@@ -98,6 +99,10 @@ class Modprobe(object):
         self.persistent = module.params['persistent']
 
         self.changed = False
+
+        self.re_find_module = re.compile(r'^ *{0} *(?:[#;].*)?\n?\Z'.format(self.name))
+        self.re_find_params = re.compile(r'^options {0} \w+=\S+ *(?:[#;].*)?\n?\Z'.format(self.name))
+        self.re_get_params_and_values = re.compile(r'^options {0} (\w+=\S+) *(?:[#;].*)?\n?\Z'.format(self.name))
 
     def load_module(self):
         command = [self.modprobe_bin]
@@ -121,11 +126,10 @@ class Modprobe(object):
 
     @property
     def module_is_loaded_persistently(self):
-        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?\Z'.format(self.name))
         for module_file in self.modules_files:
             with open(module_file) as file:
                 for line in file:
-                    if pattern.match(line):
+                    if self.re_find_module.match(line):
                         return True
 
         return False
@@ -140,12 +144,10 @@ class Modprobe(object):
     def permanent_params(self):
         params = set()
 
-        pattern = re.compile(r'^options {0} (\w+=\S+) *(?:[#;].*)?\n?\Z'.format(self.name))
-
         for modprobe_file in self.modprobe_files:
             with open(modprobe_file) as file:
                 for line in file:
-                    match = pattern.match(line)
+                    match = self.re_get_params_and_values.match(line)
                     if match:
                         params.add(match.group(1))
 
@@ -171,15 +173,13 @@ class Modprobe(object):
 
     def disable_old_params(self):
 
-        pattern = re.compile(r'^options {0} \w+=\S+ *(?:[#;].*)?\n?\Z'.format(self.name))
-
         for modprobe_file in self.modprobe_files:
             with open(modprobe_file) as file:
                 file_content = file.readlines()
 
             content_changed = False
             for index, line in enumerate(file_content):
-                if pattern.match(line):
+                if self.re_find_params.match(line):
                     file_content[index] = '#' + line
                     content_changed = True
 
@@ -189,15 +189,13 @@ class Modprobe(object):
 
     def disable_module_permanent(self):
 
-        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?\Z'.format(self.name))
-
         for module_file in self.modules_files:
             with open(module_file) as file:
                 file_content = file.readlines()
 
             content_changed = False
             for index, line in enumerate(file_content):
-                if pattern.match(line):
+                if self.re_find_module.match(line):
                     file_content[index] = '#' + line
                     content_changed = True
 
@@ -281,8 +279,8 @@ class Modprobe(object):
         }
 
 
-def main():
-    module = AnsibleModule(
+def build_module():
+    return AnsibleModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
@@ -291,6 +289,10 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+
+def main():
+    module = build_module()
 
     modprobe = Modprobe(module)
 
