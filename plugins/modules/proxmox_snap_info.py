@@ -35,7 +35,7 @@ options:
     type: int
   snapname:
     description:
-      - Beginning of the snapshot name proxmox_snap_info takes care of.
+      - Allows to restrict the results by limiting them to snapshots whose name begin with I(snapname).
     type: str
   older_than:
     description:
