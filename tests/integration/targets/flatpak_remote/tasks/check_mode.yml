@@ -104,3 +104,103 @@
     msg: |
         Removing a present flatpak remote a second time shall still mark module execution
         as changed in check mode
+
+
+# - Tests with disabled flatpak remote ------------------------------------------
+
+# enabled=true
+
+- name: Test activation of disabled flatpak remote (check mode)
+  flatpak_remote:
+    name: check-mode-disabled-test-remote
+    enabled: true
+  register: activation_result
+  check_mode: true
+
+- name: Verify activation of disabled flatpak remote test result (check mode)
+  assert:
+    that:
+      - activation_result is changed
+    msg: "Enabling an disabled flatpak remote shall mark module execution as changed"
+
+- name: Test non-existent idempotency of activation of disabled flatpak remote (check mode)
+  flatpak_remote:
+    name: check-mode-disabled-test-remote
+    enabled: true
+  register: double_activation_result
+  check_mode: true
+
+- name: >
+      Verify non-existent idempotency of activation of disabled flatpak remote
+      test result (check mode)
+  assert:
+    that:
+      - double_activation_result is changed
+    msg: |
+        Enabling an disabled flatpak remote a second time shall still mark module execution
+        as changed in check mode
+
+# enabled=false
+
+- name: Test deactivation of disabled flatpak remote not doing anything in check mode
+  flatpak_remote:
+    name: check-mode-disabled-test-remote
+    enabled: false
+  register: deactivation_result
+  check_mode: true
+
+- name: Verify deactivation of disabled flatpak remote test result (check mode)
+  assert:
+    that:
+      - deactivation_result is not changed
+    msg: "Disabling an disabled flatpak remote shall mark module execution as not changed"
+
+
+# - Tests with enabled flatpak remote ------------------------------------------
+
+# enabled=true
+
+- name: Test activation of enabled flatpak remote (check mode)
+  flatpak_remote:
+    name: check-mode-enabled-test-remote
+    enabled: true
+  register: activation_result
+  check_mode: true
+
+- name: Verify activation of enabled flatpak remote test result (check mode)
+  assert:
+    that:
+      - activation_result is not changed
+    msg: "Enabling a enabled flatpak remote shall mark module execution as not changed"
+
+# enabled=false
+
+- name: Test deactivation of enabled flatpak remote not doing anything in check mode
+  flatpak_remote:
+    name: check-mode-enabled-test-remote
+    enabled: false
+  register: deactivation_result
+  check_mode: true
+
+- name: Verify deactivation of enabled flatpak remote test result (check mode)
+  assert:
+    that:
+      - deactivation_result is changed
+    msg: "Disabling a enabled flatpak remote shall mark module execution as changed"
+
+- name: Test non-existent idempotency of deactivation of enabled flatpak remote (check mode)
+  flatpak_remote:
+    name: check-mode-enabled-test-remote
+    enabled: false
+  register: double_deactivation_result
+  check_mode: true
+
+- name: >
+      Verify non-existent idempotency of deactivation of enabled flatpak remote
+      test result (check mode)
+  assert:
+    that:
+      - double_deactivation_result is changed
+    msg: |
+        "Disabling a enabled flatpak remote a second time shall still mark module execution
+        as changed in check mode

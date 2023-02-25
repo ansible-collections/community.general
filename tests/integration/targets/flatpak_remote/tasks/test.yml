@@ -48,6 +48,64 @@
     msg: "Trying to update the URL of an existing flatpak remote shall not do anything"
 
 
+# enabled=false
+
+- name: Test deactivation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: false
+    method: "{{ method }}"
+  register: deactivation_result
+
+- name: Verify deactivation test result - {{ method }}
+  assert:
+    that:
+      - deactivation_result is changed
+    msg: "enable=false shall disable flatpak remote when enabled"
+
+- name: Test idempotency of deactivation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: false
+    method: "{{ method }}"
+  register: double_deactivation_result
+
+- name: Verify idempotency of deactivation test result - {{ method }}
+  assert:
+    that:
+      - double_deactivation_result is not changed
+    msg: "enabled=false shall not do anything when flatpak remote is already disabled"
+
+
+# enabled=false
+
+- name: Test activation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: true
+    method: "{{ method }}"
+  register: activation_result
+
+- name: Verify activation test result - {{ method }}
+  assert:
+    that:
+      - activation_result is changed
+    msg: "enable=true shall enable flatpak remote when disabled"
+
+- name: Test idempotency of activation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: true
+    method: "{{ method }}"
+  register: double_activation_result
+
+- name: Verify idempotency of activation test result - {{ method }}
+  assert:
+    that:
+      - double_activation_result is not changed
+    msg: "enabled=true shall not do anything when flatpak remote is already enabled"
+
+
 # state=absent
 
 - name: Test removal - {{ method }}
