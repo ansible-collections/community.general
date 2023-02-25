@@ -1,0 +1,2 @@
+bugfixes:
+  - "zypper - make package managing work on readonly filesystem of openSUSE MicroOS (https://github.com/ansible-collections/community.general/pull/5615)."
