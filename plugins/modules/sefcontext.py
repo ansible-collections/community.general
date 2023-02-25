@@ -333,7 +333,7 @@ def main():
             target=dict(type='str', required=True, aliases=['path']),
             ftype=dict(type='str', default='a', choices=list(option_to_file_type_str.keys())),
             setype=dict(type='str'),
-            substitute=dict(type='str'),
+            substitute=dict(type='str', aliases=['equal']),
             seuser=dict(type='str'),
             selevel=dict(type='str', aliases=['serange']),
             state=dict(type='str', default='present', choices=['absent', 'present']),
