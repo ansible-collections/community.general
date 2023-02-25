@@ -145,7 +145,7 @@ def main():
         if s["name"] == "current":
             continue
         if snapname:
-            if not s["name"][0:len(snapname)] == snapname:
+            if not s["name"].startswith(snapname):
                 continue
         if ((time.time() - s["snaptime"]) / 60 / 60 / 24) > older_than:
             oldsnapshotlist.append(s["name"])
