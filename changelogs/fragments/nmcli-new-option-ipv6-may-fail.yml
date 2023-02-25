@@ -1,0 +1,2 @@
+minor_changes:
+  - for ipv4 'may_fail' was implemented but for ipv6 is not. Added new option 'may_fail6'.

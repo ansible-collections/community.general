@@ -1,0 +1,3 @@
+bugfixes:
+  - fixed idempotency issue when modifying bridge connections - module forces default value of bridge.priority to nmcli; when bridge.stp is disabled nmcli ignores is and keep default (https://github.com/ansible-collections/community.general/issues/3216, https://github.com/ansible-collections/community.general/issues/4683)
+  - fixed idempotency issue with 'may_fail4=false' passes when method4 is 'disabled'; in this case nmcli ignores change and keeps 'yes'.

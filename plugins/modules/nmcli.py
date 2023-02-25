@@ -65,6 +65,8 @@ options:
             - Type C(gsm) is added in community.general 3.7.0.
             - Type C(wireguard) is added in community.general 4.3.0.
             - Type C(vpn) is added in community.general 5.1.0.
+            - Using C(bond-slave), C(bridge-slave) or C(team-slave) implies C(ethernet) connection type with corresponding C(slave_type) option.
+            - If you want to control non-ethernet connection attached to C(bond), C(bridge) or C(team) consider using C(slave_type) option. 
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm,
             wireguard, vpn ]
@@ -80,9 +82,16 @@ options:
         type: str
         choices: [ datagram, connected ]
         version_added: 5.8.0
+    slave_type:
+        description:
+            - Type of the device of this slave's master connection (eg, "bond").
+            - If I(master) defined this option is mandatory.
+        type: str
+        choices: [ 'bond', 'bridge', 'team' ]
+        version_added: 6.4.0
     master:
         description:
-            - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
+            - Master <master (ifname, or connection UUID or conn_name)> of bridge, team, bond master connection profile.
         type: str
     ip4:
         description:
@@ -197,6 +206,7 @@ options:
     may_fail4:
         description:
             - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
+            - This option applies when C(method4) is not C(disabled).
         type: bool
         default: true
         version_added: 3.3.0
@@ -293,6 +303,13 @@ options:
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
+    may_fail6:
+        description:
+            - If you need I(ip6) configured before C(network-online.target) is reached, set this option to C(false).
+            - This option applies when C(method6) is not C(disabled) or C(ignore).
+        type: bool
+        default: true
+        version_added: 6.4.0
     ip_privacy6:
         description:
             - If enabled, it makes the kernel generate a temporary IPv6 address in addition to the public one.
@@ -1376,6 +1393,39 @@ EXAMPLES = r'''
     autoconnect: false
     state: present
 
+## Creating bond attached to bridge example
+- name: Create bond attached to bridge
+  community.general.nmcli:
+    type: bond
+    conn_name: bond0
+    slave_type: bridge
+    master: br0
+    state: present
+
+- name: Create master bridge
+  community.general.nmcli:
+    type: bridge
+    conn_name: br0
+    method4: disabled
+    method6: disabled
+    state: present
+
+## Creating vlan connection attached to bridge
+- name: Create master bridge
+  community.general.nmcli:
+    type: bridge
+    conn_name: br0
+    state: present
+
+- name: Create VLAN 5
+  community.general.nmcli:
+    type: vlan
+    conn_name: eth0.5
+    slave_type: bridge
+    master: br0
+    vlandev: eth0
+    vlanid: 5
+    state: present
 '''
 
 RETURN = r"""#
@@ -1422,6 +1472,7 @@ class Nmcli(object):
         self.ignore_unsupported_suboptions = module.params['ignore_unsupported_suboptions']
         self.autoconnect = module.params['autoconnect']
         self.conn_name = module.params['conn_name']
+        self.slave_type = module.params['slave_type']
         self.master = module.params['master']
         self.ifname = module.params['ifname']
         self.type = module.params['type']
@@ -1448,6 +1499,7 @@ class Nmcli(object):
         self.dns6_search = module.params['dns6_search']
         self.dns6_ignore_auto = module.params['dns6_ignore_auto']
         self.method6 = module.params['method6']
+        self.may_fail6 = module.params['may_fail6']
         self.ip_privacy6 = module.params['ip_privacy6']
         self.addr_gen_mode6 = module.params['addr_gen_mode6']
         self.mtu = module.params['mtu']
@@ -1549,7 +1601,7 @@ class Nmcli(object):
         }
 
         # IP address options.
-        if self.ip_conn_type and not self.master:
+        if self.is_ip_conn_type and not self.master:
             options.update({
                 'ipv4.addresses': self.enforce_ipv4_cidr_notation(self.ip4),
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -1563,7 +1615,6 @@ class Nmcli(object):
                 'ipv4.routing-rules': self.routing_rules4,
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
-                'ipv4.may-fail': self.may_fail4,
                 'ipv6.addresses': self.enforce_ipv6_cidr_notation(self.ip6),
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
@@ -1576,18 +1627,25 @@ class Nmcli(object):
                 'ipv6.ip6-privacy': self.ip_privacy6,
                 'ipv6.addr-gen-mode': self.addr_gen_mode6
             })
+            # when 'method' is disabled/ignore the 'may_fail' no make sense but accepted by nmcli with keeping 'yes'
+            # force ignoring to save idempotency
+            if self.ipv4_method and self.ipv4_method != 'disabled':
+                options.update({'ipv4.may-fail': self.may_fail4})
+            if self.ipv6_method and self.ipv6_method not in ('disabled', 'ignore'):
+                options.update({'ipv6.may-fail': self.may_fail6})
 
         # Layer 2 options.
         if self.mac:
             options.update({self.mac_setting: self.mac})
 
-        if self.mtu_conn_type:
+        if self.is_mtu_conn_type:
             options.update({self.mtu_setting: self.mtu})
 
-        # Connections that can have a master.
-        if self.slave_conn_type:
+        # NetworkManager allows any interface type to be slave
+        if self.master:
             options.update({
                 'connection.master': self.master,
+                'connection.slave-type': self.slave_type,
             })
 
         # Options specific to a connection type.
@@ -1612,15 +1670,22 @@ class Nmcli(object):
                 'bridge.forward-delay': self.forwarddelay,
                 'bridge.hello-time': self.hellotime,
                 'bridge.max-age': self.maxage,
-                'bridge.priority': self.priority,
                 'bridge.stp': self.stp,
             })
+            # priority make sense when stp enabed, otherwise nmcli keeps bridge-priority to 32768 regrdless of input.
+            # force ignoring to save idempotency
+            if self.stp:
+                options.update({'bridge.priority': self.priority})
         elif self.type == 'team':
             options.update({
                 'team.runner': self.runner,
                 'team.runner-hwaddr-policy': self.runner_hwaddr_policy,
             })
         elif self.type == 'bridge-slave':
+            self.module.warn(
+                "Connection type as 'bridge-slave' implies 'ethernet' connection with 'bridge' slave-type. "
+                "Consider using slave_type='bridge' with necessary type."
+            )
             options.update({
                 'connection.slave-type': 'bridge',
                 'bridge-port.path-cost': self.path_cost,
@@ -1631,7 +1696,7 @@ class Nmcli(object):
             options.update({
                 'connection.slave-type': 'team',
             })
-        elif self.tunnel_conn_type:
+        elif self.is_tunnel_conn_type:
             options.update({
                 'ip-tunnel.local': self.ip_tunnel_local,
                 'ip-tunnel.mode': self.type,
@@ -1738,7 +1803,7 @@ class Nmcli(object):
         return options
 
     @property
-    def ip_conn_type(self):
+    def is_ip_conn_type(self):
         return self.type in (
             'bond',
             'bridge',
@@ -1767,11 +1832,12 @@ class Nmcli(object):
             return '802-3-ethernet.cloned-mac-address'
 
     @property
-    def mtu_conn_type(self):
+    def is_mtu_conn_type(self):
         return self.type in (
             'dummy',
             'ethernet',
             'team-slave',
+            'vlan',
         )
 
     @property
@@ -1803,7 +1869,7 @@ class Nmcli(object):
         return ip6_privacy_values[privacy]
 
     @property
-    def slave_conn_type(self):
+    def is_slave_conn_type(self):
         return self.type in (
             'bond-slave',
             'bridge-slave',
@@ -1812,7 +1878,7 @@ class Nmcli(object):
         )
 
     @property
-    def tunnel_conn_type(self):
+    def is_tunnel_conn_type(self):
         return self.type in (
             'gre',
             'ipip',
@@ -1879,6 +1945,7 @@ class Nmcli(object):
                        'ipv4.may-fail',
                        'ipv6.ignore-auto-dns',
                        'ipv6.ignore-auto-routes',
+                       'ipv6.may-fail',
                        '802-11-wireless.hidden'):
             return bool
         elif setting in ('ipv4.addresses',
@@ -1935,7 +2002,7 @@ class Nmcli(object):
     def connection_update(self, nmcli_command):
         if nmcli_command == 'create':
             cmd = [self.nmcli_bin, 'con', 'add', 'type']
-            if self.tunnel_conn_type:
+            if self.is_tunnel_conn_type:
                 cmd.append('ip-tunnel')
             else:
                 cmd.append(self.type)
@@ -1976,12 +2043,12 @@ class Nmcli(object):
         status = self.connection_update('create')
         if status[0] == 0 and self.edit_commands:
             status = self.edit_connection()
-        if self.create_connection_up:
+        if self.is_create_connection_up_needed:
             status = self.up_connection()
         return status
 
     @property
-    def create_connection_up(self):
+    def is_create_connection_up_needed(self):
         if self.type in ('bond', 'dummy', 'ethernet', 'infiniband', 'wifi'):
             if (self.mtu is not None) or (self.dns4 is not None) or (self.dns6 is not None):
                 return True
@@ -2191,6 +2258,7 @@ def main():
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
             master=dict(type='str'),
+            slave_type=dict(type=str, choices=['bond', 'bridge', 'team']),
             ifname=dict(type='str'),
             type=dict(type='str',
                       choices=[
@@ -2259,6 +2327,7 @@ def main():
                                   )),
             route_metric6=dict(type='int'),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
+            may_fail6=dict(type='bool', default=True),
             ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
             addr_gen_mode6=dict(type='str', choices=['eui64', 'stable-privacy']),
             # Bond Specific vars
@@ -2337,7 +2406,7 @@ def main():
         if nmcli.runner_hwaddr_policy and not nmcli.runner == "activebackup":
             nmcli.module.fail_json(msg="Runner-hwaddr-policy is only allowed for runner activebackup")
     # team-slave checks
-    if nmcli.type == 'team-slave':
+    if nmcli.type == 'team-slave' or nmcli.slave_type == 'team':
         if nmcli.master is None:
             nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
         if nmcli.ifname is None:

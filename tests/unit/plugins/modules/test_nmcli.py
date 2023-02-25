@@ -141,6 +141,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_GENERIC_DIFF_CHECK = [
@@ -184,6 +185,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE = [
@@ -225,6 +227,7 @@ ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:
 ipv6.route-metric:                      -1
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC = [
@@ -324,6 +327,7 @@ ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:
 ipv6.route-metric:                      -1
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
@@ -368,6 +372,7 @@ ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:
 ipv6.route-metric:                      5
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_AND_METRIC = [
@@ -413,6 +418,7 @@ ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:
 ipv6.route-metric:                      5
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
@@ -445,6 +451,7 @@ ipv6.dns-search:                        search6.redhat.com
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_GENERIC_ZONE = [
@@ -475,6 +482,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_GENERIC_ZONE_ONLY = [
@@ -516,6 +524,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 bond.options:                           mode=active-backup,primary=non_existent_primary
 """
 
@@ -548,6 +557,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 bridge.mac-address:                     52:54:00:AB:CD:EF
 bridge.stp:                             yes
 bridge.max-age:                         100
@@ -601,6 +611,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 team.runner:                            roundrobin
 """
 
@@ -662,7 +673,9 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 vlan.id:                                10
+802-3-ethernet.mtu:                     auto
 """
 
 TESTCASE_VXLAN = [
@@ -712,6 +725,7 @@ ipv4.never-default:                     no
 ipv4.may-fail:                          yes
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 ip-tunnel.mode:                         gre
 ip-tunnel.parent:                       non_existent_gre_device
 ip-tunnel.local:                        192.168.225.5
@@ -743,6 +757,7 @@ ipv4.never-default:                     no
 ipv4.may-fail:                          yes
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 ip-tunnel.mode:                         ipip
 ip-tunnel.parent:                       non_existent_ipip_device
 ip-tunnel.local:                        192.168.225.5
@@ -772,6 +787,7 @@ ipv4.never-default:                     no
 ipv4.may-fail:                          yes
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 ip-tunnel.mode:                         sit
 ip-tunnel.parent:                       non_existent_sit_device
 ip-tunnel.local:                        192.168.225.5
@@ -803,6 +819,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_STATIC = [
@@ -834,6 +851,7 @@ ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES = [
@@ -913,6 +931,7 @@ ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_STATIC_IP6_ADDRESS_SHOW_OUTPUT = """\
@@ -1065,6 +1084,7 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_DUMMY_STATIC_WITHOUT_MTU_SHOW_OUTPUT = """\
@@ -1083,6 +1103,7 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_DUMMY_STATIC_WITH_CUSTOM_MTU_SHOW_OUTPUT = """\
@@ -1103,6 +1124,7 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
+ipv6.may-fail:                          yes
 """
 
 TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE_UNCHANGED_OUTPUT = """\
@@ -1157,6 +1179,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 gsm.auto-config:                        no
 gsm.number:                             --
 gsm.username:                           t-mobile
@@ -1206,6 +1229,7 @@ ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 wireguard.private-key:                  <hidden>
 wireguard.private-key-flags:            0 (none)
 wireguard.listen-port:                  51820
@@ -1251,6 +1275,7 @@ ipv4.ignore-auto-routes:                yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 vpn.service-type:                       org.freedesktop.NetworkManager.l2tp
 vpn.data:                               gateway = vpn.example.com, ipsec-enabled = true, ipsec-psk = QnJpdHRhbnkxMjM=, password-flags = 2, user = brittany
 vpn.secrets:                            ipsec-psk = QnJpdHRhbnkxMjM=
@@ -1288,6 +1313,7 @@ ipv4.ignore-auto-routes:                no
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 vpn.service-type:                       org.freedesktop.NetworkManager.pptp
 vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany
 """
@@ -1319,6 +1345,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+ipv6.may-fail:                          yes
 infiniband.transport-mode               datagram
 """
 
@@ -3847,6 +3874,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
             master=dict(type='str'),
+            slave_type=dict(type=str, choices=['bond', 'bridge', 'team']),
             ifname=dict(type='str'),
             type=dict(type='str',
                       choices=[
@@ -3915,6 +3943,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
                                   )),
             route_metric6=dict(type='int'),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
+            may_fail6=dict(type='bool', default=True),
             ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
             addr_gen_mode6=dict(type='str', choices=['eui64', 'stable-privacy']),
             # Bond Specific vars
