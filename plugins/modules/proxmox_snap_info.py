@@ -69,7 +69,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 snaplist:
-    description: List of Snapshots
+    description: List of Snapshots.
     returned: always
     type: list
     elements: str
