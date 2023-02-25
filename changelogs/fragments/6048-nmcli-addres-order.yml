@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - order is significant for lists of addresses (https://github.com/ansible-collections/community.general/pull/6048).

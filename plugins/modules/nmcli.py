@@ -2144,8 +2144,12 @@ class Nmcli(object):
 
             if isinstance(current_value, list) and isinstance(value, list):
                 # compare values between two lists
-                if sorted(current_value) != sorted(value):
-                    changed = True
+                if key in ('ipv4.addresses', 'ipv6.addresses'):
+                    # The order of IP addresses matters because the first one
+                    # is the default source address for outbound connections.
+                    changed |= current_value != value
+                else:
+                    changed |= sorted(current_value) != sorted(value)
             elif all([key == self.mtu_setting, self.type == 'dummy', current_value is None, value == 'auto', self.mtu is None]):
                 value = None
             else:
