@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Ansible Project
+# Copyright (c) 2022 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,8 +10,13 @@ import itertools
 import json
 import pytest
 
-from .conftest import OP_VERSION_FIXTURES
-from .common import MOCK_ENTRIES
+from .onepassword_conftest import (  # noqa: F401, pylint: disable=unused-import
+    OP_VERSION_FIXTURES,
+    fake_op,
+    opv1,
+    opv2,
+)
+from .onepassword_common import MOCK_ENTRIES
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader
@@ -19,6 +24,86 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,
     OnePassCLIv2,
 )
+
+
+@pytest.mark.parametrize(
+    ("args", "rc", "expected_call_args", "expected_call_kwargs", "expected"),
+    (
+        ([], 0, ["get", "account"], {"ignore_errors": True}, True,),
+        ([], 1, ["get", "account"], {"ignore_errors": True}, False,),
+        (["acme"], 1, ["get", "account", "--account", "acme.1password.com"], {"ignore_errors": True}, False,),
+    )
+)
+def test_assert_logged_in_v1(mocker, args, rc, expected_call_args, expected_call_kwargs, expected):
+    mocker.patch.object(OnePassCLIv1, "_run", return_value=[rc, "", ""])
+
+    op_cli = OnePassCLIv1(*args)
+    result = op_cli.assert_logged_in()
+
+    op_cli._run.assert_called_with(expected_call_args, **expected_call_kwargs)
+    assert result == expected
+
+
+def test_full_signin_v1(mocker):
+    mocker.patch.object(OnePassCLIv1, "_run", return_value=[0, "", ""])
+
+    op_cli = OnePassCLIv1(
+        subdomain="acme",
+        username="bob@acme.com",
+        secret_key="SECRET",
+        master_password="ONEKEYTORULETHEMALL",
+    )
+    result = op_cli.full_signin()
+
+    op_cli._run.assert_called_with([
+        "signin",
+        "acme.1password.com",
+        b"bob@acme.com",
+        b"SECRET",
+        "--raw",
+    ], command_input=b"ONEKEYTORULETHEMALL")
+    assert result == [0, "", ""]
+
+
+@pytest.mark.parametrize(
+    ("args", "out", "expected_call_args", "expected_call_kwargs", "expected"),
+    (
+        ([], "list of accounts", ["account", "get"], {"ignore_errors": True}, True,),
+        (["acme"], "list of accounts", ["account", "get", "--account", "acme.1password.com"], {"ignore_errors": True}, True,),
+        ([], "", ["account", "list"], {}, False,),
+    )
+)
+def test_assert_logged_in_v2(mocker, args, out, expected_call_args, expected_call_kwargs, expected):
+    mocker.patch.object(OnePassCLIv2, "_run", return_value=[0, out, ""])
+    op_cli = OnePassCLIv2(*args)
+    result = op_cli.assert_logged_in()
+
+    op_cli._run.assert_called_with(expected_call_args, **expected_call_kwargs)
+    assert result == expected
+
+
+def test_full_signin_v2(mocker):
+    mocker.patch.object(OnePassCLIv2, "_run", return_value=[0, "", ""])
+
+    op_cli = OnePassCLIv2(
+        subdomain="acme",
+        username="bob@acme.com",
+        secret_key="SECRET",
+        master_password="ONEKEYTORULETHEMALL",
+    )
+    result = op_cli.full_signin()
+
+    op_cli._run.assert_called_with(
+        [
+            "account", "add", "--raw",
+            "--address", "acme.1password.com",
+            "--email", b"bob@acme.com",
+            "--signin",
+        ],
+        command_input=b"ONEKEYTORULETHEMALL",
+        environment_update={'OP_SECRET_KEY': 'SECRET'},
+    )
+    assert result == [0, "", ""]
 
 
 @pytest.mark.parametrize(
