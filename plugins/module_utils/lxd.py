@@ -60,7 +60,7 @@ class LXDClient(object):
             self.cert_file = cert_file
             self.key_file = key_file
             parts = generic_urlparse(urlparse(self.url))
-            ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
             ctx.load_cert_chain(cert_file, keyfile=key_file)
             self.connection = HTTPSConnection(parts.get('netloc'), context=ctx)
         elif url.startswith('unix:'):
