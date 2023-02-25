@@ -25,3 +25,16 @@
     name: check-mode-test-remote
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     state: present
+    enabled: true
+- name: Install disabled flatpak remote for testing check mode
+  flatpak_remote:
+    name: check-mode-disabled-test-remote
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    state: present
+    enabled: false
+- name: Install enabled flatpak remote for testing check mode
+  flatpak_remote:
+    name: check-mode-enabled-test-remote
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    state: present
+    enabled: true

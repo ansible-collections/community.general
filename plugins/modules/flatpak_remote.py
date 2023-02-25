@@ -70,6 +70,12 @@ options:
     type: str
     choices: [ absent, present ]
     default: present
+  enabled:
+    description:
+    - Indicates whether this remote is enabled.
+    type: bool
+    default: true
+    version_added: 6.4.0
 '''
 
 EXAMPLES = r'''
@@ -96,6 +102,12 @@ EXAMPLES = r'''
   community.general.flatpak_remote:
     name: flathub
     state: absent
+
+- name: Disable the flathub remote in the system installation
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    enabled: false
 '''
 
 RETURN = r'''
@@ -148,7 +160,7 @@ def remove_remote(module, binary, name, method):
 
 def remote_exists(module, binary, name, method):
     """Check if the remote exists."""
-    command = [binary, "remote-list", "-d", "--{0}".format(method)]
+    command = [binary, "remote-list", "--show-disabled", "--{0}".format(method)]
     # The query operation for the remote needs to be run even in check mode
     output = _flatpak_command(module, False, command)
     for line in output.splitlines():
@@ -157,6 +169,36 @@ def remote_exists(module, binary, name, method):
             continue
         if listed_remote[0] == to_native(name):
             return True
+    return False
+
+
+def enable_remote(module, binary, name, method):
+    """Enable a remote."""
+    global result  # pylint: disable=global-variable-not-assigned
+    command = [binary, "remote-modify", "--enable", "--{0}".format(method), name]
+    _flatpak_command(module, module.check_mode, command)
+    result['changed'] = True
+
+
+def disable_remote(module, binary, name, method):
+    """Disable a remote."""
+    global result  # pylint: disable=global-variable-not-assigned
+    command = [binary, "remote-modify", "--disable", "--{0}".format(method), name]
+    _flatpak_command(module, module.check_mode, command)
+    result['changed'] = True
+
+
+def remote_enabled(module, binary, name, method):
+    """Check if the remote is enabled."""
+    command = [binary, "remote-list", "--show-disabled", "--{0}".format(method)]
+    # The query operation for the remote needs to be run even in check mode
+    output = _flatpak_command(module, False, command)
+    for line in output.splitlines():
+        listed_remote = line.split()
+        if len(listed_remote) == 0:
+            continue
+        if listed_remote[0] == to_native(name):
+            return len(listed_remote) == 1 or "disabled" not in listed_remote[1].split(",")
     return False
 
 
@@ -182,6 +224,7 @@ def main():
                         choices=['user', 'system']),
             state=dict(type='str', default="present",
                        choices=['absent', 'present']),
+            enabled=dict(type='bool', default=True),
             executable=dict(type='str', default="flatpak")
         ),
         # This module supports check mode
@@ -192,6 +235,7 @@ def main():
     flatpakrepo_url = module.params['flatpakrepo_url']
     method = module.params['method']
     state = module.params['state']
+    enabled = module.params['enabled']
     executable = module.params['executable']
     binary = module.get_bin_path(executable, None)
 
@@ -213,6 +257,14 @@ def main():
         add_remote(module, binary, name, flatpakrepo_url, method)
     elif state == 'absent' and remote_already_exists:
         remove_remote(module, binary, name, method)
+
+    if state == 'present':
+        remote_already_enabled = remote_enabled(module, binary, to_bytes(name), method)
+
+        if enabled and not remote_already_enabled:
+            enable_remote(module, binary, name, method)
+        if not enabled and remote_already_enabled:
+            disable_remote(module, binary, name, method)
 
     module.exit_json(**result)
 
