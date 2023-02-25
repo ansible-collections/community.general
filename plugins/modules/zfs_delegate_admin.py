@@ -184,6 +184,9 @@ class ZfsDelegateAdmin(object):
             scope = linemap.get(line, scope)
             if not scope:
                 continue
+            if ' (unknown: ' in line:
+                line = line.replace('(unknown: ', '', 1)
+                line = line.replace(')', '', 1)
             try:
                 if line.startswith('\tuser ') or line.startswith('\tgroup '):
                     ent_type, ent, cur_perms = line.split()
