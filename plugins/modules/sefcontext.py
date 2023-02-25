@@ -57,6 +57,7 @@ options:
     - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux management tools.
     version_added: 6.4.0
     type: str
+    aliases: [ equal ]
   seuser:
     description:
     - SELinux user for the specified I(target).
