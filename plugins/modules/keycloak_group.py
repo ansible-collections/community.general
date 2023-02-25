@@ -72,7 +72,7 @@ options:
             - Values may be single values (e.g. a string) or a list of strings.
 
     parents:
-        version_added: "6.3.0"
+        version_added: "6.4.0"
         type: list
         description:
             - List of parent groups for the group to handle sorted top to bottom.
