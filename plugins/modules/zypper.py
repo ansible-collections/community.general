@@ -519,8 +519,21 @@ def repo_refresh(m):
     return retvals
 
 
+def get_fs_type_and_readonly_state(mount_point):
+    with open('/proc/mounts', 'r') as file:
+        for line in file.readlines():
+            fields = line.split()
+            path = fields[1]
+            if path == mount_point:
+                fs = fields[2]
+                opts = fields[3]
+                return fs, 'ro' in opts.split(',')
+    return None
+
+
 def transactional_updates():
-    return os.path.exists('/var/lib/misc/transactional-update.state')
+    return os.path.exists('/usr/sbin/transactional-update') and get_fs_type_and_readonly_state('/') == ('btrfs', True)
+
 
 # ===========================================
 # Main control flow
