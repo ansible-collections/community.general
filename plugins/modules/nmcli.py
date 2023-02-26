@@ -67,7 +67,7 @@ options:
             - Type C(wireguard) is added in community.general 4.3.0.
             - Type C(vpn) is added in community.general 5.1.0.
             - Using C(bond-slave), C(bridge-slave) or C(team-slave) implies C(ethernet) connection type with corresponding C(slave_type) option.
-            - If you want to control non-ethernet connection attached to C(bond), C(bridge) or C(team) consider using C(slave_type) option. 
+            - If you want to control non-ethernet connection attached to C(bond), C(bridge) or C(team) consider using C(slave_type) option.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
             wifi, gsm, wireguard, vpn ]
