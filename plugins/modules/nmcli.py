@@ -197,6 +197,7 @@ options:
     may_fail4:
         description:
             - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
+            - This option applies when C(method4) is not C(disabled).
         type: bool
         default: true
         version_added: 3.3.0
@@ -1576,6 +1577,10 @@ class Nmcli(object):
                 'ipv6.ip6-privacy': self.ip_privacy6,
                 'ipv6.addr-gen-mode': self.addr_gen_mode6
             })
+            # when 'method' is disabled the 'may_fail' no make sense but accepted by nmcli with keeping 'yes'
+            # force ignoring to save idempotency
+            if self.ipv4_method and self.ipv4_method != 'disabled':
+                options.update({'ipv4.may-fail': self.may_fail4})
 
         # Layer 2 options.
         if self.mac:
