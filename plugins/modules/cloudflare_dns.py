@@ -694,10 +694,11 @@ class CloudflareAPI(object):
                 "port": params['port'],
                 "weight": params['weight'],
                 "priority": params['priority'],
-                "name": params['record'][:-len('.' + params['zone'])],
+                "name": params['record'],
                 "proto": params['proto'],
                 "service": params['service']
             }
+
             new_record = {"type": params['type'], "ttl": params['ttl'], 'data': srv_data}
             search_value = str(params['weight']) + '\t' + str(params['port']) + '\t' + params['value']
             search_record = params['service'] + '.' + params['proto'] + '.' + params['record']
