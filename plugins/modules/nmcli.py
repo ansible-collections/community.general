@@ -66,6 +66,8 @@ options:
             - Type C(macvlan) is added in community.general 6.6.0.
             - Type C(wireguard) is added in community.general 4.3.0.
             - Type C(vpn) is added in community.general 5.1.0.
+            - Using C(bond-slave), C(bridge-slave) or C(team-slave) implies C(ethernet) connection type with corresponding C(slave_type) option.
+            - If you want to control non-ethernet connection attached to C(bond), C(bridge) or C(team) consider using C(slave_type) option. 
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
             wifi, gsm, wireguard, vpn ]
@@ -81,6 +83,13 @@ options:
         type: str
         choices: [ datagram, connected ]
         version_added: 5.8.0
+    slave_type:
+        description:
+            - Type of the device of this slave's master connection (eg, "bond").
+            - If I(master) defined this option is mandatory.
+        type: str
+        choices: [ 'bond', 'bridge', 'team' ]
+        version_added: 6.4.0
     master:
         description:
             - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
@@ -1429,6 +1438,39 @@ EXAMPLES = r'''
     autoconnect: false
     state: present
 
+## Creating bond attached to bridge example
+- name: Create bond attached to bridge
+  community.general.nmcli:
+    type: bond
+    conn_name: bond0
+    slave_type: bridge
+    master: br0
+    state: present
+
+- name: Create master bridge
+  community.general.nmcli:
+    type: bridge
+    conn_name: br0
+    method4: disabled
+    method6: disabled
+    state: present
+
+## Creating vlan connection attached to bridge
+- name: Create master bridge
+  community.general.nmcli:
+    type: bridge
+    conn_name: br0
+    state: present
+
+- name: Create VLAN 5
+  community.general.nmcli:
+    type: vlan
+    conn_name: eth0.5
+    slave_type: bridge
+    master: br0
+    vlandev: eth0
+    vlanid: 5
+    state: present
 '''
 
 RETURN = r"""#
@@ -1475,6 +1517,7 @@ class Nmcli(object):
         self.ignore_unsupported_suboptions = module.params['ignore_unsupported_suboptions']
         self.autoconnect = module.params['autoconnect']
         self.conn_name = module.params['conn_name']
+        self.slave_type = module.params['slave_type']
         self.master = module.params['master']
         self.ifname = module.params['ifname']
         self.type = module.params['type']
@@ -1630,10 +1673,11 @@ class Nmcli(object):
         if self.mtu_conn_type:
             options.update({self.mtu_setting: self.mtu})
 
-        # Connections that can have a master.
-        if self.slave_conn_type:
+        # NetworkManager allows any interface type to be slave
+        if self.master:
             options.update({
                 'connection.master': self.master,
+                'connection.slave-type': self.slave_type,
             })
 
         # Options specific to a connection type.
@@ -1675,6 +1719,10 @@ class Nmcli(object):
                     'team.runner-fast-rate': self.runner_fast_rate,
                 })
         elif self.type == 'bridge-slave':
+            self.module.warn(
+                "Connection type as 'bridge-slave' implies 'ethernet' connection with 'bridge' slave-type. "
+                "Consider using slave_type='bridge' with necessary type."
+            )
             options.update({
                 'connection.slave-type': 'bridge',
                 'bridge-port.path-cost': self.path_cost,
@@ -2260,6 +2308,7 @@ def main():
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
             master=dict(type='str'),
+            slave_type=dict(type='str', choices=['bond', 'bridge', 'team']),
             ifname=dict(type='str'),
             type=dict(type='str',
                       choices=[
@@ -2416,7 +2465,7 @@ def main():
         if nmcli.runner_fast_rate is not None and nmcli.runner != "lacp":
             nmcli.module.fail_json(msg="runner-fast-rate is only allowed for runner lacp")
     # team-slave checks
-    if nmcli.type == 'team-slave':
+    if nmcli.type == 'team-slave' or nmcli.slave_type == 'team':
         if nmcli.master is None:
             nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
         if nmcli.ifname is None:

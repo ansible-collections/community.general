@@ -4031,6 +4031,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
             master=dict(type='str'),
+            slave_type=dict(type=str, choices=['bond', 'bridge', 'team']),
             ifname=dict(type='str'),
             type=dict(type='str',
                       choices=[
