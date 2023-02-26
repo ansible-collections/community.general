@@ -1,0 +1,2 @@
+minor_changes:
+  - sefcontext - add support for path substitutions (https://github.com/ansible-collections/community.general/issues/1193).
