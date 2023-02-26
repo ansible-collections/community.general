@@ -1,2 +1,0 @@
-bugfixes:
-  - zfs_delegate_admin - zfs allow output can now be parsed when uids/gids are not known to the host system (https://github.com/ansible-collections/community.general/pull/5943).
