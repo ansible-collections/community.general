@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_command - adding ``EnableSecureBoot`` functionality (https://github.com/ansible-collections/community.general/pull/5899).

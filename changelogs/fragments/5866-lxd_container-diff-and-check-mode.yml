@@ -1,2 +1,0 @@
-minor_changes:
- - lxd_container - add diff and check mode (https://github.com/ansible-collections/community.general/pull/5866).
