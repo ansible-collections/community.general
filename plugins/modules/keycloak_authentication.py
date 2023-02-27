@@ -230,9 +230,9 @@ def compare_config_aliases(exec1, exec2):
             exec1["authenticationConfig"]["alias"] == exec2["authenticationConfig"]["alias"]    
 
 def get_identifier(execution):
-    if "providerId" in execution and execution["providerId"] is not None:
+    if execution.get("providerId") and not execution.get("displayName"):
         return execution["providerId"]
-    elif "displayName" in execution and execution["displayName"] is not None:
+    elif execution.get("displayName"):
         return execution["displayName"]
     else:
         raise Exception("could not find any name for execution {exec}".format(execution))
