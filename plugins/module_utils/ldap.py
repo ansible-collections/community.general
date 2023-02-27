@@ -10,6 +10,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import re
 import traceback
 from ansible.module_utils.common.text.converters import to_native
 
@@ -39,6 +40,7 @@ def gen_specs(**specs):
         'start_tls': dict(default=False, type='bool'),
         'validate_certs': dict(default=True, type='bool'),
         'sasl_class': dict(choices=['external', 'gssapi'], default='external', type='str'),
+        'xorder_discovery': dict(choices=['enable', 'auto', 'disable'], default='auto', type='str'),
     })
 
     return specs
@@ -55,12 +57,16 @@ class LdapGeneric(object):
         self.start_tls = self.module.params['start_tls']
         self.verify_cert = self.module.params['validate_certs']
         self.sasl_class = self.module.params['sasl_class']
+        self.xorder_discovery = self.module.params['xorder_discovery']
 
         # Establish connection
         self.connection = self._connect_to_ldap()
 
-        # Try to find the X_ORDERed version of the DN
-        self.dn = self._find_dn()
+        if self.xorder_discovery == "enable" or (self.xorder_discovery == "auto" and not self._xorder_dn()):
+            # Try to find the X_ORDERed version of the DN
+            self.dn = self._find_dn()
+        else:
+            self.dn = self.module.params['dn']
 
     def fail(self, msg, exn):
         self.module.fail_json(
@@ -113,3 +119,8 @@ class LdapGeneric(object):
             self.fail("Cannot bind to the server.", e)
 
         return connection
+
+    def _xorder_dn(self):
+        # match X_ORDERed DNs
+        regex = r"\w+=\{\d+\}.+"
+        return re.match(regex, self.module.params['dn']) is not None
