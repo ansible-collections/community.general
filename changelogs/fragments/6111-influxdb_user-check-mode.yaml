@@ -1,0 +1,2 @@
+bugfixes:
+  - influxdb_user - Fix running in check mode when the user doesn't exist yet.
