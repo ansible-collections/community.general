@@ -122,7 +122,7 @@ class LdapGeneric(object):
 
     def _xorder_dn(self):
         # match X_ORDERed DNs
-        regex = "\w+=\{\d+\}.+"
+        regex = r"\w+=\{\d+\}.+"
         if re.match(regex, self.module.params['dn']):
             return True
         else:
