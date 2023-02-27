@@ -135,7 +135,6 @@ class LdapSearch(LdapGeneric):
     def __init__(self, module):
         LdapGeneric.__init__(self, module)
 
-        self.dn = self.module.params['dn']
         self.filterstr = self.module.params['filter']
         self.attrlist = []
         self._load_scope()
