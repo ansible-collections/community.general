@@ -1,0 +1,2 @@
+minor_changes:
+  - Add 'default' and 'default-or-eui64' to the list of valid choices for nmcli addr_gen_mode6 parameter.
