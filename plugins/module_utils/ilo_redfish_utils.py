@@ -1785,3 +1785,21 @@ class iLORedfishUtils(RedfishUtils):
             "changed": True,
             "msg": "SNMP Alert Destinations are added"
         }
+
+    def get_server_poststate(self):
+        # Get server details
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if not response["ret"]:
+            return response
+        server_data = response["data"]
+
+        if "Hpe" in server_data["Oem"]:
+            return {
+                "ret": True,
+                "server_poststate": server_data["Oem"]["Hpe"]["PostState"]
+            }
+        else:
+            return {
+                "ret": True,
+                "server_poststate": server_data["Oem"]["Hp"]["PostState"]
+            }
