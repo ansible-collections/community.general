@@ -305,3 +305,83 @@ class iLORedfishUtils(RedfishUtils):
             "changed": False,
             "msg": "Server Reboot has failed, server state: {state} ".format(state=state)
         }
+
+    def get_snmpv3_users(self):
+        # This method returns list of SNMPv3 users
+        snmpv3_users = []
+        properties = ["AuthProtocol", "Id", "PrivacyProtocol", "SecurityName", "UserEngineID"]
+
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if not response["ret"]:
+            return response
+
+        # Get a list of all SNMPv3 Users and build respective URIs
+        response = self.get_request(self.root_uri + self.manager_uri + "SnmpService/SNMPUsers/")
+        if not response["ret"]:
+            return response
+        snmp_list = response["data"]
+
+        for item in snmp_list["Members"]:
+            item_response = self.get_request(self.root_uri + item["@odata.id"])
+            if not item_response["ret"]:
+                return item_response
+            data = item_response["data"]
+
+            snmpv3_user = {}
+            for property in properties:
+                if property in data:
+                        snmpv3_user[property] = data[property]
+
+            snmpv3_users.append(snmpv3_user)
+
+        return {
+            "ret": True,
+            "msg": snmpv3_users
+        }
+
+    def get_snmp_alert_destinations(self):
+        # This method returns list of SNMP alert destinations
+        alert_destinations = []
+        properties = ["AlertDestination", "Id", "SNMPAlertProtocol", "SNMPv3User", "SecurityName", "TrapCommunity"]
+        snmpv3_user_properties = ["AuthProtocol", "Id", "PrivacyProtocol", "SecurityName", "UserEngineID"]
+
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if not response["ret"]:
+            return response
+
+        # Get a list of all SNMP ALert Destinations and build respective URIs
+        response = self.get_request(self.root_uri + self.manager_uri + "SnmpService/SNMPAlertDestinations/")
+        if not response["ret"]:
+            return response
+        snmp_list = response["data"]
+
+        for item in snmp_list["Members"]:
+            item_response = self.get_request(self.root_uri + item["@odata.id"])
+            if not item_response["ret"]:
+                return item_response
+            data = item_response["data"]
+
+            alert_destination = {}
+            for property in properties:
+                if property in data:
+                    alert_destination[property] = data[property]
+
+            if "SNMPv3User" in alert_destination:
+                response = self.get_request(self.root_uri + alert_destination["SNMPv3User"]["@odata.id"])
+                if not response["ret"]:
+                    return response
+                data = response["data"]
+
+                snmpv3_user = {}
+                for property in snmpv3_user_properties:
+                    if property in data:
+                        snmpv3_user[property] = data[property]
+
+                alert_destination["SNMPv3User"] = snmpv3_user
+
+            alert_destinations.append(alert_destination)
+
+        return {
+            "ret": True,
+            "msg": alert_destinations
+        }

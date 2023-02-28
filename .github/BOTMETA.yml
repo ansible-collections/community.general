@@ -587,8 +587,8 @@ files:
     ignore: jose-delarosa
     maintainers: $team_redfish
   $modules/ilo_:
-    ignore: jose-delarosa varini-hp
-    maintainers: $team_redfish
+    ignore: jose-delarosa
+    maintainers: $team_redfish varini-hp Gayathirideviramasamy
   $modules/imc_rest.py:
     labels: cisco
     maintainers: dagwieers

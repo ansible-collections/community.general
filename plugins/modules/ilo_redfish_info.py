@@ -55,6 +55,7 @@ options:
     type: int
 author:
     - "Bhavya B (@bhavya06)"
+    - "Gayathiri Devi Ramasamy (@Gayathirideviramasamy)"
 '''
 
 EXAMPLES = '''
@@ -66,46 +67,50 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result_sessions
+
+  - name: Get SNMP alert destinations
+    community.general.ilo_redfish_info:
+      category: Manager
+      command: GetSnmpAlertDestinations
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Get SNMP V3 Users
+    community.general.ilo_redfish_info:
+      category: Manager
+      command: GetSnmpV3Users
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
 ilo_redfish_info:
-    description: Returns iLO sessions.
+    description: Returns the retrieved information from the iLO.
     type: dict
     contains:
-        GetiLOSessions:
-            description: Returns the iLO session msg and whether the function executed successfully.
+        command:
+            description: Returns the output msg and whether the function executed successfully.
             type: dict
             contains:
                 ret:
-                    description: Check variable to see if the information was successfully retrieved.
+                    description: Return whether the information was retrieved succesfully.
                     type: bool
                 msg:
-                    description: Information of all active iLO sessions.
-                    type: list
-                    elements: dict
-                    contains:
-                        Description:
-                            description: Provides a description of the resource.
-                            type: str
-                        Id:
-                            description: The sessionId.
-                            type: str
-                        Name:
-                            description: The name of the resource.
-                            type: str
-                        UserName:
-                            description: Name to use to log in to the management processor.
-                            type: str
+                    description: Information of all retrieved details.
+                    type: dict
     returned: always
 '''
 
 CATEGORY_COMMANDS_ALL = {
-    "Sessions": ["GetiLOSessions"]
+    "Sessions": ["GetiLOSessions"],
+    "Manager": ["GetSNMPv3Users", "GetSNMPAlertDestinations"]
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
-    "Sessions": "GetiLOSessions"
+    "Sessions": "GetiLOSessions",
+    "Manager": "GetSNMPv3Users"
 }
 
 from ansible.module_utils.basic import AnsibleModule
@@ -181,6 +186,17 @@ def main():
             for command in command_list:
                 if command == "GetiLOSessions":
                     result[command] = rf_utils.get_ilo_sessions()
+
+        elif category == "Manager":
+            resource = rf_utils._find_managers_resource()
+            if resource['ret'] is False:
+                module.fail_json(msg=resource['msg'])
+
+            for command in command_list:
+                if command == "GetSNMPv3Users":
+                    result[command] = rf_utils.get_snmpv3_users()
+                elif command == "GetSNMPAlertDestinations":
+                    result[command] = rf_utils.get_snmp_alert_destinations()
 
     module.exit_json(ilo_redfish_info=result)
 
