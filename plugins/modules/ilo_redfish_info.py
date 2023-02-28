@@ -110,7 +110,7 @@ EXAMPLES = '''
   - name: Get logical drive details with array controllers
     community.general.ilo_redfish_info:
       category: Systems
-      command: GetLogicalDrivesWithArrayControllers
+      command: GetSmartStorageLogicalDrivesWithArrayControllers
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -136,8 +136,8 @@ ilo_redfish_info:
 
 CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
                          "Systems": ["GetBootSettings", "GetSmartStoragePhysicalDrives",
-                                     "GetSmartStorageLogicalDrives", "GetLogicalDrivesWithArrayControllers",
-                                     "GetServerPostState", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"]}
+                                     "GetSmartStorageLogicalDrives", "GetSmartStorageLogicalDrivesWithArrayControllers",
+                                     "GetServerPostState"]}
 
 CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
