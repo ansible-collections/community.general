@@ -234,7 +234,7 @@ EXAMPLES = '''
   - name: Create logical drive
     community.general.ilo_redfish_config:
       category: Systems
-      command: CreateLogicalDrives
+      command: CreateSmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -250,7 +250,7 @@ EXAMPLES = '''
   - name: Create logical drives with particular physical drives
     community.general.ilo_redfish_config:
       category: Systems
-      command: CreateLogicalDrivesWithParticularPhysicalDrives
+      command: CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -263,7 +263,7 @@ EXAMPLES = '''
   - name: Delete all logical drives
     community.general.ilo_redfish_config:
       category: Systems
-      command: DeleteAllLogicalDrives
+      command: DeleteAllSmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -271,7 +271,7 @@ EXAMPLES = '''
   - name: Delete specified logical drives
     community.general.ilo_redfish_config:
       category: Systems
-      command: DeleteSpecifiedLogicalDrives
+      command: DeleteSpecifiedSmartStorageLogicalDrives
       baseuri: "***.***.***.***"
       username: "abcxyz"
       password: "******"
@@ -382,10 +382,10 @@ CATEGORY_COMMANDS_ALL = {
         "CreateSNMPAlertDestinations",
     ],
     "Systems": [
-        "DeleteAllLogicalDrives",
-        "DeleteSpecifiedLogicalDrives",
-        "CreateLogicalDrives",
-        "CreateLogicalDrivesWithParticularPhysicalDrives"
+        "DeleteAllSmartStorageLogicalDrives",
+        "DeleteSpecifiedSmartStorageLogicalDrives",
+        "CreateSmartStorageLogicalDrives",
+        "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives"
     ]
 }
 
@@ -543,21 +543,21 @@ def main():
 
     elif category == "Systems":
         dispatch = dict(
-            DeleteAllLogicalDrives=rf_utils.delete_all_logical_drives,
-            DeleteSpecifiedLogicalDrives=rf_utils.delete_specified_logical_drives,
-            CreateLogicalDrives=rf_utils.create_logical_drives,
-            CreateLogicalDrivesWithParticularPhysicalDrives=rf_utils.create_logical_drives_with_particular_physical_drives
+            DeleteAllSmartStorageLogicalDrives=rf_utils.delete_all_smartstorage_logical_drives,
+            DeleteSpecifiedSmartStorageLogicalDrives=rf_utils.delete_specified_smartstorage_logical_drives,
+            CreateSmartStorageLogicalDrives=rf_utils.create_smartstorage_logical_drives,
+            CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives=rf_utils.creat_smartstoragee_logical_drives_with_particular_physical_drives
 
         )
 
         for command in command_list:
-            if command == "DeleteAllLogicalDrives":
+            if command == "DeleteAllSmartStorageLogicalDrives":
                 result[command] = dispatch[command]()
-            elif command == "DeleteSpecifiedLogicalDrives":
+            elif command == "DeleteSpecifiedSmartStorageLogicalDrives":
                 result[command] = dispatch[command](module.params["logical_drives_names"])
-            elif command == "CreateLogicalDrives":
+            elif command == "CreateSmartStorageLogicalDrives":
                 result[command] = dispatch[command](module.params["raid_details"])
-            elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
+            elif command == "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives":
                 result[command] = dispatch[command](module.params["raid_details"])
             if "changed" in result[command]:
                 changed |= result[command]["changed"]
