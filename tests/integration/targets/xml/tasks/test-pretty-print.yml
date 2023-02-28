@@ -13,7 +13,7 @@
     xml:
       path: /tmp/ansible-xml-beers.xml
       xpath: /business/beers
-      pretty_print: yes
+      pretty_print: true
       add_children:
       - beer: Old Rasputin
     register: pretty_print
@@ -22,8 +22,8 @@
     copy:
       src: results/test-pretty-print.xml
       dest: /tmp/ansible-xml-beers.xml
-    check_mode: yes
-    diff: yes
+    check_mode: true
+    diff: true
     register: comparison
 
   - name: Test expected result

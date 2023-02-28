@@ -13,11 +13,18 @@ DOCUMENTATION = '''
 module: manageiq_provider
 short_description: Management of provider in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_provider module supports adding, updating, and deleting provider in ManageIQ.
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
   state:

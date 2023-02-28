@@ -18,6 +18,13 @@ short_description: Send notifications to Rocket Chat
 description:
     - The C(rocketchat) module sends notifications to Rocket Chat via the Incoming WebHook integration
 author: "Ramon de la Fuente (@ramondelafuente)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   domain:
     type: str
@@ -58,7 +65,7 @@ options:
     type: str
     description:
       - URL for the message sender's icon.
-    default: "https://www.ansible.com/favicon.ico"
+    default: "https://docs.ansible.com/favicon.ico"
   icon_emoji:
     type: str
     description:
@@ -212,7 +219,7 @@ def main():
             msg=dict(type='str', required=False),
             channel=dict(type='str'),
             username=dict(type='str', default='Ansible'),
-            icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
+            icon_url=dict(type='str', default='https://docs.ansible.com/favicon.ico'),
             icon_emoji=dict(type='str'),
             link_names=dict(type='int', default=1, choices=[0, 1]),
             validate_certs=dict(default=True, type='bool'),

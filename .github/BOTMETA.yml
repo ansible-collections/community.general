@@ -440,7 +440,7 @@ files:
     labels: datadog_event
     maintainers: n0ts
   $modules/datadog_monitor.py:
-    maintainers: skornehl
+    ignore: skornehl
   $modules/dconf.py:
     maintainers: azaghal
   $modules/deploy_helper.py:
@@ -1037,7 +1037,7 @@ files:
     maintainers: dagwieers
   $modules/redfish_:
     ignore: jose-delarosa
-    maintainers: $team_redfish
+    maintainers: $team_redfish TSKushal
   $modules/redhat_subscription.py:
     labels: redhat_subscription
     maintainers: barnabycourt alikins kahowell

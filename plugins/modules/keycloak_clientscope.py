@@ -33,6 +33,11 @@ description:
     - When updating a client_scope, where possible provide the client_scope ID to the module. This removes a lookup
       to the API to translate the name into the client_scope ID.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -151,8 +156,8 @@ options:
             - Values may be single values (for example a string) or a list of strings.
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Gaëtan Daubresse (@Gaetan2907)
@@ -295,7 +300,7 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+    keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 
 

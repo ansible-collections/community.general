@@ -18,6 +18,13 @@ requirements:
 short_description: Manage Cloudflare DNS records
 description:
    - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)."
+extends_documentation_fragment:
+   - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   api_token:
     description:
@@ -687,10 +694,11 @@ class CloudflareAPI(object):
                 "port": params['port'],
                 "weight": params['weight'],
                 "priority": params['priority'],
-                "name": params['record'][:-len('.' + params['zone'])],
+                "name": params['record'],
                 "proto": params['proto'],
                 "service": params['service']
             }
+
             new_record = {"type": params['type'], "ttl": params['ttl'], 'data': srv_data}
             search_value = str(params['weight']) + '\t' + str(params['port']) + '\t' + params['value']
             search_record = params['service'] + '.' + params['proto'] + '.' + params['record']

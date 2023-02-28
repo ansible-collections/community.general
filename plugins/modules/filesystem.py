@@ -19,6 +19,13 @@ module: filesystem
 short_description: Makes a filesystem
 description:
   - This module creates a filesystem.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:
@@ -87,7 +94,6 @@ notes:
     a C(blkid) command that is compatible with this module. However, these
     packages conflict with each other, and only the C(util-linux) package
     provides the command required to not fail when I(state=absent).
-  - This module supports I(check_mode).
 seealso:
   - module: community.general.filesize
   - module: ansible.posix.mount

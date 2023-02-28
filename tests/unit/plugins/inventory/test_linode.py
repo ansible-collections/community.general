@@ -16,7 +16,7 @@ mandatory_py_version = pytest.mark.skipif(
 )
 
 
-from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.errors import AnsibleError
 from ansible.parsing.dataloader import DataLoader
 from ansible.template import Templar
 from ansible_collections.community.general.plugins.inventory.linode import InventoryModule

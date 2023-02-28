@@ -20,6 +20,13 @@ description:
 requirements:
   - "A ZFS/OpenZFS implementation that supports delegation with C(zfs allow), including: Solaris >= 10, illumos (all
     versions), FreeBSD >= 8.0R, ZFS on Linux >= 0.7.0."
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -177,6 +184,9 @@ class ZfsDelegateAdmin(object):
             scope = linemap.get(line, scope)
             if not scope:
                 continue
+            if ' (unknown: ' in line:
+                line = line.replace('(unknown: ', '', 1)
+                line = line.replace(')', '', 1)
             try:
                 if line.startswith('\tuser ') or line.startswith('\tgroup '):
                     ent_type, ent, cur_perms = line.split()

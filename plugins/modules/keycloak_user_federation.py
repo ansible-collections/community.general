@@ -26,6 +26,11 @@ description:
     - The names of module options are snake_cased versions of the camelCase ones found in the
       Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -451,8 +456,9 @@ options:
 
             providerType:
                 description:
-                    - Component type for this mapper (only supported value is C(org.keycloak.storage.ldap.mappers.LDAPStorageMapper)).
+                    - Component type for this mapper.
                 type: str
+                default: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
 
             config:
                 description:
@@ -461,7 +467,8 @@ options:
                 type: dict
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Laurent Paumier (@laurpaum)
@@ -776,7 +783,7 @@ def main():
         name=dict(type='str'),
         parentId=dict(type='str'),
         providerId=dict(type='str'),
-        providerType=dict(type='str'),
+        providerType=dict(type='str', default='org.keycloak.storage.ldap.mappers.LDAPStorageMapper'),
         config=dict(type='dict'),
     )
 

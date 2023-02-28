@@ -15,6 +15,11 @@ short_description: Create / delete an instance in Rackspace Public Cloud
 description:
      - creates / deletes a Rackspace Public Cloud instance and optionally
        waits for it to be 'running'.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   auto_increment:
     description:
@@ -177,7 +182,8 @@ notes:
     In the case of deletion, the returned data structure will have C(action)
     set to C(delete), and the oldest servers in the group will be deleted.
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

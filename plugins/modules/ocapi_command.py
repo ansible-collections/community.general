@@ -17,6 +17,13 @@ description:
   - Builds OCAPI URIs locally and sends them to remote OOB controllers to
     perform an action.
   - Manages OOB controller such as Indicator LED, Reboot, Power Mode, Firmware Update.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   category:
     required: true
@@ -165,7 +172,7 @@ operationStatusId:
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ocapi_utils import OcapiUtils
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.six.moves.urllib.parse import quote_plus, urljoin
+from ansible.module_utils.six.moves.urllib.parse import urljoin
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {

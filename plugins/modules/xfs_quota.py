@@ -19,7 +19,14 @@ description:
   - Configure quotas on XFS filesystems.
   - Before using this module /etc/projects and /etc/projid need to be configured.
 author:
-- William Leemans (@bushvin)
+  - William Leemans (@bushvin)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   type:
     description:

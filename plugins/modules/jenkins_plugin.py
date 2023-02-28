@@ -17,6 +17,12 @@ short_description: Add or remove Jenkins plugin
 description:
   - Ansible module which helps to manage Jenkins plugins.
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   group:
     type: str
@@ -129,8 +135,9 @@ notes:
     parameter to point to the Jenkins server. The module must be used on the
     host where Jenkins runs as it needs direct access to the plugin files.
 extends_documentation_fragment:
-  - url
-  - files
+  - ansible.builtin.url
+  - ansible.builtin.files
+  - community.general.attributes
 '''
 
 EXAMPLES = '''
@@ -295,7 +302,6 @@ import io
 import json
 import os
 import tempfile
-import time
 
 from ansible.module_utils.basic import AnsibleModule, to_bytes
 from ansible.module_utils.six.moves import http_cookiejar as cookiejar
@@ -635,6 +641,8 @@ class JenkinsPlugin(object):
                 self.module.fail_json(
                     msg="Cannot close the tmp updates file %s." % tmp_updates_file,
                     details=to_native(e))
+        else:
+            tmp_updates_file = updates_file
 
         # Open the updates file
         try:
@@ -645,15 +653,15 @@ class JenkinsPlugin(object):
             data = json.loads(f.readline())
         except IOError as e:
             self.module.fail_json(
-                msg="Cannot open temporal updates file.",
+                msg="Cannot open%s updates file." % (" temporary" if tmp_updates_file != updates_file else ""),
                 details=to_native(e))
         except Exception as e:
             self.module.fail_json(
-                msg="Cannot load JSON data from the tmp updates file.",
+                msg="Cannot load JSON data from the%s updates file." % (" temporary" if tmp_updates_file != updates_file else ""),
                 details=to_native(e))
 
         # Move the updates file to the right place if we could read it
-        if download_updates:
+        if tmp_updates_file != updates_file:
             self.module.atomic_move(tmp_updates_file, updates_file)
 
         # Check if we have the plugin data available

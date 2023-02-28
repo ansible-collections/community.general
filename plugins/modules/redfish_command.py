@@ -18,6 +18,13 @@ description:
   - Manages OOB controller ex. reboot, log management.
   - Manages OOB controller users ex. add, remove, update.
   - Manages system power ex. on, off, graceful and forced reboot.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true
@@ -239,8 +246,16 @@ options:
     type: bool
     default: false
     version_added: 3.7.0
+  bios_attributes:
+    required: false
+    description:
+      - BIOS attributes that needs to be verified in the given server.
+    type: dict
+    version_added: 6.4.0
 
-author: "Jose Delarosa (@jose-delarosa)"
+author:
+  - "Jose Delarosa (@jose-delarosa)"
+  - "T S Kushal (@TSKushal)"
 '''
 
 EXAMPLES = '''
@@ -629,6 +644,17 @@ EXAMPLES = '''
       category: Manager
       command: PowerReboot
       resource_id: BMC
+
+  - name: Verify BIOS attributes
+    community.general.redfish_command:
+      category: Systems
+      command: VerifyBiosAttributes
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      bios_attributes:
+        SubNumaClustering: "Disabled"
+        WorkloadProfile: "Virtualization-MaxPerformance"
 '''
 
 RETURN = '''
@@ -662,7 +688,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
                 "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride",
-                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink", "VirtualMediaInsert", "VirtualMediaEject"],
+                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink", "VirtualMediaInsert", "VirtualMediaEject", "VerifyBiosAttributes"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
@@ -726,6 +752,7 @@ def main():
                 )
             ),
             strip_etag_quotes=dict(type='bool', default=False),
+            bios_attributes=dict(type="dict")
         ),
         required_together=[
             ('username', 'password'),
@@ -784,6 +811,9 @@ def main():
 
     # Etag options
     strip_etag_quotes = module.params['strip_etag_quotes']
+
+    # BIOS Attributes options
+    bios_attributes = module.params['bios_attributes']
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -845,6 +875,8 @@ def main():
                 result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
                 result = rf_utils.virtual_media_eject(virtual_media, category)
+            elif command == 'VerifyBiosAttributes':
+                result = rf_utils.verify_bios_attributes(bios_attributes)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()

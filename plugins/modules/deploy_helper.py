@@ -31,6 +31,12 @@ description:
     C(new_release), either the 'release' parameter or a generated timestamp,
     C(new_release_path), the path to the new release folder (not created by the module)."
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   path:
     type: path
@@ -111,7 +117,9 @@ notes:
   - Because of the default behaviour of generating the I(new_release) fact, this module will not be idempotent
     unless you pass your own release name with I(release). Due to the nature of deploying software, this should not
     be much of a problem.
-extends_documentation_fragment: files
+extends_documentation_fragment:
+  - ansible.builtin.files
+  - community.general.attributes
 '''
 
 EXAMPLES = '''

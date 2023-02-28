@@ -26,6 +26,13 @@ description:
   - As of Ansible 2.4 support was added for macOS.
   - As of Ansible 2.9 support was added for AIX 6.1+
   - Windows and HPUX are not supported, please let us know if you find any other OS/distro in which this fails.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   name:
     description:
@@ -356,6 +363,7 @@ class NosystemdTimezone(Timezone):
     def __init__(self, module):
         super(NosystemdTimezone, self).__init__(module)
         # Validate given timezone
+        planned_tz = ''
         if 'name' in self.value:
             tzfile = self._verify_timezone()
             planned_tz = self.value['name']['planned']

@@ -19,8 +19,15 @@ DOCUMENTATION = """
 module: slack
 short_description: Send Slack notifications
 description:
-    - The C(slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
+  - The C(slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
 author: "Ramon de la Fuente (@ramondelafuente)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   domain:
     type: str
@@ -81,8 +88,8 @@ options:
   icon_url:
     type: str
     description:
-      - Url for the message sender's icon (default C(https://www.ansible.com/favicon.ico))
-    default: https://www.ansible.com/favicon.ico
+      - URL for the message sender's icon (default C(https://docs.ansible.com/favicon.ico))
+    default: https://docs.ansible.com/favicon.ico
   icon_emoji:
     type: str
     description:
@@ -439,7 +446,7 @@ def main():
             channel=dict(type='str'),
             thread_id=dict(type='str'),
             username=dict(type='str', default='Ansible'),
-            icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
+            icon_url=dict(type='str', default='https://docs.ansible.com/favicon.ico'),
             icon_emoji=dict(type='str'),
             link_names=dict(type='int', default=1, choices=[0, 1]),
             parse=dict(type='str', choices=['none', 'full']),

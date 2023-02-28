@@ -14,6 +14,11 @@ module: rax_identity
 short_description: Load Rackspace Cloud Identity
 description:
      - Verifies Rackspace Cloud credentials and returns identity information
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     type: str
@@ -26,7 +31,8 @@ author:
     - "Christopher H. Laco (@claco)"
     - "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

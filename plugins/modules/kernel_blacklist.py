@@ -13,10 +13,17 @@ DOCUMENTATION = '''
 ---
 module: kernel_blacklist
 author:
-- Matthias Vogelgesang (@matze)
+    - Matthias Vogelgesang (@matze)
 short_description: Blacklist kernel modules
 description:
     - Add or remove kernel modules from blacklist.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     name:
         type: str

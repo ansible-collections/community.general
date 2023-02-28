@@ -38,6 +38,8 @@ class RedfishUtils(object):
         self.timeout = timeout
         self.module = module
         self.service_root = '/redfish/v1/'
+        self.session_service_uri = '/redfish/v1/SessionService'
+        self.sessions_uri = '/redfish/v1/SessionService/Sessions'
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
@@ -125,6 +127,10 @@ class RedfishUtils(object):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
+            # Service root is an unauthenticated resource; remove credentials
+            # in case the caller will be using sessions later.
+            if uri == (self.root_uri + self.service_root):
+                basic_auth = False
             resp = open_url(uri, method="GET", headers=req_headers,
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
@@ -151,6 +157,11 @@ class RedfishUtils(object):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
+            # When performing a POST to the session collection, credentials are
+            # provided in the request body.  Do not provide the basic auth
+            # header since this can cause conflicts with some services
+            if self.sessions_uri is not None and uri == (self.root_uri + self.sessions_uri):
+                basic_auth = False
             resp = open_url(uri, data=json.dumps(pyld),
                             headers=req_headers, method="POST",
                             url_username=username, url_password=password,
@@ -363,23 +374,23 @@ class RedfishUtils(object):
         return {'ret': True}
 
     def _find_sessionservice_resource(self):
+        # Get the service root
         response = self.get_request(self.root_uri + self.service_root)
         if response['ret'] is False:
             return response
         data = response['data']
-        if 'SessionService' not in data:
+
+        # Check for the session service and session collection.  Well-known
+        # defaults are provided in the constructor, but services that predate
+        # Redfish 1.6.0 might contain different values.
+        self.session_service_uri = data.get('SessionService', {}).get('@odata.id')
+        self.sessions_uri = data.get('Links', {}).get('Sessions', {}).get('@odata.id')
+
+        # If one isn't found, return an error
+        if self.session_service_uri is None:
             return {'ret': False, 'msg': "SessionService resource not found"}
-        else:
-            session_service = data["SessionService"]["@odata.id"]
-            self.session_service_uri = session_service
-            response = self.get_request(self.root_uri + session_service)
-            if response['ret'] is False:
-                return response
-            data = response['data']
-            sessions = data['Sessions']['@odata.id']
-            if sessions[-1:] == '/':
-                sessions = sessions[:-1]
-            self.sessions_uri = sessions
+        if self.sessions_uri is None:
+            return {'ret': False, 'msg': "SessionCollection resource not found"}
         return {'ret': True}
 
     def _get_resource_uri_by_id(self, uris, id_prop):
@@ -3152,3 +3163,57 @@ class RedfishUtils(object):
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Modified session service'
         return resp
+
+    def verify_bios_attributes(self, bios_attributes):
+        # This method verifies BIOS attributes against the provided input
+        server_bios = self.get_multi_bios_attributes()
+        if server_bios["ret"] is False:
+            return server_bios
+
+        bios_dict = {}
+        wrong_param = {}
+
+        # Verify bios_attributes with BIOS settings available in the server
+        for key, value in bios_attributes.items():
+            if key in server_bios["entries"][0][1]:
+                if server_bios["entries"][0][1][key] != value:
+                    bios_dict.update({key: value})
+            else:
+                wrong_param.update({key: value})
+
+        if wrong_param:
+            return {
+                "ret": False,
+                "msg": "Wrong parameters are provided: %s" % wrong_param
+            }
+
+        if bios_dict:
+            return {
+                "ret": False,
+                "msg": "BIOS parameters are not matching: %s" % bios_dict
+            }
+
+        return {
+            "ret": True,
+            "changed": False,
+            "msg": "BIOS verification completed"
+        }
+
+    def enable_secure_boot(self):
+        # This function enable Secure Boot on an OOB controller
+
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response["ret"] is False:
+            return response
+
+        server_details = response["data"]
+        secure_boot_url = server_details["SecureBoot"]["@odata.id"]
+
+        response = self.get_request(self.root_uri + secure_boot_url)
+        if response["ret"] is False:
+            return response
+
+        body = {}
+        body["SecureBootEnable"] = True
+
+        return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)

@@ -16,7 +16,7 @@ from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.ocapi_command as module
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
-from ansible.module_utils.six.moves.urllib.parse import quote_plus, urljoin
+from ansible.module_utils.six.moves.urllib.parse import urljoin
 
 
 MOCK_BASE_URI = "mockBaseUri/"

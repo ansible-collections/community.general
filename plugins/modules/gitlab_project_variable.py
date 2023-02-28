@@ -23,6 +23,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -182,7 +189,7 @@ from ansible.module_utils.six import integer_types
 
 GITLAB_IMP_ERR = None
 try:
-    import gitlab
+    import gitlab  # noqa: F401, pylint: disable=unused-import
     HAS_GITLAB_PACKAGE = True
 except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()

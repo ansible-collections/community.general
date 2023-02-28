@@ -16,6 +16,13 @@ short_description: Manage LXC Containers
 description:
   - Management of LXC containers.
 author: "Kevin Carter (@cloudnull)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:
@@ -433,7 +440,7 @@ else:
     HAS_LXC = True
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.parsing.convert_bool import boolean, BOOLEANS_FALSE
+from ansible.module_utils.parsing.convert_bool import BOOLEANS_FALSE
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 
 

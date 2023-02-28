@@ -174,7 +174,7 @@
     path: "{{ output_file }}"
     section: mysqld
     option: skip-name
-    allow_no_value: yes
+    allow_no_value: true
   register: result8
 
 - name: test-value 8 - read content from output file
@@ -203,7 +203,7 @@
     path: "{{ output_file }}"
     section: mysqld
     option: skip-name
-    allow_no_value: yes
+    allow_no_value: true
   register: result9
 
 - name: test-value 9 - assert 'changed' is false
@@ -217,7 +217,7 @@
   ini_file:
     path: "{{ output_file }}"
     section: new_empty_section
-    allow_no_value: yes
+    allow_no_value: true
   register: result10
 
 - name: test-value 10 - assert 'changed' is true and section added
@@ -231,7 +231,7 @@
   ini_file:
     path: "{{ output_file }}"
     section: new_empty_section
-    allow_no_value: yes
+    allow_no_value: true
   register: result11
 
 - name: test-value 11 - assert 'changed' is false
@@ -246,7 +246,7 @@
     state: absent
     path: "{{ output_file }}"
     section: new_empty_section
-    allow_no_value: yes
+    allow_no_value: true
 
 - name: test-value 12 - test allow_no_value with loop
   ini_file:
@@ -254,7 +254,7 @@
     section: mysqld
     option: "{{ item.o }}"
     value: "{{ item.v | d(omit) }}"
-    allow_no_value: yes
+    allow_no_value: true
   loop:
     - { o: "skip-name-resolve" }
     - { o: "max_connections", v: "500" }
@@ -316,7 +316,7 @@
     path: "{{ output_file }}"
     section: mysqld
     option: skip-name
-    allow_no_value: yes
+    allow_no_value: true
   register: result14
 
 - name: test-value 14 - read content from output file
@@ -376,7 +376,7 @@
   copy:
     content: ""
     dest: "{{ output_file }}"
-    force: yes
+    force: true
 
 - name: test-value 16 - Ensure "beverage=coke" is created within no section
   ini_file:

@@ -33,6 +33,11 @@ description:
     - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup
       to the API to translate the name into the role ID.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -97,8 +102,8 @@ options:
                       providing it will reduce the number of API calls required.
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Gaëtan Daubresse (@Gaetan2907)
@@ -201,8 +206,9 @@ end_state:
     }
 '''
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 

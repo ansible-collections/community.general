@@ -16,6 +16,13 @@ author:
 short_description: Manage daemontools services
 description:
     - Controls daemontools services on remote hosts using the svc utility.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:

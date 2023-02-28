@@ -16,6 +16,13 @@ description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
   - For use with Dell iDRAC operations that require Redfish OEM extensions.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true

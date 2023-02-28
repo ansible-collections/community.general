@@ -18,6 +18,21 @@ description:
   excludes all other versions of those packages. This allows you to for example
   protect packages from being updated by newer versions. The state of the
   plugin that reflects locking of packages is the C(locklist).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - The logics of the C(versionlock) plugin for corner cases could be
+        confusing, so please take in account that this module will do its best to
+        give a C(check_mode) prediction on what is going to happen. In case of
+        doubt, check the documentation of the plugin.
+      - Sometimes the module could predict changes in C(check_mode) that will not
+        be such because C(versionlock) concludes that there is already a entry in
+        C(locklist) that already matches.
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -54,19 +69,11 @@ options:
     type: str
     default: present
 notes:
-  - The logics of the C(versionlock) plugin for corner cases could be
-    confusing, so please take in account that this module will do its best to
-    give a C(check_mode) prediction on what is going to happen. In case of
-    doubt, check the documentation of the plugin.
-  - Sometimes the module could predict changes in C(check_mode) that will not
-    be such because C(versionlock) concludes that there is already a entry in
-    C(locklist) that already matches.
   - In an ideal world, the C(versionlock) plugin would have a dry-run option to
     know for sure what is going to happen. So far we have to work with a best
     guess as close as possible to the behaviour inferred from its code.
   - For most of cases where you want to lock and unlock specific versions of a
     package, this works fairly well.
-  - Supports C(check_mode).
 requirements:
   - dnf
   - dnf-plugin-versionlock

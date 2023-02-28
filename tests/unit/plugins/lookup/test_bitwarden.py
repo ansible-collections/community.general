@@ -6,15 +6,13 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from argparse import ArgumentParser
-
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup.bitwarden import LookupModule, Bitwarden, BitwardenException
+from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden
 
 
 MOCK_RECORDS = [
@@ -113,7 +111,7 @@ class MockBitwarden(Bitwarden):
 
     unlocked = True
 
-    def _get_matches(self, search_value, search_field="name"):
+    def _get_matches(self, search_value, search_field="name", collection_id=None):
         return list(filter(lambda record: record[search_field] == search_value, MOCK_RECORDS))
 
 

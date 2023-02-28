@@ -25,6 +25,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   project:
@@ -82,8 +89,6 @@ options:
     elements: str
     choices: ['guest', 'reporter', 'developer', 'maintainer']
     version_added: 3.7.0
-notes:
-  - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -136,7 +141,7 @@ EXAMPLES = r'''
     project: projectname
     gitlab_user: username
     access_level: developer
-    pruge_users: developer
+    purge_users: developer
     state: present
 
 - name: Remove a list of Users with Dedicated Access Levels to A GitLab project

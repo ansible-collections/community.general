@@ -18,7 +18,7 @@
   register: integration_container_namespace
 
 - name: Create a container (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container:
     state: present
     name: '{{ name }}'
@@ -87,7 +87,7 @@
       - cn_creation_confirmation_task.container.status in ["created", "ready"]
 
 - name: Update container (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container:
     state: present
     name: '{{ name }}'
@@ -156,7 +156,7 @@
       - cn_update_confirmation_task.container.status in ["created", "ready"]
 
 - name: Update container secret variables (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container:
     state: present
     name: '{{ name }}'
@@ -227,7 +227,7 @@
       - "'hashed_value' in cn_update_secret_confirmation_task.container.secret_environment_variables[0]"
 
 - name: Delete container (Check)
-  check_mode: yes
+  check_mode: true
   community.general.scaleway_container:
     state: absent
     name: '{{ name }}'
