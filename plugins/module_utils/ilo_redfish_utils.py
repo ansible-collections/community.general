@@ -330,7 +330,7 @@ class iLORedfishUtils(RedfishUtils):
             snmpv3_user = {}
             for property in properties:
                 if property in data:
-                        snmpv3_user[property] = data[property]
+                    snmpv3_user[property] = data[property]
 
             snmpv3_users.append(snmpv3_user)
 
