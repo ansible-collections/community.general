@@ -297,13 +297,13 @@ def main():
                     result[command]['ret'] = False
                     result[command]['msg'] = "raid_details params is required"
                     module.fail_json(result)
-                result[command] = rf_utils.verify_logical_drives(module.params["raid_details"], True)
+                result[command] = rf_utils.verify_smartstorage_logical_drives(module.params["raid_details"], True)
             elif command == "VerifySpecifiedSmartStorageLogicalDrives":
                 if not module.params.get("raid_details") and module.params.get("raid_details") != []:
                     result[command]['ret'] = False
                     result[command]['msg'] = "raid_details params is required"
                     module.fail_json(result)
-                result[command] = rf_utils.verify_logical_drives(module.params["raid_details"], False)
+                result[command] = rf_utils.verify_smartstorage_logical_drives(module.params["raid_details"], False)
             elif command == "VerifyUefiBootOrder":
                 if not module.params["uefi_boot_order"]:
                     result[command]['ret'] = False
@@ -315,7 +315,7 @@ def main():
                     result[command]['ret'] = False
                     result[command]['msg'] = "logical_drives_names params is required"
                     module.fail_json(result)
-                result[command] = rf_utils.get_specified_logical_drives(module.params["logical_drives_names"])
+                result[command] = rf_utils.get_specified_smartstorage_logical_drives(module.params["logical_drives_names"])
 
     # Return data back or fail with proper message
     if not result[command]['ret']:
