@@ -1149,8 +1149,7 @@ class iLORedfishUtils(RedfishUtils):
         if logical_drives_details:
             raid_details = raid_data[:]
             for raid in raid_details:
-                response = self.check_smartstorage_logical_drives(raid, logical_drives_details,
-                                                     "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
+                response = self.check_smartstorage_logical_drives(raid,logical_drives_details,"CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
                 if response["ret"]:
                     raid_data.remove(raid)
                 elif not response["ret"] and response["msg"] != "Logical drive provided is not present in server":
@@ -1162,13 +1161,11 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Provided logical drives are already present in the server"
             }
 
-        response = self.check_smartstorage_physical_drive_count(raid_data, unused_physical_drives,
-                                                   "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
+        response = self.check_smartstorage_physical_drive_count(raid_data,unused_physical_drives,"CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
-        response = self.check_smartstorage_physical_drives(raid_data, unused_physical_drives,
-                                              "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
+        response = self.check_smartstorage_physical_drives(raid_data,unused_physical_drives,"CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
