@@ -153,8 +153,7 @@ ilo_redfish_info:
 CATEGORY_COMMANDS_ALL = {"Sessions": ["GetiLOSessions"],
                          "Systems": ["GetBootSettings", "GetSmartStoragePhysicalDrives",
                                      "GetSmartStorageLogicalDrives", "GetLogicalDrivesWithArrayControllers",
-                                     "GetServerPostState", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"],
-                         "Managers": ["GetSNMPv3Users", "GetSNMPAlertDestinations", "GetiLOBackupFiles"]}
+                                     "GetServerPostState", "GetUSBInfo", "GetPCIDevices", "GetPCISlots", "GetNetworkAdapters"]}
 
 CATEGORY_COMMANDS_DEFAULT = {"Sessions": "GetiLOSessions"}
 
@@ -272,12 +271,6 @@ def main():
                     result[command] = rf_utils.get_smartstorage_logical_drives(True)
                 elif command == "GetServerPostState":
                     result[command] = rf_utils.get_server_poststate()
-        elif category == "Managers":
-            for command in command_list:
-                if command == "GetSNMPv3Users":
-                    result[command] = rf_utils.get_snmpv3_users()
-                elif command == "GetSNMPAlertDestinations":
-                    result[command] = rf_utils.get_snmp_alert_destinations()
 
     if not result[command]['ret']:
         module.fail_json(msg=to_native(result))
