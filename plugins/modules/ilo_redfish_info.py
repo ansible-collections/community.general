@@ -99,22 +99,6 @@ EXAMPLES = '''
       username: "abcxyz"
       password: "******"
 
-  - name: Get SNMP alert destinations
-    community.general.ilo_redfish_info:
-      category: Managers
-      command: GetSnmpAlertDestinations
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-
-  - name: Get SNMP V3 Users
-    community.general.ilo_redfish_info:
-      category: Managers
-      command: GetSnmpV3Users
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-
   - name: Get network boot settings
     community.general.ilo_redfish_info:
       category: Systems
