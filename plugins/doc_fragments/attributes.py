@@ -20,9 +20,13 @@ attributes:
       description: Will return details on what has changed (or possibly needs changing in C(check_mode)), when in diff mode.
 '''
 
-#    platform:
-#      description: Target OS/families that can be operated against.
-#      support: N/A
+    PLATFORM = r'''
+options: {}
+attributes:
+    platform:
+      description: Target OS/families that can be operated against.
+      support: N/A
+'''
 
     # Should be used together with the standard fragment
     INFO_MODULE = r'''

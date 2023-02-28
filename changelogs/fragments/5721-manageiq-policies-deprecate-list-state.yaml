@@ -1,0 +1,2 @@
+deprecated_features:
+  - manageiq_policies - deprecate ``state=list`` in favour of using ``community.general.manageiq_policies_info`` (https://github.com/ansible-collections/community.general/pull/5721).

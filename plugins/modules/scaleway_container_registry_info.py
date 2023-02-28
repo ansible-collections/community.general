@@ -80,7 +80,7 @@ container_registry:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway
+    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
 )
 from ansible.module_utils.basic import AnsibleModule
 

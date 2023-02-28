@@ -5,8 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import pytest
-
 from ansible_collections.community.general.plugins.modules import statsd
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args

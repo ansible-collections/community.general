@@ -19,6 +19,13 @@ author: "Jimmy Tang (@jcftang)"
 short_description: Package manager for MacPorts
 description:
     - Manages MacPorts packages (ports)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     name:
         description:
@@ -99,7 +106,6 @@ EXAMPLES = '''
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
 
 
 def selfupdate(module, port_path):

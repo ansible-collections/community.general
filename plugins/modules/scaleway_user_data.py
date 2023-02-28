@@ -19,31 +19,37 @@ module: scaleway_user_data
 short_description: Scaleway user_data management module
 author: Remy Leone (@remyleone)
 description:
-    - "This module manages user_data on compute instances on Scaleway."
-    - "It can be used to configure cloud-init for instance"
+    - This module manages user_data on compute instances on Scaleway.
+    - It can be used to configure cloud-init for instance.
 extends_documentation_fragment:
 - community.general.scaleway
+- community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
 
   server_id:
     type: str
     description:
-    - Scaleway Compute instance ID of the server
+    - Scaleway Compute instance ID of the server.
     required: true
 
   user_data:
     type: dict
     description:
     - User defined data. Typically used with C(cloud-init).
-    - Pass your cloud-init script here as a string
+    - Pass your C(cloud-init) script here as a string.
     required: false
 
   region:
     type: str
     description:
-    - Scaleway compute zone
+    - Scaleway compute zone.
     required: true
     choices:
       - ams1

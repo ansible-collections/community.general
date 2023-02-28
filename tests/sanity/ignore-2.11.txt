@@ -10,24 +10,19 @@ plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choic
 plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice         # state=get - removed in 8.0.0
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice
+plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice  # state=list - removed in 8.0.0
 plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
-plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice
+plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice      # state=list - removed in 8.0.0
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
-plugins/modules/puppet.py use-argspec-type-path
-plugins/modules/puppet.py validate-modules:parameter-invalid  # invalid alias - removed in 7.0.0
-plugins/modules/rax_files_objects.py use-argspec-type-path
-plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice
-plugins/modules/rax.py use-argspec-type-path # fix needed
+plugins/modules/puppet.py validate-modules:parameter-invalid                          # invalid alias - removed in 7.0.0
+plugins/modules/rax_files_objects.py use-argspec-type-path                            # module deprecated - removed in 9.0.0
+plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice          # module deprecated - removed in 9.0.0
+plugins/modules/rax.py use-argspec-type-path                                          # module deprecated - removed in 9.0.0
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
-plugins/modules/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
-plugins/modules/udm_share.py validate-modules:parameter-list-no-elements
-plugins/modules/udm_user.py validate-modules:parameter-list-no-elements
 plugins/modules/xfconf.py validate-modules:return-syntax-error
-plugins/modules/yarn.py use-argspec-type-path
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py compile-2.6   # django generated code
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py compile-2.7   # django generated code

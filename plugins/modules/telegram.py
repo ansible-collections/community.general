@@ -23,6 +23,13 @@ description:
     - Also, the user may try to use any other telegram bot API method, if you specify I(api_method) argument.
 notes:
     - You will require a telegram account and create telegram bot to use this module.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   token:
     type: str

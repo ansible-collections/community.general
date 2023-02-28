@@ -7,19 +7,19 @@
 - name: check systemd version
   command: "systemctl --version"
   register: systemd_version
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: check homectl version
   command: homectl --version
   register: homectl_version
-  ignore_errors: yes
+  ignore_errors: true
 
 - block:
     - name: Check and start systemd-homed service
       service:
         name: systemd-homed.service
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Add a user 'james'
       community.general.homectl:
@@ -55,9 +55,9 @@
         name: foo
         password: uq4895738!@#$%dfd
         state: present
-        resize: yes
+        resize: true
       register: resize_out
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Use option 'disksize=1G' without option resize (allowed)
       community.general.homectl:
@@ -66,13 +66,13 @@
         state: present
         disksize: 1G
       register: disk_out
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Try to Create user without giving password
       community.general.homectl:
         name: danielle
       register: danielle_out
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: remove user 'foobar' without requiring password
       community.general.homectl:
@@ -102,20 +102,20 @@
         name: janet
         state: absent
       register: user_not_exist
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Use check_mode to try and create user 'diana'
       community.general.homectl:
         name: diana
         password: helloworld123!@
         state: present
-      check_mode: yes
+      check_mode: true
       register: diana_create_checkmode_out
 
     - name: Verify user 'diana' was not created with check_mode
       command: homectl inspect diana
       register: user_diana_exists
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Try to modify user 'jake' with only noexec mount option in check_mode
       community.general.homectl:
@@ -123,7 +123,7 @@
         password: myreallysecurepassword12!
         state: present
         mountopts: noexec
-      check_mode: yes
+      check_mode: true
       register: jake_checkmode_out
 
     - name: Verify user 'jake' was not modified and still has all mount options
@@ -152,8 +152,8 @@
         password: incorrectPassword!
         state: present
         mountopts: noexec
-        locked: yes
-      ignore_errors: yes
+        locked: true
+      ignore_errors: true
       register: jake_incorrect_pass_out
 
     - assert:

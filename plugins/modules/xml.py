@@ -16,7 +16,14 @@ DOCUMENTATION = r'''
 module: xml
 short_description: Manage bits and pieces of XML files or strings
 description:
-- A CRUD-like interface to managing bits of XML files.
+  - A CRUD-like interface to managing bits of XML files.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 options:
   path:
     description:
@@ -266,7 +273,7 @@ EXAMPLES = r'''
   community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website
-    children: []
+    set_children: []
 
 # In case of namespaces, like in below XML, they have to be explicitly stated.
 #
@@ -961,7 +968,7 @@ def main():
     # add_children && set_children both set?: should have already aborted by now
 
     # set_children set?
-    if set_children:
+    if set_children is not None:
         set_target_children(module, doc, xpath, namespaces, set_children, input_type)
 
     # add_children set?

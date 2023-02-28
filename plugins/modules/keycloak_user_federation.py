@@ -24,8 +24,13 @@ description:
       to your needs and a user having the expected roles.
 
     - The names of module options are snake_cased versions of the camelCase ones found in the
-      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/15.0/rest-api/index.html).
+      Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/20.0.2/rest-api/index.html).
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -451,8 +456,9 @@ options:
 
             providerType:
                 description:
-                    - Component type for this mapper (only supported value is C(org.keycloak.storage.ldap.mappers.LDAPStorageMapper)).
+                    - Component type for this mapper.
                 type: str
+                default: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
 
             config:
                 description:
@@ -461,7 +467,8 @@ options:
                 type: dict
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Laurent Paumier (@laurpaum)
@@ -776,7 +783,7 @@ def main():
         name=dict(type='str'),
         parentId=dict(type='str'),
         providerId=dict(type='str'),
-        providerType=dict(type='str'),
+        providerType=dict(type='str', default='org.keycloak.storage.ldap.mappers.LDAPStorageMapper'),
         config=dict(type='dict'),
     )
 
@@ -835,7 +842,7 @@ def main():
 
     # See if it already exists in Keycloak
     if cid is None:
-        found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', parent=realm, name=name)), realm)
+        found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', name=name)), realm)
         if len(found) > 1:
             module.fail_json(msg='No ID given and found multiple user federations with name `{name}`. Cannot continue.'.format(name=name))
         before_comp = next(iter(found), None)
@@ -922,6 +929,8 @@ def main():
         desired_comp = desired_comp.copy()
         updated_mappers = desired_comp.pop('mappers', [])
         after_comp = kc.create_component(desired_comp, realm)
+
+        cid = after_comp['id']
 
         for mapper in updated_mappers:
             found = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)

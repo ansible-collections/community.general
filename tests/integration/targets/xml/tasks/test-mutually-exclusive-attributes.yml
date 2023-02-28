@@ -17,7 +17,7 @@
         - child02
         value: conflict!
     register: module_output
-    ignore_errors: yes
+    ignore_errors: true
 
   - name: Test expected result
     assert:

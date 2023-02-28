@@ -19,7 +19,7 @@
 - name: test fail argument not a sequence
   debug:
     msg: "{{ {'a': 'b'} | community.general.counter }}"
-  ignore_errors: yes
+  ignore_errors: true
   register: res
 
 - name: verify test fail argument not a sequence
@@ -31,7 +31,7 @@
 - name: test fail element not hashable
   debug:
     msg: "{{ [{'a': 'b'}] | community.general.counter }}"
-  ignore_errors: yes
+  ignore_errors: true
   register: res
 
 - name: verify test fail element not hashable

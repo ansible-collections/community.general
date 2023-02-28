@@ -27,6 +27,11 @@ author:
   - Sebastian Pfahl (@eryx12o45)
 requirements:
   - python-ldap
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   dn:
     required: true
@@ -57,7 +62,8 @@ options:
       - Set to C(true) to return the full attribute schema of entries, not
         their attribute values. Overrides I(attrs) when provided.
 extends_documentation_fragment:
-    - community.general.ldap.documentation
+  - community.general.ldap.documentation
+  - community.general.attributes
 """
 
 EXAMPLES = r"""
@@ -129,7 +135,6 @@ class LdapSearch(LdapGeneric):
     def __init__(self, module):
         LdapGeneric.__init__(self, module)
 
-        self.dn = self.module.params['dn']
         self.filterstr = self.module.params['filter']
         self.attrlist = []
         self._load_scope()

@@ -23,6 +23,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -182,14 +189,14 @@ from ansible.module_utils.six import integer_types
 
 GITLAB_IMP_ERR = None
 try:
-    import gitlab
+    import gitlab  # noqa: F401, pylint: disable=unused-import
     HAS_GITLAB_PACKAGE = True
 except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
 )
 
 
@@ -255,9 +262,11 @@ class GitlabProjectVariables(object):
             return True
 
         var = {
-            "key": var_obj.get('key'), "value": var_obj.get('value'),
-            "masked": var_obj.get('masked'), "protected": var_obj.get('protected'),
-            "variable_type": var_obj.get('variable_type')
+            "key": var_obj.get('key'),
+            "value": var_obj.get('value'),
+            "masked": var_obj.get('masked'),
+            "protected": var_obj.get('protected'),
+            "variable_type": var_obj.get('variable_type'),
         }
 
         if var_obj.get('environment_scope') is not None:
@@ -319,12 +328,9 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     before = [x.attributes for x in gitlab_keys]
 
     gitlab_keys = this_gitlab.list_all_project_variables()
-    existing_variables = [x.attributes for x in gitlab_keys]
+    existing_variables = filter_returned_variables(gitlab_keys)
 
-    # preprocessing:filter out and enrich before compare
-    for item in existing_variables:
-        item.pop('project_id')
-
+    # filter out and enrich before compare
     for item in requested_variables:
         item['key'] = item.pop('name')
         item['value'] = str(item.get('value'))
@@ -354,9 +360,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         if purge:
             # refetch and filter
             gitlab_keys = this_gitlab.list_all_project_variables()
-            existing_variables = [x.attributes for x in gitlab_keys]
-            for item in existing_variables:
-                item.pop('project_id')
+            existing_variables = filter_returned_variables(gitlab_keys)
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
@@ -409,7 +413,7 @@ def main():
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
-            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
+            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"]),
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )

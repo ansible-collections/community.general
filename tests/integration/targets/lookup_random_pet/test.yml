@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Call plugin
     set_fact:

@@ -27,6 +27,15 @@ notes:
       your host, you may want to add C(serial: 1) to the plays.
     - See `the webfaction API <https://docs.webfaction.com/xmlrpc-api/>`_ for more info.
 
+extends_documentation_fragment:
+    - community.general.attributes
+
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
+
 options:
 
     name:

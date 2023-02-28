@@ -9,7 +9,7 @@
         src: /nowhere
         dest: "{{ remote_tmp_dir }}/nowhere.txt"
         state: link
-        force: yes
+        force: true
 
     - name: Archive - broken link ({{ format }})
       archive:

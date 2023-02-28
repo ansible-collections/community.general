@@ -18,6 +18,13 @@ module: snap
 short_description: Manages snaps
 description:
     - "Manages snaps packages."
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:
@@ -399,8 +406,7 @@ class Snap(CmdStateModuleHelper):
 
 
 def main():
-    snap = Snap()
-    snap.run()
+    Snap.execute()
 
 
 if __name__ == '__main__':

@@ -92,9 +92,39 @@ TEST_CASES = [
                 ),
                 (
                     ['/testbin/subscription-manager', 'register',
-                        '--serverurl', 'satellite.company.com',
                         '--username', 'admin',
                         '--password', 'admin'],
+                    {'check_rc': True, 'expand_user_and_vars': False},
+                    (0, '', '')
+                )
+            ],
+            'changed': True,
+            'msg': "System successfully registered to 'satellite.company.com'."
+        }
+    ],
+    # Test simple registration using token
+    [
+        {
+            'state': 'present',
+            'server_hostname': 'satellite.company.com',
+            'token': 'fake_token',
+        },
+        {
+            'id': 'test_registeration_token',
+            'run_command.calls': [
+                (
+                    ['/testbin/subscription-manager', 'identity'],
+                    {'check_rc': False},
+                    (1, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'config', '--server.hostname=satellite.company.com'],
+                    {'check_rc': True},
+                    (0, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'register',
+                        '--token', 'fake_token'],
                     {'check_rc': True, 'expand_user_and_vars': False},
                     (0, '', '')
                 )
@@ -180,7 +210,6 @@ TEST_CASES = [
                     [
                         '/testbin/subscription-manager',
                         'register',
-                        '--serverurl', 'satellite.company.com',
                         '--org', 'admin',
                         '--activationkey', 'some-activation-key'
                     ],
@@ -310,6 +339,7 @@ TEST_CASES = [
             'org_id': 'admin',
             'force_register': 'true',
             'server_proxy_hostname': 'proxy.company.com',
+            'server_proxy_scheme': 'https',
             'server_proxy_port': '12345',
             'server_proxy_user': 'proxy_user',
             'server_proxy_password': 'secret_proxy_password'
@@ -329,6 +359,7 @@ TEST_CASES = [
                         '--server.proxy_hostname=proxy.company.com',
                         '--server.proxy_password=secret_proxy_password',
                         '--server.proxy_port=12345',
+                        '--server.proxy_scheme=https',
                         '--server.proxy_user=proxy_user'
                     ],
                     {'check_rc': True},
@@ -340,9 +371,6 @@ TEST_CASES = [
                         'register',
                         '--force',
                         '--org', 'admin',
-                        '--proxy', 'proxy.company.com:12345',
-                        '--proxyuser', 'proxy_user',
-                        '--proxypassword', 'secret_proxy_password',
                         '--username', 'admin',
                         '--password', 'admin'
                     ],

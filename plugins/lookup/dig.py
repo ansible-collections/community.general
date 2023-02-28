@@ -35,9 +35,10 @@ DOCUMENTATION = '''
         description:
             - Record type to query.
             - C(DLV) has been removed in community.general 6.0.0.
+            - C(CAA) has been added in community.general 6.3.0.
         type: str
         default: 'A'
-        choices: [A, ALL, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
+        choices: [A, ALL, AAAA, CAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
       flat:
         description: If 0 each record is returned as a dictionary, otherwise a string.
         type: int
@@ -129,6 +130,12 @@ RETURN = """
        AAAA:
            description:
                - address
+       CAA:
+           description:
+               - flags
+               - tag
+               - value
+           version_added: 6.3.0
        CNAME:
            description:
                - target
@@ -198,7 +205,7 @@ try:
     import dns.resolver
     import dns.reversename
     import dns.rdataclass
-    from dns.rdatatype import (A, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC,
+    from dns.rdatatype import (A, AAAA, CAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC,
                                MX, NAPTR, NS, NSEC3PARAM, PTR, RP, SOA, SPF, SRV, SSHFP, TLSA, TXT)
     HAVE_DNS = True
 except ImportError:
@@ -218,6 +225,7 @@ def make_rdata_dict(rdata):
     supported_types = {
         A: ['address'],
         AAAA: ['address'],
+        CAA: ['flags', 'tag', 'value'],
         CNAME: ['target'],
         DNAME: ['target'],
         DNSKEY: ['flags', 'algorithm', 'protocol', 'key'],
@@ -230,7 +238,7 @@ def make_rdata_dict(rdata):
         NSEC3PARAM: ['algorithm', 'flags', 'iterations', 'salt'],
         PTR: ['target'],
         RP: ['mbox', 'txt'],
-        # RRSIG: ['algorithm', 'labels', 'original_ttl', 'expiration', 'inception', 'signature'],
+        # RRSIG: ['type_covered', 'algorithm', 'labels', 'original_ttl', 'expiration', 'inception', 'key_tag', 'signer', 'signature'],
         SOA: ['mname', 'rname', 'serial', 'refresh', 'retry', 'expire', 'minimum'],
         SPF: ['strings'],
         SRV: ['priority', 'weight', 'port', 'target'],
@@ -251,6 +259,8 @@ def make_rdata_dict(rdata):
 
             if rdata.rdtype == DS and f == 'digest':
                 val = dns.rdata._hexify(rdata.digest).replace(' ', '')
+            if rdata.rdtype == DNSKEY and f == 'algorithm':
+                val = int(val)
             if rdata.rdtype == DNSKEY and f == 'key':
                 val = dns.rdata._base64ify(rdata.key).replace(' ', '')
             if rdata.rdtype == NSEC3PARAM and f == 'salt':

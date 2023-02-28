@@ -15,6 +15,13 @@ short_description: Manage OpenBSD system upgrades
 version_added: 1.1.0
 description:
     - Manage OpenBSD system upgrades using sysupgrade.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     snapshot:
         description:

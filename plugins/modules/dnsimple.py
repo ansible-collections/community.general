@@ -16,6 +16,13 @@ module: dnsimple
 short_description: Interface with dnsimple.com (a DNS hosting service)
 description:
    - "Manages domains and records via the DNSimple API, see the docs: U(http://developer.dnsimple.com/)."
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   account_email:
     description:
@@ -168,7 +175,7 @@ class DNSimpleV2():
     def dnsimple_client(self):
         """creates a dnsimple client object"""
         if self.account_email and self.account_api_token:
-            client = Client(sandbox=self.sandbox, email=self.account_email, access_token=self.account_api_token)
+            client = Client(sandbox=self.sandbox, email=self.account_email, access_token=self.account_api_token, user_agent="ansible/community.general")
         else:
             msg = "Option account_email or account_api_token not provided. " \
                   "Dnsimple authentiction with a .dnsimple config file is not " \

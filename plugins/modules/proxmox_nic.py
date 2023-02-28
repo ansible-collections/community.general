@@ -16,6 +16,11 @@ version_added: 3.1.0
 description:
   - Allows you to create/update/delete a NIC on Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
 author: "Lammert Hellinga (@Kogelvis) <lammert@hellinga.it>"
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   bridge:
     description:
@@ -90,6 +95,7 @@ options:
     type: int
 extends_documentation_fragment:
   - community.general.proxmox.documentation
+  - community.general.attributes
 '''
 
 EXAMPLES = '''
@@ -223,7 +229,7 @@ class ProxmoxNicAnsible(ProxmoxAnsible):
 
         if interface in vminfo:
             if not self.module.check_mode:
-                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(vmid=vmid, delete=interface)
+                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(delete=interface)
             return True
 
         return False

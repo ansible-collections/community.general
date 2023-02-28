@@ -19,6 +19,12 @@ description:
 
 version_added: "3.3.0"
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+
 options:
     realm:
         description:
@@ -86,7 +92,8 @@ options:
             - If C(true), allows to remove the authentication flow and recreate it.
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Philippe Gauthier (@elfelip)
@@ -206,7 +213,7 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak \
-    import KeycloakAPI, camel, keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+    import KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
 
 

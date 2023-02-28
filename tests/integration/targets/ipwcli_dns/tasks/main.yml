@@ -83,7 +83,7 @@
     username: '{{ username }}'
     password: '{{ password }}'
   register: result
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: assert the failure of the new SRV record
   assert:
@@ -105,7 +105,7 @@
     flags: S
     username: '{{ username }}'
     password: '{{ password }}'
-  check_mode: yes
+  check_mode: true
   register: result
 
 - name: assert the NAPTR check_mode

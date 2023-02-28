@@ -23,6 +23,13 @@ author:
     - Aaron Bull Schaefer (@elasticdog) <aaron@elasticdog.com>
     - Maxime de Roucy (@tchernomax)
     - Jean Raby (@jraby)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 options:
     name:
         description:

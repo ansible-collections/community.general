@@ -80,13 +80,13 @@ from ansible.errors import AnsibleError, AnsibleFilterError
 import importlib
 
 try:
-    import jc
+    import jc  # noqa: F401, pylint: disable=unused-import
     HAS_LIB = True
 except ImportError:
     HAS_LIB = False
 
 
-def jc(data, parser, quiet=True, raw=False):
+def jc_filter(data, parser, quiet=True, raw=False):
     """Convert returned command output to JSON using the JC library
 
     Arguments:
@@ -138,8 +138,14 @@ def jc(data, parser, quiet=True, raw=False):
         raise AnsibleError('You need to install "jc" as a Python library on the Ansible controller prior to running jc filter')
 
     try:
-        jc_parser = importlib.import_module('jc.parsers.' + parser)
-        return jc_parser.parse(data, quiet=quiet, raw=raw)
+        # new API (jc v1.18.0 and higher) allows use of plugin parsers
+        if hasattr(jc, 'parse'):
+            return jc.parse(parser, data, quiet=quiet, raw=raw)
+
+        # old API (jc v1.17.7 and lower)
+        else:
+            jc_parser = importlib.import_module('jc.parsers.' + parser)
+            return jc_parser.parse(data, quiet=quiet, raw=raw)
 
     except Exception as e:
         raise AnsibleFilterError('Error in jc filter plugin:  %s' % e)
@@ -150,5 +156,5 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'jc': jc
+            'jc': jc_filter,
         }

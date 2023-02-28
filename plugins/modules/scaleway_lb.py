@@ -21,27 +21,33 @@ author: Remy Leone (@remyleone)
 description:
     - "This module manages load-balancers on Scaleway."
 extends_documentation_fragment:
-- community.general.scaleway
+    - community.general.scaleway
+    - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
 
   name:
     type: str
     description:
-      - Name of the load-balancer
+      - Name of the load-balancer.
     required: true
 
   description:
     type: str
     description:
-      - Description of the load-balancer
+      - Description of the load-balancer.
     required: true
 
   organization_id:
     type: str
     description:
-      - Organization identifier
+      - Organization identifier.
     required: true
 
   state:
@@ -56,7 +62,7 @@ options:
   region:
     type: str
     description:
-    - Scaleway zone
+    - Scaleway zone.
     required: true
     choices:
       - nl-ams
@@ -68,7 +74,7 @@ options:
     elements: str
     default: []
     description:
-    - List of tags to apply to the load-balancer
+    - List of tags to apply to the load-balancer.
 
   wait:
     description:
@@ -79,14 +85,14 @@ options:
   wait_timeout:
     type: int
     description:
-    - Time to wait for the load-balancer to reach the expected state
+    - Time to wait for the load-balancer to reach the expected state.
     required: false
     default: 300
 
   wait_sleep_time:
     type: int
     description:
-    - Time to wait before every attempt to check the state of the load-balancer
+    - Time to wait before every attempt to check the state of the load-balancer.
     required: false
     default: 3
 '''

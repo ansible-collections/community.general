@@ -16,6 +16,13 @@ description:
   - "Create and delete GitHub webhooks"
 requirements:
   - "PyGithub >= 1.3.5"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   repository:
     description:
@@ -154,12 +161,17 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def _create_hook_config(module):
-    return {
+    hook_config = {
         "url": module.params["url"],
         "content_type": module.params["content_type"],
-        "secret": module.params.get("secret"),
         "insecure_ssl": "1" if module.params["insecure_ssl"] else "0"
     }
+
+    secret = module.params.get("secret")
+    if secret:
+        hook_config["secret"] = secret
+
+    return hook_config
 
 
 def create_hook(repo, module):

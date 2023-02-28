@@ -12,3 +12,4 @@ skip/rhel8.3
 skip/rhel8.4
 skip/rhel8.5
 skip/rhel9.0
+skip/rhel9.1

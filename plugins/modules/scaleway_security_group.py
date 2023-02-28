@@ -18,11 +18,16 @@ module: scaleway_security_group
 short_description: Scaleway Security Group management module
 author: Antoine Barbare (@abarbare)
 description:
-    - This module manages Security Group on Scaleway account
-      U(https://developer.scaleway.com).
+    - "This module manages Security Group on Scaleway account U(https://developer.scaleway.com)."
 extends_documentation_fragment:
-- community.general.scaleway
+    - community.general.scaleway
+    - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -105,8 +110,8 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: This is only present when C(state=present)
-    returned: when C(state=present)
+    description: This is only present when I(state=present).
+    returned: when I(state=present)
     type: dict
     sample: {
         "scaleway_security_group": {

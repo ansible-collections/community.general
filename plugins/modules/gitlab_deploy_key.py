@@ -25,6 +25,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   project:
@@ -151,6 +158,7 @@ class GitLabDeployKey(object):
             changed = True
         else:
             changed, deploy_key = self.update_deploy_key(self.deploy_key_object, {
+                'title': key_title,
                 'can_push': options['can_push']})
 
         self.deploy_key_object = deploy_key

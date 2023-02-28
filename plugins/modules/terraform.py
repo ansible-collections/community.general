@@ -13,8 +13,15 @@ DOCUMENTATION = r'''
 module: terraform
 short_description: Manages a Terraform deployment (and plans)
 description:
-     - Provides support for deploying resources with Terraform and pulling
-       resource information back into Ansible.
+  - Provides support for deploying resources with Terraform and pulling
+    resource information back into Ansible.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     choices: ['planned', 'present', 'absent']
@@ -48,7 +55,9 @@ options:
     version_added: 3.0.0
   workspace:
     description:
-      - The terraform workspace to work with.
+      - The terraform workspace to work with. This sets the C(TF_WORKSPACE) environmental variable
+        that is used to override workspace selection. For more information about workspaces
+        have a look at U(https://developer.hashicorp.com/terraform/language/state/workspaces).
     type: str
     default: default
   purge_workspace:
@@ -297,9 +306,9 @@ def preflight_validation(bin_path, project_path, version, variables_args=None, p
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
     if LooseVersion(version) < LooseVersion('0.15.0'):
-        rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path)
+        module.run_command([bin_path, 'validate', '-no-color'] + variables_args, check_rc=True, cwd=project_path)
     else:
-        rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path)
+        module.run_command([bin_path, 'validate', '-no-color'], check_rc=True, cwd=project_path)
 
 
 def _state_args(state_file):
@@ -310,7 +319,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace):
     command = [bin_path, 'init', '-input=false', '-no-color']
     if backend_config:
         for key, val in backend_config.items():
@@ -328,7 +337,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
     if plugin_paths:
         for plugin_path in plugin_paths:
             command.extend(['-plugin-dir', plugin_path])
-    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
+    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path, environ_update={"TF_WORKSPACE": workspace})
 
 
 def get_workspace_context(bin_path, project_path):
@@ -343,6 +352,7 @@ def get_workspace_context(bin_path, project_path):
             continue
         elif stripped_item.startswith('* '):
             workspace_ctx["current"] = stripped_item.replace('* ', '')
+            workspace_ctx["all"].append(stripped_item.replace('* ', ''))
         else:
             workspace_ctx["all"].append(stripped_item)
     return workspace_ctx
@@ -485,7 +495,7 @@ def main():
 
     if force_init:
         if overwrite_init or not os.path.isfile(os.path.join(project_path, ".terraform", "terraform.tfstate")):
-            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths)
+            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
@@ -625,9 +635,9 @@ def main():
 
     outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(state_file)
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)
+    outputs = {}
     if rc == 1:
         module.warn("Could not get Terraform outputs. This usually means none have been defined.\nstdout: {0}\nstderr: {1}".format(outputs_text, outputs_err))
-        outputs = {}
     elif rc != 0:
         module.fail_json(
             msg="Failure when getting Terraform outputs. "

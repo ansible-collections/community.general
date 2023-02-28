@@ -10,7 +10,6 @@ __metaclass__ = type
 
 import pytest
 
-from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.inventory.data import InventoryData
 from ansible_collections.community.general.plugins.inventory.xen_orchestra import InventoryModule
 

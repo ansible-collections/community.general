@@ -14,11 +14,18 @@ DOCUMENTATION = '''
 module: riak
 short_description: This module handles some common Riak operations
 description:
-     - This module can be used to join nodes to a cluster, check
-       the status of the cluster.
+    - This module can be used to join nodes to a cluster, check
+      the status of the cluster.
 author:
     - "James Martin (@jsmartin)"
     - "Drew Kerrigan (@drewkerrigan)"
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   command:
     description:

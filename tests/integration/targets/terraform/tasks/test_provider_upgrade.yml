@@ -16,7 +16,7 @@
   ansible.builtin.template:
     src: templates/provider_test/main.tf.j2
     dest: "{{ terraform_project_dir }}/{{ tf_provider['name'] }}/main.tf"
-    force: yes
+    force: true
   register: terraform_provider_hcl
 
 # The purpose of this task is to init terraform multiple times with different provider module
@@ -26,7 +26,7 @@
   community.general.terraform:
     project_path: "{{ terraform_provider_hcl.dest | dirname }}"
     binary_path: "{{ terraform_binary_path }}"
-    force_init: yes
+    force_init: true
     provider_upgrade: "{{ terraform_provider_upgrade }}"
     state: present
   register: terraform_init_result

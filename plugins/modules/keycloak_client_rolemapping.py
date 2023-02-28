@@ -33,6 +33,11 @@ description:
     - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup
       to the API to translate the name into the role ID.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 
 options:
     state:
@@ -97,8 +102,8 @@ options:
                       providing it will reduce the number of API calls required.
 
 extends_documentation_fragment:
-- community.general.keycloak
-
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Gaëtan Daubresse (@Gaetan2907)
@@ -201,8 +206,9 @@ end_state:
     }
 '''
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -295,7 +301,7 @@ def main():
     assigned_roles_before = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
 
     result['existing'] = assigned_roles_before
-    result['proposed'] = roles
+    result['proposed'] = list(assigned_roles_before) if assigned_roles_before else []
 
     update_roles = []
     for role_index, role in enumerate(roles, start=0):
@@ -307,6 +313,7 @@ def main():
                         'id': role['id'],
                         'name': role['name'],
                     })
+                    result['proposed'].append(available_role)
         # Fetch roles to remove if state absent
         else:
             for assigned_role in assigned_roles_before:
@@ -315,13 +322,15 @@ def main():
                         'id': role['id'],
                         'name': role['name'],
                     })
+                    if assigned_role in result['proposed']:  # Handle double removal
+                        result['proposed'].remove(assigned_role)
 
     if len(update_roles):
         if state == 'present':
             # Assign roles
             result['changed'] = True
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
+                result['diff'] = dict(before=assigned_roles_before, after=result['proposed'])
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_group_rolemapping(gid, cid, update_roles, realm=realm)
@@ -333,7 +342,7 @@ def main():
             # Remove mapping of role
             result['changed'] = True
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=update_roles)
+                result['diff'] = dict(before=assigned_roles_before, after=result['proposed'])
             if module.check_mode:
                 module.exit_json(**result)
             kc.delete_group_rolemapping(gid, cid, update_roles, realm=realm)
@@ -344,7 +353,7 @@ def main():
     # Do nothing
     else:
         result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are correctly mapped with group %s.' % (roles, group_name)
+        result['msg'] = 'Nothing to do, roles %s are %s with group %s.' % (roles, 'mapped' if state == 'present' else 'not mapped', group_name)
         module.exit_json(**result)
 
 

@@ -18,6 +18,13 @@ description:
   - This modules allows for enable/disable/activate of I(awall) policies.
   - Alpine Wall (I(awall)) generates a firewall configuration from the enabled policy files
     and activates the configuration on the system.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:

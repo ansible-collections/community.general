@@ -16,7 +16,14 @@ requirements: [ pushbullet.py ]
 module: pushbullet
 short_description: Sends notifications to Pushbullet
 description:
-   - This module sends push notifications via Pushbullet to channels or devices.
+    - This module sends push notifications via Pushbullet to channels or devices.
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     api_key:
         type: str

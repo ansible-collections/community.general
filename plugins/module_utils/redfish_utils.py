@@ -19,6 +19,8 @@ POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json'
                 'OData-Version': '4.0'}
 PATCH_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
                  'OData-Version': '4.0'}
+PUT_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
+               'OData-Version': '4.0'}
 DELETE_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 
 FAIL_MSG = 'Issuing a data modification command without specifying the '\
@@ -36,6 +38,8 @@ class RedfishUtils(object):
         self.timeout = timeout
         self.module = module
         self.service_root = '/redfish/v1/'
+        self.session_service_uri = '/redfish/v1/SessionService'
+        self.sessions_uri = '/redfish/v1/SessionService/Sessions'
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
@@ -123,6 +127,10 @@ class RedfishUtils(object):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
+            # Service root is an unauthenticated resource; remove credentials
+            # in case the caller will be using sessions later.
+            if uri == (self.root_uri + self.service_root):
+                basic_auth = False
             resp = open_url(uri, method="GET", headers=req_headers,
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
@@ -143,18 +151,28 @@ class RedfishUtils(object):
         except Exception as e:
             return {'ret': False,
                     'msg': "Failed GET request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'data': data, 'headers': headers}
+        return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
     def post_request(self, uri, pyld):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
+            # When performing a POST to the session collection, credentials are
+            # provided in the request body.  Do not provide the basic auth
+            # header since this can cause conflicts with some services
+            if self.sessions_uri is not None and uri == (self.root_uri + self.sessions_uri):
+                basic_auth = False
             resp = open_url(uri, data=json.dumps(pyld),
                             headers=req_headers, method="POST",
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
+            try:
+                data = json.loads(to_native(resp.read()))
+            except Exception as e:
+                # No response data; this is okay in many cases
+                data = None
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
@@ -169,7 +187,7 @@ class RedfishUtils(object):
         except Exception as e:
             return {'ret': False,
                     'msg': "Failed POST request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'headers': headers, 'resp': resp}
+        return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
     def patch_request(self, uri, pyld, check_pyld=False):
         req_headers = dict(PATCH_HEADERS)
@@ -218,6 +236,41 @@ class RedfishUtils(object):
             return {'ret': False, 'changed': False,
                     'msg': "Failed PATCH request to '%s': '%s'" % (uri, to_text(e))}
         return {'ret': True, 'changed': True, 'resp': resp, 'msg': 'Modified %s' % uri}
+
+    def put_request(self, uri, pyld):
+        req_headers = dict(PUT_HEADERS)
+        r = self.get_request(uri)
+        if r['ret']:
+            # Get etag from etag header or @odata.etag property
+            etag = r['headers'].get('etag')
+            if not etag:
+                etag = r['data'].get('@odata.etag')
+            if etag:
+                if self.strip_etag_quotes:
+                    etag = etag.strip('"')
+                req_headers['If-Match'] = etag
+        username, password, basic_auth = self._auth_params(req_headers)
+        try:
+            resp = open_url(uri, data=json.dumps(pyld),
+                            headers=req_headers, method="PUT",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
+                            follow_redirects='all',
+                            use_proxy=True, timeout=self.timeout)
+        except HTTPError as e:
+            msg = self._get_extended_message(e)
+            return {'ret': False,
+                    'msg': "HTTP Error %s on PUT request to '%s', extended message: '%s'"
+                           % (e.code, uri, msg),
+                    'status': e.code}
+        except URLError as e:
+            return {'ret': False, 'msg': "URL Error on PUT request to '%s': '%s'"
+                                         % (uri, e.reason)}
+        # Almost all errors should be caught above, but just in case
+        except Exception as e:
+            return {'ret': False,
+                    'msg': "Failed PUT request to '%s': '%s'" % (uri, to_text(e))}
+        return {'ret': True, 'resp': resp}
 
     def delete_request(self, uri, pyld=None):
         req_headers = dict(DELETE_HEADERS)
@@ -321,23 +374,23 @@ class RedfishUtils(object):
         return {'ret': True}
 
     def _find_sessionservice_resource(self):
+        # Get the service root
         response = self.get_request(self.root_uri + self.service_root)
         if response['ret'] is False:
             return response
         data = response['data']
-        if 'SessionService' not in data:
+
+        # Check for the session service and session collection.  Well-known
+        # defaults are provided in the constructor, but services that predate
+        # Redfish 1.6.0 might contain different values.
+        self.session_service_uri = data.get('SessionService', {}).get('@odata.id')
+        self.sessions_uri = data.get('Links', {}).get('Sessions', {}).get('@odata.id')
+
+        # If one isn't found, return an error
+        if self.session_service_uri is None:
             return {'ret': False, 'msg': "SessionService resource not found"}
-        else:
-            session_service = data["SessionService"]["@odata.id"]
-            self.session_service_uri = session_service
-            response = self.get_request(self.root_uri + session_service)
-            if response['ret'] is False:
-                return response
-            data = response['data']
-            sessions = data['Sessions']['@odata.id']
-            if sessions[-1:] == '/':
-                sessions = sessions[:-1]
-            self.sessions_uri = sessions
+        if self.sessions_uri is None:
+            return {'ret': False, 'msg': "SessionCollection resource not found"}
         return {'ret': True}
 
     def _get_resource_uri_by_id(self, uris, id_prop):
@@ -1384,11 +1437,82 @@ class RedfishUtils(object):
         else:
             return self._software_inventory(self.software_uri)
 
+    def _operation_results(self, response, data, handle=None):
+        """
+        Builds the results for an operation from task, job, or action response.
+
+        :param response: HTTP response object
+        :param data: HTTP response data
+        :param handle: The task or job handle that was last used
+        :return: dict containing operation results
+        """
+
+        operation_results = {'status': None, 'messages': [], 'handle': None, 'ret': True,
+                             'resets_requested': []}
+
+        if response.status == 204:
+            # No content; successful, but nothing to return
+            # Use the Redfish "Completed" enum from TaskState for the operation status
+            operation_results['status'] = 'Completed'
+        else:
+            # Parse the response body for details
+
+            # Determine the next handle, if any
+            operation_results['handle'] = handle
+            if response.status == 202:
+                # Task generated; get the task monitor URI
+                operation_results['handle'] = response.getheader('Location', handle)
+
+            # Pull out the status and messages based on the body format
+            if data is not None:
+                response_type = data.get('@odata.type', '')
+                if response_type.startswith('#Task.') or response_type.startswith('#Job.'):
+                    # Task and Job have similar enough structures to treat the same
+                    operation_results['status'] = data.get('TaskState', data.get('JobState'))
+                    operation_results['messages'] = data.get('Messages', [])
+                else:
+                    # Error response body, which is a bit of a misnomer since it's used in successful action responses
+                    operation_results['status'] = 'Completed'
+                    if response.status >= 400:
+                        operation_results['status'] = 'Exception'
+                    operation_results['messages'] = data.get('error', {}).get('@Message.ExtendedInfo', [])
+            else:
+                # No response body (or malformed); build based on status code
+                operation_results['status'] = 'Completed'
+                if response.status == 202:
+                    operation_results['status'] = 'New'
+                elif response.status >= 400:
+                    operation_results['status'] = 'Exception'
+
+            # Clear out the handle if the operation is complete
+            if operation_results['status'] in ['Completed', 'Cancelled', 'Exception', 'Killed']:
+                operation_results['handle'] = None
+
+            # Scan the messages to see if next steps are needed
+            for message in operation_results['messages']:
+                message_id = message['MessageId']
+
+                if message_id.startswith('Update.1.') and message_id.endswith('.OperationTransitionedToJob'):
+                    # Operation rerouted to a job; update the status and handle
+                    operation_results['status'] = 'New'
+                    operation_results['handle'] = message['MessageArgs'][0]
+                    operation_results['resets_requested'] = []
+                    # No need to process other messages in this case
+                    break
+
+                if message_id.startswith('Base.1.') and message_id.endswith('.ResetRequired'):
+                    # A reset to some device is needed to continue the update
+                    reset = {'uri': message['MessageArgs'][0], 'type': message['MessageArgs'][1]}
+                    operation_results['resets_requested'].append(reset)
+
+        return operation_results
+
     def simple_update(self, update_opts):
         image_uri = update_opts.get('update_image_uri')
         protocol = update_opts.get('update_protocol')
         targets = update_opts.get('update_targets')
         creds = update_opts.get('update_creds')
+        apply_time = update_opts.get('update_apply_time')
 
         if not image_uri:
             return {'ret': False, 'msg':
@@ -1439,11 +1563,65 @@ class RedfishUtils(object):
                 payload["Username"] = creds.get('username')
             if creds.get('password'):
                 payload["Password"] = creds.get('password')
+        if apply_time:
+            payload["@Redfish.OperationApplyTime"] = apply_time
         response = self.post_request(self.root_uri + update_uri, payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
-                'msg': "SimpleUpdate requested"}
+                'msg': "SimpleUpdate requested",
+                'update_status': self._operation_results(response['resp'], response['data'])}
+
+    def get_update_status(self, update_handle):
+        """
+        Gets the status of an update operation.
+
+        :param handle: The task or job handle tracking the update
+        :return: dict containing the response of the update status
+        """
+
+        if not update_handle:
+            return {'ret': False, 'msg': 'Must provide a handle tracking the update.'}
+
+        # Get the task or job tracking the update
+        response = self.get_request(self.root_uri + update_handle)
+        if response['ret'] is False:
+            return response
+
+        # Inspect the response to build the update status
+        return self._operation_results(response['resp'], response['data'], update_handle)
+
+    def perform_requested_update_operations(self, update_handle):
+        """
+        Performs requested operations to allow the update to continue.
+
+        :param handle: The task or job handle tracking the update
+        :return: dict containing the result of the operations
+        """
+
+        # Get the current update status
+        update_status = self.get_update_status(update_handle)
+        if update_status['ret'] is False:
+            return update_status
+
+        changed = False
+
+        # Perform any requested updates
+        for reset in update_status['resets_requested']:
+            resp = self.post_request(self.root_uri + reset['uri'], {'ResetType': reset['type']})
+            if resp['ret'] is False:
+                # Override the 'changed' indicator since other resets may have
+                # been successful
+                resp['changed'] = changed
+                return resp
+            changed = True
+
+        msg = 'No operations required for the update'
+        if changed:
+            # Will need to consider finetuning this message if the scope of the
+            # requested operations grow over time
+            msg = 'One or more components reset to continue the update'
+        return {'ret': True, 'changed': changed, 'msg': msg}
 
     def get_bios_attributes(self, systems_uri):
         result = {}
@@ -2985,3 +3163,57 @@ class RedfishUtils(object):
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Modified session service'
         return resp
+
+    def verify_bios_attributes(self, bios_attributes):
+        # This method verifies BIOS attributes against the provided input
+        server_bios = self.get_multi_bios_attributes()
+        if server_bios["ret"] is False:
+            return server_bios
+
+        bios_dict = {}
+        wrong_param = {}
+
+        # Verify bios_attributes with BIOS settings available in the server
+        for key, value in bios_attributes.items():
+            if key in server_bios["entries"][0][1]:
+                if server_bios["entries"][0][1][key] != value:
+                    bios_dict.update({key: value})
+            else:
+                wrong_param.update({key: value})
+
+        if wrong_param:
+            return {
+                "ret": False,
+                "msg": "Wrong parameters are provided: %s" % wrong_param
+            }
+
+        if bios_dict:
+            return {
+                "ret": False,
+                "msg": "BIOS parameters are not matching: %s" % bios_dict
+            }
+
+        return {
+            "ret": True,
+            "changed": False,
+            "msg": "BIOS verification completed"
+        }
+
+    def enable_secure_boot(self):
+        # This function enable Secure Boot on an OOB controller
+
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response["ret"] is False:
+            return response
+
+        server_details = response["data"]
+        secure_boot_url = server_details["SecureBoot"]["@odata.id"]
+
+        response = self.get_request(self.root_uri + secure_boot_url)
+        if response["ret"] is False:
+            return response
+
+        body = {}
+        body["SecureBootEnable"] = True
+
+        return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)

@@ -1,0 +1,2 @@
+minor_changes:
+  - one_vm - add a new ``updateconf`` option which implements the ``one.vm.updateconf`` API call (https://github.com/ansible-collections/community.general/pull/5812).

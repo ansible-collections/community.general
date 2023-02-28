@@ -112,19 +112,6 @@ stages:
             - test: 2
             - test: 3
             - test: 4
-  - stage: Sanity_2_11
-    displayName: Sanity 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Test {0}
-          testFormat: 2.11/sanity/{0}
-          targets:
-            - test: 1
-            - test: 2
-            - test: 3
-            - test: 4
 ### Units
   - stage: Units_devel
     displayName: Units devel
@@ -176,19 +163,26 @@ stages:
           targets:
             - test: 2.6
             - test: 3.8
-  - stage: Units_2_11
-    displayName: Units 2.11
+
+## Remote
+  - stage: Remote_devel_extra_vms
+    displayName: Remote devel extra VMs
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          nameFormat: Python {0}
-          testFormat: 2.11/units/{0}/1
+          testFormat: devel/{0}
           targets:
-            - test: 2.7
-            - test: 3.5
-
-## Remote
+            - name: Alpine 3.17
+              test: alpine/3.17
+            # - name: Fedora 37
+            #   test: fedora/37
+            # - name: Ubuntu 20.04
+            #   test: ubuntu/20.04
+            - name: Ubuntu 22.04
+              test: ubuntu/22.04
+          groups:
+            - vm
   - stage: Remote_devel
     displayName: Remote devel
     dependsOn: []
@@ -201,12 +195,12 @@ stages:
               test: macos/12.0
             - name: RHEL 7.9
               test: rhel/7.9
-            - name: RHEL 9.0
-              test: rhel/9.0
-            - name: FreeBSD 12.3
-              test: freebsd/12.3
+            - name: RHEL 9.1
+              test: rhel/9.1
             - name: FreeBSD 13.1
               test: freebsd/13.1
+            - name: FreeBSD 12.4
+              test: freebsd/12.4
           groups:
             - 1
             - 2
@@ -221,8 +215,8 @@ stages:
           targets:
             - name: RHEL 9.0
               test: rhel/9.0
-            - name: FreeBSD 13.1
-              test: freebsd/13.1
+            - name: FreeBSD 12.3
+              test: freebsd/12.3
           groups:
             - 1
             - 2
@@ -261,22 +255,6 @@ stages:
             - 1
             - 2
             - 3
-  - stage: Remote_2_11
-    displayName: Remote 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.11/{0}
-          targets:
-            - name: RHEL 7.9
-              test: rhel/7.9
-            - name: RHEL 8.3
-              test: rhel/8.3
-          groups:
-            - 1
-            - 2
-            - 3
 
 ### Docker
   - stage: Docker_devel
@@ -289,8 +267,8 @@ stages:
           targets:
             - name: CentOS 7
               test: centos7
-            - name: Fedora 36
-              test: fedora36
+            - name: Fedora 37
+              test: fedora37
             - name: openSUSE 15
               test: opensuse15
             - name: Ubuntu 20.04
@@ -311,8 +289,8 @@ stages:
         parameters:
           testFormat: 2.14/linux/{0}
           targets:
-            - name: Ubuntu 20.04
-              test: ubuntu2004
+            - name: Fedora 36
+              test: fedora36
           groups:
             - 1
             - 2
@@ -353,24 +331,6 @@ stages:
             - 1
             - 2
             - 3
-  - stage: Docker_2_11
-    displayName: Docker 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.11/linux/{0}
-          targets:
-            - name: Fedora 32
-              test: fedora32
-            - name: Fedora 33
-              test: fedora33
-            - name: Alpine 3
-              test: alpine3
-          groups:
-            - 1
-            - 2
-            - 3
 
 ### Community Docker
   - stage: Docker_community_devel
@@ -386,7 +346,7 @@ stages:
             - name: ArchLinux
               test: archlinux/3.10
             - name: CentOS Stream 8
-              test: centos-stream8/3.8
+              test: centos-stream8/3.9
           groups:
             - 1
             - 2
@@ -434,46 +394,32 @@ stages:
           testFormat: 2.12/generic/{0}/1
           targets:
             - test: 3.8
-  - stage: Generic_2_11
-    displayName: Generic 2.11
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.11/generic/{0}/1
-          targets:
-            - test: 2.7
-            - test: 3.5
 
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
       - Sanity_devel
-      - Sanity_2_11
       - Sanity_2_12
       - Sanity_2_13
       - Sanity_2_14
       - Units_devel
-      - Units_2_11
       - Units_2_12
       - Units_2_13
       - Units_2_14
+      - Remote_devel_extra_vms
       - Remote_devel
-      - Remote_2_11
       - Remote_2_12
       - Remote_2_13
       - Remote_2_14
       - Docker_devel
-      - Docker_2_11
       - Docker_2_12
       - Docker_2_13
       - Docker_2_14
       - Docker_community_devel
-      - Generic_devel
-      - Generic_2_11
-      - Generic_2_12
-      - Generic_2_13
-      - Generic_2_14
+# Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
+#      - Generic_devel
+#      - Generic_2_12
+#      - Generic_2_13
+#      - Generic_2_14
     jobs:
       - template: templates/coverage.yml

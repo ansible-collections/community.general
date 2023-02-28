@@ -15,6 +15,11 @@ short_description: Manage user files for basic authentication
 description:
   - Add and remove username/password entries in a password file using htpasswd.
   - This is used by web servers such as Apache and Nginx for basic authentication.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   path:
     type: path
@@ -41,9 +46,12 @@ options:
     description:
       - Encryption scheme to be used.  As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
-        md5_crypt and sha256_crypt, which are linux passwd hashes.  If you
-        do so the password file will not be compatible with Apache or Nginx
-      - 'Some of the available choices might be: C(apr_md5_crypt), C(des_crypt), C(ldap_sha1), C(plaintext)'
+        C(portable_apache22) and C(host_apache24); or C(md5_crypt) and C(sha256_crypt),
+        which are Linux passwd hashes.  Only some schemes in addition to
+        the four choices below will be compatible with Apache or Nginx, and
+        supported schemes depend on passlib version and its dependencies.
+      - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
+      - 'Some of the available choices might be: C(apr_md5_crypt), C(des_crypt), C(ldap_sha1), C(plaintext).'
   state:
     type: str
     required: false
@@ -65,7 +73,9 @@ notes:
   - "On RHEL or CentOS: Enable EPEL, then install I(python-passlib)."
 requirements: [ passlib>=1.6 ]
 author: "Ansible Core Team"
-extends_documentation_fragment: files
+extends_documentation_fragment:
+  - files
+  - community.general.attributes
 '''
 
 EXAMPLES = """

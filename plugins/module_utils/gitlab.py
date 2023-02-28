@@ -110,3 +110,14 @@ def gitlab_authentication(module):
             GitLab remove Session API now that private tokens are removed from user API endpoints since version 10.2." % to_native(e))
 
     return gitlab_instance
+
+
+def filter_returned_variables(gitlab_variables):
+    # pop properties we don't know
+    existing_variables = [dict(x.attributes) for x in gitlab_variables]
+    KNOWN = ['key', 'value', 'masked', 'protected', 'variable_type', 'environment_scope']
+    for item in existing_variables:
+        for key in list(item.keys()):
+            if key not in KNOWN:
+                item.pop(key)
+    return existing_variables

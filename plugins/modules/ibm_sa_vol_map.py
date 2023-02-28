@@ -19,6 +19,12 @@ description:
     - "This module maps volumes to or unmaps them from the hosts on
         IBM Spectrum Accelerate Family storage systems."
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     vol:
         description:
@@ -55,8 +61,8 @@ options:
         type: str
 
 extends_documentation_fragment:
-- community.general.ibm_storage
-
+  - community.general.ibm_storage
+  - community.general.attributes
 
 author:
     - Tzur Eliyahu (@tzure)

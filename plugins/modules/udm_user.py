@@ -14,14 +14,19 @@ DOCUMENTATION = r'''
 ---
 module: udm_user
 author:
-- Tobias Rüetschi (@keachi)
+    - Tobias Rüetschi (@keachi)
 short_description: Manage posix users on a univention corporate server
 description:
     - "This module allows to manage posix users on a univention corporate
        server (UCS).
        It uses the python API of the UCS to create a new object or edit it."
-requirements:
-    - Python >= 2.6
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: partial
 options:
     state:
         default: "present"
@@ -78,6 +83,7 @@ options:
         description:
             - A list of e-mail addresses.
         type: list
+        elements: str
     employee_number:
         description:
             - Employee number
@@ -99,6 +105,7 @@ options:
                LDAP filter for each group as $GROUP:
                C((&(objectClass=posixGroup)(cn=$GROUP)))."
         type: list
+        elements: str
     home_share:
         description:
             - "Home NFS share. Must be a LDAP DN, e.g.
@@ -116,6 +123,7 @@ options:
             - List of private telephone numbers.
         aliases: [ homeTelephoneNumber ]
         type: list
+        elements: str
     homedrive:
         description:
             - Windows home drive, e.g. C("H:").
@@ -126,6 +134,7 @@ options:
             - List of alternative e-mail addresses.
         aliases: [ mailAlternativeAddress ]
         type: list
+        elements: str
     mail_home_server:
         description:
             - FQDN of mail server
@@ -142,6 +151,7 @@ options:
             - Mobile phone number
         aliases: [ mobileTelephoneNumber ]
         type: list
+        elements: str
     organisation:
         description:
             - Organisation
@@ -165,10 +175,12 @@ options:
             - List of pager telephone numbers.
         aliases: [ pagerTelephonenumber ]
         type: list
+        elements: str
     phone:
         description:
             - List of telephone numbers.
         type: list
+        elements: str
         default: []
     postcode:
         description:
@@ -201,12 +213,14 @@ options:
                join."
         aliases: [ sambaPrivileges ]
         type: list
+        elements: str
         default: []
     samba_user_workstations:
         description:
             - Allow the authentication only on this Microsoft Windows host.
         aliases: [ sambaUserWorkstations ]
         type: list
+        elements: str
         default: []
     sambahome:
         description:
@@ -221,11 +235,13 @@ options:
         description:
             - A list of superiors as LDAP DNs.
         type: list
+        elements: str
     serviceprovider:
         default: ['']
         description:
             - Enable user for the following service providers.
         type: list
+        elements: str
     shell:
         default: '/bin/bash'
         description:
@@ -333,7 +349,8 @@ def main():
             display_name=dict(type='str',
                               aliases=['displayName']),
             email=dict(default=[''],
-                       type='list'),
+                       type='list',
+                       elements='str'),
             employee_number=dict(type='str',
                                  aliases=['employeeNumber']),
             employee_type=dict(type='str',
@@ -341,18 +358,21 @@ def main():
             firstname=dict(type='str'),
             gecos=dict(type='str'),
             groups=dict(default=[],
-                        type='list'),
+                        type='list',
+                        elements='str'),
             home_share=dict(type='str',
                             aliases=['homeShare']),
             home_share_path=dict(type='str',
                                  aliases=['homeSharePath']),
             home_telephone_number=dict(default=[],
                                        type='list',
+                                       elements='str',
                                        aliases=['homeTelephoneNumber']),
             homedrive=dict(type='str'),
             lastname=dict(type='str'),
             mail_alternative_address=dict(default=[],
                                           type='list',
+                                          elements='str',
                                           aliases=['mailAlternativeAddress']),
             mail_home_server=dict(type='str',
                                   aliases=['mailHomeServer']),
@@ -360,6 +380,7 @@ def main():
                                       aliases=['mailPrimaryAddress']),
             mobile_telephone_number=dict(default=[],
                                          type='list',
+                                         elements='str',
                                          aliases=['mobileTelephoneNumber']),
             organisation=dict(type='str',
                               aliases=['organization']),
@@ -371,11 +392,13 @@ def main():
                                   aliases=['override_pw_length']),
             pager_telephonenumber=dict(default=[],
                                        type='list',
+                                       elements='str',
                                        aliases=['pagerTelephonenumber']),
             password=dict(type='str',
                           no_log=True),
             phone=dict(default=[],
-                       type='list'),
+                       type='list',
+                       elements='str'),
             postcode=dict(type='str'),
             primary_group=dict(type='str',
                                aliases=['primaryGroup']),
@@ -387,16 +410,20 @@ def main():
                              aliases=['roomNumber']),
             samba_privileges=dict(default=[],
                                   type='list',
+                                  elements='str',
                                   aliases=['sambaPrivileges']),
             samba_user_workstations=dict(default=[],
                                          type='list',
+                                         elements='str',
                                          aliases=['sambaUserWorkstations']),
             sambahome=dict(type='str'),
             scriptpath=dict(type='str'),
             secretary=dict(default=[],
-                           type='list'),
+                           type='list',
+                           elements='str'),
             serviceprovider=dict(default=[''],
-                                 type='list'),
+                                 type='list',
+                                 elements='str'),
             shell=dict(default='/bin/bash',
                        type='str'),
             street=dict(type='str'),

@@ -14,11 +14,18 @@ module: manageiq_alerts
 
 short_description: Configuration of alerts in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
 description:
   - The manageiq_alerts module supports adding, updating and deleting alerts in ManageIQ.
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
   state:

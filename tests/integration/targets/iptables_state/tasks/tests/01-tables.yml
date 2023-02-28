@@ -17,7 +17,7 @@
     path: "{{ iptables_saved }}"
   register: iptables_state
   changed_when: false
-  check_mode: yes
+  check_mode: true
 
 - name: "assert that results are as expected"
   assert:
@@ -25,7 +25,7 @@
       - "'*filter' in iptables_state.initial_state"
       - iptables_state.tables.filter is defined
       - iptables_state.tables.nat is undefined
-    quiet: yes
+    quiet: true
 
 
 
@@ -36,7 +36,7 @@
     path: "{{ iptables_saved }}"
   register: iptables_state
   changed_when: false
-  check_mode: yes
+  check_mode: true
 
 - name: "assert that results are as expected"
   assert:
@@ -45,7 +45,7 @@
       - "'*filter' in iptables_state.initial_state"
       - iptables_state.tables.nat is defined
       - iptables_state.tables.filter is undefined
-    quiet: yes
+    quiet: true
 
 
 
@@ -65,7 +65,7 @@
       - "'*nat' not in iptables_state.saved"
       - iptables_state.tables.filter is defined
       - iptables_state.tables.nat is undefined
-    quiet: yes
+    quiet: true
 
 
 
@@ -86,7 +86,7 @@
       - "'*filter' not in iptables_state.saved"
       - iptables_state.tables.nat is defined
       - iptables_state.tables.filter is undefined
-    quiet: yes
+    quiet: true
 
 
 
@@ -106,7 +106,7 @@
       - "'*nat' in iptables_state.saved"
       - iptables_state.tables.filter is defined
       - iptables_state.tables.nat is defined
-    quiet: yes
+    quiet: true
 
 
 
@@ -129,7 +129,7 @@
       - iptables_state.tables.nat is defined
       - iptables_state.tables.filter is undefined
       - iptables_state is not changed
-    quiet: yes
+    quiet: true
 
 
 
@@ -163,21 +163,20 @@
       - "'-A INPUT -j ACCEPT' not in iptables_state.restored"
       - iptables_state.tables.filter is undefined
       - iptables_state is changed
-    quiet: yes
+    quiet: true
 
 
 
-- name: "get security, raw and mangle tables states"
+- name: "get raw and mangle tables states"
   iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
     table: "{{ item }}"
   loop:
-    - security
     - raw
     - mangle
   changed_when: false
-  check_mode: yes
+  check_mode: true
 
 
 
@@ -198,9 +197,7 @@
       - "'*nat' in iptables_state.saved"
       - "'raw' in iptables_state.tables"
       - "'*raw' in iptables_state.saved"
-      - "'security' in iptables_state.tables"
-      - "'*security' in iptables_state.saved"
-    quiet: yes
+    quiet: true
 
 
 
@@ -233,19 +230,16 @@
       - "'*mangle' in iptables_state.initial_state"
       - "'*nat' in iptables_state.initial_state"
       - "'*raw' in iptables_state.initial_state"
-      - "'*security' in iptables_state.initial_state"
       - "'filter' in iptables_state.tables"
       - "'mangle' not in iptables_state.tables"
       - "'nat' not in iptables_state.tables"
       - "'raw' not in iptables_state.tables"
-      - "'security' not in iptables_state.tables"
       - "'*filter' in iptables_state.restored"
       - "'*mangle' not in iptables_state.restored"
       - "'*nat' not in iptables_state.restored"
       - "'*raw' not in iptables_state.restored"
-      - "'*security' not in iptables_state.restored"
       - iptables_state is not changed
-    quiet: yes
+    quiet: true
 
 
 
@@ -264,19 +258,16 @@
       - "'*mangle' in iptables_state.initial_state"
       - "'*nat' in iptables_state.initial_state"
       - "'*raw' in iptables_state.initial_state"
-      - "'*security' in iptables_state.initial_state"
       - "'filter' in iptables_state.tables"
       - "'mangle' in iptables_state.tables"
       - "'nat' in iptables_state.tables"
       - "'raw' in iptables_state.tables"
-      - "'security' in iptables_state.tables"
       - "'*filter' in iptables_state.restored"
       - "'*mangle' in iptables_state.restored"
       - "'*nat' in iptables_state.restored"
       - "'*raw' in iptables_state.restored"
-      - "'*security' in iptables_state.restored"
       - iptables_state is not changed
-    quiet: yes
+    quiet: true
 
 
 
@@ -288,7 +279,7 @@
   register: iptables_state
   async: "{{ ansible_timeout }}"
   poll: 0
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: "explain expected failure"
   assert:

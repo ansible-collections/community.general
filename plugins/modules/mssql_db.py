@@ -15,7 +15,14 @@ DOCUMENTATION = '''
 module: mssql_db
 short_description: Add or remove MSSQL databases from a remote host
 description:
-   - Add or remove MSSQL databases from a remote host.
+  - Add or remove MSSQL databases from a remote host.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:

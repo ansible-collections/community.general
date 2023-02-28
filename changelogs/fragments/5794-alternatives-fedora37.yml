@@ -1,0 +1,2 @@
+bugfixes:
+  - "alternatives - support subcommands on Fedora 37, which uses ``follower`` instead of ``slave`` (https://github.com/ansible-collections/community.general/pull/5794)."

@@ -16,8 +16,8 @@
     src:  "{{ filesize_testfile | basename }}"
     dest: "{{ filesize_testlink }}"
     state: link
-    force: yes
-    follow: no
+    force: true
+    follow: false
 
 
 
@@ -26,7 +26,7 @@
     path: "{{ filesize_testlink }}"
     size: "512 kB"
   register: filesize_test_symlink_01
-  check_mode: yes
+  check_mode: true
 
 - name: Create a file with a size of 512 kB (512000 bytes)
   community.general.filesize:
@@ -45,7 +45,7 @@
     path: "{{ filesize_testlink }}"
     size: "500 KiB"
   register: filesize_test_symlink_03
-  check_mode: yes
+  check_mode: true
 
 - name: Create a file with a size of 500 KiB (512000 bytes) (idempotency)
   community.general.filesize:
