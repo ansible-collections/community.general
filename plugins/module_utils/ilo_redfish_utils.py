@@ -1161,7 +1161,8 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Provided logical drives are already present in the server"
             }
 
-        response = self.check_smartstorage_physical_drive_count(raid_data, unused_physical_drives, "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
+        response = self.check_smartstorage_physical_drive_count(raid_data, unused_physical_drives,
+                   "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
