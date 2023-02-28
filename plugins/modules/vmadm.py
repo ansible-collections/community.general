@@ -16,6 +16,13 @@ short_description: Manage SmartOS virtual machines and zones
 description:
   - Manage SmartOS virtual machines through vmadm(1M).
 author: Jasper Lievisse Adriaanse (@jasperla)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   archive_on_delete:
     required: false
@@ -438,7 +445,7 @@ def get_vm_prop(module, uuid, prop):
 def get_vm_uuid(module, alias):
     # Lookup the uuid that goes with the given alias.
     # Returns the uuid or '' if not found.
-    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid', 'alias={1}'.format(alias)]
+    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid', 'alias={0}'.format(alias)]
 
     (rc, stdout, stderr) = module.run_command(cmd)
 

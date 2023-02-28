@@ -14,13 +14,19 @@ module: manageiq_tenant
 
 short_description: Management of tenants in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Evert Mulder (@evertmulder)
 description:
   - The manageiq_tenant module supports adding, updating and deleting tenants in ManageIQ.
 requirements:
-- manageiq-client
+  - manageiq-client
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     type: str

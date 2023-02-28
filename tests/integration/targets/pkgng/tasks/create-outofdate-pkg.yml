@@ -31,7 +31,7 @@
 - name: Find created package file
   find:
     path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
-    use_regex: yes
+    use_regex: true
     pattern: '.*\.(pkg|tzst|t[xbg]z|tar)'
   register: pkgng_test_outofdate_pkg_tempfile
 
@@ -42,7 +42,7 @@
 
 - name: Copy the created package file to the expected location
   copy:
-    remote_src: yes
+    remote_src: true
     src: '{{ pkgng_test_outofdate_pkg_tempfile.files[0].path }}'
     dest: '{{ pkgng_test_outofdate_pkg_path }}'
 

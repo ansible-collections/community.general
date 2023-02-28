@@ -8,3 +8,5 @@ destructive
 skip/aix
 skip/osx  # FIXME
 skip/rhel9.0  # FIXME
+skip/rhel9.1  # FIXME
+skip/freebsd12.4  # FIXME

@@ -30,6 +30,12 @@ description:
       SAML-specific settings on an OpenID Connect client for instance and vice versa. Be careful.
       If you do not specify a setting, usually a sensible default is chosen.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+
 options:
     state:
         description:
@@ -539,7 +545,8 @@ options:
                       client and signed by its key, base64-encoded.
 
 extends_documentation_fragment:
-- community.general.keycloak
+    - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Eike Frost (@eikef)
@@ -712,6 +719,7 @@ end_state:
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
+import copy
 
 
 def normalise_cr(clientrep, remove_ids=False):
@@ -750,7 +758,7 @@ def sanitize_cr(clientrep):
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict
     """
-    result = clientrep.copy()
+    result = copy.deepcopy(clientrep)
     if 'secret' in result:
         result['secret'] = 'no_log'
     if 'attributes' in result:

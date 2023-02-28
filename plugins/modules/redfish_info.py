@@ -21,6 +21,10 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
+attributes:
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
   category:
     required: false
@@ -58,6 +62,12 @@ options:
       - Timeout in seconds for HTTP requests to OOB controller.
     default: 10
     type: int
+  update_handle:
+    required: false
+    description:
+      - Handle to check the status of an update in progress.
+    type: str
+    version_added: '6.1.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -247,6 +257,15 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Get the status of an update operation
+    community.general.redfish_info:
+      category: Update
+      command: GetUpdateStatus
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      update_handle: /redfish/v1/TaskService/TaskMonitors/735
+
   - name: Get Manager Services
     community.general.redfish_info:
       category: Manager
@@ -324,7 +343,8 @@ CATEGORY_COMMANDS_ALL = {
                 "GetChassisThermals", "GetChassisInventory", "GetHealthReport"],
     "Accounts": ["ListUsers"],
     "Sessions": ["GetSessions"],
-    "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory"],
+    "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory",
+               "GetUpdateStatus"],
     "Manager": ["GetManagerNicInventory", "GetVirtualMedia", "GetLogs", "GetNetworkProtocols",
                 "GetHealthReport", "GetHostInterfaces", "GetManagerInventory"],
 }
@@ -350,7 +370,8 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=10)
+            timeout=dict(type='int', default=10),
+            update_handle=dict(),
         ),
         required_together=[
             ('username', 'password'),
@@ -371,6 +392,9 @@ def main():
 
     # timeout
     timeout = module.params['timeout']
+
+    # update handle
+    update_handle = module.params['update_handle']
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -482,6 +506,8 @@ def main():
                     result["software"] = rf_utils.get_software_inventory()
                 elif command == "GetFirmwareUpdateCapabilities":
                     result["firmware_update_capabilities"] = rf_utils.get_firmware_update_capabilities()
+                elif command == "GetUpdateStatus":
+                    result["update_status"] = rf_utils.get_update_status(update_handle)
 
         elif category == "Sessions":
             # execute only if we find SessionService resources

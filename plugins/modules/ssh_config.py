@@ -20,6 +20,13 @@ description:
 author:
     - Björn Andersson (@gaqzi)
     - Abhijeet Kasurde (@Akasurde)
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:
@@ -88,10 +95,13 @@ options:
       - If I(user) and this option are not specified, C(/etc/ssh/ssh_config) is used.
       - Mutually exclusive with I(user).
     type: path
+  host_key_algorithms:
+    description:
+      - Sets the C(HostKeyAlgorithms) option.
+    type: str
+    version_added: 6.1.0
 requirements:
 - StormSSH
-notes:
-- Supports check mode.
 '''
 
 EXAMPLES = r'''
@@ -164,6 +174,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
 class SSHConfig():
@@ -183,10 +194,7 @@ class SSHConfig():
         self.config.load()
 
     def check_ssh_config_path(self):
-        if self.user:
-            self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config')
-        elif self.config_file is None:
-            self.config_file = '/etc/ssh/ssh_config'
+        self.config_file = determine_config_file(self.user, self.config_file)
 
         # See if the identity file exists or not, relative to the config file
         if os.path.exists(self.config_file) and self.identity_file is not None:
@@ -207,6 +215,7 @@ class SSHConfig():
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
             proxycommand=self.params.get('proxycommand'),
+            host_key_algorithms=self.params.get('host_key_algorithms'),
         )
 
         # Convert True / False to 'yes' / 'no' for usage in ssh_config
@@ -297,6 +306,7 @@ def main():
             group=dict(default=None, type='str'),
             host=dict(type='str', required=True),
             hostname=dict(type='str'),
+            host_key_algorithms=dict(type='str', no_log=False),
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),

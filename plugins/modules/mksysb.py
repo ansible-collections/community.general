@@ -17,6 +17,13 @@ module: mksysb
 short_description: Generates AIX mksysb rootvg backups
 description:
   - This module manages a basic AIX mksysb (image) of rootvg.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   backup_crypt_files:
     description:
@@ -100,10 +107,6 @@ import os
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat
-)
 
 
 class MkSysB(ModuleHelper):

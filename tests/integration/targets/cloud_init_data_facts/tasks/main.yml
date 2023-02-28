@@ -29,6 +29,12 @@
       - cloud-init
       - udev
 
+  - name: Ensure systemd-network user exists
+    user:
+      name: systemd-network
+      state: present
+    when: ansible_distribution == 'Fedora' and ansible_distribution_major_version|int >= 37
+
   - name: setup run cloud-init
     service:
       name: cloud-init-local
@@ -36,7 +42,7 @@
 
   - name: test gather cloud-init facts in check mode
     cloud_init_data_facts:
-    check_mode: yes
+    check_mode: true
     register: result
   - name: verify test gather cloud-init facts in check mode
     assert:

@@ -14,13 +14,22 @@ DOCUMENTATION = r'''
 module: iso_create
 short_description: Generate ISO file with specified files or folders
 description:
-    - This module is used to generate ISO file with specified path of files.
+  - This module is used to generate ISO file with specified path of files.
 author:
-    - Diane Wang (@Tomorrow9) <dianew@vmware.com>
+  - Diane Wang (@Tomorrow9) <dianew@vmware.com>
 requirements:
-- "pycdlib"
-- "python >= 2.7"
+  - "pycdlib"
+  - "python >= 2.7"
 version_added: '0.2.0'
+
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
    src_files:

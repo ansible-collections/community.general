@@ -6,9 +6,9 @@
 - name: Verify package sentinel file is not present
   stat:
     path: '{{ pkgng_test_install_prefix | default("") }}{{ pkgng_test_pkg_sentinelfile_path }}'
-    get_attributes: no
-    get_checksum: no
-    get_mime: no
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
   register: pkgng_install_stat_before
 
 - name: Install package
@@ -23,21 +23,21 @@
   pkgng:
     <<: *pkgng_install_params
     state: absent
-  check_mode: yes
+  check_mode: true
   register: pkgng_install_checkmode
 
 - name: Install package (idempotent, cached)
   pkgng:
     <<: *pkgng_install_params
-    cached: yes
+    cached: true
   register: pkgng_install_idempotent_cached
 
 - name: Verify package sentinel file is present
   stat:
     path: '{{ pkgng_test_install_prefix | default("") }}{{ pkgng_test_pkg_sentinelfile_path }}'
-    get_attributes: no
-    get_checksum: no
-    get_mime: no
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
   register: pkgng_install_stat_after
 
 - name: Remove test package (if requested)

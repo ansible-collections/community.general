@@ -1,0 +1,2 @@
+deprecated_features:
+  - manageiq_tags - deprecate ``state=list`` in favour of using ``community.general.manageiq_tags_info`` (https://github.com/ansible-collections/community.general/pull/5727).

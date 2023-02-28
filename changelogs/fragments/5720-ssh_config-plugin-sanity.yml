@@ -1,0 +1,2 @@
+minor_changes:
+  - ssh_config - refactor code to module util to fix sanity check (https://github.com/ansible-collections/community.general/pull/5720).

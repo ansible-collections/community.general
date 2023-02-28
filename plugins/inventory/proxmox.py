@@ -277,6 +277,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
             a = self._get_session()
+
+            if a.verify is False:
+                from requests.packages.urllib3 import disable_warnings
+                disable_warnings()
+
             ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
 
             json = ret.json()
@@ -408,7 +413,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     stripped_value = value.strip()
                     if stripped_value:
                         parsed_key = key + "_parsed"
-                        properties[parsed_key] = [tag.strip() for tag in stripped_value.split(",")]
+                        properties[parsed_key] = [tag.strip() for tag in stripped_value.replace(',', ';').split(";")]
 
                 # The first field in the agent string tells you whether the agent is enabled
                 # the rest of the comma separated string is extra config for the agent.
@@ -615,7 +620,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for o in ('url', 'user', 'password', 'token_id', 'token_secret'):
             v = self.get_option(o)
             if self.templar.is_template(v):
-                v = self.templar.template(v, disable_looups=False)
+                v = self.templar.template(v, disable_lookups=False)
             setattr(self, 'proxmox_%s' % o, v)
 
         # some more cleanup and validation

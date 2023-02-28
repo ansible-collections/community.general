@@ -66,6 +66,59 @@
       - result.existing == {}
       - result.end_state.name == "{{ federation }}"
 
+- name: Create new user federation in admin realm
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ admin_realm }}"
+    name: "{{ federation }}"
+    state: present
+    provider_id: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      enabled: true
+      priority: 0
+      fullSyncPeriod: -1
+      changedSyncPeriod: -1
+      cachePolicy: DEFAULT
+      batchSizeForSync: 1000
+      editMode: READ_ONLY
+      importEnabled: true
+      syncRegistrations: false
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: "inetOrgPerson, organizationalPerson"
+      connectionUrl: "ldaps://ldap.example.com:636"
+      usersDn: "ou=Users,dc=example,dc=com"
+      authType: simple
+      bindDn: cn=directory reader
+      bindCredential: secret
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: "ldapsOnly"
+      connectionPooling: true
+      pagination: true
+      allowKerberosAuthentication: false
+      useKerberosForPasswordAuthentication: false
+      debug: false
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert user federation created (admin realm)
+  assert:
+    that:
+      - result is changed
+      - result.existing == {}
+      - result.end_state.name == "{{ federation }}"
+
 - name: Update existing user federation (no change)
   community.general.keycloak_user_federation:
     auth_keycloak_url: "{{ url }}"
@@ -121,6 +174,61 @@
       - result.end_state != {}
       - result.end_state.name == "{{ federation }}"
 
+- name: Update existing user federation (no change, admin realm)
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ admin_realm }}"
+    name: "{{ federation }}"
+    state: present
+    provider_id: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      enabled: true
+      priority: 0
+      fullSyncPeriod: -1
+      changedSyncPeriod: -1
+      cachePolicy: DEFAULT
+      batchSizeForSync: 1000
+      editMode: READ_ONLY
+      importEnabled: true
+      syncRegistrations: false
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: "inetOrgPerson, organizationalPerson"
+      connectionUrl: "ldaps://ldap.example.com:636"
+      usersDn: "ou=Users,dc=example,dc=com"
+      authType: simple
+      bindDn: cn=directory reader
+      bindCredential: "**********"
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: "ldapsOnly"
+      connectionPooling: true
+      pagination: true
+      allowKerberosAuthentication: false
+      useKerberosForPasswordAuthentication: false
+      debug: false
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert user federation unchanged (admin realm)
+  assert:
+    that:
+      - result is not changed
+      - result.existing != {}
+      - result.existing.name == "{{ federation }}"
+      - result.end_state != {}
+      - result.end_state.name == "{{ federation }}"
+
 - name: Update existing user federation (with change)
   community.general.keycloak_user_federation:
     auth_keycloak_url: "{{ url }}"
@@ -162,6 +270,14 @@
       useKerberosForPasswordAuthentication: false
       debug: false
     mappers:
+      # overwrite / update pre existing default mapper
+      - name: "username"
+        providerId: "user-attribute-ldap-mapper"
+        config:
+          ldap.attribute: ldap_user
+          user.model.attribute: usr
+          read.only: true
+      # create new mapper
       - name: "full name"
         providerId: "full-name-ldap-mapper"
         providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
@@ -227,3 +343,83 @@
       - result is not changed
       - result.existing == {}
       - result.end_state == {}
+
+- name: Create new user federation together with mappers
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ federation }}"
+    state: present
+    provider_id: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      enabled: true
+      priority: 0
+      fullSyncPeriod: -1
+      changedSyncPeriod: -1
+      cachePolicy: DEFAULT
+      batchSizeForSync: 1000
+      editMode: READ_ONLY
+      importEnabled: true
+      syncRegistrations: false
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: "inetOrgPerson, organizationalPerson"
+      connectionUrl: "ldaps://ldap.example.com:636"
+      usersDn: "ou=Users,dc=example,dc=com"
+      authType: simple
+      bindDn: cn=directory reader
+      bindCredential: secret
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: "ldapsOnly"
+      connectionPooling: true
+      pagination: true
+      allowKerberosAuthentication: false
+      useKerberosForPasswordAuthentication: false
+      debug: false
+    mappers:
+      # overwrite / update pre existing default mapper
+      - name: "username"
+        providerId: "user-attribute-ldap-mapper"
+        config:
+          ldap.attribute: ldap_user
+          user.model.attribute: usr
+          read.only: true
+      # create new mapper
+      - name: "full name"
+        providerId: "full-name-ldap-mapper"
+        providerType: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        config:
+          ldap.full.name.attribute: cn
+          read.only: true
+          write.only: false
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert user federation created
+  assert:
+    that:
+      - result is changed
+      - result.existing == {}
+      - result.end_state.name == "{{ federation }}"
+
+## no point in retesting this, just doing it to clean up introduced server changes
+- name: Delete absent user federation
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ federation }}"
+    state: absent

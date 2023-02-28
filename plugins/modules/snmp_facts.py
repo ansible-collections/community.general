@@ -24,6 +24,10 @@ extends_documentation_fragment:
     - community.general.attributes
     - community.general.attributes.facts
     - community.general.attributes.facts_module
+attributes:
+    check_mode:
+        version_added: 3.3.0
+        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 options:
     host:
         description:
@@ -183,20 +187,14 @@ ansible_interfaces:
 '''
 
 import binascii
-import traceback
 from collections import defaultdict
+from ansible_collections.community.general.plugins.module_utils import deps
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_text
 
-PYSNMP_IMP_ERR = None
-try:
+with deps.declare("pysnmp"):
     from pysnmp.entity.rfc3413.oneliner import cmdgen
     from pysnmp.proto.rfc1905 import EndOfMibView
-    HAS_PYSNMP = True
-except Exception:
-    PYSNMP_IMP_ERR = traceback.format_exc()
-    HAS_PYSNMP = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_text
 
 
 class DefineOid(object):
@@ -299,8 +297,7 @@ def main():
 
     m_args = module.params
 
-    if not HAS_PYSNMP:
-        module.fail_json(msg=missing_required_lib('pysnmp'), exception=PYSNMP_IMP_ERR)
+    deps.validate(module)
 
     cmdGen = cmdgen.CommandGenerator()
     transport_opts = dict((k, m_args[k]) for k in ('timeout', 'retries') if m_args[k] is not None)

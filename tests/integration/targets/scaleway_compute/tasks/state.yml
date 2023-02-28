@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a server (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
@@ -61,7 +61,7 @@
       - server_creation_confirmation_task is not changed
 
 - name: Patch server tags (Check)
-  check_mode: yes
+  check_mode: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
@@ -124,7 +124,7 @@
       - server_patching_confirmation_task is not changed
 
 - name: Run it (Check mode)
-  check_mode: yes
+  check_mode: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: running
@@ -187,7 +187,7 @@
       - server_run_confirmation_task is not changed
 
 - name: Reboot it (Check mode)
-  check_mode: yes
+  check_mode: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: restarted
@@ -229,7 +229,7 @@
       - server_reboot_task is changed
 
 - name: Stop it (Check mode)
-  check_mode: yes
+  check_mode: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: stopped
@@ -292,7 +292,7 @@
       - server_stop_confirmation_task is not changed
 
 - name: Destroy it (Check mode)
-  check_mode: yes
+  check_mode: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: absent
@@ -355,7 +355,7 @@
       - server_destroy_confirmation_task is not changed
 
 - name: Testing for unauthorized organization
-  ignore_errors: yes
+  ignore_errors: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
@@ -373,7 +373,7 @@
       - unauthorized_organization_task is not changed
 
 - name: Testing for unexisting image
-  ignore_errors: yes
+  ignore_errors: true
   scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present

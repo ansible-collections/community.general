@@ -265,6 +265,8 @@ files:
     maintainers: delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
+  $module_utils/deps.py:
+    maintainers: russoz
   $module_utils/gconftool2.py:
     labels: gconftool2
     maintainers: russoz
@@ -279,9 +281,14 @@ files:
     maintainers: $team_huawei
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak
+  $module_utils/identity/keycloak/keycloak_clientsecret.py:
+    maintainers: $team_keycloak fynncfchen johncant
   $module_utils/ipa.py:
     labels: ipa
     maintainers: $team_ipa
+  $module_utils/jenkins.py:
+    labels: jenkins
+    maintainers: russoz
   $module_utils/manageiq.py:
     labels: manageiq
     maintainers: $team_manageiq
@@ -302,6 +309,9 @@ files:
   $module_utils/pipx.py:
     labels: pipx
     maintainers: russoz
+  $module_utils/puppet.py:
+    labels: puppet
+    maintainers: russoz
   $module_utils/pure.py:
     labels: pure pure_storage
     maintainers: $team_purestorage
@@ -313,6 +323,8 @@ files:
   $module_utils/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
+  $module_utils/ssh.py:
+    maintainers: russoz
   $module_utils/storage/hpe3par/hpe3par.py:
     maintainers: farhan7500 gautamphegde
   $module_utils/utm_utils.py:
@@ -428,7 +440,7 @@ files:
     labels: datadog_event
     maintainers: n0ts
   $modules/datadog_monitor.py:
-    maintainers: skornehl
+    ignore: skornehl
   $modules/dconf.py:
     maintainers: azaghal
   $modules/deploy_helper.py:
@@ -522,8 +534,6 @@ files:
     maintainers: zimbatm
   $modules/gunicorn.py:
     maintainers: agmezr
-  $modules/hana_query.py:
-    maintainers: rainerleber
   $modules/haproxy.py:
     maintainers: ravibhure Normo
   $modules/heroku_collaborator.py:
@@ -665,6 +675,10 @@ files:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope.py:
     maintainers: Gaetan2907
+  $modules/keycloak_clientsecret_info.py:
+    maintainers: fynncfchen johncant
+  $modules/keycloak_clientsecret_regenerate.py:
+    maintainers: fynncfchen johncant
   $modules/keycloak_group.py:
     maintainers: adamgoossens
   $modules/keycloak_identity_provider.py:
@@ -814,6 +828,10 @@ files:
     maintainers: shane-walker xcambar
   $modules/nsupdate.py:
     maintainers: nerzhul
+  $modules/ocapi_command.py:
+    maintainers: $team_wdc
+  $modules/ocapi_info.py:
+    maintainers: $team_wdc
   $modules/oci_vcn.py:
     maintainers: $team_oracle rohitChaware
   $modules/odbc.py:
@@ -1019,7 +1037,7 @@ files:
     maintainers: dagwieers
   $modules/redfish_:
     ignore: jose-delarosa
-    maintainers: $team_redfish
+    maintainers: $team_redfish TSKushal
   $modules/redhat_subscription.py:
     labels: redhat_subscription
     maintainers: barnabycourt alikins kahowell
@@ -1068,10 +1086,6 @@ files:
     maintainers: nerzhul
   $modules/runit.py:
     maintainers: jsumners
-  $modules/sap_task_list_execute:
-    maintainers: rainerleber
-  $modules/sapcar_extract.py:
-    maintainers: RainerLeber
   $modules/say.py:
     maintainers: $team_ansible_core
     ignore: mpdehaan

@@ -23,6 +23,15 @@ requirements:
   - "python >= 2.7"
 version_added: '5.8.0'
 
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
 options:
   src_iso:
     description:
@@ -97,18 +106,13 @@ dest_iso:
 '''
 
 import os
-import traceback
 
-PYCDLIB_IMP_ERR = None
-try:
-    import pycdlib
-    HAS_PYCDLIB = True
-except ImportError:
-    PYCDLIB_IMP_ERR = traceback.format_exc()
-    HAS_PYCDLIB = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.general.plugins.module_utils import deps
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+
+with deps.declare("pycdlib"):
+    import pycdlib
 
 
 # The upper dir exist, we only add subdirectoy
@@ -306,9 +310,7 @@ def main():
         required_one_of=[('delete_files', 'add_files'), ],
         supports_check_mode=True,
     )
-    if not HAS_PYCDLIB:
-        module.fail_json(
-            missing_required_lib('pycdlib'), exception=PYCDLIB_IMP_ERR)
+    deps.validate(module)
 
     src_iso = module.params['src_iso']
     if not os.path.exists(src_iso):

@@ -8,8 +8,10 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
+import os
 import socket
 import ssl
+import json
 
 from ansible.module_utils.urls import generic_urlparse
 from ansible.module_utils.six.moves.urllib.parse import urlparse
@@ -19,8 +21,6 @@ from ansible.module_utils.common.text.converters import to_text
 # httplib/http.client connection using unix domain socket
 HTTPConnection = http_client.HTTPConnection
 HTTPSConnection = http_client.HTTPSConnection
-
-import json
 
 
 class UnixHTTPConnection(HTTPConnection):
@@ -60,7 +60,7 @@ class LXDClient(object):
             self.cert_file = cert_file
             self.key_file = key_file
             parts = generic_urlparse(urlparse(self.url))
-            ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
             ctx.load_cert_chain(cert_file, keyfile=key_file)
             self.connection = HTTPSConnection(parts.get('netloc'), context=ctx)
         elif url.startswith('unix:'):
@@ -124,3 +124,11 @@ class LXDClient(object):
         if err is None:
             err = resp_json.get('error', None)
         return err
+
+
+def default_key_file():
+    return os.path.expanduser('~/.config/lxc/client.key')
+
+
+def default_cert_file():
+    return os.path.expanduser('~/.config/lxc/client.crt')

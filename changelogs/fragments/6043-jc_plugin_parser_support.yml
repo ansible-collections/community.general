@@ -1,0 +1,2 @@
+minor_changes:
+  - jc filter plugin - added the ability to use parser plugins (https://github.com/ansible-collections/community.general/pull/6043).

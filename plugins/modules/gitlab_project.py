@@ -26,6 +26,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   group:
@@ -172,6 +179,78 @@ options:
       - This option is only used on creation, not for updates. This is also only used if I(initialize_with_readme=true).
     type: str
     version_added: "4.2.0"
+  builds_access_level:
+    description:
+      - C(private) means that repository CI/CD is allowed only to project members.
+      - C(disabled) means that repository CI/CD is disabled.
+      - C(enabled) means that repository CI/CD is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.2.0"
+  forking_access_level:
+    description:
+      - C(private) means that repository forks is allowed only to project members.
+      - C(disabled) means that repository forks are disabled.
+      - C(enabled) means that repository forks are enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.2.0"
+  container_registry_access_level:
+    description:
+      - C(private) means that container registry is allowed only to project members.
+      - C(disabled) means that container registry is disabled.
+      - C(enabled) means that container registry is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.2.0"
+  releases_access_level:
+    description:
+      - C(private) means that accessing release is allowed only to project members.
+      - C(disabled) means that accessing release is disabled.
+      - C(enabled) means that accessing release is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.4.0"
+  environments_access_level:
+    description:
+      - C(private) means that deployment to environment is allowed only to project members.
+      - C(disabled) means that deployment to environment is disabled.
+      - C(enabled) means that deployment to environment is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.4.0"
+  feature_flags_access_level:
+    description:
+      - C(private) means that feature rollout is allowed only to project members.
+      - C(disabled) means that feature rollout is disabled.
+      - C(enabled) means that feature rollout is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.4.0"
+  infrastructure_access_level:
+    description:
+      - C(private) means that configuring infrastructure is allowed only to project members.
+      - C(disabled) means that configuring infrastructure is disabled.
+      - C(enabled) means that configuring infrastructure is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.4.0"
+  monitor_access_level:
+    description:
+      - C(private) means that monitoring health is allowed only to project members.
+      - C(disabled) means that monitoring health is disabled.
+      - C(enabled) means that monitoring health is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.4.0"
+  security_and_compliance_access_level:
+    description:
+      - C(private) means that accessing security and complicance tab is allowed only to project members.
+      - C(disabled) means that accessing security and complicance tab is disabled.
+      - C(enabled) means that accessing security and complicance tab is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "6.4.0"
 '''
 
 EXAMPLES = r'''
@@ -287,6 +366,15 @@ class GitLabProject(object):
             'squash_option': options['squash_option'],
             'ci_config_path': options['ci_config_path'],
             'shared_runners_enabled': options['shared_runners_enabled'],
+            'builds_access_level': options['builds_access_level'],
+            'forking_access_level': options['forking_access_level'],
+            'container_registry_access_level': options['container_registry_access_level'],
+            'releases_access_level': options['releases_access_level'],
+            'environments_access_level': options['environments_access_level'],
+            'feature_flags_access_level': options['feature_flags_access_level'],
+            'infrastructure_access_level': options['infrastructure_access_level'],
+            'monitor_access_level': options['monitor_access_level'],
+            'security_and_compliance_access_level': options['security_and_compliance_access_level'],
         }
         # Because we have already call userExists in main()
         if self.project_object is None:
@@ -417,6 +505,15 @@ def main():
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
         avatar_path=dict(type='path'),
+        builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        forking_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        container_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        releases_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        environments_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        feature_flags_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        infrastructure_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
     ))
 
     module = AnsibleModule(
@@ -464,6 +561,15 @@ def main():
     shared_runners_enabled = module.params['shared_runners_enabled']
     avatar_path = module.params['avatar_path']
     default_branch = module.params['default_branch']
+    builds_access_level = module.params['builds_access_level']
+    forking_access_level = module.params['forking_access_level']
+    container_registry_access_level = module.params['container_registry_access_level']
+    releases_access_level = module.params['releases_access_level']
+    environments_access_level = module.params['environments_access_level']
+    feature_flags_access_level = module.params['feature_flags_access_level']
+    infrastructure_access_level = module.params['infrastructure_access_level']
+    monitor_access_level = module.params['monitor_access_level']
+    security_and_compliance_access_level = module.params['security_and_compliance_access_level']
 
     if default_branch and not initialize_with_readme:
         module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
@@ -533,6 +639,15 @@ def main():
             "ci_config_path": ci_config_path,
             "shared_runners_enabled": shared_runners_enabled,
             "avatar_path": avatar_path,
+            "builds_access_level": builds_access_level,
+            "forking_access_level": forking_access_level,
+            "container_registry_access_level": container_registry_access_level,
+            "releases_access_level": releases_access_level,
+            "environments_access_level": environments_access_level,
+            "feature_flags_access_level": feature_flags_access_level,
+            "infrastructure_access_level": infrastructure_access_level,
+            "monitor_access_level": monitor_access_level,
+            "security_and_compliance_access_level": security_and_compliance_access_level,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)

@@ -14,8 +14,15 @@ module: github_repo
 short_description: Manage your repositories on Github
 version_added: 2.2.0
 description:
-- Manages Github repositories using PyGithub library.
-- Authentication can be done with I(access_token) or with I(username) and I(password).
+  - Manages Github repositories using PyGithub library.
+  - Authentication can be done with I(access_token) or with I(username) and I(password).
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   username:
     description:
@@ -89,7 +96,6 @@ notes:
 - For Python 3, PyGithub>=1.54 should be used.
 - "For Python 3.5, PyGithub==1.54 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020)."
 - "For Python 2.7, PyGithub==1.45 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019)."
-- Supports C(check_mode).
 author:
 - Álvaro Torres Cogollo (@atorrescogollo)
 '''

@@ -1,0 +1,2 @@
+bugfixes:
+  - "jenkins_plugin - fix error due to undefined variable when updates file is not downloaded (https://github.com/ansible-collections/community.general/pull/6100)."

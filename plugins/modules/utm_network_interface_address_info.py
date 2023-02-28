@@ -20,6 +20,10 @@ short_description: Get info for a network/interface_address object
 description:
     - Get info for a network/interface_address object in SOPHOS UTM.
 
+attributes:
+    check_mode:
+        version_added: 3.3.0
+        # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
 
 options:
     name:

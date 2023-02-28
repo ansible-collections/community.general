@@ -25,6 +25,13 @@ notes:
     - See C(man ufw) for more examples.
 requirements:
     - C(ufw) package
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   state:
     description:

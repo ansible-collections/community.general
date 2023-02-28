@@ -18,6 +18,12 @@ description:
     - A module to manage Pritunl users using the Pritunl API.
 extends_documentation_fragment:
     - community.general.pritunl
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
     organization:
         type: str
@@ -336,7 +342,7 @@ def main():
             user_gravatar=dict(required=False, type="bool", default=None),
             user_mac_addresses=dict(required=False, type="list", elements="str", default=None),
         )
-    ),
+    )
 
     module = AnsibleModule(argument_spec=argument_spec)
 

@@ -14,6 +14,11 @@ module: rax_clb_nodes
 short_description: Add, modify and remove nodes from a Rackspace Cloud Load Balancer
 description:
   - Adds, modifies and removes nodes from a Rackspace Cloud Load Balancer
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   address:
     type: str
@@ -85,8 +90,9 @@ options:
       - Virtualenv to execute this module in
 author: "Lukasz Kawczynski (@neuroid)"
 extends_documentation_fragment:
-- community.general.rackspace
-- community.general.rackspace.openstack
+  - community.general.rackspace
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

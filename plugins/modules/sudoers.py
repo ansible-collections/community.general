@@ -19,6 +19,13 @@ description:
   - This module allows for the manipulation of sudoers files.
 author:
   - "Jon Ellis (@JonEllis) <ellis.jp@gmail.com>"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   commands:
     description:
@@ -43,6 +50,18 @@ options:
       - Whether a password will be required to run the sudo'd command.
     default: true
     type: bool
+  setenv:
+    description:
+      - Whether to allow keeping the environment when command is run with sudo.
+    default: false
+    type: bool
+    version_added: 6.3.0
+  host:
+    description:
+      - Specify the host the rule is for.
+    default: ALL
+    type: str
+    version_added: 6.2.0
   runas:
     description:
       - Specify the target user the command(s) will run as.
@@ -95,10 +114,11 @@ EXAMPLES = '''
 
 - name: >-
     Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics
-    without requiring a password
+    without requiring a password on the host called webserver
   community.general.sudoers:
     name: monitor-app
     group: monitoring
+    host: webserver
     commands: /usr/local/bin/gather-app-metrics
 
 - name: >-
@@ -116,6 +136,13 @@ EXAMPLES = '''
   community.general.sudoers:
     name: alice-service
     state: absent
+
+- name: Allow alice to sudo /usr/local/bin/upload and keep env variables
+  community.general.sudoers:
+    name: allow-alice-upload
+    user: alice
+    commands: /usr/local/bin/upload
+    setenv: true
 '''
 
 import os
@@ -136,6 +163,8 @@ class Sudoers(object):
         self.group = module.params['group']
         self.state = module.params['state']
         self.nopassword = module.params['nopassword']
+        self.setenv = module.params['setenv']
+        self.host = module.params['host']
         self.runas = module.params['runas']
         self.sudoers_path = module.params['sudoers_path']
         self.file = os.path.join(self.sudoers_path, self.name)
@@ -177,8 +206,16 @@ class Sudoers(object):
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
+        setenv_str = 'SETENV:' if self.setenv else ''
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
-        return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
+        return "{owner} {host}={runas}{nopasswd}{setenv} {commands}\n".format(
+            owner=owner,
+            host=self.host,
+            runas=runas_str,
+            nopasswd=nopasswd_str,
+            setenv=setenv_str,
+            commands=commands_str
+        )
 
     def validate(self):
         if self.validation == 'absent':
@@ -224,6 +261,14 @@ def main():
         'nopassword': {
             'type': 'bool',
             'default': True,
+        },
+        'setenv': {
+            'type': 'bool',
+            'default': False,
+        },
+        'host': {
+            'type': 'str',
+            'default': 'ALL',
         },
         'runas': {
             'type': 'str',

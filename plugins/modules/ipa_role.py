@@ -14,6 +14,11 @@ author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA role
 description:
 - Add, modify and delete a role within FreeIPA server using FreeIPA API.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   cn:
     description:
@@ -79,7 +84,8 @@ options:
     type: list
     elements: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 

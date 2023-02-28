@@ -15,11 +15,18 @@ module: manageiq_policies
 
 short_description: Management of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
-- community.general.manageiq
+  - community.general.manageiq
+  - community.general.attributes
 
 author: Daniel Korn (@dkorn)
 description:
   - The manageiq_policies module supports adding and deleting policy_profiles in ManageIQ.
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -27,7 +34,10 @@ options:
     description:
       - C(absent) - policy_profiles should not exist,
       - C(present) - policy_profiles should exist,
-      - C(list) - list current policy_profiles and policies.
+      - >
+        C(list) - list current policy_profiles and policies.
+        This state is deprecated and will be removed 8.0.0.
+        Please use the module M(community.general.manageiq_policies_info) instead.
     choices: ['absent', 'present', 'list']
     default: 'present'
   policy_profiles:
@@ -77,17 +87,6 @@ EXAMPLES = '''
     resource_type: 'provider'
     policy_profiles:
       - name: openscap profile
-    manageiq_connection:
-      url: 'http://127.0.0.1:3000'
-      username: 'admin'
-      password: 'smartvm'
-      validate_certs: false
-
-- name: List current policy_profile and policies for a provider in ManageIQ
-  community.general.manageiq_policies:
-    state: list
-    resource_name: 'EngLab'
-    resource_type: 'provider'
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
@@ -162,6 +161,13 @@ def main():
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
+
+    if state == "list":
+        module.deprecate(
+            'The value "list" for "state" is deprecated. Please use community.general.manageiq_policies_info instead.',
+            version='8.0.0',
+            collection_name='community.general'
+        )
 
     # get the action and resource type
     action = actions[state]

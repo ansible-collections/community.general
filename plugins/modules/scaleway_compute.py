@@ -21,8 +21,14 @@ author: Remy Leone (@remyleone)
 description:
     - "This module manages compute instances on Scaleway."
 extends_documentation_fragment:
-- community.general.scaleway
+    - community.general.scaleway
+    - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
 
@@ -177,7 +183,6 @@ import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves.urllib.parse import quote as urlquote
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 
 SCALEWAY_SERVER_STATES = (

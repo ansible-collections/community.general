@@ -22,7 +22,7 @@
   wakeonlan:
     mac: 00-00-5E-00-53-66-AB
     port: 9
-  ignore_errors: yes
+  ignore_errors: true
   register: incorrect_mac_length
 
 - name: Check error message
@@ -35,7 +35,7 @@
   wakeonlan:
     mac: ZW-YX-WV-UT-SR-QP
     port: 9
-  ignore_errors: yes
+  ignore_errors: true
   register: incorrect_mac_format
 
 - name: Check error message
@@ -48,7 +48,7 @@
   wakeonlan:
     mac: 00-00-5E-00-53-66
     broadcast: 345.567.678.890
-  ignore_errors: yes
+  ignore_errors: true
   register: incorrect_broadcast_address
 
 - name: Check error message

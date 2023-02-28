@@ -26,6 +26,13 @@ requirements:
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -99,8 +106,6 @@ options:
           - The scope for the variable.
         type: str
         default: '*'
-notes:
-- Supports I(check_mode).
 '''
 
 
@@ -165,7 +170,7 @@ from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
 )
 
 
@@ -296,11 +301,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     before = [x.attributes for x in gitlab_keys]
 
     gitlab_keys = this_gitlab.list_all_group_variables()
-    existing_variables = [x.attributes for x in gitlab_keys]
-
-    # preprocessing:filter out and enrich before compare
-    for item in existing_variables:
-        item.pop('group_id')
+    existing_variables = filter_returned_variables(gitlab_keys)
 
     for item in requested_variables:
         item['key'] = item.pop('name')
@@ -331,9 +332,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         if purge:
             # refetch and filter
             gitlab_keys = this_gitlab.list_all_group_variables()
-            existing_variables = [x.attributes for x in gitlab_keys]
-            for item in existing_variables:
-                item.pop('group_id')
+            existing_variables = filter_returned_variables(gitlab_keys)
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:

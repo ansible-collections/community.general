@@ -35,12 +35,13 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import c
 
 
 class MSimple(ModuleHelper):
-    output_params = ('a', 'b', 'c')
+    output_params = ('a', 'b', 'c', 'm')
     module = dict(
         argument_spec=dict(
             a=dict(type='int', default=0),
             b=dict(type='str'),
             c=dict(type='str'),
+            m=dict(type='str'),
         ),
         supports_check_mode=True,
     )
@@ -56,6 +57,8 @@ class MSimple(ModuleHelper):
             self.vars['c'] = str(self.vars.c) * 3
 
     def __run__(self):
+        if self.vars.m:
+            self.vars.msg = self.vars.m
         if self.vars.a >= 100:
             raise Exception("a >= 100")
         if self.vars.c == "abc change":

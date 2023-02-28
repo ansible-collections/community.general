@@ -15,6 +15,11 @@ short_description: Manage FreeIPA password policies
 description:
 - Add, modify, or delete a password policy using the IPA API.
 version_added: 2.0.0
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     group:
         description:
@@ -60,9 +65,8 @@ options:
         description: Period (in seconds) for which users are locked out.
         type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
-notes:
-- Supports C(check_mode).
+  - community.general.ipa.documentation
+  - community.general.attributes
 '''
 
 EXAMPLES = r'''

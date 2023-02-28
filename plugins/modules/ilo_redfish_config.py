@@ -15,6 +15,13 @@ description:
   - Builds Redfish URIs locally and sends them to iLO to
     set or update a configuration attribute.
   - For use with HPE iLO operations that require Redfish OEM extensions.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true
@@ -125,7 +132,7 @@ def main():
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
             attribute_name=dict(required=True),
-            attribute_value=dict(),
+            attribute_value=dict(type='str'),
             timeout=dict(type='int', default=10)
         ),
         required_together=[

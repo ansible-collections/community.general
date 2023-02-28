@@ -22,9 +22,15 @@ description:
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.scaleway_waitable_resource
+  - community.general.attributes
 requirements:
   - passlib[argon2] >= 1.7.4
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -200,7 +206,7 @@ container:
 from copy import deepcopy
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
+    SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
     scaleway_waitable_resource_argument_spec, resource_attributes_should_be_changed,
     SecretVariables
 )
