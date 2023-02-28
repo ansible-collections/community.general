@@ -167,14 +167,6 @@ EXAMPLES = '''
               DataDriveInterfaceType: SAS
               DataDriveMinimumSizeGiB: 0
 
-  - name: Check server reboot status
-    community.general.ilo_redfish_command:
-      category: Systems
-      command: CheckiLORebootStatus
-      baseuri: "***.***.***.***"
-      username: "abcxyz"
-      password: "******"
-
   - name: Get specified logical drives details
     community.general.ilo_redfish_command:
       category: Systems
@@ -220,7 +212,7 @@ except ImportError as e:
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["VerifySmartStorageLogicalDrives", "VerifyUefiBootOrder",
-                "VerifySpecifiedSmartStorageLogicalDrives", "CheckiLORebootStatus", "GetSpecifiedSmartStorageLogicalDrives"]
+                "VerifySpecifiedSmartStorageLogicalDrives", "GetSpecifiedSmartStorageLogicalDrives"]
 }
 
 
@@ -318,8 +310,6 @@ def main():
                     result[command]['msg'] = "uefi_boot_order params is required"
                     module.fail_json(result)
                 result[command] = rf_utils.verify_uefi_boot_order(module.params["uefi_boot_order"])
-            elif command == "CheckiLORebootStatus":
-                result[command] = rf_utils.check_reboot_status()
             elif command == "GetSpecifiedSmartStorageLogicalDrives":
                 if not module.params["logical_drives_names"]:
                     result[command]['ret'] = False
