@@ -319,73 +319,6 @@ class iLORedfishUtils(RedfishUtils):
         }
         # return result
 
-    def get_snmpv3_users(self):
-        # This method returns list of SNMPv3 users
-        snmpv3_users = []
-
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if not response["ret"]:
-            return response
-
-        response = self.get_request(self.root_uri + self.manager_uri + "SnmpService/SNMPUsers/")
-        if not response["ret"]:
-            return response
-
-        snmp_list = response["data"]
-
-        for item in snmp_list["Members"]:
-            item_response = self.get_request(
-                self.root_uri + item["@odata.id"]
-            )
-            if not item_response["ret"]:
-                return item_response
-
-            output = self.remove_odata(item_response["data"])
-            snmpv3_users.append(output)
-
-        return {
-            "ret": True,
-            "msg": snmpv3_users
-        }
-
-    def get_snmp_alert_destinations(self):
-        # This method returns list of SNMP alert destinations
-        alert_destinations = []
-
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if not response["ret"]:
-            return response
-
-        response = self.get_request(self.root_uri + self.manager_uri + "SnmpService/SNMPAlertDestinations/")
-        if not response["ret"]:
-            return response
-
-        snmp_list = response["data"]
-        for item in snmp_list["Members"]:
-            item_response = self.get_request(
-                self.root_uri + item["@odata.id"]
-            )
-            if not item_response["ret"]:
-                return item_response
-
-            # Remove odata details
-            output = self.remove_odata(item_response["data"])
-
-            # Get SNMPv3 users details attached to alert destination
-            if "SNMPv3User" in output:
-                response = self.get_request(
-                    self.root_uri + output["SNMPv3User"]["@odata.id"]
-                )
-                if not response["ret"]:
-                    return response
-                output["SNMPv3User"] = self.remove_odata(response["data"])
-            alert_destinations.append(output)
-
-        return {
-            "ret": True,
-            "msg": alert_destinations
-        }
-
     def remove_odata(self, output):
         # Remove odata variables given in the list
         remove_list = ["@odata.context", "@odata.etag", "@odata.id", "@odata.type"]
@@ -575,7 +508,7 @@ class iLORedfishUtils(RedfishUtils):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified %s" % mgrattr['mgr_attr_name']}
 
-    def verify_drive_count(self, raid_details, logical_drives_count):
+    def verify_smartstorage_drive_count(self, raid_details, logical_drives_count):
         if len(raid_details) != logical_drives_count:
             return {
                 "ret": False,
@@ -587,7 +520,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "Drive count is same as input"
         }
 
-    def verify_logical_drives(self, raid_details, check_length=False):
+    def verify_smartstorage_logical_drives(self, raid_details, check_length=False):
         # This method verifies logical drives present in the OOB controller against the provided input
         result = self.get_smartstorage_logical_drives()
         if not result["ret"]:
@@ -596,7 +529,7 @@ class iLORedfishUtils(RedfishUtils):
         logical_drives_details = result["msg"]["logical_drives_details"]
         logical_drives_count = int(len(logical_drives_details))
         if check_length:
-            response = self.verify_drive_count(raid_details, logical_drives_count)
+            response = self.verify_smartstorage_drive_count(raid_details, logical_drives_count)
             if not response["ret"]:
                 return response
 
@@ -696,7 +629,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "Input Boot Order matches with the Server Boot Order"
         }
 
-    def delete_all_logical_drives(self):
+    def delete_all_smartstorage_logical_drives(self):
         # This function deletes all the logical drives
         response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
@@ -727,7 +660,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "Delete logical drives request sent. System Reset required."
         }
 
-    def get_unused_drives(self):
+    def get_unused_smartstorage_drives(self):
         # This function fetches the unconfigured drives
         unused_physical_drives = []
 
@@ -785,10 +718,10 @@ class iLORedfishUtils(RedfishUtils):
             "unused_physical_drives": unused_physical_drives
         }
 
-    def validation_error(self, raid, input_list, missing_param, not_defined, drive_input, command="CreateLogicalDrives"):
+    def validation_error(self, raid, input_list, missing_param, not_defined, drive_input, command="CreateSmartStorageLogicalDrives"):
         # This function returns error messages for invalid inputs passed to the
         # CreateLogicalDrives and CreateLogicalDrivesWithPArticularPhysicalDrives modules
-        if command == "CreateLogicalDrives":
+        if command == "CreateSmartStorageLogicalDrives":
             if missing_param:
                 msg = "Input parameters %s are missing to create logical drive. " + \
                       "Mandatory parameters are %s and in data drive details: %s"
@@ -826,7 +759,7 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Input parameters verified"
             }
 
-        elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
+        elif command == "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives":
             msg = "Input parameters %s are missing to create logical drive. " + \
                   "Mandatory parameters are %s "
             if missing_param:
@@ -856,7 +789,7 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Input parameters verified"
             }
 
-    def verify_input_paramters(self, raid_data, command="CreateLogicalDrives"):
+    def verify_input_paramters(self, raid_data, command="CreateSmartStorageLogicalDrives"):
         # Verifying input parameters passed to the CreateLogicalDrives and
         # CreateLogicalDrivesWithPArticularPhysicalDrives modules
         if command == "CreateLogicalDrives":
@@ -887,7 +820,7 @@ class iLORedfishUtils(RedfishUtils):
 
             return self.validation_error(raid, input_list, missing_param, not_defined, drive_input)
 
-        elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
+        elif command == "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives":
             input_list = ['LogicalDriveName', 'CapacityGB', 'Raid', 'DataDrives']
 
             for raid in raid_data:
@@ -901,10 +834,10 @@ class iLORedfishUtils(RedfishUtils):
 
             return self.validation_error(raid, input_list, missing_param, not_defined, [], command="CreateLogicalDrivesWithParticularPhysicalDrives")
 
-    def check_physical_drives(self, raid_data, unused_physical_drives, command="CreateLogicalDrives"):
+    def check_smartstorage_physical_drives(self, raid_data, unused_physical_drives, command="CreateSmartStorageLogicalDrives"):
         # Checking and verifying physical drives present in the OOB controller for the
         # CreateLogicalDrives and CreateLogicalDrivesWithPArticularPhysicalDrives modules
-        if command == "CreateLogicalDrives":
+        if command == "CreateSmartStorageLogicalDrives":
             raid_data = sorted(raid_data, key=lambda i: i['DataDrives']['DataDriveMinimumSizeGiB'])
             unused_physical_drives = sorted(unused_physical_drives, key=lambda i: i['CapacityGB'])
             for raid in raid_data:
@@ -941,7 +874,7 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Physical drives verified"
             }
 
-        elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
+        elif command == "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives":
             for raid in raid_data:
                 capacity = 0
                 for drive in raid["DataDrives"]:
@@ -961,10 +894,10 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Physical drives verified"
             }
 
-    def check_logical_drives(self, raid, logical_drives_details, command="CreateLogicalDrives"):
+    def check_smartstorage_logical_drives(self, raid, logical_drives_details, command="CreateSmartStorageLogicalDrives"):
         # Checking and verifying logical drives present in the OOB controller for the CreateLogicalDrives
         # and CreateLogicalDrivesWithPArticularPhysicalDrives module
-        if command == "CreateLogicalDrives":
+        if command == "CreateSmartStorageLogicalDrives":
             for drive in logical_drives_details:
                 if drive["LogicalDriveName"] == raid["LogicalDriveName"]:
                     if ("Raid" + drive["Raid"]) != raid["Raid"] or \
@@ -999,7 +932,7 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Logical drive provided is not present in server"
             }
 
-        elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
+        elif command == "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives":
             for drive in logical_drives_details:
                 if drive["LogicalDriveName"] == raid["LogicalDriveName"]:
                     if ("Raid" + drive["Raid"]) != raid["Raid"] or \
@@ -1032,9 +965,9 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Logical drive provided is not present in server"
             }
 
-    def check_physical_drive_count(self, raid_data, unused_physical_drives, command="CreateLogicalDrives"):
+    def check_smartstorage_physical_drive_count(self, raid_data, unused_physical_drives, command="CreateSmartStorageLogicalDrives"):
         # Check physical drives are available in the OOB controller to create logical drives
-        if command == "CreateLogicalDrives":
+        if command == "CreateSmartStorageLogicalDrives":
             needed_phy = 0
             for ld in raid_data:
                 needed_phy = needed_phy + int(ld["DataDrives"]["DataDriveCount"])
@@ -1060,7 +993,7 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Physical drive count verified"
             }
 
-        elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
+        elif command == "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives":
             needed_phy_drives = [drive for ld in raid_data for drive in ld["DataDrives"]]
             needed_phy = len(needed_phy_drives)
 
@@ -1097,7 +1030,7 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Physical drive count verified"
             }
 
-    def verify_raid_details(self, raid_data):
+    def verify_smartstorage_raid_details(self, raid_data):
         # Verifying raid details for CreateLogicalDrivesWithPArticularPhysicalDrives module
         data_drive_locations = []
 
@@ -1120,7 +1053,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "RAID details verified"
         }
 
-    def create_logical_drives(self, raid_data):
+    def create_smartstorage_logical_drives(self, raid_data):
         # This function invokes the creation of logical drive.
 
         # verify input parameters
@@ -1134,7 +1067,7 @@ class iLORedfishUtils(RedfishUtils):
             return logical_drives_details_response
 
         logical_drives_details = logical_drives_details_response["msg"]["logical_drives_details"]
-        response = self.get_unused_drives()
+        response = self.get_smartstorage_unused_drives()
         if not response["ret"]:
             return response
 
@@ -1143,7 +1076,7 @@ class iLORedfishUtils(RedfishUtils):
         if logical_drives_details:
             raid_details = raid_data[:]
             for raid in raid_details:
-                response = self.check_logical_drives(raid, logical_drives_details)
+                response = self.check_smartstorage_logical_drives(raid, logical_drives_details)
                 if response["ret"]:
                     raid_data.remove(raid)
                 elif not response["ret"] and response["msg"] != "Logical drive provided is not present in server":
@@ -1156,11 +1089,11 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Provided logical drives are already present in the server"
             }
 
-        response = self.check_physical_drive_count(raid_data, unused_physical_drives)
+        response = self.check_smartstorage_physical_drive_count(raid_data, unused_physical_drives)
         if not response["ret"]:
             return response
 
-        response = self.check_physical_drives(raid_data, unused_physical_drives)
+        response = self.check_smartstorage_physical_drives(raid_data, unused_physical_drives)
         if not response["ret"]:
             return response
 
@@ -1189,7 +1122,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "Create logical drives request sent for %s. System Reset required." % str(ld_names)
         }
 
-    def create_logical_drives_with_particular_physical_drives(self, raid_data):
+    def create_smartstorage_logical_drives_with_particular_physical_drives(self, raid_data):
         # This function invokes the creation of logical drive with paticular physical drives
 
         # verify input parameters
@@ -1197,7 +1130,7 @@ class iLORedfishUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.verify_raid_details(raid_data)
+        response = self.verify_smartstorage_raid_details(raid_data)
         if not response["ret"]:
             return response
 
@@ -1207,7 +1140,7 @@ class iLORedfishUtils(RedfishUtils):
             return logical_drives_details_response
 
         logical_drives_details = logical_drives_details_response["msg"]["logical_drives_details"]
-        response = self.get_unused_drives()
+        response = self.get_smartstorage_unused_drives()
         if not response["ret"]:
             return response
 
@@ -1216,8 +1149,8 @@ class iLORedfishUtils(RedfishUtils):
         if logical_drives_details:
             raid_details = raid_data[:]
             for raid in raid_details:
-                response = self.check_logical_drives(raid, logical_drives_details,
-                                                     "CreateLogicalDrivesWithParticularPhysicalDrives")
+                response = self.check_smartstorage_logical_drives(raid, logical_drives_details,
+                                                     "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
                 if response["ret"]:
                     raid_data.remove(raid)
                 elif not response["ret"] and response["msg"] != "Logical drive provided is not present in server":
@@ -1229,13 +1162,13 @@ class iLORedfishUtils(RedfishUtils):
                 "msg": "Provided logical drives are already present in the server"
             }
 
-        response = self.check_physical_drive_count(raid_data, unused_physical_drives,
-                                                   "CreateLogicalDrivesWithParticularPhysicalDrives")
+        response = self.check_smartstorage_physical_drive_count(raid_data, unused_physical_drives,
+                                                   "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
-        response = self.check_physical_drives(raid_data, unused_physical_drives,
-                                              "CreateLogicalDrivesWithParticularPhysicalDrives")
+        response = self.check_smartstorage_physical_drives(raid_data, unused_physical_drives,
+                                              "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
@@ -1267,7 +1200,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "Create logical drives request sent for %s. System Reset required." % str(ld_names)
         }
 
-    def delete_specified_logical_drives(self, logical_drives_names):
+    def delete_specified_smartstorage_logical_drives(self, logical_drives_names):
         # This function makes call to Server through redfish client to delete logical drives
         # in OOB controller whose names are given in the logical_drives_names parameter
 
@@ -1420,83 +1353,7 @@ class iLORedfishUtils(RedfishUtils):
             "msg": "SNMPv3 users are deleted"
         }
 
-    def get_server_poststate(self):
-        # Get server details
-        response = self.get_request(self.root_uri + self.systems_uri)
-        if not response["ret"]:
-            return response
-
-        server_data = response["msg"]["data"]
-
-        if "Hpe" in server_data["Oem"]:
-            return {
-                "ret": True,
-                "server_poststate": server_data["Oem"]["Hpe"]["PostState"]
-            }
-        else:
-            return {
-                "ret": True,
-                "server_poststate": server_data["Oem"]["Hp"]["PostState"]
-            }
-
-    def check_reboot_status(self, polling_interval=60, max_polling_time=1200):
-        # This method checks if OOB controller reboot is completed
-        time.sleep(10)
-
-        # Check server poststate
-        state = self.get_server_poststate()
-        if not state["ret"]:
-            return state
-
-        count = int(max_polling_time / polling_interval)
-        times = 0
-
-        # When server is powered OFF
-        pcount = 0
-        while state["server_poststate"] in ["PowerOff", "Off"] and pcount < 5:
-            time.sleep(10)
-            state = self.get_server_poststate()
-            if not state["ret"]:
-                return state
-
-            if state["server_poststate"] not in ["PowerOff", "Off"]:
-                break
-            pcount = pcount + 1
-        if state["server_poststate"] in ["PowerOff", "Off"]:
-            return {
-                "ret": False,
-                "changed": False,
-                "msg": "Server is powered OFF"
-            }
-
-            # When server is not rebooting
-        if state["server_poststate"] in ["InPostDiscoveryComplete", "FinishedPost"]:
-            return {
-                "ret": False,
-                "changed": False,
-                "msg": "Server is not rebooting"
-            }
-
-        while state["server_poststate"] not in ["InPostDiscoveryComplete", "FinishedPost"] and count > times:
-            state = self.get_server_poststate()
-            if not state["ret"]:
-                return state
-
-            if state["server_poststate"] in ["InPostDiscoveryComplete", "FinishedPost"]:
-                return {
-                    "ret": True,
-                    "changed": True,
-                    "msg": "Server reboot is completed"
-                }
-            time.sleep(polling_interval)
-            times = times + 1
-        return {
-            "ret": False,
-            "changed": False,
-            "msg": "Server Reboot has failed, server state: {state} ".format(state=state)
-        }
-
-    def get_specified_logical_drives(self, logical_drives_names):
+    def get_specified_smartstorage_logical_drives(self, logical_drives_names):
         # This method returns logical drives details for provided logical drive names
         result = {}
         logical_drives_names_list = logical_drives_names[:]
