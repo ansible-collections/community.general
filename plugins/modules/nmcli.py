@@ -295,6 +295,7 @@ options:
     addr_gen_mode6:
         description:
             - Configure method for creating the address for use with IPv6 Stateless Address Autoconfiguration.
+            - C(default) and C(deafult-or-eui64) have been added in community.general 6.4.0.
         type: str
         choices: [default, default-or-eui64, eui64, stable-privacy]
         version_added: 4.2.0
