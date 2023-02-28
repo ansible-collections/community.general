@@ -1162,7 +1162,7 @@ class iLORedfishUtils(RedfishUtils):
             }
 
         response = self.check_smartstorage_physical_drive_count(raid_data, unused_physical_drives,
-                   "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
+                                                                "CreateSmartStorageLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
