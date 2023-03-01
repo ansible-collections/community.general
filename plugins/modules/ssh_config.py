@@ -6,8 +6,10 @@
 # Copyright (c) 2021, Abhijeet Kasurde <akasurde@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) <2013> <Emre Yilmaz>
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -100,8 +102,6 @@ options:
       - Sets the C(HostKeyAlgorithms) option.
     type: str
     version_added: 6.1.0
-requirements:
-- StormSSH
 '''
 
 EXAMPLES = r'''
@@ -162,22 +162,264 @@ hosts_change_diff:
 import os
 import traceback
 
-from copy import deepcopy
-
-STORM_IMP_ERR = None
 try:
-    from storm.parsers.ssh_config_parser import ConfigParser
-    HAS_STORM = True
+    import paramiko
 except ImportError:
-    HAS_STORM = False
-    STORM_IMP_ERR = traceback.format_exc()
+    HAS_PARAMIKO = False
+    PARAMIKO_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_PARAMIKO = True
+    PARAMIKO_IMPORT_ERROR = None
+
+from copy import deepcopy
+from operator import itemgetter
+import re
+
+from paramiko.config import SSHConfig
+import ansible.module_utils.six
+
+
+# Storm config parser from here: https://github.com/emre/storm/blob/master/storm/parsers/ssh_config_parser.py
+class StormConfig(SSHConfig):
+    def parse(self, file_obj):
+        """
+        Read an OpenSSH config from the given file object.
+        @param file_obj: a file-like object to read the config file from
+        @type file_obj: file
+        """
+        order = 1
+        host = {"host": ['*'], "config": {}, }
+        for line in file_obj:
+            line = line.rstrip('\n').lstrip()
+            if line == '':
+                self._config.append({
+                    'type': 'empty_line',
+                    'value': line,
+                    'host': '',
+                    'order': order,
+                })
+                order += 1
+                continue
+
+            if line.startswith('#'):
+                self._config.append({
+                    'type': 'comment',
+                    'value': line,
+                    'host': '',
+                    'order': order,
+                })
+                order += 1
+                continue
+
+            if '=' in line:
+                # Ensure ProxyCommand gets properly split
+                if line.lower().strip().startswith('proxycommand'):
+                    proxy_re = re.compile(r"^(proxycommand)\s*=*\s*(.*)", re.I)
+                    match = proxy_re.match(line)
+                    key, value = match.group(1).lower(), match.group(2)
+                else:
+                    key, value = line.split('=', 1)
+                    key = key.strip().lower()
+            else:
+                # find first whitespace, and split there
+                i = 0
+                while (i < len(line)) and not line[i].isspace():
+                    i += 1
+                if i == len(line):
+                    raise Exception('Unparsable line: %r' % line)
+                key = line[:i].lower()
+                value = line[i:].lstrip()
+            if key == 'host':
+                self._config.append(host)
+                value = value.split()
+                host = {
+                    key: value,
+                    'config': {},
+                    'type': 'entry',
+                    'order': order
+                }
+                order += 1
+            elif key in ['identityfile', 'localforward', 'remoteforward']:
+                if key in host['config']:
+                    host['config'][key].append(value)
+                else:
+                    host['config'][key] = [value]
+            elif key not in host['config']:
+                host['config'].update({key: value})
+        self._config.append(host)
+
+
+class ConfigParser(object):
+    """
+    Config parser for ~/.ssh/config files.
+    """
+
+    def __init__(self, ssh_config_file=None):
+        if not ssh_config_file:
+            ssh_config_file = self.get_default_ssh_config_file()
+
+        self.defaults = {}
+
+        self.ssh_config_file = ssh_config_file
+
+        if not os.path.exists(self.ssh_config_file):
+            if not os.path.exists(os.path.dirname(self.ssh_config_file)):
+                os.makedirs(os.path.dirname(self.ssh_config_file))
+            open(self.ssh_config_file, 'w+').close()
+            os.chmod(self.ssh_config_file, 0o600)
+
+        self.config_data = []
+
+    def get_default_ssh_config_file(self):
+        return os.path.expanduser("~/.ssh/config")
+
+    def load(self):
+        config = StormConfig()
+
+        with open(self.ssh_config_file) as fd:
+            config.parse(fd)
+
+        for entry in config.__dict__.get("_config"):
+            if entry.get("host") == ["*"]:
+                self.defaults.update(entry.get("config"))
+
+            if entry.get("type") in ["comment", "empty_line"]:
+                self.config_data.append(entry)
+                continue
+
+            host_item = {
+                'host': entry["host"][0],
+                'options': entry.get("config"),
+                'type': 'entry',
+                'order': entry.get("order", 0),
+            }
+
+            if len(entry["host"]) > 1:
+                host_item.update({
+                    'host': " ".join(entry["host"]),
+                })
+            # minor bug in paramiko.SSHConfig that duplicates
+            # "Host *" entries.
+            if entry.get("config") and len(entry.get("config")) > 0:
+                self.config_data.append(host_item)
+
+        return self.config_data
+
+    def add_host(self, host, options):
+        self.config_data.append({
+            'host': host,
+            'options': options,
+            'order': self.get_last_index(),
+        })
+
+        return self
+
+    def update_host(self, host, options, use_regex=False):
+        for index, host_entry in enumerate(self.config_data):
+            if host_entry.get("host") == host or \
+                    (use_regex and re.match(host, host_entry.get("host"))):
+
+                if 'deleted_fields' in options:
+                    deleted_fields = options.pop("deleted_fields")
+                    for deleted_field in deleted_fields:
+                        del self.config_data[index]["options"][deleted_field]
+
+                self.config_data[index]["options"].update(options)
+
+        return self
+
+    def search_host(self, search_string):
+        results = []
+        for host_entry in self.config_data:
+            if host_entry.get("type") != 'entry':
+                continue
+            if host_entry.get("host") == "*":
+                continue
+
+            searchable_information = host_entry.get("host")
+            for key, value in ansible.module_utils.six.iteritems(host_entry.get("options")):
+                if isinstance(value, list):
+                    value = " ".join(value)
+                if isinstance(value, int):
+                    value = str(value)
+
+                searchable_information += " " + value
+
+            if search_string in searchable_information:
+                results.append(host_entry)
+
+        return results
+
+    def delete_host(self, host):
+        found = 0
+        for index, host_entry in enumerate(self.config_data):
+            if host_entry.get("host") == host:
+                del self.config_data[index]
+                found += 1
+
+        if found == 0:
+            raise ValueError('No host found')
+        return self
+
+    def delete_all_hosts(self):
+        self.config_data = []
+        self.write_to_ssh_config()
+
+        return self
+
+    def dump(self):
+        if len(self.config_data) < 1:
+            return
+
+        file_content = ""
+        self.config_data = sorted(self.config_data, key=itemgetter("order"))
+
+        for host_item in self.config_data:
+            if host_item.get("type") in ['comment', 'empty_line']:
+                file_content += host_item.get("value") + "\n"
+                continue
+            host_item_content = "Host {0}\n".format(host_item.get("host"))
+            for key, value in ansible.module_utils.six.iteritems(host_item.get("options")):
+                if isinstance(value, list):
+                    sub_content = ""
+                    for value_ in value:
+                        sub_content += "    {0} {1}\n".format(
+                            key, value_
+                        )
+                    host_item_content += sub_content
+                else:
+                    host_item_content += "    {0} {1}\n".format(
+                        key, value
+                    )
+            file_content += host_item_content
+
+        return file_content
+
+    def write_to_ssh_config(self):
+        with open(self.ssh_config_file, 'w+') as f:
+            data = self.dump()
+            if data:
+                f.write(data)
+        return self
+
+    def get_last_index(self):
+        last_index = 0
+        indexes = []
+        for item in self.config_data:
+            if item.get("order"):
+                indexes.append(item.get("order"))
+        if len(indexes) > 0:
+            last_index = max(indexes)
+
+        return last_index
+
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
-class SSHConfig():
+class SSHConfig:
     def __init__(self, module):
         self.module = module
         self.params = module.params
@@ -265,7 +507,8 @@ class SSHConfig():
             try:
                 self.config.write_to_ssh_config()
             except PermissionError as perm_exec:
-                self.module.fail_json(msg="Failed to write to %s due to permission issue: %s" % (self.config_file, to_native(perm_exec)))
+                self.module.fail_json(
+                    msg="Failed to write to %s due to permission issue: %s" % (self.config_file, to_native(perm_exec)))
             # Make sure we set the permission
             perm_mode = '0600'
             if self.config_file == '/etc/ssh/ssh_config':
@@ -326,10 +569,6 @@ def main():
             ['user', 'ssh_config_file'],
         ],
     )
-
-    if not HAS_STORM:
-        module.fail_json(changed=False, msg=missing_required_lib("stormssh"),
-                         exception=STORM_IMP_ERR)
 
     ssh_config_obj = SSHConfig(module)
     ssh_config_obj.ensure_state()
