@@ -273,27 +273,32 @@ def add_error_line(err_msg_lines, err_msg, flow, exec_name, subflow = None, expe
                         exec_name=exec_name, \
                         expected=" (Expected : " + str(expected) if expected is not None else "",\
                         actual=", Actual : " + str(actual) if actual is not None else "")]
+
 def create_diff_key(execution):
     return "{ex_id}{subflow}".format(subflow=(" / " + execution["flowAlias"]) if execution.get("flowAlias") is not None else "",\
             ex_id=get_identifier(execution))
 
+def remove_keys_for_diff(ex):
+    ex_copy = copy.deepcopy(ex)
+    ex_for_diff = dict((k, ex_copy[k]) for k in ex_copy if k not in ["flowAlias"] and ex_copy[k])
+    return ex_for_diff
+
 def add_diff_entry(new_exec, old_exec, before, after):
-    exec_key = create_diff_key(new_exec)
-    data = [(time, execution) for (time, execution) in [(after, new_exec), (before, old_exec)] if execution is not None and time is not None]
-    for time, execution in data:
-        if time.get("executions") is None:
-            time["executions"] = {}
-        time["executions"][exec_key] = {}
-        for key in new_exec:
-            if new_exec[key] is not None and key not in ["flowAlias", "requirementChoices", "configurable"]: # Remove key we know are only in one execution
-                if key == "authenticationConfig":
-                    config = {"alias": execution["authenticationConfig"]["alias"], "config" : {}}
-                    for configKey in new_exec["authenticationConfig"]["config"]:
-                        if new_exec["authenticationConfig"]["config"].get(configKey) != "":
-                            config["config"].update({configKey:execution["authenticationConfig"]["config"].get(configKey)})
-                    time["executions"][exec_key].update({key:config})
-                else:
-                    time["executions"][exec_key].update({key:execution[key]})
+    # Create a "before" execution and an "after" execution. In order to make the diff useful in check_mode, the keys that are not specified in the "after"
+    # execution (e.g. an ID) have values taken directly from the "before" execution.
+    # If we do not do that, diff mode would tell you that some key/value pairs (e.g. {'id':'some_id') has been deleted, whereas it was
+    # simply not given yet.
+    exec_key = create_diff_key(new_exec if new_exec != {} else old_exec)
+    old_ex_for_diff = remove_keys_for_diff(old_exec)
+    new_ex_for_diff = remove_keys_for_diff(new_exec)
+    if not before.get("executions"):
+       before["executions"] = {}
+    if not after.get("executions"):
+       after["executions"] = {}
+    before["executions"][exec_key] = old_ex_for_diff
+    after["executions"][exec_key] = old_ex_for_diff | new_ex_for_diff
+    if after["executions"][exec_key].get("authenticationConfig") and before["executions"][exec_key].get("authenticationConfig"):
+        after["executions"][exec_key]["authenticationConfig"] = before["executions"][exec_key]["authenticationConfig"] | after["executions"][exec_key]["authenticationConfig"]
 
 
 def create_or_update_executions(kc, config, check_mode, realm='master'):
@@ -341,7 +346,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                 found_index = find_exec_in_executions(existing_exec, new_executions_copy, [])
                 if found_index == -1:
                     changed = True
-                    add_diff_entry(existing_exec, existing_exec, before, None)
+                    add_diff_entry({}, existing_exec, before, after)
                     add_error_line(err_msg_lines=err_msg, err_msg="extra execution", flow=config["alias"],\
                         exec_name=get_identifier(existing_exec)) 
                     if not check_mode:
@@ -455,7 +460,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\
                             exec_name=get_identifier(new_exec))
                         changed = True
-                        add_diff_entry(new_exec, None, before, after)
+                        add_diff_entry(new_exec, {}, before, after)
                 if new_exec.get("id") is not None:
                     changed_executions_ids.append(new_exec["id"])
         for time in [before, after]:
