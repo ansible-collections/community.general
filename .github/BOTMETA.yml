@@ -294,7 +294,6 @@ files:
     maintainers: $team_manageiq
   $module_utils/memset.py:
     labels: cloud memset
-    maintainers: glitchcrab
   $module_utils/mh/:
     labels: module_helper
     maintainers: russoz
@@ -783,7 +782,7 @@ files:
     labels: maven_artifact
     maintainers: tumbl3w33d turb
   $modules/memset_:
-    maintainers: glitchcrab
+    ignore: glitchcrab
   $modules/mksysb.py:
     labels: aix mksysb
     maintainers: $team_aix
