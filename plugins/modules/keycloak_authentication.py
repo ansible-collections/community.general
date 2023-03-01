@@ -548,7 +548,7 @@ def main():
                 result['diff'] = dict(before='', after=new_auth_repr)
 
             if module.check_mode:
-                result['msg'] = "Flow {} was created.".format(auth_repr.get("alias"))
+                result['msg'] = "Flow {} was created.".format(new_auth_repr.get("alias"))
                 module.exit_json(**result)
 
             # If copyFrom is defined, create authentication flow from a copy
