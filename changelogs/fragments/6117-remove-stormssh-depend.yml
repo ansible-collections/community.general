@@ -1,2 +1,2 @@
 trivial:
-  - Added StormSSH's config parser into ssh_config directly (https://github.com/ansible-collections/community.general/pull/6117).
+  - ssh_config - Added StormSSH's config parser into ssh_config directly (https://github.com/ansible-collections/community.general/pull/6117).
