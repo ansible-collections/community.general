@@ -89,7 +89,7 @@ def main():
         id=dict(type="str"),
         client_id=dict(type="str", aliases=["clientId"]),
         scope_mappings=dict(
-            type="list", elements="dict", aliases=["scopeMappings"]
+            type="dict", aliases=["scopeMappings"]
         ),
     )
 
@@ -143,11 +143,12 @@ def main():
     # Build a proposed changeset from parameters given to this module
     changeset = dict((k, None) for k in before_mappings)
     
+    mappings = module.params.get("scope_mappings")
     if module.params.get("scope_mappings"):
-        for target_client in module.params.get("scope_mappings"):
-            target_id = [client["id"] for client in existing_clients if client["clientId"] == target_client["target_client_id"]][0]
-            roles = [r.get("name") for r in target_client["roles"]]
-            changeset.update({target_client["target_client_id"]: list(sorted(roles))})
+        for target_client in mappings.keys():
+            target_id = [client["id"] for client in existing_clients if client["clientId"] == target_client][0]
+            roles = mappings.get(target_client)["roles"]
+            changeset.update({target_client: list(sorted(roles))})
  
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_mappings = before_mappings.copy()
