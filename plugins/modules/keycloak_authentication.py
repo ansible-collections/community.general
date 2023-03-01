@@ -236,19 +236,19 @@ def get_identifier(execution):
         return execution["displayName"]
     else:
         raise Exception("could not find any name for execution {exec}".format(execution))
-        
+
 def create_authentication_execution(kc, config, new_exec, flow_alias_parent, isFlow, realm='master'):
-            
+
     updated_exec = {}
-        
+
     # Add authentication execution (or subflow) and returns its id (given by keycloak)
-    if isFlow:    
+    if isFlow:
         kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm)
     else:
         for key in new_exec: 
             if key != "flowAlias" and key != "authenticationConfig":
                 updated_exec[key] = new_exec[key]
-        #raise Exception(updated_exec)
+        # raise Exception(updated_exec)
         kc.create_execution(updated_exec, flowAlias=flow_alias_parent, realm=realm)
 
 def hasSameName(new_exec, other_exec):
@@ -256,7 +256,7 @@ def hasSameName(new_exec, other_exec):
         return other_exec["providerId"] == new_exec["providerId"]
     elif "displayName" in other_exec and "displayName" in new_exec:
         return other_exec["displayName"] == new_exec["displayName"]
-                
+
 def update_authentication_execution(kc, flow_alias_parent, new_exec, check_mode, realm):
     updated_exec = {}
     for key in new_exec:
@@ -265,7 +265,7 @@ def update_authentication_execution(kc, flow_alias_parent, new_exec, check_mode,
             updated_exec[key] = new_exec[key]
     if new_exec["requirement"] is not None and not check_mode:
         kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
-        
+
 
 def add_error_line(err_msg_lines, err_msg, flow, exec_name, subflow = None, expected = None, actual = None):
     err_msg_lines["lines"] += ["Flow {flow}{subflow}, Execution: {exec_name}: {err_msg}{expected}{actual}.".format(\
@@ -276,7 +276,7 @@ def add_error_line(err_msg_lines, err_msg, flow, exec_name, subflow = None, expe
 def create_diff_key(execution):
     return "{ex_id}{subflow}".format(subflow=(" / " + execution["flowAlias"]) if execution.get("flowAlias") is not None else "",\
             ex_id=get_identifier(execution))
-            
+
 def add_diff_entry(new_exec, old_exec, before, after):
     exec_key = create_diff_key(new_exec)
     data = [(time, execution) for (time, execution) in [(after, new_exec), (before, old_exec)] if execution is not None and time is not None]
@@ -287,7 +287,7 @@ def add_diff_entry(new_exec, old_exec, before, after):
         for key in new_exec:
             if new_exec[key] is not None and key not in ["flowAlias", "requirementChoices", "configurable"]: # Remove key we know are only in one execution
                 if key == "authenticationConfig":
-                    config = {"alias":execution["authenticationConfig"]["alias"], "config" : {}}
+                    config = {"alias": execution["authenticationConfig"]["alias"], "config" : {}}
                     for configKey in new_exec["authenticationConfig"]["config"]:
                         if new_exec["authenticationConfig"]["config"].get(configKey) != "":
                             config["config"].update({configKey:execution["authenticationConfig"]["config"].get(configKey)})
@@ -327,10 +327,10 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     level = levels[execution["flowAlias"]] + 1
                 levels.update({get_identifier(execution) : level})
                 execution["level"] = level
-            
+
             # Keep track of ids of execution we handled already to account for dupplicates
             changed_executions_ids = []
-                
+
             # Remove extra executions if any. Iterate backwards so we don't stumble upon concurrency issues
             # when deleting subflows
             new_executions_copy = copy.deepcopy(new_executions)
@@ -349,15 +349,15 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                 else:
                     new_executions_copy[found_index].clear()
                 existing_exec_index -= 1
-            
+
             # Update existing executions after deletion
             if changed:
                 existing_executions = kc.get_executions_representation(config, realm=realm)
 
             for new_exec_index, new_exec in enumerate(new_executions):
-            
+
                 if new_exec.get("flowAlias") is not None:
-                    flow_alias_parent = new_exec["flowAlias"]                        
+                    flow_alias_parent = new_exec["flowAlias"]
                 else:
                     flow_alias_parent = config["alias"]
 
@@ -368,7 +368,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     level_indices.append(0)
                     current_level = new_exec["level"]
                 elif new_exec["level"] < current_level:
-                    current_level = new_exec["level"]                
+                    current_level = new_exec["level"]
                     for i in range(current_level + 1, len(level_indices)):
                         level_indices[i] = 0
                     level_indices[current_level] += 1
@@ -377,10 +377,10 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     level_indices[current_level] = 0
                 else:
                     level_indices[current_level] += 1
-                    
+
                 new_exec["index"] = level_indices[current_level]
-                
-                # Check if there exists an execution with same name/providerID, at the same level as new execution               
+
+                # Check if there exists an execution with same name/providerID, at the same level as new execution
                 exec_index = find_exec_in_executions(new_exec, existing_executions, changed_executions_ids)
                 if exec_index != -1:
                     # There exists an execution of same name/providerID at same level.
@@ -389,7 +389,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     for index_key, key in enumerate(new_exec, start=0):
                         if new_exec[key] is None:
                             exclude_key.append(key)
-                    
+
                     # Compare the executions to see if it need changes
                     exec_need_changes = False
                     existing_exec = existing_executions[exec_index]
@@ -401,7 +401,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                     if new_exec.get("authenticationConfig") is not None:
                         config_changed = "authenticationConfig" not in existing_exec or \
                             new_exec["authenticationConfig"]["alias"] != existing_exec["authenticationConfig"]["alias"] 
-                                        
+
                         if not config_changed and new_exec["authenticationConfig"].get("config") is not None:
                             for key in new_exec["authenticationConfig"]["config"]:
                                 config_changed |= new_exec["authenticationConfig"]["config"][key] is not None and\
@@ -548,6 +548,7 @@ def main():
                 result['diff'] = dict(before='', after=new_auth_repr)
 
             if module.check_mode:
+                result['msg'] = "Flow {} was created.".format(new_auth_repr.get("alias"))
                 module.exit_json(**result)
 
             # If copyFrom is defined, create authentication flow from a copy
