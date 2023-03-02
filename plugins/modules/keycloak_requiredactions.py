@@ -182,11 +182,17 @@ def main():
             # check if new required action is different
             # from existing required action
             changed = False
+            after = {}
             for param in req_action_repr:
                 default_not_enabled = (param == 'defaultAction'
                                        and not req_action_repr['enabled']
                                        and not new_req_action_repr['enabled'])
+                if new_req_action_repr[param] is None:
+                    after[param] = req_action_repr[param]
+                else:
+                    after[param] = new_req_action_repr[param]
                 if not default_not_enabled \
+                   and new_req_action_repr[param] is not None \
                    and req_action_repr[param] != new_req_action_repr[param]:
                     changed = True
             result["changed"] = changed
@@ -203,7 +209,7 @@ def main():
                 if module._diff:
                     result["diff"] = {
                         "before": req_action_repr,
-                        "after": new_req_action_repr,
+                        "after": after,
                     }
                 if module.check_mode:  # if check mode, exit
                     module.exit_json(**result)
