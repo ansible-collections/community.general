@@ -224,7 +224,9 @@ class TestInterfacesFileModule(unittest.TestCase):
 
                     self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
                     self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
-                    self.compareFileToBackup(path, backupp)
+                    if testfile not in ["no_leading_spaces"]:
+                        # skip if eth0 has MTU value
+                        self.compareFileToBackup(path, backupp)
 
     def test_change_method(self):
         testcases = {
