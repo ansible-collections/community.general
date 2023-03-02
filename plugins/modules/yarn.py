@@ -244,8 +244,9 @@ class Yarn(object):
         # because it only only lists binaries, but `yarn global add` can install libraries too.
         result, error = self._exec(cmd, run_in_check_mode=True, check_rc=False, unsupported_with_global=True)
 
-        if error:
-            self.module.fail_json(msg=error)
+        for line in error.splitlines():
+            if json.loads(line)['type'] == 'error':
+                self.module.fail_json(msg=error)
 
         for json_line in result.strip().split('\n'):
             data = json.loads(json_line)
