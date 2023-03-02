@@ -5,12 +5,12 @@
 # Copyright (C) <2013> <Emre Yilmaz>
 # SPDX-License-Identifier: MIT
 
+from __future__ import (absolute_import, division, print_function)
 import os
 import re
 import traceback
 from operator import itemgetter
 
-from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.module_utils.basic import missing_required_lib
