@@ -148,6 +148,11 @@ class Opkg(StateModuleHelper):
             ),
         )
 
+        if self.vars.update_cache:
+            rc, dummy, dummy = self.runner("update_cache").run()
+            if rc != 0:
+                self.do_raise("could not update package db")
+
     @staticmethod
     def split_name_and_version(package):
         """ Split the name and the version when using the NAME=VERSION syntax """
@@ -164,10 +169,6 @@ class Opkg(StateModuleHelper):
         return want_installed == has_package
 
     def state_present(self):
-        if self.vars.update_cache:
-            dummy, rc, dummy = self.runner("update_cache").run()
-            if rc != 0:
-                self.do_raise("could not update package db")
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 pkg_name, pkg_version = self.split_name_and_version(package)
@@ -176,16 +177,14 @@ class Opkg(StateModuleHelper):
                     if not self._package_in_desired_state(pkg_name, want_installed=True, version=pkg_version):
                         self.do_raise("failed to install %s" % package)
                     self.vars.install_c += 1
+            if self.verbosity >= 4:
+                self.vars.run_info = ctx.run_info
         if self.vars.install_c > 0:
             self.vars.msg = "installed %s package(s)" % (self.vars.install_c)
         else:
             self.vars.msg = "package(s) already present"
 
     def state_absent(self):
-        if self.vars.update_cache:
-            dummy, rc, dummy = self.runner("update_cache").run()
-            if rc != 0:
-                self.do_raise("could not update package db")
         with self.runner("state force package") as ctx:
             for package in self.vars.name:
                 package, dummy = self.split_name_and_version(package)
@@ -194,6 +193,8 @@ class Opkg(StateModuleHelper):
                     if not self._package_in_desired_state(package, want_installed=False):
                         self.do_raise("failed to remove %s" % package)
                     self.vars.remove_c += 1
+            if self.verbosity >= 4:
+                self.vars.run_info = ctx.run_info
         if self.vars.remove_c > 0:
             self.vars.msg = "removed %s package(s)" % (self.vars.remove_c)
         else:
