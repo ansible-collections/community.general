@@ -150,6 +150,54 @@ TEST_CASES = [
             ),
         ],
     ),
+    ModuleTestCase(
+        id="install_vim_updatecache",
+        input={"name": "vim-fuller", "state": "present", "update_cache": True},
+        output={
+            "msg": "installed 1 package(s)"
+        },
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/opkg", "update"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+            RunCmdCall(
+                command=["/testbin/opkg", "list-installed", "vim-fuller"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+            RunCmdCall(
+                command=["/testbin/opkg", "install", "vim-fuller"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out=(
+                    "Multiple packages (libgcc1 and libgcc1) providing same name marked HOLD or PREFER. Using latest.\n"
+                    "Installing vim-fuller (9.0-1) to root...\n"
+                    "Downloading https://downloads.openwrt.org/snapshots/packages/x86_64/packages/vim-fuller_9.0-1_x86_64.ipk\n"
+                    "Installing terminfo (6.4-2) to root...\n"
+                    "Downloading https://downloads.openwrt.org/snapshots/packages/x86_64/base/terminfo_6.4-2_x86_64.ipk\n"
+                    "Installing libncurses6 (6.4-2) to root...\n"
+                    "Downloading https://downloads.openwrt.org/snapshots/packages/x86_64/base/libncurses6_6.4-2_x86_64.ipk\n"
+                    "Configuring terminfo.\n"
+                    "Configuring libncurses6.\n"
+                    "Configuring vim-fuller.\n"
+                ),
+                err="",
+            ),
+            RunCmdCall(
+                command=["/testbin/opkg", "list-installed", "vim-fuller"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="vim-fuller - 9.0-1 \n",   # This output has the extra space at the end, to satisfy the behaviour of Yocto/OpenEmbedded's opkg
+                err="",
+            ),
+        ],
+    ),
 ]
 TEST_CASES_IDS = [item.id for item in TEST_CASES]
 
