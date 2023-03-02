@@ -395,9 +395,15 @@ def main():
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
         if clientscope_param == 'protocol_mappers':
-            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
-        changeset[camel(clientscope_param)] = new_param_value
+            def get_existing_with_same_name(name):
+                if "protocolMappers" not in before_clientscope:
+                    return {}
+                mappers = [r for r in before_clientscope["protocolMappers"] if r["name"] == name]
+                return mappers[0] if len(mappers) > 0 else {}
+            new_param_value = [get_existing_with_same_name(x["name"]) | dict((k, v) for k, v in x.items() \
+            if v is not None) for x in new_param_value]
 
+        changeset[camel(clientscope_param)] = new_param_value
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_clientscope = before_clientscope.copy()
     desired_clientscope.update(changeset)
