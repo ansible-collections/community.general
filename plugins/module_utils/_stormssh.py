@@ -3,7 +3,7 @@
 # This particular file snippet, and this file snippet only, is based on
 # the config parser from here: https://github.com/emre/storm/blob/master/storm/parsers/ssh_config_parser.py
 # Copyright (C) <2013> <Emre Yilmaz>
-# It is licensed under the MIT License
+# SPDX-License-Identifier: MIT
 
 import os
 import re
