@@ -64,7 +64,7 @@ EXAMPLES = r'''
 - name: Remove lock from Apache / httpd to be updated again
   community.general.yum_versionlock:
     state: absent
-    package: httpd
+    name: httpd
 '''
 
 RETURN = r'''
