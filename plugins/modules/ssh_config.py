@@ -163,17 +163,8 @@ hosts_change_diff:
 import os
 import traceback
 
-try:
-    import paramiko
-except ImportError:
-    HAS_PARAMIKO = False
-    PARAMIKO_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PARAMIKO = True
-    PARAMIKO_IMPORT_ERROR = None
-
 from copy import deepcopy
-from ansible_collections.community.general.plugins.module_utils._stormssh import StormConfig, ConfigParser
+from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser
 
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -331,9 +322,6 @@ def main():
             ['user', 'ssh_config_file'],
         ],
     )
-
-    if not HAS_PARAMIKO:
-        module.fail_json(changed=False, msg=missing_required_lib("paramiko"), exception=PARAMIKO_IMPORT_ERROR)
 
     ssh_config_obj = SSHConfig(module)
     ssh_config_obj.ensure_state()
