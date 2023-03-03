@@ -172,8 +172,7 @@ def getValueFromLine(s):
     option = s.split()[0]
     optionStart = s.find(option)
     optionLen = len(option)
-    valueStart = re.search(r'\s', s[optionLen + optionStart:]).end() + optionLen + optionStart
-    return s[valueStart:valueEnd]
+    return s[optionLen + optionStart:].strip()
 
 
 def read_interfaces_file(module, filename):
