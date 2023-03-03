@@ -341,9 +341,9 @@ def main():
         version = 'latest'
 
     if module.params['executable']:
-      executable = module.params['executable'].split(' ')
+        executable = module.params['executable'].split(' ')
     else:
-      executable = [module.get_bin_path('yarn', True)]
+        executable = [module.get_bin_path('yarn', True)]
 
     # When installing globally, use the defined path for global node_modules
     if globally:
