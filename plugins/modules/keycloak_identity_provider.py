@@ -433,6 +433,11 @@ def sanitize(idp):
             idpcopy['clientSecret'] = '**********'
     return idpcopy
 
+def normalize(idp):
+    idpcopy = deepcopy(idp)
+    if idpcopy.get('mappers'):
+        idpcopy['mappers'] = sorted(idpcopy['mappers'], key=lambda x: x.get('name'))
+    return idpcopy
 
 def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
@@ -587,7 +592,7 @@ def main():
             # Process an update
 
             # no changes
-            if desired_idp == before_idp:
+            if normalize(desired_idp) == normalize(before_idp):
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_idp)
                 result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
