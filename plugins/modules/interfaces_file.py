@@ -244,7 +244,6 @@ def read_interfaces_lines(module, line_strings):
         else:
             if currently_processing == "IFACE":
                 option_name = words[0]
-                # TODO: if option_name in currif.options
                 value = getValueFromLine(line)
                 lines.append(optionDict(line, iface_name, option_name, value, address_family))
                 if option_name in ["pre-up", "up", "down", "post-up"]:
@@ -261,6 +260,26 @@ def read_interfaces_lines(module, line_strings):
     return lines, ifaces
 
 
+def get_interface_options(iface_lines):
+    return list(filter(lambda i: i['line_type'] == 'option', iface_lines))
+
+
+def get_target_options(iface_options, option):
+    return list(filter(lambda i: i['option'] == option, iface_options))
+
+
+def update_existing_option_line(target_option, value):
+    old_line = target_option['line']
+    old_value = target_option['value']
+    prefix_start = old_line.find(target_option["option"])
+    optionLen = len(target_option["option"])
+    old_value_position = re.search(r"\s+".join(map(re.escape, old_value.split())), old_line[prefix_start + optionLen:])
+    start = old_value_position.start() + prefix_start + optionLen
+    end = old_value_position.end() + prefix_start + optionLen
+    line = old_line[:start] + value + old_line[end:]
+    return line
+
+
 def set_interface_option(module, lines, iface, option, raw_value, state, address_family=None):
     value = str(raw_value)
     changed = False
@@ -275,8 +294,8 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
         module.fail_json(msg="Error: interface %s not found" % iface)
         return changed, None
 
-    iface_options = list(filter(lambda i: i['line_type'] == 'option', iface_lines))
-    target_options = list(filter(lambda i: i['option'] == option, iface_options))
+    iface_options = get_interface_options(iface_lines)
+    target_options = get_target_options(iface_options, option)
 
     if state == "present":
         if len(target_options) < 1:
@@ -293,15 +312,8 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
                 if target_options[-1]['value'] != value:
                     changed = True
                     target_option = target_options[-1]
-                    old_line = target_option['line']
-                    old_value = target_option['value']
+                    line = update_existing_option_line(target_option, value)
                     address_family = target_option['address_family']
-                    prefix_start = old_line.find(option)
-                    optionLen = len(option)
-                    old_value_position = re.search(r"\s+".join(map(re.escape, old_value.split())), old_line[prefix_start + optionLen:])
-                    start = old_value_position.start() + prefix_start + optionLen
-                    end = old_value_position.end() + prefix_start + optionLen
-                    line = old_line[:start] + value + old_line[end:]
                     index = len(lines) - lines[::-1].index(target_option) - 1
                     lines[index] = optionDict(line, iface, option, value, address_family)
     elif state == "absent":
