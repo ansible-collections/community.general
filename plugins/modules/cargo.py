@@ -44,6 +44,13 @@ options:
       try to install all of them in this version.
     type: str
     required: false
+  locked:
+    description:
+      - Install with locked dependencies.
+    required: false
+    type: bool
+    default: false
+    version_added: 6.5.0
   state:
     description:
       - The state of the Rust package.
@@ -59,6 +66,11 @@ EXAMPLES = r"""
 - name: Install "ludusavi" Rust package
   community.general.cargo:
     name: ludusavi
+
+- name: Install "ludusavi" Rust package with locked dependencies
+  community.general.cargo:
+    name: ludusavi
+    locked: true
 
 - name: Install "ludusavi" Rust package in version 0.10.0
   community.general.cargo:
@@ -94,6 +106,7 @@ class Cargo(object):
         self.path = kwargs["path"]
         self.state = kwargs["state"]
         self.version = kwargs["version"]
+        self.locked = kwargs["locked"]
 
         self.executable = [module.get_bin_path("cargo", True)]
 
@@ -132,6 +145,8 @@ class Cargo(object):
     def install(self, packages=None):
         cmd = ["install"]
         cmd.extend(packages or self.name)
+        if self.locked:
+            cmd.append("--locked")
         if self.path:
             cmd.append("--root")
             cmd.append(self.path)
@@ -164,6 +179,7 @@ def main():
         path=dict(default=None, type="path"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
+        locked=dict(default=False, type="bool"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
@@ -171,6 +187,7 @@ def main():
     path = module.params["path"]
     state = module.params["state"]
     version = module.params["version"]
+    locked = module.params["locked"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
@@ -180,7 +197,7 @@ def main():
         LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
     )
 
-    cargo = Cargo(module, name=name, path=path, state=state, version=version)
+    cargo = Cargo(module, name=name, path=path, state=state, version=version, locked=locked)
     changed, out, err = False, None, None
     installed_packages = cargo.get_installed()
     if state == "present":
