@@ -22,6 +22,7 @@ DOCUMENTATION = '''
             - Path to the jail
         default: inventory_hostname
         vars:
+            - name: inventory_hostname
             - name: ansible_host
             - name: ansible_jail_host
       remote_user:
