@@ -161,14 +161,12 @@ hosts_change_diff:
 '''
 
 import os
-import traceback
 
 from copy import deepcopy
-from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser
-
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils._stormssh import ConfigParser, HAS_PARAMIKO, PARAMIKO_IMPORT_ERROR
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
@@ -182,6 +180,8 @@ class SSHConfig:
         self.config_file = self.params.get('ssh_config_file')
         self.identity_file = self.params['identity_file']
         self.check_ssh_config_path()
+        if not HAS_PARAMIKO:
+            module.fail_json(msg=missing_required_lib('PARAMIKO'), exception=PARAMIKO_IMPORT_ERROR)
         try:
             self.config = ConfigParser(self.config_file)
         except FileNotFoundError:

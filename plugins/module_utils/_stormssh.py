@@ -13,11 +13,10 @@ from operator import itemgetter
 
 __metaclass__ = type
 
-from ansible.module_utils.basic import missing_required_lib
-
 try:
-    import paramiko
+    from paramiko.config import SSHConfig
 except ImportError:
+    SSHConfig = object
     HAS_PARAMIKO = False
     PARAMIKO_IMPORT_ERROR = traceback.format_exc()
 else:
@@ -25,7 +24,7 @@ else:
     PARAMIKO_IMPORT_ERROR = None
 
 
-class StormConfig(paramiko.config.SSHConfig):
+class StormConfig(SSHConfig):
     def parse(self, file_obj):
         """
         Read an OpenSSH config from the given file object.
@@ -182,7 +181,7 @@ class ConfigParser(object):
                 continue
 
             searchable_information = host_entry.get("host")
-            for key, value in ansible.module_utils.six.iteritems(host_entry.get("options")):
+            for key, value in host_entry.get("options").items():
                 if isinstance(value, list):
                     value = " ".join(value)
                 if isinstance(value, int):
@@ -224,7 +223,7 @@ class ConfigParser(object):
                 file_content += host_item.get("value") + "\n"
                 continue
             host_item_content = "Host {0}\n".format(host_item.get("host"))
-            for key, value in ansible.module_utils.six.iteritems(host_item.get("options")):
+            for key, value in host_item.get("options").items():
                 if isinstance(value, list):
                     sub_content = ""
                     for value_ in value:
@@ -259,5 +258,3 @@ class ConfigParser(object):
         return last_index
 
 
-if not HAS_PARAMIKO:
-    module.fail_json(msg=missing_required_lib('PARAMIKO'), exception=PARAMIKO_IMPORT_ERROR)
