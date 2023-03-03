@@ -104,6 +104,10 @@
         PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
       register: yarn_install_old_package
 
+    - assert:
+        that:
+          - yarn_install_old_package is changed
+
     - name: 'Again but without explicit executable path'
       yarn:
         path: '{{ remote_tmp_dir }}'
@@ -112,11 +116,6 @@
         state: present
       environment:
         PATH: '{{ yarn_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}'
-      register: yarn_install_old_package
-
-    - assert:
-        that:
-          - yarn_install_old_package is changed
 
     - name: 'Upgrade old package'
       yarn:
