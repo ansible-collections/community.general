@@ -1,0 +1,2 @@
+bugfixes:
+  - yarn - fix ``global=true`` to not fail when `executable` wasn't specified (https://github.com/ansible-collections/community.general/pull/6132)
