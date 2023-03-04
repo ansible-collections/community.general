@@ -108,6 +108,15 @@
         that:
           - yarn_install_old_package is changed
 
+    - name: 'Again but without explicit executable path'
+      yarn:
+        path: '{{ remote_tmp_dir }}'
+        name: left-pad
+        version: 1.1.0
+        state: present
+      environment:
+        PATH: '{{ yarn_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}'
+
     - name: 'Upgrade old package'
       yarn:
         path: '{{ remote_tmp_dir }}'
