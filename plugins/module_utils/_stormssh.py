@@ -256,5 +256,3 @@ class ConfigParser(object):
             last_index = max(indexes)
 
         return last_index
-
-
