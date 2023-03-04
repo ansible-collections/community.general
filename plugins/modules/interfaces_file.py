@@ -317,7 +317,7 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
     elif state == "absent":
         if len(target_options) >= 1:
             if option in ["pre-up", "up", "down", "post-up"] and value is not None and value != "None":
-                for target_option in filter(lambda i: i['value'] == value, target_options):
+                for target_option in [ito for ito in target_options if ito['value'] == value]:
                     changed = True
                     lines = list(filter(lambda ln: ln != target_option, lines))
             else:
