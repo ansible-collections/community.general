@@ -176,8 +176,8 @@ def getValueFromLine(s):
 
 
 def read_interfaces_file(module, filename):
-    f = open(filename, 'r')
-    return read_interfaces_lines(module, f)
+    with open(filename, 'r') as f:
+        return read_interfaces_lines(module, f)
 
 
 def read_interfaces_lines(module, line_strings):
