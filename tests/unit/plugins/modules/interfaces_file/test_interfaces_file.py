@@ -88,7 +88,6 @@ class TestInterfacesFileModule(unittest.TestCase):
         else:
             with open(testfilepath, 'r') as goldenfile:
                 goldenData = json.load(goldenfile)
-                goldenfile.close()
         self.assertEqual(goldenData, ifaces)
 
     def compareStringWithFile(self, string, path):
