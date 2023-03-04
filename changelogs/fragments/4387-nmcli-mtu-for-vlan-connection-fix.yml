@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - implemented changing mtu value on vlan interfaces (https://github.com/ansible-collections/community.general/issues/4387).
