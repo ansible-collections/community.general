@@ -229,7 +229,7 @@ class Yarn(object):
             return out, err
 
         return None, None
-    
+
     def _process_yarn_error(self, err):
         try:
             # We need to filter for errors, since Yarn warnings are included in stderr
