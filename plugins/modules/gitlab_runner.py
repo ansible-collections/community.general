@@ -234,9 +234,8 @@ class GitLabRunner(object):
             'maximum_timeout': options['maximum_timeout'],
             'tag_list': options['tag_list'],
         }
-        if arguments['access_level'] is not None:
+        if options.get('access_level') is not None:
             arguments['access_level'] = options['access_level']
-
         # Because we have already call userExists in main()
         if self.runner_object is None:
             arguments['description'] = description
@@ -251,7 +250,7 @@ class GitLabRunner(object):
                 access_level_on_creation = False
 
             if not access_level_on_creation:
-                del arguments['access_level']
+                arguments.pop('access_level', None)
 
             runner = self.create_runner(arguments)
             changed = True
