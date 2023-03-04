@@ -663,6 +663,7 @@ ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 vlan.id:                                10
+802-3-ethernet.mtu:                     auto
 """
 
 TESTCASE_VXLAN = [
