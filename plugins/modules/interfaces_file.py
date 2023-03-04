@@ -323,7 +323,7 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
             else:
                 changed = True
                 for target_option in target_options:
-                    lines = list(filter(lambda ln: ln != target_option, lines))
+                    lines = [ln for ln in lines if ln != target_option]
     else:
         module.fail_json(msg="Error: unsupported state %s, has to be either present or absent" % state)
 
