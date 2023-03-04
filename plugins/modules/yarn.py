@@ -179,14 +179,10 @@ class Yarn(object):
         self.registry = kwargs['registry']
         self.production = kwargs['production']
         self.ignore_scripts = kwargs['ignore_scripts']
+        self.executable = kwargs['executable']
 
         # Specify a version of package if version arg passed in
         self.name_version = None
-
-        if kwargs['executable']:
-            self.executable = kwargs['executable'].split(' ')
-        else:
-            self.executable = [module.get_bin_path('yarn', True)]
 
         if kwargs['version'] and self.name is not None:
             self.name_version = self.name + '@' + str(self.version)
@@ -328,7 +324,6 @@ def main():
     version = module.params['version']
     globally = module.params['global']
     production = module.params['production']
-    executable = module.params['executable']
     registry = module.params['registry']
     state = module.params['state']
     ignore_scripts = module.params['ignore_scripts']
@@ -345,9 +340,14 @@ def main():
     if state == 'latest':
         version = 'latest'
 
+    if module.params['executable']:
+        executable = module.params['executable'].split(' ')
+    else:
+        executable = [module.get_bin_path('yarn', True)]
+
     # When installing globally, use the defined path for global node_modules
     if globally:
-        _rc, out, _err = module.run_command([executable, 'global', 'dir'], check_rc=True)
+        _rc, out, _err = module.run_command(executable + ['global', 'dir'], check_rc=True)
         path = out.strip()
 
     yarn = Yarn(module,
