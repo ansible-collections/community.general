@@ -83,9 +83,8 @@ class TestInterfacesFileModule(unittest.TestCase):
         goldenstring = string
         goldenData = ifaces
         if not os.path.isfile(testfilepath):
-            f = io.open(testfilepath, 'wb')
-            f.write(string.encode())
-            f.close()
+            with io.open(testfilepath, 'wb') as f:
+                f.write(string.encode())
         else:
             with open(testfilepath, 'r') as goldenfile:
                 goldenData = json.load(goldenfile)
