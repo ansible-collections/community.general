@@ -260,7 +260,7 @@ def read_interfaces_lines(module, line_strings):
 
 
 def get_interface_options(iface_lines):
-    return list(filter(lambda i: i['line_type'] == 'option', iface_lines))
+    return [i for i in iface_lines if i['line_type'] == 'option']
 
 
 def get_target_options(iface_options, option):
