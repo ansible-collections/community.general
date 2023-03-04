@@ -232,12 +232,12 @@ class Yarn(object):
     
     def _process_yarn_error(self, err):
         try:
-          # We need to filter for errors, since Yarn warnings are included in stderr
-          for line in err.splitlines():
-              if json.loads(line)['type'] == 'error':
-                  self.module.fail_json(msg=err)
+            # We need to filter for errors, since Yarn warnings are included in stderr
+            for line in err.splitlines():
+                if json.loads(line)['type'] == 'error':
+                    self.module.fail_json(msg=err)
         except Exception:
-          self.module.fail_json(msg="Unexpected error from Yarn", err=err)
+            self.module.fail_json(msg="Unexpected error from Yarn", err=err)
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']
