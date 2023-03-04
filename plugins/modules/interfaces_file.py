@@ -263,7 +263,7 @@ def get_interface_options(iface_lines):
 
 
 def get_target_options(iface_options, option):
-    return [i for i in iface_options if  i['option'] == option]
+    return [i for i in iface_options if i['option'] == option]
 
 
 def update_existing_option_line(target_option, value):
