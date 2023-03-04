@@ -229,6 +229,15 @@ class Yarn(object):
             return out, err
 
         return None, None
+    
+    def _process_yarn_error(self, err):
+        try:
+          # We need to filter for errors, since Yarn warnings are included in stderr
+          for line in err.splitlines():
+              if json.loads(line)['type'] == 'error':
+                  self.module.fail_json(msg=err)
+        except Exception:
+          self.module.fail_json(msg="Unexpected error from Yarn", err=err)
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']
@@ -244,9 +253,7 @@ class Yarn(object):
         # because it only only lists binaries, but `yarn global add` can install libraries too.
         result, error = self._exec(cmd, run_in_check_mode=True, check_rc=False, unsupported_with_global=True)
 
-        for line in error.splitlines():
-            if json.loads(line)['type'] == 'error':
-                self.module.fail_json(msg=error)
+        self._process_yarn_error(error)
 
         for json_line in result.strip().split('\n'):
             data = json.loads(json_line)
@@ -284,9 +291,7 @@ class Yarn(object):
         cmd_result, err = self._exec(['outdated', '--json'], True, False, unsupported_with_global=True)
 
         # the package.json in the global dir is missing a license field, so warnings are expected on stderr
-        for line in err.splitlines():
-            if json.loads(line)['type'] == 'error':
-                self.module.fail_json(msg=err)
+        self._process_yarn_error(err)
 
         if not cmd_result:
             return outdated
