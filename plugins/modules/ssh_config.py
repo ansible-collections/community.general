@@ -170,9 +170,11 @@ from ansible_collections.community.general.plugins.module_utils._stormssh import
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
-class SSHConfig:
+class SSHConfig(object):
     def __init__(self, module):
         self.module = module
+        if not HAS_PARAMIKO:
+            module.fail_json(msg=missing_required_lib('PARAMIKO'), exception=PARAMIKO_IMPORT_ERROR)
         self.params = module.params
         self.user = self.params.get('user')
         self.group = self.params.get('group') or self.user
@@ -180,8 +182,6 @@ class SSHConfig:
         self.config_file = self.params.get('ssh_config_file')
         self.identity_file = self.params['identity_file']
         self.check_ssh_config_path()
-        if not HAS_PARAMIKO:
-            module.fail_json(msg=missing_required_lib('PARAMIKO'), exception=PARAMIKO_IMPORT_ERROR)
         try:
             self.config = ConfigParser(self.config_file)
         except FileNotFoundError:
