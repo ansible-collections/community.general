@@ -237,7 +237,7 @@ class Yarn(object):
                 if json.loads(line)['type'] == 'error':
                     self.module.fail_json(msg=err)
         except Exception:
-            self.module.fail_json(msg="Unexpected error from Yarn", err=err)
+            self.module.fail_json(msg="Unexpected stderr output from Yarn: %s" % err, stderr=err)
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']
