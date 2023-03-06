@@ -29,7 +29,7 @@
     issue: "{{ non_existent_issue }}"
     action: get_status
   register: get_status_0003
-  ignore_errors: True
+  ignore_errors: true
 
 - assert:
     that:

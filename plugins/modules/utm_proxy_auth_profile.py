@@ -58,9 +58,6 @@ options:
           - Should the login data be stripped when proxying the request to the backend host
         type: bool
         default: true
-        choices:
-          - True
-          - False
     backend_user_prefix:
         type: str
         description:
@@ -118,9 +115,6 @@ options:
           - Allow session persistency
         type: bool
         default: false
-        choices:
-          - True
-          - False
     frontend_session_lifetime:
         type: int
         description:
@@ -131,9 +125,6 @@ options:
           - Specifies if limitation of session lifetime is active
         type: bool
         default: true
-        choices:
-          - True
-          - False
     frontend_session_lifetime_scope:
         type: str
         description:
@@ -153,9 +144,6 @@ options:
           - Specifies if session timeout is active
         type: bool
         default: true
-        choices:
-          - True
-          - False
     frontend_session_timeout_scope:
         type: str
         description:
@@ -184,9 +172,6 @@ options:
           - Should a redirect to the requested URL be made
         type: bool
         default: false
-        choices:
-          - True
-          - False
 
 extends_documentation_fragment:
 - community.general.utm
@@ -336,7 +321,7 @@ def main():
             aaa=dict(type='list', elements='str', required=True),
             basic_prompt=dict(type='str', required=True),
             backend_mode=dict(type='str', required=False, default="None", choices=['Basic', 'None']),
-            backend_strip_basic_auth=dict(type='bool', required=False, default=True, choices=[True, False]),
+            backend_strip_basic_auth=dict(type='bool', required=False, default=True),
             backend_user_prefix=dict(type='str', required=False, default=""),
             backend_user_suffix=dict(type='str', required=False, default=""),
             comment=dict(type='str', required=False, default=""),
@@ -348,16 +333,16 @@ def main():
             frontend_logout=dict(type='str', required=False),
             frontend_mode=dict(type='str', required=False, default="Basic", choices=['Basic', 'Form']),
             frontend_realm=dict(type='str', required=False),
-            frontend_session_allow_persistency=dict(type='bool', required=False, default=False, choices=[True, False]),
+            frontend_session_allow_persistency=dict(type='bool', required=False, default=False),
             frontend_session_lifetime=dict(type='int', required=True),
-            frontend_session_lifetime_limited=dict(type='bool', required=False, default=True, choices=[True, False]),
+            frontend_session_lifetime_limited=dict(type='bool', required=False, default=True),
             frontend_session_lifetime_scope=dict(type='str', required=False, default="hours", choices=['days', 'hours', 'minutes']),
             frontend_session_timeout=dict(type='int', required=True),
-            frontend_session_timeout_enabled=dict(type='bool', required=False, default=True, choices=[True, False]),
+            frontend_session_timeout_enabled=dict(type='bool', required=False, default=True),
             frontend_session_timeout_scope=dict(type='str', required=False, default="minutes", choices=['days', 'hours', 'minutes']),
             logout_delegation_urls=dict(type='list', elements='str', required=False, default=[]),
             logout_mode=dict(type='str', required=False, default="None", choices=['None', 'Delegation']),
-            redirect_to_requested_url=dict(type='bool', required=False, default=False, choices=[True, False])
+            redirect_to_requested_url=dict(type='bool', required=False, default=False)
         )
     )
     try:
