@@ -108,7 +108,7 @@ EXAMPLES = r'''
     device: en1
     attributes:
       mtu: 900
-      arp: false
+      arp: 'off'
     state: available
 
 - name: Configure IP, netmask and set en1 up.
