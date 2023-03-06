@@ -115,9 +115,6 @@ options:
           - Allow session persistency
         type: bool
         default: false
-        choices:
-          - True
-          - False
     frontend_session_lifetime:
         type: int
         description:
