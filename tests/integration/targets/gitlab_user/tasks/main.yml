@@ -32,7 +32,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     password: "{{ gitlab_user_pass }}"
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -49,7 +49,7 @@
     name: ansible_test_user
     username: ansible_test_user
     password: Secr3tPassw00rd
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state_again
@@ -68,7 +68,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     isadmin: true
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -86,7 +86,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     isadmin: true
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -104,7 +104,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     isadmin: false
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -122,8 +122,8 @@
     email: foo@bar.baz
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
-    confirm: True
-    validate_certs: False
+    confirm: true
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -141,7 +141,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     confirm: false
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -159,7 +159,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     confirm: false
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -177,7 +177,7 @@
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
     confirm: false
-    validate_certs: False
+    validate_certs: false
     api_token: "{{ gitlab_login_token }}"
     state: present
   register: gitlab_user_state
@@ -192,7 +192,7 @@
 - name: Update User Test => Change User Password
   gitlab_user:
     api_url: "{{ gitlab_host }}"
-    validate_certs: False
+    validate_certs: false
 
     # note: the only way to check if a password really is what it is expected
     #   to be is to use it for login, so we use it here instead of the
@@ -218,7 +218,7 @@
 - name: Update User Test => Reset User Password
   gitlab_user:
     api_url: "{{ gitlab_host }}"
-    validate_certs: False
+    validate_certs: false
 
     api_username: "{{ gitlab_user }}"
     api_password: new-super-password
@@ -238,7 +238,7 @@
 - name: Update User Test => Check that password was reset
   gitlab_user:
     api_url: "{{ gitlab_host }}"
-    validate_certs: False
+    validate_certs: false
 
     api_username: "{{ gitlab_user }}"
     api_password: "{{ gitlab_user_pass }}"
