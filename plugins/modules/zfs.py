@@ -62,7 +62,7 @@ EXAMPLES = '''
     name: rpool/myfs
     state: present
     extra_zfs_properties:
-      setuid: off
+      setuid: 'off'
 
 - name: Create a new volume called myvol in pool rpool.
   community.general.zfs:

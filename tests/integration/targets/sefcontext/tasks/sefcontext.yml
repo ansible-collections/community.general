@@ -111,7 +111,7 @@
     path: /tmp/foo
     substitute: /home
     state: present
-    reload: no
+    reload: false
   register: subst_first
 
 - assert:
@@ -124,7 +124,7 @@
     path: /tmp/foo
     substitute: /home
     state: present
-    reload: no
+    reload: false
   register: subst_second
 
 - assert:
@@ -137,7 +137,7 @@
     path: /tmp/foo
     substitute: /boot
     state: present
-    reload: no
+    reload: false
   register: subst_third
 
 - assert:
@@ -150,7 +150,7 @@
     path: /tmp/foo
     substitute: /boot
     state: present
-    reload: no
+    reload: false
   register: subst_fourth
 
 - assert:
@@ -163,7 +163,7 @@
     path: /tmp/foo
     substitute: /dev
     state: absent
-    reload: no
+    reload: false
   register: subst_fifth
 
 - assert:
@@ -176,7 +176,7 @@
     path: /tmp/foo
     substitute: /boot
     state: absent
-    reload: no
+    reload: false
   register: subst_sixth
 
 - assert:
@@ -189,7 +189,7 @@
     path: /tmp/foo
     substitute: /boot
     state: absent
-    reload: no
+    reload: false
   register: subst_seventh
 
 - assert:
@@ -202,7 +202,7 @@
     path: /tmp/foo
     substitute: /home
     state: present
-    reload: no
+    reload: false
   register: subst_eighth
 
 - assert:
@@ -214,7 +214,7 @@
   sefcontext:
     path: /tmp/foo
     state: absent
-    reload: no
+    reload: false
   register: subst_ninth
 
 - assert:
@@ -225,7 +225,7 @@
   sefcontext:
     path: /tmp/foo
     state: absent
-    reload: no
+    reload: false
   register: subst_tenth
 
 - assert:

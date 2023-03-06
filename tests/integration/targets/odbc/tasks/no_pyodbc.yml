@@ -7,7 +7,7 @@
   odbc:
     dsn: "Test"
     query: "SELECT * FROM nothing"
-  ignore_errors: True
+  ignore_errors: true
   register: results
 
 - assert:

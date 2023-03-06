@@ -22,7 +22,7 @@
       - vars
 
 - name: Install OpenSSL
-  become: True
+  become: true
   package:
     name: '{{ openssl_package_name }}'
   when: not ansible_os_family == 'Darwin'
@@ -49,13 +49,13 @@
     when: cryptography_from_pip
 
 - name: Install pyOpenSSL (Python 3)
-  become: True
+  become: true
   package:
     name: '{{ pyopenssl_package_name_python3 }}'
   when: pyopenssl_package_name_python3 is defined and ansible_python_version is version('3.0', '>=')
 
 - name: Install pyOpenSSL (Python 2)
-  become: True
+  become: true
   package:
     name: '{{ pyopenssl_package_name }}'
   when: pyopenssl_package_name is defined and ansible_python_version is version('3.0', '<')

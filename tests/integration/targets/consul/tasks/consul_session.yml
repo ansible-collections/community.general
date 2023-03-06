@@ -45,7 +45,7 @@
 
 - name: search created session
   set_fact:
-    test_session_found: True
+    test_session_found: true
   loop: "{{ result['sessions'] }}"
   when: "item.get('ID') == session_id and item.get('Name') == 'testsession'"
 
@@ -69,7 +69,7 @@
     state: info
     name: test
   register: result
-  ignore_errors: True
+  ignore_errors: true
 
 - assert:
     that:
@@ -81,7 +81,7 @@
     id: '{{ session_id }}'
     scheme: non_existent
   register: result
-  ignore_errors: True
+  ignore_errors: true
 
 - assert:
     that:
@@ -94,7 +94,7 @@
     port: 8501
     scheme: https
   register: result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: previous task should fail since certificate is not known
   assert:
@@ -108,7 +108,7 @@
     id: '{{ session_id }}'
     port: 8501
     scheme: https
-    validate_certs: False
+    validate_certs: false
   register: result
 
 - name: previous task should succeed since certificate isn't checked

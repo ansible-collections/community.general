@@ -16,7 +16,7 @@
 - name: Create {{ gitlab_project_name }}
   gitlab_project:
     server_url: "{{ gitlab_host }}"
-    validate_certs: False
+    validate_certs: false
     login_token: "{{ gitlab_login_token }}"
     name: "{{ gitlab_project_name }}"
     state: present

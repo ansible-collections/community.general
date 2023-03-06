@@ -16,7 +16,7 @@
     dsn: "t1"
     query: "SELECT * FROM nothing"
   register: results
-  ignore_errors: True
+  ignore_errors: true
 
 - assert:
     that:

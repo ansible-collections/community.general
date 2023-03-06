@@ -178,7 +178,7 @@
       state: present
       bindir: "{{ remote_tmp_dir }}/custom_bindir"
       norc: true
-      user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
+      user_install: false  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
     register: install_gem_result
 
   - name: Get stats of gem executable
@@ -198,7 +198,7 @@
       state: absent
       bindir: "{{ remote_tmp_dir }}/custom_bindir"
       norc: true
-      user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
+      user_install: false  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
     register: install_gem_result
 
   - name: Get stats of gem executable

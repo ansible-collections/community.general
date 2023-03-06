@@ -53,7 +53,7 @@
     - name: Create a user to run the tests with
       shell: echo "CREATE USER {{ my_user }} SUPERUSER PASSWORD '{{ my_pass }}'" | psql postgres
       become_user: "{{ pg_user }}"
-      become: True
+      become: true
 
     - name: Create a table
       odbc:
@@ -68,7 +68,7 @@
                 len         interval hour to minute
             );
       become_user: "{{ pg_user }}"
-      become: True
+      become: true
       register: results
 
     - assert:
@@ -83,7 +83,7 @@
         dsn: "{{ dsn }}"
         query: "INSERT INTO films (code, title, did, date_prod, kind, len) VALUES ('asdfg', 'My First Movie', 1, '2019-01-12', 'SyFi', '02:00')"
       become_user: "{{ pg_user }}"
-      become: True
+      become: true
       register: results
 
     - assert:
@@ -102,7 +102,7 @@
           - 'Comedy'
           - '01:30'
       become_user: "{{ pg_user }}"
-      become: True
+      become: true
       register: results
 
     - assert:
@@ -135,7 +135,7 @@
           - 'asdfg'
           - 'qwert'
       register: results
-      changed_when: False
+      changed_when: false
 
     - assert:
         that:

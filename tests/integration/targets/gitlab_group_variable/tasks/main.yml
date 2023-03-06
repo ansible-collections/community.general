@@ -18,7 +18,7 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    purge: True
+    purge: true
 
 - name: add a variable value in check_mode
   gitlab_group_variable:
@@ -73,7 +73,7 @@
     vars:
       ACCESS_KEY_ID:
         value: checkmode
-        protected: True
+        protected: true
   register: gitlab_group_variable_state
 
 - name: state must be changed
@@ -89,7 +89,7 @@
     vars:
       ACCESS_KEY_ID:
         value: checkmode
-        protected: False
+        protected: false
   register: gitlab_group_variable_state
 
 - name: state must be changed
@@ -105,7 +105,7 @@
     vars:
       ACCESS_KEY_ID:
         value: checkmode
-        masked: True
+        masked: true
   register: gitlab_group_variable_state
 
 - name: state must be changed
@@ -151,8 +151,8 @@
     vars:
       ACCESS_KEY_ID:
         value: checkmode
-        masked: True
-        protected: True
+        masked: true
+        protected: true
         variable_type: env_var
   register: gitlab_group_variable_state
 
@@ -169,8 +169,8 @@
     vars:
       ACCESS_KEY_ID:
         value: checkmode
-        masked: True
-        protected: True
+        masked: true
+        protected: true
         variable_type: env_var
   register: gitlab_group_variable_state
 
@@ -187,7 +187,7 @@
     vars:
       ACCESS_KEY_ID:
         value: checkmode
-        protected: False
+        protected: false
   register: gitlab_group_variable_state
 
 - name: state must be changed
@@ -265,7 +265,7 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    purge: True
+    purge: true
 
 - name: set two test variables
   gitlab_group_variable:
@@ -312,7 +312,7 @@
     group: "{{ gitlab_group_name }}"
     vars:
       ACCESS_KEY_ID: changed
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: edit one variable state must be changed
@@ -332,7 +332,7 @@
     group: "{{ gitlab_group_name }}"
     vars:
       some: value
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: append one variable state must be changed
@@ -372,7 +372,7 @@
     group: "{{ gitlab_group_name }}"
     vars:
       some: value
-    purge: True
+    purge: true
   register: gitlab_group_variable_state
 
 - name: set one variables and purge all others state must be changed
@@ -391,7 +391,7 @@
     group: "{{ gitlab_group_name }}"
     vars:
       some: value
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: only one variable is left state must not be changed
@@ -411,7 +411,7 @@
     group: "{{ gitlab_group_name }}"
     vars:
       some: 42
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: only one variable is left state must be changed
@@ -430,7 +430,7 @@
     group: "{{ gitlab_group_name }}"
     vars:
       some: 42.23
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: only one variable is left state must be changed
@@ -471,7 +471,7 @@
       - name: my_test_var
         value: my_test_value
         variable_type: file
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: append one variable state must be changed
@@ -562,7 +562,7 @@
       page1_var18: value
       page1_var19: value
       page1_var20: value
-    purge: True
+    purge: true
   register: gitlab_group_variable_state
 
 - name: complete page added state must be changed
@@ -598,7 +598,7 @@
       page2_var18: value
       page2_var19: value
       page2_var20: value
-    purge: False
+    purge: false
   register: gitlab_group_variable_state
 
 - name: existing page untouched state must be changed
@@ -613,7 +613,7 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    purge: True
+    purge: true
   register: gitlab_group_variable_state
 
 - name: check that no variables are untouched state must be changed
@@ -630,7 +630,7 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    purge: True
+    purge: true
     variables:
       - name: SECRET_ACCESS_KEY
         value: 3214cbad
@@ -678,7 +678,7 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    purge: True
+    purge: true
     variables:
       - name: delete_me
         value: ansible

@@ -71,7 +71,7 @@
     community.general.apache2_module:
       name: autoindex
       state: absent
-      force: True
+      force: true
 
   - name: reenable autoindex
     community.general.apache2_module:
@@ -93,7 +93,7 @@
     community.general.apache2_module:
       name: dump_io
       state: present
-    ignore_errors: True
+    ignore_errors: true
     register: enable_dumpio_wrong
 
   - name: disable dump_io
@@ -132,7 +132,7 @@
     community.general.apache2_module:
       name: "{{ item }}"
       state: absent
-      ignore_configcheck: True
+      ignore_configcheck: true
     with_items:
       - mpm_worker
       - mpm_event
@@ -142,7 +142,7 @@
     community.general.apache2_module:
       name: mpm_event
       state: present
-      ignore_configcheck: True
+      ignore_configcheck: true
     register: enabledmpmevent
 
   - name: ensure changed mpm_event
@@ -154,7 +154,7 @@
     community.general.apache2_module:
       name: "{{ item.name }}"
       state: "{{ item.state }}"
-      ignore_configcheck: True
+      ignore_configcheck: true
     with_items:
       - name: mpm_event
         state: absent
@@ -193,7 +193,7 @@
     community.general.apache2_module:
       name: "{{item}}"
       state: absent
-      ignore_configcheck: True
+      ignore_configcheck: true
     with_items:
       - mpm_worker
       - mpm_event
@@ -203,5 +203,5 @@
     community.general.apache2_module:
       name: mpm_event
       state: present
-      ignore_configcheck: True
+      ignore_configcheck: true
     register: enabledmpmevent

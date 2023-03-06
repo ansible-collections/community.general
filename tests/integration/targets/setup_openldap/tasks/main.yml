@@ -14,25 +14,25 @@
       include_vars: '{{ ansible_os_family }}.yml'
 
     - name: Install OpenLDAP server and tools
-      become: True
+      become: true
       package:
         name: '{{ item }}'
       loop: '{{ openldap_packages_name }}'
 
     - name: Install python-ldap (Python 3)
-      become: True
+      become: true
       package:
         name: '{{ python_ldap_package_name_python3 }}'
       when: ansible_python_version is version('3.0', '>=')
 
     - name: Install python-ldap (Python 2)
-      become: True
+      become: true
       package:
         name: '{{ python_ldap_package_name }}'
       when: ansible_python_version is version('3.0', '<')
 
     - name: Make sure OpenLDAP service is stopped
-      become: True
+      become: true
       shell: 'cat /var/run/slapd/slapd.pid | xargs -r kill -9 '
 
     - name: Debconf
@@ -45,14 +45,14 @@
         creates: "/root/slapd_configured"
 
     - name: Start OpenLDAP service
-      become: True
+      become: true
       service:
         name: '{{ openldap_service_name }}'
-        enabled: True
+        enabled: true
         state: started
 
     - name: Copy initial config ldif file
-      become: True
+      become: true
       copy:
         src: 'files/{{ item }}'
         dest: '/tmp/{{ item }}'
@@ -67,6 +67,6 @@
       shell: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/rootpw_cnconfig.ldif"
 
     - name: Add initial config
-      become: True
+      become: true
       shell: 'ldapadd -H ldapi:/// -x -D "cn=admin,dc=example,dc=com" -w Test1234! -f /tmp/initial_config.ldif'
   when: ansible_os_family in ['Ubuntu', 'Debian']
