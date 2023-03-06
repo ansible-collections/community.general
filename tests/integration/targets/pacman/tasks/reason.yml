@@ -41,7 +41,7 @@
           - '{{url_pkg_url.stdout}}'
           - '{{file_pkg_path}}'
         reason: dependency
-      check_mode: True
+      check_mode: true
       register: install_1
 
     - name: Install packages from mixed sources as explicit

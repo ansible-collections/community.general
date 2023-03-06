@@ -968,7 +968,6 @@ options:
                     - Enable or disable IPSec tunnel to L2TP host.
                     - This option is need when C(service-type) is C(org.freedesktop.NetworkManager.l2tp).
                 type: bool
-                choices: [ yes, no ]
             ipsec-psk:
                 description:
                     - The pre-shared key in base64 encoding.

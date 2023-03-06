@@ -100,7 +100,7 @@ powerstate:
     description: The current power state of the machine.
     returned: success and I(machine) is not provided
     type: str
-    sample: on
+    sample: 'on'
 status:
     description: The current power state of the machine when the machine option is set.
     returned: success and I(machine) is provided
@@ -132,14 +132,14 @@ EXAMPLES = '''
     name: test.testdomain.com
     user: admin
     password: password
-    state: on
+    state: 'on'
 
 - name: Ensure machines of which remote target address is 48 and 50 are powered off
   community.general.ipmi_power:
     name: test.testdomain.com
     user: admin
     password: password
-    state: off
+    state: 'off'
     machine:
       - targetAddress: 48
       - targetAddress: 50
@@ -151,9 +151,9 @@ EXAMPLES = '''
     password: password
     machine:
       - targetAddress: 48
-        state: on
+        state: 'on'
       - targetAddress: 50
-        state: off
+        state: 'off'
 '''
 
 import traceback

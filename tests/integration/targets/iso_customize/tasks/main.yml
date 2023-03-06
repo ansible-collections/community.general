@@ -61,7 +61,7 @@
       - "{{ test_dir }}/test01.cfg"
       - "{{ test_dir }}/test02.cfg"
     dest_iso: "{{ test_dir }}/test.iso"
-    udf: True
+    udf: true
 
 - include_tasks: iso_customize.yml
   vars:

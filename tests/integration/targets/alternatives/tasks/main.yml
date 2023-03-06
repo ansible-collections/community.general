@@ -19,8 +19,8 @@
 
   - include_tasks: tests.yml
     with_nested:
-        - [ True, False ] # with_link
-        - [ True, False ] # with_alternatives
+        - [ true, false ] # with_link
+        - [ true, false ] # with_alternatives
         - [ 'auto', 'manual' ] # mode
     loop_control:
       loop_var: test_conf
@@ -34,7 +34,7 @@
     - include_tasks: tests_set_priority.yml
       with_sequence: start=3 end=4
     vars:
-      with_alternatives: True
+      with_alternatives: true
       mode: auto
 
   - block:
@@ -44,7 +44,7 @@
     - include_tasks: tests_set_priority.yml
       with_sequence: start=3 end=4
     vars:
-      with_alternatives: False
+      with_alternatives: false
       mode: auto
 
   # Test that path is checked: alternatives must fail when path is nonexistent

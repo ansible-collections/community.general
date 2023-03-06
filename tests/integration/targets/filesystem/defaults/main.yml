@@ -6,7 +6,7 @@
 tested_filesystems:
   # key: fstype
   #   fssize: size (Mo)
-  #   grow: True if resizefs is supported
+  #   grow: true if resizefs is supported
   # Other minimal sizes:
   # - XFS: 20Mo
   # - Btrfs: 150Mo (50Mo when "--metadata single" is used and 100Mb when on newer Fedora versions)
@@ -15,19 +15,19 @@ tested_filesystems:
   #     - 1.7.0 requires at least 30Mo
   #     - 1.10.0 requires at least 38Mo
   #     - resizefs asserts when initial fs is smaller than 60Mo and seems to require 1.10.0
-  ext4: {fssize: 10, grow: True}
-  ext4dev: {fssize: 10, grow: True}
-  ext3: {fssize: 10, grow: True}
-  ext2: {fssize: 10, grow: True}
-  xfs: {fssize: 300, grow: False}  # grow requires a mounted filesystem
-  btrfs: {fssize: 150, grow: False}  # grow requires a mounted filesystem
-  reiserfs: {fssize: 33, grow: False}  # grow not implemented
-  vfat: {fssize: 20, grow: True}
-  ocfs2: {fssize: '{{ ocfs2_fssize }}', grow: False}  # grow not implemented
+  ext4: {fssize: 10, grow: true}
+  ext4dev: {fssize: 10, grow: true}
+  ext3: {fssize: 10, grow: true}
+  ext2: {fssize: 10, grow: true}
+  xfs: {fssize: 300, grow: false}  # grow requires a mounted filesystem
+  btrfs: {fssize: 150, grow: false}  # grow requires a mounted filesystem
+  reiserfs: {fssize: 33, grow: false}  # grow not implemented
+  vfat: {fssize: 20, grow: true}
+  ocfs2: {fssize: '{{ ocfs2_fssize }}', grow: false}  # grow not implemented
   f2fs: {fssize: '{{ f2fs_fssize|default(60) }}', grow: 'f2fs_version is version("1.10.0", ">=")'}
-  lvm: {fssize: 20, grow: True}
-  swap: {fssize: 10, grow: False}  # grow not implemented
-  ufs: {fssize: 10, grow: True}
+  lvm: {fssize: 20, grow: true}
+  swap: {fssize: 10, grow: false}  # grow not implemented
+  ufs: {fssize: 10, grow: true}
 
 
 get_uuid_any: "blkid -c /dev/null -o value -s UUID {{ dev }}"

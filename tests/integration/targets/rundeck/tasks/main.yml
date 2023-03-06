@@ -105,7 +105,7 @@
     job_id: "{{ rundeck_job_id }}"
     job_options:
       sleep: "5"
-    wait_execution: False
+    wait_execution: false
   register: rundeck_job_run_forget
 
 - name: Assert that Rundeck job test_job is running

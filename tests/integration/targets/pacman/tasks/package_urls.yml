@@ -66,14 +66,14 @@
           - '{{reg_pkg}}'
           - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
-      check_mode: True
+      check_mode: true
       register: install_1
 
     - name: Install packages from url (check mode, cached)
       pacman:
         name:
           - '{{url_pkg_url}}'
-      check_mode: True
+      check_mode: true
       register: install_1c
     - name: Delete cached {{url_pkg}}
       file:
@@ -141,14 +141,14 @@
           - '{{reg_pkg}}'
           - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
-      check_mode: True
+      check_mode: true
       register: uninstall_1
     - name: Uninstall packages - url (check mode, cached)
       pacman:
         state: absent
         name:
           - '{{url_pkg_url}}'
-      check_mode: True
+      check_mode: true
       register: uninstall_1c
     - name: Delete cached {{url_pkg}}
       file:
