@@ -20,7 +20,7 @@
     auth_password: "{{ admin_password }}"
     realm: "{{ realm }}"
     client_id: "{{ client_id }}"
-    service_accounts_enabled: True
+    service_accounts_enabled: true
     state: present
   register: client
 

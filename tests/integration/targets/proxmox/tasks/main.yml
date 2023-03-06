@@ -285,7 +285,7 @@
         interface: net5
         bridge: vmbr0
         tag: 24
-        firewall: True
+        firewall: true
       register: results
 
     - assert:

@@ -149,7 +149,7 @@
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test5.iso"
-    udf: True
+    udf: true
   register: iso_result
 - debug: var=iso_result
 

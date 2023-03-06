@@ -58,9 +58,6 @@ options:
           - Should the login data be stripped when proxying the request to the backend host
         type: bool
         default: true
-        choices:
-          - True
-          - False
     backend_user_prefix:
         type: str
         description:
@@ -131,9 +128,6 @@ options:
           - Specifies if limitation of session lifetime is active
         type: bool
         default: true
-        choices:
-          - True
-          - False
     frontend_session_lifetime_scope:
         type: str
         description:
@@ -153,9 +147,6 @@ options:
           - Specifies if session timeout is active
         type: bool
         default: true
-        choices:
-          - True
-          - False
     frontend_session_timeout_scope:
         type: str
         description:
@@ -184,9 +175,6 @@ options:
           - Should a redirect to the requested URL be made
         type: bool
         default: false
-        choices:
-          - True
-          - False
 
 extends_documentation_fragment:
 - community.general.utm

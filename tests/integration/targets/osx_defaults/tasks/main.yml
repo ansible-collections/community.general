@@ -185,8 +185,8 @@
     - { type: 'int', value: 1, key: 'sample_int'}
     - { type: 'integer', value: 1, key: 'sample_int_2'}
     - { type: 'integer', value: -1, key: 'negative_int'}
-    - { type: 'bool', value: True, key: 'sample_bool'}
-    - { type: 'boolean', value: True, key: 'sample_bool_2'}
+    - { type: 'bool', value: true, key: 'sample_bool'}
+    - { type: 'boolean', value: true, key: 'sample_bool_2'}
     - { type: 'date', value: "2019-02-19 10:10:10", key: 'sample_date'}
     - { type: 'float', value: 1.2, key: 'sample_float'}
     - { type: 'string', value: 'sample', key: 'sample_string'}
