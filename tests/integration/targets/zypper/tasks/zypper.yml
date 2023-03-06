@@ -22,7 +22,7 @@
 
 - name: check hello with rpm
   shell: rpm -q hello
-  failed_when: False
+  failed_when: false
   register: rpm_result
 
 - debug: var=zypper_result
@@ -55,7 +55,7 @@
 
 - name: check hello with rpm
   shell: rpm -q hello
-  failed_when: False
+  failed_when: false
   register: rpm_result
 
 - debug: var=zypper_result
@@ -91,12 +91,12 @@
 
 - name: check hello with rpm
   shell: rpm -q hello
-  failed_when: False
+  failed_when: false
   register: rpm_hello_result
 
 - name: check metamail with rpm
   shell: rpm -q metamail
-  failed_when: False
+  failed_when: false
   register: rpm_metamail_result
 
 - name: verify packages uninstalled
@@ -115,12 +115,12 @@
 
 - name: check hello with rpm
   shell: rpm -q hello
-  failed_when: False
+  failed_when: false
   register: rpm_hello_result
 
 - name: check metamail with rpm
   shell: rpm -q metamail
-  failed_when: False
+  failed_when: false
   register: rpm_metamail_result
 
 - name: verify packages installed
@@ -224,7 +224,7 @@
 
 - name: check empty with rpm
   shell: rpm -q empty
-  failed_when: False
+  failed_when: false
   register: rpm_result
 
 - name: verify installation of empty
@@ -406,15 +406,15 @@
   zypper:
     name: hello
     state: present
-    update_cache: True
+    update_cache: true
   register: zypper_result_update_cache
 
 - name: run updatecache in check mode
   zypper:
     name: hello
     state: present
-    update_cache: True
-  check_mode: True
+    update_cache: true
+  check_mode: true
   register: zypper_result_update_cache_check
 
 

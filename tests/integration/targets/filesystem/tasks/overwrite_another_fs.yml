@@ -24,7 +24,7 @@
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
   register: fs_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: 'Get UUID of the filesystem'
   ansible.builtin.shell:

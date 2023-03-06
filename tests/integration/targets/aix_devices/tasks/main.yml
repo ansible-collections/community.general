@@ -61,7 +61,7 @@
     device: en1
     attributes:
       mtu: 900
-      arp: off
+      arp: 'off'
     state: present
 
 - name: Configure IP, netmask and set en1 up.
