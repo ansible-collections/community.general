@@ -83,7 +83,7 @@
 - name: Execute the current dummysubcmd command
   command: dummysubcmd
   register: cmd
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Ensure that the subcommand is gone
   assert:
@@ -166,7 +166,7 @@
 - name: Execute the current dummysubcmd command
   command: dummysubcmd
   register: cmd
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Ensure that the subcommand is gone
   assert:

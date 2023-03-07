@@ -45,7 +45,7 @@
   debug:
     var: "invalid_comma_separated | community.general.from_csv(strict=True)"
   register: _invalid_csv_strict_true
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Test invalid csv input when strict=True is failed
   assert:
