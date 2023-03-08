@@ -26,6 +26,7 @@ class Response(object):
     def __init__(self):
         self.content = None
         self.status_code = None
+        self.stderr = None
 
     def json(self):
         return json.loads(self.content)
@@ -75,6 +76,10 @@ def memset_api_call(api_key, api_method, payload=None):
             msg = "Memset API returned a {0} response ({1}, {2})." . format(response.status_code, response.json()['error_type'], response.json()['error'])
         else:
             msg = "Memset API returned an error ({0}, {1})." . format(response.json()['error_type'], response.json()['error'])
+    except urllib_error.URLError as e:
+        has_failed = True
+        msg = "An URLError occured ({0})." . format(type(e))
+        response.stderr = "{0}" . format(e)
 
     if msg is None:
         msg = response.json()

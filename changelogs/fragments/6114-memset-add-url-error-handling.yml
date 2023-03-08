@@ -1,0 +1,2 @@
+bugfixes:
+  - "memset - fix memset urlerror handling (https://github.com/ansible-collections/community.general/pull/6114)."
