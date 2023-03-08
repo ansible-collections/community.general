@@ -178,6 +178,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if self._options['port']:
                 cmd.append('-p')
+                cmd.append(','.join(self._options['port']))
 
             if not self._options['ports']:
                 cmd.append('-sP')
