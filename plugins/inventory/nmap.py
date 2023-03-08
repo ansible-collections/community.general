@@ -38,7 +38,8 @@ DOCUMENTATION = '''
             description:
                 - Only scan specific port or port range (C(-p)).
                 - Ex: (C(22; 1-65535; U:53,111,137,T:21-25,80,139,8080,S:9))
-            type: string
+            type: list
+            elements: string
         ports:
             description: Enable/disable scanning for open ports
             type: boolean
