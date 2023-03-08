@@ -139,7 +139,10 @@ def reload_dns(args=None):
         # manifest themselves at this point so we need to ensure the user is
         # informed of the reason.
         retvals['failed'] = has_failed
-        retvals['memset_api'] = response.json()
+        if response.status_code is not None:
+            retvals['memset_api'] = response.json()
+        else:
+            retvals['stderr'] = response.stderr
         retvals['msg'] = msg
         return retvals
 
