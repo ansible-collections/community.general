@@ -264,6 +264,9 @@ def create_or_delete(args=None):
         retvals['failed'] = _has_failed
         retvals['msg'] = _msg
 
+        if response.stderr is not None:
+            retvals['stderr'] = response.stderr
+
         return retvals
 
     zone_exists, _msg, counter, _zone_id = get_zone_id(zone_name=args['name'], current_zones=response.json())
