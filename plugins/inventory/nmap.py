@@ -34,6 +34,11 @@ DOCUMENTATION = '''
             description: list of addresses to exclude
             type: list
             elements: string
+        port:
+            description:
+                - Only scan specific port or port range (C(-p)).
+                - Ex: 22; 1-65535; U:53,111,137,T:21-25,80,139,8080,S:9
+            type: string
         ports:
             description: Enable/disable scanning for open ports
             type: boolean
@@ -170,6 +175,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if self._options['sudo']:
                 cmd.insert(0, 'sudo')
+
+            if self._options['port']:
+                cmd.append('-p')
 
             if not self._options['ports']:
                 cmd.append('-sP')
