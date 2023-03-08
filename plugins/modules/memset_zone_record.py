@@ -313,7 +313,10 @@ def create_or_delete(args=None):
         # informed of the reason.
         retvals['failed'] = _has_failed
         retvals['msg'] = msg
-        retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
+        if response.status_code is not None:
+            retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
+        else:
+            retvals['stderr'] = response.stderr
         return retvals
 
     zone_exists, _msg, counter, zone_id = get_zone_id(zone_name=args['zone'], current_zones=response.json())
