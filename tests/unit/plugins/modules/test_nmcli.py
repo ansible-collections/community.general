@@ -586,14 +586,6 @@ TESTCASE_TEAM = [
         'ifname': 'team0_non_existant',
         'state': 'present',
         '_ansible_check_mode': False,
-    },
-    {
-        'type': 'team',
-        'conn_name': 'non_existent_nw_device',
-        'ifname': 'team0_non_existant',
-        'state': 'present',
-        'runner_fast_rate': False,
-        '_ansible_check_mode': False,
     }
 ]
 
@@ -643,6 +635,32 @@ TESTCASE_TEAM_RUNNER_FAST_RATE_FAILS = [
         'ifname': 'team0_non_existant',
         'runner_fast_rate': True,
         'state': 'present',
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'team',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'team0_non_existant',
+        'state': 'present',
+        'runner_fast_rate': False,
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'team',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'team0_non_existant',
+        'state': 'present',
+        'runner': 'activebackup',
+        'runner_fast_rate': False,
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'team',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'team0_non_existant',
+        'state': 'present',
+        'runner': 'activebackup',
+        'runner_fast_rate': True,
         '_ansible_check_mode': False,
     }
 ]
