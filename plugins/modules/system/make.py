@@ -18,15 +18,6 @@ author: Linus Unnebäck (@LinusU) <linus@folkdatorn.se>
 description:
   - Run targets in a Makefile.
 options:
-  target:
-    description:
-      - The target to run.
-      - Typically this would be something like C(install),C(test) or C(all)."
-    type: str
-  params:
-    description:
-      - Any extra parameters to pass to make.
-    type: dict
   chdir:
     description:
       - Change to this directory before running make.
@@ -36,11 +27,6 @@ options:
     description:
       - Use a custom Makefile.
     type: path
-  make:
-    description:
-      - Use a specific make binary.
-    type: path
-    version_added: '0.2.0'
   jobs:
     description:
       - Set the number of make jobs to run concurrently.
@@ -48,6 +34,20 @@ options:
       - This is not supported by all make implementations.
     type: int
     version_added: 2.0.0
+  make:
+    description:
+      - Use a specific make binary.
+    type: path
+    version_added: '0.2.0'
+  params:
+    description:
+      - Any extra parameters to pass to make.
+    type: dict
+  target:
+    description:
+      - The target to run.
+      - Typically this would be something like C(install), C(test), or C(all).
+    type: str
 '''
 
 EXAMPLES = r'''
@@ -76,7 +76,33 @@ EXAMPLES = r'''
     file: /some-project/Makefile
 '''
 
-RETURN = r'''# '''
+RETURN = r'''
+chdir:
+  description:
+    - The value of the module parameter I(chdir).
+  type: str
+  returned: success
+file:
+  description:
+    - The value of the module parameter I(file).
+  type: str
+  returned: success
+jobs:
+  description:
+    - The value of the module parameter I(jobs)
+  type: int
+  returned: success
+params:
+  description:
+    - The value of the module parameter I(params)
+  type: dict
+  returned: success
+target:
+  description:
+    - The value of the module parameter I(target)
+  type: str
+  returned: success
+'''
 
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.basic import AnsibleModule
