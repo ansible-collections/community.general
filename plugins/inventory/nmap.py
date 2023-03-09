@@ -88,6 +88,13 @@ plugin: community.general.nmap
 sudo: true
 strict: false
 address: 192.168.0.0/24
+
+plugin: community.general.nmap
+address: 192.168.0.0/24
+exclude: 192.168.0.1, web.example.com
+port: 22, 443
+groups:
+  web_servers: "ports | selectattr('port', 'equalto', '443')"
 '''
 
 import os
