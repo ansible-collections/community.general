@@ -8,12 +8,25 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-- name: Ensure that systemd-sysv is absent in Ubuntu 18 and Debian
-  apt:
-    name: systemd-sysv
-    state: absent
-  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')
-  register: systemd_sysv_install
+
+- name: Get file stat for /sbin/shutdown 
+  stat:
+    path: "/sbin/shutdown"
+  register: sbin_shutdown 
+
+- name: Get file stat for /usr/sbin/shutdown 
+  stat:
+    path: "/usr/sbin/shutdown"
+  register: usr_sbin_shutdown 
+
+- name: Get file stat for /usr/local/sbin/shutdown 
+  stat:
+    path: "/usr/local/sbin/shutdown"
+  register: usr_local_sbin_shutdown 
+
+- name: debug stat
+  debug:
+    msg: " {{ sbin_shutdown.stat.exists }}"
 
 - name: Execute shutdown with custom message and delay
   community.general.shutdown:
@@ -28,18 +41,23 @@
   register: shutdown_result_minus
   check_mode: true
 
-- name: Verify Custom Message except Alpine, AIX
+- name: Verify Custom Message except Alpine, AIX, or non-sysv shutdown command
   assert:
     that:
       - '"Custom Message" in shutdown_result["shutdown_command"]'
       - '"Shut down initiated by Ansible" in shutdown_result_minus["shutdown_command"]'
       - '"Custom Message" not in shutdown_result_minus["shutdown_command"]'
-  when: ansible_os_family not in ['Alpine', 'AIX']
+  when:
+    - 'sbin_shutdown.stat.exists or usr_sbin_shutdown.stat.exists or usr_local_sbin_shutdown.stat.exists'
+    - 'ansible_os_family not in ["Alpine", "AIX"]'
 
-- name: Verify shutdown command is present except Alpine, VMKernel
+- name: Verify shutdown command is present except Alpine, AIX, or non-sysv shutdown command
   assert:
     that: '"shutdown" in shutdown_result["shutdown_command"]'
-  when: ansible_os_family != 'Alpine' and ansible_system != 'VMKernel'
+  when:
+    - "ansible_os_family != 'Alpine'"
+    - "ansible_system != 'VMKernel'"
+    - 'sbin_shutdown.stat.exists or usr_sbin_shutdown.stat.exists or usr_local_sbin_shutdown.stat.exists'
 
 - name: Verify shutdown command is present in Alpine
   assert:
@@ -56,7 +74,10 @@
     that:
       - '"-h 1" in shutdown_result["shutdown_command"]'
       - '"-h 0" in shutdown_result_minus["shutdown_command"]'
-  when: ansible_system == 'Linux' and ansible_os_family != 'Alpine'
+  when:
+    - "ansible_system == 'Linux'"
+    - "ansible_os_family != 'Alpine'"
+    - 'sbin_shutdown.stat.exists or usr_sbin_shutdown.stat.exists or usr_local_sbin_shutdown.stat.exists'
 
 - name: Verify shutdown delay is present in minutes in Void, MacOSX, OpenBSD
   assert:
@@ -86,8 +107,3 @@
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_system == 'VMKernel'
 
-- name: Install systemd-sysv in Ubuntu 18 and Debian in case it has been removed in test
-  apt:
-    name: systemd-sysv
-    state: present 
-  when: systemd_sysv_install is changed

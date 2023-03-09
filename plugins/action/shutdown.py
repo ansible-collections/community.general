@@ -144,7 +144,10 @@ class ActionModule(ActionBase):
 
         full_path = [x['path'] for x in find_result['files']]
         if not full_path:
-            raise AnsibleError('Unable to find command "{0}" in search paths: {1}'.format(shutdown_bin, search_paths))
+            display.vvv('Unable to find command "{0}" in search paths: {1}, will attempt a shutdown using systemd '
+                        'directly '.format(shutdown_bin, search_paths))
+            self._shutdown_command = 'systemctl poweroff'
+            return self._shutdown_command
         self._shutdown_command = full_path[0]
         return self._shutdown_command
 
@@ -153,6 +156,9 @@ class ActionModule(ActionBase):
         shutdown_result = {}
         shutdown_command = self.get_shutdown_command(task_vars, distribution)
         shutdown_command_args = self.get_shutdown_command_args(distribution)
+        if shutdown_command == 'systemctl poweroff':
+            display.vvv('attempting to shutdown using systemd poweroff command')
+            shutdown_command_args = ''
         shutdown_command_exec = '{0} {1}'.format(shutdown_command, shutdown_command_args)
 
         self.cleanup(force=True)
