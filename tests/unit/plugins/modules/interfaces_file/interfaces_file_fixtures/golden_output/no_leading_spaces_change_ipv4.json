@@ -1,0 +1,21 @@
+{
+    "eth0": {
+        "address": "10.0.0.1",
+        "address_family": "inet",
+        "down": [],
+        "method": "static",
+        "mtu": "1500",
+        "netmask": "255.255.255.0",
+        "post-up": [],
+        "pre-up": [],
+        "up": []
+    },
+    "lo": {
+        "address_family": "inet",
+        "down": [],
+        "method": "loopback",
+        "post-up": [],
+        "pre-up": [],
+        "up": []
+    }
+}

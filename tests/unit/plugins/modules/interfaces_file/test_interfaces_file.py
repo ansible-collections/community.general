@@ -44,6 +44,8 @@ golden_output_path = os.path.join(os.path.dirname(__file__), 'interfaces_file_fi
 
 
 class TestInterfacesFileModule(unittest.TestCase):
+    unittest.TestCase.maxDiff = None
+
     def getTestFiles(self, include_filter=None, exclude_filter=None):
         flist = next(os.walk(fixture_path))[2]
         flist = [file for file in flist if not file.endswith('.license')]
@@ -73,10 +75,22 @@ class TestInterfacesFileModule(unittest.TestCase):
     def compareInterfacesToFile(self, ifaces, path, testname=None):
         if not testname:
             testname = "%s.%s.json" % (path, inspect.stack()[1][3])
-        self.compareStringWithFile(json.dumps(ifaces, sort_keys=True, indent=4, separators=(',', ': ')), testname)
+
+        testfilepath = os.path.join(golden_output_path, testname)
+        string = json.dumps(ifaces, sort_keys=True, indent=4, separators=(',', ': '))
+        if string and not string.endswith('\n'):
+            string += '\n'
+        goldenstring = string
+        goldenData = ifaces
+        if not os.path.isfile(testfilepath):
+            with io.open(testfilepath, 'wb') as f:
+                f.write(string.encode())
+        else:
+            with open(testfilepath, 'r') as goldenfile:
+                goldenData = json.load(goldenfile)
+        self.assertEqual(goldenData, ifaces)
 
     def compareStringWithFile(self, string, path):
-        # self.assertEqual("","_",msg=path)
         testfilepath = os.path.join(golden_output_path, path)
         if string and not string.endswith('\n'):
             string += '\n'
@@ -89,7 +103,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             with open(testfilepath, 'r') as goldenfile:
                 goldenstring = goldenfile.read()
                 goldenfile.close()
-        self.assertEqual(string, goldenstring)
+        self.assertEqual(goldenstring, string)
 
     def test_no_changes(self):
         for testfile in self.getTestFiles():
@@ -224,7 +238,9 @@ class TestInterfacesFileModule(unittest.TestCase):
 
                     self.compareInterfacesLinesToFile(lines, testfile, "%s_%s" % (testfile, testname))
                     self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
-                    self.compareFileToBackup(path, backupp)
+                    if testfile not in ["no_leading_spaces"]:
+                        # skip if eth0 has MTU value
+                        self.compareFileToBackup(path, backupp)
 
     def test_change_method(self):
         testcases = {
@@ -268,6 +284,195 @@ class TestInterfacesFileModule(unittest.TestCase):
                     self.compareInterfacesToFile(ifaces, testfile, "%s_%s.json" % (testfile, testname))
                     # Restore backup
                     move(backupp, path)
+
+    def test_getValueFromLine(self):
+        testcases = [
+            {
+                "line": "  address   1.2.3.5",
+                "value": "1.2.3.5",
+            }
+        ]
+        for testcase in testcases:
+            value = interfaces_file.getValueFromLine(testcase["line"])
+            self.assertEqual(testcase["value"], value)
+
+    def test_get_interface_options(self):
+        testcases = {
+            "basic": {
+                "iface_lines": [
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "iface eno1 inet static",
+                        "line_type": "iface",
+                        "params": {
+                            "address": "",
+                            "address_family": "inet",
+                            "down": [],
+                            "gateway": "",
+                            "method": "static",
+                            "netmask": "",
+                            "post-up": [],
+                            "pre-up": [],
+                            "up": []
+                        }
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  address   1.2.3.5",
+                        "line_type": "option",
+                        "option": "address",
+                        "value": "1.2.3.5"
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  netmask   255.255.255.0",
+                        "line_type": "option",
+                        "option": "netmask",
+                        "value": "255.255.255.0"
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  gateway   1.2.3.1",
+                        "line_type": "option",
+                        "option": "gateway",
+                        "value": "1.2.3.1"
+                    }
+                ],
+                "iface_options": [
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  address   1.2.3.5",
+                        "line_type": "option",
+                        "option": "address",
+                        "value": "1.2.3.5"
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  netmask   255.255.255.0",
+                        "line_type": "option",
+                        "option": "netmask",
+                        "value": "255.255.255.0"
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  gateway   1.2.3.1",
+                        "line_type": "option",
+                        "option": "gateway",
+                        "value": "1.2.3.1"
+                    }
+                ]
+            },
+        }
+
+        for testname in testcases.keys():
+            iface_options = interfaces_file.get_interface_options(testcases[testname]["iface_lines"])
+            self.assertEqual(testcases[testname]["iface_options"], iface_options)
+
+    def test_get_interface_options(self):
+        testcases = {
+            "select address": {
+                "iface_options": [
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  address   1.2.3.5",
+                        "line_type": "option",
+                        "option": "address",
+                        "value": "1.2.3.5"
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  netmask   255.255.255.0",
+                        "line_type": "option",
+                        "option": "netmask",
+                        "value": "255.255.255.0"
+                    },
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  gateway   1.2.3.1",
+                        "line_type": "option",
+                        "option": "gateway",
+                        "value": "1.2.3.1"
+                    }
+                ],
+                "target_options": [
+                    {
+                        "address_family": "inet",
+                        "iface": "eno1",
+                        "line": "  address   1.2.3.5",
+                        "line_type": "option",
+                        "option": "address",
+                        "value": "1.2.3.5"
+                    }
+                ],
+                "option": "address"
+            },
+        }
+
+        for testname in testcases.keys():
+            target_options = interfaces_file.get_target_options(testcases[testname]["iface_options"], testcases[testname]["option"])
+            self.assertEqual(testcases[testname]["target_options"], target_options)
+
+    def test_update_existing_option_line(self):
+        testcases = {
+            "update address": {
+                "target_option": {
+                    "address_family": "inet",
+                    "iface": "eno1",
+                    "line": "  address   1.2.3.5",
+                    "line_type": "option",
+                    "option": "address",
+                    "value": "1.2.3.5"
+                },
+                "value": "1.2.3.4",
+                "result": "  address   1.2.3.4",
+            },
+        }
+
+        for testname in testcases.keys():
+            updated = interfaces_file.update_existing_option_line(testcases[testname]["target_option"], testcases[testname]["value"])
+            self.assertEqual(testcases[testname]["result"], updated)
+
+    def test_predefined(self):
+        testcases = {
+            "idempotency": {
+                "source_lines": [
+                    "iface eno1 inet static",
+                    "  address   1.2.3.5",
+                    "  netmask   255.255.255.0",
+                    "  gateway   1.2.3.1",
+                ],
+                "input": {
+                    "iface": "eno1",
+                    "option": "address",
+                    "value": "1.2.3.5",
+                    'state': 'present',
+                },
+                "result_lines": [
+                    "iface eno1 inet static",
+                    "  address   1.2.3.5",
+                    "  netmask   255.255.255.0",
+                    "  gateway   1.2.3.1",
+                ],
+                "changed": False,
+            },
+        }
+
+        for testname in testcases.keys():
+            lines, ifaces = interfaces_file.read_interfaces_lines(module, testcases[testname]["source_lines"])
+            changed, lines = interfaces_file.set_interface_option(module, lines, testcases[testname]["input"]['iface'], testcases[testname]["input"]['option'],
+                                                                  testcases[testname]["input"]['value'], testcases[testname]["input"]['state'])
+            self.assertEqual(testcases[testname]["result_lines"], [d['line'] for d in lines if 'line' in d])
+            assert testcases[testname]['changed'] == changed
 
     def test_inet_inet6(self):
         testcases = {
