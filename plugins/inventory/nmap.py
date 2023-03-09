@@ -89,6 +89,7 @@ sudo: true
 strict: false
 address: 192.168.0.0/24
 
+# an nmap scan specifying ports and classifying results to an inventory group
 plugin: community.general.nmap
 address: 192.168.0.0/24
 exclude: 192.168.0.1, web.example.com
