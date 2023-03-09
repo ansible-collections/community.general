@@ -414,9 +414,9 @@ options:
     runner_fast_rate:
         description:
             - Option specifies the rate at which our link partner is asked to transmit LACPDU
-              packets. If this is true then packets will be sent once per second. Otherwise they
+              packets. If this is C(true) then packets will be sent once per second. Otherwise they
               will be sent every 30 seconds.
-            - Only allowed for lacp runner.
+            - Only allowed for C(lacp) runner.
         type: bool
         version_added: 6.5.0
     vlanid:
@@ -1627,11 +1627,11 @@ class Nmcli(object):
         elif self.type == 'team':
             options.update({
                 'team.runner': self.runner,
-                'team.runner-hwaddr-policy': self.runner_hwaddr_policy
+                'team.runner-hwaddr-policy': self.runner_hwaddr_policy,
             })
             if self.runner_fast_rate is not None:
                 options.update({
-                    'team.runner-fast-rate': self.runner_fast_rate
+                    'team.runner-fast-rate': self.runner_fast_rate,
                 })
         elif self.type == 'bridge-slave':
             options.update({
