@@ -40,6 +40,7 @@ DOCUMENTATION = '''
                 - "Ex: (C(22; 1-65535; U:53,111,137,T:21-25,80,139,8080,S:9))"
             type: list
             elements: string
+            version_added: 6.5.0
         ports:
             description: Enable/disable scanning for open ports
             type: boolean
