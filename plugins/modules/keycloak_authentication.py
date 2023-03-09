@@ -291,10 +291,6 @@ def add_diff_entry(new_exec, old_exec, before, after):
     exec_key = create_diff_key(new_exec if new_exec != {} else old_exec)
     old_ex_for_diff = remove_keys_for_diff(old_exec)
     new_ex_for_diff = remove_keys_for_diff(new_exec)
-    if not before.get("executions"):
-       before["executions"] = {}
-    if not after.get("executions"):
-       after["executions"] = {}
     before["executions"][exec_key] = old_ex_for_diff
     after["executions"][exec_key] = old_ex_for_diff | new_ex_for_diff
     if after["executions"][exec_key].get("authenticationConfig") and before["executions"][exec_key].get("authenticationConfig"):
@@ -314,8 +310,8 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
     """
     try:
         changed = False
-        after = {}
-        before = {}
+        after = {"executions":{}}
+        before = {"executions":{}}
         err_msg = {"lines":[]}
         if "authenticationExecutions" in config:
             # Get existing executions on the Keycloak server for this alias
@@ -346,7 +342,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                 found_index = find_exec_in_executions(existing_exec, new_executions_copy, [])
                 if found_index == -1:
                     changed = True
-                    add_diff_entry({}, existing_exec, before, after)
+                    before["executions"][create_diff_key(existing_exec)] = remove_keys_for_diff(existing_exec)
                     add_error_line(err_msg_lines=err_msg, err_msg="extra execution", flow=config["alias"],\
                         exec_name=get_identifier(existing_exec)) 
                     if not check_mode:
@@ -460,7 +456,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\
                             exec_name=get_identifier(new_exec))
                         changed = True
-                        add_diff_entry(new_exec, {}, before, after)
+                        after["executions"][create_diff_key(existing_exec)] = remove_keys_for_diff(new_exec)
                 if new_exec.get("id") is not None:
                     changed_executions_ids.append(new_exec["id"])
         for time in [before, after]:
