@@ -37,7 +37,10 @@ DOCUMENTATION = '''
         port:
             description:
                 - Only scan specific port or port range (C(-p)).
-                - "For example, you could pass C(22) for a single port, C(1-65535) for a range of ports, or C(U:53,111,137,T:21-25,80,139,8080,S:9) to check port 53 with UDP, ports 21-25 with TCP, port 9 with SCTP, and ports 111, 137, 80, 139, and 8080 with all protocols."
+                - For example, you could pass
+                    C(22) for a single port
+                    C(1-65535) for a range of ports
+                    C(U:53,111,137,T:21-25,80,139,8080,S:9) to check port 53 with UDP, ports 21-25 with TCP, port 9 with SCTP, and ports 111, 137, 80, 139, and 8080 with all.
             type: list
             elements: string
             version_added: 6.5.0
