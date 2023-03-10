@@ -106,4 +106,3 @@
       - '"-d 100" in shutdown_result["shutdown_command"]'
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_system == 'VMKernel'
-
