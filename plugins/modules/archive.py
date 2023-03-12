@@ -538,7 +538,7 @@ class ZipArchive(Archive):
             archive = zipfile.ZipFile(_to_native_ascii(path), 'r')
             checksums = set((info.filename, info.CRC) for info in archive.infolist())
             archive.close()
-        except zipfile.BadZipFile:
+        except BadZipFile:
             checksums = set()
         return checksums
 
