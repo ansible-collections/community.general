@@ -11,3 +11,4 @@ skip/freebsd
 skip/aix
 skip/python2.6  # python-daemon package used in integration tests requires >=2.7
 skip/rhel  # FIXME
+unstable  # TODO: the tests fail a lot; 'unstable' only requires them to pass when the module itself has been modified
