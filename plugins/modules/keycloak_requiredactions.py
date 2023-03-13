@@ -107,7 +107,7 @@ def main():
         "default_action": {"type": "bool", "aliases": ["defaultAction"]},
         "enabled": {"type": "bool"},
         "name": {"type": "str"},
-        "priority": {"type": "int", "default": "0"},
+        "priority": {"type": "int"},
         "provider_id": {"type": "str", "aliases": ["providerId"]},
     }
     argument_spec.update(meta_args)
