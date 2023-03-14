@@ -152,7 +152,11 @@ def execute_command(cmd, module):
     # This makes run_command() use shell=False which we need to not cause shell
     # expansion of special characters like '*'.
     cmd_args = shlex.split(cmd)
-    return module.run_command(cmd_args)
+
+    # We set TERM to 'dumb' to keep pkg_add happy if the machine running
+    # ansible is using a TERM that the managed machine does not know about,
+    # e.g.: "No progress meter: failed termcap lookup on xterm-kitty".
+    return module.run_command(cmd_args, environ_update={'TERM': 'dumb'})
 
 
 # Function used to find out if a package is currently installed.
