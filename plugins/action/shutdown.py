@@ -103,7 +103,7 @@ class ActionModule(ActionBase):
         except KeyError as ke:
             raise AnsibleError('Failed to get distribution information. Missing "{0}" in output.'.format(ke.args[0]))
 
-    def get_full_shutdown_command(self, task_vars, distribution):
+    def get_shutdown_command(self, task_vars, distribution):
         def find_command(command, find_search_paths):
             display.debug('{action}: running find module looking in {paths} to get path for "{command}"'.format(
                 action=self._task.action,
@@ -169,7 +169,7 @@ class ActionModule(ActionBase):
     def perform_shutdown(self, task_vars, distribution):
         result = {}
         shutdown_result = {}
-        shutdown_command_exec = get_full_shutdown_command(self, task_vars, distribution)
+        shutdown_command_exec = self.get_shutdown_command(task_vars, distribution)
 
         self.cleanup(force=True)
         try:
