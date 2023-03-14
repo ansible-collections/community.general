@@ -72,6 +72,13 @@ options:
         type: str
         required: false
         version_added: 5.8.0
+    use_tls:
+        description:
+            - Using TLS/SSL or not.
+        type: bool
+        default: false
+        required: false
+        version_added: '6.5.0'
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
@@ -155,6 +162,7 @@ def main():
             recursive=dict(default=False, type='bool'),
             auth_scheme=dict(default='digest', choices=['digest', 'sasl']),
             auth_credential=dict(type='str', no_log=True),
+            use_tls=dict(default=False, type='bool'),
         ),
         supports_check_mode=False
     )
@@ -208,7 +216,7 @@ def check_params(params):
 class KazooCommandProxy():
     def __init__(self, module):
         self.module = module
-        self.zk = KazooClient(module.params['hosts'])
+        self.zk = KazooClient(module.params['hosts'], use_ssl=module.params['use_tls'])
 
     def absent(self):
         return self._absent(self.module.params['name'])
