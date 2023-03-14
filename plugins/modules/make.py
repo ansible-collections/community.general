@@ -89,6 +89,12 @@ chdir:
     - The value of the module parameter I(chdir).
   type: str
   returned: success
+command:
+  description:
+    - The command built and executed by the module.
+  type: str
+  returned: success
+  version_added: 6.5.0
 file:
   description:
     - The value of the module parameter I(file).
@@ -96,22 +102,23 @@ file:
   returned: success
 jobs:
   description:
-    - The value of the module parameter I(jobs)
+    - The value of the module parameter I(jobs).
   type: int
   returned: success
 params:
   description:
-    - The value of the module parameter I(params)
+    - The value of the module parameter I(params).
   type: dict
   returned: success
 target:
   description:
-    - The value of the module parameter I(target)
+    - The value of the module parameter I(target).
   type: str
   returned: success
 '''
 
 from ansible.module_utils.six import iteritems
+from ansible.module_utils.six.moves import shlex_quote
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -218,6 +225,7 @@ def main():
         chdir=module.params['chdir'],
         file=module.params['file'],
         jobs=module.params['jobs'],
+        command=' '.join([shlex_quote(part) for part in base_command]),
     )
 
 
