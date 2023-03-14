@@ -9,25 +9,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-- name: Get file stat for /sbin/shutdown 
-  stat:
-    path: "/sbin/shutdown"
-  register: sbin_shutdown 
-
-- name: Get file stat for /usr/sbin/shutdown 
-  stat:
-    path: "/usr/sbin/shutdown"
-  register: usr_sbin_shutdown 
-
-- name: Get file stat for /usr/local/sbin/shutdown 
-  stat:
-    path: "/usr/local/sbin/shutdown"
-  register: usr_local_sbin_shutdown 
-
-- name: debug stat
-  debug:
-    msg: " {{ sbin_shutdown.stat.exists }}"
-
 - name: Execute shutdown with custom message and delay
   community.general.shutdown:
     delay: 100
