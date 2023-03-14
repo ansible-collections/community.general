@@ -146,12 +146,12 @@ class ActionModule(ActionBase):
             systemctl_search_paths = ['/bin', '/usr/bin']
             full_path = find_command('systemctl', systemctl_search_paths)  # find the path to the systemctl command
             if not full_path:  # if we couldn't find systemctl
-                raise AnsibleError('Unable to find systemctl command in search paths: {1}.'.format(
-                    shutdown_bin, systemctl_search_paths))  # we give up here
+                raise AnsibleError('Unable to find systemctl command in search paths: {1}.'.
+                                   format(systemctl_search_paths))  # we give up here
             else:
                 return full_path[0]  # done, since we cannot use args with systemd shutdown
 
-        # systemd case taken care of, here we add args to the command 
+        # systemd case taken care of, here we add args to the command
         args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
         # Convert seconds to minutes. If less that 60, set it to 0.
         delay_sec = self.delay
