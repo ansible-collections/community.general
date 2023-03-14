@@ -27,6 +27,8 @@ def patch_redhat_subscription(mocker):
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.unlink', return_value=True)
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.AnsibleModule.get_bin_path',
                  return_value='/testbin/subscription-manager')
+    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.Rhsm._can_connect_to_dbus',
+                 return_value=False)
 
 
 @pytest.mark.parametrize('patch_ansible_module', [{}], indirect=['patch_ansible_module'])
