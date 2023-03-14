@@ -27,9 +27,12 @@ DOCUMENTATION = r'''
             elements: string
             default:
                 - ams1
+                - ams2
                 - par1
                 - par2
+                - par3
                 - waw1
+                - waw2
         tags:
             description: Filter results on a specific tag.
             type: list
@@ -80,7 +83,12 @@ EXAMPLES = r'''
 plugin: community.general.scaleway
 regions:
   - ams1
+  - ams2
   - par1
+  - par2
+  - par3
+  - waw1
+  - waw2
 tags:
   - foobar
 hostnames:
