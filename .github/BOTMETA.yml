@@ -1313,8 +1313,7 @@ files:
     labels: m:xml xml
     maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
   $modules/yarn.py:
-    maintainers: verkaufer
-    ignore: chrishoffman
+    ignore: chrishoffman verkaufer
   $modules/yum_versionlock.py:
     maintainers: gyptazy aminvakil
   $modules/zfs:
