@@ -2233,6 +2233,8 @@ class KeycloakAPI(object):
                 ({}, {})".format(data["alias"], realm, str(e),
                 URL_REGISTER_REQUIRED_ACTIONS, data)
             )
+        if data['priority'] is not None or data['config'] is not None:
+            self.update_required_action(data, realm)
 
 
     def update_required_action(self, rep, realm="master"):
