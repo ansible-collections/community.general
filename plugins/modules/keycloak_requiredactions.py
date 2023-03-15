@@ -103,7 +103,7 @@ def main():
         "id": {"type": "str"},
         "realm": {"type": "str"},
         "alias": {"type": "str"},
-        "config": {"type": "dict", "default": "{}"},
+        "config": {"type": "dict"},
         "default_action": {"type": "bool", "aliases": ["defaultAction"]},
         "enabled": {"type": "bool"},
         "name": {"type": "str"},

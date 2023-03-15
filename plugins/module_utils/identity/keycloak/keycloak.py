@@ -2218,7 +2218,6 @@ class KeycloakAPI(object):
         """
 
         try:
-            register_data = data
             open_url(
                 URL_REGISTER_REQUIRED_ACTIONS.format(url=self.baseurl, realm=realm),
                 method="POST",
@@ -2226,13 +2225,13 @@ class KeycloakAPI(object):
                 headers=self.restheaders,
                 timeout=self.connection_timeout,
                 validate_certs=self.validate_certs,
-                data=json.dumps(register_data),
+                data=json.dumps(data),
             )
         except Exception as e:
             self.module.fail_json(
                 msg="Could not register required action {} in realm {}: {} \
                 ({}, {})".format(data["alias"], realm, str(e),
-                URL_REGISTER_REQUIRED_ACTIONS, register_data)
+                URL_REGISTER_REQUIRED_ACTIONS, data)
             )
 
 
