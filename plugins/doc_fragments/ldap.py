@@ -24,7 +24,7 @@ options:
       - The password to use with I(bind_dn).
     type: str
     default: ''
-  ca_cert_file:
+  ca_path:
     description:
       - Set the path to PEM file with CA certs.
     type: path
