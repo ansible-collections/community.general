@@ -456,7 +456,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\
                             exec_name=get_identifier(new_exec))
                         changed = True
-                        after["executions"][create_diff_key(existing_exec)] = remove_keys_for_diff(new_exec)
+                        after["executions"][create_diff_key(new_exec)] = remove_keys_for_diff(new_exec)
                 if new_exec.get("id") is not None:
                     changed_executions_ids.append(new_exec["id"])
         for time in [before, after]:
