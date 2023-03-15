@@ -34,7 +34,7 @@ def gen_specs(**specs):
     specs.update({
         'bind_dn': dict(),
         'bind_pw': dict(default='', no_log=True),
-        'ca_cert_file': dict(type="str"),
+        'ca_cert_file': dict(type='path'),
         'dn': dict(required=True),
         'referrals_chasing': dict(type='str', default='anonymous', choices=['disabled', 'anonymous']),
         'server_uri': dict(default='ldapi:///'),

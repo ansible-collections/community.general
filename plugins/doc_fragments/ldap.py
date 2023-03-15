@@ -26,8 +26,8 @@ options:
     default: ''
   ca_cert_file:
     description:
-      - Set the path to PEM file with CA certs
-    type: str
+      - Set the path to PEM file with CA certs.
+    type: path
     version_added: "6.5.0"
   dn:
     required: true
