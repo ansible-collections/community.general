@@ -187,7 +187,9 @@
     state: inject
     name: ansible-lint
     inject_packages:
+      - black
       - licenses
+    include_apps: true
   register: inject_pkgs_ansible_lint
 
 - name: cleanup ansible-lint
