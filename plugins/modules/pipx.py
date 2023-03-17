@@ -53,6 +53,7 @@ options:
             - Only used when I(state=inject).
         type: bool
         default: false
+        version_added: 6.5.0
     install_deps:
         description:
             - Include applications of dependent packages.
