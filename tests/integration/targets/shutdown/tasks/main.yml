@@ -29,7 +29,6 @@
       - '"Shut down initiated by Ansible" in shutdown_result_minus["shutdown_command"]'
       - '"Custom Message" not in shutdown_result_minus["shutdown_command"]'
   when:
-    - 'sbin_shutdown.stat.exists or usr_sbin_shutdown.stat.exists or usr_local_sbin_shutdown.stat.exists'
     - 'ansible_os_family not in ["Alpine", "AIX"]'
 
 - name: Verify shutdown command is present except Alpine, AIX, or non-sysv shutdown command
@@ -38,7 +37,6 @@
   when:
     - "ansible_os_family != 'Alpine'"
     - "ansible_system != 'VMKernel'"
-    - 'sbin_shutdown.stat.exists or usr_sbin_shutdown.stat.exists or usr_local_sbin_shutdown.stat.exists'
 
 - name: Verify shutdown command is present in Alpine
   assert:
@@ -58,7 +56,6 @@
   when:
     - "ansible_system == 'Linux'"
     - "ansible_os_family != 'Alpine'"
-    - 'sbin_shutdown.stat.exists or usr_sbin_shutdown.stat.exists or usr_local_sbin_shutdown.stat.exists'
 
 - name: Verify shutdown delay is present in minutes in Void, MacOSX, OpenBSD
   assert:
