@@ -88,7 +88,7 @@ options:
     type: str
   proxyjump:
     description:
-      - Sets the C(Proxyjump) option.
+      - Sets the C(ProxyJump) option.
       - Mutually exclusive with I(proxycommand).
     type: str
   forward_agent:
