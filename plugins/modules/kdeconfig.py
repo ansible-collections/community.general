@@ -64,7 +64,7 @@ options:
     default: false
 extends_documentation_fragment:
   - files
-  - attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
