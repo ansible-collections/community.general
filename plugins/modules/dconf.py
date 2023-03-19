@@ -70,13 +70,18 @@ options:
     description:
       - A dconf key to modify or read from the dconf database.
   value:
-    type: str
+    type: raw
     required: false
     description:
       - Value to set for the specified dconf key. Value should be specified in
         GVariant format. Due to complexity of this format, it is best to have a
         look at existing values in the dconf database.
       - Required for I(state=present).
+      - Although the type is specified as "raw", it should typically be
+        specified as a string. However, boolean values in particular are
+        handled properly even when specified as booleans rather than strings
+        (in fact, handling booleans properly is why the type of this parameter
+        is "raw").
   state:
     type: str
     required: false
@@ -155,6 +160,7 @@ except ImportError:
     HAS_PSUTIL = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 
 
 class DBusWrapper(object):
@@ -405,10 +411,23 @@ def main():
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'absent', 'read']),
             key=dict(required=True, type='str', no_log=False),
-            value=dict(required=False, default=None, type='str'),
+            # Converted to str below after special handling of bool.
+            value=dict(required=False, default=None, type='raw'),
         ),
         supports_check_mode=True
     )
+
+    # Try to be forgiving about the user specifying a boolean as the value, or
+    # more accurately about the fact that YAML and Ansible are quite insistent
+    # about converting strings that look like booleans into booleans. Convert
+    # the boolean into a string of the type dconf will understand. Any type for
+    # the value other than boolean is just converted into a string directly.
+    if module.params['value'] is not None:
+        if isinstance(module.params['value'], bool):
+            module.params['value'] = 'true' if module.params['value'] else 'false'
+        else:
+            module.params['value'] = to_native(
+                module.params['value'], errors='surrogate_or_strict')
 
     if Variant is None:
         module.warn(
