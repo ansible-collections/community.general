@@ -14,19 +14,18 @@ short_description: Manage KDE configuration files
 version_added: "6.5.0"
 description:
   - Add or change individual settings in KDE configuration files.
-  - Check mode is supported.
   - It uses B(kwriteconfig) under the hood.
 
 options:
   path:
     description:
-      - Path to the config file. If the file doesn't exist it will be created.
+      - Path to the config file. If the file does not exist it will be created.
     type: path
     required: true
   kwriteconfig_path:
     description:
       - Path to the kwriteconfig executable. If not specified, Ansible will try
-      - to discover it.
+        to discover it.
     type: path
   values:
     description:
@@ -63,7 +62,14 @@ options:
       - Create a backup file.
     type: bool
     default: false
-extends_documentation_fragment: files
+extends_documentation_fragment:
+  - files
+  - attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: full
 requirements:
   - kwriteconfig
 author:
@@ -241,13 +247,13 @@ def main():
                     required=True),
         path=dict(type='path', required=True),
         kwriteconfig_path=dict(type='path'),
-        backup=dict(type='bool', default=False)
+        backup=dict(type='bool', default=False),
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
         add_file_common_args=True,
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     kwriteconfig = None
@@ -262,7 +268,7 @@ def main():
             module.fail_json(msg='kwriteconfig is not installed')
     for v in module.params['values']:
         if not v['key']:
-            module.fail_json(msg="'key' can't be empty")
+            module.fail_json(msg="'key' cannot be empty")
     with TemporaryDirectory(dir=module.tmpdir) as tmpdir:
         run_module(module, tmpdir, kwriteconfig)
 
