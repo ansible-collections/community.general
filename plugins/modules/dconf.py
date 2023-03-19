@@ -353,7 +353,7 @@ class DconfPreference(object):
         rc, out, err = dbus_wrapper.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while write the value with error: %s' % err,
+            self.module.fail_json(msg='dconf failed while writing key %s, value %s with error: %s' % (key, value, err),
                                   out=out,
                                   err=err)
 
