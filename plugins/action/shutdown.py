@@ -146,7 +146,7 @@ class ActionModule(ActionBase):
             systemctl_search_paths = ['/bin', '/usr/bin']
             full_path = find_command('systemctl', systemctl_search_paths)  # find the path to the systemctl command
             if not full_path:  # if we couldn't find systemctl
-                raise AnsibleError('Unable to find systemctl command in search paths: {1}.'.
+                raise AnsibleError('Unable to find systemctl command in search paths: {0}.'.
                                    format(systemctl_search_paths))  # we give up here
             else:
                 return full_path[0]  # done, since we cannot use args with systemd shutdown
