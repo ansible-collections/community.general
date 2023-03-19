@@ -3229,7 +3229,7 @@ class RedfishUtils(object):
             result['ret'] = True
             data = response['data']
             oem = data.get['Oem']
-            hpe = oem.get('Hpe']
+            hpe = oem.get['Hpe']
             thermal_config = hpe.get('ThermalConfiguration')
         result["current_thermal_config"] = thermal_config
         return result
@@ -3245,7 +3245,7 @@ class RedfishUtils(object):
             result['ret'] = True
             data = response['data']
             oem = data.get['Oem']
-            hpe = oem.get('Hpe']
+            hpe = oem.get['Hpe']
             fan_percent_min_config = hpe.get('FanPercentMinimum')
         result["fan_percent_min"] = fan_percent_min_config
         return result
