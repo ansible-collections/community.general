@@ -288,6 +288,10 @@ class DconfPreference(object):
 
         Returns True if the two values are equal.
         """
+        if canonical_value is None:
+            # It's unset in dconf database, so anything the user is trying to
+            # set is a change.
+            return False
         try:
             variant1 = Variant.parse(None, canonical_value)
             variant2 = Variant.parse(variant1.get_type(), user_value)
