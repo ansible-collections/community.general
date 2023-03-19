@@ -366,4 +366,4 @@
     that:
       - result_ekey is not changed
       - result_ekey is failed
-      - "result_ekey.msg == \"'key' can't be empty\""
+      - "result_ekey.msg == \"'key' cannot be empty\""
