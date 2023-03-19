@@ -91,6 +91,7 @@ options:
       - Sets the C(ProxyJump) option.
       - Mutually exclusive with I(proxycommand).
     type: str
+    version_added: 6.5.0
   forward_agent:
     description:
       - Sets the C(ForwardAgent) option.
