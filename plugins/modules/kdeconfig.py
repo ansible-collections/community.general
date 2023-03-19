@@ -200,7 +200,7 @@ def run_module(module, tmpdir, kwriteconfig):
         if not result['changed']:
             shutil.copystat(b_path, b_tmpfile)
             uid, gid = module.user_and_group(b_path)
-            shutil.chown(b_tmpfile, uid, gid)
+            os.chown(b_tmpfile, uid, gid)
             if module._diff:
                 diff = {}
             else:
