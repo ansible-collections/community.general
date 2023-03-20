@@ -577,6 +577,15 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
+def normalize_checkmode(realmrep):
+
+    result = realmrep.copy()
+    for key in result.keys():
+        if isinstance(result[key], dict):
+            result[key] = dict((k,v) for k,v in result[key].items() if v and k != "id")
+        
+    return dict((k,v) for k,v in result.items() if v)
+
 def sanitize_cr(realmrep):
     """ Removes probably sensitive details from a realm representation.
 
@@ -627,7 +636,7 @@ def main():
         default_groups=dict(type='list', elements='str', aliases=['defaultGroups']),
         default_locale=dict(type='str', aliases=['defaultLocale']),
         default_optional_client_scopes=dict(type='list', elements='str', aliases=['defaultOptionalClientScopes']),
-        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
+        default_role=dict(type='dict', aliases=['defaultRole']),
         default_signature_algorithm=dict(type='str', aliases=['defaultSignatureAlgorithm']),
         direct_grant_flow=dict(type='str', aliases=['directGrantFlow']),
         display_name=dict(type='str', aliases=['displayName']),
@@ -773,9 +782,9 @@ def main():
             if module.check_mode:
                 # We can only compare the current realm with the proposed updates we have
                 if module._diff:
-                    result['diff'] = dict(before=before_realm_sanitized,
-                                          after=sanitize_cr(desired_realm))
-                result['changed'] = (before_realm != desired_realm)
+                    result['diff'] = dict(before=normalize_checkmode(before_realm_sanitized),
+                                          after=normalize_checkmode(sanitize_cr(desired_realm)))
+                result['changed'] = (normalize_checkmode(before_realm) != normalize_checkmode(desired_realm))
 
                 module.exit_json(**result)
 
