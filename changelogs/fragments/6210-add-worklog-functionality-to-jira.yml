@@ -1,0 +1,2 @@
+minor_changes:
+  - jira - add worklog functionality (https://github.com/ansible-collections/community.general/issues/6209, https://github.com/ansible-collections/community.general/pull/6210).

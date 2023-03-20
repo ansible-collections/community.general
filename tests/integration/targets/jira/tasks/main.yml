@@ -67,6 +67,24 @@
     that:
       - assign is changed
 
+- name: Worklog on issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: Worklog
+    fields:
+      timeSpentSeconds: 1200
+  register: worklog
+- name: assert worklog -> with comment
+  assert:
+    that:
+      - worklog is changed
+      - worklog.meta.comment == 'Worklog'
+      - worklog.meta.timeSpentSeconds == 1200
+
 - name: transition -> Resolved with comment
   community.general.jira:
     uri: "{{ uri }}"
