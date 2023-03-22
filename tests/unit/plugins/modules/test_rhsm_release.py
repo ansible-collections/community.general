@@ -30,9 +30,16 @@ class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):
         self.get_bin_path = self.mock_get_bin_path.start()
         self.get_bin_path.return_value = '/testbin/subscription-manager'
 
+        # subscription-manager needs to be run as root
+        self.mock_os_getuid = patch('ansible_collections.community.general.plugins.modules.rhsm_release.'
+                                    'os.getuid')
+        self.os_getuid = self.mock_os_getuid.start()
+        self.os_getuid.return_value = 0
+
     def tearDown(self):
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
+        self.mock_os_getuid.stop()
         super(RhsmRepositoryReleaseModuleTestCase, self).tearDown()
 
     def module_main(self, exit_exc):

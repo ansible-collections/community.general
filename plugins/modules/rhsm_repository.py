@@ -19,6 +19,8 @@ author: Giovanni Sciortino (@giovannisciortino)
 notes:
   - In order to manage RHSM repositories the system must be already registered
     to RHSM manually or using the Ansible C(redhat_subscription) module.
+  - It is possible to interact with C(subscription-manager) only as root,
+    so root permissions are required to successfully run this module.
 
 requirements:
   - subscription-manager
@@ -100,9 +102,7 @@ def run_subscription_manager(module, arguments):
     lang_env = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
     rc, out, err = module.run_command("%s %s" % (rhsm_bin, " ".join(arguments)), environ_update=lang_env)
 
-    if rc == 1 and (err == 'The password you typed is invalid.\nPlease try again.\n' or os.getuid() != 0):
-        module.fail_json(msg='The executable file subscription-manager must be run using root privileges')
-    elif rc == 0 and out == 'This system has no repositories available through subscriptions.\n':
+    if rc == 0 and out == 'This system has no repositories available through subscriptions.\n':
         module.fail_json(msg='This system has no repositories available through subscriptions')
     elif rc == 1:
         module.fail_json(msg='subscription-manager failed with the following error: %s' % err)
@@ -243,6 +243,12 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    if os.getuid() != 0:
+        module.fail_json(
+            msg="Interacting with subscription-manager requires root permissions ('become: true')"
+        )
+
     name = module.params['name']
     state = module.params['state']
     purge = module.params['purge']

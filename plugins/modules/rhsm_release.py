@@ -18,6 +18,8 @@ notes:
   - This module will fail on an unregistered system.
     Use the C(redhat_subscription) module to register a system
     prior to setting the RHSM release.
+  - It is possible to interact with C(subscription-manager) only as root,
+    so root permissions are required to successfully run this module.
 requirements:
   - Red Hat Enterprise Linux 6+ with subscription-manager installed
 extends_documentation_fragment:
@@ -63,6 +65,7 @@ current_release:
 
 from ansible.module_utils.basic import AnsibleModule
 
+import os
 import re
 
 # Matches release-like values such as 7.2, 5.10, 6Server, 8
@@ -108,6 +111,11 @@ def main():
         ),
         supports_check_mode=True
     )
+
+    if os.getuid() != 0:
+        module.fail_json(
+            msg="Interacting with subscription-manager requires root permissions ('become: true')"
+        )
 
     target_release = module.params['release']
 
