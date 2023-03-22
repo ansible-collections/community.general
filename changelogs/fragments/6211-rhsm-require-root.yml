@@ -1,0 +1,6 @@
+bugfixes:
+  - redhat_subscription, rhsm_release, rhsm_repository - cleanly fail when not running as root,
+    rather than hanging on an interactive ``console-helper`` prompt; they all interact with
+    ``subscription-manager``, which already requires to be run as root
+    (https://github.com/ansible-collections/community.general/issues/734,
+     https://github.com/ansible-collections/community.general/pull/6211).
