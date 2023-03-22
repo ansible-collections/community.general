@@ -57,7 +57,7 @@ options:
     install_deps:
         description:
             - Include applications of dependent packages.
-            - Only used when I(state=install), I(state=upgrade), or I(state=inject).
+            - Only used when I(state=install), I(state=latest), I(state=upgrade), or I(state=inject).
         type: bool
         default: false
     inject_packages:
@@ -69,7 +69,7 @@ options:
     force:
         description:
             - Force modification of the application's virtual environment. See C(pipx) for details.
-            - Only used when I(state=install), I(state=upgrade), I(state=upgrade_all), or I(state=inject).
+            - Only used when I(state=install), I(state=upgrade), I(state=upgrade_all), I(state=latest), or I(state=inject).
         type: bool
         default: false
     include_injected:
@@ -81,12 +81,12 @@ options:
     index_url:
         description:
             - Base URL of Python Package Index.
-            - Only used when I(state=install), I(state=upgrade), or I(state=inject).
+            - Only used when I(state=install), I(state=upgrade), I(state=latest), or I(state=inject).
         type: str
     python:
         description:
             - Python version to be used when creating the application virtual environment. Must be 3.6+.
-            - Only used when I(state=install), I(state=reinstall), or I(state=reinstall_all).
+            - Only used when I(state=install), I(state=latest), I(state=reinstall), or I(state=reinstall_all).
         type: str
     executable:
         description:
