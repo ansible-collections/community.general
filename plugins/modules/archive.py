@@ -198,6 +198,10 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.module_utils import six
 
+try:  # python 3.2+
+    from zipfile import BadZipFile  # type: ignore[attr-defined]
+except ImportError:  # older python
+    from zipfile import BadZipfile as BadZipFile
 
 LZMA_IMP_ERR = None
 if six.PY3:
@@ -534,7 +538,7 @@ class ZipArchive(Archive):
             archive = zipfile.ZipFile(_to_native_ascii(path), 'r')
             checksums = set((info.filename, info.CRC) for info in archive.infolist())
             archive.close()
-        except zipfile.BadZipfile:
+        except BadZipFile:
             checksums = set()
         return checksums
 
