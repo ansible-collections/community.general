@@ -26,6 +26,11 @@ notes:
       config file and default to None.
     - It is possible to interact with C(subscription-manager) only as root,
       so root permissions are required to successfully run this module.
+    - Since community.general 6.5.0, credentials (that is, I(username) and I(password),
+      I(activationkey), or I(token)) are needed only in case the the system is not registered,
+      or I(force_register) is specified; this makes it possible to use the module to tweak an
+      already registered system, for example attaching pools to it (using I(pool), or I(pool_ids)),
+      and modifying the C(syspurpose) attributes (using I(syspurpose)).
 requirements:
     - subscription-manager
     - Optionally the C(dbus) Python library; this is usually included in the OS
@@ -1073,7 +1078,7 @@ def main():
                             ['activationkey', 'environment'],
                             ['activationkey', 'auto_attach'],
                             ['pool', 'pool_ids']],
-        required_if=[['state', 'present', ['username', 'activationkey', 'token'], True]],
+        required_if=[['force_register', True, ['username', 'activationkey', 'token'], True]],
     )
 
     if getuid() != 0:
@@ -1155,6 +1160,8 @@ def main():
                 else:
                     module.exit_json(changed=False, msg="System already registered.")
         else:
+            if not username and not activationkey and not token:
+                module.fail_json(msg="state is present but any of the following are missing: username, activationkey, token")
             try:
                 rhsm.enable()
                 rhsm.configure(**module.params)
