@@ -174,8 +174,14 @@ def drop_user(module, client, user_name):
 def set_user_grants(module, client, user_name, grants):
     changed = False
 
+    current_grants = []
     try:
         current_grants = client.get_list_privileges(user_name)
+    except influx.exceptions.InfluxDBClientError as e:
+        if not module.check_mode or 'user not found' not in e.content:
+            module.fail_json(msg=e.content)
+
+    try:
         parsed_grants = []
         # Fix privileges wording
         for i, v in enumerate(current_grants):
