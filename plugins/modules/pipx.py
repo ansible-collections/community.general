@@ -75,7 +75,8 @@ options:
     include_injected:
         description:
             - Upgrade the injected packages along with the application.
-            - Only used when I(state=upgrade) or I(state=upgrade_all).
+            - Only used when I(state=upgrade), I(state=upgrade_all), or I(state=latest).
+            - I(state=upgrade) and I(state=latest) added in community.general 6.5.0.
         type: bool
         default: false
     index_url:
@@ -254,7 +255,7 @@ class PipX(StateModuleHelper):
         if self.vars.force:
             self.changed = True
 
-        with self.runner('state index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state include_injected index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
@@ -307,7 +308,7 @@ class PipX(StateModuleHelper):
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
-        with self.runner('state index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state include_injected index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run(state='upgrade')
             self._capture_results(ctx)
 
