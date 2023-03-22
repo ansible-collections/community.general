@@ -92,11 +92,11 @@ EXAMPLES = r'''
     values:
       - groups: [Group, Subgroup]
         key: KEY
-        bool_value: yes
+        bool_value: true
       - group: Group2
         key: KEY
         value: VALUE
-    backup: yes
+    backup: true
 '''
 
 RETURN = r''' # '''
