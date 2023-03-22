@@ -24,6 +24,8 @@ notes:
       I(server_proxy_hostname), I(server_proxy_port), I(server_proxy_user) and
       I(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf)
       config file and default to None.
+    - It is possible to interact with C(subscription-manager) only as root,
+      so root permissions are required to successfully run this module.
 requirements:
     - subscription-manager
     - Optionally the C(dbus) Python library; this is usually included in the OS
@@ -291,7 +293,7 @@ subscribed_pool_ids:
 '''
 
 from os.path import isfile
-from os import unlink
+from os import getuid, unlink
 import re
 import shutil
 import tempfile
@@ -1073,6 +1075,11 @@ def main():
                             ['pool', 'pool_ids']],
         required_if=[['state', 'present', ['username', 'activationkey', 'token'], True]],
     )
+
+    if getuid() != 0:
+        module.fail_json(
+            msg="Interacting with subscription-manager requires root permissions ('become: true')"
+        )
 
     rhsm.module = module
     state = module.params['state']
