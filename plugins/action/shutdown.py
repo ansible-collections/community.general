@@ -115,7 +115,7 @@ class ActionModule(ActionBase):
                 module_name='ansible.legacy.find',
                 module_args={
                     'paths': find_search_paths,
-                    'patterns': [shutdown_bin],
+                    'patterns': [command],
                     'file_type': 'any'
                 }
             )
@@ -146,10 +146,11 @@ class ActionModule(ActionBase):
             systemctl_search_paths = ['/bin', '/usr/bin']
             full_path = find_command('systemctl', systemctl_search_paths)  # find the path to the systemctl command
             if not full_path:  # if we couldn't find systemctl
-                raise AnsibleError('Unable to find systemctl command in search paths: {0}.'.
-                                   format(systemctl_search_paths))  # we give up here
+                raise AnsibleError(
+                    'Could not find command "{0}" in search paths: {1} or systemctl command in search paths: {2}, unable to shutdown.'.
+                    format(shutdown_bin, search_paths, systemctl_search_paths))  # we give up here
             else:
-                return full_path[0]  # done, since we cannot use args with systemd shutdown
+                return "{0} poweroff".format(full_path[0]) # done, since we cannot use args with systemd shutdown
 
         # systemd case taken care of, here we add args to the command
         args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
@@ -158,13 +159,13 @@ class ActionModule(ActionBase):
         shutdown_message = self._task.args.get('msg', self.DEFAULT_SHUTDOWN_MESSAGE)
         return '{0} {1}'. \
             format(
-                full_path[0],
-                args.format(
-                    delay_sec=delay_sec,
-                    delay_min=delay_sec // 60,
-                    message=shutdown_message
-                )
+            full_path[0],
+            args.format(
+                delay_sec=delay_sec,
+                delay_min=delay_sec // 60,
+                message=shutdown_message
             )
+        )
 
     def perform_shutdown(self, task_vars, distribution):
         result = {}
