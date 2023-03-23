@@ -4078,7 +4078,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             # team active-backup runner specific options
             runner_hwaddr_policy=dict(type='str', choices=['same_all', 'by_active', 'only_active']),
             # team lacp runner specific options
-            runner_fast_rate=dict(type='bool', default=False),
+            runner_fast_rate=dict(type='bool'),
             # vlan specific vars
             vlanid=dict(type='int'),
             vlandev=dict(type='str'),
