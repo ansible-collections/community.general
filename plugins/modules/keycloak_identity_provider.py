@@ -430,14 +430,14 @@ def sanitize(idp):
     idpcopy = deepcopy(idp)
     if 'config' in idpcopy:
         if 'clientSecret' in idpcopy['config']:
-            idpcopy['clientSecret'] = '**********'
+            idpcopy['config']['clientSecret'] = '**********'
     return idpcopy
 
 def normalize(idp):
     idpcopy = deepcopy(idp)
     if idpcopy.get('mappers'):
         idpcopy['mappers'] = sorted(idpcopy['mappers'], key=lambda x: x.get('name'))
-    return idpcopy
+    return dict((k, v) for k, v in idpcopy.items() if v)
 
 def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
@@ -600,7 +600,6 @@ def main():
 
             # doing an update
             result['changed'] = True
-
             if module._diff:
                 result['diff'] = dict(before=sanitize(before_idp), after=sanitize(desired_idp))
 

@@ -248,7 +248,6 @@ def create_authentication_execution(kc, config, new_exec, flow_alias_parent, isF
         for key in new_exec: 
             if key != "flowAlias" and key != "authenticationConfig":
                 updated_exec[key] = new_exec[key]
-        # raise Exception(updated_exec)
         kc.create_execution(updated_exec, flowAlias=flow_alias_parent, realm=realm)
 
 def hasSameName(new_exec, other_exec):
@@ -275,12 +274,12 @@ def add_error_line(err_msg_lines, err_msg, flow, exec_name, subflow = None, expe
                         actual=", Actual : " + str(actual) if actual is not None else "")]
 
 def create_diff_key(execution):
-    return "{ex_id}{subflow}".format(subflow=(" / " + execution["flowAlias"]) if execution.get("flowAlias") is not None else "",\
+    return "{subflow}{ex_id}".format(subflow=(execution["flowAlias"] + " / ") if execution.get("flowAlias") else "",\
             ex_id=get_identifier(execution))
 
 def remove_keys_for_diff(ex):
     ex_copy = copy.deepcopy(ex)
-    ex_for_diff = dict((k, ex_copy[k]) for k in ex_copy if k not in ["flowAlias"] and ex_copy[k])
+    ex_for_diff = dict((k, ex_copy[k]) for k in ex_copy if ex_copy[k])
     return ex_for_diff
 
 def add_diff_entry(new_exec, old_exec, before, after):
@@ -412,7 +411,6 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             if not check_mode:
                                 kc.add_authenticationConfig_to_execution(new_exec["id"], new_exec["authenticationConfig"], realm=realm)
                             changed = True
-                            add_diff_entry(new_exec, existing_exec, before, after)
                             add_error_line(err_msg_lines=err_msg, err_msg= "wrong config", flow = config["alias"], exec_name=get_identifier(new_exec), \
                             expected = str(new_exec["authenticationConfig"]), actual = str(existing_exec["authenticationConfig"] if "authenticationConfig" in existing_exec else None))
                     # Check if there has been some reordering
@@ -424,7 +422,6 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                             existing_executions = kc.get_executions_representation(config, realm=realm)
                         add_error_line(err_msg_lines=err_msg, err_msg="wrong index", flow=config["alias"], exec_name=get_identifier(new_exec),\
                         expected=new_exec["index"], actual= existing_exec["index"])
-                        add_diff_entry(new_exec, existing_exec, before, after)
                     # Update execution
                     if exec_need_changes:
                         changed = True
@@ -432,7 +429,7 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                         if new_exec["requirement"] != existing_exec["requirement"]:
                             add_error_line(err_msg_lines=err_msg, err_msg="wrong requirement", flow=config["alias"], exec_name=get_identifier(new_exec),\
                             expected = new_exec["requirement"], actual = existing_exec["requirement"])
-                        add_diff_entry(new_exec, existing_exec, before, after)
+                    add_diff_entry(new_exec, existing_exec, before, after)
                 else :
                     # Create new execution
                     if new_exec.get("providerId") is not None or new_exec.get("displayName") is not None :
@@ -446,11 +443,12 @@ def create_or_update_executions(kc, config, check_mode, realm='master'):
                                 raise Exception("could not find newly created execution")
                             created = created_list[0]
                             new_exec["id"] = created["id"]
+                            # We must update the execution after its creation in case KeyCloak did not set everything properly
+                            # (This happens for example when the user doesn't specify the requirementChoice field explicitly)
                             update_authentication_execution(kc, flow_alias_parent, new_exec, check_mode, realm)
                             shift = created["index"] - level_indices[current_level]
                             if shift != 0:
                                 kc.change_execution_priority(new_exec["id"], shift, realm=realm)
-                            existing_executions = kc.get_executions_representation(config, realm=realm)
                             if new_exec.get("authenticationConfig") is not None:
                                 kc.add_authenticationConfig_to_execution(new_exec["id"], new_exec["authenticationConfig"], realm=realm)
                         add_error_line(err_msg_lines=err_msg, err_msg="missing execution", flow=config["alias"],\

@@ -297,7 +297,15 @@ end_state:
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
+import copy
 
+def normalize_checkmode(clientscoperep):
+    result = copy.deepcopy(clientscoperep)
+    if 'attributes' in result:
+        result['attributes'] = {key:result['attributes'][key] for key in sorted(result['attributes'].keys())}
+    if 'protocolMappers' in result:
+        result['protocolMappers'] = list(sorted(result['protocolMappers'], key= lambda mapper: mapper.get('name')))
+    return dict((k, v) for k, v in result.items() if v)
 
 def sanitize_cr(clientscoperep):
     """ Removes probably sensitive details from a clientscoperep representation.
@@ -451,11 +459,12 @@ def main():
                 result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
                 module.exit_json(**result)
 
-            # doing an update
-            result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(desired_clientscope))
+                result['diff'] = dict(before=normalize_checkmode(sanitize_cr(before_clientscope)), after=normalize_checkmode(sanitize_cr(desired_clientscope)))
+            
+            # doing an update
+            result['changed'] = normalize_checkmode(before_clientscope) != normalize_checkmode(desired_clientscope)
 
             if module.check_mode:
                 module.exit_json(**result)
