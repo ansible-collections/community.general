@@ -203,7 +203,7 @@
   assert:
     that:
       - not proxy_mut_ex.changed
-      - "'parameters are mutually exclusive' in mut_ex.msg"
+      - "'parameters are mutually exclusive' in proxy_mut_ex.msg"
 
 - name: Add a full name host
   community.general.ssh_config:
