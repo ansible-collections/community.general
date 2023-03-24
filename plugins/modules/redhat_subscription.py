@@ -1069,6 +1069,7 @@ def main():
             }
         },
         required_together=[['username', 'password'],
+                           ['activationkey', 'org_id'],
                            ['server_proxy_hostname', 'server_proxy_port'],
                            ['server_proxy_user', 'server_proxy_password']],
         mutually_exclusive=[['activationkey', 'username'],
@@ -1100,8 +1101,6 @@ def main():
     auto_attach = module.params['auto_attach']
     activationkey = module.params['activationkey']
     org_id = module.params['org_id']
-    if activationkey and not org_id:
-        module.fail_json(msg='org_id is required when using activationkey')
     environment = module.params['environment']
     pool = module.params['pool']
     pool_ids = {}
