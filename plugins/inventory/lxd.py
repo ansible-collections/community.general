@@ -107,6 +107,14 @@ plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 type_filter: both
 
+# simple lxd.yml including virtual machines and containers
+plugin: community.general.lxd
+url: "https://example.com:8443"
+type_filter: both
+client_cert: "~/.config/lxc/client.crt"
+client_key: "~/.config/lxc/client.key"
+trust_password: "SUPERSECRET"
+
 # grouping lxd.yml
 groupby:
   locationBerlin:
