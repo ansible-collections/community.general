@@ -137,8 +137,10 @@ class LXDClient(object):
             err = resp_json.get('error', None)
         return err
 
+
 def default_key_file():
     return os.path.expanduser('~/.config/lxc/client.key')
+
 
 def default_cert_file():
     return os.path.expanduser('~/.config/lxc/client.crt')
