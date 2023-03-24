@@ -302,8 +302,9 @@ options:
     addr_gen_mode6:
         description:
             - Configure method for creating the address for use with IPv6 Stateless Address Autoconfiguration.
+            - C(default) and C(deafult-or-eui64) have been added in community.general 6.5.0.
         type: str
-        choices: [eui64, stable-privacy]
+        choices: [default, default-or-eui64, eui64, stable-privacy]
         version_added: 4.2.0
     mtu:
         description:
@@ -2264,7 +2265,7 @@ def main():
             route_metric6=dict(type='int'),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
-            addr_gen_mode6=dict(type='str', choices=['eui64', 'stable-privacy']),
+            addr_gen_mode6=dict(type='str', choices=['default', 'default-or-eui64', 'eui64', 'stable-privacy']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
