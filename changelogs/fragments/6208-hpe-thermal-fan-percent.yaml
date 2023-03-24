@@ -1,3 +1,2 @@
-
 minor_changes:
   - redfish_info - adds commands to retrieve the HPE ThermalConfiguration and FanPercentMinimum settings from iLO (with two corresponding functions added to redfish_utils) (https://github.com/ansible-collections/community.general/pull/6208).
