@@ -164,8 +164,8 @@ class ActionModule(ActionBase):
                     delay_sec=delay_sec,
                     delay_min=delay_sec // 60,
                     message=shutdown_message
+                    )
             )
-        )
 
     def perform_shutdown(self, task_vars, distribution):
         result = {}
