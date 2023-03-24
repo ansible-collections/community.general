@@ -68,7 +68,7 @@ DOCUMENTATION = '''
             default: false
             version_added: 6.1.0
         open:
-            description: Only show open (or possibly open) ports.
+            description: Only scan for open (or possibly open) ports.
             type: boolean
             default: false
             version_added: 6.5.0
