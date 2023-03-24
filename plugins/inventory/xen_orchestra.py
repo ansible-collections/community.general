@@ -139,7 +139,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.conn = create_connection(
             '{0}://{1}/api/'.format(proto, xoa_api_host), sslopt=sslopt)
 
-
     CALL_TIMEOUT = 100
     """Number of 1/10ths of a second to wait before method call times out."""
     def call(self, method: str, params: dict) -> dict:
@@ -163,7 +162,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         raise AnsibleError(
             f'Method call {method} timed out after {self.CALL_TIMEOUT / 10} seconds.')
-
 
     def login(self, user, password):
         result = self.call('session.signIn', {
