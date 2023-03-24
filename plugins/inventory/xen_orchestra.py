@@ -141,9 +141,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     CALL_TIMEOUT = 100
     """Number of 1/10ths of a second to wait before method call times out."""
-    def call(self, method: str, params: dict) -> dict:
+
+    def call(self, method, params):
         """Calls a method on the XO server with the provided parameters."""
-        id = int(self.pointer)
+        id = self.pointer
         self.conn.send(json.dumps({
             'id': id,
             'jsonrpc': '2.0',
