@@ -112,13 +112,13 @@
   register: shutdown_result
   check_mode: true
   when: 
-    - '"systemd-sysv" not in ansible_facts.packages'
     - "(ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')"
+    - '"systemd-sysv" not in ansible_facts.packages'
 
 - name: Install systemd_sysv in case it has been removed in test
   apt:
     name: systemd-sysv
     state: present
   when:
-    - "systemd_sysv_install is changed"
     - "(ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')"
+    - "systemd_sysv_install is changed"
