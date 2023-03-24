@@ -1031,9 +1031,10 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             None"""
-
         if len(self.data) == 0:  # If no data is injected by unittests open socket
             self.socket = self._connect_to_socket()
+            if self.trust_password is not None and self.url.startswith('https:'):
+                self.socket.authenticate(self.trust_password)
             self.get_instance_data(self._get_instances())
             self.get_network_data(self._get_networks())
 
@@ -1044,8 +1045,6 @@ class InventoryModule(BaseInventoryPlugin):
             self.cleandata()
 
         self.extract_information_from_instance_configs()
-
-        # self.display.vvv(self.save_json_data([os.path.abspath(__file__)]))
 
         self.build_inventory()
 
