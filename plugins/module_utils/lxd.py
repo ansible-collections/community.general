@@ -57,16 +57,16 @@ class LXDClient(object):
         self.debug = debug
         self.logs = []
         if url.startswith('https:'):
-            try: 
+            try:
                 with open(cert_file, 'r') as fh:
                     self.cert_file = cert_file
-            except FileNotFoundError: 
+            except FileNotFoundError:
                 raise LXDClientException('The certificate "{0}" does not exist.'.format(cert_file))
 
-            try: 
+            try:
                 with open(key_file, 'r') as fh:
                     self.key_file = key_file
-            except FileNotFoundError: 
+            except FileNotFoundError:
                 raise LXDClientException('The certificate key "{0}" does not exist.'.format(key_file))
 
             parts = generic_urlparse(urlparse(self.url))
