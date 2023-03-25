@@ -44,10 +44,17 @@ attributes:
     support: none
 
 options:
+  group:
+    description:
+      - ID or full path of the group in the form group/subgroup.
+      - Mutually exclusive with I(owned) and I(project).
+    type: str
+    version_added: '6.5.0'
   project:
     description:
       - ID or full path of the project in the form of group/name.
       - Mutually exclusive with I(owned) since community.general 4.5.0.
+      - Mutually exclusive with I(group).
     type: str
     version_added: '3.7.0'
   description:
@@ -73,6 +80,7 @@ options:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
       - Mutually exclusive with I(project) since community.general 4.5.0.
+      - Mutually exclusive with I(group).
     default: false
     type: bool
     version_added: 2.0.0
@@ -209,20 +217,22 @@ except NameError:
 
 
 class GitLabRunner(object):
-    def __init__(self, module, gitlab_instance, project=None):
+    def __init__(self, module, gitlab_instance, group=None, project=None):
         self._module = module
         self._gitlab = gitlab_instance
+        self.runner_object = None
+
         # Whether to operate on GitLab-instance-wide or project-wide runners
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
         # for group runner token access
         if project:
             self._runners_endpoint = project.runners.list
+        elif group:
+            self._runners_endpoint = group.runners.list
         elif module.params['owned']:
             self._runners_endpoint = gitlab_instance.runners.list
         else:
             self._runners_endpoint = gitlab_instance.runners.all
-
-        self.runner_object = None
 
     def create_or_update_runner(self, description, options):
         changed = False
@@ -360,6 +370,7 @@ def main():
         maximum_timeout=dict(type='int', default=3600),
         registration_token=dict(type='str', no_log=True),
         project=dict(type='str'),
+        group=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     ))
 
@@ -372,6 +383,8 @@ def main():
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
             ['project', 'owned'],
+            ['group', 'owned'],
+            ['project', 'group'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -396,6 +409,7 @@ def main():
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
     project = module.params['project']
+    group = module.params['group']
 
     if access_level is None:
         message = "The option 'access_level' is unspecified, so 'ref_protected' is assumed. "\
@@ -408,13 +422,20 @@ def main():
 
     gitlab_instance = gitlab_authentication(module)
     gitlab_project = None
+    gitlab_group = None
+
     if project:
         try:
             gitlab_project = gitlab_instance.projects.get(project)
         except gitlab.exceptions.GitlabGetError as e:
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
+    elif group:
+        try:
+            gitlab_group = gitlab_instance.groups.get(group)
+        except gitlab.exceptions.GitlabGetError as e:
+            module.fail_json(msg='No such a group %s' % group, exception=to_native(e))
 
-    gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
+    gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_group, gitlab_project)
     runner_exists = gitlab_runner.exists_runner(runner_description)
 
     if state == 'absent':

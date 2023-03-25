@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
+
+import gitlab
 __metaclass__ = type
 
 import pytest
@@ -23,9 +25,11 @@ try:
     from .gitlab import (FakeAnsibleModule,
                          GitlabModuleTestCase,
                          python_version_match_requirement,
-                         resp_find_runners_all,
-                         resp_find_runners_list, resp_get_runner,
-                         resp_create_runner, resp_delete_runner)
+                         resp_find_runners_all, resp_find_runners_list,
+                         resp_find_project_runners, resp_find_group_runners,
+                         resp_get_runner,
+                         resp_create_runner, resp_delete_runner,
+                         resp_get_project_by_name, resp_get_group_by_name)
 
     # GitLab module requirements
     if python_version_match_requirement():
@@ -73,6 +77,37 @@ class TestGitlabRunner(GitlabModuleTestCase):
         self.assertEqual(rvalue, True)
 
         rvalue = self.module_util_owned.exists_runner("test-3-00000000")
+
+        self.assertEqual(rvalue, False)
+
+    @with_httmock(resp_find_project_runners)
+    @with_httmock(resp_get_runner)
+    @with_httmock(resp_get_project_by_name)
+    def test_project_runner_exist(self):
+        gitlab_project = self.gitlab_instance.projects.get('foo-bar/diaspora-client')
+        module_util = GitLabRunner(module=FakeAnsibleModule(), gitlab_instance=self.gitlab_instance, project=gitlab_project)
+
+        rvalue = module_util.exists_runner("test-1-20220210")
+
+        self.assertEqual(rvalue, True)
+
+        rvalue = module_util.exists_runner("test-3-00000000")
+
+        self.assertEqual(rvalue, False)
+
+    @with_httmock(resp_find_group_runners)
+    @with_httmock(resp_get_group_by_name)
+    @with_httmock(resp_get_runner)
+    @pytest.mark.skipif(gitlab.__version__ < "2.3.0", reason="require python-gitlab >= 2.3.0")
+    def test_group_runner_exist(self):
+        gitlab_group = self.gitlab_instance.groups.get('foo-bar')
+        module_util = GitLabRunner(module=FakeAnsibleModule(), gitlab_instance=self.gitlab_instance, group=gitlab_group)
+
+        rvalue = module_util.exists_runner("test-3-20220210")
+
+        self.assertEqual(rvalue, True)
+
+        rvalue = module_util.exists_runner("test-3-00000000")
 
         self.assertEqual(rvalue, False)
 

@@ -213,6 +213,31 @@ def resp_get_group(url, request):
     return response(200, content, headers, None, 5, request)
 
 
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/foo-bar", method="get")
+def resp_get_group_by_name(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('{"id": 1, "name": "Foobar Group", "path": "foo-bar",'
+               '"description": "An interesting group", "visibility": "public",'
+               '"lfs_enabled": true, "avatar_url": "http://localhost:3000/uploads/group/avatar/1/foo.jpg",'
+               '"web_url": "http://localhost:3000/groups/foo-bar", "request_access_enabled": false,'
+               '"full_name": "Foobar Group", "full_path": "foo-bar",'
+               '"project_creation_level": "maintainer", "subgroup_creation_level": "maintainer",'
+               '"require_two_factor_authentication": true,'
+               '"file_template_project_id": 1, "parent_id": null, "projects": [{"id": 1,"description": null, "default_branch": "master",'
+               '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
+               '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
+               '"web_url": "http://example.com/diaspora/diaspora-client",'
+               '"readme_url": "http://example.com/diaspora/diaspora-client/blob/master/README.md",'
+               '"tag_list": ["example","disapora client"],"name": "Diaspora Client",'
+               '"name_with_namespace": "Diaspora / Diaspora Client","path": "diaspora-client",'
+               '"path_with_namespace": "diaspora/diaspora-client","created_at": "2013-09-30T13:46:02Z",'
+               '"last_activity_at": "2013-09-30T13:46:02Z","forks_count": 0,'
+               '"avatar_url": "http://example.com/uploads/project/avatar/4/uploads/avatar.png",'
+               '"star_count": 0}]}')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1", method="get")
 def resp_get_missing_group(url, request):
     headers = {'content-type': 'application/json'}
@@ -595,6 +620,40 @@ def resp_find_runners_list(url, request):
                '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
                '"online": true,"status": "online"},{"active": true,'
                '"description": "test-2-20201214","id": 2,"ip_address": "127.0.0.1",'
+               '"is_shared": false,"name": null,"online": false,"status": "offline"}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/projects/1/runners$', method="get")
+def resp_find_project_runners(url, request):
+    headers = {'content-type': 'application/json',
+               "X-Page": 1,
+               "X-Next-Page": 2,
+               "X-Per-Page": 1,
+               "X-Total-Pages": 1,
+               "X-Total": 2}
+    content = ('[{"active": true,"description": "test-1-20220210","id": 1,'
+               '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
+               '"online": true,"status": "online"},{"active": true,'
+               '"description": "test-2-20220210","id": 2,"ip_address": "127.0.0.1",'
+               '"is_shared": false,"name": null,"online": false,"status": "offline"}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/groups/1/runners$', method="get")
+def resp_find_group_runners(url, request):
+    headers = {'content-type': 'application/json',
+               "X-Page": 1,
+               "X-Next-Page": 2,
+               "X-Per-Page": 1,
+               "X-Total-Pages": 1,
+               "X-Total": 2}
+    content = ('[{"active": true,"description": "test-3-20220210","id": 1,'
+               '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
+               '"online": true,"status": "online"},{"active": true,'
+               '"description": "test-4-20220210","id": 2,"ip_address": "127.0.0.1",'
                '"is_shared": false,"name": null,"online": false,"status": "offline"}]')
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
