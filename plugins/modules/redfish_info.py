@@ -321,6 +321,22 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Get HPE Thermal Config
+    community.general.redfish_info:
+      category: Chassis
+      command: GetHPEThermalConfig
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Get HPE Fan Percent Minimum
+    community.general.redfish_info:
+      category: Chassis
+      command: GetHPEFanPercentMin
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -340,7 +356,7 @@ CATEGORY_COMMANDS_ALL = {
                 "GetStorageControllerInventory", "GetDiskInventory", "GetVolumeInventory",
                 "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia"],
     "Chassis": ["GetFanInventory", "GetPsuInventory", "GetChassisPower",
-                "GetChassisThermals", "GetChassisInventory", "GetHealthReport"],
+                "GetChassisThermals", "GetChassisInventory", "GetHealthReport", "GetHPEThermalConfig", "GetHPEFanPercentMin"],
     "Accounts": ["ListUsers"],
     "Sessions": ["GetSessions"],
     "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory",
@@ -482,6 +498,10 @@ def main():
                     result["chassis"] = rf_utils.get_chassis_inventory()
                 elif command == "GetHealthReport":
                     result["health_report"] = rf_utils.get_multi_chassis_health_report()
+                elif command == "GetHPEThermalConfig":
+                    result["hpe_thermal_config"] = rf_utils.get_hpe_thermal_config()
+                elif command == "GetHPEFanPercentMin":
+                    result["hpe_fan_percent_min"] = rf_utils.get_hpe_fan_percent_min()
 
         elif category == "Accounts":
             # execute only if we find an Account service resource
