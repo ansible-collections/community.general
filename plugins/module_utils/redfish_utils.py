@@ -3217,3 +3217,35 @@ class RedfishUtils(object):
         body["SecureBootEnable"] = True
 
         return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)
+
+    def get_hpe_thermal_config(self):
+        result = {}
+        key = "Thermal"
+        # Go through list
+        for chassis_uri in self.chassis_uri_list:
+            response = self.get_request(self.root_uri + chassis_uri)
+            if response['ret'] is False:
+                return response
+            result['ret'] = True
+            data = response['data']
+            oem = data.get['Oem']
+            hpe = oem.get['Hpe']
+            thermal_config = hpe.get('ThermalConfiguration')
+        result["current_thermal_config"] = thermal_config
+        return result
+
+    def get_hpe_fan_percent_min(self):
+        result = {}
+        key = "Thermal"
+        # Go through list
+        for chassis_uri in self.chassis_uri_list:
+            response = self.get_request(self.root_uri + chassis_uri)
+            if response['ret'] is False:
+                return response
+            result['ret'] = True
+            data = response['data']
+            oem = data.get['Oem']
+            hpe = oem.get['Hpe']
+            fan_percent_min_config = hpe.get('FanPercentMinimum')
+        result["fan_percent_min"] = fan_percent_min_config
+        return result
