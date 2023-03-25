@@ -27,8 +27,7 @@ attributes:
 options:
   package:
     description:
-      - list of packages to install, upgrade or remove.
-    required: true
+      - List of packages to install, upgrade, or remove.
     aliases: [ name, pkg ]
     type: list
     elements: str
@@ -40,9 +39,30 @@ options:
     type: str
   update_cache:
     description:
-      - update the package database first C(apt-get update).
+      - Run the equivalent of C(apt-get update) before the operation. Can be run as part of the package installation or as a separate step.
+      - Default is not to update the cache.
     type: bool
     default: false
+  clean:
+    description:
+      - Run the equivalent of C(apt-get clean) to clear out the local repository of retrieved package files. It removes everything but
+        the lock file from C(/var/cache/apt/archives/) and C(/var/cache/apt/archives/partial/).
+      - Can be run as part of the package installation (clean runs before install) or as a separate step.
+    type: bool
+    default: false
+    version_added: 6.5.0
+  dist_upgrade:
+    description:
+      - If true performs an C(apt-get dist-upgrade) to upgrade system.
+    type: bool
+    default: false
+    version_added: 6.5.0
+  update_kernel:
+    description:
+      - If true performs an C(update-kernel) to upgrade kernel packages.
+    type: bool
+    default: false
+    version_added: 6.5.0
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
@@ -76,6 +96,16 @@ EXAMPLES = '''
     name: bar
     state: present
     update_cache: true
+
+- name: Run the equivalent of "apt-get clean" as a separate step
+  community.general.apt_rpm:
+    clean: true
+
+- name: Perform cache update and complete system upgrade (includes kernel)
+  community.general.apt_rpm:
+    update_cache: true
+    dist_upgrade: true
+    update_kernel: true
 '''
 
 import os
@@ -84,6 +114,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 APT_PATH = "/usr/bin/apt-get"
 RPM_PATH = "/usr/bin/rpm"
+APT_GET_ZERO = "\n0 upgraded, 0 newly installed"
+UPDATE_KERNEL_ZERO = "\nTry to install new kernel "
 
 
 def query_package(module, name):
@@ -104,13 +136,38 @@ def query_package_provides(module, name):
 
 
 def update_package_db(module):
-    rc, out, err = module.run_command("%s update" % APT_PATH)
+    rc, update_out, err = module.run_command([APT_PATH, "update"], check_rc=True, environ_update={"LANG": "C"})
+    return (False, update_out)
 
-    if rc != 0:
-        module.fail_json(msg="could not update package db: %s" % err)
+
+def dir_size(module, path):
+    total_size = 0
+    for path, dirs, files in os.walk(path):
+        for f in files:
+            total_size += os.path.getsize(os.path.join(path, f))
+    return total_size
+
+
+def clean(module):
+    t = dir_size(module, "/var/cache/apt/archives")
+    rc, out, err = module.run_command([APT_PATH, "clean"], check_rc=True)
+    return (t != dir_size(module, "/var/cache/apt/archives"), out)
+
+
+def dist_upgrade(module):
+    rc, out, err = module.run_command([APT_PATH, "-y", "dist-upgrade"], check_rc=True, environ_update={"LANG": "C"})
+    return (APT_GET_ZERO not in out, out)
+
+
+def update_kernel(module):
+    rc, out, err = module.run_command(["/usr/sbin/update-kernel", "-y"], check_rc=True, environ_update={"LANG": "C"})
+    return (UPDATE_KERNEL_ZERO not in out, out)
 
 
 def remove_packages(module, packages):
+
+    if packages is None:
+        return (False, "Empty package list")
 
     remove_c = 0
     # Using a for loop in case of error, we can report the package that failed
@@ -119,7 +176,7 @@ def remove_packages(module, packages):
         if not query_package(module, package):
             continue
 
-        rc, out, err = module.run_command("%s -y remove %s" % (APT_PATH, package))
+        rc, out, err = module.run_command("%s -y remove %s" % (APT_PATH, package), environ_update={"LANG": "C"})
 
         if rc != 0:
             module.fail_json(msg="failed to remove %s: %s" % (package, err))
@@ -127,12 +184,15 @@ def remove_packages(module, packages):
         remove_c += 1
 
     if remove_c > 0:
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c)
+        return (True, "removed %s package(s)" % remove_c)
 
-    module.exit_json(changed=False, msg="package(s) already absent")
+    return (False, "package(s) already absent")
 
 
 def install_packages(module, pkgspec):
+
+    if pkgspec is None:
+        return (False, "Empty package list")
 
     packages = ""
     for package in pkgspec:
@@ -141,7 +201,7 @@ def install_packages(module, pkgspec):
 
     if len(packages) != 0:
 
-        rc, out, err = module.run_command("%s -y install %s" % (APT_PATH, packages))
+        rc, out, err = module.run_command("%s -y install %s" % (APT_PATH, packages), environ_update={"LANG": "C"})
 
         installed = True
         for packages in pkgspec:
@@ -152,9 +212,9 @@ def install_packages(module, pkgspec):
         if rc or not installed:
             module.fail_json(msg="'apt-get -y install %s' failed: %s" % (packages, err))
         else:
-            module.exit_json(changed=True, msg="%s present(s)" % packages)
+            return (True, "%s present(s)" % packages)
     else:
-        module.exit_json(changed=False)
+        return (False, "Nothing to install")
 
 
 def main():
@@ -162,7 +222,10 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed']),
             update_cache=dict(type='bool', default=False),
-            package=dict(type='list', elements='str', required=True, aliases=['name', 'pkg']),
+            clean=dict(type='bool', default=False),
+            dist_upgrade=dict(type='bool', default=False),
+            update_kernel=dict(type='bool', default=False),
+            package=dict(type='list', elements='str', aliases=['name', 'pkg']),
         ),
     )
 
@@ -170,17 +233,39 @@ def main():
         module.fail_json(msg="cannot find /usr/bin/apt-get and/or /usr/bin/rpm")
 
     p = module.params
+    modified = False
+    output = ""
 
     if p['update_cache']:
         update_package_db(module)
 
+    if p['clean']:
+        (m, out) = clean(module)
+        modified = modified or m
+
+    if p['dist_upgrade']:
+        (m, out) = dist_upgrade(module)
+        modified = modified or m
+        output += out
+
+    if p['update_kernel']:
+        (m, out) = update_kernel(module)
+        modified = modified or m
+        output += out
+
     packages = p['package']
-
     if p['state'] in ['installed', 'present']:
-        install_packages(module, packages)
+        (m, out) = install_packages(module, packages)
+        modified = modified or m
+        output += out
 
-    elif p['state'] in ['absent', 'removed']:
-        remove_packages(module, packages)
+    if p['state'] in ['absent', 'removed']:
+        (m, out) = remove_packages(module, packages)
+        modified = modified or m
+        output += out
+
+    # Return total modification status and output of all commands
+    module.exit_json(changed=modified, msg=output)
 
 
 if __name__ == '__main__':
