@@ -84,7 +84,14 @@ options:
   proxycommand:
     description:
       - Sets the C(ProxyCommand) option.
+      - Mutually exclusive with I(proxyjump).
     type: str
+  proxyjump:
+    description:
+      - Sets the C(ProxyJump) option.
+      - Mutually exclusive with I(proxycommand).
+    type: str
+    version_added: 6.5.0
   forward_agent:
     description:
       - Sets the C(ForwardAgent) option.
@@ -210,6 +217,7 @@ class SSHConfig(object):
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
             proxycommand=self.params.get('proxycommand'),
+            proxyjump=self.params.get('proxyjump'),
             host_key_algorithms=self.params.get('host_key_algorithms'),
         )
 
@@ -306,6 +314,7 @@ def main():
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
+            proxyjump=dict(type='str', default=None),
             forward_agent=dict(type='bool'),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
@@ -320,6 +329,7 @@ def main():
         supports_check_mode=True,
         mutually_exclusive=[
             ['user', 'ssh_config_file'],
+            ['proxycommand', 'proxyjump'],
         ],
     )
 
