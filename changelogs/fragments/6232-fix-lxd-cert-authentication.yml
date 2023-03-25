@@ -1,2 +1,2 @@
 bugfixes:
-  - lxd inventory - bugfix to authenticate client certificates at the server (https://github.com/ansible-collections/community.general/issues/6204)
+  - lxd inventory plugin - bugfix to authenticate client certificates at the server (https://github.com/ansible-collections/community.general/issues/6204).
