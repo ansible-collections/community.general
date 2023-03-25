@@ -22,6 +22,11 @@ attributes:
   diff_mode:
     support: none
 options:
+  archive:
+    description:
+      - Specify a path to an archive to restore (instead of creating or cloning a VM).
+    type: str
+    version_added: 6.5.0
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
@@ -535,6 +540,14 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf
+
+- name: Create a VM from archive (backup)
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    archive: backup-storage:backup/vm/140/2023-03-08T06:41:23Z
+    name: spynal
 
 - name: Create new VM with minimal options and given vmid
   community.general.proxmox_kvm:
@@ -1053,6 +1066,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 def main():
     module_args = proxmox_auth_argument_spec()
     kvm_args = dict(
+        archive=dict(type='str'),
         acpi=dict(type='bool'),
         agent=dict(type='str'),
         args=dict(type='str'),
@@ -1256,6 +1270,7 @@ def main():
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
             proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
+                              archive=module.params['archive'],
                               acpi=module.params['acpi'],
                               agent=module.params['agent'],
                               autostart=module.params['autostart'],

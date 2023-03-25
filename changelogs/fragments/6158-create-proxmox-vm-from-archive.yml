@@ -1,0 +1,2 @@
+minor_changes:
+  - "proxmox_kvm - add new ``archive`` parameter. This is needed to create a VM from an archive (backup) (https://github.com/ansible-collections/community.general/pull/6159)."
