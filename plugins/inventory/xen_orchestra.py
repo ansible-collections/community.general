@@ -78,6 +78,7 @@ compose:
 
 import json
 import ssl
+from time import sleep
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
@@ -138,21 +139,42 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.conn = create_connection(
             '{0}://{1}/api/'.format(proto, xoa_api_host), sslopt=sslopt)
 
+    CALL_TIMEOUT = 100
+    """Number of 1/10ths of a second to wait before method call times out."""
+
+    def call(self, method, params):
+        """Calls a method on the XO server with the provided parameters."""
+        id = self.pointer
+        self.conn.send(json.dumps({
+            'id': id,
+            'jsonrpc': '2.0',
+            'method': method,
+            'params': params
+        }))
+
+        waited = 0
+        while waited < self.CALL_TIMEOUT:
+            response = json.loads(self.conn.recv())
+            if 'id' in response and response['id'] == id:
+                return response
+            else:
+                sleep(0.1)
+                waited += 1
+
+        raise AnsibleError(
+            'Method call {method} timed out after {timeout} seconds.'.format(method=method, timeout=self.CALL_TIMEOUT / 10))
+
     def login(self, user, password):
-        payload = {'id': self.pointer, 'jsonrpc': '2.0', 'method': 'session.signIn', 'params': {
-            'username': user, 'password': password}}
-        self.conn.send(json.dumps(payload))
-        result = json.loads(self.conn.recv())
+        result = self.call('session.signIn', {
+            'username': user, 'password': password
+        })
 
         if 'error' in result:
             raise AnsibleError(
                 'Could not connect: {0}'.format(result['error']))
 
     def get_object(self, name):
-        payload = {'id': self.pointer, 'jsonrpc': '2.0',
-                   'method': 'xo.getAllObjects', 'params': {'filter': {'type': name}}}
-        self.conn.send(json.dumps(payload))
-        answer = json.loads(self.conn.recv())
+        answer = self.call('xo.getAllObjects', {'filter': {'type': name}})
 
         if 'error' in answer:
             raise AnsibleError(
