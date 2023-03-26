@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Copyright (c) 2023, Salvatore Mesoraca <s.mesoraca16@gmail.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# This script is not supposed to correctly emulate
+# kwriteconf output format.
+# It only tries to emulate its behaviour from the
+# point of view of the Ansible module.
+# Which is: write something that depends on the arguments
+# to the output file, unless we already wrote that before.
+
+set -e
+
+args=""
+prev_was_file=0
+for var in "$@"; do
+    if [ $prev_was_file -eq 1 ]; then
+        fname="$var"
+        prev_was_file=0
+    else
+        args="$args $var"
+    fi
+    if [ "$var" = "--file" ]; then
+        prev_was_file=1
+    fi
+done
+
+if [ "x$fname" = "x" ]; then
+    exit 1
+fi
+
+if [ -e "$fname" ]; then
+    grep -qF "$args" "$fname" && exit 0
+fi
+
+echo "$args" >> "$fname"
