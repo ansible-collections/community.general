@@ -664,6 +664,8 @@ files:
     ignore: DWSR
     labels: jira
     maintainers: Slezhuk tarka pertoft
+  $modules/kdeconfig.py:
+    maintainers: smeso
   $modules/kernel_blacklist.py:
     maintainers: matze
   $modules/keycloak_:
