@@ -1808,6 +1808,32 @@ releases:
     - 4647-gconftool2-command-arg.yaml
     - psf-license.yml
     release_date: '2022-05-16'
+  4.8.10:
+    changes:
+      bugfixes:
+      - ModuleHelper - fix bug when adjusting the name of reserved output variables
+        (https://github.com/ansible-collections/community.general/pull/5755).
+      - loganalytics callback plugin - adjust type of callback to ``notification``,
+        it was incorrectly classified as ``aggregate`` before (https://github.com/ansible-collections/community.general/pull/5761).
+      - logdna callback plugin - adjust type of callback to ``notification``, it was
+        incorrectly classified as ``aggregate`` before (https://github.com/ansible-collections/community.general/pull/5761).
+      - logstash callback plugin - adjust type of callback to ``notification``, it
+        was incorrectly classified as ``aggregate`` before (https://github.com/ansible-collections/community.general/pull/5761).
+      - splunk callback plugin - adjust type of callback to ``notification``, it was
+        incorrectly classified as ``aggregate`` before (https://github.com/ansible-collections/community.general/pull/5761).
+      - sumologic callback plugin - adjust type of callback to ``notification``, it
+        was incorrectly classified as ``aggregate`` before (https://github.com/ansible-collections/community.general/pull/5761).
+      - syslog_json callback plugin - adjust type of callback to ``notification``,
+        it was incorrectly classified as ``aggregate`` before (https://github.com/ansible-collections/community.general/pull/5761).
+      - terraform and timezone - slight refactoring to avoid linter reporting potentially
+        undefined variables (https://github.com/ansible-collections/community.general/pull/5933).
+      release_summary: Maintenance release.
+    fragments:
+    - 4.8.10.yml
+    - 5755-mh-fix-output-conflict.yml
+    - 5761-callback-types.yml
+    - 5933-linting.yml
+    release_date: '2023-03-26'
   4.8.2:
     changes:
       bugfixes:
