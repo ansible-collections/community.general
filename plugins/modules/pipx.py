@@ -76,7 +76,7 @@ options:
         description:
             - Upgrade the injected packages along with the application.
             - Only used when I(state=upgrade), I(state=upgrade_all), or I(state=latest).
-            - I(state=upgrade) and I(state=latest) added in community.general 6.5.0.
+            - This is used with I(state=upgrade) and I(state=latest) since community.general 6.5.0.
         type: bool
         default: false
     index_url:
