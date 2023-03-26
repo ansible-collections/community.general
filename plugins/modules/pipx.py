@@ -47,10 +47,17 @@ options:
               If the application source, such as a package with version specifier, or an URL,
               directory or any other accepted specification. See C(pipx) documentation for more details.
             - When specified, the C(pipx) command will use I(source) instead of I(name).
+    install_apps:
+        description:
+            - Add apps from the injected packages.
+            - Only used when I(state=inject).
+        type: bool
+        default: false
+        version_added: 6.5.0
     install_deps:
         description:
             - Include applications of dependent packages.
-            - Only used when I(state=install) or I(state=upgrade).
+            - Only used when I(state=install), I(state=upgrade), or I(state=inject).
         type: bool
         default: false
     inject_packages:
@@ -161,6 +168,7 @@ class PipX(StateModuleHelper):
                                 'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all', 'latest']),
             name=dict(type='str'),
             source=dict(type='str'),
+            install_apps=dict(type='bool', default=False),
             install_deps=dict(type='bool', default=False),
             inject_packages=dict(type='list', elements='str'),
             force=dict(type='bool', default=False),
@@ -271,7 +279,7 @@ class PipX(StateModuleHelper):
             self.do_raise("Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
             self.changed = True
-        with self.runner('state index_url force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
+        with self.runner('state index_url install_apps install_deps force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
