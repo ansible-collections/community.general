@@ -162,7 +162,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 waited += 1
 
         raise AnsibleError(
-            f'Method call {method} timed out after {self.CALL_TIMEOUT / 10} seconds.')
+            'Method call {method} timed out after {timeout} seconds.'.format(method=method, timeout=self.CALL_TIMEOUT / 10))
 
     def login(self, user, password):
         result = self.call('session.signIn', {
