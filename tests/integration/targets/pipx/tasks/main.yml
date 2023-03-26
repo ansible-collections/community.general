@@ -190,6 +190,15 @@
       - licenses
   register: inject_pkgs_ansible_lint
 
+- name: inject packages with apps
+  community.general.pipx:
+    state: inject
+    name: ansible-lint
+    inject_packages:
+      - black
+    install_apps: true
+  register: inject_pkgs_apps_ansible_lint
+
 - name: cleanup ansible-lint
   community.general.pipx:
     state: absent
@@ -203,6 +212,9 @@
       - inject_pkgs_ansible_lint is changed
       - '"ansible-lint" in inject_pkgs_ansible_lint.application'
       - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
+      - inject_pkgs_apps_ansible_lint is changed
+      - '"ansible-lint" in inject_pkgs_apps_ansible_lint.application'
+      - '"black" in inject_pkgs_apps_ansible_lint.application["ansible-lint"]["injected"]'
       - uninstall_ansible_lint is changed
 
 ##############################################################################
