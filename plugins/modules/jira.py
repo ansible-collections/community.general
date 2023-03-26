@@ -6,6 +6,7 @@
 #
 # Copyright (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search and update function
 # Copyright (c) 2021, Brandon McNama <brandonmcnama@outlook.com> Issue attachment functionality
+# Copyright (c) 2022, Hugo Prudente <hugo.kenshin+oss@gmail.com> Worklog functionality
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -40,9 +41,10 @@ options:
     type: str
     required: true
     aliases: [ command ]
-    choices: [ attach, comment, create, edit, fetch, link, search, transition, update ]
+    choices: [ attach, comment, create, edit, fetch, link, search, transition, update, worklog ]
     description:
       - The operation to perform.
+      - C(worklog) was added in community.genereal 6.5.0.
 
   username:
     type: str
@@ -171,7 +173,6 @@ options:
      - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add JIRA properties for example.
      - Note that JIRA may not allow changing field values on specific transitions or states.
     default: {}
-
   jql:
     required: false
     description:
@@ -286,6 +287,47 @@ EXAMPLES = r"""
         - key: 'sd.public.comment'
           value:
             internal: true
+
+# Add an workog to an existing issue
+- name: Worklog on issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: A worklog added by Ansible
+    fields:
+      timeSpentSeconds: 12000
+
+- name: Workflow on issue with comment restricted visibility
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: A worklog added by Ansible
+    comment_visibility:
+      type: role
+      value: Developers
+    fields:
+      timeSpentSeconds: 12000
+
+- name: Workflow on issue with comment property to mark it internal
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: A worklog added by Ansible
+    fields:
+      properties:
+        - key: 'sd.public.comment'
+          value:
+            internal: true
+      timeSpentSeconds: 12000
 
 # Assign an existing issue using edit
 - name: Assign an issue using free-form fields
@@ -438,7 +480,7 @@ class JIRA(StateModuleHelper):
             uri=dict(type='str', required=True),
             operation=dict(
                 type='str',
-                choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
+                choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search', 'worklog'],
                 aliases=['command'], required=True
             ),
             username=dict(type='str'),
@@ -481,6 +523,7 @@ class JIRA(StateModuleHelper):
             ('operation', 'attach', ['issue', 'attachment']),
             ('operation', 'create', ['project', 'issuetype', 'summary']),
             ('operation', 'comment', ['issue', 'comment']),
+            ('operation', 'workflow', ['issue', 'comment']),
             ('operation', 'fetch', ['issue']),
             ('operation', 'transition', ['issue', 'status']),
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
@@ -533,6 +576,22 @@ class JIRA(StateModuleHelper):
             data.update(self.vars.fields)
 
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(on_success=True)
+    def operation_worklog(self):
+        data = {
+            'comment': self.vars.comment
+        }
+        # if comment_visibility is specified restrict visibility
+        if self.vars.comment_visibility is not None:
+            data['visibility'] = self.vars.comment_visibility
+
+        # Use 'fields' to merge in any additional data
+        if self.vars.fields:
+            data.update(self.vars.fields)
+
+        url = self.vars.restbase + '/issue/' + self.vars.issue + '/worklog'
         self.vars.meta = self.post(url, data)
 
     @cause_changes(on_success=True)
