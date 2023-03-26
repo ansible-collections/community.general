@@ -1,0 +1,34 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+testlist_initial_value: "{{ testlist2 }}"
+testlist1__merge_list:
+  - item1
+testlist2:
+  - item2
+testlist3__merge_list:
+  - item3
+
+testdict1__merge_dict:
+  item1: test
+  list_item:
+    - test1
+testdict2__merge_dict:
+  item2: test
+  list_item:
+    - test2
+
+override_warn_init:
+  key_to_override: Initial value
+override__override_warn:
+  key_to_override: Override value
+
+override_error_init:
+  key_to_override: Initial value
+override__override_error:
+  key_to_override: Override value
+
+logging_output_file: /tmp/ansible-test-merge-variables  # The Ansible log output is available in this file
