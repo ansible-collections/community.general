@@ -85,7 +85,7 @@ testb__test_dict:
 
 
 # Merge variables that end with '__test_dict' and store the result in a variable 'example_a'
-example_a: "{{ lookup('community.general.merge_variables', '__test_dict') }}"
+example_a: "{{ lookup('community.general.merge_variables', '__test_dict', pattern_type='suffix') }}"
 
 # The variable example_a now contains:
 # ports:
@@ -93,9 +93,9 @@ example_a: "{{ lookup('community.general.merge_variables', '__test_dict') }}"
 #   - 3
 
 
-# Merge variables that end with '__test_list', starting with an initial value and store the result
-# in a variable 'example_b'
-example_b: "{{ lookup('community.general.merge_variables', '__test_list', initial_value=test_init_list) }}"
+# Merge variables that match the '^.+__test_list$' regular expression, starting with an initial value and store the
+# result in a variable 'example_b'
+example_b: "{{ lookup('community.general.merge_variables', '^.+__test_list$', initial_value=test_init_list) }}"
 
 # The variable example_b now contains:
 #   - "list init item 1"
