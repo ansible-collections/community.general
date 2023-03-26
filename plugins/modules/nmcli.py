@@ -413,6 +413,14 @@ options:
         type: str
         choices: [ same_all, by_active, only_active ]
         version_added: 3.4.0
+    runner_fast_rate:
+        description:
+            - Option specifies the rate at which our link partner is asked to transmit LACPDU
+              packets. If this is C(true) then packets will be sent once per second. Otherwise they
+              will be sent every 30 seconds.
+            - Only allowed for C(lacp) runner.
+        type: bool
+        version_added: 6.5.0
     vlanid:
         description:
             - This is only used with VLAN - VLAN ID in range <0-4095>.
@@ -1473,6 +1481,7 @@ class Nmcli(object):
         self.mac = module.params['mac']
         self.runner = module.params['runner']
         self.runner_hwaddr_policy = module.params['runner_hwaddr_policy']
+        self.runner_fast_rate = module.params['runner_fast_rate']
         self.vlanid = module.params['vlanid']
         self.vlandev = module.params['vlandev']
         self.flags = module.params['flags']
@@ -1625,6 +1634,10 @@ class Nmcli(object):
                 'team.runner': self.runner,
                 'team.runner-hwaddr-policy': self.runner_hwaddr_policy,
             })
+            if self.runner_fast_rate is not None:
+                options.update({
+                    'team.runner-fast-rate': self.runner_fast_rate,
+                })
         elif self.type == 'bridge-slave':
             options.update({
                 'connection.slave-type': 'bridge',
@@ -1885,7 +1898,8 @@ class Nmcli(object):
                        'ipv4.may-fail',
                        'ipv6.ignore-auto-dns',
                        'ipv6.ignore-auto-routes',
-                       '802-11-wireless.hidden'):
+                       '802-11-wireless.hidden',
+                       'team.runner-fast-rate'):
             return bool
         elif setting in ('ipv4.addresses',
                          'ipv6.addresses',
@@ -2300,6 +2314,8 @@ def main():
                              choices=['broadcast', 'roundrobin', 'activebackup', 'loadbalance', 'lacp']),
             # team active-backup runner specific options
             runner_hwaddr_policy=dict(type='str', choices=['same_all', 'by_active', 'only_active']),
+            # team lacp runner specific options
+            runner_fast_rate=dict(type='bool'),
             # vlan specific vars
             vlanid=dict(type='int'),
             vlandev=dict(type='str'),
@@ -2346,6 +2362,8 @@ def main():
     if nmcli.type == "team":
         if nmcli.runner_hwaddr_policy and not nmcli.runner == "activebackup":
             nmcli.module.fail_json(msg="Runner-hwaddr-policy is only allowed for runner activebackup")
+        if nmcli.runner_fast_rate is not None and nmcli.runner != "lacp":
+            nmcli.module.fail_json(msg="runner-fast-rate is only allowed for runner lacp")
     # team-slave checks
     if nmcli.type == 'team-slave':
         if nmcli.master is None:

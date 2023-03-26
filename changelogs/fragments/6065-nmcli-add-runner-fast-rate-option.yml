@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add support for ``team.runner-fast-rate`` parameter for ``team`` connections (https://github.com/ansible-collections/community.general/issues/6065).
