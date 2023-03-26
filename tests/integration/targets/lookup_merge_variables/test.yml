@@ -1,0 +1,174 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test merge_variables lookup plugin
+  hosts: localhost
+  tasks:
+    - name: Include test data
+      include_vars: vars.yml
+
+    # Test the default behavior
+    - name: Test merge list
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 2"
+              - "'item1' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '^.+__merge_list$') }}"
+
+    - name: Test merge dict
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Validate that dict is complete
+          assert:
+            that:
+              - "'item1' in merged_dict"
+              - "'item2' in merged_dict"
+              - "'list_item' in merged_dict"
+              - "(merged_dict.list_item | length) == 2"
+              - "'test1' in (merged_dict.list_item)"
+              - "'test2' in (merged_dict.list_item)"
+      vars:
+        merged_dict: "{{ lookup('community.general.merge_variables', '^.+__merge_dict$') }}"
+
+    # Test the behavior when no results are found
+    - name: Test merge without results
+      block:
+        - debug:
+            msg: "{{ not_found }}"
+        - name: Validate that the variable defaults to an empty list
+          vars:
+          assert:
+            that:
+              - "(not_found | default('default-used', True)) == 'default-used'"
+      vars:
+        not_found: "{{ lookup('community.general.merge_variables', '^.+__merge_not_found$') }}"
+
+    # Test the 'pattern_type' options
+    - name: Test merge list (pattern_type = prefix)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 4"
+              - "'item1' in merged_list"
+              - "'item2' in merged_list"
+              - "'item2' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', 'testlist', pattern_type='prefix') }}"
+
+    - name: Test merge list (pattern_type = suffix)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 2"
+              - "'item1' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '__merge_list', pattern_type='suffix') }}"
+
+    - name: Test merge list (pattern_type = regex)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 3"
+              - "'item1' in merged_list"
+              - "'item2' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '^testlist[0-9].*', pattern_type='regex') }}"
+
+    # Test the 'initial_value' option
+    - name: Test merge without results but with initial value
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ not_found_initial_value }}"
+
+        - name: Validate that the variable only contains the initial value
+          vars:
+          assert:
+            that:
+              - "(not_found_initial_value | count) == 1"
+              - "(not_found_initial_value | first) == 'item2'"
+      vars:
+        not_found_initial_value: "{{ lookup('community.general.merge_variables', '^.+__merge_not_found$', initial_value=testlist_initial_value) }}"
+
+    - name: Test merging a list with an initial value
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list_with_initial_value }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list_with_initial_value | length) == 3"
+              - "'item1' in merged_list_with_initial_value"
+              - "'item2' in merged_list_with_initial_value"
+              - "'item3' in merged_list_with_initial_value"
+      vars:
+        merged_list_with_initial_value: "{{ lookup('community.general.merge_variables', '^.+__merge_list$', initial_value=testlist_initial_value) }}"
+
+    # Test the 'override' options
+    - name: Test the 'override=warn' option
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_with_override_warn }}"
+
+        - name: Validate that the dict is complete and the warning is printed
+          assert:
+            that:
+              - "'key_to_override' in merged_with_override_warn"
+              - "merged_with_override_warn.key_to_override == 'Override value'"
+              - "'key_to_override' in lookup('file', logging_output_file)"  # Check if a message is given
+              - "'[WARNING]' in lookup('file', logging_output_file)"        # and verify that the message is a WARNING
+      vars:
+        merged_with_override_warn: "{{ lookup('community.general.merge_variables', '^.+__override_warn$', initial_value=override_warn_init, override='warn') }}"
+
+    - name: Test the 'override=error' option
+      block:
+        - name: Validate that an override result in an error
+          debug:
+            msg: "{{ lookup('community.general.merge_variables', '^.+__override_error$', initial_value=override_error_init, override='error') }}"
+          ignore_errors: true  # Do not stop the playbook
+          register: _override_error_result
+
+        - name: Print the output
+          debug:
+            msg: "{{ _override_error_result }}"
+
+        - name: Validate that the error is reported
+          assert:
+            that:
+              - "_override_error_result.failed"
+              - "'key_to_override' in _override_error_result.msg"
