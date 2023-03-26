@@ -32,6 +32,7 @@ def pipx_runner(module, command, **kwargs):
             state=fmt.as_map(_state_map),
             name=fmt.as_list(),
             name_source=fmt.as_func(fmt.unpack_args(lambda n, s: [s] if s else [n])),
+            install_apps=fmt.as_bool("--include-apps"),
             install_deps=fmt.as_bool("--include-deps"),
             inject_packages=fmt.as_list(),
             force=fmt.as_bool("--force"),
