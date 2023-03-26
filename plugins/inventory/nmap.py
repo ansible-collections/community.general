@@ -42,7 +42,7 @@ DOCUMENTATION = '''
             type: string
             version_added: 6.5.0
         ports:
-            description: Enable/disable scanning for open ports
+            description: Enable/disable scanning ports.
             type: boolean
             default: true
         ipv4:
@@ -67,6 +67,11 @@ DOCUMENTATION = '''
             type: boolean
             default: false
             version_added: 6.1.0
+        open:
+            description: Only scan for open (or possibly open) ports.
+            type: boolean
+            default: false
+            version_added: 6.5.0
         dns_resolve:
             description: Whether to always (C(true)) or never (C(false)) do DNS resolution.
             type: boolean
@@ -212,6 +217,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             if self._options['icmp_timestamp']:
                 cmd.append('-PP')
+
+            if self._options['open']:
+                cmd.append('--open')
 
             cmd.append(self._options['address'])
             try:
