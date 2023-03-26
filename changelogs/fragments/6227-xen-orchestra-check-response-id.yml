@@ -1,0 +1,2 @@
+bugfixes:
+  - xenorchestra inventory plugin - fix failure to receive objects from server due to not checking the id of the response (https://github.com/ansible-collections/community.general/pull/6227).
