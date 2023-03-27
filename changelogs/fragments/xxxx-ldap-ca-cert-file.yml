@@ -1,2 +1,0 @@
-minor_changes:
-  - ldap modules - add ``ca_path`` option (https://github.com/ansible-collections/community.general/pull/6185).
