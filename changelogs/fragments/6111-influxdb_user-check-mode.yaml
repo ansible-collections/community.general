@@ -1,2 +1,0 @@
-bugfixes:
-  - influxdb_user - fix running in check mode when the user does not exist yet (https://github.com/ansible-collections/community.general/pull/6111).

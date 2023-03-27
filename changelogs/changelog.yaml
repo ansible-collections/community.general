@@ -1528,3 +1528,36 @@ releases:
     - 6074-loader_in_listify.yml.yml
     - remove-unneeded-imports.yml
     release_date: '2023-02-26'
+  5.8.7:
+    changes:
+      bugfixes:
+      - archive - avoid deprecated exception class on Python 3 (https://github.com/ansible-collections/community.general/pull/6180).
+      - influxdb_user - fix running in check mode when the user does not exist yet
+        (https://github.com/ansible-collections/community.general/pull/6111).
+      - interfaces_file - fix reading options in lines not starting with a space (https://github.com/ansible-collections/community.general/issues/6120).
+      - jail connection plugin - add ``inventory_hostname`` to vars under ``remote_addr``.
+        This is needed for compatibility with ansible-core 2.13 (https://github.com/ansible-collections/community.general/pull/6118).
+      - memset - fix memset urlerror handling (https://github.com/ansible-collections/community.general/pull/6114).
+      - nmcli - fixed idempotency issue for bridge connections. Module forced default
+        value of ``bridge.priority`` to nmcli if not set; if ``bridge.stp`` is disabled
+        nmcli ignores it and keep default (https://github.com/ansible-collections/community.general/issues/3216,
+        https://github.com/ansible-collections/community.general/issues/4683).
+      - nmcli - fixed idempotency issue when module params is set to ``may_fail4=false``
+        and ``method4=disabled``; in this case nmcli ignores change and keeps their
+        own default value ``yes`` (https://github.com/ansible-collections/community.general/pull/6106).
+      - nmcli - implemented changing mtu value on vlan interfaces (https://github.com/ansible-collections/community.general/issues/4387).
+      - xenorchestra inventory plugin - fix failure to receive objects from server
+        due to not checking the id of the response (https://github.com/ansible-collections/community.general/pull/6227).
+      release_summary: Bugfix release.
+    fragments:
+    - 3216-nmcli-bridge-idempotency-fix.yml
+    - 4387-nmcli-mtu-for-vlan-connection-fix.yml
+    - 5.8.7.yml
+    - 6106-nmcli-ipv4-mayfail-idempotency-fix.yml
+    - 6111-influxdb_user-check-mode.yaml
+    - 6114-memset-add-url-error-handling.yml
+    - 6118-jail-plugin-fix-default-inventory_hostname.yml
+    - 6131-fix-interfaces_file-for-no-leading-spaces.yml
+    - 6180-replace-deprecated-badzipfile.yml
+    - 6227-xen-orchestra-check-response-id.yml
+    release_date: '2023-03-27'
