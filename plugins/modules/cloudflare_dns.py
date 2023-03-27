@@ -650,7 +650,7 @@ class CloudflareAPI(object):
                     if not self.module.check_mode:
                         result, info = self._cf_api_call('/zones/{0}/dns_records/{1}'.format(rr['zone_id'], rr['id']), 'DELETE')
             else:
-                if ((rr['type'] == 'CAA') and (rr['data']['tag'] != params['caa_tag'])):
+                if rr['type'] == 'CAA' and rr['data']['tag'] != params['caa_tag']:
                     break
 
                 self.changed = True
