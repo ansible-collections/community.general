@@ -41,6 +41,14 @@ options:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
         existing entry, use M(community.general.ldap_attrs) module instead.
+      - Each attribute value can be a string for single-valued attributes or
+        a list of strings for multi-valued attributes.
+      - If you specify values for this option in YAML, please note that you can improve
+        readability for long string values by using YAML block modifiers as seen in the
+        examples for this module.
+      - Note that when using values that YAML/ansible-core interprets as other types,
+        like C(yes), C(no) (booleans), or C(2.10) (float), make sure to quote them if
+        these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
     type: dict
     default: {}
   objectClass:
@@ -85,6 +93,29 @@ EXAMPLES = """
     attributes:
       description: An LDAP administrator
       userPassword: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
+
+- name: Set possible values for attributes elements
+  community.general.ldap_entry:
+    dn: cn=admin,dc=example,dc=com
+    objectClass:
+      - simpleSecurityObject
+      - organizationalRole
+    attributes:
+      description: An LDAP Administrator
+      roleOccupant:
+      - cn=Chocs Puddington,ou=Information Technology,dc=example,dc=com
+      - cn=Alice Stronginthebrain,ou=Information Technology,dc=example,dc=com
+      olcAccess:
+      - >-
+        {0}to attrs=userPassword,shadowLastChange
+        by self write
+        by anonymous auth
+        by dn="cn=admin,dc=example,dc=com" write
+        by * none'
+      - >-
+        {1}to dn.base="dc=example,dc=com"
+        by dn="cn=admin,dc=example,dc=com" write
+        by * read
 
 - name: Get rid of an old entry
   community.general.ldap_entry:
