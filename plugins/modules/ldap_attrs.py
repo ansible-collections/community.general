@@ -60,13 +60,12 @@ options:
       - The attribute(s) and value(s) to add or remove.
       - Each attribute value can be a string for single-valued attributes or
         a list of strings for multi-valued attributes.
-      - To break long string values
-        into multiple lines for readability use the YAML block modifiers as
-        seen in the examples.
+      - If you specify values for this option in YAML, please note that you can improve
+        readability for long string values by using YAML block modifiers as seen in the
+        examples for this module.
       - Note that when using values that YAML/ansible-core interprets as other types,
         like C(yes), C(no) (booleans), or C(2.10) (float), make sure to quote them if
-        these are meant to be strings. Otherwise you risk that the wrong values are
-        sent to LDAP.
+        these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
   ordered:
     required: false
     type: bool
