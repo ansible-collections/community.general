@@ -47,7 +47,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     KeycloakError,
 )
 from ansible.module_utils.basic import AnsibleModule
-
+from copy import deepcopy
 
     
 def get_all_mappings(kc, cid, existing_clients, realm):
@@ -59,12 +59,12 @@ def get_all_mappings(kc, cid, existing_clients, realm):
             all_mappings.update({existing_client["clientId"]: list(sorted(scope_mappings))})
     return all_mappings
     
-def update_mappings(kc, cid, before_mappings, desired_mappings, existing_clients, realm):
+def update_mappings(kc, cid, before_mappings, desired_mappings, ids, realm):
     # Update scope mappings
-    mappings_update_dict = before_mappings | desired_mappings # Forces all keys not in desired_mappings to None
+    mappings_update_dict = before_mappings | desired_mappings 
     for client_id, roles in mappings_update_dict.items():
         existing_sm = before_mappings.get(client_id)
-        target_id = [c["id"] for c in existing_clients if c["clientId"] == client_id][0]
+        target_id = ids[client_id]
         if roles:
             for role in roles:
                 if not existing_sm or role not in existing_sm:
@@ -75,6 +75,19 @@ def update_mappings(kc, cid, before_mappings, desired_mappings, existing_clients
                 if not roles or role not in roles:
                     repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
                     kc.delete_client_scope_mapping(cid, target_id, repr, realm=realm)
+
+def delete_proposed_mappings(kc, cid, before_mappings, mappings_to_delete):
+    
+    new_mappings = deepcopy(before_mappings)
+    for client_id, roles in mappings_to_delete.items():
+        for role in roles:
+            if client_id in new_mappings.keys() and role in new_mappings.get(client_id):
+                new_mappings[client_id].remove(role)
+    for client_id in before_mappings.keys():
+        if not new_mappings.get(client_id):
+            new_mappings.pop(client_id)
+    return new_mappings
+        
 def main():
     """
     Module execution
@@ -84,7 +97,7 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        state=dict(default="present", choices=["present"]),
+        state=dict(default="present", choices=["present", "absent"]),
         realm=dict(type="str", default="master"),
         id=dict(type="str"),
         client_id=dict(type="str", aliases=["clientId"]),
@@ -122,39 +135,25 @@ def main():
     realm = module.params.get("realm")
     cid = module.params.get("id")
     state = module.params.get("state")
-
-    # See if it already exists in Keycloak
-    if cid is None:
-        before_mappings = kc.get_client_by_clientid(
-            module.params.get("client_id"), realm=realm
-        )
-        if before_mappings is not None:
-            cid = before_mappings["id"]
-    else:
-        before_mappings = kc.get_client_by_id(cid, realm=realm)
-
-    if before_mappings is None:
-        before_mappings = {}
         
     # Get all existing scope mappings
     existing_clients = kc.get_clients(realm=realm)
+    ids = dict((c["clientId"], c["id"]) for c in existing_clients)
+    if not cid:
+        cid = ids[module.params.get("client_id")]
     before_mappings = get_all_mappings(kc, cid, existing_clients, realm=realm)
 
-    # Build a proposed changeset from parameters given to this module
-    changeset = dict((k, None) for k in before_mappings)
-    
-    mappings = module.params.get("scope_mappings")
-    if module.params.get("scope_mappings"):
-        for target_client in mappings.keys():
-            target_id = [client["id"] for client in existing_clients if client["clientId"] == target_client][0]
-            roles = mappings.get(target_client)["roles"]
+    # Build a proposed changeset from parameters given to this module. We sort te roles to avoid a diff that is only a re-ordering
+    changeset = module.params.get("scope_mappings")
+    if changeset:
+        for target_client, roles in changeset.items():
             changeset.update({target_client: list(sorted(roles))})
  
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_mappings = before_mappings.copy()
     desired_mappings.update(changeset)
 
-    result["proposed"] = changeset
+    result["proposed"] = desired_mappings
     result["existing"] = before_mappings
 
     if state == "present":
@@ -172,12 +171,10 @@ def main():
             module.exit_json(**result)
         
         existing_clients = kc.get_clients(realm=realm)
-        update_mappings(kc, cid, before_mappings, desired_mappings, existing_clients, realm=realm)
+        update_mappings(kc, cid, before_mappings, desired_mappings, ids, realm=realm)
         after_mappings = get_all_mappings(kc, cid, existing_clients, realm=realm)
         
-        
-        if before_mappings == after_mappings:
-            result["changed"] = False
+        result["changed"] = before_mappings != after_mappings
         if module._diff:
             result["diff"] = dict(
                 before=before_mappings, after=after_mappings
@@ -186,6 +183,30 @@ def main():
         result["end_state"] = after_mappings
 
         result["msg"] = "Mappings for client %s have been updated." % module.params.get("client_id")
+        module.exit_json(**result)
+    
+    elif state == "absent":
+        result['changed'] = True
+        proposed_mappings = delete_proposed_mappings(kc, cid, before_mappings, changeset)
+        if module._diff:
+            result['diff'] = dict(before=before_mappings, after=proposed_mappings)
+        if module.check_mode:
+            module.exit_json(**result)
+        
+        for client, roles in changeset.items():
+            for role in roles:
+                kc.delete_client_scope_mapping(cid, ids[client], [{"name" : role}], realm=realm)
+        
+        result['msg'] = 'Scope mappings %s removed from client %s.' % (changeset, module.params.get("client_id"))
+        
+        result["proposed"] = {}
+
+        result["end_state"] = {}
+        existing_clients = kc.get_clients(realm=realm)
+        mappings_after = get_all_mappings(kc, cid, existing_clients, realm=realm)
+        for target_client, roles in mappings_after.items():
+            mappings_after.update({target_client: list(sorted(roles))})
+        result['end_state'] = mappings_after
         module.exit_json(**result)
 
     module.exit_json(**result)
