@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: btrfs_subvolume
 short_description: Manage btrfs subvolumes
-version_added: "6.3.0"
+version_added: "6.6.0"
 
 description: Creates, updates and deletes btrfs subvolumes and snapshots.
 
@@ -48,8 +48,8 @@ options:
         type: str
     recursive:
         description:
-        - When true, indicates that parent/child subvolumes should be created/removed.
-        - as necessary to complete the operation (for I(state=present) and I(state=absent) respectively).
+        - When true, indicates that parent/child subvolumes should be created/removedas necessary
+          to complete the operation (for I(state=present) and I(state=absent) respectively).
         type: bool
         default: false
     snapshot_source:
@@ -80,8 +80,18 @@ notes:
   - If any or all of the options I(filesystem_device), I(filesystem_label) or I(filesystem_uuid) parameters are provided, there is expected
     to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or only a single
     btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and return an error.
-  - I(check_mode) is supported, but in some scenarios it may erroneously report intermediate subvolumes being created.
-    After mounting, if a directory like file is found where the subvolume would have been created, the operation is skipped.
+
+extends_documentation_fragment:
+  - community.general.attributes
+
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - In some scenarios it may erroneously report intermediate subvolumes being created.
+        After mounting, if a directory like file is found where the subvolume would have been created, the operation is skipped.
+  diff_mode:
+    support: none
 
 author:
     - Gregory Furlong (@gnfzdz)

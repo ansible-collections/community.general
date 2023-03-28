@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: btrfs_info
 short_description: Query btrfs filesystem info
-version_added: "6.3.0"
+version_added: "6.6.0"
 description: Query status of available btrfs filesystems, including uuid, label, subvolumes and mountpoints.
 
 author:
@@ -33,48 +33,48 @@ EXAMPLES = r'''
 RETURN = r'''
 
 filesystems:
-    description: Summaries of the current state for all btrfs filesystems found on the target host
+    description: Summaries of the current state for all btrfs filesystems found on the target host.
     type: list
     elements: dict
     returned: success
     contains:
         uuid:
-            description: A unique identifier assigned to the filesystem
+            description: A unique identifier assigned to the filesystem.
             type: str
             sample: 96c9c605-1454-49b8-a63a-15e2584c208e
         label:
-            description: An optional label assigned to the filesystem
+            description: An optional label assigned to the filesystem.
             type: str
             sample: Tank
         devices:
-            description: A list of devices assigned to the filesystem
+            description: A list of devices assigned to the filesystem.
             type: list
             sample:
                 - /dev/sda1
                 - /dev/sdb1
         default_subvolume:
-            description: The id of the filesystem's default subvolume
+            description: The id of the filesystem's default subvolume.
             type: int
             sample: 5
         subvolumes:
-            description: A list of dicts containing metadata for all of the filesystem's subvolumes
+            description: A list of dicts containing metadata for all of the filesystem's subvolumes.
             type: list
             elements: dict
             contains:
                 id:
-                    description: An identifier assigned to the subvolume, unique within the containing filesystem
+                    description: An identifier assigned to the subvolume, unique within the containing filesystem.
                     type: int
                     sample: 256
                 mountpoints:
-                    description: Paths where the subvolume is mounted on the targeted host
+                    description: Paths where the subvolume is mounted on the targeted host.
                     type: list
                     sample: ['/home']
                 parent:
-                    description: The identifier of this subvolume's parent
+                    description: The identifier of this subvolume's parent.
                     type: int
                     sample: 5
                 path:
-                    description: The full path of the subvolume relative to the btrfs fileystem's root
+                    description: The full path of the subvolume relative to the btrfs fileystem's root.
                     type: str
                     sample: /@home
 
