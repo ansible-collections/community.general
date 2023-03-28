@@ -210,9 +210,7 @@ target_subvolume_id:
 from ansible_collections.community.general.plugins.module_utils.btrfs import BtrfsFilesystemsProvider, BtrfsCommands, BtrfsModuleException
 from ansible_collections.community.general.plugins.module_utils.btrfs import normalize_subvolume_path
 from ansible.module_utils.basic import AnsibleModule
-from datetime import datetime
 import os
-import re
 import tempfile
 
 
