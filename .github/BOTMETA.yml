@@ -931,6 +931,8 @@ files:
   $modules/pear.py:
     ignore: jle64
     labels: pear
+  $modules/perlmod_install_info.py:
+    maintainers: jikamens
   $modules/pids.py:
     maintainers: saranyasridharan
   $modules/pingdom.py:
