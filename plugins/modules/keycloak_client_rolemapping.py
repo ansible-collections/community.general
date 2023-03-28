@@ -348,14 +348,17 @@ def main():
             module.exit_json(**result)
         else:
             # Remove mapping of role
-            result['changed'] = True
+            before_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(assigned_roles_before, key = lambda r : r["name"]))]}
+            proposed_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(result["proposed"], key = lambda r : r["name"]))]}
             if module._diff:
-                result['diff'] = dict(before=assigned_roles_before, after=result['proposed'])
+                result['diff'] = dict(before=before_names, after=proposed_names)
             if module.check_mode:
+                result['changed'] = assigned_roles_before != result['proposed']
                 module.exit_json(**result)
             kc.delete_group_rolemapping(gid, cid, update_roles, realm=realm)
             result['msg'] = 'Roles %s removed from group %s.' % (update_roles, group_name)
             assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+            result['changed'] = assigned_roles_before != assigned_roles_after
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
             
