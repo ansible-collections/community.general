@@ -189,45 +189,62 @@ class Zfs(object):
 
     def set_properties_if_changed(self):
         diff = {'before': {'extra_zfs_properties': {}}, 'after': {'extra_zfs_properties': {}}}
-        current_properties = self.get_current_properties()
+        current_properties = self.list_properties()
         for prop, value in self.properties.items():
-            current_value = current_properties.get(prop, None)
+            current_value = self.get_property(prop, current_properties)
             if current_value != value:
                 self.set_property(prop, value)
                 diff['before']['extra_zfs_properties'][prop] = current_value
                 diff['after']['extra_zfs_properties'][prop] = value
         if self.module.check_mode:
             return diff
-        updated_properties = self.get_current_properties()
+        updated_properties = self.list_properties()
         for prop in self.properties:
-            value = updated_properties.get(prop, None)
+            value = self.get_property(prop, updated_properties)
             if value is None:
                 self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
-            if current_properties.get(prop, None) != value:
+            if self.get_property(prop, current_properties) != value:
                 self.changed = True
             if prop in diff['after']['extra_zfs_properties']:
                 diff['after']['extra_zfs_properties'][prop] = value
         return diff
 
-    def get_current_properties(self):
-        cmd = [self.zfs_cmd, 'get', '-H', '-p', '-o', "property,value,source"]
+    def list_properties(self):
+        cmd = [self.zfs_cmd, 'get', '-H', '-p', '-o', "property,source"]
         if self.enhanced_sharing:
             cmd += ['-e']
         cmd += ['all', self.name]
         rc, out, err = self.module.run_command(cmd)
-        properties = dict()
+        properties = []
         for line in out.splitlines():
-            prop, value, source = line.split('\t')
+            prop, source = line.split('\t')
             # include source '-' so that creation-only properties are not removed
             # to avoids errors when the dataset already exists and the property is not changed
             # this scenario is most likely when the same playbook is run more than once
             if source in ('local', 'received', '-'):
-                properties[prop] = value
+                properties += [prop]
+        return properties
+
+    def get_property(self, name, list_of_properties):
         # Add alias for enhanced sharing properties
         if self.enhanced_sharing:
-            properties['sharenfs'] = properties.get('share.nfs', None)
-            properties['sharesmb'] = properties.get('share.smb', None)
-        return properties
+            if name == 'sharenfs':
+                name = 'share.nfs'
+            elif name == 'sharesmb':
+                name = 'share.smb'
+        if name not in list_of_properties:
+            return None
+        cmd = [self.zfs_cmd, 'get', '-H', '-p', '-o', "value"]
+        if self.enhanced_sharing:
+            cmd += ['-e']
+        cmd += [name, self.name]
+        rc, out, err = self.module.run_command(cmd)
+        if rc != 0:
+            return None
+        #
+        # Strip last newline
+        #
+        return out[:-1]
 
 
 def main():
