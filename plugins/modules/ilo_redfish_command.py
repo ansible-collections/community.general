@@ -15,10 +15,10 @@ description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
 attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   category:
     required: true
