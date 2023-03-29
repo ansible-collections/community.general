@@ -66,7 +66,7 @@ EXAMPLES = '''
   - name: Check iLO reboot status
     community.general.ilo_redfish_command:
       category: Systems
-      command: CheckiLORebootStatus
+      command: WaitforiLORebootCompletion
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
@@ -92,7 +92,7 @@ ilo_redfish_command:
 
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["CheckiLORebootStatus"]
+    "Systems": ["WaitforiLORebootCompletion"]
 }
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
@@ -158,8 +158,8 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
-            if command == "CheckiLORebootStatus":
-                result[command] = rf_utils.check_ilo_reboot_status()
+            if command == "WaitforiLORebootCompletion":
+                result[command] = rf_utils.wait_for_ilo_reboot_completion()
 
     # Return data back or fail with proper message
     if not result[command]['ret']:

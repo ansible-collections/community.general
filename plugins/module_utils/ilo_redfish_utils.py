@@ -248,7 +248,7 @@ class iLORedfishUtils(RedfishUtils):
                 "server_poststate": server_data["Oem"]["Hp"]["PostState"]
             }
 
-    def check_ilo_reboot_status(self, polling_interval=60, max_polling_time=1800):
+    def wait_for_ilo_reboot_completion(self, polling_interval=60, max_polling_time=1800):
         # This method checks if OOB controller reboot is completed
         time.sleep(10)
 
