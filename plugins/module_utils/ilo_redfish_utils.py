@@ -336,7 +336,7 @@ class iLORedfishUtils(RedfishUtils):
 
         return {
             "ret": True,
-            "msg": snmpv3_users
+            "entries": snmpv3_users
         }
 
     def get_snmp_alert_destinations(self):
@@ -383,5 +383,5 @@ class iLORedfishUtils(RedfishUtils):
 
         return {
             "ret": True,
-            "msg": alert_destinations
+            "entries": alert_destinations
         }
