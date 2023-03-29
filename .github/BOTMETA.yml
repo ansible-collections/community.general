@@ -674,6 +674,8 @@ files:
     maintainers: $team_keycloak
   $modules/keycloak_authentication.py:
     maintainers: elfelip Gaetan2907
+  $modules/keycloak_authz_authorization_scope.py:
+    maintainers: mattock
   $modules/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope.py:
