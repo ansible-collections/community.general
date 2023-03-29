@@ -1,2 +1,2 @@
 minor_changes:
-  - added new features for ilo_redfish_utils  (https://github.com/ansible-collections/community.general/pull/5542).
+  - ilo_redfish_config - add new features  (https://github.com/ansible-collections/community.general/pull/5542).
