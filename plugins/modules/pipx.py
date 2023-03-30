@@ -57,7 +57,7 @@ options:
     install_deps:
         description:
             - Include applications of dependent packages.
-            - Only used when I(state=install), I(state=upgrade), or I(state=inject).
+            - Only used when I(state=install), I(state=latest), I(state=upgrade), or I(state=inject).
         type: bool
         default: false
     inject_packages:
@@ -69,24 +69,25 @@ options:
     force:
         description:
             - Force modification of the application's virtual environment. See C(pipx) for details.
-            - Only used when I(state=install), I(state=upgrade), I(state=upgrade_all), or I(state=inject).
+            - Only used when I(state=install), I(state=upgrade), I(state=upgrade_all), I(state=latest), or I(state=inject).
         type: bool
         default: false
     include_injected:
         description:
             - Upgrade the injected packages along with the application.
-            - Only used when I(state=upgrade) or I(state=upgrade_all).
+            - Only used when I(state=upgrade), I(state=upgrade_all), or I(state=latest).
+            - This is used with I(state=upgrade) and I(state=latest) since community.general 6.6.0.
         type: bool
         default: false
     index_url:
         description:
             - Base URL of Python Package Index.
-            - Only used when I(state=install), I(state=upgrade), or I(state=inject).
+            - Only used when I(state=install), I(state=upgrade), I(state=latest), or I(state=inject).
         type: str
     python:
         description:
             - Python version to be used when creating the application virtual environment. Must be 3.6+.
-            - Only used when I(state=install), I(state=reinstall), or I(state=reinstall_all).
+            - Only used when I(state=install), I(state=latest), I(state=reinstall), or I(state=reinstall_all).
         type: str
     executable:
         description:
@@ -254,7 +255,7 @@ class PipX(StateModuleHelper):
         if self.vars.force:
             self.changed = True
 
-        with self.runner('state index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state include_injected index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
@@ -307,7 +308,7 @@ class PipX(StateModuleHelper):
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
-        with self.runner('state index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state include_injected index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run(state='upgrade')
             self._capture_results(ctx)
 
