@@ -1,0 +1,2 @@
+minor_changes:
+  - pipx - ensure ``include_injected`` parameter works with ``state=upgrade`` and ``state=latest`` (https://github.com/ansible-collections/community.general/pull/6212).
