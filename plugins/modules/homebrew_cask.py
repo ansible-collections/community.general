@@ -78,9 +78,9 @@ options:
   greedy:
     description:
     - Upgrade casks that auto update.
-    - Passes --greedy to brew cask outdated when checking
+    - Passes C(--greedy) to C(brew outdated --cask) when checking
       if an installed cask has a newer version available,
-      or to brew cask upgrade when upgrading all casks.
+      or to C(brew upgrade --cask) when upgrading all casks.
     type: bool
     default: false
 '''
