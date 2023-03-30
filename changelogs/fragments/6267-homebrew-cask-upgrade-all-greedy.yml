@@ -1,0 +1,2 @@
+bugfixes:
+  - homebrew_cask - allows passing --greedy option to upgrade_all
