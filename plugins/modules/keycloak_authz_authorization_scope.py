@@ -15,6 +15,8 @@ module: keycloak_authz_authorization_scope
 
 short_description: Allows administration of Keycloak client authorization scopes via Keycloak API
 
+version_added: 6.6.0
+
 description:
     - This module allows the administration of Keycloak client Authorization Scopes via the Keycloak REST
       API. Authorization Scopes are only available if a client has Authorization enabled.
@@ -26,7 +28,7 @@ description:
 
     - The names of module options are snake_cased versions of the camelCase options used by Keycloak.
       The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
-      https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/
+      U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
 
 options:
     state:
@@ -44,17 +46,17 @@ options:
         required: True
     display_name:
         description:
-            - The display name of the authorization scope
+            - The display name of the authorization scope.
         type: str
         required: False
     icon_uri:
         description:
-            - The icon URI for the authorization scope
+            - The icon URI for the authorization scope.
         type: str
         required: False
     client_id:
         description:
-            - The clientId of the keycloak client that should have the authorization scope.
+            - The C(clientId) of the Keycloak client that should have the authorization scope.
             - This is usually a human-readable name of the Keycloak client.
         type: str
         required: True
