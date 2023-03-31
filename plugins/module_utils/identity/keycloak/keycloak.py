@@ -2196,7 +2196,7 @@ class KeycloakAPI(object):
 
     def get_authz_authorization_scope_by_name(self, name, client_id, realm):
         url = URL_AUTHZ_AUTHORIZATION_SCOPES.format(url=self.baseurl, client_id=client_id, realm=realm)
-        search_url = "%s/search?name=%s" % (url, name)
+        search_url = "%s/search?name=%s" % (url, name.replace(' ', '%20'))
 
         try:
             return json.loads(to_native(open_url(search_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
