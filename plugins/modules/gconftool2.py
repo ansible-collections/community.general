@@ -95,7 +95,6 @@ from ansible_collections.community.general.plugins.module_utils.gconftool2 impor
 
 
 class GConftool(StateModuleHelper):
-    change_params = ('value', )
     diff_params = ('value', )
     output_params = ('key', 'value_type')
     facts_params = ('key', 'value_type')
@@ -125,6 +124,7 @@ class GConftool(StateModuleHelper):
 
         self.vars.set('previous_value', self._get(), fact=True)
         self.vars.set('value_type', self.vars.value_type)
+        self.vars.set('_value', self.vars.previous_value, output=False, change=True)
         self.vars.set_meta('value', initial_value=self.vars.previous_value)
         self.vars.set('playbook_value', self.vars.value, fact=True)
 
@@ -149,10 +149,12 @@ class GConftool(StateModuleHelper):
         with self.runner("state key", output_process=self._make_process(False)) as ctx:
             ctx.run()
         self.vars.set('new_value', None, fact=True)
+        self.vars._value = None
 
     def state_present(self):
         with self.runner("direct config_source value_type state key value", output_process=self._make_process(True)) as ctx:
             self.vars.set('new_value', ctx.run(), fact=True)
+        self.vars._value = self.vars.new_value
 
 
 def main():

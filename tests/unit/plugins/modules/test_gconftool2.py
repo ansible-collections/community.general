@@ -54,7 +54,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'state': 'present', 'key': '/desktop/gnome/background/picture_filename', 'value': '200', 'value_type': 'int'},
+        {'state': 'present', 'key': '/desktop/gnome/background/picture_filename', 'value': 200, 'value_type': 'int'},
         {
             'id': 'test_simple_element_set',
             'run_command.calls': [
@@ -70,6 +70,47 @@ TEST_CASES = [
                 ),
             ],
             'new_value': '200',
+            'changed': True,
+        }
+    ],
+    [
+        {'state': 'present', 'key': '/desktop/gnome/background/picture_filename', 'value': 200, 'value_type': 'int'},
+        {
+            'id': 'test_simple_element_set_idempotency_int',
+            'run_command.calls': [
+                (
+                    ['/testbin/gconftool-2', '--get', '/desktop/gnome/background/picture_filename'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '200\n', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--type', 'int', '--set', '/desktop/gnome/background/picture_filename', '200'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '200\n', '',),
+                ),
+            ],
+            'new_value': '200',
+            'changed': False,
+        }
+    ],
+    [
+        {'state': 'present', 'key': '/apps/gnome_settings_daemon/screensaver/start_screensaver', 'value': 'false', 'value_type': 'bool'},
+        {
+            'id': 'test_simple_element_set_idempotency_bool',
+            'run_command.calls': [
+                (
+                    ['/testbin/gconftool-2', '--get', '/apps/gnome_settings_daemon/screensaver/start_screensaver'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, 'false\n', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--type', 'bool', '--set', '/apps/gnome_settings_daemon/screensaver/start_screensaver', 'false'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, 'false\n', '',),
+                ),
+            ],
+            'new_value': 'false',
+            'changed': False,
         }
     ],
 ]
@@ -100,6 +141,9 @@ def test_gconftool2(mocker, capfd, patch_gconftool2, testcase):
     results = json.loads(out)
     print("testcase =\n%s" % testcase)
     print("results =\n%s" % results)
+
+    if 'changed' in testcase:
+        assert results['changed'] == testcase['changed']
 
     for conditional_test_result in ('value',):
         if conditional_test_result in testcase:
