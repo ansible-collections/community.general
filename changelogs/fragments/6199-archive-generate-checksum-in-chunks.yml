@@ -1,2 +1,2 @@
-minor_changes:
+bugfixes:
   - archive - reduce ram usage by generating crc32 checksum over chunks
