@@ -544,7 +544,8 @@ class Rhsm(RegistrationBase):
                 return default
 
         distro_id = distro.id()
-        distro_version = tuple(str2int(p) for p in distro.version_parts())
+        distro_version_parts = distro.version_parts()
+        distro_version = tuple(str2int(p) for p in distro_version_parts)
 
         # Stop the rhsm service when using systemd (which means Fedora or
         # RHEL 7+): this is because the service may not use new configuration bits
@@ -585,11 +586,31 @@ class Rhsm(RegistrationBase):
             # of RHEL before 8.6, and then it changed to 'environments'; since
             # the Register*() D-Bus functions reject unknown options, we have
             # to pass the right option depending on the version -- funky.
+            def supports_option_environments():
+                # subscription-manager in any supported Fedora version
+                # has the new option.
+                if distro_id == 'fedora':
+                    return True
+                # Check for RHEL 8 >= 8.6, or RHEL >= 9.
+                if distro_id == 'rhel' and \
+                   ((distro_version[0] == 8 and distro_version[1] >= 6) or
+                       distro_version[0] >= 9):
+                    return True
+                # CentOS: similar checks as for RHEL, with one extra bit:
+                # if the 2nd part of the version is empty, it means it is
+                # CentOS Stream, and thus we can assume it has the latest
+                # version of subscription-manager.
+                if distro_id == 'centos' and \
+                   ((distro_version[0] == 8 and
+                       (distro_version[1] >= 6 or distro_version_parts[1] == '')) or
+                       distro_version[0] >= 9):
+                    return True
+                # Unknown or old distro: assume it does not support
+                # the new option.
+                return False
+
             environment_key = 'environment'
-            if distro_id == 'fedora' or \
-               (distro_id == 'rhel' and
-                ((distro_version[0] == 8 and distro_version[1] >= 6) or
-                 distro_version[0] >= 9)):
+            if supports_option_environments():
                 environment_key = 'environments'
             register_opts[environment_key] = environment
         if force_register and dbus_force_option_works:
