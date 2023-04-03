@@ -1043,7 +1043,8 @@ files:
     maintainers: $team_redfish TSKushal
   $modules/redhat_subscription.py:
     labels: redhat_subscription
-    maintainers: barnabycourt alikins kahowell
+    maintainers: $team_rhsm
+    ignore: barnabycourt alikins kahowell
   $modules/redis.py:
     maintainers: slok
   $modules/redis_data.py:
@@ -1066,9 +1067,9 @@ files:
     labels: rhn_register
     maintainers: jlaska $team_rhn
   $modules/rhsm_release.py:
-    maintainers: seandst
+    maintainers: seandst $team_rhsm
   $modules/rhsm_repository.py:
-    maintainers: giovannisciortino
+    maintainers: giovannisciortino $team_rhsm
   $modules/riak.py:
     maintainers: drewkerrigan jsmartin
   $modules/rocketchat.py:
@@ -1393,6 +1394,7 @@ macros:
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_redfish: mraineri tomasg2012 xmadsen renxulei rajeevkallur bhavya06 jyundt
   team_rhn: FlossWare alikins barnabycourt vritant
+  team_rhsm: cnsnyder ptoscano
   team_scaleway: remyleone abarbare
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
   team_suse: commel evrardjp lrupp toabctl AnderEnder alxgu andytom sealor
