@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_project plugin - add new option ``topics`` for adding topics to gitlab project (https://github.com/ansible-collections/community.general/pull/xxxx).
