@@ -251,6 +251,13 @@ options:
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"
+  topics:
+    description:
+      - A topic or list of topics to be assigned to a project.
+      - It is compatible with old GitLab server releases (versions before 14, correspond to C(tag_list)).
+    type: list
+    elements: str
+    version_added: "6.6.0"
 '''
 
 EXAMPLES = r'''
@@ -334,6 +341,8 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab, ensure_gitlab_package
 )
 
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+
 
 class GitLabProject(object):
     def __init__(self, module, gitlab_instance):
@@ -376,6 +385,14 @@ class GitLabProject(object):
             'monitor_access_level': options['monitor_access_level'],
             'security_and_compliance_access_level': options['security_and_compliance_access_level'],
         }
+
+        # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version
+        # and check if less than 14. If yes we use tag_list instead topics
+        if LooseVersion(self._gitlab.version()[0]) < LooseVersion("14"):
+            project_options['tag_list'] = options['topics']
+        else:
+            project_options['topics'] = options['topics']
+
         # Because we have already call userExists in main()
         if self.project_object is None:
             project_options.update({
@@ -514,6 +531,7 @@ def main():
         infrastructure_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        topics=dict(type='list', elements='str'),
     ))
 
     module = AnsibleModule(
@@ -570,6 +588,7 @@ def main():
     infrastructure_access_level = module.params['infrastructure_access_level']
     monitor_access_level = module.params['monitor_access_level']
     security_and_compliance_access_level = module.params['security_and_compliance_access_level']
+    topics = module.params['topics']
 
     if default_branch and not initialize_with_readme:
         module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
@@ -648,6 +667,7 @@ def main():
             "infrastructure_access_level": infrastructure_access_level,
             "monitor_access_level": monitor_access_level,
             "security_and_compliance_access_level": security_and_compliance_access_level,
+            "topics": topics,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
