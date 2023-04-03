@@ -1,0 +1,4 @@
+bugfixes:
+  - redhat_subscription - use the right D-Bus options for environments when registering
+    a CentOS Stream 8 system and using ``environment``
+    (https://github.com/ansible-collections/community.general/pull/6275).
