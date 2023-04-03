@@ -253,8 +253,8 @@ options:
     version_added: "6.4.0"
   topics:
     description:
-      - a topic or list of topics to be assigned on project.
-      - It's compatible with old gitlab server release (<14, correspond to `tag_list`)
+      - A topic or list of topics to be assigned to a project.
+      - It is compatible with old GitLab server releases (versions before 14, correspond to C(tag_list)).
     type: list
     elements: str
     version_added: "6.6.0"
@@ -667,7 +667,7 @@ def main():
             "infrastructure_access_level": infrastructure_access_level,
             "monitor_access_level": monitor_access_level,
             "security_and_compliance_access_level": security_and_compliance_access_level,
-            "topics": topics
+            "topics": topics,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
