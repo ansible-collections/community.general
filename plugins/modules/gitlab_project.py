@@ -385,8 +385,8 @@ class GitLabProject(object):
             'monitor_access_level': options['monitor_access_level'],
             'security_and_compliance_access_level': options['security_and_compliance_access_level'],
         }
-        
-        # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version 
+
+        # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version
         # and check if less than 14. If yes we use tag_list instead topics
         if LooseVersion(self._gitlab.version()[0]) < LooseVersion("14"):
             project_options['tag_list'] = options['topics']
