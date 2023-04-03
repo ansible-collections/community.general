@@ -450,7 +450,7 @@ class Rhsm(RegistrationBase):
         self.module.debug('Verified system D-Bus bus as usable')
         return True
 
-    def register(self, username, password, token, auto_attach, activationkey, org_id,
+    def register(self, was_registered, username, password, token, auto_attach, activationkey, org_id,
                  consumer_type, consumer_name, consumer_id, force_register, environment,
                  release):
         '''
@@ -463,7 +463,7 @@ class Rhsm(RegistrationBase):
         # There is no support for token-based registration in the D-Bus API
         # of rhsm, so always use the CLI in that case.
         if not token and self._can_connect_to_dbus():
-            self._register_using_dbus(username, password, auto_attach,
+            self._register_using_dbus(was_registered, username, password, auto_attach,
                                       activationkey, org_id, consumer_type,
                                       consumer_name, consumer_id,
                                       force_register, environment, release)
@@ -521,7 +521,7 @@ class Rhsm(RegistrationBase):
 
         rc, stderr, stdout = self.module.run_command(args, check_rc=True, expand_user_and_vars=False)
 
-    def _register_using_dbus(self, username, password, auto_attach,
+    def _register_using_dbus(self, was_registered, username, password, auto_attach,
                              activationkey, org_id, consumer_type, consumer_name,
                              consumer_id, force_register, environment, release):
         '''
@@ -570,7 +570,7 @@ class Rhsm(RegistrationBase):
              distro_version[0] > 9)):
             dbus_force_option_works = True
 
-        if force_register and not dbus_force_option_works:
+        if force_register and not dbus_force_option_works and was_registered:
             self.unregister()
 
         register_opts = {}
@@ -592,7 +592,7 @@ class Rhsm(RegistrationBase):
                  distro_version[0] >= 9)):
                 environment_key = 'environments'
             register_opts[environment_key] = environment
-        if force_register and dbus_force_option_works:
+        if force_register and dbus_force_option_works and was_registered:
             register_opts['force'] = True
         # Wrap it as proper D-Bus dict
         register_opts = dbus.Dictionary(register_opts, signature='sv', variant_level=1)
@@ -1137,8 +1137,11 @@ def main():
     # Ensure system is registered
     if state == 'present':
 
+        # Cache the status of the system before the changes
+        was_registered = rhsm.is_registered
+
         # Register system
-        if rhsm.is_registered and not force_register:
+        if was_registered and not force_register:
             if syspurpose and 'sync' in syspurpose and syspurpose['sync'] is True:
                 try:
                     rhsm.sync_syspurpose()
@@ -1165,7 +1168,7 @@ def main():
             try:
                 rhsm.enable()
                 rhsm.configure(**module.params)
-                rhsm.register(username, password, token, auto_attach, activationkey, org_id,
+                rhsm.register(was_registered, username, password, token, auto_attach, activationkey, org_id,
                               consumer_type, consumer_name, consumer_id, force_register,
                               environment, release)
                 if syspurpose and 'sync' in syspurpose and syspurpose['sync'] is True:
