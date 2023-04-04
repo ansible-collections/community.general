@@ -10,6 +10,7 @@
 
 - name: Has-snap block
   when: has_snap
+  become: true
   block:
     - name: Make sure package is not installed (hello-world)
       community.general.snap:
@@ -198,3 +199,35 @@
           - hello-world
           - uhttpd
         state: present
+      register: install_two
+
+    - name: Install two packages at the same time
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: present
+      register: install_two_again
+
+    - name: Remove packages (hello-world & uhttpd)
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: absent
+      register: install_two_remove
+
+    - name: Assert installation of two packages
+      assert:
+        that:
+          - install_two is changed
+          - "'hello-world' in install_two.snaps_installed"
+          - "'uhttpd' in install_two.snaps_installed"
+          - install_two.snaps_removed is not defined
+          - install_two_again is not changed
+          - install_two_again.snaps_installed is not defined
+          - install_two_again.snaps_removed is not defined
+          - install_two_remove is changed
+          - install_two_again.snaps_installed is not defined
+          - "'hello-world' in install_two_remove.snaps_removed"
+          - "'uhttpd' in install_two_remove.snaps_removed"
