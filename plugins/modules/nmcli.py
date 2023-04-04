@@ -1673,8 +1673,8 @@ class Nmcli(object):
         if self.mtu_conn_type:
             options.update({self.mtu_setting: self.mtu})
 
-        # NetworkManager allows any interface type to be slave
-        if self.master:
+        # Connections that can have a master.
+        if self.slave_conn_type:
             options.update({
                 'connection.master': self.master,
                 'connection.slave-type': self.slave_type,
@@ -1693,9 +1693,17 @@ class Nmcli(object):
                 'xmit_hash_policy': self.xmit_hash_policy,
             })
         elif self.type == 'bond-slave':
-            options.update({
-                'connection.slave-type': 'bond',
-            })
+            if self.slave_type and self.slave_type != 'bond':
+                self.module.fail_json(msg="Connection type '%s' cannot be combined with '%s' slave-type. "
+                                          "Allowed slave-type for '%s' is 'bond'."
+                                          % (self.type, self.slave_type, self.type)
+                                      )
+            if not self.slave_type:
+                self.module.warn("Connection 'slave-type' property automatically set to 'bond' "
+                                 "because of using 'bond-slave' connection type.")
+                options.update({
+                    'connection.slave-type': 'bond',
+                })
         elif self.type == 'bridge':
             options.update({
                 'bridge.ageing-time': self.ageingtime,
@@ -1719,20 +1727,36 @@ class Nmcli(object):
                     'team.runner-fast-rate': self.runner_fast_rate,
                 })
         elif self.type == 'bridge-slave':
+            if self.slave_type and self.slave_type != 'bridge':
+                self.module.fail_json(msg="Connection type '%s' cannot be combined with '%s' slave-type. "
+                                          "Allowed slave-type for '%s' is 'bridge'."
+                                          % (self.type, self.slave_type, self.type)
+                                      )
+            if not self.slave_type:
+                self.module.warn("Connection 'slave-type' property automatically set to 'bridge' "
+                                 "because of using 'bridge-slave' connection type.")
+                options.update({'connection.slave-type': 'bridge'})
             self.module.warn(
                 "Connection type as 'bridge-slave' implies 'ethernet' connection with 'bridge' slave-type. "
                 "Consider using slave_type='bridge' with necessary type."
             )
             options.update({
-                'connection.slave-type': 'bridge',
                 'bridge-port.path-cost': self.path_cost,
                 'bridge-port.hairpin-mode': self.hairpin,
                 'bridge-port.priority': self.slavepriority,
             })
         elif self.type == 'team-slave':
-            options.update({
-                'connection.slave-type': 'team',
-            })
+            if self.slave_type and self.slave_type != 'team':
+                self.module.fail_json(msg="Connection type '%s' cannot be combined with '%s' slave-type. "
+                                          "Allowed slave-type for '%s' is 'team'."
+                                          % (self.type, self.slave_type, self.type)
+                                      )
+            if not self.slave_type:
+                self.module.warn("Connection 'slave-type' property automatically set to 'team' "
+                                 "because of using 'team-slave' connection type.")
+                options.update({
+                    'connection.slave-type': 'team',
+                })
         elif self.tunnel_conn_type:
             options.update({
                 'ip-tunnel.local': self.ip_tunnel_local,
