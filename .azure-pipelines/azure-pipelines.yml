@@ -73,6 +73,19 @@ stages:
             - test: 3
             - test: 4
             - test: extra
+  - stage: Sanity_2_15
+    displayName: Sanity 2.15
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Test {0}
+          testFormat: 2.15/sanity/{0}
+          targets:
+            - test: 1
+            - test: 2
+            - test: 3
+            - test: 4
   - stage: Sanity_2_14
     displayName: Sanity 2.14
     dependsOn: []
@@ -130,6 +143,16 @@ stages:
             - test: 3.9
             - test: '3.10'
             - test: '3.11'
+  - stage: Units_2_15
+    displayName: Units 2.15
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.14/units/{0}/1
+          targets:
+            - test: "3.10"
   - stage: Units_2_14
     displayName: Units 2.14
     dependsOn: []
@@ -139,7 +162,6 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.14/units/{0}/1
           targets:
-            - test: 2.7
             - test: 3.9
   - stage: Units_2_13
     displayName: Units 2.13
@@ -193,14 +215,26 @@ stages:
           targets:
             - name: macOS 13.2
               test: macos/13.2
-            - name: RHEL 7.9
-              test: rhel/7.9
             - name: RHEL 9.1
               test: rhel/9.1
             - name: FreeBSD 13.1
               test: freebsd/13.1
             - name: FreeBSD 12.4
               test: freebsd/12.4
+          groups:
+            - 1
+            - 2
+            - 3
+  - stage: Remote_2_15
+    displayName: Remote 2.15
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.15/{0}
+          targets:
+            - name: RHEL 7.9
+              test: rhel/7.9
           groups:
             - 1
             - 2
@@ -265,8 +299,6 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: CentOS 7
-              test: centos7
             - name: Fedora 37
               test: fedora37
             - name: openSUSE 15
@@ -277,6 +309,20 @@ stages:
               test: ubuntu2204
             - name: Alpine 3
               test: alpine3
+          groups:
+            - 1
+            - 2
+            - 3
+  - stage: Docker_2_15
+    displayName: Docker 2.15
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.15/linux/{0}
+          targets:
+            - name: CentOS 7
+              test: centos7
           groups:
             - 1
             - 2
@@ -364,6 +410,16 @@ stages:
           targets:
             - test: 2.7
             - test: '3.11'
+  - stage: Generic_2_15
+    displayName: Generic 2.14
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.14/generic/{0}/1
+          targets:
+            - test: 3.9
   - stage: Generic_2_14
     displayName: Generic 2.14
     dependsOn: []
@@ -402,24 +458,29 @@ stages:
       - Sanity_2_12
       - Sanity_2_13
       - Sanity_2_14
+      - Sanity_2_15
       - Units_devel
       - Units_2_12
       - Units_2_13
       - Units_2_14
+      - Units_2_15
       - Remote_devel_extra_vms
       - Remote_devel
       - Remote_2_12
       - Remote_2_13
       - Remote_2_14
+      - Remote_2_15
       - Docker_devel
       - Docker_2_12
       - Docker_2_13
       - Docker_2_14
+      - Docker_2_15
       - Docker_community_devel
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
 #      - Generic_devel
 #      - Generic_2_12
 #      - Generic_2_13
 #      - Generic_2_14
+#      - Generic_2_15
     jobs:
       - template: templates/coverage.yml
