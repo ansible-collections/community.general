@@ -201,7 +201,7 @@
         state: present
       register: install_two
 
-    - name: Install two packages at the same time
+    - name: Install two packages at the same time (again)
       community.general.snap:
         name:
           - hello-world
@@ -217,6 +217,14 @@
         state: absent
       register: install_two_remove
 
+    - name: Remove packages again (hello-world & uhttpd)
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: absent
+      register: install_two_remove_again
+
     - name: Assert installation of two packages
       assert:
         that:
@@ -231,3 +239,6 @@
           - install_two_again.snaps_installed is not defined
           - "'hello-world' in install_two_remove.snaps_removed"
           - "'uhttpd' in install_two_remove.snaps_removed"
+          - install_two_remove_again is not changed
+          - install_two_remove_again.snaps_installed is not defined
+          - install_two_remove_again.snaps_removed is not defined
