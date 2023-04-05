@@ -256,6 +256,7 @@ def main():
     state = module.params["state"]
     name = module.params["name"]
     zone = module.params["zone"]
+    template = []
     if module.params["template"]:
         template = [module.params["template"]]
     check_command = module.params["check_command"]
