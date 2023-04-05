@@ -1,8 +1,2 @@
-bugfix:
-  - >
-  flatpak - fixes idempotency detection issues. In some
-  cases the module could fail to properly detect already existing flatpaks
-  because of a parameter witch only checks the installed apps.
-  (https://github.com/ansible-collections/community.general/pull/6289)
-
-  
+bugfixes:
+  - flatpak - fixes idempotency detection issues. In some cases the module could fail to properly detect already existing flatpaks because of a parameter witch only checks the installed apps. (https://github.com/ansible-collections/community.general/pull/6289).
