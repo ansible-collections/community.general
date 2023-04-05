@@ -81,6 +81,11 @@ options:
       - A list of puppet tags to be used.
     type: list
     elements: str
+  skip_tags:
+    description:
+      - A list of puppet tags to be excluded.
+    type: list
+    elements: str
   execute:
     description:
       - Execute a specific piece of Puppet code.
@@ -143,6 +148,8 @@ EXAMPLES = r'''
     tags:
     - update
     - nginx
+    skip_tags:
+    - service
 
 - name: Run puppet agent in noop mode
   community.general.puppet:
@@ -198,6 +205,7 @@ def main():
             environment=dict(type='str'),
             certname=dict(type='str'),
             tags=dict(type='list', elements='str'),
+            skip_tags=dict(type='list', elements='str'),
             execute=dict(type='str'),
             summarize=dict(type='bool', default=False),
             debug=dict(type='bool', default=False),
@@ -232,11 +240,11 @@ def main():
     runner = puppet_utils.puppet_runner(module)
 
     if not p['manifest'] and not p['execute']:
-        args_order = "_agent_fixed puppetmaster show_diff confdir environment tags certname noop use_srv_records"
+        args_order = "_agent_fixed puppetmaster show_diff confdir environment tags skip_tags certname noop use_srv_records"
         with runner(args_order) as ctx:
             rc, stdout, stderr = ctx.run()
     else:
-        args_order = "_apply_fixed logdest modulepath environment certname tags noop _execute summarize debug verbose"
+        args_order = "_apply_fixed logdest modulepath environment certname tags skip_tags noop _execute summarize debug verbose"
         with runner(args_order) as ctx:
             rc, stdout, stderr = ctx.run(_execute=[p['execute'], p['manifest']])
 

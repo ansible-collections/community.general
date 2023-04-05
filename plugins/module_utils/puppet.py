@@ -96,6 +96,7 @@ def puppet_runner(module):
             confdir=cmd_runner_fmt.as_opt_val("--confdir"),
             environment=cmd_runner_fmt.as_opt_val("--environment"),
             tags=cmd_runner_fmt.as_func(lambda v: ["--tags", ",".join(v)]),
+            skip_tags=cmd_runner_fmt.as_func(lambda v: ["--skip_tags", ",".join(v)]),
             certname=cmd_runner_fmt.as_opt_eq_val("--certname"),
             noop=cmd_runner_fmt.as_func(noop_func),
             use_srv_records=cmd_runner_fmt.as_map({
