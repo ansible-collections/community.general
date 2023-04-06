@@ -86,6 +86,7 @@ options:
       - A list of puppet tags to be excluded.
     type: list
     elements: str
+    version_added: 6.6.0
   execute:
     description:
       - Execute a specific piece of Puppet code.
