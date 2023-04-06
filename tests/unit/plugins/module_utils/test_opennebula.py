@@ -75,6 +75,17 @@ RENDER_VALID = [
             NIC=[NAME="NIC1",NETWORK_ID="1"]
         ''').strip()
     ),
+    (
+        {
+            'SCHED_REQUIREMENTS': 'CLUSTER_ID="100"',
+            'BACKSLASH_ESCAPED': "this is escaped: \\n; this isn't: \"\nend",
+        },
+        textwrap.dedent('''
+            BACKSLASH_ESCAPED="this is escaped: \\\\n; this isn't: \\"
+            end"
+            SCHED_REQUIREMENTS="CLUSTER_ID=\\"100\\""
+        ''').strip()
+    )
 ]
 
 

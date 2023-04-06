@@ -52,6 +52,9 @@ def render(to_render):
                 for item in value:
                     yield '{0:}=[{1:}]'.format(key, ','.join(recurse(item)))
                 continue
+            if isinstance(value, str):
+                yield '{0:}="{1:}"'.format(key, value.replace('\\', '\\\\').replace('"', '\\"'))
+                continue
             yield '{0:}="{1:}"'.format(key, value)
     return '\n'.join(recurse(to_render))
 
