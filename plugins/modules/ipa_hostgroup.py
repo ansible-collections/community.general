@@ -24,7 +24,7 @@ options:
     description:
     - If C(yes), add the listed I(host) to the I(hostgroup).
     - If C(no), only the listed I(host) will be in I(hostgroup), removing any other hosts.
-    default: no
+    default: false
     type: bool
   cn:
     description:
