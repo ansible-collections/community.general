@@ -45,6 +45,8 @@ def render(to_render):
     """Converts dictionary to OpenNebula template."""
     def recurse(to_render):
         for key, value in sorted(to_render.items()):
+            if value is None:
+                continue
             if isinstance(value, dict):
                 yield '{0:}=[{1:}]'.format(key, ','.join(recurse(value)))
                 continue

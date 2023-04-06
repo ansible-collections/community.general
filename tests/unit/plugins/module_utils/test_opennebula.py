@@ -77,6 +77,7 @@ RENDER_VALID = [
     ),
     (
         {
+            'EMPTY_VALUE': None,
             'SCHED_REQUIREMENTS': 'CLUSTER_ID="100"',
             'BACKSLASH_ESCAPED': "this is escaped: \\n; this isn't: \"\nend",
         },
@@ -85,7 +86,7 @@ RENDER_VALID = [
             end"
             SCHED_REQUIREMENTS="CLUSTER_ID=\\"100\\""
         ''').strip()
-    )
+    ),
 ]
 
 
