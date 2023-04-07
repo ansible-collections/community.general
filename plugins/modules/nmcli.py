@@ -89,7 +89,7 @@ options:
             - If I(master) defined this option is mandatory.
         type: str
         choices: [ 'bond', 'bridge', 'team' ]
-        version_added: 6.4.0
+        version_added: 6.6.0
     master:
         description:
             - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
