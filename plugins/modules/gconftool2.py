@@ -155,9 +155,10 @@ class GConftool(StateModuleHelper):
 
     def state_present(self):
         with self.runner("direct config_source value_type state key value", output_process=self._make_process(True)) as ctx:
-            self.vars.set('new_value', ctx.run(), fact=True)
+            ctx.run()
             if self.verbosity >= 4:
                 self.vars.run_info = ctx.run_info
+        self.vars.set('new_value', self._get(), fact=True)
         self.vars._value = self.vars.new_value
 
 

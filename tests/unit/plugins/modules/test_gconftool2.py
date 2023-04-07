@@ -66,6 +66,11 @@ TEST_CASES = [
                 (
                     ['/testbin/gconftool-2', '--type', 'int', '--set', '/desktop/gnome/background/picture_filename', '200'],
                     {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--get', '/desktop/gnome/background/picture_filename'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                     (0, '200\n', '',),
                 ),
             ],
@@ -86,6 +91,11 @@ TEST_CASES = [
                 (
                     ['/testbin/gconftool-2', '--type', 'int', '--set', '/desktop/gnome/background/picture_filename', '200'],
                     {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--get', '/desktop/gnome/background/picture_filename'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                     (0, '200\n', '',),
                 ),
             ],
@@ -105,6 +115,11 @@ TEST_CASES = [
                 ),
                 (
                     ['/testbin/gconftool-2', '--type', 'bool', '--set', '/apps/gnome_settings_daemon/screensaver/start_screensaver', 'false'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--get', '/apps/gnome_settings_daemon/screensaver/start_screensaver'],
                     {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                     (0, 'false\n', '',),
                 ),
@@ -143,7 +158,7 @@ def test_gconftool2(mocker, capfd, patch_gconftool2, testcase):
     print("results =\n%s" % results)
 
     if 'changed' in testcase:
-        assert results['changed'] == testcase['changed']
+        assert results.get('changed', False) == testcase['changed']
 
     for conditional_test_result in ('value',):
         if conditional_test_result in testcase:
