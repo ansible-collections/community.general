@@ -318,6 +318,7 @@ def _state_args(state_file):
         return ['-state', state_file]
     return []
 
+
 def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths, workspace):
     command = [bin_path, 'init', '-input=false', '-no-color']
     if backend_config:
