@@ -168,6 +168,8 @@ class RundeckACLManager:
                 except ValueError as e:
                     self.module.fail_json(msg="Rundeck response was not a valid JSON. Exception was: %s. "
                                               "Object was: %s" % (str(e), resp))
+            elif resp == b'':                
+                resp = None
         return resp, info
 
     def get_acl(self):
