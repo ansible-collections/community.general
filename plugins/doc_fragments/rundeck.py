@@ -29,4 +29,5 @@ options:
     description:
       - Rundeck User API Token.
     required: true
+    aliases: ["token"]
 '''
