@@ -119,7 +119,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.rundeck import (
     api_argument_spec,
-    api_request
+    api_request,
 )
 
 
@@ -130,7 +130,7 @@ class RundeckACLManager:
     def get_acl(self):
         resp, info = api_request(
             module=self.module,
-            endpoint="system/acl/%s.aclpolicy" % self.module.params["name"]
+            endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
         )
 
         return resp
@@ -146,7 +146,7 @@ class RundeckACLManager:
                 module=self.module,
                 endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
                 method="POST",
-                data={"contents": self.module.params["policy"]}
+                data={"contents": self.module.params["policy"]},
             )
 
             if info["status"] == 201:
@@ -170,7 +170,7 @@ class RundeckACLManager:
                 module=self.module,
                 endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
                 method="PUT",
-                data={"contents": self.module.params["policy"]}
+                data={"contents": self.module.params["policy"]},
             )
 
             if info["status"] == 200:
@@ -192,7 +192,7 @@ class RundeckACLManager:
                 api_request(
                     module=self.module,
                     endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
-                    method="DELETE"
+                    method="DELETE",
                 )
 
                 self.module.exit_json(changed=True, before=facts, after={})
@@ -205,7 +205,7 @@ def main():
         state=dict(type='str', choices=['present', 'absent'], default='present'),
         name=dict(required=True, type='str'),
         policy=dict(type='str'),
-        project=dict(type='str')
+        project=dict(type='str'),
     ))
 
     module = AnsibleModule(
@@ -213,7 +213,7 @@ def main():
         required_if=[
             ['state', 'present', ['policy']],
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not bool(re.match("[a-zA-Z0-9,.+_-]+", module.params["name"])):
