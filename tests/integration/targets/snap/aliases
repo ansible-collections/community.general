@@ -11,4 +11,3 @@ skip/freebsd
 skip/osx
 skip/macos
 skip/docker
-skip/ubuntu  # FIXME!

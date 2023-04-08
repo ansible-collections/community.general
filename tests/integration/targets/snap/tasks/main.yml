@@ -53,7 +53,7 @@
     - name: Check package has been installed correctly (hello-world)
       command: hello-world
       environment:
-        PATH: /var/lib/snapd/snap/bin/
+        PATH: /snap/bin/
 
     - name: Remove package (hello-world) (check mode)
       community.general.snap:
