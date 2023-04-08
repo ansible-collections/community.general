@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Install snapd (default)
+- name: Install snapd (ubuntu)
   package:
     name: "{{ snap_packages }}"
     state: present
@@ -13,12 +13,6 @@
   service:
     name: snapd
     state: started
-
-- name: Create link /snap
-  file:
-    src: /var/lib/snapd/snap
-    dest: /snap
-    state: link
 
 - name: Inform that snap is installed
   set_fact:
