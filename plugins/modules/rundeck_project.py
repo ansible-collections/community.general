@@ -38,6 +38,12 @@ options:
         description:
             - Sets the project name.
         required: true
+    api_token:
+        type: str
+        description:
+            - Sets the token to authenticate against Rundeck API.
+        required: true
+        aliases: ["token"]
     client_cert:
         version_added: '0.2.0'
     client_key:
@@ -170,6 +176,7 @@ def main():
     argument_spec.update(dict(
         state=dict(type='str', choices=['present', 'absent'], default='present'),
         name=dict(required=True, type='str'),
+        api_token=dict(required=True, type="str", no_log=True, aliases=["token"]),
     ))
 
     module = AnsibleModule(
