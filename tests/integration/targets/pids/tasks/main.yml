@@ -90,6 +90,15 @@
     src:  "{{ remote_tmp_dir }}/obtainpid.txt"
   register: newpid
 
+- name: Gather all processes to make debugging easier
+  command: ps aux
+  register: result
+  no_log: true
+
+- name: List all processes to make debugging easier
+  debug:
+    var: result.stdout_lines
+
 - name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"
   assert:
     that:
