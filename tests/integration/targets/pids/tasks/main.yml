@@ -32,7 +32,7 @@
 
 - name: "Picking a random process name"
   set_fact:
-    random_name: some-random-long-name-{{ 99999999 | random }}
+    random_name: some-random-long-name-{{ 10000000000 + (9999999999 | random) }}
 
 - name: Copy the fake 'sleep' source code
   copy:
@@ -66,17 +66,17 @@
 
 - name: "Checking that exact non-substring matches are required"
   pids:
-    name: "{{ random_name[0:5] }}"
+    name: "{{ random_name[0:25] }}"
   register: exactpidmatch
 
 - name: "Checking that patterns can be used with the pattern option"
   pids:
-    pattern: "{{ random_name[0:5] }}"
+    pattern: "{{ random_name[0:25] }}"
   register: pattern_pid_match
 
 - name: "Checking that case-insensitive patterns can be used with the pattern option"
   pids:
-    pattern: "{{ random_name[0:5] | upper }}"
+    pattern: "{{ random_name[0:25] | upper }}"
     ignore_case: true
   register: caseinsensitive_pattern_pid_match
 
