@@ -22,7 +22,7 @@ def api_argument_spec():
     api_argument_spec.update(dict(
         url=dict(required=True, type="str"),
         api_version=dict(type="int", default=39),
-        api_token=dict(required=True, type="str", no_log=True, aliases=["token"])
+        api_token=dict(required=True, type="str", no_log=True)
     ))
 
     return api_argument_spec
