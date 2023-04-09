@@ -37,10 +37,8 @@ options:
             - Sets the project name.
         required: true
     api_token:
-        type: str
         description:
             - Sets the token to authenticate against Rundeck API.
-        required: true
         aliases: ["token"]
     project:
         type: str
@@ -210,10 +208,11 @@ def main():
     argument_spec.update(dict(
         state=dict(type='str', choices=['present', 'absent'], default='present'),
         name=dict(required=True, type='str'),
-        api_token=dict(required=True, type="str", no_log=True, aliases=["token"]),
         policy=dict(type='str'),
         project=dict(type='str'),
     ))
+
+    argument_spec['api_token']['aliases'] = ['token']
 
     module = AnsibleModule(
         argument_spec=argument_spec,
