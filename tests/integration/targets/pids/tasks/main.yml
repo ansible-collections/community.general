@@ -43,15 +43,14 @@
 - name: Compile fake 'sleep' binary
   command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
 
-- name: Copy helper script
-  copy:
+- name: Copy templated helper script
+  template:
     src: obtainpid.sh
     dest: "{{ remote_tmp_dir }}/obtainpid.sh"
     mode: 0755
 
 - name: "Run the fake 'sleep' binary"
-  command: "sh {{ remote_tmp_dir }}/obtainpid.sh '{{ remote_tmp_dir }}/{{ random_name }}' '{{ remote_tmp_dir }}/obtainpid.txt'"
-
+  command: sh {{ remote_tmp_dir }}/obtainpid.sh
   async: 100
   poll: 0
 
