@@ -52,6 +52,34 @@
       - "'tox' not in uninstall_tox.application"
 
 ##############################################################################
+- name: install application tox with system-site-packages
+  community.general.pipx:
+    name: tox
+    system_site_packages: true
+  register: install_tox
+
+- name: get raw pipx_info
+  community.general.pipx_info:
+    include_raw: true
+  register: pipx_info_raw
+
+- name: uninstall application tox
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox
+
+- name: check assertions tox
+  assert:
+    that:
+      - install_tox is changed
+      - "'tox' in install_tox.application"
+      - pipx_info_raw is not changed
+      - "'--system-site-packages' in pipx_info_raw.raw_output.venvs.tox.metadata.venv_args"
+      - uninstall_tox is changed
+      - "'tox' not in uninstall_tox.application"
+
+##############################################################################
 - name: install application tox 3.24.0
   community.general.pipx:
     name: tox

@@ -39,6 +39,7 @@ def pipx_runner(module, command, **kwargs):
             include_injected=fmt.as_bool("--include-injected"),
             index_url=fmt.as_opt_val('--index-url'),
             python=fmt.as_opt_val('--python'),
+            system_site_packages=fmt.as_bool("--system-site-packages"),
             _list=fmt.as_fixed(['list', '--include-injected', '--json']),
             editable=fmt.as_bool("--editable"),
             pip_args=fmt.as_opt_val('--pip-args'),
