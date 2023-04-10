@@ -86,7 +86,7 @@ ilo_redfish_command:
                     type: bool
                 msg:
                     description: Status of the operation performed on the iLO.
-                    type: dict
+                    type: str
     returned: always
 '''
 
