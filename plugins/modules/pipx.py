@@ -89,6 +89,13 @@ options:
             - Python version to be used when creating the application virtual environment. Must be 3.6+.
             - Only used when I(state=install), I(state=latest), I(state=reinstall), or I(state=reinstall_all).
         type: str
+    system_site_packages:
+        description:
+            - Give application virtual environment access to the system site-packages directory.
+            - Only used when I(state=install) or I(state=latest).
+        type: bool
+        default: false
+        version_added: 6.6.0
     executable:
         description:
             - Path to the C(pipx) installed in the system.
@@ -176,6 +183,7 @@ class PipX(StateModuleHelper):
             include_injected=dict(type='bool', default=False),
             index_url=dict(type='str'),
             python=dict(type='str'),
+            system_site_packages=dict(type='bool', default=False),
             executable=dict(type='path'),
             editable=dict(type='bool', default=False),
             pip_args=dict(type='str'),
@@ -243,7 +251,7 @@ class PipX(StateModuleHelper):
     def state_install(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            with self.runner('state index_url install_deps force python editable pip_args name_source', check_mode_skip=True) as ctx:
+            with self.runner('state index_url install_deps force python system_site_packages editable pip_args name_source', check_mode_skip=True) as ctx:
                 ctx.run(name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
@@ -304,7 +312,7 @@ class PipX(StateModuleHelper):
     def state_latest(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            with self.runner('state index_url install_deps force python editable pip_args name_source', check_mode_skip=True) as ctx:
+            with self.runner('state index_url install_deps force python system_site_packages editable pip_args name_source', check_mode_skip=True) as ctx:
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
