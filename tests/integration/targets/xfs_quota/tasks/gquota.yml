@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create disk image
-  command: 'dd if=/dev/zero of={{ remote_tmp_dir }}/img-gquota bs=1M count=20
+  command: 'dd if=/dev/zero of={{ remote_tmp_dir }}/img-gquota bs=1M count=400
 
     '
 - name: Create XFS filesystem

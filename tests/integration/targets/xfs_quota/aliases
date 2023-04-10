@@ -7,7 +7,6 @@ azp/posix/vm
 needs/privileged
 needs/root
 skip/aix
-skip/alpine  # FIXME
 skip/osx
 skip/macos
 skip/freebsd
