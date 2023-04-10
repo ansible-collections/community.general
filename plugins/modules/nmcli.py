@@ -892,8 +892,15 @@ options:
             mode:
                 description:
                     - The macvlan mode, which specifies the communication mechanism between multiple macvlans on the same lower device.
-                        Choices: 0(unknown), 1(vepa), 2(bridge), 3(private), 4(passthru) and 5(source).
+                    - 'Following choices are allowed:
+                      C(0) B(unknown) (default)
+                      C(1) B(vepa)
+                      C(2) B(bridge)
+                      C(3) B(private)
+                      C(4) B(passthru)
+                      C(5) B(source)'
                 type: int
+                choices: [ 0, 1, 2, 3, 4, 5 ]
             parent:
                 description:
                     - If given, specifies the parent interface name or parent connection UUID from which this MAC-VLAN interface should
