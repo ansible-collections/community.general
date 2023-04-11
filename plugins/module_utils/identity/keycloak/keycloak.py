@@ -1872,7 +1872,7 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Unable to create new execution '%s' %s: %s: %s %s" %
                                   (flowAlias, execution["providerId"], repr(e), ";".join([e.url, e.msg, str(e.code), str(e.hdrs)]), str(newExec)))
         except Exception as e:
-            self.module.fail_json(msg="Unable to create new execution %s: %s" % (execution["provider"], str(e)))
+            self.module.fail_json(msg="Unable to create new execution '%s' %s: %s" % (flowAlias, execution["providerId"], repr(e)))
 
     def change_execution_priority(self, executionId, diff, realm='master'):
         """ Raise or lower execution priority of diff time
