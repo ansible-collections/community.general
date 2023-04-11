@@ -893,20 +893,21 @@ options:
                 description:
                     - The macvlan mode, which specifies the communication mechanism between multiple macvlans on the same lower device.
                     - 'Following choices are allowed:
-                      C(0) B(unknown) (default)
                       C(1) B(vepa)
                       C(2) B(bridge)
                       C(3) B(private)
                       C(4) B(passthru)
                       C(5) B(source)'
                 type: int
-                choices: [ 0, 1, 2, 3, 4, 5 ]
+                choices: [ 1, 2, 3, 4, 5 ]
+                required: true
             parent:
                 description:
                     - If given, specifies the parent interface name or parent connection UUID from which this MAC-VLAN interface should
                         be created. If this property is not specified, the connection must contain an "802-3-ethernet" setting with a
                         "mac-address" property.
                 type: str
+                required: true
             promiscuous:
                 description:
                     - Whether the interface should be put in promiscuous mode.
@@ -2398,13 +2399,11 @@ def main():
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
-            macvlan=dict(type='dict',
-                         options=dict(
-                              mode=dict(type='int'),
-                              parent=dict(type='str'),
+            macvlan=dict(type='dict', options=dict(
+                              mode=dict(type='int', choices=[1, 2, 3, 4, 5], required=True),
+                              parent=dict(type='str', required=True),
                               promiscuous=dict(type='bool'),
-                              tap=dict(type='bool')
-                        )),
+                              tap=dict(type='bool'))),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
