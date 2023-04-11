@@ -892,12 +892,8 @@ options:
             mode:
                 description:
                     - The macvlan mode, which specifies the communication mechanism between multiple macvlans on the same lower device.
-                    - 'Following choices are allowed:
-                      C(1) B(vepa)
-                      C(2) B(bridge)
-                      C(3) B(private)
-                      C(4) B(passthru)
-                      C(5) B(source)'
+                    - 'Following choices are allowed: C(1) B(vepa), C(2) B(bridge), C(3) B(private), C(4) B(passthru)
+                      and C(5) B(source)'
                 type: int
                 choices: [ 1, 2, 3, 4, 5 ]
                 required: true
