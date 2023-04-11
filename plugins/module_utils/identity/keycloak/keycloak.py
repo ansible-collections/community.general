@@ -1795,6 +1795,9 @@ class KeycloakAPI(object):
                 data=json.dumps(updatedExec),
                 timeout=self.connection_timeout,
                 validate_certs=self.validate_certs)
+        except HTTPError as e:
+            self.module.fail_json(msg="Unable to update execution '%s': %s: %s %s" %
+                                      (flowAlias, repr(e), ";".join([e.url, e.msg, str(e.code), str(e.hdrs)]), str(updatedExec)))
         except Exception as e:
             self.module.fail_json(msg="Unable to update executions %s: %s" % (updatedExec, str(e)))
 
@@ -1865,6 +1868,9 @@ class KeycloakAPI(object):
                 data=json.dumps(newExec),
                 timeout=self.connection_timeout,
                 validate_certs=self.validate_certs)
+        except HTTPError as e:
+            self.module.fail_json(msg="Unable to create new execution '%s' %s: %s: %s %s" %
+                                  (flowAlias, execution["providerId"], repr(e), ";".join([e.url, e.msg, str(e.code), str(e.hdrs)]), str(newExec)))
         except Exception as e:
             self.module.fail_json(msg="Unable to create new execution %s: %s" % (execution["provider"], str(e)))
 
