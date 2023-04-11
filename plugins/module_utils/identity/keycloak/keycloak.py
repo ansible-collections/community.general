@@ -1822,7 +1822,7 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
 
-    def create_subflow(self, subflowName, flowAlias, realm='master'):
+    def create_subflow(self, subflowName, flowAlias, realm='master', flowType='basic-flow'):
         """ Create new sublow on the flow
 
         :param subflowName: name of the subflow to create
@@ -1833,7 +1833,7 @@ class KeycloakAPI(object):
             newSubFlow = {}
             newSubFlow["alias"] = subflowName
             newSubFlow["provider"] = "registration-page-form"
-            newSubFlow["type"] = "basic-flow"
+            newSubFlow["type"] = flowType
             open_url(
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
                     url=self.baseurl,
