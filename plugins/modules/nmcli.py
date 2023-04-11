@@ -2398,7 +2398,13 @@ def main():
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
-            macvlan=dict(type='dict'),
+            macvlan=dict(type='dict',
+                         options=dict(
+                              mode=dict(type='int'),
+                              parent=dict(type='str'),
+                              promiscuous=dict(type='bool'),
+                              tap=dict(type='bool')
+                        )),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
