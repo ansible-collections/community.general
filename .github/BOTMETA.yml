@@ -678,6 +678,8 @@ files:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope.py:
     maintainers: Gaetan2907
+  $modules/keycloak_clientscope_type.py:
+    maintainers: simonpahl
   $modules/keycloak_clientsecret_info.py:
     maintainers: fynncfchen johncant
   $modules/keycloak_clientsecret_regenerate.py:
