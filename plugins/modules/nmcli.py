@@ -1751,6 +1751,8 @@ class Nmcli(object):
                     options.update({
                         'macvlan.%s' % name: value,
                     })
+            elif self.state == 'present':
+                raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
                 for name, value in self.wireguard.items():
