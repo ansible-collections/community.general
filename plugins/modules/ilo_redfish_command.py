@@ -79,7 +79,7 @@ ilo_redfish_command:
     description: Returns the status of the operation performed on the iLO.
     type: dict
     contains:
-        command:
+        WaitforiLORebootCompletion:
             description: Returns the output msg and whether the function executed successfully.
             type: dict
             contains:
