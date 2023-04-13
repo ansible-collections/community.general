@@ -19,6 +19,8 @@ attributes:
     support: none
   diff_mode:
     support: none
+extends_documentation_fragment:
+  - community.general.attributes
 options:
   category:
     required: true
