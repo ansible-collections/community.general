@@ -82,6 +82,7 @@ options:
             subFlowType:
                 description:
                     - For new subflows, optionally specify the type.
+                    - Is only used at creation.
                 choices: ["basic-flow", "form-flow"]
                 default: "basic-flow"
                 type: str
