@@ -601,7 +601,13 @@ class TarArchive(Archive):
                 # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
                 # to their original names so only file checksum is returned
                 f = self._open_compressed_file(_to_native_ascii(path), 'r')
-                checksums = set([(b'', crc32(f.read()))])
+                checksum = 0
+                while True:
+                    chunk = f.read(16 * 1024 * 1024)
+                    if not chunk:
+                        break
+                    checksum = crc32(chunk, checksum)
+                checksums = set([(b'', checksum)])
                 f.close()
             except Exception:
                 checksums = set()
