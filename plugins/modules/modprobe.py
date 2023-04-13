@@ -52,7 +52,7 @@ options:
             - If C(present), adds module name to C(/etc/modules-load.d/) and params to C(/etc/modprobe.d/) so the module will be loaded on next reboot.
             - If C(absent), will comment out module name from C(/etc/modules-load.d/) and comment out params from C(/etc/modprobe.d/) so the module will not be
               loaded on next reboot.
-            - If C(disabled), will not toch anything and leave C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
+            - If C(disabled), will not touch anything and leave C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
             - Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar triggers encoded in the
               kernel modules themselves instead of configuration like this.
             - In fact, most modern kernel modules are prepared for automatic loading already.
