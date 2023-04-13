@@ -98,8 +98,26 @@ ilo_redfish_info:
                     description: Return whether the information was retrieved succesfully.
                     type: bool
                 msg:
-                    description: Information of all retrieved details.
-                    type: dict
+                    description: Information of all active iLO sessions.
+                    type: list
+                    elements: dict
+                    contains:
+                        Description:
+                            description: Provides a description of the resource.
+                            type: str
+                        Id:
+                            description: The sessionId.
+                            type: str
+                        Name:
+                            description: The name of the resource.
+                            type: str
+                        UserName:
+                            description: Name to use to log in to the management processor.
+                            type: str
+                enteries:
+                    description: List of retieved SNMP Users/Alert Destinations.
+                    type: list
+                    elements: dict
     returned: always
 '''
 
