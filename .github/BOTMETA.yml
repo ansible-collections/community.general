@@ -988,7 +988,7 @@ files:
     maintainers: sysadmind
   $modules/puppet.py:
     labels: puppet
-    maintainers: nibalizer emonty
+    maintainers: emonty
   $modules/pushbullet.py:
     maintainers: willybarro
   $modules/pushover.py:
