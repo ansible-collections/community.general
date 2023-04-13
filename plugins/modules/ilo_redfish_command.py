@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_command
 short_description: Manages Out-Of-Band controllers using Redfish APIs
-version_added: 6.5.0
+version_added: 6.6.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
