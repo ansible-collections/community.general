@@ -68,6 +68,7 @@ options:
 
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.attributes
 
 author:
     - Samuli Seppänen (@mattock)
@@ -94,27 +95,27 @@ msg:
     type: str
 
 end_state:
-    description: Representation of the authorization scope after module execution
+    description: Representation of the authorization scope after module execution.
     returned: on success
     type: complex
     contains:
         id:
-            description: id of the authorization scope
+            description: ID of the authorization scope.
             type: str
             returned: when I(status) == "present"
             sample: a6ab1cf2-1001-40ec-9f39-48f23b6a0a41
         name:
-            description: name of the authorization scope
+            description: Name of the authorization scope.
             type: str
             returned: when I(status) == "present"
             sample: file:delete
         display_name:
-            description: display name of the authorization scope
+            description: Display name of the authorization scope.
             type: str
             returned: when I(status) == "present"
             sample: File delete
         icon_uri:
-            description: icon URI for the authorization scope
+            description: Icon URI for the authorization scope.
             type: str
             returned: when I(status) == "present"
             sample: http://localhost/icon.png
