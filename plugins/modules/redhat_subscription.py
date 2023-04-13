@@ -461,8 +461,10 @@ class Rhsm(RegistrationBase):
               * Exception - if any error occurs during the registration
         '''
         # There is no support for token-based registration in the D-Bus API
-        # of rhsm, so always use the CLI in that case.
-        if not token and self._can_connect_to_dbus():
+        # of rhsm, so always use the CLI in that case;
+        # also, since the specified environments are names, and the D-Bus APIs
+        # require IDs for the environments, use the CLI also in that case
+        if not token and not environment and self._can_connect_to_dbus():
             self._register_using_dbus(was_registered, username, password, auto_attach,
                                       activationkey, org_id, consumer_type,
                                       consumer_name, consumer_id,

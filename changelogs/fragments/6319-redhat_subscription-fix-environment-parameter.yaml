@@ -1,0 +1,5 @@
+bugfixes:
+  - redhat_subscription - do not use D-Bus for registering when ``environment`` is specified,
+    so it possible to specify again the environment names for registering,
+    as the D-Bus APIs work only with IDs
+    (https://github.com/ansible-collections/community.general/pull/6319).
