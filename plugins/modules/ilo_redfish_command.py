@@ -37,7 +37,7 @@ options:
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller
+      - Base URI of OOB controller.
     type: str
   username:
     required: false
