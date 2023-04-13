@@ -1,0 +1,3 @@
+minor_changes:
+  - puppet - add new options ``skip_tags`` to exclude certain tagged resources during a puppet agent or apply (https://github.com/ansible-collections/community.general/pull/6293).
+  
