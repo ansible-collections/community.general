@@ -85,6 +85,7 @@ options:
                 choices: ["basic-flow", "form-flow"]
                 default: "basic-flow"
                 type: str
+                version_added: 6.6.0
     state:
         description:
             - Control if the authentication flow must exists or not.
