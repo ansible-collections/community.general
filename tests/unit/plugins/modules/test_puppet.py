@@ -102,6 +102,30 @@ TEST_CASES = [
             "changed": False,
         }
     ],
+    [
+        {
+            "skip_tags": ["d", "e", "f"]
+        },
+        {
+            "id": "puppet_agent_skip_tags_def",
+            "run_command.calls": [
+                (
+                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
+                    (0, "blah, anything", "",),  # output rc, out, err
+                ),
+                (
+                    [
+                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--skip_tags", "d,e,f"
+                    ],
+                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
+                    (0, "", "",),  # output rc, out, err
+                ),
+            ],
+            "changed": False,
+        }
+    ]
 ]
 TEST_CASES_IDS = [item[1]["id"] for item in TEST_CASES]
 
