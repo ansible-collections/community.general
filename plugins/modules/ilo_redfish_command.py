@@ -31,7 +31,7 @@ options:
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
