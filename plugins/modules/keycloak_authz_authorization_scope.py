@@ -30,6 +30,12 @@ description:
       The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
       U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+
 options:
     state:
         description:
@@ -148,7 +154,7 @@ def main():
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
+                           supports_check_mode=False,
                            required_one_of=(
                                [['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
