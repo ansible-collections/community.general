@@ -10,7 +10,6 @@
 
 - name: Has-snap block
   when: has_snap
-  become: true
   block:
     - name: Make sure package is not installed (hello-world)
       community.general.snap:

@@ -8,20 +8,17 @@
     name: "{{ snap_packages }}"
     state: present
   notify: Remove snapd
-  become: true
 
 - name: Make sure that snapd is running
   service:
     name: snapd
     state: started
-  become: true
 
 - name: Create link /snap
   file:
     src: /var/lib/snapd/snap
     dest: /snap
     state: link
-  become: true
 
 - name: Inform that snap is installed
   set_fact:
