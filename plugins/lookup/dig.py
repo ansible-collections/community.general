@@ -61,6 +61,7 @@ DOCUMENTATION = '''
         description:
           - Return empty result without empty strings, and return empty list instead of C(NXDOMAIN).
           - The default for this option will likely change to C(true) in the future.
+          - This option will be forced to C(true) if multiple domains to be queried are specified.
         default: false
         type: bool
         version_added: 6.0.0
@@ -94,6 +95,21 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: "MX record for gmail.com {{ item }}"
   with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=true) }}"
+
+- name: lookup multiple names at once
+  ansible.builtin.debug:
+    msg: "A record found {{ item }}"
+  loop: "{{'community.general.dig', 'example.org.', 'example.com.', 'gmail.com.', wantlist=true) }}"
+
+- name: lookup multiple names at once (from list variable)
+  ansible.builtin.debug:
+    msg: "A record found {{ item }}"
+  loop: "{{'community.general.dig', *hosts, wantlist=true) }}"
+  vars:
+    hosts:
+      - example.org.
+      - example.com.
+      - gmail.com.
 
 - ansible.builtin.debug:
     msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '192.0.2.5/PTR') }}"
@@ -308,7 +324,7 @@ class LookupModule(LookupBase):
         edns_size = 4096
         myres.use_edns(0, ednsflags=dns.flags.DO, payload=edns_size)
 
-        domain = None
+        domains = []
         qtype = self.get_option('qtype')
         flat = self.get_option('flat')
         fail_on_error = self.get_option('fail_on_error')
@@ -365,63 +381,71 @@ class LookupModule(LookupBase):
             if '/' in t:
                 try:
                     domain, qtype = t.split('/')
+                    domains.append(domain)
                 except Exception:
-                    domain = t
+                    domains.append(t)
             else:
-                domain = t
+                domains.append(t)
 
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
 
+        if qtype.upper() == 'PTR':
+            reversed_domains = []
+            for domain in domains:
+                try:
+                    n = dns.reversename.from_address(domain)
+                    reversed_domains.append(n.to_text())
+                except dns.exception.SyntaxError:
+                    pass
+                except Exception as e:
+                    raise AnsibleError("dns.reversename unhandled exception %s" % to_native(e))
+            domains = reversed_domains
+
+        if len(domains) > 1:
+            real_empty = True
+
         ret = []
 
-        if qtype.upper() == 'PTR':
+        for domain in domains:
             try:
-                n = dns.reversename.from_address(domain)
-                domain = n.to_text()
-            except dns.exception.SyntaxError:
-                pass
-            except Exception as e:
-                raise AnsibleError("dns.reversename unhandled exception %s" % to_native(e))
+                answers = myres.query(domain, qtype, rdclass=rdclass)
+                for rdata in answers:
+                    s = rdata.to_text()
+                    if qtype.upper() == 'TXT':
+                        s = s[1:-1]  # Strip outside quotes on TXT rdata
 
-        try:
-            answers = myres.query(domain, qtype, rdclass=rdclass)
-            for rdata in answers:
-                s = rdata.to_text()
-                if qtype.upper() == 'TXT':
-                    s = s[1:-1]  # Strip outside quotes on TXT rdata
+                    if flat:
+                        ret.append(s)
+                    else:
+                        try:
+                            rd = make_rdata_dict(rdata)
+                            rd['owner'] = answers.canonical_name.to_text()
+                            rd['type'] = dns.rdatatype.to_text(rdata.rdtype)
+                            rd['ttl'] = answers.rrset.ttl
+                            rd['class'] = dns.rdataclass.to_text(rdata.rdclass)
 
-                if flat:
-                    ret.append(s)
-                else:
-                    try:
-                        rd = make_rdata_dict(rdata)
-                        rd['owner'] = answers.canonical_name.to_text()
-                        rd['type'] = dns.rdatatype.to_text(rdata.rdtype)
-                        rd['ttl'] = answers.rrset.ttl
-                        rd['class'] = dns.rdataclass.to_text(rdata.rdclass)
+                            ret.append(rd)
+                        except Exception as err:
+                            if fail_on_error:
+                                raise AnsibleError("Lookup failed: %s" % str(err))
+                            ret.append(str(err))
 
-                        ret.append(rd)
-                    except Exception as err:
-                        if fail_on_error:
-                            raise AnsibleError("Lookup failed: %s" % str(err))
-                        ret.append(str(err))
-
-        except dns.resolver.NXDOMAIN as err:
-            if fail_on_error:
-                raise AnsibleError("Lookup failed: %s" % str(err))
-            if not real_empty:
-                ret.append('NXDOMAIN')
-        except dns.resolver.NoAnswer as err:
-            if fail_on_error:
-                raise AnsibleError("Lookup failed: %s" % str(err))
-            if not real_empty:
-                ret.append("")
-        except dns.resolver.Timeout as err:
-            if fail_on_error:
-                raise AnsibleError("Lookup failed: %s" % str(err))
-            if not real_empty:
-                ret.append("")
-        except dns.exception.DNSException as err:
-            raise AnsibleError("dns.resolver unhandled exception %s" % to_native(err))
+            except dns.resolver.NXDOMAIN as err:
+                if fail_on_error:
+                    raise AnsibleError("Lookup failed: %s" % str(err))
+                if not real_empty:
+                    ret.append('NXDOMAIN')
+            except dns.resolver.NoAnswer as err:
+                if fail_on_error:
+                    raise AnsibleError("Lookup failed: %s" % str(err))
+                if not real_empty:
+                    ret.append("")
+            except dns.resolver.Timeout as err:
+                if fail_on_error:
+                    raise AnsibleError("Lookup failed: %s" % str(err))
+                if not real_empty:
+                    ret.append("")
+            except dns.exception.DNSException as err:
+                raise AnsibleError("dns.resolver unhandled exception %s" % to_native(err))
 
         return ret
