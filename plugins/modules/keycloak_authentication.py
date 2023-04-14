@@ -272,7 +272,7 @@ def create_or_update_executions(kc, config, realm='master'):
                 exec_index = find_exec_in_executions(new_exec, existing_executions)
                 if exec_index != -1:
                     # Remove key that doesn't need to be compared with existing_exec
-                    exclude_key = ["flowAlias"]
+                    exclude_key = ["flowAlias", "subFlowType"]
                     for index_key, key in enumerate(new_exec, start=0):
                         if new_exec[key] is None:
                             exclude_key.append(key)
@@ -290,7 +290,7 @@ def create_or_update_executions(kc, config, realm='master'):
                     id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 elif new_exec["displayName"] is not None:
-                    kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec['subFlowType'])
+                    kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec["subFlowType"])
                     exec_found = True
                     exec_index = new_exec_index
                     id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
