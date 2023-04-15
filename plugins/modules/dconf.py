@@ -143,7 +143,10 @@ EXAMPLES = r"""
 
 
 import os
-import traceback
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils import deps
 
 try:
     from gi.repository.GLib import Variant, GError
@@ -151,16 +154,8 @@ except ImportError:
     Variant = None
     GError = AttributeError
 
-PSUTIL_IMP_ERR = None
-try:
+with deps.declare("psutil"):
     import psutil
-    HAS_PSUTIL = True
-except ImportError:
-    PSUTIL_IMP_ERR = traceback.format_exc()
-    HAS_PSUTIL = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 
 
 class DBusWrapper(object):
@@ -414,7 +409,10 @@ def main():
             # Converted to str below after special handling of bool.
             value=dict(required=False, default=None, type='raw'),
         ),
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[
+            ('state', 'present', ['value'])
+        ],
     )
 
     # Try to be forgiving about the user specifying a boolean as the value, or
@@ -435,12 +433,7 @@ def main():
             'using string comparison to check value equality. This fallback '
             'will be deprecated in a future version of community.general.')
 
-    if not HAS_PSUTIL:
-        module.fail_json(msg=missing_required_lib("psutil"), exception=PSUTIL_IMP_ERR)
-
-    # If present state was specified, value must be provided.
-    if module.params['state'] == 'present' and module.params['value'] is None:
-        module.fail_json(msg='State "present" requires "value" to be set.')
+    deps.validate(module)
 
     # Create wrapper instance.
     dconf = DconfPreference(module, module.check_mode)
