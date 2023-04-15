@@ -65,7 +65,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Check iLO reboot status
+  - name: Wait for iLO Reboot Completion
     community.general.ilo_redfish_command:
       category: Systems
       command: WaitforiLORebootCompletion
