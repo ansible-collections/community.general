@@ -90,12 +90,12 @@ ilo_redfish_info:
     description: Returns the retrieved information from the iLO.
     type: dict
     contains:
-        command:
-            description: Returns the output msg and whether the function executed successfully.
+        GetiLOSessions:
+            description: Returns the iLO session msg and whether the function executed successfully.
             type: dict
             contains:
                 ret:
-                    description: Return whether the information was retrieved succesfully.
+                    description: Check variable to see if the information was successfully retrieved.
                     type: bool
                 msg:
                     description: Information of all active iLO sessions.
@@ -114,8 +114,26 @@ ilo_redfish_info:
                         UserName:
                             description: Name to use to log in to the management processor.
                             type: str
+        GetSNMPv3Users:
+            description: Returns the output msg and whether the function executed successfully.
+            type: dict
+            contains:
+                ret:
+                    description: Return whether the information was retrieved succesfully.
+                    type: bool
                 entries:
-                    description: List of retieved SNMP Users/Alert Destinations.
+                    description: List of retieved SNMPv3 Users.
+                    type: list
+                    elements: dict
+        GetSNMPAlertDestinations:
+            description: Returns the output msg and whether the function executed successfully.
+            type: dict
+            contains:
+                ret:
+                    description: Return whether the information was retrieved succesfully.
+                    type: bool
+                entries:
+                    description: List of retieved SNMP Alert Destinations.
                     type: list
                     elements: dict
     returned: always
