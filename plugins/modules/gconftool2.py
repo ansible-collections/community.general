@@ -35,12 +35,13 @@ options:
     type: str
     description:
     - Preference keys typically have simple values such as strings,
-      integers, or lists of strings and integers. This is ignored if the state
-      is "get". See man gconftool-2(1).
+      integers, or lists of strings and integers.
+      This is ignored unless I(state=present). See man gconftool-2(1).
   value_type:
     type: str
     description:
-    - The type of value being set. This is ignored if the state is "get".
+    - The type of value being set.
+      This is ignored unless I(state=present). See man gconftool-2(1).
     choices: [ bool, float, int, string ]
   state:
     type: str
@@ -56,8 +57,8 @@ options:
       See man gconftool-2(1).
   direct:
     description:
-    - Access the config database directly, bypassing server.  If direct is
-      specified then the config_source must be specified as well.
+    - Access the config database directly, bypassing server.  If I(direct) is
+      specified then the I(config_source) must be specified as well.
       See man gconftool-2(1).
     type: bool
     default: false
@@ -87,6 +88,13 @@ RETURN = '''
     returned: success
     type: str
     sample: "Serif 12"
+  previous_value:
+    description:
+      - The value of the preference key before executing the module.
+      - From community.general 6.6.0 onwards it returns C(null) for a non-existent I(key), and returns C("") before that.
+    returned: success
+    type: str
+    sample: "Serif 12"
 ...
 '''
 
@@ -110,7 +118,6 @@ class GConftool(StateModuleHelper):
         ),
         required_if=[
             ('state', 'present', ['value', 'value_type']),
-            ('state', 'absent', ['value']),
             ('direct', True, ['config_source']),
         ],
         supports_check_mode=True,
@@ -132,7 +139,8 @@ class GConftool(StateModuleHelper):
         def process(rc, out, err):
             if err and fail_on_err:
                 self.ansible.fail_json(msg='gconftool-2 failed with error: %s' % (str(err)))
-            self.vars.value = out.rstrip()
+            out = out.rstrip()
+            self.vars.value = None if out == "" else out
             return self.vars.value
         return process
 

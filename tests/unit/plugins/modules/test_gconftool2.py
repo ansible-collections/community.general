@@ -36,7 +36,6 @@ TEST_CASES = [
                     (0, '100\n', '',),
                 ),
             ],
-            'new_value': '100',
         }
     ],
     [
@@ -50,7 +49,6 @@ TEST_CASES = [
                     (0, '', "No value set for `/desktop/gnome/background/picture_filename'\n",),
                 ),
             ],
-            'new_value': None,
         }
     ],
     [
@@ -128,6 +126,44 @@ TEST_CASES = [
             'changed': False,
         }
     ],
+    [
+        {'state': 'absent', 'key': '/desktop/gnome/background/picture_filename'},
+        {
+            'id': 'test_simple_element_unset',
+            'run_command.calls': [
+                (
+                    ['/testbin/gconftool-2', '--get', '/desktop/gnome/background/picture_filename'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '200\n', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--unset', '/desktop/gnome/background/picture_filename'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '', '',),
+                ),
+            ],
+            'changed': True,
+        }
+    ],
+    [
+        {'state': 'absent', 'key': '/apps/gnome_settings_daemon/screensaver/start_screensaver'},
+        {
+            'id': 'test_simple_element_unset_idempotency',
+            'run_command.calls': [
+                (
+                    ['/testbin/gconftool-2', '--get', '/apps/gnome_settings_daemon/screensaver/start_screensaver'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '', '',),
+                ),
+                (
+                    ['/testbin/gconftool-2', '--unset', '/apps/gnome_settings_daemon/screensaver/start_screensaver'],
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
+                    (0, '', '',),
+                ),
+            ],
+            'changed': False,
+        }
+    ],
 ]
 TEST_CASES_IDS = [item[1]['id'] for item in TEST_CASES]
 
@@ -159,6 +195,8 @@ def test_gconftool2(mocker, capfd, patch_gconftool2, testcase):
 
     if 'changed' in testcase:
         assert results.get('changed', False) == testcase['changed']
+    if 'new_value' in testcase:
+        assert results.get('new_value', None) == testcase['new_value']
 
     for conditional_test_result in ('value',):
         if conditional_test_result in testcase:
