@@ -114,7 +114,7 @@ ilo_redfish_info:
                         UserName:
                             description: Name to use to log in to the management processor.
                             type: str
-                enteries:
+                entries:
                     description: List of retieved SNMP Users/Alert Destinations.
                     type: list
                     elements: dict
