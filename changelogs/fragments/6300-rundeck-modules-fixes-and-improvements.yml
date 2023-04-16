@@ -1,0 +1,8 @@
+bugfixes:
+  - rundeck_acl_policy - fix ``TypeError - byte indices must be integers or slices, not str`` error caused by empty API response. Update the module to use ``module_utils.rundeck`` functions
+    (https://github.com/ansible-collections/community.general/pull/5887,
+     https://github.com/ansible-collections/community.general/pull/6300).
+  - rundeck_project - update the module to use ``module_utils.rundeck`` functions
+    (https://github.com/ansible-collections/community.general/issues/5742)
+    (https://github.com/ansible-collections/community.general/pull/6300)
+  - rundeck module utils - fix errors caused by the API empty responses (https://github.com/ansible-collections/community.general/pull/6300)

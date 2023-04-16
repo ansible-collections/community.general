@@ -81,12 +81,18 @@ def api_request(module, endpoint, data=None, method="GET"):
 
     try:
         content = response.read()
-        json_response = json.loads(content)
-        return json_response, info
+
+        if not content:
+            return None, info
+        else:
+            json_response = json.loads(content)
+            return json_response, info
     except AttributeError as error:
-        module.fail_json(msg="Rundeck API request error",
-                         exception=to_native(error),
-                         execution_info=info)
+        module.fail_json(
+            msg="Rundeck API request error",
+            exception=to_native(error),
+            execution_info=info
+        )
     except ValueError as error:
         module.fail_json(
             msg="No valid JSON response",
