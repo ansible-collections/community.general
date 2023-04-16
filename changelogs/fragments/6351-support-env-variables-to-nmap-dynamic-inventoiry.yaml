@@ -1,2 +1,2 @@
 minor_changes:
-  - Added environment variables for configure `address` and `exclude` for nmap dynamic inventory plugin(https://github.com/ansible-collections/community.general/issues/6351)
+  -  nmap dynamic inventory plugin - added environment variables for configure ``address`` and ``exclude`` (https://github.com/ansible-collections/community.general/issues/6351).
