@@ -13,7 +13,6 @@ DOCUMENTATION = '''
   description:
     - Test whether a given string refers to an existing module or action plugin.
     - This can be useful in roles, which can use this to ensure that required modules are present ahead of time.
-    - M(foo).
   options:
     _input:
       description: A string denoting a fully qualified collection name (FQCN) of a module or action plugin.
