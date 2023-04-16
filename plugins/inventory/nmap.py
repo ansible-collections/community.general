@@ -37,7 +37,8 @@ DOCUMENTATION = '''
             type: list
             elements: string
             env:
-              - name: NMAP_EXCLUDE
+              - name: ANSIBLE_NMAP_EXCLUDE
+                version_added: 6.6.0
         port:
             description:
                 - Only scan specific port or port range (C(-p)).
