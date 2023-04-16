@@ -589,7 +589,7 @@ files:
     ignore: jose-delarosa
     maintainers: $team_redfish
   $modules/ilo_:
-    ignore: jose-delarosa
+    ignore: jose-delarosa varini-hp
     maintainers: $team_redfish
   $modules/imc_rest.py:
     labels: cisco
