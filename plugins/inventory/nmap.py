@@ -30,10 +30,14 @@ DOCUMENTATION = '''
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
             required: true
+            env:
+              - name: NMAP_ADDRESS
         exclude:
-            description: list of addresses to exclude
+            description: list of addresses to exclude (e.g 10.2.2.15-25 or 10.2.2.15,10.2.2.16)
             type: list
             elements: string
+            env:
+              - name: NMAP_EXCLUDE
         port:
             description:
                 - Only scan specific port or port range (C(-p)).
