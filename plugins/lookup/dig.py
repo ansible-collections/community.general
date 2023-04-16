@@ -96,15 +96,15 @@ EXAMPLES = """
     msg: "MX record for gmail.com {{ item }}"
   with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=true) }}"
 
-- name: lookup multiple names at once
+- name: Lookup multiple names at once
   ansible.builtin.debug:
     msg: "A record found {{ item }}"
-  loop: "{{'community.general.dig', 'example.org.', 'example.com.', 'gmail.com.', wantlist=true) }}"
+  loop: "{{ query('community.general.dig', 'example.org.', 'example.com.', 'gmail.com.') }}"
 
-- name: lookup multiple names at once (from list variable)
+- name: Lookup multiple names at once (from list variable)
   ansible.builtin.debug:
     msg: "A record found {{ item }}"
-  loop: "{{'community.general.dig', *hosts, wantlist=true) }}"
+  loop: "{{ query('community.general.dig', *hosts) }}"
   vars:
     hosts:
       - example.org.
