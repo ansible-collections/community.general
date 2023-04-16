@@ -2,22 +2,34 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Install parted
+  package:
+    name: parted
+    state: present
+  when: ansible_os_family == 'Alpine'
+
 - name: Create empty file
   community.general.filesize:
     path: /bigfile
     size: 1GiB
   notify: Remove file
 
+- name: Obtain loop device name
+  command:
+    cmd: losetup -f
+  changed_when: false
+  register: losetup_name
+
 - name: Create loopback device
   command:
-    cmd: losetup -fP --show /bigfile
+    cmd: losetup -f /bigfile
   changed_when: true
   register: losetup_cmd
   notify: Remove loopback device
 
 - name: Create first partition
   community.general.parted:
-    device: "{{ losetup_cmd.stdout }}"
+    device: "{{ losetup_name.stdout }}"
     number: 1
     state: present
     fs_type: ext4
@@ -26,20 +38,20 @@
 
 - name: Make filesystem
   community.general.filesystem:
-    device: "{{ losetup_cmd.stdout }}p1"
+    device: "{{ losetup_name.stdout }}p1"
     fstype: ext4
   register: fs1_succ
 
 - name: Make filesystem (fail)
   community.general.filesystem:
-    device: "{{ losetup_cmd.stdout }}p2"
+    device: "{{ losetup_name.stdout }}p2"
     fstype: ext4
   ignore_errors: true
   register: fs_fail
 
 - name: Create second partition
   community.general.parted:
-    device: "{{ losetup_cmd.stdout }}"
+    device: "{{ losetup_name.stdout }}"
     number: 2
     state: present
     fs_type: ext4
@@ -49,13 +61,13 @@
 
 - name: Make filesystem
   community.general.filesystem:
-    device: "{{ losetup_cmd.stdout }}p2"
+    device: "{{ losetup_name.stdout }}p2"
     fstype: ext4
   register: fs2_succ
 
 - name: Remove first partition
   community.general.parted:
-    device: "{{ losetup_cmd.stdout }}"
+    device: "{{ losetup_name.stdout }}"
     number: 1
     state: absent
   register: partition_rem1
