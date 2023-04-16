@@ -13,9 +13,14 @@ import subprocess
 
 def main():
     """Main entry point."""
-    if not os.path.isdir(os.path.join('docs', 'docsite')):
-        return
-    p = subprocess.run(['antsibull-docs', 'lint-collection-docs', '.'], check=False)
+    env = os.environ.copy()
+    suffix = ':{env}'.format(env=env["ANSIBLE_COLLECTIONS_PATH"]) if 'ANSIBLE_COLLECTIONS_PATH' in env else ''
+    env['ANSIBLE_COLLECTIONS_PATH'] = '{root}{suffix}'.format(root=os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd()))), suffix=suffix)
+    p = subprocess.run(
+        ['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--disallow-semantic-markup', '--skip-rstcheck', '.'],
+        env=env,
+        check=False,
+    )
     if p.returncode not in (0, 3):
         print('{0}:0:0: unexpected return code {1}'.format(sys.argv[0], p.returncode))
 
