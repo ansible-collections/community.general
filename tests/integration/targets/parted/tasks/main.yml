@@ -1,0 +1,86 @@
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install parted
+  package:
+    name: parted
+    state: present
+  when: ansible_os_family == 'Alpine'
+
+- name: Create empty file
+  community.general.filesize:
+    path: /bigfile
+    size: 1GiB
+  notify: Remove file
+
+- name: Obtain loop device name
+  command:
+    cmd: losetup -f
+  changed_when: false
+  register: losetup_name
+
+- name: Create loopback device
+  command:
+    cmd: losetup -f /bigfile
+  changed_when: true
+  register: losetup_cmd
+  notify: Remove loopback device
+
+- name: Create first partition
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    number: 1
+    state: present
+    fs_type: ext4
+    part_end: "50%"
+  register: partition1
+
+- name: Make filesystem
+  community.general.filesystem:
+    device: "{{ losetup_name.stdout }}p1"
+    fstype: ext4
+  register: fs1_succ
+
+- name: Make filesystem (fail)
+  community.general.filesystem:
+    device: "{{ losetup_name.stdout }}p2"
+    fstype: ext4
+  ignore_errors: true
+  register: fs_fail
+
+- name: Create second partition
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    number: 2
+    state: present
+    fs_type: ext4
+    part_start: "{{ partition1.partitions[0].end + 1 }}KiB"
+    part_end: "100%"
+  register: partition2
+
+- name: Make filesystem
+  community.general.filesystem:
+    device: "{{ losetup_name.stdout }}p2"
+    fstype: ext4
+  register: fs2_succ
+
+- name: Remove first partition
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    number: 1
+    state: absent
+  register: partition_rem1
+
+- name: Assert results
+  assert:
+    that:
+      - partition1 is changed
+      - fs1_succ is changed
+      - fs_fail is failed
+      - fs_fail is not changed
+      - partition2 is changed
+      - partition2.partitions | length == 2
+      - fs2_succ is changed
+      - partition_rem1 is changed
+      - partition_rem1.partitions | length == 1
