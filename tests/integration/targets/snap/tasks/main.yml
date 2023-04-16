@@ -191,3 +191,53 @@
           - "'uhttpd:document-root-dir=/tmp' in install_with_option_changed.options_changed"
           - "'uhttpd:listening-port=8080' not in install_with_option_changed.options_changed"
           - remove is changed
+
+    - name: Install two packages at the same time
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: present
+      register: install_two
+
+    - name: Install two packages at the same time (again)
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: present
+      register: install_two_again
+
+    - name: Remove packages (hello-world & uhttpd)
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: absent
+      register: install_two_remove
+
+    - name: Remove packages again (hello-world & uhttpd)
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: absent
+      register: install_two_remove_again
+
+    - name: Assert installation of two packages
+      assert:
+        that:
+          - install_two is changed
+          - "'hello-world' in install_two.snaps_installed"
+          - "'uhttpd' in install_two.snaps_installed"
+          - install_two.snaps_removed is not defined
+          - install_two_again is not changed
+          - install_two_again.snaps_installed is not defined
+          - install_two_again.snaps_removed is not defined
+          - install_two_remove is changed
+          - install_two_again.snaps_installed is not defined
+          - "'hello-world' in install_two_remove.snaps_removed"
+          - "'uhttpd' in install_two_remove.snaps_removed"
+          - install_two_remove_again is not changed
+          - install_two_remove_again.snaps_installed is not defined
+          - install_two_remove_again.snaps_removed is not defined
