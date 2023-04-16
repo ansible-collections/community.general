@@ -14,8 +14,8 @@ import subprocess
 def main():
     """Main entry point."""
     env = os.environ.copy()
-    suffix = f':{env["ANSIBLE_COLLECTIONS_PATH"]}' if 'ANSIBLE_COLLECTIONS_PATH' in env else ''
-    env['ANSIBLE_COLLECTIONS_PATH'] = f'{os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))}{suffix}'
+    suffix = ':{env}'.format(env=env["ANSIBLE_COLLECTIONS_PATH"]) if 'ANSIBLE_COLLECTIONS_PATH' in env else ''
+    env['ANSIBLE_COLLECTIONS_PATH'] = '{root}{suffix}'.format(root=os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd()))), suffix=suffix)
     p = subprocess.run(
         ['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--disallow-semantic-markup', '--skip-rstcheck', '.'],
         env=env,
