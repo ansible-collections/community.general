@@ -13,8 +13,6 @@ import subprocess
 
 def main():
     """Main entry point."""
-    if not os.path.isdir(os.path.join('docs', 'docsite')):
-        return
     p = subprocess.run(['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--disallow-semantic-markup', '--skip-rstcheck', '.'], check=False)
     if p.returncode not in (0, 3):
         print('{0}:0:0: unexpected return code {1}'.format(sys.argv[0], p.returncode))
