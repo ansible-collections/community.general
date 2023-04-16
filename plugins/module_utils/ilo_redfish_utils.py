@@ -385,4 +385,3 @@ class iLORedfishUtils(RedfishUtils):
             "ret": True,
             "entries": alert_destinations
         }
-
