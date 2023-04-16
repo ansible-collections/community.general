@@ -36,22 +36,10 @@ options:
         description:
             - Sets the project name.
         required: true
-    url:
-        type: str
-        description:
-            - Sets the rundeck instance URL.
-        required: true
-    api_version:
-        type: int
-        description:
-            - Sets the API version used by module.
-            - API version must be at least 14.
-        default: 14
-    token:
-        type: str
+    api_token:
         description:
             - Sets the token to authenticate against Rundeck API.
-        required: true
+        aliases: ["token"]
     project:
         type: str
         description:
@@ -82,8 +70,9 @@ options:
     validate_certs:
         version_added: '0.2.0'
 extends_documentation_fragment:
-    - ansible.builtin.url
-    - community.general.attributes
+  - ansible.builtin.url
+  - community.general.attributes
+  - community.general.rundeck
 '''
 
 EXAMPLES = '''
@@ -107,7 +96,7 @@ EXAMPLES = '''
 
 - name: Remove a rundeck system policy
   community.general.rundeck_acl_policy:
-    name: "Project_02"
+    name: "Project_01"
     url: "https://rundeck.example.org"
     token: "mytoken"
     state: absent
@@ -129,49 +118,25 @@ after:
 '''
 
 # import module snippets
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url, url_argument_spec
-from ansible.module_utils.common.text.converters import to_text
-import json
 import re
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.rundeck import (
+    api_argument_spec,
+    api_request,
+)
 
 
 class RundeckACLManager:
     def __init__(self, module):
         self.module = module
 
-    def handle_http_code_if_needed(self, infos):
-        if infos["status"] == 403:
-            self.module.fail_json(msg="Token not allowed. Please ensure token is allowed or has the correct "
-                                      "permissions.", rundeck_response=infos["body"])
-        elif infos["status"] >= 500:
-            self.module.fail_json(msg="Fatal Rundeck API error.", rundeck_response=infos["body"])
-
-    def request_rundeck_api(self, query, data=None, method="GET"):
-        resp, info = fetch_url(self.module,
-                               "%s/api/%d/%s" % (self.module.params["url"], self.module.params["api_version"], query),
-                               data=json.dumps(data),
-                               method=method,
-                               headers={
-                                   "Content-Type": "application/json",
-                                   "Accept": "application/json",
-                                   "X-Rundeck-Auth-Token": self.module.params["token"]
-                               })
-
-        self.handle_http_code_if_needed(info)
-        if resp is not None:
-            resp = resp.read()
-            if resp != b"":
-                try:
-                    json_resp = json.loads(to_text(resp, errors='surrogate_or_strict'))
-                    return json_resp, info
-                except ValueError as e:
-                    self.module.fail_json(msg="Rundeck response was not a valid JSON. Exception was: %s. "
-                                              "Object was: %s" % (str(e), resp))
-        return resp, info
-
     def get_acl(self):
-        resp, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"])
+        resp, info = api_request(
+            module=self.module,
+            endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+        )
+
         return resp
 
     def create_or_update_acl(self):
@@ -181,9 +146,12 @@ class RundeckACLManager:
             if self.module.check_mode:
                 self.module.exit_json(changed=True, before={}, after=self.module.params["policy"])
 
-            dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
-                                                   method="POST",
-                                                   data={"contents": self.module.params["policy"]})
+            resp, info = api_request(
+                module=self.module,
+                endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                method="POST",
+                data={"contents": self.module.params["policy"]},
+            )
 
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
@@ -202,9 +170,12 @@ class RundeckACLManager:
             if self.module.check_mode:
                 self.module.exit_json(changed=True, before=facts, after=facts)
 
-            dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
-                                                   method="PUT",
-                                                   data={"contents": self.module.params["policy"]})
+            resp, info = api_request(
+                module=self.module,
+                endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                method="PUT",
+                data={"contents": self.module.params["policy"]},
+            )
 
             if info["status"] == 200:
                 self.module.exit_json(changed=True, before=facts, after=self.get_acl())
@@ -216,34 +187,39 @@ class RundeckACLManager:
 
     def remove_acl(self):
         facts = self.get_acl()
+
         if facts is None:
             self.module.exit_json(changed=False, before={}, after={})
         else:
             # If not in check mode, remove the project
             if not self.module.check_mode:
-                self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"], method="DELETE")
-            self.module.exit_json(changed=True, before=facts, after={})
+                api_request(
+                    module=self.module,
+                    endpoint="system/acl/%s.aclpolicy" % self.module.params["name"],
+                    method="DELETE",
+                )
+
+                self.module.exit_json(changed=True, before=facts, after={})
 
 
 def main():
     # Also allow the user to set values for fetch_url
-    argument_spec = url_argument_spec()
+    argument_spec = api_argument_spec()
     argument_spec.update(dict(
         state=dict(type='str', choices=['present', 'absent'], default='present'),
         name=dict(required=True, type='str'),
-        url=dict(required=True, type='str'),
-        api_version=dict(type='int', default=14),
-        token=dict(required=True, type='str', no_log=True),
         policy=dict(type='str'),
         project=dict(type='str'),
     ))
+
+    argument_spec['api_token']['aliases'] = ['token']
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
             ['state', 'present', ['policy']],
         ],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     if not bool(re.match("[a-zA-Z0-9,.+_-]+", module.params["name"])):
