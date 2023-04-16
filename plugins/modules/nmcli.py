@@ -63,11 +63,12 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
             - Type C(gsm) is added in community.general 3.7.0.
+            - Type C(macvlan) is added in community.general 6.6.0.
             - Type C(wireguard) is added in community.general 4.3.0.
             - Type C(vpn) is added in community.general 5.1.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm,
-            wireguard, vpn ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
+            wifi, gsm, wireguard, vpn ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -879,6 +880,38 @@ options:
                     - The username used to authenticate with the network, if required.
                     - Many providers do not require a username, or accept any username.
                     - But if a username is required, it is specified here.
+    macvlan:
+        description:
+            - The configuration of the MAC VLAN connection.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
+              U(https://networkmanager.dev/docs/api/latest/settings-macvlan.html).'
+        type: dict
+        version_added: 6.6.0
+        suboptions:
+            mode:
+                description:
+                    - The macvlan mode, which specifies the communication mechanism between multiple macvlans on the same lower device.
+                    - 'Following choices are allowed: C(1) B(vepa), C(2) B(bridge), C(3) B(private), C(4) B(passthru)
+                      and C(5) B(source)'
+                type: int
+                choices: [ 1, 2, 3, 4, 5 ]
+                required: true
+            parent:
+                description:
+                    - If given, specifies the parent interface name or parent connection UUID from which this MAC-VLAN interface should
+                        be created. If this property is not specified, the connection must contain an "802-3-ethernet" setting with a
+                        "mac-address" property.
+                type: str
+                required: true
+            promiscuous:
+                description:
+                    - Whether the interface should be put in promiscuous mode.
+                type: bool
+            tap:
+                description:
+                    - Whether the interface should be a MACVTAP.
+                type: bool
     wireguard:
         description:
             - The configuration of the Wireguard connection.
@@ -1357,6 +1390,17 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
+- name: Create a macvlan connection
+  community.general.nmcli:
+    type: macvlan
+    conn_name: my-macvlan-connection
+    ifname: mymacvlan0
+    macvlan:
+        mode: 2
+        parent: eth1
+    autoconnect: true
+    state: present
+
 - name: Create a wireguard connection
   community.general.nmcli:
     type: wireguard
@@ -1502,13 +1546,14 @@ class Nmcli(object):
         self.wifi = module.params['wifi']
         self.wifi_sec = module.params['wifi_sec']
         self.gsm = module.params['gsm']
+        self.macvlan = module.params['macvlan']
         self.wireguard = module.params['wireguard']
         self.vpn = module.params['vpn']
         self.transport_mode = module.params['transport_mode']
 
         if self.method4:
             self.ipv4_method = self.method4
-        elif self.type in ('dummy', 'wireguard') and not self.ip4:
+        elif self.type in ('dummy', 'macvlan', 'wireguard') and not self.ip4:
             self.ipv4_method = 'disabled'
         elif self.ip4:
             self.ipv4_method = 'manual'
@@ -1517,7 +1562,7 @@ class Nmcli(object):
 
         if self.method6:
             self.ipv6_method = self.method6
-        elif self.type in ('dummy', 'wireguard') and not self.ip6:
+        elif self.type in ('dummy', 'macvlan', 'wireguard') and not self.ip6:
             self.ipv6_method = 'disabled'
         elif self.ip6:
             self.ipv6_method = 'manual'
@@ -1700,6 +1745,14 @@ class Nmcli(object):
                     options.update({
                         'gsm.%s' % name: value,
                     })
+        elif self.type == 'macvlan':
+            if self.macvlan:
+                for name, value in self.macvlan.items():
+                    options.update({
+                        'macvlan.%s' % name: value,
+                    })
+            elif self.state == 'present':
+                raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
                 for name, value in self.wireguard.items():
@@ -1777,6 +1830,7 @@ class Nmcli(object):
             'wifi',
             '802-11-wireless',
             'gsm',
+            'macvlan',
             'wireguard',
             'vpn',
         )
@@ -2239,6 +2293,7 @@ def main():
                           'vxlan',
                           'wifi',
                           'gsm',
+                          'macvlan',
                           'wireguard',
                           'vpn',
                       ]),
@@ -2342,6 +2397,11 @@ def main():
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
+            macvlan=dict(type='dict', options=dict(
+                              mode=dict(type='int', choices=[1, 2, 3, 4, 5], required=True),
+                              parent=dict(type='str', required=True),
+                              promiscuous=dict(type='bool'),
+                              tap=dict(type='bool'))),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
