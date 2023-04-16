@@ -112,6 +112,12 @@ TESTCASE_CONNECTION = [
         'state': 'absent',
         '_ansible_check_mode': True,
     },
+    {
+        'type': 'macvlan',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
 ]
 
 TESTCASE_GENERIC = [
@@ -1406,6 +1412,45 @@ connection.interface-name:              infiniband_non_existant
 infiniband.transport_mode:              connected
 """
 
+TESTCASE_MACVLAN = [
+    {
+        'type': 'macvlan',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'macvlan_non_existant',
+        'macvlan': {
+            'mode': '2',
+            'parent': 'non_existent_parent',
+        },
+        'method4': 'manual',
+        'ip4': '10.10.10.10/24',
+        'method6': 'manual',
+        'ip6': '2001:db8::1/128',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_MACVLAN_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.type:                        macvlan
+connection.interface-name:              macvlan_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::1/128
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+macvlan.parent:                         non_existent_parent
+macvlan.mode:                           2 (bridge)
+macvlan.promiscuous:                    yes
+macvlan.tap:                            no
+"""
+
 
 def mocker_set(mocker,
                connection_exists=False,
@@ -1813,6 +1858,13 @@ def mocked_infiniband_connection_static_transport_mode_connected_modify(mocker):
                    (0, TESTCASE_INFINIBAND_STATIC_MODIFY_TRANSPORT_MODE_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
+
+
+@pytest.fixture
+def mocked_macvlan_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_MACVLAN_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
@@ -3998,6 +4050,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
                           'vxlan',
                           'wifi',
                           'gsm',
+                          'macvlan',
                           'wireguard',
                           'vpn',
                       ]),
@@ -4101,6 +4154,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
+            macvlan=dict(type='dict'),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
@@ -4125,3 +4179,81 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             num_of_diff_params += 1
 
     assert num_of_diff_params == 1
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_MACVLAN, indirect=['patch_ansible_module'])
+def test_create_macvlan(mocked_generic_connection_create, capfd):
+    """
+    Test : Create macvlan connection with static IP configuration
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'macvlan'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+    for param in ['connection.interface-name', 'macvlan_non_existant',
+                  'ipv4.method', 'manual',
+                  'ipv4.addresses', '10.10.10.10/24',
+                  'ipv6.method', 'manual',
+                  'ipv6.addresses', '2001:db8::1/128',
+                  'macvlan.mode', '2',
+                  'macvlan.parent', 'non_existent_parent']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_MACVLAN, indirect=['patch_ansible_module'])
+def test_macvlan_connection_unchanged(mocked_macvlan_connection_unchanged, capfd):
+    """
+    Test : Macvlan connection with static IP configuration unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_MACVLAN, indirect=['patch_ansible_module'])
+def test_macvlan_mod(mocked_generic_connection_modify, capfd):
+    """
+    Test : Modify macvlan connection
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['macvlan.mode', '2']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
