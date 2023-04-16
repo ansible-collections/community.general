@@ -6,13 +6,21 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import os
 import sys
 import subprocess
 
 
 def main():
     """Main entry point."""
-    p = subprocess.run(['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--disallow-semantic-markup', '--skip-rstcheck', '.'], check=False)
+    env = os.environ.copy()
+    suffix = f':{env["ANSIBLE_COLLECTIONS_PATH"]}' if 'ANSIBLE_COLLECTIONS_PATH' in env else ''
+    env['ANSIBLE_COLLECTIONS_PATH'] = f'{os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd())))}{suffix}'
+    p = subprocess.run(
+        ['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--disallow-semantic-markup', '--skip-rstcheck', '.'],
+        env=env,
+        check=False,
+    )
     if p.returncode not in (0, 3):
         print('{0}:0:0: unexpected return code {1}'.format(sys.argv[0], p.returncode))
 
