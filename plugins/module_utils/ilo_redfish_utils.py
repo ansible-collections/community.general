@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+import time
 
 
 class iLORedfishUtils(RedfishUtils):
@@ -228,3 +229,79 @@ class iLORedfishUtils(RedfishUtils):
         if not response['ret']:
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified %s" % mgrattr['mgr_attr_name']}
+
+    def get_server_poststate(self):
+        # Get server details
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if not response["ret"]:
+            return response
+        server_data = response["data"]
+
+        if "Hpe" in server_data["Oem"]:
+            return {
+                "ret": True,
+                "server_poststate": server_data["Oem"]["Hpe"]["PostState"]
+            }
+        else:
+            return {
+                "ret": True,
+                "server_poststate": server_data["Oem"]["Hp"]["PostState"]
+            }
+
+    def wait_for_ilo_reboot_completion(self, polling_interval=60, max_polling_time=1800):
+        # This method checks if OOB controller reboot is completed
+        time.sleep(10)
+
+        # Check server poststate
+        state = self.get_server_poststate()
+        if not state["ret"]:
+            return state
+
+        count = int(max_polling_time / polling_interval)
+        times = 0
+
+        # When server is powered OFF
+        pcount = 0
+        while state["server_poststate"] in ["PowerOff", "Off"] and pcount < 5:
+            time.sleep(10)
+            state = self.get_server_poststate()
+            if not state["ret"]:
+                return state
+
+            if state["server_poststate"] not in ["PowerOff", "Off"]:
+                break
+            pcount = pcount + 1
+        if state["server_poststate"] in ["PowerOff", "Off"]:
+            return {
+                "ret": False,
+                "changed": False,
+                "msg": "Server is powered OFF"
+            }
+
+        # When server is not rebooting
+        if state["server_poststate"] in ["InPostDiscoveryComplete", "FinishedPost"]:
+            return {
+                "ret": True,
+                "changed": False,
+                "msg": "Server is not rebooting"
+            }
+
+        while state["server_poststate"] not in ["InPostDiscoveryComplete", "FinishedPost"] and count > times:
+            state = self.get_server_poststate()
+            if not state["ret"]:
+                return state
+
+            if state["server_poststate"] in ["InPostDiscoveryComplete", "FinishedPost"]:
+                return {
+                    "ret": True,
+                    "changed": True,
+                    "msg": "Server reboot is completed"
+                }
+            time.sleep(polling_interval)
+            times = times + 1
+
+        return {
+            "ret": False,
+            "changed": False,
+            "msg": "Server Reboot has failed, server state: {state} ".format(state=state)
+        }
