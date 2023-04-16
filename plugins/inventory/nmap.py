@@ -33,7 +33,9 @@ DOCUMENTATION = '''
             env:
               - name: NMAP_ADDRESS
         exclude:
-            description: list of addresses to exclude (e.g 10.2.2.15-25 or 10.2.2.15,10.2.2.16)
+            description:
+              - List of addresses to exclude.
+              - For example C(10.2.2.15-25) or C(10.2.2.15,10.2.2.16).
             type: list
             elements: string
             env:
