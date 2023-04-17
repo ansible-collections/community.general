@@ -108,22 +108,22 @@ end_state:
         id:
             description: ID of the authorization scope.
             type: str
-            returned: when I(status) == "present"
+            returned: when I(state=present)
             sample: a6ab1cf2-1001-40ec-9f39-48f23b6a0a41
         name:
             description: Name of the authorization scope.
             type: str
-            returned: when I(status) == "present"
+            returned: when I(state=present)
             sample: file:delete
         display_name:
             description: Display name of the authorization scope.
             type: str
-            returned: when I(status) == "present"
+            returned: when I(state=present)
             sample: File delete
         icon_uri:
             description: Icon URI for the authorization scope.
             type: str
-            returned: when I(status) == "present"
+            returned: when I(state=present)
             sample: http://localhost/icon.png
 
 '''
