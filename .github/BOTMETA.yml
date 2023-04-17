@@ -1042,9 +1042,9 @@ files:
     ignore: jose-delarosa
     maintainers: $team_redfish TSKushal
   $modules/redhat_subscription.py:
-    ignore: barnabycourt alikins kahowell
     labels: redhat_subscription
     maintainers: $team_rhsm
+    ignore: barnabycourt alikins kahowell
   $modules/redis.py:
     maintainers: slok
   $modules/redis_data.py:
