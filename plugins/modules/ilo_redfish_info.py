@@ -117,6 +117,7 @@ ilo_redfish_info:
         GetSNMPv3Users:
             description: Returns the output msg and whether the function executed successfully.
             type: dict
+            version_added: 6.6.0
             contains:
                 ret:
                     description: Return whether the information was retrieved succesfully.
