@@ -2,4 +2,4 @@ bugfixes:
   - "keycloak - improve error messages (https://github.com/ansible-collections/community.general/pull/6318)."
 
 minor_changes:
-  - "keycloak_authentication - Add flow type option to sub flows to allow the creation of 'form-flow' sub flows like in keycloak's built-in registration flow (https://github.com/ansible-collections/community.general/pull/6318)."
+  - "keycloak_authentication - add flow type option to sub flows to allow the creation of 'form-flow' sub flows like in Keycloak's built-in registration flow (https://github.com/ansible-collections/community.general/pull/6318)."
