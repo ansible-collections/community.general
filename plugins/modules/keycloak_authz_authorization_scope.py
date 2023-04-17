@@ -32,9 +32,9 @@ description:
 
 attributes:
     check_mode:
-        support: none
+        support: full
     diff_mode:
-        support: none
+        support: full
 
 options:
     state:
@@ -154,12 +154,12 @@ def main():
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=False,
+                           supports_check_mode=True,
                            required_one_of=(
                                [['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    result = dict(changed=False, msg='', end_state={})
+    result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
 
     # Obtain access token, initialize API
     try:
@@ -214,34 +214,56 @@ def main():
                 authz_scope[k] = ''
 
     if authz_scope and state == 'present':
-        diff = False
+        changes = False
         for k, v in payload.items():
             if authz_scope[k] != v:
-                diff = True
+                changes = True
                 # At this point we know we have to update the object anyways,
                 # so there's no need to do more work.
                 break
-        if diff:
-            kc.update_authz_authorization_scope(
-                payload=payload, id=authz_scope['id'], client_id=cid, realm=realm)
-            result['changed'] = True
-            result['msg'] = 'Authorization scope modified'
+
+        if changes:
+            if module._diff:
+                result['diff'] = dict(before=authz_scope, after=payload)
+
+            if module.check_mode:
+                result['msg'] = 'Authorization scope would be updated'
+                module.exit_json(**result)
+            else:
+                kc.update_authz_authorization_scope(
+                    payload=payload, id=authz_scope['id'], client_id=cid, realm=realm)
+                result['changed'] = True
+                result['msg'] = 'Authorization scope updated'
         else:
             result['changed'] = False
-            result['msg'] = 'Authorization scope not modified'
+            result['msg'] = 'Authorization scope not updated'
 
         result['end_state'] = payload
     elif not authz_scope and state == 'present':
-        kc.create_authz_authorization_scope(
-            payload=payload, client_id=cid, realm=realm)
-        result['changed'] = True
-        result['msg'] = 'Authorization scope created'
-        result['end_state'] = payload
+        if module._diff:
+            result['diff'] = dict(before={}, after=payload)
+
+        if module.check_mode:
+            result['msg'] = 'Authorization scope would be created'
+            module.exit_json(**result)
+        else:
+            kc.create_authz_authorization_scope(
+                payload=payload, client_id=cid, realm=realm)
+            result['changed'] = True
+            result['msg'] = 'Authorization scope created'
+            result['end_state'] = payload
     elif authz_scope and state == 'absent':
-        kc.remove_authz_authorization_scope(
-            id=authz_scope['id'], client_id=cid, realm=realm)
-        result['changed'] = True
-        result['msg'] = 'Authorization scope created'
+        if module._diff:
+            result['diff'] = dict(before=authz_scope, after={})
+
+        if module.check_mode:
+            result['msg'] = 'Authorization scope would be removed'
+            module.exit_json(**result)
+        else:
+            kc.remove_authz_authorization_scope(
+                id=authz_scope['id'], client_id=cid, realm=realm)
+            result['changed'] = True
+            result['msg'] = 'Authorization scope removed'
     elif not authz_scope and state == 'absent':
         result['changed'] = False
     else:
