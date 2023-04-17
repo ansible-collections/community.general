@@ -31,8 +31,8 @@ DOCUMENTATION = '''
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
             required: true
             env:
-              - name: ANSIBLE_NMAP_ADDRESS
-                version_added: 6.6.0
+                - name: ANSIBLE_NMAP_ADDRESS
+                  version_added: 6.6.0
         exclude:
             description:
               - List of addresses to exclude.
@@ -40,8 +40,8 @@ DOCUMENTATION = '''
             type: list
             elements: string
             env:
-              - name: ANSIBLE_NMAP_EXCLUDE
-                version_added: 6.6.0
+                - name: ANSIBLE_NMAP_EXCLUDE
+                  version_added: 6.6.0
         port:
             description:
                 - Only scan specific port or port range (C(-p)).
