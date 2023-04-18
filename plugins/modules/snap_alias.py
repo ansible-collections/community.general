@@ -98,7 +98,7 @@ _state_map = dict(
 
 
 class SnapAlias(StateModuleHelper):
-    _RE_ALIAS_LIST = re.compile(r"^(?P<snap>[\w-]+)\s+(?P<alias>[\w-]+)\s+.*$")
+    _RE_ALIAS_LIST = re.compile(r"^(?P<snap>[\S]+)\s+(?P<alias>[\w-]+)\s+.*$")
 
     module = dict(
         argument_spec={
@@ -142,7 +142,10 @@ class SnapAlias(StateModuleHelper):
             return results
 
         with self.runner("state name", check_rc=True, output_process=process) as ctx:
-            return ctx.run(state="info")
+            aliases = ctx.run(state="info")
+            if self.verbosity >= 4:
+                self.vars.get_aliases_run_info = ctx.run_info
+            return aliases
 
     def _get_aliases_for(self, name):
         return self._get_aliases().get(name, [])
