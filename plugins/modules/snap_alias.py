@@ -98,7 +98,7 @@ _state_map = dict(
 
 
 class SnapAlias(StateModuleHelper):
-    _RE_ALIAS_LIST = re.compile(r"^(?P<snap>[\S]+)\s+(?P<alias>[\w-]+)\s+.*$")
+    _RE_ALIAS_LIST = re.compile(r"^(?P<snap>\S+)\s+(?P<alias>[\w-]+)\s+.*$")
 
     module = dict(
         argument_spec={
