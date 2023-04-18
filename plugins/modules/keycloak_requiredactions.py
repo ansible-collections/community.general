@@ -183,18 +183,8 @@ def main():
             # from existing required action
             changed = False
             after = {}
-            for param in req_action_repr:
-                default_not_enabled = (param == 'defaultAction'
-                                       and not req_action_repr['enabled']
-                                       and not new_req_action_repr['enabled'])
-                if new_req_action_repr[param] is None:
-                    after[param] = req_action_repr[param]
-                else:
-                    after[param] = new_req_action_repr[param]
-                if not default_not_enabled \
-                   and new_req_action_repr[param] is not None \
-                   and req_action_repr[param] != new_req_action_repr[param]:
-                    changed = True
+            desired_action = req_action_repr.copy() | dict((k,v) for k,v in new_req_action_repr.items() if v is not None)
+            changed = (desired_action != req_action_repr)
             result["changed"] = changed
             if not changed:
                 if module._diff:
@@ -209,13 +199,17 @@ def main():
                 if module._diff:
                     result["diff"] = {
                         "before": req_action_repr,
-                        "after": after,
+                        "after": desired_action,
                     }
                 if module.check_mode:  # if check mode, exit
                     module.exit_json(**result)
                 # Update required action
-                action = kc.update_required_action(new_req_action_repr,
-                                                   realm=realm)
+                action = kc.update_required_action(desired_action, realm=realm)
+                if module._diff:
+                    result["diff"] = {
+                        "before": req_action_repr,
+                        "after": action,
+                    }
                 if action is not None:
                     req_action_repr = action
                 result["action"] = req_action_repr
