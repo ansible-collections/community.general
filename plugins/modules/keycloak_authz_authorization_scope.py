@@ -186,37 +186,37 @@ def main():
 
     # Get current state of the Authorization Scope using its name as the search
     # filter. This returns False if it is not found.
-    authz_scope = kc.get_authz_authorization_scope_by_name(
+    before_authz_scope = kc.get_authz_authorization_scope_by_name(
         name=name, client_id=cid, realm=realm)
 
     # Generate a JSON payload for Keycloak Admin API. This is needed for
     # "create" and "update" operations.
-    payload = {}
-    payload['name'] = name
-    payload['displayName'] = display_name
-    payload['iconUri'] = icon_uri
+    desired_authz_scope = {}
+    desired_authz_scope['name'] = name
+    desired_authz_scope['displayName'] = display_name
+    desired_authz_scope['iconUri'] = icon_uri
 
     # Add "id" to payload for modify operations
-    if authz_scope:
-        payload['id'] = authz_scope['id']
+    if before_authz_scope:
+        desired_authz_scope['id'] = before_authz_scope['id']
 
     # Ensure that undefined (null) optional parameters are presented as empty
     # strings in the desired state. This makes comparisons with current state
     # much easier.
-    for k, v in payload.items():
+    for k, v in desired_authz_scope.items():
         if not v:
-            payload[k] = ''
+            desired_authz_scope[k] = ''
 
     # Do the above for the current state
-    if authz_scope:
+    if before_authz_scope:
         for k in ['displayName', 'iconUri']:
-            if k not in authz_scope:
-                authz_scope[k] = ''
+            if k not in before_authz_scope:
+                before_authz_scope[k] = ''
 
-    if authz_scope and state == 'present':
+    if before_authz_scope and state == 'present':
         changes = False
-        for k, v in payload.items():
-            if authz_scope[k] != v:
+        for k, v in desired_authz_scope.items():
+            if before_authz_scope[k] != v:
                 changes = True
                 # At this point we know we have to update the object anyways,
                 # so there's no need to do more work.
@@ -224,47 +224,47 @@ def main():
 
         if changes:
             if module._diff:
-                result['diff'] = dict(before=authz_scope, after=payload)
+                result['diff'] = dict(before=before_authz_scope, after=desired_authz_scope)
 
             if module.check_mode:
                 result['msg'] = 'Authorization scope would be updated'
                 module.exit_json(**result)
             else:
                 kc.update_authz_authorization_scope(
-                    payload=payload, id=authz_scope['id'], client_id=cid, realm=realm)
+                    payload=desired_authz_scope, id=before_authz_scope['id'], client_id=cid, realm=realm)
                 result['changed'] = True
                 result['msg'] = 'Authorization scope updated'
         else:
             result['changed'] = False
             result['msg'] = 'Authorization scope not updated'
 
-        result['end_state'] = payload
-    elif not authz_scope and state == 'present':
+        result['end_state'] = desired_authz_scope
+    elif not before_authz_scope and state == 'present':
         if module._diff:
-            result['diff'] = dict(before={}, after=payload)
+            result['diff'] = dict(before={}, after=desired_authz_scope)
 
         if module.check_mode:
             result['msg'] = 'Authorization scope would be created'
             module.exit_json(**result)
         else:
             kc.create_authz_authorization_scope(
-                payload=payload, client_id=cid, realm=realm)
+                payload=desired_authz_scope, client_id=cid, realm=realm)
             result['changed'] = True
             result['msg'] = 'Authorization scope created'
-            result['end_state'] = payload
-    elif authz_scope and state == 'absent':
+            result['end_state'] = desired_authz_scope
+    elif before_authz_scope and state == 'absent':
         if module._diff:
-            result['diff'] = dict(before=authz_scope, after={})
+            result['diff'] = dict(before=before_authz_scope, after={})
 
         if module.check_mode:
             result['msg'] = 'Authorization scope would be removed'
             module.exit_json(**result)
         else:
             kc.remove_authz_authorization_scope(
-                id=authz_scope['id'], client_id=cid, realm=realm)
+                id=before_authz_scope['id'], client_id=cid, realm=realm)
             result['changed'] = True
             result['msg'] = 'Authorization scope removed'
-    elif not authz_scope and state == 'absent':
+    elif not before_authz_scope and state == 'absent':
         result['changed'] = False
     else:
         module.fail_json(msg='Unable to determine what to do with authorization scope %s of client %s in realm %s' % (
