@@ -6,6 +6,7 @@ azp/posix/1
 azp/posix/vm
 skip/aix
 skip/alpine
+skip/fedora
 skip/freebsd
 skip/osx
 skip/macos
