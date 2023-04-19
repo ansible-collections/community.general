@@ -19,6 +19,16 @@ description:
       registering using D-Bus if possible.
 author: "Barnaby Court (@barnabycourt)"
 notes:
+    - |
+      The module tries to use the D-Bus C(rhsm) service (part of C(subscription-manager))
+      to register, starting from community.general 6.5.0: this is done so credentials
+      (username, password, activation keys) can be passed to C(rhsm) in a secure way.
+      C(subscription-manager) itself gets credentials only as arguments of command line
+      parameters, which is I(not) secure, as they can be easily stolen by checking the
+      process listing on the system. Due to limitations of the D-Bus interface of C(rhsm),
+      the module will I(not) use D-Bus for registation when trying either to register
+      using I(token), or when specifying I(environment), or when the system is old
+      (typically RHEL 6 and older).
     - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an Organization ID.
     - Since 2.5 values for I(server_hostname), I(server_insecure), I(rhsm_baseurl),
       I(server_proxy_hostname), I(server_proxy_port), I(server_proxy_user) and
