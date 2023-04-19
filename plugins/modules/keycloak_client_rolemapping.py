@@ -254,8 +254,8 @@ def main():
     roles = module.params.get('roles')
 
     # Check the parameters
-    if cid is None and client_id is None:
-        module.fail_json(msg='Either the `client_id` or `cid` has to be specified.')
+    # if cid is None and client_id is None:
+        # module.fail_json(msg='Either the `client_id` or `cid` has to be specified.')
     if gid is None and group_name is None:
         module.fail_json(msg='Either the `group_name` or `gid` has to be specified.')
 
@@ -266,7 +266,7 @@ def main():
             gid = group_rep['id']
         else:
             module.fail_json(msg='Could not fetch group %s:' % group_name)
-    if cid is None:
+    if cid is None and client_id is not None:
         cid = kc.get_client_id(client_id, realm=realm)
         if cid is None:
             module.fail_json(msg='Could not fetch client %s:' % client_id)
@@ -328,8 +328,8 @@ def main():
         if state == 'present':
             # Assign roles
             result['changed'] = True
-            before_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(assigned_roles_before, key = lambda r : r["name"]))]}
-            proposed_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(result["proposed"], key = lambda r : r["name"]))]}
+            before_names = {"{} / {}".format(group_name, client_id if client_id else "realm"): [r["name"] for r in list(sorted(assigned_roles_before, key = lambda r : r["name"]))]}
+            proposed_names = {"{} / {}".format(group_name, client_id if client_id else "realm"): [r["name"] for r in list(sorted(result["proposed"], key = lambda r : r["name"]))]}
             if module._diff:
                 result['diff'] = dict(before=before_names, after=proposed_names)
             if module.check_mode:
@@ -339,7 +339,7 @@ def main():
                 kc.delete_group_rolemapping(gid, cid, to_del, realm=realm)
             result['msg'] = 'Roles %s assigned to group %s.' % (update_roles, group_name)
             assigned_roles_after = kc.get_client_group_rolemappings(gid, cid, realm=realm)
-            after_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(assigned_roles_after, key = lambda r : r["name"]))]}
+            after_names = {"{} / {}".format(group_name, client_id if client_id else "realm"): [r["name"] for r in list(sorted(assigned_roles_after, key = lambda r : r["name"]))]}
             
             if module._diff:
                 result['diff'] = dict(before=before_names, after=after_names)
@@ -348,8 +348,8 @@ def main():
             module.exit_json(**result)
         else:
             # Remove mapping of role
-            before_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(assigned_roles_before, key = lambda r : r["name"]))]}
-            proposed_names = {"{group_name} / {client_id}".format(group_name=group_name, client_id=client_id): [r["name"] for r in list(sorted(result["proposed"], key = lambda r : r["name"]))]}
+            before_names = {"{} / {}".format(group_name, client_id if client_id else "realm"): [r["name"] for r in list(sorted(assigned_roles_before, key = lambda r : r["name"]))]}
+            proposed_names = {"{} / {}".format(group_name, client_id if client_id else "realm"): [r["name"] for r in list(sorted(result["proposed"], key = lambda r : r["name"]))]}
             if module._diff:
                 result['diff'] = dict(before=before_names, after=proposed_names)
             if module.check_mode:

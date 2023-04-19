@@ -58,6 +58,9 @@ URL_CLIENTSCOPE_PROTOCOLMAPPER = "{url}/admin/realms/{realm}/client-scopes/{id}/
 URL_CLIENT_GROUP_ROLEMAPPINGS = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}"
 URL_CLIENT_GROUP_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}/available"
 URL_CLIENT_GROUP_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}/composite"
+URL_REALM_GROUP_ROLEMAPPINGS = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/realm"
+URL_REALM_GROUP_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/realm/available"
+URL_REALM_GROUP_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/realm/composite"
 
 URL_USERS = "{url}/admin/realms/{realm}/users"
 URL_CLIENT_SERVICE_ACCOUNT_USER = "{url}/admin/realms/{realm}/clients/{id}/service-account-user"
@@ -476,7 +479,10 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The ID of the role, None if not found.
         """
-        rolemappings = self.get_client_roles_by_id(cid, realm=realm)
+        if cid:
+            rolemappings = self.get_client_roles_by_id(cid, realm=realm)
+        else:
+            rolemappings = self.get_realm_roles(realm=realm)
         for role in rolemappings:
             if name == role['name']:
                 return role['id']
@@ -528,7 +534,10 @@ class KeycloakAPI(object):
         :param realm: client from this realm
         :return: dict of rolemapping representation or None if none matching exist
         """
-        rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        if not cid:
+            rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
+        else:
+            rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             rolemappings = json.loads(to_native(open_url(rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
                                                          timeout=self.connection_timeout,
@@ -549,7 +558,10 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The rollemappings of specified group and client of the realm (default "master").
         """
-        available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS_AVAILABLE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        if not cid:
+            available_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS_AVAILABLE.format(url=self.baseurl, realm=realm, id=gid)
+        else:
+            available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS_AVAILABLE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             return json.loads(to_native(open_url(available_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout,
@@ -566,7 +578,10 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The rollemappings of specified group and client of the realm (default "master").
         """
-        composite_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        if not cid:
+            composite_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
+        else:
+            composite_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             return json.loads(to_native(open_url(composite_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout,
@@ -583,7 +598,10 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The rollemappings of specified group and client of the realm (default "master").
         """
-        composite_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS_COMPOSITE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        if not cid:
+            composite_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS_COMPOSITE.format(url=self.baseurl, realm=realm, id=gid)
+        else:
+            composite_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS_COMPOSITE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             return json.loads(to_native(open_url(composite_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout,
@@ -650,7 +668,10 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: None.
         """
-        available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        if not cid:
+            available_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
+        else:
+            available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             open_url(available_rolemappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
@@ -667,7 +688,10 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: None.
         """
-        available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        if not cid:
+            available_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
+        else:
+            available_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             open_url(available_rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
