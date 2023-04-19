@@ -1,0 +1,2 @@
+minor_changes::
+    - idrac_redfish_command - add ``job_id`` to ``CreateBiosConfigJob`` response (https://github.com/ansible-collections/community.general/issues/5603).
