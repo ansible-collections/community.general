@@ -225,6 +225,7 @@ def main():
         group_name=dict(type='str'),
         cid=dict(type='str'),
         client_id=dict(type='str'),
+        realm_roles=dict(type='bool'),
         roles=dict(type='list', elements='dict', options=roles_spec),
     )
 
@@ -232,7 +233,9 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password'],
+                                             ['gid', 'group_name'],
+                                             ['cid', 'client_id', 'realm_roles']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
@@ -251,13 +254,8 @@ def main():
     client_id = module.params.get('client_id')
     gid = module.params.get('gid')
     group_name = module.params.get('group_name')
+    realm_roles = module.params.get('realm_roles')
     roles = module.params.get('roles')
-
-    # Check the parameters
-    # if cid is None and client_id is None:
-        # module.fail_json(msg='Either the `client_id` or `cid` has to be specified.')
-    if gid is None and group_name is None:
-        module.fail_json(msg='Either the `group_name` or `gid` has to be specified.')
 
     # Get the potential missing parameters
     if gid is None:
@@ -266,7 +264,7 @@ def main():
             gid = group_rep['id']
         else:
             module.fail_json(msg='Could not fetch group %s:' % group_name)
-    if cid is None and client_id is not None:
+    if cid is None and not realm_roles:
         cid = kc.get_client_id(client_id, realm=realm)
         if cid is None:
             module.fail_json(msg='Could not fetch client %s:' % client_id)
@@ -278,20 +276,20 @@ def main():
                 module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
             # Fetch missing role_id
             if role['id'] is None:
-                role_id = kc.get_client_role_id_by_name(cid, role['name'], realm=realm)
+                role_id = kc.get_role_id_by_name(cid, role['name'], is_realm_role=realm_roles, realm=realm)
                 if role_id is not None:
                     role['id'] = role_id
                 else:
                     module.fail_json(msg='Could not fetch role %s:' % (role['name']))
             # Fetch missing role_name
             else:
-                role['name'] = kc.get_client_group_rolemapping_by_id(gid, cid, role['id'], realm=realm)['name']
+                role['name'] = kc.get_group_rolemapping_by_id(gid, cid, role['id'], is_realm_role=realm_roles, realm=realm)['name']
                 if role['name'] is None:
                     module.fail_json(msg='Could not fetch role %s' % (role['id']))
 
     # Get effective client-level role mappings
-    available_roles_before = kc.get_client_group_available_rolemappings(gid, cid, realm=realm)
-    assigned_roles_before = kc.get_client_group_rolemappings(gid, cid, realm=realm) #kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+    available_roles_before = kc.get_group_available_rolemappings(gid, cid, is_realm_role=realm_roles, realm=realm)
+    assigned_roles_before = kc.get_group_rolemappings(gid, cid, is_realm_role=realm_roles, realm=realm)
 
     result['existing'] = assigned_roles_before
     result['proposed'] = list(assigned_roles_before) if assigned_roles_before else []
@@ -318,6 +316,7 @@ def main():
                     if assigned_role in result['proposed']:  # Handle double removal
                         result['proposed'].remove(assigned_role)
     
+    # Remove existing roles that are not in the given list of roles
     roles_names = [k["name"] for k in roles]
     to_del = []                 
     for role_mapping in [r for r in assigned_roles_before if r["name"] not in roles_names]:
@@ -334,11 +333,11 @@ def main():
                 result['diff'] = dict(before=before_names, after=proposed_names)
             if module.check_mode:
                 module.exit_json(**result)
-            kc.add_group_rolemapping(gid, cid, update_roles, realm=realm)
+            kc.add_group_rolemapping(gid, cid, update_roles, is_realm_role=realm_roles, realm=realm)
             if len(to_del):
-                kc.delete_group_rolemapping(gid, cid, to_del, realm=realm)
+                kc.delete_group_rolemapping(gid, cid, to_del, is_realm_role=realm_roles, realm=realm)
             result['msg'] = 'Roles %s assigned to group %s.' % (update_roles, group_name)
-            assigned_roles_after = kc.get_client_group_rolemappings(gid, cid, realm=realm)
+            assigned_roles_after = kc.get_group_rolemappings(gid, cid, is_realm_role=realm_roles, realm=realm)
             after_names = {"{} / {}".format(group_name, client_id if client_id else "realm"): [r["name"] for r in list(sorted(assigned_roles_after, key = lambda r : r["name"]))]}
             
             if module._diff:
@@ -355,9 +354,9 @@ def main():
             if module.check_mode:
                 result['changed'] = assigned_roles_before != result['proposed']
                 module.exit_json(**result)
-            kc.delete_group_rolemapping(gid, cid, update_roles, realm=realm)
+            kc.delete_group_rolemapping(gid, cid, update_roles, is_realm_role=realm_roles, realm=realm)
             result['msg'] = 'Roles %s removed from group %s.' % (update_roles, group_name)
-            assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
+            assigned_roles_after = kc.get_group_composite_rolemappings(gid, cid, is_realm_role=realm_roles, realm=realm)
             result['changed'] = assigned_roles_before != assigned_roles_after
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
