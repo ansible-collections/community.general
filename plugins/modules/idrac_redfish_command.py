@@ -85,6 +85,14 @@ msg:
     returned: always
     type: str
     sample: "Action was successful"
+return_values:
+    description: Dictionary containing command-specific response data from the action.
+    returned: on success
+    type: dict
+    version_added: 6.6.0
+    sample: {
+        "job_id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/JID_471269252011"
+    }
 '''
 
 import re
@@ -128,10 +136,9 @@ class IdracRedfishUtils(RedfishUtils):
             return response
 
         response_output = response['resp'].__dict__
-        job_id = response_output["headers"]["Location"]
-        job_id = re.search("JID_.+", job_id).group()
-        # Currently not passing job_id back to user but patch is coming
-        return {'ret': True, 'msg': "Config job %s created" % job_id}
+        job_id_full = response_output["headers"]["Location"]
+        job_id = re.search("JID_.+", job_id_full).group()
+        return {'ret': True, 'msg': "Config job %s created" % job_id, 'job_id': job_id_full}
 
 
 CATEGORY_COMMANDS_ALL = {
@@ -143,6 +150,7 @@ CATEGORY_COMMANDS_ALL = {
 
 def main():
     result = {}
+    return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
@@ -210,11 +218,13 @@ def main():
                 if result['ret'] is False:
                     module.fail_json(msg=to_native(result['msg']))
                 result = rf_utils.create_bios_config_job()
+                if 'job_id' in result:
+                    return_values['job_id'] = result['job_id']
 
     # Return data back or fail with proper message
     if result['ret'] is True:
         del result['ret']
-        module.exit_json(changed=True, msg='Action was successful')
+        module.exit_json(changed=True, msg='Action was successful', return_values=return_values)
     else:
         module.fail_json(msg=to_native(result['msg']))
 
