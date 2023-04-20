@@ -128,8 +128,7 @@ def vars_to_variables(vars, module):
     # transform old vars to new variables structure
     variables = list()
     for item, value in vars.items():
-        if (isinstance(value, string_types) or
-           isinstance(value, (integer_types, float))):
+        if (isinstance(value, (string_types, integer_types, float)):
             variables.append(
                 {
                     "name": item,
