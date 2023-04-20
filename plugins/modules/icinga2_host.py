@@ -256,9 +256,9 @@ def main():
     state = module.params["state"]
     name = module.params["name"]
     zone = module.params["zone"]
-    template = [name]
+    template = []
     if module.params["template"]:
-        template.append(module.params["template"])
+        template = [module.params["template"]]
     check_command = module.params["check_command"]
     ip = module.params["ip"]
     display_name = module.params["display_name"]
@@ -273,20 +273,18 @@ def main():
         module.fail_json(msg="unable to connect to Icinga. Exception message: %s" % (e))
 
     data = {
+        'templates': template,
         'attrs': {
             'address': ip,
             'display_name': display_name,
             'check_command': check_command,
             'zone': zone,
-            'vars': {
-                'made_by': "ansible",
-            },
-            'templates': template,
+            'vars.made_by': "ansible"
         }
     }
 
-    if variables:
-        data['attrs']['vars'].update(variables)
+    for key, value in variables.items():
+        data['attrs']['vars.' + key] = value
 
     changed = False
     if icinga.exists(name):
