@@ -208,7 +208,7 @@ def uninstall_flat(module, binary, names, method):
 
 def flatpak_exists(module, binary, names, method):
     """Check if the flatpaks are installed."""
-    command = [binary, "list", "--{0}".format(method), "--app"]
+    command = [binary, "list", "--{0}".format(method)]
     output = _flatpak_command(module, False, command)
     installed = []
     not_installed = []
