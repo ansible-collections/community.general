@@ -203,8 +203,7 @@ def main():
                          description=dict(type='str'),
                          host=dict(type='list', elements='str'),
                          hostgroup=dict(type='list', elements='str'),
-                         state=dict(type='str', default='present',
-                         choices=['present', 'absent', 'enabled', 'disabled']),
+                         state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
                          append=dict(type='bool', default=False))
 
     module = AnsibleModule(argument_spec=argument_spec,
