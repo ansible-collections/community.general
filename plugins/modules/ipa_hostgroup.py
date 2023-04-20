@@ -26,6 +26,7 @@ options:
     - If C(false), only the listed I(host) will be in I(hostgroup), removing any other hosts.
     default: false
     type: bool
+    version_added: 6.6.0
   cn:
     description:
     - Name of host-group.
