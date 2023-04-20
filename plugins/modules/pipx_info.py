@@ -53,6 +53,7 @@ notes:
     - >
       This module will honor C(pipx) environment variables such as but not limited to C(PIPX_HOME) and C(PIPX_BIN_DIR)
       passed using the R(environment Ansible keyword, playbooks_environment).
+    - This module requires C(pipx) version 0.16.2.1 or above.
     - Please note that C(pipx) requires Python 3.6 or above.
     - See also the C(pipx) documentation at U(https://pypa.github.io/pipx/).
 author:
