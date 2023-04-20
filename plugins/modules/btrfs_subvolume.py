@@ -143,65 +143,65 @@ RETURN = r'''
 
 filesystem:
     description:
-    - A summary of the final state of the targeted btrfs filesystem
+    - A summary of the final state of the targeted btrfs filesystem.
     type: dict
     returned: success
     contains:
         uuid:
-            description: A unique identifier assigned to the filesystem
+            description: A unique identifier assigned to the filesystem.
             returned: success
             type: str
             sample: 96c9c605-1454-49b8-a63a-15e2584c208e
         label:
-            description: An optional label assigned to the filesystem
+            description: An optional label assigned to the filesystem.
             returned: success
             type: str
             sample: Tank
         devices:
-            description: A list of devices assigned to the filesystem
+            description: A list of devices assigned to the filesystem.
             returned: success
             type: list
             sample:
                 - /dev/sda1
                 - /dev/sdb1
         default_subvolume:
-            description: The id of the filesystem's default subvolume
+            description: The ID of the filesystem's default subvolume.
             returned: success and if filesystem is mounted
             type: int
             sample: 5
         subvolumes:
-            description: A list of dicts containing metadata for all of the filesystem's subvolumes
+            description: A list of dicts containing metadata for all of the filesystem's subvolumes.
             returned: success and if filesystem is mounted
             type: list
             elements: dict
             contains:
                 id:
-                    description: An identifier assigned to the subvolume, unique within the containing filesystem
+                    description: An identifier assigned to the subvolume, unique within the containing filesystem.
                     type: int
                     sample: 256
                 mountpoints:
-                    description: Paths where the subvolume is mounted on the targeted host
+                    description: Paths where the subvolume is mounted on the targeted host.
                     type: list
                     sample: ['/home']
                 parent:
-                    description: The identifier of this subvolume's parent
+                    description: The identifier of this subvolume's parent.
                     type: int
                     sample: 5
                 path:
-                    description: The full path of the subvolume relative to the btrfs fileystem's root
+                    description: The full path of the subvolume relative to the btrfs fileystem's root.
                     type: str
                     sample: /@home
 
 modifications:
     description:
-    - A list where each element describes a change made to the target btrfs filesystem
+    - A list where each element describes a change made to the target btrfs filesystem.
     type: list
     returned: Success
     elements: str
 
 target_subvolume_id:
     description:
-    - The id of the subvolume specified with the I(name) parameter, either pre-existing or created as part of module execution
+    - The ID of the subvolume specified with the I(name) parameter, either pre-existing or created as part of module execution.
     type: int
     sample: 257
     returned: Success and subvolume exists after module execution
