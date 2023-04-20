@@ -150,7 +150,7 @@ def main():
         deps.validate(module, "ipaddress")
 
         try:
-            if 'arpa' not in zone:
+            if 'in-addr.arpa' not in zone:
                 raise Exception("Zone must be reversed zone for ptr_record. (e.g. 1.1.192.in-addr.arpa)")
             ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
             subnet_offset = ipaddr_rev.find(zone)
