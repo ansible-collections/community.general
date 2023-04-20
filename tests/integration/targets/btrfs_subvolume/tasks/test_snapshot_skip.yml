@@ -1,0 +1,41 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a snapshot if one does not already exist at path
+  block:
+  - name: Create a snapshot named 'snapshot_skip'
+    community.general.btrfs_subvolume:
+      automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/snapshot_skip"
+      snapshot_source: "/"
+      snapshot_conflict: "skip"
+      state: "present"
+    register: result
+  - name: Snapshot 'snapshot_skip' created
+    ansible.builtin.assert:
+      that:
+      - result is changed
+
+  - name: Create a snapshot named 'snapshot_skip' (idempotency)
+    community.general.btrfs_subvolume:
+      automount: Yes
+      filesystem_label: "{{ btrfs_subvolume_target_label }}"
+      name: "/snapshot_skip"
+      snapshot_source: "/"
+      snapshot_conflict: "skip"
+      state: "present"
+    register: result
+  - name: Snapshot 'snapshot_skip' created (idempotency)
+    ansible.builtin.assert:
+      that:
+      - result is not changed
+
+- name: Cleanup created snapshot
+  community.general.btrfs_subvolume:
+    automount: Yes
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
+    name: "/snapshot_skip"
+    state: "absent"

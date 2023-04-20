@@ -1,0 +1,37 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Create file {{ item.file }} to back loop device {{ item.loop }}"
+  ansible.builtin.command:
+    cmd: "dd if=/dev/zero of={{ item.file }} bs=1M count=200"  ## minimum count 109
+    creates: "{{ item.file }}"
+  with_items: "{{ btrfs_subvolume_configs }}"
+
+- name: "Setup loop device {{ item.loop }}"
+  ansible.builtin.command:
+    cmd: "losetup {{ item.loop }} {{ item.file }}"
+    creates: "{{ item.loop }}"
+  with_items: "{{ btrfs_subvolume_configs }}"
+
+- name: Create single device btrfs filesystem
+  ansible.builtin.command:
+    cmd: "mkfs.btrfs --label {{ btrfs_subvolume_single_label }} -f {{ btrfs_subvolume_single_devices | first }}"
+  changed_when: True
+
+- name: Create multiple device btrfs filesystem
+  ansible.builtin.command:
+    cmd: "mkfs.btrfs --label {{ btrfs_subvolume_multiple_label }} -f -d raid0 {{ btrfs_subvolume_multiple_devices | join(' ') }}"
+  changed_when: True
+
+# Typically created by udev, but apparently missing on Alpine
+- name: Create btrfs control device node
+  ansible.builtin.command:
+    cmd: "mknod /dev/btrfs-control c 10 234"
+    creates: "/dev/btrfs-control"
+
+- name: Force rescan to ensure all device are detected
+  ansible.builtin.command:
+    cmd: "btrfs device scan"
+  changed_when: True

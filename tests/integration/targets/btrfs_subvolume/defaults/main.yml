@@ -1,0 +1,20 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+btrfs_subvolume_single_configs:
+- file: "/tmp/disks0.img"
+  loop: "/dev/loop95"
+btrfs_subvolume_multiple_configs:
+- file: "/tmp/diskm0.img"
+  loop: "/dev/loop97"
+- file: "/tmp/diskm1.img"
+  loop: "/dev/loop98"
+- file: "/tmp/diskm2.img"
+  loop: "/dev/loop99"
+btrfs_subvolume_configs: "{{ btrfs_subvolume_single_configs + btrfs_subvolume_multiple_configs }}"
+btrfs_subvolume_single_devices: "{{ btrfs_subvolume_single_configs | map(attribute='loop') }}"
+btrfs_subvolume_single_label: "single"
+btrfs_subvolume_multiple_devices: "{{ btrfs_subvolume_multiple_configs | map(attribute='loop') }}"
+btrfs_subvolume_multiple_label: "multiple"

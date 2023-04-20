@@ -267,6 +267,8 @@ files:
     maintainers: delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
+  $module_utils/btrfs.py:
+    maintainers: gnfzdz
   $module_utils/deps.py:
     maintainers: russoz
   $module_utils/gconftool2.py:
@@ -395,6 +397,8 @@ files:
     maintainers: catcombo
   $modules/bower.py:
     maintainers: mwarkentin
+  $modules/btrfs_:
+    maintainers: gnfzdz
   $modules/bundler.py:
     maintainers: thoiberg
   $modules/bzr.py:
