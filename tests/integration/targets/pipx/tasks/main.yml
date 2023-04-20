@@ -184,6 +184,19 @@
     name: tox
   register: uninstall_tox_latest_again
 
+- name: install application tox with deps
+  community.general.pipx:
+    state: latest
+    name: tox
+    install_deps: true
+  register: install_tox_with_deps
+
+- name: cleanup tox latest yet again
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox_again
+
 - name: check assertions tox latest
   assert:
     that:
@@ -198,6 +211,10 @@
       - install_tox_latest_with_preinstall_again_force is changed
       - install_tox_latest_with_preinstall_again_force.application.tox.version == latest_tox_version
       - uninstall_tox_latest_again is changed
+      - install_tox_with_deps is changed
+      - install_tox_with_deps.application.tox.version == latest_tox_version
+      - uninstall_tox_again is changed
+      - "'tox' not in uninstall_tox_again.application"
 
 ##############################################################################
 - name: ensure application ansible-lint is uninstalled

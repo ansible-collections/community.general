@@ -57,7 +57,7 @@ options:
     install_deps:
         description:
             - Include applications of dependent packages.
-            - Only used when I(state=install), I(state=latest), I(state=upgrade), or I(state=inject).
+            - Only used when I(state=install), I(state=latest), or I(state=inject).
         type: bool
         default: false
     inject_packages:
@@ -120,6 +120,7 @@ notes:
     - >
       This module will honor C(pipx) environment variables such as but not limited to C(PIPX_HOME) and C(PIPX_BIN_DIR)
       passed using the R(environment Ansible keyword, playbooks_environment).
+    - This module requires C(pipx) version 0.16.2.1 or above.
     - Please note that C(pipx) requires Python 3.6 or above.
     - >
       This first implementation does not verify whether a specified version constraint has been installed or not.
@@ -263,7 +264,7 @@ class PipX(StateModuleHelper):
         if self.vars.force:
             self.changed = True
 
-        with self.runner('state include_injected index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
@@ -316,7 +317,7 @@ class PipX(StateModuleHelper):
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
-        with self.runner('state include_injected index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run(state='upgrade')
             self._capture_results(ctx)
 
