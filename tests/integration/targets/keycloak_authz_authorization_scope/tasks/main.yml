@@ -45,7 +45,7 @@
 - name: Assert that authorization scope was not created in check mode
   assert:
     that:
-      - result is not changed
+      - result is changed
       - result.end_state == {}
       - result.msg == 'Authorization scope would be created'
       - result.diff.before == {}
@@ -116,7 +116,7 @@
 - name: Assert that authorization scope was not updated in check mode
   assert:
     that:
-      - result is not changed
+      - result is changed
       - result.msg == 'Authorization scope would be updated'
       - result.diff.before.displayName == 'File delete'
       - result.diff.before.iconUri == 'http://localhost/icon.png'
@@ -182,7 +182,7 @@
 - name: Assert that authorization scope has not been removed in check mode
   assert:
     that:
-      - result is not changed
+      - result is changed
       - result.msg == 'Authorization scope would be removed'
       - result.diff.before.name == 'file:delete'
       - result.diff.after == {}

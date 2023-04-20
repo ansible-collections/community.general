@@ -49,28 +49,28 @@ options:
         description:
             - Name of the authorization scope to create.
         type: str
-        required: True
+        required: true
     display_name:
         description:
             - The display name of the authorization scope.
         type: str
-        required: False
+        required: false
     icon_uri:
         description:
             - The icon URI for the authorization scope.
         type: str
-        required: False
+        required: false
     client_id:
         description:
             - The C(clientId) of the Keycloak client that should have the authorization scope.
             - This is usually a human-readable name of the Keycloak client.
         type: str
-        required: True
+        required: true
     realm:
         description:
             - The name of the Keycloak realm the Keycloak client is in.
         type: str
-        required: True
+        required: true
 
 extends_documentation_fragment:
     - community.general.keycloak
@@ -227,6 +227,7 @@ def main():
                 result['diff'] = dict(before=before_authz_scope, after=desired_authz_scope)
 
             if module.check_mode:
+                result['changed'] = True
                 result['msg'] = 'Authorization scope would be updated'
                 module.exit_json(**result)
             else:
@@ -244,6 +245,7 @@ def main():
             result['diff'] = dict(before={}, after=desired_authz_scope)
 
         if module.check_mode:
+            result['changed'] = True
             result['msg'] = 'Authorization scope would be created'
             module.exit_json(**result)
         else:
@@ -257,6 +259,7 @@ def main():
             result['diff'] = dict(before=before_authz_scope, after={})
 
         if module.check_mode:
+            result['changed'] = True
             result['msg'] = 'Authorization scope would be removed'
             module.exit_json(**result)
         else:
