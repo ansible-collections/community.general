@@ -100,7 +100,6 @@ RETURN = '''#'''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils import deps
-from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     umc_module_for_add,
     umc_module_for_edit,
