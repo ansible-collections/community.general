@@ -204,6 +204,8 @@ files:
     maintainers: ddelnano shinuza
   $lookups/:
     labels: lookups
+  $lookups/bitwarden_secrets_manager.py:
+    maintainers: jantari
   $lookups/bitwarden.py:
     maintainers: lungj
   $lookups/cartesian.py: {}

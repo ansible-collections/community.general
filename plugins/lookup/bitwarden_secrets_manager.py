@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# (c) 2023, jantari (https://github.com/jantari)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
@@ -12,7 +13,7 @@ DOCUMENTATION = """
     requirements:
       - bws (command line utility)
     short_description: Retrieve secrets from Bitwarden Secrets Manager
-    version_added: ?.?.?
+    version_added: 6.6.0
     description:
       - Retrieve secrets from Bitwarden Secrets Manager.
     options:
