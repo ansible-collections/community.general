@@ -49,6 +49,16 @@ URL_CLIENTSCOPE = "{url}/admin/realms/{realm}/client-scopes/{id}"
 URL_CLIENTSCOPE_PROTOCOLMAPPERS = "{url}/admin/realms/{realm}/client-scopes/{id}/protocol-mappers/models"
 URL_CLIENTSCOPE_PROTOCOLMAPPER = "{url}/admin/realms/{realm}/client-scopes/{id}/protocol-mappers/models/{mapper_id}"
 
+URL_DEFAULT_CLIENTSCOPES = "{url}/admin/realms/{realm}/default-default-client-scopes"
+URL_DEFAULT_CLIENTSCOPE = "{url}/admin/realms/{realm}/default-default-client-scopes/{id}"
+URL_OPTIONAL_CLIENTSCOPES = "{url}/admin/realms/{realm}/default-optional-client-scopes"
+URL_OPTIONAL_CLIENTSCOPE = "{url}/admin/realms/{realm}/default-optional-client-scopes/{id}"
+
+URL_CLIENT_DEFAULT_CLIENTSCOPES = "{url}/admin/realms/{realm}/clients/{cid}/default-client-scopes"
+URL_CLIENT_DEFAULT_CLIENTSCOPE = "{url}/admin/realms/{realm}/clients/{cid}/default-client-scopes/{id}"
+URL_CLIENT_OPTIONAL_CLIENTSCOPES = "{url}/admin/realms/{realm}/clients/{cid}/optional-client-scopes"
+URL_CLIENT_OPTIONAL_CLIENTSCOPE = "{url}/admin/realms/{realm}/clients/{cid}/optional-client-scopes/{id}"
+
 URL_CLIENT_GROUP_ROLEMAPPINGS = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}"
 URL_CLIENT_GROUP_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}/available"
 URL_CLIENT_GROUP_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}/composite"
@@ -1162,6 +1172,131 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not update protocolmappers for clientscope %s in realm %s: %s'
                                       % (mapper_rep, realm, str(e)))
+
+    def get_default_clientscopes(self, realm, client_id=None):
+        """Fetch the name and ID of all clientscopes on the Keycloak server.
+
+        To fetch the full data of the client scope, make a subsequent call to
+        get_clientscope_by_clientscopeid, passing in the ID of the client scope you wish to return.
+
+        :param realm: Realm in which the clientscope resides.
+        :param client_id: The client in which the clientscope resides.
+        :return The default clientscopes of this realm or client
+        """
+        url = URL_DEFAULT_CLIENTSCOPES if client_id is None else URL_CLIENT_DEFAULT_CLIENTSCOPES
+        return self._get_clientscopes_of_type(realm, url, 'default', client_id)
+
+    def get_optional_clientscopes(self, realm, client_id=None):
+        """Fetch the name and ID of all clientscopes on the Keycloak server.
+
+        To fetch the full data of the client scope, make a subsequent call to
+        get_clientscope_by_clientscopeid, passing in the ID of the client scope you wish to return.
+
+        :param realm: Realm in which the clientscope resides.
+        :param client_id: The client in which the clientscope resides.
+        :return The optinal clientscopes of this realm or client
+        """
+        url = URL_OPTIONAL_CLIENTSCOPES if client_id is None else URL_CLIENT_OPTIONAL_CLIENTSCOPES
+        return self._get_clientscopes_of_type(realm, url, 'optional', client_id)
+
+    def _get_clientscopes_of_type(self, realm, url_template, scope_type, client_id=None):
+        """Fetch the name and ID of all clientscopes on the Keycloak server.
+
+        To fetch the full data of the client scope, make a subsequent call to
+        get_clientscope_by_clientscopeid, passing in the ID of the client scope you wish to return.
+
+        :param realm: Realm in which the clientscope resides.
+        :param url_template the template for the right type
+        :param scope_type this can be either optinal or default
+        :param client_id: The client in which the clientscope resides.
+        :return The clientscopes of the specified type of this realm
+        """
+        if client_id is None:
+            clientscopes_url = url_template.format(url=self.baseurl, realm=realm)
+            try:
+                return json.loads(to_native(open_url(clientscopes_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                     timeout=self.connection_timeout, validate_certs=self.validate_certs).read()))
+            except Exception as e:
+                self.module.fail_json(msg="Could not fetch list of %s clientscopes in realm %s: %s" % (scope_type, realm, str(e)))
+        else:
+            cid = self.get_client_id(client_id=client_id, realm=realm)
+            clientscopes_url = url_template.format(url=self.baseurl, realm=realm, cid=cid)
+            try:
+                return json.loads(to_native(open_url(clientscopes_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                     timeout=self.connection_timeout, validate_certs=self.validate_certs).read()))
+            except Exception as e:
+                self.module.fail_json(msg="Could not fetch list of %s clientscopes in client %s: %s" % (scope_type, client_id, clientscopes_url))
+
+    def _decide_url_type_clientscope(self, client_id=None, scope_type="default"):
+        """Decides which url to use.
+        :param scope_type this can be either optinal or default
+        :param client_id: The client in which the clientscope resides.
+        """
+        if client_id is None:
+            if scope_type == "default":
+                return URL_DEFAULT_CLIENTSCOPE
+            if scope_type == "optional":
+                return URL_OPTIONAL_CLIENTSCOPE
+        else:
+            if scope_type == "default":
+                return URL_CLIENT_DEFAULT_CLIENTSCOPE
+            if scope_type == "optional":
+                return URL_CLIENT_OPTIONAL_CLIENTSCOPE
+
+    def add_default_clientscope(self, id, realm="master", client_id=None):
+        """Add a client scope as default either on realm or client level.
+
+        :param id: Client scope Id.
+        :param realm: Realm in which the clientscope resides.
+        :param client_id: The client in which the clientscope resides.
+        """
+        self._action_type_clientscope(id, client_id, "default", realm, 'add')
+
+    def add_optional_clientscope(self, id, realm="master", client_id=None):
+        """Add a client scope as optional either on realm or client level.
+
+        :param id: Client scope Id.
+        :param realm: Realm in which the clientscope resides.
+        :param client_id: The client in which the clientscope resides.
+        """
+        self._action_type_clientscope(id, client_id, "optional", realm, 'add')
+
+    def delete_default_clientscope(self, id, realm="master", client_id=None):
+        """Remove a client scope as default either on realm or client level.
+
+        :param id: Client scope Id.
+        :param realm: Realm in which the clientscope resides.
+        :param client_id: The client in which the clientscope resides.
+        """
+        self._action_type_clientscope(id, client_id, "default", realm, 'delete')
+
+    def delete_optional_clientscope(self, id, realm="master", client_id=None):
+        """Remove a client scope as optional either on realm or client level.
+
+        :param id: Client scope Id.
+        :param realm: Realm in which the clientscope resides.
+        :param client_id: The client in which the clientscope resides.
+        """
+        self._action_type_clientscope(id, client_id, "optional", realm, 'delete')
+
+    def _action_type_clientscope(self, id=None, client_id=None, scope_type="default", realm="master", action='add'):
+        """ Delete or add a clientscope of type.
+        :param name: The name of the clientscope. A lookup will be performed to retrieve the clientscope ID.
+        :param client_id: The ID of the clientscope (preferred to name).
+        :param scope_type 'default' or 'optional'
+        :param realm: The realm in which this group resides, default "master".
+        """
+        cid = None if client_id is None else self.get_client_id(client_id=client_id, realm=realm)
+        # should have a good cid by here.
+        clientscope_type_url = self._decide_url_type_clientscope(client_id, scope_type).format(realm=realm, id=id, cid=cid, url=self.baseurl)
+        try:
+            method = 'PUT' if action == "add" else 'DELETE'
+            return open_url(clientscope_type_url, method=method, http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs)
+
+        except Exception as e:
+            place = 'realm' if client_id is None else 'client ' + client_id
+            self.module.fail_json(msg="Unable to %s %s clientscope %s @ %s : %s" % (action, scope_type, id, place, str(e)))
 
     def create_clientsecret(self, id, realm="master"):
         """ Generate a new client secret by id
