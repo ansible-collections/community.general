@@ -183,7 +183,7 @@ class CPANMinus(ModuleHelper):
             if v.name and v.from_path:
                 self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
 
-        self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
+        self.command = self.get_bin_path(v.executable if v.executable else self.command)
         self.vars.set("binary", self.command)
 
     def _is_package_installed(self, name, locallib, version):
