@@ -1930,6 +1930,9 @@ class KeycloakAPI(object):
                 data=json.dumps(updatedExec),
                 timeout=self.connection_timeout,
                 validate_certs=self.validate_certs)
+        except HTTPError as e:
+            self.module.fail_json(msg="Unable to update execution '%s': %s: %s %s" %
+                                      (flowAlias, repr(e), ";".join([e.url, e.msg, str(e.code), str(e.hdrs)]), str(updatedExec)))
         except Exception as e:
             self.module.fail_json(msg="Unable to update executions %s: %s" % (updatedExec, str(e)))
 
@@ -1954,7 +1957,7 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
 
-    def create_subflow(self, subflowName, flowAlias, realm='master'):
+    def create_subflow(self, subflowName, flowAlias, realm='master', flowType='basic-flow'):
         """ Create new sublow on the flow
 
         :param subflowName: name of the subflow to create
@@ -1965,7 +1968,7 @@ class KeycloakAPI(object):
             newSubFlow = {}
             newSubFlow["alias"] = subflowName
             newSubFlow["provider"] = "registration-page-form"
-            newSubFlow["type"] = "basic-flow"
+            newSubFlow["type"] = flowType
             open_url(
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
                     url=self.baseurl,
@@ -2000,8 +2003,11 @@ class KeycloakAPI(object):
                 data=json.dumps(newExec),
                 timeout=self.connection_timeout,
                 validate_certs=self.validate_certs)
+        except HTTPError as e:
+            self.module.fail_json(msg="Unable to create new execution '%s' %s: %s: %s %s" %
+                                  (flowAlias, execution["providerId"], repr(e), ";".join([e.url, e.msg, str(e.code), str(e.hdrs)]), str(newExec)))
         except Exception as e:
-            self.module.fail_json(msg="Unable to create new execution %s: %s" % (execution["provider"], str(e)))
+            self.module.fail_json(msg="Unable to create new execution '%s' %s: %s" % (flowAlias, execution["providerId"], repr(e)))
 
     def change_execution_priority(self, executionId, diff, realm='master'):
         """ Raise or lower execution priority of diff time

@@ -79,6 +79,14 @@ options:
                 description:
                     - Priority order of the execution.
                 type: int
+            subFlowType:
+                description:
+                    - For new subflows, optionally specify the type.
+                    - Is only used at creation.
+                choices: ["basic-flow", "form-flow"]
+                default: "basic-flow"
+                type: str
+                version_added: 6.6.0
     state:
         description:
             - Control if the authentication flow must exists or not.
@@ -264,7 +272,7 @@ def create_or_update_executions(kc, config, realm='master'):
                 exec_index = find_exec_in_executions(new_exec, existing_executions)
                 if exec_index != -1:
                     # Remove key that doesn't need to be compared with existing_exec
-                    exclude_key = ["flowAlias"]
+                    exclude_key = ["flowAlias", "subFlowType"]
                     for index_key, key in enumerate(new_exec, start=0):
                         if new_exec[key] is None:
                             exclude_key.append(key)
@@ -282,7 +290,7 @@ def create_or_update_executions(kc, config, realm='master'):
                     id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 elif new_exec["displayName"] is not None:
-                    kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm)
+                    kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec["subFlowType"])
                     exec_found = True
                     exec_index = new_exec_index
                     id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
@@ -299,7 +307,7 @@ def create_or_update_executions(kc, config, realm='master'):
                             kc.add_authenticationConfig_to_execution(updated_exec["id"], new_exec["authenticationConfig"], realm=realm)
                         for key in new_exec:
                             # remove unwanted key for the next API call
-                            if key != "flowAlias" and key != "authenticationConfig":
+                            if key not in ("flowAlias", "authenticationConfig", "subFlowType"):
                                 updated_exec[key] = new_exec[key]
                         if new_exec["requirement"] is not None:
                             kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
@@ -334,6 +342,7 @@ def main():
                                           flowAlias=dict(type='str'),
                                           authenticationConfig=dict(type='dict'),
                                           index=dict(type='int'),
+                                          subFlowType=dict(choices=["basic-flow", "form-flow"], default='basic-flow', type='str'),
                                       )),
         state=dict(choices=["absent", "present"], default='present'),
         force=dict(type='bool', default=False),
