@@ -35,10 +35,9 @@ options:
     description:
       - Section name in INI file. This is added if I(state=present) automatically when
         a single value is being set.
-      - If left empty or set to C(null), the I(option) will be placed before the first I(section).
+      - If left empty, being omitted, or being set to C(null), the I(option) will be placed before the first I(section).
       - Using C(null) is also required if the config format does not support sections.
     type: str
-    required: true
   option:
     description:
       - If set (required for changing a I(value)), this is the name of the option.
@@ -423,7 +422,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['dest']),
-            section=dict(type='str', required=True),
+            section=dict(type='str'),
             option=dict(type='str'),
             value=dict(type='str'),
             values=dict(type='list', elements='str'),
