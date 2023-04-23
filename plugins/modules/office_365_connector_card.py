@@ -63,7 +63,7 @@ options:
     elements: dict
     description:
       - Contains a list of sections to display in the card.
-      - For more information see https://learn.microsoft.com/en-us/outlook/actionable-messages/message-card-reference#section-fields.
+      - For more information see U(https://learn.microsoft.com/en-us/outlook/actionable-messages/message-card-reference#section-fields).
 '''
 
 EXAMPLES = """
