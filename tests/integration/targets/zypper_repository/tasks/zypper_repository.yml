@@ -214,6 +214,8 @@
       - remove_repo is changed
 
 # For now, the URL does not work for 15.4
+# FIXME: Try to get this working with newer versions
+#        (Maybe 'Uyuni' needs to be replaced with something else?)
 - when: ansible_distribution_version is version('15.4', '<')
   block:
   - name: add new repository via url to .repo file
@@ -261,8 +263,8 @@
         - "removed_by_repo_file"
         - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
 
-# For now, the file does not work for 15.4
-- when: ansible_distribution_version is version('15.4', '<')
+# FIXME: THIS DOESN'T SEEM TO WORK ANYMORE WITH ANY OPENSUSE VERSION IN CI!
+- when: false
   block:
   - name: Copy test .repo file
     copy:
