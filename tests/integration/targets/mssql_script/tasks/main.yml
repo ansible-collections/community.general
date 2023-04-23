@@ -22,6 +22,7 @@
 - name: Start container
   community.docker.docker_container:
     name: mssql-test
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
     env:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "{{ mssql_login_password }}"
@@ -29,8 +30,8 @@
     ports:
       - "{{ mssql_port }}:1433"  # {{ mssql_port }}"
     detach: true
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
     auto_remove: true
+    memory: 2200M
 
 - name: Check default ports
   ansible.builtin.wait_for:

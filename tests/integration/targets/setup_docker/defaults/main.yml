@@ -9,7 +9,7 @@ distro_lookup_names:
   - "{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml"
   - "D-{{ ansible_facts.distribution }}.yml"
   - "{{ ansible_facts.os_family }}.yml"
-  - "nothing.yml"
+  - "default.yml"
 
 has_docker: false
 
