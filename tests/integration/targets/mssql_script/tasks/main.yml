@@ -28,7 +28,7 @@
       SA_PASSWORD: "{{ mssql_login_password }}"
       MSSQL_PID: Developer
     ports:
-      - "{{ mssql_port }}:1433"  # {{ mssql_port }}"
+      - "{{ mssql_port }}:1433"
     detach: true
     auto_remove: true
     memory: 2200M
