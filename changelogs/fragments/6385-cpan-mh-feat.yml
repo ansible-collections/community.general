@@ -1,0 +1,2 @@
+minor_changes:
+  - cpanm - minor change, use feature from ``ModuleHelper`` (https://github.com/ansible-collections/community.general/pull/6385).
