@@ -12,5 +12,3 @@ distro_lookup_names:
   - "default.yml"
 
 has_docker: false
-
-docker_packages: []
