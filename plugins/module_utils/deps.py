@@ -50,7 +50,7 @@ class _Dependency(object):
     def failed(self):
         return self.state == 1
 
-    def verify(self, module):
+    def validate(self, module):
         if self.failed:
             module.fail_json(msg=self.message, exception=self.trace)
 
@@ -71,10 +71,10 @@ def declare(name, *args, **kwargs):
         _deps[name] = dep
 
 
-def validate(module, spec=None):
+def _select_names(spec):
     dep_names = sorted(_deps)
 
-    if spec is not None:
+    if spec:
         if spec.startswith("-"):
             spec_split = spec[1:].split(":")
             for d in spec_split:
@@ -86,5 +86,13 @@ def validate(module, spec=None):
                 _deps[d]  # ensure it exists
                 dep_names.append(d)
 
-    for dep in dep_names:
-        _deps[dep].verify(module)
+    return dep_names
+
+
+def validate(module, spec=None):
+    for dep in _select_names(spec):
+        _deps[dep].validate(module)
+
+
+def failed(spec=None):
+    return any(_deps[d].failed for d in _select_names(spec))
