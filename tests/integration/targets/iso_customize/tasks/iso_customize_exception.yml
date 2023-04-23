@@ -17,16 +17,6 @@
   register: customized_result
   failed_when: customized_result.msg.find('does not exist') == -1
 
-# Test: Get MODULE FAILURE when no add files data and no delete files data
-- name: "Testcase:: no add files data and no delete files data"
-  community.general.iso_customize:
-    src_iso: "{{ test_dir }}/test1.iso"
-    dest_iso: "{{ test_dir }}/iso_customize_nodata.iso"
-    # delete_files:
-    # add_files:
-  register: customized_result
-  failed_when: customized_result.msg.find("MODULE FAILURE") == -1
-
 # Test: nothing is changed when no options "add files" and "delete files"
 - block:
     - name: "Testcase: no options 'add files' and 'delete files'"
