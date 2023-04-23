@@ -32,8 +32,8 @@ attributes:
 options:
   release:
     description:
-      - RHSM release version to use (use null to unset)
-    required: true
+      - RHSM release version to use.
+      - To unset either pass C(null) for this option, or omit this option.
     type: str
 author:
   - Sean Myers (@seandst)
@@ -43,17 +43,17 @@ EXAMPLES = '''
 # Set release version to 7.1
 - name: Set RHSM release version
   community.general.rhsm_release:
-      release: "7.1"
+    release: "7.1"
 
 # Set release version to 6Server
 - name: Set RHSM release version
   community.general.rhsm_release:
-      release: "6Server"
+    release: "6Server"
 
 # Unset release version
 - name: Unset RHSM release release
   community.general.rhsm_release:
-      release: null
+    release: null
 '''
 
 RETURN = '''
@@ -107,7 +107,7 @@ def set_release(module, release):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            release=dict(type='str', required=True),
+            release=dict(type='str'),
         ),
         supports_check_mode=True
     )
