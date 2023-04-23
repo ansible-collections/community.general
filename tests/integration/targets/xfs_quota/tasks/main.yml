@@ -17,7 +17,6 @@
       - mount
       - umount
     state: latest
-  notify: cleanup alpine
 
 - block:
     - name: Create test user
