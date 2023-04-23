@@ -13,8 +13,8 @@ module: office_365_connector_card
 short_description: Use webhooks to create Connector Card messages within an Office 365 group
 description:
   - Creates Connector Card messages through
-  - Office 365 Connectors
-  - U(https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#connector-card-for-microsoft-365-groups)
+    Office 365 Connectors
+    U(https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#connector-card-for-microsoft-365-groups).
 author: "Marc Sensenich (@marc-sensenich)"
 notes:
   - This module is not idempotent, therefore if the same task is run twice
