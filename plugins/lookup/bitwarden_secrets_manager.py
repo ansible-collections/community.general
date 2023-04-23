@@ -23,7 +23,10 @@ DOCUMENTATION = """
         type: list
         elements: str
       bws_access_token:
-        description: A BWS access token to use for this lookup.
+        description: The BWS access token to use for this lookup.
+        env:
+          - name: BWS_ACCESS_TOKEN
+        required: true
         type: str
 """
 
@@ -66,7 +69,6 @@ RETURN = """
     elements: raw
 """
 
-import os
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleError
@@ -121,12 +123,6 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
         bws_access_token = self.get_option('bws_access_token')
-
-        if not bws_access_token:
-            bws_access_token = os.getenv('BWS_ACCESS_TOKEN')
-
-        if not bws_access_token:
-            raise AnsibleError("No access token. Pass the bws_access_token parameter or set the BWS_ACCESS_TOKEN environment variable.")
 
         return [_bitwarden.get_secret(term, bws_access_token) for term in terms]
 
