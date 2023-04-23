@@ -97,19 +97,9 @@ EXAMPLES = '''
 
 RETURN = '''#'''
 
-HAVE_UNIVENTION = False
-HAVE_IPADDRESS = False
-try:
-    from univention.admin.handlers.dns import (
-        forward_zone,
-        reverse_zone,
-    )
-    HAVE_UNIVENTION = True
-except ImportError:
-    pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.basic import missing_required_lib
+from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     umc_module_for_add,
     umc_module_for_edit,
@@ -118,27 +108,26 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     config,
     uldap,
 )
-try:
+
+
+with deps.declare("univention", msg="This module requires univention python bindings"):
+    from univention.admin.handlers.dns import (
+        forward_zone,
+        reverse_zone,
+    )
+
+with deps.declare("ipaddress"):
     import ipaddress
-    HAVE_IPADDRESS = True
-except ImportError:
-    pass
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            type=dict(required=True,
-                      type='str'),
-            zone=dict(required=True,
-                      type='str'),
-            name=dict(required=True,
-                      type='str'),
-            data=dict(default={},
-                      type='dict'),
-            state=dict(default='present',
-                       choices=['present', 'absent'],
-                       type='str')
+            type=dict(required=True, type='str'),
+            zone=dict(required=True, type='str'),
+            name=dict(required=True, type='str'),
+            data=dict(default={}, type='dict'),
+            state=dict(default='present', choices=['present', 'absent'], type='str')
         ),
         supports_check_mode=True,
         required_if=([
@@ -146,8 +135,7 @@ def main():
         ])
     )
 
-    if not HAVE_UNIVENTION:
-        module.fail_json(msg="This module requires univention python bindings")
+    deps.validate(module, "univention")
 
     type = module.params['type']
     zone = module.params['zone']
@@ -159,8 +147,8 @@ def main():
 
     workname = name
     if type == 'ptr_record':
-        if not HAVE_IPADDRESS:
-            module.fail_json(msg=missing_required_lib('ipaddress'))
+        deps.validate(module, "ipaddress")
+
         try:
             if 'arpa' not in zone:
                 raise Exception("Zone must be reversed zone for ptr_record. (e.g. 1.1.192.in-addr.arpa)")
@@ -196,7 +184,7 @@ def main():
                     '(zoneName={0})'.format(zone),
                     scope='domain',
                 )
-                if len(so) == 0:
+                if not so == 0:
                     raise Exception("Did not find zone '{0}' in Univention".format(zone))
                 obj = umc_module_for_add('dns/{0}'.format(type), container, superordinate=so[0])
             else:
