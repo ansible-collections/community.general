@@ -38,7 +38,7 @@
     host: "{{ mssql_host }}"
     port: "{{ mssql_port }}"
     state: started         # Port should be open
-    delay: 10              # No wait before first check (sec)
+    delay: 10              # Wait 10 secs before first check
     timeout: 30            # Stop checking after timeout (sec)
 
 - name: Check DB connection
