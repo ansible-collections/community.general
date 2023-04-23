@@ -90,6 +90,9 @@ URL_IDENTITY_PROVIDER_MAPPER = "{url}/admin/realms/{realm}/identity-provider/ins
 URL_COMPONENTS = "{url}/admin/realms/{realm}/components"
 URL_COMPONENT = "{url}/admin/realms/{realm}/components/{id}"
 
+URL_AUTHZ_AUTHORIZATION_SCOPE = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/scope/{id}"
+URL_AUTHZ_AUTHORIZATION_SCOPES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/scope"
+
 
 def keycloak_argument_spec():
     """
@@ -2331,3 +2334,44 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to delete component %s in realm %s: %s'
                                       % (cid, realm, str(e)))
+
+    def get_authz_authorization_scope_by_name(self, name, client_id, realm):
+        url = URL_AUTHZ_AUTHORIZATION_SCOPES.format(url=self.baseurl, client_id=client_id, realm=realm)
+        search_url = "%s/search?name=%s" % (url, quote(name))
+
+        try:
+            return json.loads(to_native(open_url(search_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception:
+            return False
+
+    def create_authz_authorization_scope(self, payload, client_id, realm):
+        """Create an authorization scope for a Keycloak client"""
+        url = URL_AUTHZ_AUTHORIZATION_SCOPES.format(url=self.baseurl, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create authorization scope %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+
+    def update_authz_authorization_scope(self, payload, id, client_id, realm):
+        """Update an authorization scope for a Keycloak client"""
+        url = URL_AUTHZ_AUTHORIZATION_SCOPE.format(url=self.baseurl, id=id, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create update scope %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+
+    def remove_authz_authorization_scope(self, id, client_id, realm):
+        """Remove an authorization scope from a Keycloak client"""
+        url = URL_AUTHZ_AUTHORIZATION_SCOPE.format(url=self.baseurl, id=id, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete scope %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
