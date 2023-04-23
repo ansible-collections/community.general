@@ -17,7 +17,6 @@
   ansible.builtin.pip:
     name:
       - pymssql
-      - requests
     state: present
 
 - name: Start container
