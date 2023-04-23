@@ -5,7 +5,7 @@ importlib ; python_version < '2.7'
 python-memcached
 
 # requirement for the redis cache plugin
-redis
+redis <= 4.5.1
 
 # requirement for the linode module
 linode-python  # APIv3
@@ -13,7 +13,7 @@ linode_api4 ; python_version > '2.6'  # APIv4
 
 # requirement for the gitlab and github modules
 python-gitlab
-PyGithub
+PyGithub <= 1.58.0
 httmock
 
 # requirement for maven_artifact module
@@ -22,7 +22,7 @@ lxml ; python_version >= '2.7'
 semantic_version
 
 # requirement for datadog_downtime module
-datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
+datadog-api-client >= 1.0.0b3, <= 2.10.0 ; python_version >= '3.6'
 
 # requirement for dnsimple module
 dnsimple >= 2 ; python_version >= '3.6'
