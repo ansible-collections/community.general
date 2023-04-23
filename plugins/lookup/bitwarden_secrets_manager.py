@@ -64,9 +64,9 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description: List containing the secret JSON object. Guaranteed to be of length 1.
+    description: List containing one or more secrets.
     type: list
-    elements: raw
+    elements: dict
 """
 
 from subprocess import Popen, PIPE
@@ -112,10 +112,7 @@ class Bitwarden(object):
 
         out, err = self._run(params)
 
-        # This includes things that matched in different fields.
-        initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
-
-        return [initial_matches]
+        return AnsibleJSONDecoder().raw_decode(out)[0]
 
 
 class LookupModule(LookupBase):
