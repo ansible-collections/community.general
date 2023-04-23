@@ -10,7 +10,6 @@
 - name: install pycdlib
   pip:
     name: pycdlib
-    # state: latest
     extra_args: "-c {{ remote_constraints }}"
   register: install_pycdlib
 - debug: var=install_pycdlib
