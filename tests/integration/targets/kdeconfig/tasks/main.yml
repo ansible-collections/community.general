@@ -355,7 +355,7 @@
     path: "{{ output_file }}"
     values:
       - group: test1
-        key:
+        key: ''
         value: test2
     kwriteconfig_path: "{{ kwriteconf_fake }}"
   register: result_ekey
