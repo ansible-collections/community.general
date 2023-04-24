@@ -1,4 +1,0 @@
-bugfixes:
-  - redhat_subscription - try to unregister only when already registered when ``force_register`` is specified
-    (https://github.com/ansible-collections/community.general/issues/6258,
-     https://github.com/ansible-collections/community.general/pull/6259).
