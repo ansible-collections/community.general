@@ -74,17 +74,17 @@ EXAMPLES = """
 
 RETURN = '''
   key:
-    description: The key specified in the module parameters
+    description: The key specified in the module parameters.
     returned: success
     type: str
     sample: /desktop/gnome/interface/font_name
   value_type:
-    description: The type of the value that was changed
+    description: The type of the value that was changed.
     returned: success
     type: str
     sample: string
   value:
-    description: The value of the preference key after executing the module
+    description: The value of the preference key after executing the module or C(null) if key is removed.
     returned: success
     type: str
     sample: "Serif 12"
