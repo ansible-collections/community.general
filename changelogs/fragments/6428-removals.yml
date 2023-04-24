@@ -5,3 +5,4 @@ breaking_changes:
 removed_features:
   - "newrelic_deployment - the ``appname`` and ``environment`` options have been removed. They did not do anything (https://github.com/ansible-collections/community.general/pull/6428)."
   - "puppet - the alias ``show-diff`` of the ``show_diff`` option has been removed. Use ``show_diff`` instead (https://github.com/ansible-collections/community.general/pull/6428)."
+  - "cmd_runner module utils - the ``fmt`` alias of ``cmd_runner_fmt`` has been removed. Use ``cmd_runner_fmt`` instead (https://github.com/ansible-collections/community.general/pull/6428)."
