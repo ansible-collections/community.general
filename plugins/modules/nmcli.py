@@ -397,9 +397,9 @@ options:
         description:
             - This is only used with 'bridge-slave' - 'hairpin mode' for the slave, which allows frames to be sent back out through the slave the
               frame was received on.
-            - The default value is C(true), but that is being deprecated
-              and it will be changed to C(false) in community.general 7.0.0.
+            - The default change to C(false) in community.general 7.0.0. It used to be C(true) before.
         type: bool
+        default: false
     runner:
         description:
             - This is the type of device or network connection that you wish to create for a team.
@@ -1519,8 +1519,7 @@ class Nmcli(object):
         self.hellotime = module.params['hellotime']
         self.maxage = module.params['maxage']
         self.ageingtime = module.params['ageingtime']
-        # hairpin should be back to normal in 7.0.0
-        self._hairpin = module.params['hairpin']
+        self.hairpin = module.params['hairpin']
         self.path_cost = module.params['path_cost']
         self.mac = module.params['mac']
         self.runner = module.params['runner']
@@ -1570,18 +1569,6 @@ class Nmcli(object):
             self.ipv6_method = None
 
         self.edit_commands = []
-
-    @property
-    def hairpin(self):
-        if self._hairpin is None:
-            self.module.deprecate(
-                "Parameter 'hairpin' default value will change from true to false in community.general 7.0.0. "
-                "Set the value explicitly to suppress this warning.",
-                version='7.0.0', collection_name='community.general',
-            )
-            # Should be False in 7.0.0 but then that should be in argument_specs
-            self._hairpin = True
-        return self._hairpin
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
         if isinstance(cmd, list):
@@ -2366,7 +2353,7 @@ def main():
             hellotime=dict(type='int', default=2),
             maxage=dict(type='int', default=20),
             ageingtime=dict(type='int', default=300),
-            hairpin=dict(type='bool'),
+            hairpin=dict(type='bool', default=False),
             path_cost=dict(type='int', default=100),
             # team specific vars
             runner=dict(type='str', default='roundrobin',
