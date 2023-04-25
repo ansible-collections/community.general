@@ -167,11 +167,6 @@ EXAMPLES = r"""
   tasks:
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
-
-description: 
-    -Private key stores into certificate file which is attached with secret. 
-    -If fetch_attachments=True then private key file will be download on specified path 
-    -And file content will display in debug message.
     
 - hosts: localhost
   vars:
