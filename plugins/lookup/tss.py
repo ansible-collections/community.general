@@ -26,14 +26,16 @@ options:
         description: The integer ID of the secret.
         required: true
         type: int
-    _fetch_attachments:
+    fetch_attachments:
         description: The boolean flag which indicate attached file will get downloaded or not.
         required: false
         type: bool
-    _file_download_path:
+        version_added: 7.0.0
+    file_download_path:
         description: Indicate the file attachment download location.
         required: false
-        type: str
+        type: path
+        version_added: 7.0.0
     base_url:
         description: The base URL of the server, e.g. C(https://localhost/SecretServer).
         env:
@@ -166,6 +168,9 @@ EXAMPLES = r"""
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
 
+description: -Private key stores into certificate file which is attached with secret. -If fetch_attachments=True then 
+private key file will be download on specified path and file content will display in debug message.
+    
 - hosts: localhost
   vars:
       secret: >-
@@ -173,8 +178,8 @@ EXAMPLES = r"""
             lookup(
                 'community.general.tss',
                 102,
-                _fetch_attachments=True,
-                _file_download_path='/home/certs',
+                fetch_attachments=True,
+                file_download_path='/home/certs',
                 base_url='https://secretserver.domain.com/SecretServer/',
                 token='thycotic_access_token'
             )
@@ -249,12 +254,12 @@ class TSSClient(object):
         if fetch_file_attachments:
             obj = self._client.get_secret(secret_id, fetch_file_attachments)
             for i in obj['items']:
-                if os.path.isdir(file_download_path):
+                if file_download_path and os.path.isdir(file_download_path):
                     if i['isFile']:
                         try:
-                            f = open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "w")
-                            f.write(i['itemValue'].text)
-                            f.close()
+                            with open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "w") as f:
+                                f.write(i['itemValue'].text)
+                                f.close()
                             i['itemValue'] = "*** Not Valid For Display ***"
                         except ValueError:
                             raise AnsibleOptionsError("Failed to download {0}".format(str(i['slug'])))
@@ -322,7 +327,7 @@ class TSSClientV1(TSSClient):
 
 
 class LookupModule(LookupBase):
-    def run(self, terms, variables, _fetch_attachments=False, _file_download_path="", **kwargs):
+    def run(self, terms, variables, **kwargs):
         if not HAS_TSS_SDK:
             raise AnsibleError("python-tss-sdk must be installed to use this plugin")
 
@@ -339,6 +344,6 @@ class LookupModule(LookupBase):
         )
 
         try:
-            return [tss.get_secret(term, _fetch_attachments, _file_download_path) for term in terms]
+            return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
         except SecretServerError as error:
             raise AnsibleError("Secret Server lookup failure: %s" % error.message)
