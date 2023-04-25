@@ -175,18 +175,17 @@ EXAMPLES = r"""
                 102,
                 _fetch_attachments=True,
                 _file_download_path='/home/certs',
-                base_url='https://scimtest.secretservercloud.com/',
-                username='user.name',
-                password='password'
+                base_url='https://secretserver.domain.com/SecretServer/',
+                token='thycotic_access_token'
             )
         }}
   tasks:
     - ansible.builtin.debug:
         msg: >
-          the password is {{
+          the private key is {{
             (secret['items']
               | items2dict(key_name='slug',
-                           value_name='itemValue'))
+                           value_name='itemValue'))['private-key']
           }}
 """
 
@@ -250,12 +249,17 @@ class TSSClient(object):
         if fetch_file_attachments:
             obj = self._client.get_secret(secret_id, fetch_file_attachments)
             for i in obj['items']:
-                os.makedirs(os.path.join(file_download_path, "Certificates"), exist_ok=True)
-                if i['isFile']:
-                    f = open(os.path.join(file_download_path, "Certificates", str(obj['id']) + "_" + i['slug']), "w")
-                    f.write(i['itemValue'].text)
-                    f.close()
-                    i['itemValue'] = "*** Not Valid For Display ***"
+                if os.path.isdir(file_download_path):
+                    if i['isFile']:
+                        try:
+                            f = open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "w")
+                            f.write(i['itemValue'].text)
+                            f.close()
+                            i['itemValue'] = "*** Not Valid For Display ***"
+                        except ValueError:
+                            raise AnsibleOptionsError("Failed to download {0}".format(str(i['slug'])))
+                else:
+                    raise AnsibleOptionsError("File download path does not exist")
             return obj
         else:
             return self._client.get_secret_json(secret_id)
