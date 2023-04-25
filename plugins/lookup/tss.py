@@ -167,7 +167,7 @@ EXAMPLES = r"""
   tasks:
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
-    
+
 - hosts: localhost
   vars:
       secret: >-
