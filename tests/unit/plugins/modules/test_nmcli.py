@@ -568,6 +568,7 @@ TESTCASE_BRIDGE_SLAVE = [
         'type': 'bridge-slave',
         'conn_name': 'non_existent_nw_device',
         'ifname': 'br0_non_existant',
+        'hairpin': True,
         'path_cost': 100,
         'state': 'present',
         '_ansible_check_mode': False,
