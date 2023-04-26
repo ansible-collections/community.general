@@ -1924,7 +1924,14 @@ class RedfishUtils(object):
         # Get the SettingsObject URI to apply the attributes
         set_bios_attr_uri = data.get("@Redfish.Settings", {}).get("SettingsObject", {}).get("@odata.id")
         if set_bios_attr_uri is None:
-            return {'ret': False, 'msg': "Settings resource for BIOS attributes not found."}
+            # WORKAROUND
+            # Some Gigabyte systems do not implement @Redfish.Settings, but
+            # implement the settings resource.
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'Gigabyte':
+                set_bios_attr_uri = bios_uri + "/SD"
+            else:
+                return {'ret': False, 'msg': "Settings resource for BIOS attributes not found."}
 
         # Construct payload and issue PATCH command
         payload = {"Attributes": attrs_to_patch}

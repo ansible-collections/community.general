@@ -1,0 +1,2 @@
+bugfixes:
+    - redfish_utils - add workaround to ``SetBiosAttributes`` for Gigabyte systems that do not properly implement ``@Redfish.Settings`` (https://github.com/ansible-collections/community.general/issues/6433).
