@@ -61,18 +61,6 @@ options:
     description:
       - The name of the user/process that triggered this deployment
     required: false
-  appname:
-    type: str
-    description:
-      - Name of the application.
-      - This option has been deprecated and will be removed in community.general 7.0.0. Please do not use.
-    required: false
-  environment:
-    type: str
-    description:
-      - The environment for this deployment.
-      - This option has been deprecated and will be removed community.general 7.0.0. Please do not use.
-    required: false
   validate_certs:
     description:
       - If C(false), SSL certificates will not be validated. This should only be used
@@ -113,8 +101,6 @@ def main():
             description=dict(required=False),
             revision=dict(required=True),
             user=dict(required=False),
-            appname=dict(required=False, removed_in_version='7.0.0', removed_from_collection='community.general'),
-            environment=dict(required=False, removed_in_version='7.0.0', removed_from_collection='community.general'),
             validate_certs=dict(default=True, type='bool'),
         ),
         required_one_of=[['app_name', 'application_id']],

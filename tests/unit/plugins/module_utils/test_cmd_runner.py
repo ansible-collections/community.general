@@ -11,44 +11,44 @@ from sys import version_info
 import pytest
 
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, PropertyMock
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
 TC_FORMATS = dict(
-    simple_boolean__true=(fmt.as_bool, ("--superflag",), True, ["--superflag"]),
-    simple_boolean__false=(fmt.as_bool, ("--superflag",), False, []),
-    simple_boolean__none=(fmt.as_bool, ("--superflag",), None, []),
-    simple_boolean_both__true=(fmt.as_bool, ("--superflag", "--falseflag"), True, ["--superflag"]),
-    simple_boolean_both__false=(fmt.as_bool, ("--superflag", "--falseflag"), False, ["--falseflag"]),
-    simple_boolean_both__none=(fmt.as_bool, ("--superflag", "--falseflag"), None, ["--falseflag"]),
-    simple_boolean_both__none_ig=(fmt.as_bool, ("--superflag", "--falseflag", True), None, []),
-    simple_boolean_not__true=(fmt.as_bool_not, ("--superflag",), True, []),
-    simple_boolean_not__false=(fmt.as_bool_not, ("--superflag",), False, ["--superflag"]),
-    simple_boolean_not__none=(fmt.as_bool_not, ("--superflag",), None, ["--superflag"]),
-    simple_optval__str=(fmt.as_optval, ("-t",), "potatoes", ["-tpotatoes"]),
-    simple_optval__int=(fmt.as_optval, ("-t",), 42, ["-t42"]),
-    simple_opt_val__str=(fmt.as_opt_val, ("-t",), "potatoes", ["-t", "potatoes"]),
-    simple_opt_val__int=(fmt.as_opt_val, ("-t",), 42, ["-t", "42"]),
-    simple_opt_eq_val__str=(fmt.as_opt_eq_val, ("--food",), "potatoes", ["--food=potatoes"]),
-    simple_opt_eq_val__int=(fmt.as_opt_eq_val, ("--answer",), 42, ["--answer=42"]),
-    simple_list_potato=(fmt.as_list, (), "literal_potato", ["literal_potato"]),
-    simple_list_42=(fmt.as_list, (), 42, ["42"]),
-    simple_map=(fmt.as_map, ({'a': 1, 'b': 2, 'c': 3},), 'b', ["2"]),
-    simple_default_type__list=(fmt.as_default_type, ("list",), [1, 2, 3, 5, 8], ["--1", "--2", "--3", "--5", "--8"]),
-    simple_default_type__bool_true=(fmt.as_default_type, ("bool", "what"), True, ["--what"]),
-    simple_default_type__bool_false=(fmt.as_default_type, ("bool", "what"), False, []),
-    simple_default_type__potato=(fmt.as_default_type, ("any-other-type", "potato"), "42", ["--potato", "42"]),
-    simple_fixed_true=(fmt.as_fixed, [("--always-here", "--forever")], True, ["--always-here", "--forever"]),
-    simple_fixed_false=(fmt.as_fixed, [("--always-here", "--forever")], False, ["--always-here", "--forever"]),
-    simple_fixed_none=(fmt.as_fixed, [("--always-here", "--forever")], None, ["--always-here", "--forever"]),
-    simple_fixed_str=(fmt.as_fixed, [("--always-here", "--forever")], "something", ["--always-here", "--forever"]),
+    simple_boolean__true=(cmd_runner_fmt.as_bool, ("--superflag",), True, ["--superflag"]),
+    simple_boolean__false=(cmd_runner_fmt.as_bool, ("--superflag",), False, []),
+    simple_boolean__none=(cmd_runner_fmt.as_bool, ("--superflag",), None, []),
+    simple_boolean_both__true=(cmd_runner_fmt.as_bool, ("--superflag", "--falseflag"), True, ["--superflag"]),
+    simple_boolean_both__false=(cmd_runner_fmt.as_bool, ("--superflag", "--falseflag"), False, ["--falseflag"]),
+    simple_boolean_both__none=(cmd_runner_fmt.as_bool, ("--superflag", "--falseflag"), None, ["--falseflag"]),
+    simple_boolean_both__none_ig=(cmd_runner_fmt.as_bool, ("--superflag", "--falseflag", True), None, []),
+    simple_boolean_not__true=(cmd_runner_fmt.as_bool_not, ("--superflag",), True, []),
+    simple_boolean_not__false=(cmd_runner_fmt.as_bool_not, ("--superflag",), False, ["--superflag"]),
+    simple_boolean_not__none=(cmd_runner_fmt.as_bool_not, ("--superflag",), None, ["--superflag"]),
+    simple_optval__str=(cmd_runner_fmt.as_optval, ("-t",), "potatoes", ["-tpotatoes"]),
+    simple_optval__int=(cmd_runner_fmt.as_optval, ("-t",), 42, ["-t42"]),
+    simple_opt_val__str=(cmd_runner_fmt.as_opt_val, ("-t",), "potatoes", ["-t", "potatoes"]),
+    simple_opt_val__int=(cmd_runner_fmt.as_opt_val, ("-t",), 42, ["-t", "42"]),
+    simple_opt_eq_val__str=(cmd_runner_fmt.as_opt_eq_val, ("--food",), "potatoes", ["--food=potatoes"]),
+    simple_opt_eq_val__int=(cmd_runner_fmt.as_opt_eq_val, ("--answer",), 42, ["--answer=42"]),
+    simple_list_potato=(cmd_runner_fmt.as_list, (), "literal_potato", ["literal_potato"]),
+    simple_list_42=(cmd_runner_fmt.as_list, (), 42, ["42"]),
+    simple_map=(cmd_runner_fmt.as_map, ({'a': 1, 'b': 2, 'c': 3},), 'b', ["2"]),
+    simple_default_type__list=(cmd_runner_fmt.as_default_type, ("list",), [1, 2, 3, 5, 8], ["--1", "--2", "--3", "--5", "--8"]),
+    simple_default_type__bool_true=(cmd_runner_fmt.as_default_type, ("bool", "what"), True, ["--what"]),
+    simple_default_type__bool_false=(cmd_runner_fmt.as_default_type, ("bool", "what"), False, []),
+    simple_default_type__potato=(cmd_runner_fmt.as_default_type, ("any-other-type", "potato"), "42", ["--potato", "42"]),
+    simple_fixed_true=(cmd_runner_fmt.as_fixed, [("--always-here", "--forever")], True, ["--always-here", "--forever"]),
+    simple_fixed_false=(cmd_runner_fmt.as_fixed, [("--always-here", "--forever")], False, ["--always-here", "--forever"]),
+    simple_fixed_none=(cmd_runner_fmt.as_fixed, [("--always-here", "--forever")], None, ["--always-here", "--forever"]),
+    simple_fixed_str=(cmd_runner_fmt.as_fixed, [("--always-here", "--forever")], "something", ["--always-here", "--forever"]),
 )
 if tuple(version_info) >= (3, 1):
     from collections import OrderedDict
 
     # needs OrderedDict to provide a consistent key order
     TC_FORMATS["simple_default_type__dict"] = (  # type: ignore
-        fmt.as_default_type,
+        cmd_runner_fmt.as_default_type,
         ("dict",),
         OrderedDict((('a', 1), ('b', 2))),
         ["--a=1", "--b=2"]
@@ -76,11 +76,11 @@ TC_RUNNER = dict(
     #             param1=dict(
     #                 type="int",
     #                 value=11,
-    #                 fmt_func=fmt.as_opt_eq_val,
+    #                 fmt_func=cmd_runner_fmt.as_opt_eq_val,
     #                 fmt_arg="--answer",
     #             ),
     #             param2=dict(
-    #                 fmt_func=fmt.as_bool,
+    #                 fmt_func=cmd_runner_fmt.as_bool,
     #                 fmt_arg="--bb-here",
     #             )
     #         ),
@@ -119,8 +119,8 @@ TC_RUNNER = dict(
     aa_bb=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb']),
@@ -137,8 +137,8 @@ TC_RUNNER = dict(
     aa_bb_default_order=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(),
@@ -155,8 +155,8 @@ TC_RUNNER = dict(
     aa_bb_default_order_args_order=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(args_order=['aa', 'bb']),
@@ -173,8 +173,8 @@ TC_RUNNER = dict(
     aa_bb_dup_in_args_order=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb', 'aa']),
@@ -189,8 +189,8 @@ TC_RUNNER = dict(
     aa_bb_process_output=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
@@ -209,8 +209,8 @@ TC_RUNNER = dict(
     aa_bb_ignore_none_with_none=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=49, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=49, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
@@ -228,8 +228,8 @@ TC_RUNNER = dict(
     aa_bb_ignore_not_none_with_none=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=49, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=49, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
@@ -247,8 +247,8 @@ TC_RUNNER = dict(
     aa_bb_fixed=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_fixed, fmt_arg=["fixed", "args"]),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_fixed, fmt_arg=["fixed", "args"]),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb']),
@@ -265,8 +265,8 @@ TC_RUNNER = dict(
     aa_bb_map=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_map, fmt_arg={"v1": 111, "v2": 222}),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_map, fmt_arg={"v1": 111, "v2": 222}),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb']),
@@ -283,8 +283,8 @@ TC_RUNNER = dict(
     aa_bb_map_default=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt_func=fmt.as_map, fmt_arg={"v1": 111, "v2": 222}),
+                aa=dict(type="int", value=11, fmt_func=cmd_runner_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=cmd_runner_fmt.as_map, fmt_arg={"v1": 111, "v2": 222}),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb']),

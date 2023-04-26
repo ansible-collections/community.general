@@ -114,8 +114,9 @@ options:
       - Whether the runner should be registered with an access level or not.
       - If set to C(true), the value of I(access_level) is used for runner registration.
       - If set to C(false), GitLab registers the runner with the default access level.
-      - The current default of this option is C(false). This default is deprecated and will change to C(true) in commuinty.general 7.0.0.
+      - The default of this option changed to C(true) in community.general 7.0.0. Before, it was C(false).
     required: false
+    default: true
     type: bool
     version_added: 6.3.0
   maximum_timeout:
@@ -252,13 +253,6 @@ class GitLabRunner(object):
             arguments['token'] = options['registration_token']
 
             access_level_on_creation = self._module.params['access_level_on_creation']
-            if access_level_on_creation is None:
-                message = "The option 'access_level_on_creation' is unspecified, so 'false' is assumed. "\
-                          "That means any value of 'access_level' is ignored and GitLab registers the runner with its default value. "\
-                          "The option 'access_level_on_creation' will switch to 'true' in community.general 7.0.0"
-                self._module.deprecate(message, version='7.0.0', collection_name='community.general')
-                access_level_on_creation = False
-
             if not access_level_on_creation:
                 arguments.pop('access_level', None)
 
@@ -366,7 +360,7 @@ def main():
         run_untagged=dict(type='bool', default=True),
         locked=dict(type='bool', default=False),
         access_level=dict(type='str', choices=["not_protected", "ref_protected"]),
-        access_level_on_creation=dict(type='bool'),
+        access_level_on_creation=dict(type='bool', default=True),
         maximum_timeout=dict(type='int', default=3600),
         registration_token=dict(type='str', no_log=True),
         project=dict(type='str'),
