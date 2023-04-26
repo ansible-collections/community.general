@@ -52,9 +52,9 @@ options:
         description:
             - Define which release of a snap is installed and tracked for updates.
               This option can only be specified if there is a single snap in the task.
+            - If not passed, the C(snap) command will default to I(stable).
         type: str
         required: false
-        default: stable
     options:
         description:
             - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
@@ -167,7 +167,7 @@ class Snap(StateModuleHelper):
             'state': dict(type='str', default='present',
                           choices=['absent', 'present', 'enabled', 'disabled']),
             'classic': dict(type='bool', default=False),
-            'channel': dict(type='str', default='stable'),
+            'channel': dict(type='str'),
             'options': dict(type='list', elements='str'),
         },
         supports_check_mode=True,
@@ -211,6 +211,10 @@ class Snap(StateModuleHelper):
             '\n'.join(results_out),
             '\n'.join(results_err),
         ]
+
+    def __quit_module__(self):
+        if self.vars.channel is None:
+            self.vars.channel = "stable"
 
     def convert_json_subtree_to_map(self, json_subtree, prefix=None):
         option_map = {}
