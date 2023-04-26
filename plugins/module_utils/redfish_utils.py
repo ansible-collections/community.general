@@ -1925,10 +1925,10 @@ class RedfishUtils(object):
         set_bios_attr_uri = data.get("@Redfish.Settings", {}).get("SettingsObject", {}).get("@odata.id")
         if set_bios_attr_uri is None:
             # WORKAROUND
-            # Some Gigabyte systems do not implement @Redfish.Settings, but
-            # implement the settings resource.
+            # Some systems with firmware from AMI do not implement
+            # @Redfish.Settings, but implement the settings resource.
             vendor = self._get_vendor()['Vendor']
-            if vendor == 'Gigabyte':
+            if vendor == 'AMI':
                 set_bios_attr_uri = bios_uri + "/SD"
             else:
                 return {'ret': False, 'msg': "Settings resource for BIOS attributes not found."}
