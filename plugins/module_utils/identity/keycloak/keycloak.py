@@ -105,6 +105,17 @@ URL_COMPONENT = "{url}/admin/realms/{realm}/components/{id}"
 URL_AUTHZ_AUTHORIZATION_SCOPE = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/scope/{id}"
 URL_AUTHZ_AUTHORIZATION_SCOPES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/scope"
 
+# This URL is used for:
+# - Querying client authorization permissions
+# - Removing client authorization permissions
+URL_AUTHZ_POLICIES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy"
+URL_AUTHZ_POLICY = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy/{id}"
+
+URL_AUTHZ_PERMISSION = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/permission/{permission_type}/{id}"
+URL_AUTHZ_PERMISSIONS = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/permission/{permission_type}"
+
+URL_AUTHZ_RESOURCES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/resource"
+
 
 def keycloak_argument_spec():
     """
@@ -2892,3 +2903,69 @@ class KeycloakAPI(object):
                     group_dict['name'] = group
                     list_of_groups.append(group_dict)
         return list_of_groups
+
+    def get_authz_permission_by_name(self, name, client_id, realm):
+        """Get authorization permission by name"""
+        url = URL_AUTHZ_POLICIES.format(url=self.baseurl, client_id=client_id, realm=realm)
+        search_url = "%s/search?name=%s" % (url, name.replace(' ', '%20'))
+
+        try:
+            return json.loads(to_native(open_url(search_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception:
+            return False
+
+    def create_authz_permission(self, payload, permission_type, client_id, realm):
+        """Create an authorization permission for a Keycloak client"""
+        url = URL_AUTHZ_PERMISSIONS.format(url=self.baseurl, permission_type=permission_type, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create permission %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+
+    def remove_authz_permission(self, id, client_id, realm):
+        """Create an authorization permission for a Keycloak client"""
+        url = URL_AUTHZ_POLICY.format(url=self.baseurl, id=id, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete permission %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
+
+    def update_authz_permission(self, payload, permission_type, id, client_id, realm):
+        """Update a permission for a Keycloak client"""
+        url = URL_AUTHZ_PERMISSION.format(url=self.baseurl, permission_type=permission_type, id=id, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create update permission %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+
+    def get_authz_resource_by_name(self, name, client_id, realm):
+        """Get authorization resource by name"""
+        url = URL_AUTHZ_RESOURCES.format(url=self.baseurl, client_id=client_id, realm=realm)
+        search_url = "%s/search?name=%s" % (url, name.replace(' ', '%20'))
+
+        try:
+            return json.loads(to_native(open_url(search_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception:
+            return False
+
+    def get_authz_policy_by_name(self, name, client_id, realm):
+        """Get authorization policy by name"""
+        url = URL_AUTHZ_POLICIES.format(url=self.baseurl, client_id=client_id, realm=realm)
+        search_url = "%s/search?name=%s&permission=false" % (url, name.replace(' ', '%20'))
+
+        try:
+            return json.loads(to_native(open_url(search_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception:
+            return False
