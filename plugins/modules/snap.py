@@ -162,6 +162,7 @@ class Snap(StateModuleHelper):
     __disable_re = re.compile(r'(?:\S+\s+){5}(?P<notes>\S+)')
     __set_param_re = re.compile(r'(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)')
     __list_re = re.compile(r'^(?P<name>\S+)\s+\S+\s+\S+\s+(?P<channel>\S+)')
+    __install_re = re.compile(r'(?P<name>\S+)\s.+\sinstalled')
     module = dict(
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
@@ -301,7 +302,10 @@ class Snap(StateModuleHelper):
             self.vars.cmd, rc, out, err = self._run_multiple_commands(params, actionable_snaps)
 
         if rc == 0:
-            return
+            match_install = [self.__install_re.match(line) for line in out.split('\n')]
+            match_install = [m.group('name') in actionable_snaps for m in match_install if m]
+            if len(match_install) == len(commands):
+                return
 
         classic_snap_pattern = re.compile(r'^error: This revision of snap "(?P<package_name>\w+)"'
                                           r' was published using classic confinement')
