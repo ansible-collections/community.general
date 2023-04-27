@@ -161,11 +161,11 @@ from ansible_collections.community.general.plugins.module_utils.snap import snap
 class Snap(StateModuleHelper):
     __disable_re = re.compile(r'(?:\S+\s+){5}(?P<notes>\S+)')
     __set_param_re = re.compile(r'(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)')
+    __list_re = re.compile(r'^(?P<name>\S+)\s+\S+\s+\S+\s+(?P<channel>\S+)')
     module = dict(
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
-            'state': dict(type='str', default='present',
-                          choices=['absent', 'present', 'enabled', 'disabled']),
+            'state': dict(type='str', default='present', choices=['absent', 'present', 'enabled', 'disabled']),
             'classic': dict(type='bool', default=False),
             'channel': dict(type='str'),
             'options': dict(type='list', elements='str'),
@@ -259,9 +259,18 @@ class Snap(StateModuleHelper):
 
         return option_map
 
-    def is_snap_installed(self, snap_name):
-        rc, dummy, dummy = self.runner("_list name").run(name=snap_name)
-        return rc == 0
+    def is_snap_installed(self, snap_name, channel):
+        with self.runner("_list name") as ctx:
+            rc, out, err = ctx.run(name=snap_name)
+        if rc != 0:
+            return False
+        out = out.split('\n')[1:]
+        out = [self.__list_re.match(x) for x in out]
+        out = [(m.group('name'), m.group('channel')) for m in out if m]
+        if channel is None:
+            return any(snap_name == m[0] for m in out)
+        else:
+            return any((snap_name, channel) == m for m in out)
 
     def is_snap_enabled(self, snap_name):
         with self.runner("_list name") as ctx:
@@ -276,7 +285,7 @@ class Snap(StateModuleHelper):
         return "disabled" not in notes.split(',')
 
     def process_actionable_snaps(self, actionable_snaps):
-        self.changed = True
+        self.changed = False
         self.vars.snaps_installed = actionable_snaps
 
         if self.check_mode:
@@ -309,7 +318,7 @@ class Snap(StateModuleHelper):
 
         self.vars.meta('classic').set(output=True)
         self.vars.meta('channel').set(output=True)
-        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
+        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s, self.vars.channel)]
 
         if actionable_snaps:
             self.process_actionable_snaps(actionable_snaps)
@@ -320,7 +329,7 @@ class Snap(StateModuleHelper):
         if self.vars.options is None:
             return
 
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
+        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s, self.vars.channel)]
         overall_options_changed = []
 
         for snap_name in actionable_snaps:
@@ -388,7 +397,7 @@ class Snap(StateModuleHelper):
         self.do_raise(msg=msg)
 
     def state_absent(self):
-        self._generic_state_action(self.is_snap_installed, "snaps_removed", ['classic', 'channel', 'state'])
+        self._generic_state_action(lambda s: self.is_snap_installed(s, self.vars.channel), "snaps_removed", ['classic', 'channel', 'state'])
 
     def state_enabled(self):
         self._generic_state_action(lambda s: not self.is_snap_enabled(s), "snaps_enabled", ['classic', 'channel', 'state'])

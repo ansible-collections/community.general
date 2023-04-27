@@ -234,6 +234,7 @@
       - install_two_remove_again.snaps_installed is not defined
       - install_two_remove_again.snaps_removed is not defined
 
+# Test for https://github.com/ansible-collections/community.general/issues/1606
 - name: Install package (microk8s)
   community.general.snap:
     name: microk8s
