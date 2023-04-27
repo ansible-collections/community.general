@@ -16,9 +16,6 @@ from httmock import urlmatch
 import pytest
 
 
-dnsimple = pytest.importorskip('dnsimple_info')
-
-
 @urlmatch(netloc='(.)*dnsimple.com(.)*',
           path='/v2/[0-9]*/zones/')
 def zones_resp(url, request):
