@@ -62,7 +62,7 @@ Recommendations
 
 * Don't forget to publish the service ports when starting the container
 * Take into consideration that the services inside the container will take a while to get started. Use both/either `ansible.builtin.wait_for` to check for the availability of the network port and/or `retries` on the first task effectively using those services
-* As a precautionary measure, start using the role in a test that is marked either `disabled` or `unsupported`, and move forward from there. If intent on running a test that uses docker in the CI execution, please make sure that intention is mentioned with some anticipation to the collection maintainers as it can significantly increase the load and time length of the tests.
+* As a precautionary measure, start using the role in a test that is marked either `disabled` or `unsupported`, and move forward from there.
 
 
 Known Issues & Caveats
