@@ -285,7 +285,7 @@ class Snap(StateModuleHelper):
         return "disabled" not in notes.split(',')
 
     def process_actionable_snaps(self, actionable_snaps):
-        self.changed = False
+        self.changed = True
         self.vars.snaps_installed = actionable_snaps
 
         if self.check_mode:
