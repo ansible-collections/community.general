@@ -61,7 +61,7 @@ class _Dependency(object):
 
 @contextmanager
 def declare(name, *args, **kwargs):
-    _caller = inspect.stack()[1].filename
+    _caller = inspect.stack()[1][1]
     deps = _deps.get(_caller, {})
     dep = _Dependency(name, *args, **kwargs)
     try:
@@ -76,7 +76,7 @@ def declare(name, *args, **kwargs):
 
 
 def _select_names(spec):
-    _caller = inspect.stack()[1].filename
+    _caller = inspect.stack()[1][1]
     dep_names = sorted(_deps.get(_caller, {}))
 
     if spec:
@@ -95,16 +95,13 @@ def _select_names(spec):
 
 
 def validate(module, spec=None):
-    _caller = inspect.stack()[1].filename
+    _caller = inspect.stack()[1][1]
     deps = _deps.get(_caller, {})
-    try:
-        for dep in _select_names(spec):
-            deps[dep].validate(module)
-    except Exception as e:
-        raise Exception(inspect.stack()[1].filename)
+    for dep in _select_names(spec):
+        deps[dep].validate(module)
 
 
 def failed(spec=None):
-    _caller = inspect.stack()[1].filename
+    _caller = inspect.stack()[1][1]
     deps = _deps.get(_caller, {})
     return any(deps[d].failed for d in _select_names(spec))
