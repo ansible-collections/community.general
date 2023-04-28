@@ -27,7 +27,9 @@ options:
         required: true
         type: int
     fetch_attachments:
-        description: The boolean flag which indicate attached file will get downloaded or not.
+        description:
+            - Boolean flag which indicates whether attached files will get downloaded or not.
+            - The download will only happen if file_download_path has been provided.
         required: false
         type: bool
         version_added: 7.0.0
