@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+import inspect
 import traceback
 from contextlib import contextmanager
 
@@ -60,6 +61,8 @@ class _Dependency(object):
 
 @contextmanager
 def declare(name, *args, **kwargs):
+    _caller = inspect.stack()[1].filename
+    deps = _deps.get(_caller, {})
     dep = _Dependency(name, *args, **kwargs)
     try:
         yield dep
@@ -68,11 +71,13 @@ def declare(name, *args, **kwargs):
     else:
         dep.succeed()
     finally:
-        _deps[name] = dep
+        deps[name] = dep
+        _deps[_caller] = deps
 
 
 def _select_names(spec):
-    dep_names = sorted(_deps)
+    _caller = inspect.stack()[1].filename
+    dep_names = sorted(_deps.get(_caller, {}))
 
     if spec:
         if spec.startswith("-"):
@@ -90,9 +95,16 @@ def _select_names(spec):
 
 
 def validate(module, spec=None):
-    for dep in _select_names(spec):
-        _deps[dep].validate(module)
+    _caller = inspect.stack()[1].filename
+    deps = _deps.get(_caller, {})
+    try:
+        for dep in _select_names(spec):
+            deps[dep].validate(module)
+    except Exception as e:
+        raise Exception(inspect.stack()[1].filename)
 
 
 def failed(spec=None):
-    return any(_deps[d].failed for d in _select_names(spec))
+    _caller = inspect.stack()[1].filename
+    deps = _deps.get(_caller, {})
+    return any(deps[d].failed for d in _select_names(spec))
