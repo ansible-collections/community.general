@@ -1,0 +1,2 @@
+bugfixes:
+  - deps module util - fixed bug where dependencies leaked between different modules (https://github.com/ansible-collections/community.general/pull/6453).
