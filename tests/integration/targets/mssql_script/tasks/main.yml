@@ -13,6 +13,7 @@
 # docker run --name mssql-test -e "ACCEPT_EULA=Y" -e 'SA_PASSWORD={{ mssql_login_password }}' -p "{ mssql_port }"0:"{ mssql_port }" -d mcr.microsoft.com/mssql/server:2019-latest
 # ansible-test integration mssql_script  -v --allow-disabled
 
+<<<<<<< HEAD
 - name: Install pymssql
   ansible.builtin.pip:
     name:
@@ -48,6 +49,19 @@
     login_host: "{{ mssql_host }}"
     login_port: "{{ mssql_port }}"
     script: "SELECT 1"
+
+- name: Execute a malformed query
+  ws1cs.db.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: "SELCT 1"
+  failed_when: false
+  register: bad_query
+- assert:
+    that:
+      - bad_query.error.startswith('ProgrammingError')
 
 - name: two batches with default output
   community.general.mssql_script:
@@ -134,6 +148,30 @@
       - result_batches_dict.query_results_dict[0] | length == 2  # two selects in first batch
       - result_batches_dict.query_results_dict[0][0] | length == 1  # one row in first select
       - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0'  # column 'b0s0' of first row
+
+- name: Multiple batches with no resultsets and mixed-case GO
+  ws1cs.db.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: |
+      CREATE TABLE #integration56yH2 (c1 VARCHAR(10), c2 VARCHAR(10))
+      Go
+      INSERT INTO #integration56yH2 VALUES ('C1_VALUE1', 'C2_VALUE1')
+      gO
+      UPDATE #integration56yH2 SET c2 = 'C2_VALUE2' WHERE c1 = 'C1_VALUE1'
+      go
+      SELECT * from #integration56yH2
+      GO
+      DROP TABLE #integration56yH2
+  register: empty_batches
+- assert:
+    that:
+      - empty_batches.query_results | length == 5  # five batch results
+      - empty_batches.query_results[3][0] | length == 1  # one row in select
+      - empty_batches.query_results[3][0][0] | length == 2  # two columns in row
+      - empty_batches.query_results[3][0][0][1] == 'C2_VALUE2'  # value has been updated
 
 - name: Stored procedure may return multiple result sets
   community.general.mssql_script:

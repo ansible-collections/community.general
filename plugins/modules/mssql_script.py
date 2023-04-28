@@ -206,6 +206,7 @@ query_results_dict:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
 import json
+import re
 PYMSSQL_IMP_ERR = None
 try:
     import pymssql
@@ -280,14 +281,15 @@ def run_module():
         cursor = conn.cursor(as_dict=True)
         query_results_key = 'query_results_dict'
 
-    queries = script.split('\nGO\n')
+    queries = re.split(r'\n[Gg][Oo]\n', script)
     result['changed'] = True
     if module.check_mode:
         module.exit_json(**result)
 
     query_results = []
-    try:
-        for query in queries:
+    for query in queries:
+        # Catch and exit on any bad query errors
+        try:
             cursor.execute(query, sql_params)
             qry_result = []
             rows = cursor.fetchall()
@@ -295,8 +297,17 @@ def run_module():
                 qry_result.append(rows)
                 rows = cursor.fetchall()
             query_results.append(qry_result)
-    except Exception as e:
-        return module.fail_json(msg="query failed", query=query, error=str(e), **result)
+        except Exception as e:
+            # We know we executed the statement so this error just means we have no resultset
+            # which is ok (eg UPDATE/INSERT)
+            if (
+                type(e).__name__ == 'OperationalError' and
+                str(e) == 'Statement not executed or executed statement has no resultset'
+            ):
+                query_results.append([])
+            else:
+                error_msg = '%s: %s' % (type(e).__name__, str(e))
+                return module.fail_json(msg="query failed", query=query, error=error_msg, **result)
 
     # ensure that the result is json serializable
     qry_results = json.loads(json.dumps(query_results, default=clean_output))
