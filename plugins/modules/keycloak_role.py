@@ -308,12 +308,6 @@ def main():
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_role = copy.deepcopy(before_role)
     desired_role.update(changeset)
-    f1 = open("/tmp/changeset.json", "w")
-    f1.write(str(changeset))
-    f1.close()
-    f2 = open("/tmp/desired.json", 'w')
-    f2.write(str(desired_role))
-    f2.close()
 
     result['proposed'] = changeset
     result['existing'] = before_role

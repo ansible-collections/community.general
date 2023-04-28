@@ -1716,18 +1716,12 @@ class KeycloakAPI(object):
                         client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
                         for client_role in client_roles:
                             if client_role['name'] == composite['name']:
-                                f = open('/tmp/client_role.json','w')
-                                f.write(json.dumps(client_role))
-                                f.close()
                                 composites_to_be_created.append(client_role)
                                 break
                     else:
                         realm_role = self.get_realm_role(name=composite["name"])
                         composites_to_be_created.append(realm_role)
             if len(composites_to_be_created) > 0:
-                f = open('/tmp/composites_to_be_created.json','w')
-                f.write(json.dumps(composites_to_be_created))
-                f.close()
                 # create new composites
                 open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                     data=json.dumps(composites_to_be_created), validate_certs=self.validate_certs)
