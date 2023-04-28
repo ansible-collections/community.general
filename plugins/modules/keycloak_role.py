@@ -77,6 +77,28 @@ options:
         description:
             - A dict of key/value pairs to set as custom attributes for the role.
             - Values may be single values (e.g. a string) or a list of strings.
+    composite:
+        description:
+            - If true, the role is a composition of other realm and/or client role.
+        default: false
+        type: bool
+    composites:
+        description:
+            - List of roles to include to the composite realm role.
+            - If the composite role is a client role, the clientId (not id of the client) must be specified.
+        required: false
+        type: list
+        suboptions:
+            name:
+                description:
+                    - Name of the role. This can be the name of a REALM role or a client role.
+                type: str
+                required: true
+            client_id:
+                description:
+                    - Client ID if the role is a client role. Do not include this option for a REALM role.
+                    - Use the client id we can see in the Keycloak console, not the technical id of the client.
+                type: str
 
 extends_documentation_fragment:
     - community.general.keycloak
@@ -200,7 +222,7 @@ end_state:
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
-
+import copy
 
 def main():
     """
@@ -210,6 +232,11 @@ def main():
     """
     argument_spec = keycloak_argument_spec()
 
+    composites_spec = dict(
+        name=dict(type='str', required=True),
+        client_id=dict(type='str', alias='clientId')
+    )
+
     meta_args = dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
         name=dict(type='str', required=True),
@@ -217,6 +244,8 @@ def main():
         realm=dict(type='str', default='master'),
         client_id=dict(type='str'),
         attributes=dict(type='dict'),
+        composites=dict(type='list', default=[], options=composites_spec),
+        composite=dict(type='bool', default=False),
     )
 
     argument_spec.update(meta_args)
@@ -250,7 +279,7 @@ def main():
 
     # Filter and map the parameters names that apply to the role
     role_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id', 'composites'] and
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id'] and
                    module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
@@ -269,11 +298,22 @@ def main():
         new_param_value = module.params.get(param)
         old_value = before_role[param] if param in before_role else None
         if new_param_value != old_value:
-            changeset[camel(param)] = new_param_value
+            if type(param) is dict:
+                changeset[camel(param)] = copy.deepcopy(new_param_value)
+            elif type(param) is list:
+                changeset[camel(param)] = new_param_value.copy()
+            else:
+                changeset[camel(param)] = new_param_value
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_role = before_role.copy()
+    desired_role = copy.deepcopy(before_role)
     desired_role.update(changeset)
+    f1 = open("/tmp/changeset.json", "w")
+    f1.write(str(changeset))
+    f1.close()
+    f2 = open("/tmp/desired.json", 'w')
+    f2.write(str(desired_role))
+    f2.close()
 
     result['proposed'] = changeset
     result['existing'] = before_role

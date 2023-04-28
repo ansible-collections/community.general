@@ -1658,6 +1658,9 @@ class KeycloakAPI(object):
         """
         roles_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
@@ -1672,6 +1675,9 @@ class KeycloakAPI(object):
         """
         role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
@@ -1756,12 +1762,30 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
 
+    def convert_role_composites(self, composites):
+        keycloak_compatible_composites = {}
+        for composite in composites:
+            if "client_id" in composite:
+                if "client" not in keycloak_compatible_composites:
+                    keycloak_compatible_composites["client"] = {}
+                if composite["client_id"] not in keycloak_compatible_composites["client"]:
+                    keycloak_compatible_composites["client"][composite["client_id"]] = []
+                keycloak_compatible_composites["client"][composite["client_id"]].append(composite["name"])
+            else:
+                if "realm" not in keycloak_compatible_composites:
+                    keycloak_compatible_composites["realm"] = []
+                keycloak_compatible_composites["realm"].append(composite["name"])
+        return keycloak_compatible_composites
+    
     def update_client_role(self, rolerep, clientid, realm="master"):
         """ Update an existing client role.
 
@@ -1776,6 +1800,9 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
