@@ -11,10 +11,6 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from httmock import response
 from httmock import with_httmock
 from httmock import urlmatch
-import pytest
-
-
-dnsimple = pytest.importorskip('dnsimple_info')
 
 
 @urlmatch(netloc='(.)*dnsimple.com(.)*',
