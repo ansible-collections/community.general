@@ -86,15 +86,8 @@ snap_aliases:
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-
-
-_state_map = dict(
-    present='alias',
-    absent='unalias',
-    info='aliases',
-)
+from ansible_collections.community.general.plugins.module_utils.snap import snap_runner
 
 
 class SnapAlias(StateModuleHelper):
@@ -113,18 +106,12 @@ class SnapAlias(StateModuleHelper):
         supports_check_mode=True,
     )
 
-    command_args_formats = {
-        "state": cmd_runner_fmt.as_map(_state_map),
-        "name": cmd_runner_fmt.as_list(),
-        "alias": cmd_runner_fmt.as_list(),
-    }
-
     def _aliases(self):
         n = self.vars.name
         return {n: self._get_aliases_for(n)} if n else self._get_aliases()
 
     def __init_module__(self):
-        self.runner = CmdRunner(self.module, "snap", self.command_args_formats, check_rc=False)
+        self.runner = snap_runner(self.module)
         self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
 
     def __quit_module__(self):
@@ -141,8 +128,8 @@ class SnapAlias(StateModuleHelper):
                 results[snap] = results.get(snap, []) + [alias]
             return results
 
-        with self.runner("state name", check_rc=True, output_process=process) as ctx:
-            aliases = ctx.run(state="info")
+        with self.runner("state_alias name", check_rc=True, output_process=process) as ctx:
+            aliases = ctx.run(state_alias="info")
             if self.verbosity >= 4:
                 self.vars.get_aliases_run_info = ctx.run_info
             return aliases
@@ -164,8 +151,8 @@ class SnapAlias(StateModuleHelper):
         for _alias in self.vars.alias:
             if not self._has_alias(self.vars.name, _alias):
                 self.changed = True
-                with self.runner("state name alias", check_mode_skip=True) as ctx:
-                    ctx.run(alias=_alias)
+                with self.runner("state_alias name alias", check_mode_skip=True) as ctx:
+                    ctx.run(state_alias=self.vars.state, alias=_alias)
                     if self.verbosity >= 4:
                         self.vars.run_info = ctx.run_info
 
@@ -173,16 +160,16 @@ class SnapAlias(StateModuleHelper):
         if not self.vars.alias:
             if self._has_alias(self.vars.name):
                 self.changed = True
-                with self.runner("state name", check_mode_skip=True) as ctx:
-                    ctx.run()
+                with self.runner("state_alias name", check_mode_skip=True) as ctx:
+                    ctx.run(state_alias=self.vars.state)
                     if self.verbosity >= 4:
                         self.vars.run_info = ctx.run_info
         else:
             for _alias in self.vars.alias:
                 if self._has_alias(self.vars.name, _alias):
                     self.changed = True
-                    with self.runner("state alias", check_mode_skip=True) as ctx:
-                        ctx.run(alias=_alias)
+                    with self.runner("state_alias alias", check_mode_skip=True) as ctx:
+                        ctx.run(state_alias=self.vars.state, alias=_alias)
                         if self.verbosity >= 4:
                             self.vars.run_info = ctx.run_info
 

@@ -1,0 +1,2 @@
+minor_changes:
+  - snap_alias - refactor code to module utils (https://github.com/ansible-collections/community.general/pull/6441).
