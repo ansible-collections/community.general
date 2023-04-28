@@ -9,6 +9,7 @@ __metaclass__ = type
 
 import json
 import traceback
+import copy
 
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode, quote
@@ -1675,14 +1676,62 @@ class KeycloakAPI(object):
         """
         role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
         try:
+            composites = None
             if "composites" in rolerep:
-                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
-                rolerep["composites"] = keycloak_compatible_composites
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep["composites"]
+            role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            self.update_realm_role_composites(rolerep=rolerep, composites=composites, realm=realm)
+            return role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
+
+    def update_realm_role_composites(self, rolerep, composites, realm='master'):
+        composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+        if composites is not None:
+            # Get existing composites
+            existing_composites = json.loads(to_native(open_url(composite_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                        validate_certs=self.validate_certs).read()))
+            composites_to_be_created = []
+            for composite in composites:
+                composite_found = False
+                existing_composite_client = None
+                for existing_composite in existing_composites:
+                    if existing_composite["clientRole"]:
+                        existing_composite_client = self.get_client_by_id(existing_composite["containerId"])
+                        if ("client_id" in composite 
+                            and existing_composite_client["clientId"] == composite["client_id"]
+                            and composite["name"] == existing_composite["name"]):
+                            composite_found = True
+                            break
+                    else:
+                        if ("client_id" not in composite
+                            and composite["name"] == existing_composite["name"]):
+                            composite_found = True
+                            break
+                if not composite_found:
+                    if "client_id" in composite:
+                        client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                        for client_role in client_roles:
+                            if client_role['name'] == composite['name']:
+                                f = open('/tmp/client_role.json','w')
+                                f.write(json.dumps(client_role))
+                                f.close()
+                                composites_to_be_created.append(client_role)
+                                break
+                    else:
+                        realm_role = self.get_realm_role(name=composite["name"])
+                        composites_to_be_created.append(realm_role)
+            if len(composites_to_be_created) > 0:
+                f = open('/tmp/composites_to_be_created.json','w')
+                f.write(json.dumps(composites_to_be_created))
+                f.close()
+                # create new composites
+                open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                    data=json.dumps(composites_to_be_created), validate_certs=self.validate_certs)
+
 
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
