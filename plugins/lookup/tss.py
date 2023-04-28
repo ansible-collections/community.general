@@ -29,7 +29,7 @@ options:
     fetch_attachments:
         description:
             - Boolean flag which indicates whether attached files will get downloaded or not.
-            - The download will only happen if file_download_path has been provided.
+            - The download will only happen if I(file_download_path) has been provided.
         required: false
         type: bool
         version_added: 7.0.0
