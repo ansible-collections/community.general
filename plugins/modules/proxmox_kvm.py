@@ -275,6 +275,7 @@ options:
       - Migrate the VM on I(node) if it is on another node.
     type: bool
     default: false
+    version_added: 7.0.0
   migrate_downtime:
     description:
       - Sets maximum tolerated downtime (in seconds) for migrations.
