@@ -45,7 +45,7 @@ options:
     type: bool
     default: false
 notes:
-    - Either I(name) or I(activate) is required.
+    - At least one of I(name) and I(activate) is required.
 '''
 
 EXAMPLES = r'''
