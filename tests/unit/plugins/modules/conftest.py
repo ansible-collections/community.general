@@ -13,6 +13,8 @@ from ansible.module_utils.six import string_types
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.common._collections_compat import MutableMapping
 
+from ansible_collections.community.general.plugins.module_utils import deps
+
 
 @pytest.fixture
 def patch_ansible_module(request, mocker):
@@ -30,3 +32,8 @@ def patch_ansible_module(request, mocker):
         raise Exception('Malformed data to the patch_ansible_module pytest fixture')
 
     mocker.patch('ansible.module_utils.basic._ANSIBLE_ARGS', to_bytes(args))
+
+
+@pytest.fixture(autouse=True)
+def deps_cleanup():
+    deps._deps.clear()
