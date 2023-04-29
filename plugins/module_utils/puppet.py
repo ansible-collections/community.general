@@ -63,11 +63,7 @@ def puppet_runner(module):
         return cmd
 
     def noop_func(v):
-        _noop = cmd_runner_fmt.as_map({
-            True: "--noop",
-            False: "--no-noop",
-        })
-        return _noop(module.check_mode or v)
+        return ["--noop"] if module.check_mode or v else ["--no-noop"]
 
     _logdest_map = {
         "syslog": ["--logdest", "syslog"],

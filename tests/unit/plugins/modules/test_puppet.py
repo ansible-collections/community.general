@@ -14,11 +14,16 @@ __metaclass__ = type
 
 import json
 
+from collections import namedtuple
 from ansible_collections.community.general.plugins.modules import puppet
 
 import pytest
 
 TESTED_MODULE = puppet.__name__
+
+
+ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_command_calls"])
+RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"])
 
 
 @pytest.fixture
@@ -32,106 +37,156 @@ def patch_get_bin_path(mocker):
 
 
 TEST_CASES = [
-    [
-        {},
-        {
-            "id": "puppet_agent_plain",
-            "run_command.calls": [
-                (
-                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "blah, anything", "",),  # output rc, out, err
-                ),
-                (
-                    [
-                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
-                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0"
-                    ],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "", "",),  # output rc, out, err
-                ),
-            ],
-            "changed": False,
-        }
-    ],
-    [
-        {
-            "certname": "potatobox"
-        },
-        {
-            "id": "puppet_agent_certname",
-            "run_command.calls": [
-                (
-                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "blah, anything", "",),  # output rc, out, err
-                ),
-                (
-                    [
-                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
-                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--certname=potatobox"
-                    ],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "", "",),  # output rc, out, err
-                ),
-            ],
-            "changed": False,
-        }
-    ],
-    [
-        {
-            "tags": ["a", "b", "c"]
-        },
-        {
-            "id": "puppet_agent_tags_abc",
-            "run_command.calls": [
-                (
-                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "blah, anything", "",),  # output rc, out, err
-                ),
-                (
-                    [
-                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
-                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--tags", "a,b,c"
-                    ],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "", "",),  # output rc, out, err
-                ),
-            ],
-            "changed": False,
-        }
-    ],
-    [
-        {
-            "skip_tags": ["d", "e", "f"]
-        },
-        {
-            "id": "puppet_agent_skip_tags_def",
-            "run_command.calls": [
-                (
-                    ["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "blah, anything", "",),  # output rc, out, err
-                ),
-                (
-                    [
-                        "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
-                        "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--skip_tags", "d,e,f"
-                    ],
-                    {"environ_update": {"LANGUAGE": "C", "LC_ALL": "C"}, "check_rc": False},
-                    (0, "", "",),  # output rc, out, err
-                ),
-            ],
-            "changed": False,
-        }
-    ]
+    ModuleTestCase(
+        id="puppet_agent_plain",
+        input={},
+        output=dict(changed=False),
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="blah, anything",
+                err="",
+            ),
+            RunCmdCall(
+                command=[
+                    "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                    "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0"
+                ],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+        ]
+    ),
+    ModuleTestCase(
+        id="puppet_agent_certname",
+        input={"certname": "potatobox"},
+        output=dict(changed=False),
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="blah, anything",
+                err="",
+            ),
+            RunCmdCall(
+                command=[
+                    "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                    "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--certname=potatobox"
+                ],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+        ]
+    ),
+    ModuleTestCase(
+        id="puppet_agent_tags_abc",
+        input={"tags": ["a", "b", "c"]},
+        output=dict(changed=False),
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="blah, anything",
+                err="",
+            ),
+            RunCmdCall(
+                command=[
+                    "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                    "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--tags", "a,b,c"
+                ],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+        ]
+    ),
+    ModuleTestCase(
+        id="puppet_agent_skip_tags_def",
+        input={"skip_tags": ["d", "e", "f"]},
+        output=dict(changed=False),
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="blah, anything",
+                err="",
+            ),
+            RunCmdCall(
+                command=[
+                    "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                    "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--skip_tags", "d,e,f"
+                ],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+        ]
+    ),
+    ModuleTestCase(
+        id="puppet_agent_noop_false",
+        input={"noop": False},
+        output=dict(changed=False),
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="blah, anything",
+                err="",
+            ),
+            RunCmdCall(
+                command=[
+                    "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                    "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--no-noop"
+                ],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+        ]
+    ),
+    ModuleTestCase(
+        id="puppet_agent_noop_true",
+        input={"noop": True},
+        output=dict(changed=False),
+        run_command_calls=[
+            RunCmdCall(
+                command=["/testbin/puppet", "config", "print", "agent_disabled_lockfile"],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="blah, anything",
+                err="",
+            ),
+            RunCmdCall(
+                command=[
+                    "/testbin/timeout", "-s", "9", "30m", "/testbin/puppet", "agent", "--onetime", "--no-daemonize",
+                    "--no-usecacheonfailure", "--no-splay", "--detailed-exitcodes", "--verbose", "--color", "0", "--noop"
+                ],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out="",
+                err="",
+            ),
+        ]
+    ),
 ]
-TEST_CASES_IDS = [item[1]["id"] for item in TEST_CASES]
+TEST_CASES_IDS = [item.id for item in TEST_CASES]
 
 
 @pytest.mark.parametrize("patch_ansible_module, testcase",
-                         TEST_CASES,
+                         [[x.input, x] for x in TEST_CASES],
                          ids=TEST_CASES_IDS,
                          indirect=["patch_ansible_module"])
 @pytest.mark.usefixtures("patch_ansible_module")
@@ -140,8 +195,10 @@ def test_puppet(mocker, capfd, patch_get_bin_path, testcase):
     Run unit tests for test cases listen in TEST_CASES
     """
 
+    run_cmd_calls = testcase.run_command_calls
+
     # Mock function used for running commands first
-    call_results = [item[2] for item in testcase["run_command.calls"]]
+    call_results = [(x.rc, x.out, x.err) for x in run_cmd_calls]
     mock_run_command = mocker.patch(
         "ansible.module_utils.basic.AnsibleModule.run_command",
         side_effect=call_results)
@@ -152,18 +209,19 @@ def test_puppet(mocker, capfd, patch_get_bin_path, testcase):
 
     out, err = capfd.readouterr()
     results = json.loads(out)
+    print("testcase =\n%s" % str(testcase))
     print("results =\n%s" % results)
 
-    assert mock_run_command.call_count == len(testcase["run_command.calls"])
+    assert mock_run_command.call_count == len(run_cmd_calls)
     if mock_run_command.call_count:
         call_args_list = [(item[0][0], item[1]) for item in mock_run_command.call_args_list]
-        expected_call_args_list = [(item[0], item[1]) for item in testcase["run_command.calls"]]
+        expected_call_args_list = [(item.command, item.environ) for item in run_cmd_calls]
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
         assert call_args_list == expected_call_args_list
 
-    assert results.get("changed", False) == testcase["changed"]
+    assert results.get("changed", False) == testcase.output["changed"]
     if "failed" in testcase:
-        assert results.get("failed", False) == testcase["failed"]
+        assert results.get("failed", False) == testcase.output["failed"]
     if "msg" in testcase:
-        assert results.get("msg", "") == testcase["msg"]
+        assert results.get("msg", "") == testcase.output["msg"]
