@@ -99,6 +99,14 @@ options:
                     - Client ID if the role is a client role. Do not include this option for a REALM role.
                     - Use the client id we can see in the Keycloak console, not the technical id of the client.
                 type: str
+            state:
+                description:
+                    - Create the composite if present, remove it if absent.
+                type: str
+                choices:
+                    - present
+                    - absent
+                default: present
 
 extends_documentation_fragment:
     - community.general.keycloak
@@ -234,7 +242,8 @@ def main():
 
     composites_spec = dict(
         name=dict(type='str', required=True),
-        client_id=dict(type='str', alias='clientId')
+        client_id=dict(type='str', alias='clientId'),
+        state=dict(type='str', default='present', choices=['present', 'absent'])
     )
 
     meta_args = dict(

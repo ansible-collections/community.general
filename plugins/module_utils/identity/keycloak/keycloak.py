@@ -1695,6 +1695,7 @@ class KeycloakAPI(object):
             existing_composites = json.loads(to_native(open_url(composite_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                         validate_certs=self.validate_certs).read()))
             composites_to_be_created = []
+            composites_to_be_deleted = []
             for composite in composites:
                 composite_found = False
                 existing_composite_client = None
@@ -1711,7 +1712,7 @@ class KeycloakAPI(object):
                             and composite["name"] == existing_composite["name"]):
                             composite_found = True
                             break
-                if not composite_found:
+                if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
                     if "client_id" in composite:
                         client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
                         for client_role in client_roles:
@@ -1721,10 +1722,25 @@ class KeycloakAPI(object):
                     else:
                         realm_role = self.get_realm_role(name=composite["name"])
                         composites_to_be_created.append(realm_role)
+                elif composite_found and 'state' in composite and composite['state'] == 'absent':
+                    if "client_id" in composite:
+                        client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                        for client_role in client_roles:
+                            if client_role['name'] == composite['name']:
+                                composites_to_be_deleted.append(client_role)
+                                break
+                    else:
+                        realm_role = self.get_realm_role(name=composite["name"])
+                        composites_to_be_deleted.append(realm_role)
+                
             if len(composites_to_be_created) > 0:
                 # create new composites
                 open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                     data=json.dumps(composites_to_be_created), validate_certs=self.validate_certs)
+            if len(composites_to_be_deleted) > 0:
+                # create new composites
+                open_url(composite_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                    data=json.dumps(composites_to_be_deleted), validate_certs=self.validate_certs)
 
 
     def delete_realm_role(self, name, realm='master'):
@@ -1815,18 +1831,18 @@ class KeycloakAPI(object):
                                       % (rolerep['name'], clientid, realm, str(e)))
 
     def convert_role_composites(self, composites):
-        keycloak_compatible_composites = {}
+        keycloak_compatible_composites = {
+            'client': {},
+            'realm': []
+        }
         for composite in composites:
-            if "client_id" in composite:
-                if "client" not in keycloak_compatible_composites:
-                    keycloak_compatible_composites["client"] = {}
-                if composite["client_id"] not in keycloak_compatible_composites["client"]:
-                    keycloak_compatible_composites["client"][composite["client_id"]] = []
-                keycloak_compatible_composites["client"][composite["client_id"]].append(composite["name"])
-            else:
-                if "realm" not in keycloak_compatible_composites:
-                    keycloak_compatible_composites["realm"] = []
-                keycloak_compatible_composites["realm"].append(composite["name"])
+            if 'state' not in composite or composite['state'] == 'present':
+                if "client_id" in composite:
+                    if composite["client_id"] not in keycloak_compatible_composites["client"]:
+                        keycloak_compatible_composites["client"][composite["client_id"]] = []
+                    keycloak_compatible_composites["client"][composite["client_id"]].append(composite["name"])
+                else:
+                    keycloak_compatible_composites["realm"].append(composite["name"])
         return keycloak_compatible_composites
     
     def update_client_role(self, rolerep, clientid, realm="master"):
