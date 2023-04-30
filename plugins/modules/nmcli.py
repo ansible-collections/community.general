@@ -1614,7 +1614,10 @@ class Nmcli(object):
 
         self.edit_commands = []
 
-        # Additional validation of options set passed to module that cannot be implemented in module's argspecs.
+        self.extra_options_validation()
+
+    def extra_options_validation(self):
+        """ Additional validation of options set passed to module that cannot be implemented in module's argspecs. """
         if self.type not in ("bridge-slave", "team-slave", "bond-slave"):
             if self.master is not None and self.slave_type is None:
                 self.module.fail_json(msg="'slave_type' option is required when 'master' is specified.")
