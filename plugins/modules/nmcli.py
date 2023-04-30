@@ -93,6 +93,7 @@ options:
     master:
         description:
             - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
+            - Mandatory if I(slave_type) is defined.
         type: str
     ip4:
         description:
@@ -1613,6 +1614,25 @@ class Nmcli(object):
 
         self.edit_commands = []
 
+        # Additional validation of options set passed to module that cannot be implemented in module's argspecs.
+        if self.type not in ("bridge-slave", "team-slave", "bond-slave"):
+            if self.master is not None and self.slave_type is None:
+                self.module.fail_json(msg="'slave_type' option is required when 'master' is specified.")
+            if self.master is None and self.slave_type is not None:
+                self.module.fail_json(msg="'master' option is required when 'slave_type' is specified.")
+
+    @property
+    def hairpin(self):
+        if self._hairpin is None:
+            self.module.deprecate(
+                "Parameter 'hairpin' default value will change from true to false in community.general 7.0.0. "
+                "Set the value explicitly to suppress this warning.",
+                version='7.0.0', collection_name='community.general',
+            )
+            # Should be False in 7.0.0 but then that should be in argument_specs
+            self._hairpin = True
+        return self._hairpin
+
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
         if isinstance(cmd, list):
             cmd = [to_text(item) for item in cmd]
@@ -2476,7 +2496,6 @@ def main():
                             ['routes4_extended', 'routes4'],
                             ['routes6_extended', 'routes6']],
         required_if=[("type", "wifi", [("ssid")])],
-        required_by={"master": "slave_type"},
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
