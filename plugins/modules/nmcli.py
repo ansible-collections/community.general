@@ -2476,7 +2476,7 @@ def main():
                             ['routes4_extended', 'routes4'],
                             ['routes6_extended', 'routes6']],
         required_if=[("type", "wifi", [("ssid")])],
-        required_by={"master": "slave-type"},
+        required_by={"master": "slave_type"},
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
