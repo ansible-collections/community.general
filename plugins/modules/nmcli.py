@@ -85,7 +85,7 @@ options:
         version_added: 5.8.0
     slave_type:
         description:
-            - Type of the device of this slave's master connection (eg, "bond").
+            - Type of the device of this slave's master connection (for example C(bond)).
             - Mandatory if I(master) is defined.
         type: str
         choices: [ 'bond', 'bridge', 'team' ]
