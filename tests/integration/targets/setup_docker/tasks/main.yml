@@ -1,0 +1,55 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Print information on which we distinguish
+  debug:
+    msg: "Distribution '{{ ansible_facts.distribution }}', version '{{ ansible_facts.distribution_version }}', OS family '{{ ansible_facts.os_family }}'"
+
+- name: Install EPEL repository (RHEL only)
+  include_role:
+    name: setup_epel
+  when:
+    - ansible_distribution in ['RedHat', 'CentOS']
+    - ansible_distribution_major_version is version('9', '<')
+
+- name: Distribution specific
+  block:
+    - name: Include distribution specific vars
+      include_vars: "{{ lookup('first_found', params) }}"
+      vars:
+        params:
+          files: "{{ distro_lookup_names }}"
+          paths:
+            - "{{ role_path }}/vars"
+    - name: Include distribution specific tasks
+      include_tasks: "{{ lookup('first_found', params) }}"
+      vars:
+        params:
+          files: "{{ distro_lookup_names }}"
+          paths:
+            - "{{ role_path }}/tasks"
+
+- name: Start docker service
+  become: true
+  ansible.builtin.service:
+    name: docker
+    state: started
+
+- name: Cheat on the docker socket permissions
+  become: true
+  ansible.builtin.file:
+    path: /var/run/docker.sock
+    mode: 0666
+
+- name: Install python "requests"
+  ansible.builtin.pip:
+    name:
+      - requests
+    state: present

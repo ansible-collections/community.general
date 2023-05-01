@@ -3,6 +3,29 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Start container
+  community.docker.docker_container:
+    name: mykeycloak
+    image: "quay.io/keycloak/keycloak:20.0.2"
+    command: start-dev
+    env:
+      KC_HTTP_RELATIVE_PATH: /auth
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
+    ports:
+      - "8080:8080"
+    detach: true
+    auto_remove: true
+    memory: 2200M
+
+- name: Check default ports
+  ansible.builtin.wait_for:
+    host: "localhost"
+    port: "8080"
+    state: started         # Port should be open
+    delay: 30              # Wait before first check
+    timeout: 50            # Stop checking after timeout (sec)
+
 - name: Create a keycloak group
   community.general.keycloak_group:
     auth_keycloak_url: "{{ url }}"
@@ -13,6 +36,9 @@
     name: test-group
     state: present
   register: result
+  retries: 3
+  delay: 20
+  until: result is not failed
 
 - name: Assert group was created
   assert:

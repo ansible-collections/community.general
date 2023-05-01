@@ -4,6 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 mssql_host: localhost
-mssql_port: 14330
+mssql_port: 1433
 mssql_login_user: sa
-mssql_login_password: "yourStrong(!)Password"
+mssql_login_password: "Abcd!234"
