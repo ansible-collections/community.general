@@ -7,8 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-# pylint: disable=unused-import
-
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 

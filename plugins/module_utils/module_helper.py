@@ -7,6 +7,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+# pylint: disable=unused-import
+
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import (
     ModuleHelper, StateModuleHelper, CmdModuleHelper, CmdStateModuleHelper, AnsibleModule
