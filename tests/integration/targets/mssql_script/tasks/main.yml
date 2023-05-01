@@ -13,7 +13,6 @@
 # docker run --name mssql-test -e "ACCEPT_EULA=Y" -e 'SA_PASSWORD={{ mssql_login_password }}' -p "{ mssql_port }"0:"{ mssql_port }" -d mcr.microsoft.com/mssql/server:2019-latest
 # ansible-test integration mssql_script  -v --allow-disabled
 
-<<<<<<< HEAD
 - name: Install pymssql
   ansible.builtin.pip:
     name:
