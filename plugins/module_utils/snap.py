@@ -28,10 +28,9 @@ def snap_runner(module, **kwargs):
         module,
         "snap",
         arg_formats=dict(
-            state_alias=cmd_runner_fmt.as_map(_alias_state_map),
+            state_alias=cmd_runner_fmt.as_map(_alias_state_map),  # snap_alias only
             name=cmd_runner_fmt.as_list(),
-            alias=cmd_runner_fmt.as_list(),
-            actionable_snaps=cmd_runner_fmt.as_list(),
+            alias=cmd_runner_fmt.as_list(),                       # snap_alias only
             state=cmd_runner_fmt.as_map(_state_map),
             _list=cmd_runner_fmt.as_fixed("list"),
             _set=cmd_runner_fmt.as_fixed("set"),
