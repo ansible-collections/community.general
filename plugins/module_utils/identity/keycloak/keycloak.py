@@ -1682,14 +1682,20 @@ class KeycloakAPI(object):
                 del rolerep["composites"]
             role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
-            self.update_realm_role_composites(rolerep=rolerep, composites=composites, realm=realm)
+            self.update_role_composites(rolerep=rolerep, composites=composites, realm=realm)
             return role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
 
-    def update_realm_role_composites(self, rolerep, composites, realm='master'):
-        composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+    def update_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        if clientid is not None:
+            client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+            cid = client['id']
+            composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+        else:
+            composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
         if composites is not None:
             # Get existing composites
             existing_composites = json.loads(to_native(open_url(composite_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
@@ -1859,11 +1865,16 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
+            composites = None
             if "composites" in rolerep:
-                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
-                rolerep["composites"] = keycloak_compatible_composites
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep['composites']
+            update_role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            
+            self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
+
+            return update_role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
