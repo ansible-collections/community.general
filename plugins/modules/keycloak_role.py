@@ -86,8 +86,9 @@ options:
         description:
             - List of roles to include to the composite realm role.
             - If the composite role is a client role, the clientId (not id of the client) must be specified.
-        required: false
+        default: []
         type: list
+        elements: dict
         suboptions:
             name:
                 description:
@@ -99,6 +100,9 @@ options:
                     - Client ID if the role is a client role. Do not include this option for a REALM role.
                     - Use the client id we can see in the Keycloak console, not the technical id of the client.
                 type: str
+                required: false
+                aliases:
+                    - clientId
             state:
                 description:
                     - Create the composite if present, remove it if absent.
@@ -232,6 +236,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
+
 def main():
     """
     Module execution
@@ -242,7 +247,7 @@ def main():
 
     composites_spec = dict(
         name=dict(type='str', required=True),
-        client_id=dict(type='str', alias='clientId'),
+        client_id=dict(type='str', aliases=['clientId'], required=False),
         state=dict(type='str', default='present', choices=['present', 'absent'])
     )
 
@@ -253,7 +258,7 @@ def main():
         realm=dict(type='str', default='master'),
         client_id=dict(type='str'),
         attributes=dict(type='dict'),
-        composites=dict(type='list', default=[], options=composites_spec),
+        composites=dict(type='list', default=[], options=composites_spec, elements='dict'),
         composite=dict(type='bool', default=False),
     )
 
@@ -307,9 +312,9 @@ def main():
         new_param_value = module.params.get(param)
         old_value = before_role[param] if param in before_role else None
         if new_param_value != old_value:
-            if type(param) is dict:
+            if isinstance(param, dict):
                 changeset[camel(param)] = copy.deepcopy(new_param_value)
-            elif type(param) is list:
+            elif isinstance(param, list):
                 changeset[camel(param)] = new_param_value.copy()
             else:
                 changeset[camel(param)] = new_param_value

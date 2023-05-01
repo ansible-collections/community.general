@@ -1681,7 +1681,7 @@ class KeycloakAPI(object):
                 composites = copy.deepcopy(rolerep["composites"])
                 del rolerep["composites"]
             role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+                                     data=json.dumps(rolerep), validate_certs=self.validate_certs)
             self.update_role_composites(rolerep=rolerep, composites=composites, realm=realm)
             return role_response
         except Exception as e:
@@ -1698,8 +1698,13 @@ class KeycloakAPI(object):
             composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
         if composites is not None:
             # Get existing composites
-            existing_composites = json.loads(to_native(open_url(composite_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                        validate_certs=self.validate_certs).read()))
+            existing_composites = json.loads(to_native(open_url(
+                composite_url,
+                method='GET',
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs).read()))
             composites_to_be_created = []
             composites_to_be_deleted = []
             for composite in composites:
@@ -1708,18 +1713,19 @@ class KeycloakAPI(object):
                 for existing_composite in existing_composites:
                     if existing_composite["clientRole"]:
                         existing_composite_client = self.get_client_by_id(existing_composite["containerId"])
-                        if ("client_id" in composite 
-                            and existing_composite_client["clientId"] == composite["client_id"]
-                            and composite["name"] == existing_composite["name"]):
+                        if ("client_id" in composite
+                                and composite['client_id'] is not None
+                                and existing_composite_client["clientId"] == composite["client_id"]
+                                and composite["name"] == existing_composite["name"]):
                             composite_found = True
                             break
                     else:
-                        if ("client_id" not in composite
-                            and composite["name"] == existing_composite["name"]):
+                        if (("client_id" not in composite or composite['client_id'] is None)
+                                and composite["name"] == existing_composite["name"]):
                             composite_found = True
                             break
                 if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
-                    if "client_id" in composite:
+                    if "client_id" in composite and composite['client_id'] is not None:
                         client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
                         for client_role in client_roles:
                             if client_role['name'] == composite['name']:
@@ -1729,7 +1735,7 @@ class KeycloakAPI(object):
                         realm_role = self.get_realm_role(name=composite["name"])
                         composites_to_be_created.append(realm_role)
                 elif composite_found and 'state' in composite and composite['state'] == 'absent':
-                    if "client_id" in composite:
+                    if "client_id" in composite and composite['client_id'] is not None:
                         client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
                         for client_role in client_roles:
                             if client_role['name'] == composite['name']:
@@ -1738,16 +1744,15 @@ class KeycloakAPI(object):
                     else:
                         realm_role = self.get_realm_role(name=composite["name"])
                         composites_to_be_deleted.append(realm_role)
-                
+
             if len(composites_to_be_created) > 0:
                 # create new composites
                 open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                    data=json.dumps(composites_to_be_created), validate_certs=self.validate_certs)
+                         data=json.dumps(composites_to_be_created), validate_certs=self.validate_certs)
             if len(composites_to_be_deleted) > 0:
                 # create new composites
                 open_url(composite_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                    data=json.dumps(composites_to_be_deleted), validate_certs=self.validate_certs)
-
+                         data=json.dumps(composites_to_be_deleted), validate_certs=self.validate_certs)
 
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
@@ -1843,14 +1848,14 @@ class KeycloakAPI(object):
         }
         for composite in composites:
             if 'state' not in composite or composite['state'] == 'present':
-                if "client_id" in composite:
+                if "client_id" in composite and composite["client_id"] is not None:
                     if composite["client_id"] not in keycloak_compatible_composites["client"]:
                         keycloak_compatible_composites["client"][composite["client_id"]] = []
                     keycloak_compatible_composites["client"][composite["client_id"]].append(composite["name"])
                 else:
                     keycloak_compatible_composites["realm"].append(composite["name"])
         return keycloak_compatible_composites
-    
+
     def update_client_role(self, rolerep, clientid, realm="master"):
         """ Update an existing client role.
 
@@ -1870,10 +1875,8 @@ class KeycloakAPI(object):
                 composites = copy.deepcopy(rolerep["composites"])
                 del rolerep['composites']
             update_role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
-            
+                                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
             self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
-
             return update_role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
