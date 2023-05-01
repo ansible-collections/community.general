@@ -235,7 +235,7 @@ class Snap(StateModuleHelper):
         return self.convert_json_subtree_to_map(json_object)
 
     def retrieve_option_map(self, snap_name):
-        with self.runner("get name json_format") as ctx:
+        with self.runner("get name") as ctx:
             rc, out, err = ctx.run(name=snap_name)
 
         if rc != 0:

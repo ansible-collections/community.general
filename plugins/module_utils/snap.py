@@ -34,11 +34,10 @@ def snap_runner(module, **kwargs):
             state=cmd_runner_fmt.as_map(_state_map),
             _list=cmd_runner_fmt.as_fixed("list"),
             _set=cmd_runner_fmt.as_fixed("set"),
-            get=cmd_runner_fmt.as_fixed("get"),
+            get=cmd_runner_fmt.as_fixed(["get", "-d"]),
             classic=cmd_runner_fmt.as_bool("--classic"),
             channel=cmd_runner_fmt.as_func(lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)]),
             options=cmd_runner_fmt.as_list(),
-            json_format=cmd_runner_fmt.as_fixed("-d"),
         ),
         check_rc=False,
         **kwargs
