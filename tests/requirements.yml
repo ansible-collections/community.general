@@ -6,5 +6,6 @@
 integration_tests_dependencies:
 - ansible.posix
 - community.crypto
+- community.docker
 unit_tests_dependencies:
 - community.internal_test_tools
