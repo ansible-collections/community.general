@@ -1,0 +1,2 @@
+minor_changes:
+  - snap - refacotr module to use ``CmdRunner`` to execute external commands (https://github.com/ansible-collections/community.general/pull/6468).
