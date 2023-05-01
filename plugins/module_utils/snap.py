@@ -15,15 +15,31 @@ _alias_state_map = dict(
     info='aliases',
 )
 
+_state_map = dict(
+    present='install',
+    absent='remove',
+    enabled='enable',
+    disabled='disable',
+)
+
 
 def snap_runner(module, **kwargs):
     runner = CmdRunner(
         module,
-        module.get_bin_path("snap"),
+        "snap",
         arg_formats=dict(
             state_alias=cmd_runner_fmt.as_map(_alias_state_map),
             name=cmd_runner_fmt.as_list(),
             alias=cmd_runner_fmt.as_list(),
+            actionable_snaps=cmd_runner_fmt.as_list(),
+            state=cmd_runner_fmt.as_map(_state_map),
+            _list=cmd_runner_fmt.as_fixed("list"),
+            _set=cmd_runner_fmt.as_fixed("set"),
+            get=cmd_runner_fmt.as_fixed("get"),
+            classic=cmd_runner_fmt.as_bool("--classic"),
+            channel=cmd_runner_fmt.as_func(lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)]),
+            options=cmd_runner_fmt.as_list(),
+            json_format=cmd_runner_fmt.as_fixed("-d"),
         ),
         check_rc=False,
         **kwargs
