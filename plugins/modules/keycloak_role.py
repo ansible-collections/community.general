@@ -90,6 +90,7 @@ options:
         default: []
         type: list
         elements: dict
+        version_added: 7.0.0
         suboptions:
             name:
                 description:
