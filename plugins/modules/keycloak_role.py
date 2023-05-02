@@ -86,7 +86,7 @@ options:
     composites:
         description:
             - List of roles to include to the composite realm role.
-            - If the composite role is a client role, the clientId (not id of the client) must be specified.
+            - If the composite role is a client role, the C(clientId) (not ID of the client) must be specified.
         default: []
         type: list
         elements: dict
