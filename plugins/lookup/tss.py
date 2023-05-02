@@ -170,9 +170,9 @@ EXAMPLES = r"""
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
 
-#Private key stores into certificate file which is attached with secret.
-#If fetch_attachments=True then private key file will be download on specified path
-#And file content will display in debug message.
+# Private key stores into certificate file which is attached with secret.
+# If fetch_attachments=True then private key file will be download on specified path
+# And file content will display in debug message.
 - hosts: localhost
   vars:
       secret: >-
@@ -261,7 +261,6 @@ class TSSClient(object):
                         try:
                             with open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "w") as f:
                                 f.write(i['itemValue'].text)
-                                f.close()
                             i['itemValue'] = "*** Not Valid For Display ***"
                         except ValueError:
                             raise AnsibleOptionsError("Failed to download {0}".format(str(i['slug'])))
