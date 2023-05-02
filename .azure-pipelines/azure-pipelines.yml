@@ -150,7 +150,7 @@ stages:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: 2.14/units/{0}/1
+          testFormat: 2.15/units/{0}/1
           targets:
             - test: "3.10"
   - stage: Units_2_14
@@ -411,13 +411,13 @@ stages:
             - test: 2.7
             - test: '3.11'
   - stage: Generic_2_15
-    displayName: Generic 2.14
+    displayName: Generic 2.15
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: 2.14/generic/{0}/1
+          testFormat: 2.15/generic/{0}/1
           targets:
             - test: 3.9
   - stage: Generic_2_14
