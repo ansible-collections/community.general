@@ -100,7 +100,7 @@ options:
             client_id:
                 description:
                     - Client ID if the role is a client role. Do not include this option for a REALM role.
-                    - Use the client id we can see in the Keycloak console, not the technical id of the client.
+                    - Use the client ID you can see in the Keycloak console, not the technical ID of the client.
                 type: str
                 required: false
                 aliases:
