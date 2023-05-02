@@ -118,8 +118,6 @@ def main():
     except Exception as exception:
         module.fail_json(msg="Attribute action failed.", details=to_native(exception))
 
-    module.exit_json(changed=False)
-
 
 def _extract_entry(dn, attrs):
     extracted = {'dn': dn}
@@ -142,7 +140,7 @@ class LdapSearch(LdapGeneric):
         self._load_schema()
 
     def _load_schema(self):
-        self.schema = self.module.boolean(self.module.params['schema'])
+        self.schema = self.module.params['schema']
         if self.schema:
             self.attrsonly = 1
         else:
