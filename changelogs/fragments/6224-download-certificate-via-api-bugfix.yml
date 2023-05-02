@@ -1,2 +1,2 @@
 bugfixes:
-  - tss_lookup_plugin - allow to download secret attachments. Previously, we could not download secret attachments but now use ``fetch_attachments`` and ``file_download_path`` variables to download attachments (https://github.com/ansible-collections/community.general/issues/6224).
+  - tss lookup plugin - allow to download secret attachments. Previously, we could not download secret attachments but now use ``fetch_attachments`` and ``file_download_path`` variables to download attachments (https://github.com/ansible-collections/community.general/issues/6224).
