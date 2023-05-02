@@ -1,2 +1,2 @@
 minor_changes:
-  - keycloak_role - Add composite roles support for realm and client roles (https://github.com/ansible-collections/community.general/pull/6469).
+  - keycloak_role - add composite roles support for realm and client roles (https://github.com/ansible-collections/community.general/pull/6469).
