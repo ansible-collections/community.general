@@ -314,12 +314,7 @@ def main():
         new_param_value = module.params.get(param)
         old_value = before_role[param] if param in before_role else None
         if new_param_value != old_value:
-            if isinstance(param, dict):
-                changeset[camel(param)] = copy.deepcopy(new_param_value)
-            elif isinstance(param, list):
-                changeset[camel(param)] = new_param_value.copy()
-            else:
-                changeset[camel(param)] = new_param_value
+            changeset[camel(param)] = copy.deepcopy(new_param_value)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_role = copy.deepcopy(before_role)
