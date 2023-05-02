@@ -1,0 +1,2 @@
+breaking_changes:
+  - The alias username for the auth_username parameter of keycloak module_utils have been removed because it conflicted with the username parameter of the new keycloak user module (https://github.com/ansible-collections/community.general/pull/6476).
