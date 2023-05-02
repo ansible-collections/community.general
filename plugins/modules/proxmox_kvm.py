@@ -272,7 +272,7 @@ options:
     type: int
   migrate:
     description:
-      - Migrate the VM on I(node) if it is on another node.
+      - Migrate the VM to I(node) if it is on another node.
     type: bool
     default: false
     version_added: 7.0.0
