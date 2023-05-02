@@ -38,6 +38,12 @@ class DependencyCtxMgr(object):
 
 
 class DependencyMixin(ModuleHelperBase):
+    """
+    THIS CLASS IS BEING DEPRECATED.
+    See the deprecation notice in ``DependencyMixin.fail_on_missing_deps()`` below.
+
+    Mixin for mapping module options to running a CLI command with its arguments.
+    """
     _dependencies = []
 
     @classmethod
@@ -46,6 +52,12 @@ class DependencyMixin(ModuleHelperBase):
         return cls._dependencies[-1]
 
     def fail_on_missing_deps(self):
+        self.module.deprecate(
+            'The DependencyMixin is being deprecated. '
+            'Modules should use community.general.plugins.module_utils.deps instead.',
+            version='9.0.0',
+            collection_name='community.general',
+        )
         for d in self._dependencies:
             if not d.has_it:
                 self.module.fail_json(changed=False,
