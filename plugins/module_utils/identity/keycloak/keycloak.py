@@ -9,6 +9,7 @@ __metaclass__ = type
 
 import json
 import traceback
+import copy
 
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode, quote
@@ -64,6 +65,14 @@ URL_CLIENT_GROUP_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/groups/{id
 URL_CLIENT_GROUP_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}/composite"
 
 URL_USERS = "{url}/admin/realms/{realm}/users"
+URL_USER = "{url}/admin/realms/{realm}/users/{id}"
+URL_USER_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings"
+URL_USER_REALM_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/realm"
+URL_USER_CLIENTS_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients"
+URL_USER_CLIENT_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client_id}"
+URL_USER_GROUPS = "{url}/admin/realms/{realm}/users/{id}/groups"
+URL_USER_GROUP = "{url}/admin/realms/{realm}/users/{id}/groups/{group_id}"
+
 URL_CLIENT_SERVICE_ACCOUNT_USER = "{url}/admin/realms/{realm}/clients/{id}/service-account-user"
 URL_CLIENT_USER_ROLEMAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}"
 URL_CLIENT_USER_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}/available"
@@ -105,7 +114,7 @@ def keycloak_argument_spec():
         auth_client_id=dict(type='str', default='admin-cli'),
         auth_realm=dict(type='str'),
         auth_client_secret=dict(type='str', default=None, no_log=True),
-        auth_username=dict(type='str', aliases=['username']),
+        auth_username=dict(type='str'),
         auth_password=dict(type='str', aliases=['password'], no_log=True),
         validate_certs=dict(type='bool', default=True),
         connection_timeout=dict(type='int', default=10),
@@ -2382,3 +2391,245 @@ class KeycloakAPI(object):
                             validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not delete scope %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
+
+    def get_user_by_id(self, user_id, realm='master'):
+        """
+        Get a User by its ID.
+        :param user_id: ID of the user.
+        :param realm: Realm
+        :return: Representation of the user.
+        """
+        try:
+            user_url = URL_USER.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id)
+            userrep = json.load(
+                open_url(
+                    user_url,
+                    method='GET',
+                    headers=self.restheaders))
+            return userrep
+        except Exception as e:
+            self.module.fail_json(msg='Could not get user %s in realm %s: %s'
+                                      % (user_id, realm, str(e)))
+
+    def create_user(self, userrep, realm='master'):
+        """
+        Create a new User.
+        :param userrep: Representation of the user to create
+        :param realm: Realm
+        :return: Representation of the user created.
+        """
+        try:
+            if 'attributes' in userrep and isinstance(userrep['attributes'], list):
+                attributes = copy.deepcopy(userrep['attributes'])
+                userrep['attributes'] = self.convert_user_attributes_to_keycloak_dict(attributes=attributes)
+            users_url = URL_USERS.format(
+                url=self.baseurl,
+                realm=realm)
+            open_url(users_url,
+                     method='POST',
+                     headers=self.restheaders,
+                     data=json.dumps(userrep))
+            created_user = self.get_user_by_username(
+                username=userrep['username'],
+                realm=realm)
+            return created_user
+        except Exception as e:
+            self.module.fail_json(msg='Could not create user %s in realm %s: %s'
+                                      % (userrep['username'], realm, str(e)))
+
+    def convert_user_attributes_to_keycloak_dict(self, attributes):
+        keycloak_user_attributes_dict = {}
+        for attribute in attributes:
+            if ('state' not in attribute or attribute['state'] == 'present') and 'name' in attribute:
+                keycloak_user_attributes_dict[attribute['name']] = attribute['values'] if 'values' in attribute else []
+        return keycloak_user_attributes_dict
+
+    def convert_keycloak_user_attributes_dict_to_module_list(self, attributes):
+        module_attributes_list = []
+        for key in attributes:
+            attr = {}
+            attr['name'] = key
+            attr['values'] = attributes[key]
+            module_attributes_list.append(attr)
+        return module_attributes_list
+
+    def update_user(self, userrep, realm='master'):
+        """
+        Update a User.
+        :param userrep: Representation of the user to update. This representation must include the ID of the user.
+        :param realm: Realm
+        :return: Representation of the updated user.
+        """
+        try:
+            if 'attributes' in userrep and isinstance(userrep['attributes'], list):
+                attributes = copy.deepcopy(userrep['attributes'])
+                userrep['attributes'] = self.convert_user_attributes_to_keycloak_dict(attributes=attributes)
+            user_url = URL_USER.format(
+                url=self.baseurl,
+                realm=realm,
+                id=userrep["id"])
+            open_url(
+                user_url,
+                method='PUT',
+                headers=self.restheaders,
+                data=json.dumps(userrep))
+            updated_user = self.get_user_by_id(
+                user_id=userrep['id'],
+                realm=realm)
+            return updated_user
+        except Exception as e:
+            self.module.fail_json(msg='Could not update user %s in realm %s: %s'
+                                      % (userrep['username'], realm, str(e)))
+
+    def delete_user(self, user_id, realm='master'):
+        """
+        Delete a User.
+        :param user_id: ID of the user to be deleted
+        :param realm: Realm
+        :return: HTTP response.
+        """
+        try:
+            user_url = URL_USER.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id)
+            return open_url(
+                user_url,
+                method='DELETE',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete user %s in realm %s: %s'
+                                      % (user_id, realm, str(e)))
+
+    def get_user_groups(self, user_id, realm='master'):
+        """
+        Get groups for a user.
+        :param user_id: User ID
+        :param realm: Realm
+        :return: Representation of the client groups.
+        """
+        try:
+            groups = []
+            user_groups_url = URL_USER_GROUPS.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id)
+            user_groups = json.load(
+                open_url(
+                    user_groups_url,
+                    method='GET',
+                    headers=self.restheaders))
+            for user_group in user_groups:
+                groups.append(user_group["name"])
+            return groups
+        except Exception as e:
+            self.module.fail_json(msg='Could not get groups for user %s in realm %s: %s'
+                                      % (user_id, realm, str(e)))
+
+    def add_user_in_group(self, user_id, group_id, realm='master'):
+        """
+        Add a user to a group.
+        :param user_id: User ID
+        :param group_id: Group Id to add the user to.
+        :param realm: Realm
+        :return: HTTP Response
+        """
+        try:
+            user_group_url = URL_USER_GROUP.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id,
+                group_id=group_id)
+            return open_url(
+                user_group_url,
+                method='PUT',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not add user %s in group %s in realm %s: %s'
+                                      % (user_id, group_id, realm, str(e)))
+
+    def remove_user_from_group(self, user_id, group_id, realm='master'):
+        """
+        Remove a user from a group for a user.
+        :param user_id: User ID
+        :param group_id: Group Id to add the user to.
+        :param realm: Realm
+        :return: HTTP response
+        """
+        try:
+            user_group_url = URL_USER_GROUP.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id,
+                group_id=group_id)
+            return open_url(
+                user_group_url,
+                method='DELETE',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not remove user %s from group %s in realm %s: %s'
+                                      % (user_id, group_id, realm, str(e)))
+
+    def update_user_groups_membership(self, userrep, groups, realm='master'):
+        """
+        Update user's group membership
+        :param userrep: Representation of the user. This representation must include the ID.
+        :param realm: Realm
+        :return: True if group membership has been changed. False Otherwise.
+        """
+        changed = False
+        try:
+            user_existing_groups = self.get_user_groups(
+                user_id=userrep['id'],
+                realm=realm)
+            groups_to_add_and_remove = self.extract_groups_to_add_to_and_remove_from_user(groups)
+            # If group membership need to be changed
+            if not is_struct_included(groups_to_add_and_remove['add'], user_existing_groups):
+                # Get available goups in the realm
+                realm_groups = self.get_groups(realm=realm)
+                for realm_group in realm_groups:
+                    if "name" in realm_group and realm_group["name"] in groups_to_add_and_remove['add']:
+                        self.add_user_in_group(
+                            user_id=userrep["id"],
+                            group_id=realm_group["id"],
+                            realm=realm)
+                        changed = True
+                    elif "name" in realm_group and realm_group['name'] in groups_to_add_and_remove['remove']:
+                        self.remove_user_from_group(
+                            user_id=userrep['id'],
+                            group_id=realm_group['id'],
+                            realm=realm)
+                        changed = True
+            return changed
+        except Exception as e:
+            self.module.fail_json(msg='Could not update group membership for user %s in realm %s: %s'
+                                      % (userrep['id]'], realm, str(e)))
+
+    def extract_groups_to_add_to_and_remove_from_user(self, groups):
+        groups_extract = {}
+        groups_to_add = []
+        groups_to_remove = []
+        if isinstance(groups, list) and len(groups) > 0:
+            for group in groups:
+                group_name = group['name'] if isinstance(group, dict) and 'name' in group else group
+                if isinstance(group, dict) and ('state' not in group or group['state'] == 'present'):
+                    groups_to_add.append(group_name)
+                else:
+                    groups_to_remove.append(group_name)
+        groups_extract['add'] = groups_to_add
+        groups_extract['remove'] = groups_to_remove
+
+        return groups_extract
+
+    def convert_user_group_list_of_str_to_list_of_dict(self, groups):
+        list_of_groups = []
+        if isinstance(groups, list) and len(groups) > 0:
+            for group in groups:
+                if isinstance(group, str):
+                    group_dict = {}
+                    group_dict['name'] = group
+                    list_of_groups.append(group_dict)
+        return list_of_groups
