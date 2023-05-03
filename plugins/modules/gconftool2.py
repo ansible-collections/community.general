@@ -84,7 +84,9 @@ RETURN = '''
     type: str
     sample: string
   value:
-    description: The value of the preference key after executing the module or C(null) if key is removed.
+    description:
+      - The value of the preference key after executing the module or C(null) if key is removed.
+      - From community.general 7.0.0 onwards it returns C(null) for a non-existent I(key), and returns C("") before that.
     returned: success
     type: str
     sample: "Serif 12"
