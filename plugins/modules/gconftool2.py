@@ -91,7 +91,7 @@ RETURN = '''
   previous_value:
     description:
       - The value of the preference key before executing the module.
-      - From community.general 6.6.0 onwards it returns C(null) for a non-existent I(key), and returns C("") before that.
+      - From community.general 7.0.0 onwards it returns C(null) for a non-existent I(key), and returns C("") before that.
     returned: success
     type: str
     sample: "Serif 12"
