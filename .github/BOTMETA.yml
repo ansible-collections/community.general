@@ -707,6 +707,8 @@ files:
     maintainers: fynncfchen
   $modules/keycloak_role.py:
     maintainers: laurpaum
+  $modules/keycloak_user.py:
+    maintainers: elfelip
   $modules/keycloak_user_federation.py:
     maintainers: laurpaum
   $modules/keycloak_user_rolemapping.py:
