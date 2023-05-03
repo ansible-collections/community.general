@@ -383,14 +383,12 @@ def emerge_packages(module, packages):
             """Fallback to default: don't use this argument at all."""
             continue
 
-        if not flag_val:
+        """Add the --flag=value pair."""
+        if isinstance(flag_val, bool):
+            args.extend((arg, to_native('y' if flag_val else 'n')))
+        elif not flag_val:
             """If the value is 0 or 0.0: add the flag, but not the value."""
             args.append(arg)
-            continue
-
-        """Add the --flag=value pair."""
-        if isinstance(p[flag], bool):
-            args.extend((arg, to_native('y' if flag_val else 'n')))
         else:
             args.extend((arg, to_native(flag_val)))
 
