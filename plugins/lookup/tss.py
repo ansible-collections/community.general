@@ -172,7 +172,7 @@ EXAMPLES = r"""
 
 # Private key stores into certificate file which is attached with secret.
 # If fetch_attachments=True then private key file will be download on specified path
-# And file content will display in debug message.
+# and file content will display in debug message.
 - hosts: localhost
   vars:
       secret: >-
