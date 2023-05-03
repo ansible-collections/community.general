@@ -1,0 +1,5 @@
+bugfixes:
+  - gconftool2 - fix ``changed`` result always being ``true`` (https://github.com/ansible-collections/community.general/issues/6028).
+  - gconftool2 - remove requirement of parameter ``value`` when ``state=absent`` (https://github.com/ansible-collections/community.general/issues/6028).
+breaking_changes:
+  - gconftool2 - fix processing of ``gconftool-2`` when ``key`` does not exist, returning ``null`` instead of empty string for both ``value`` and ``previous_value`` return values (https://github.com/ansible-collections/community.general/issues/6028).
