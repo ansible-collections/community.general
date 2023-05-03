@@ -165,8 +165,7 @@ class IpbaseFacts(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            http_agent=dict(default=USER_AGENT),
-            timeout=dict(type='int', default=10),
+            http_agent=dict(default=USER_AGENT)
         ),
         supports_check_mode=True,
     )
