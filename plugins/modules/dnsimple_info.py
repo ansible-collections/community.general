@@ -239,9 +239,9 @@ with deps.declare("requests"):
 
 def build_url(account, key, is_sandbox):
     headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer ' + key}
-    url = 'https://api{sandbox}.dnsimple.com/'.format(
-        sandbox=".sandbox" if is_sandbox else "") + 'v2/' + account
+               'Authorization': 'Bearer {0}'.format(key)}
+    sandbox = '.sandbox' if is_sandbox else ''
+    url = 'https://api{sandbox}.dnsimple.com/v2/{account}'.format(sandbox=sandbox, account=account)
     req = Request(url=url, headers=headers)
     prepped_request = req.prepare()
     return prepped_request
@@ -250,18 +250,20 @@ def build_url(account, key, is_sandbox):
 def iterate_data(module, request_object):
     base_url = request_object.url
     response = Session().send(request_object)
-    if 'pagination' in response.json():
-        data = response.json()["data"]
-        pages = response.json()["pagination"]["total_pages"]
-        if int(pages) > 1:
-            for page in range(1, pages):
-                page = page + 1
-                request_object.url = base_url + '&page=' + str(page)
-                new_results = Session().send(request_object)
-                data = data + new_results.json()["data"]
-        return data
-    else:
+    if 'pagination' not in response.json():
         module.fail_json('API Call failed, check ID, key and sandbox values')
+
+    data = response.json()["data"]
+    total_pages = response.json()["pagination"]["total_pages"]
+    page = 1
+
+    while page < total_pages:
+        page = page + 1
+        request_object.url = '{url}&page={page}'.format(url=base_url, page=page)
+        new_results = Session().send(request_object)
+        data = data + new_results.json()['data']
+
+    return data
 
 
 def record_info(dnsimple_mod, req_obj):
