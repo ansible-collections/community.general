@@ -1,13 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+#
 # Copyright (c) 2023, Dominik Kukacka <dominik.kukacka@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.basic import AnsibleModule
 __metaclass__ = type
 
 
@@ -110,6 +108,9 @@ ansible_facts:
       type: str
       sample: "America/Los_Angeles"
 '''
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible.module_utils.urls import fetch_url
 
 
 USER_AGENT = 'ansible-ipbase-module/0.0.1'
