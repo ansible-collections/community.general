@@ -111,8 +111,10 @@ ansible_facts:
       sample: "America/Los_Angeles"
 '''
 
+
 USER_AGENT = 'ansible-ipbase-module/0.0.1'
 BASE_URL = 'https://api.ipbase.com/v2/info?hostname=1'
+
 
 class IpbaseFacts(object):
 
