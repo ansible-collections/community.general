@@ -814,7 +814,7 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf-2
-    migrate: True
+    migrate: true
 '''
 
 RETURN = '''
