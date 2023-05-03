@@ -237,7 +237,7 @@ class TestKeycloakRealmRole(ModuleTestCase):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
-        self.assertEqual(len(mock_get_realm_role.mock_calls), 2)
+        self.assertEqual(len(mock_get_realm_role.mock_calls), 1)
         self.assertEqual(len(mock_create_realm_role.mock_calls), 0)
         self.assertEqual(len(mock_update_realm_role.mock_calls), 0)
 

@@ -234,7 +234,7 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
@@ -361,10 +361,25 @@ def main():
 
     else:
         if state == 'present':
+            compare_exclude = []
+            if 'composites' in desired_role and isinstance(desired_role['composites'], list) and len(desired_role['composites']) > 0:
+                composites = kc.get_role_composites(rolerep=before_role, clientid=clientid, realm=realm)
+                before_role['composites'] = []
+                for composite in composites:
+                    before_composite = {}
+                    if composite['clientRole']:
+                        composite_client = kc.get_client_by_id(id=composite['containerId'])
+                        before_composite['client_id'] = composite_client['clientId']
+                    else:
+                        before_composite['client_id'] = None
+                    before_composite['name'] = composite['name']
+                    before_composite['state'] = 'present'
+                    before_role['composites'].append(before_composite)
+            else:
+                compare_exclude.append('composites')
             # Process an update
-
             # no changes
-            if desired_role == before_role:
+            if is_struct_included(desired_role, before_role, exclude=compare_exclude):
                 result['changed'] = False
                 result['end_state'] = desired_role
                 result['msg'] = "No changes required to role {name}.".format(name=name)
