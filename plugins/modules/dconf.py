@@ -143,14 +143,44 @@ EXAMPLES = r"""
 
 
 import os
+import sys
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.respawn import (
+    has_respawned,
+    probe_interpreters_for_module,
+    respawn_module,
+)
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils import deps
 
+# Python 2 doesn't have ModuleNotFoundError
 try:
-    from gi.repository.GLib import Variant, GError
-except ImportError:
+    import_errors = (AttributeError, ImportError, ModuleNotFoundError)
+except NameError:
+    import_errors = (AttributeError, ImportError,)
+
+glib_module_name = 'gi.repository.GLib'
+
+try:
+    # Note: When you call `__import__` without `fromlist`, it returns the
+    # top-level module object, even if you tell it to import a submodule. In
+    # others words, `__import__("gi.repository.GLib")` returns the `gi` module
+    # object, not the `gi.repository.GLib` module object.
+    # On the other hand, when you call it _with_ `fromlist`, it returns the
+    # module object the particular symbols you listed are being imported from.
+    # We're taking advantage of that here.
+    # Of note: You don't get an error when you specify a nonexistent symbol
+    # in `fromlist`, so it doesn't really matter what we list in it, but just
+    # to avoid confusion (and in case that behavior changes later) we are
+    # listing the symbols that we actually want to import. This, by the way, is
+    # why `AttributeError` is listed above in `import_errors`, so that we'll
+    # catch it if it turns out that either `Variant` or `GError` is
+    # unexpectedly missing.
+    mod = __import__(glib_module_name, fromlist=('Variant', 'GError'))
+    Variant = mod.Variant
+    GError = mod.GError
+except import_errors:
     Variant = None
     GError = AttributeError
 
@@ -414,6 +444,34 @@ def main():
             ('state', 'present', ['value']),
         ],
     )
+
+    if Variant is None:
+        # This interpreter can't see the GLib module. To try to fix that, we'll
+        # look in common locations for system-owned interpreters that can see
+        # it; if we find one, we'll respawn under it. Otherwise we'll proceed
+        # with degraded performance, without the ability to parse GVariants.
+        # Later (in a different PR) we'll actually deprecate this degraded
+        # performance level and fail with an error if the library can't be
+        # found.
+
+        if has_respawned():
+            # This shouldn't be possible; short-circuit early if it happens.
+            module.fail_json(
+                msg="%s must be installed and visible from %s." %
+                (glib_module_name, sys.executable))
+
+        interpreters = ['/usr/bin/python3', '/usr/bin/python2',
+                        '/usr/bin/python']
+
+        interpreter = probe_interpreters_for_module(
+            interpreters, glib_module_name)
+
+        if interpreter:
+            # Found the Python bindings; respawn this module under the
+            # interpreter where we found them.
+            respawn_module(interpreter)
+            # This is the end of the line for this process, it will exit here
+            # once the respawned module has completed.
 
     # Try to be forgiving about the user specifying a boolean as the value, or
     # more accurately about the fact that YAML and Ansible are quite insistent
