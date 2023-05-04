@@ -623,7 +623,7 @@ files:
     maintainers: bregman-arie
   $modules/ipa_:
     maintainers: $team_ipa
-  $modules/ipbase_facts.py:
+  $modules/ipbase_info.py:
     maintainers: dominikkukacka
   $modules/ipa_pwpolicy.py:
     maintainers: adralioh
