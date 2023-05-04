@@ -24,11 +24,10 @@ options:
     description:
       - "The IP you want to get the info for."
     required: false
-    default: "The primary outgoing IP address of the host."
     type: str
   apikey:
     description:
-      - "The api key for the request if you need more requests."
+      - "The apikey for the request if you need more requests."
     required: false
     type: str
 notes:
