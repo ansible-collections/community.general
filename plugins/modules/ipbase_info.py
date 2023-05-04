@@ -84,14 +84,7 @@ class IpbaseFacts(object):
     def __init__(self, module):
         self.module = module
 
-    def info(self, ip, apikey):
-        url = BASE_URL
-        if ip:
-            url += '&ip=' + str(ip)
-
-        if apikey:
-            url += '&apikey=' + str(apikey)
-
+    def _get_url_data(self, url):
         response, info = fetch_url(
             self.module,
             url,
@@ -107,33 +100,44 @@ class IpbaseFacts(object):
         else:
             try:
                 content = response.read()
-                parsedData = self.module.from_json(content.decode('utf8'))
-
-                result = dict(
-                    ip=parsedData['data']['ip'],
-                    hostname=parsedData['data']['hostname'],
-                    continent=parsedData['data']['location']['continent']['name'],
-                    continent_code=parsedData['data']['location']['continent']['code'],
-                    country=parsedData['data']['location']['country']['name'],
-                    country_code=parsedData['data']['location']['country']['alpha2'],
-                    is_in_european_union=parsedData['data']['location']['country']['is_in_european_union'],
-                    region=parsedData['data']['location']['region']['name'],
-                    region_code=parsedData['data']['location']['region']['alpha2'],
-                    city=parsedData['data']['location']['city']['name'],
-                    zip=parsedData['data']['location']['zip'],
-                    latitude=parsedData['data']['location']['latitude'],
-                    longitude=parsedData['data']['location']['longitude'],
-                    timezone=parsedData['data']['timezone']['id'],
-                    as_name=parsedData['data']['connection']['organization'],
-                    as_number=parsedData['data']['connection']['asn'],
-                )
-
+                result = self.module.from_json(content.decode('utf8'))
             except ValueError:
                 self.module.fail_json(
                     msg='Failed to parse the ipbase.com response: '
                     '{0} {1}'.format(url, content))
             else:
-                return dict(data=result)
+                return result
+
+    def info(self, ip, apikey):
+        url = BASE_URL
+        if ip:
+            url += '&ip=' + str(ip)
+
+        if apikey:
+            url += '&apikey=' + str(apikey)
+
+        response = self._get_url_data(url)
+
+        result = dict(
+            ip=response['data']['ip'],
+            hostname=response['data']['hostname'],
+            continent=response['data']['location']['continent']['name'],
+            continent_code=response['data']['location']['continent']['code'],
+            country=response['data']['location']['country']['name'],
+            country_code=response['data']['location']['country']['alpha2'],
+            is_in_european_union=response['data']['location']['country']['is_in_european_union'],
+            region=response['data']['location']['region']['name'],
+            region_code=response['data']['location']['region']['alpha2'],
+            city=response['data']['location']['city']['name'],
+            zip=response['data']['location']['zip'],
+            latitude=response['data']['location']['latitude'],
+            longitude=response['data']['location']['longitude'],
+            timezone=response['data']['timezone']['id'],
+            as_name=response['data']['connection']['organization'],
+            as_number=response['data']['connection']['asn'],
+        )
+
+        return dict(data=result)
 
 
 def main():
