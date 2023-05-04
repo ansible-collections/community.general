@@ -281,10 +281,9 @@ def run_module():
         query_results_key = 'query_results_dict'
 
     # Process the script into batches
-    statements = script.split('\n')
     queries = []
     current_batch = []
-    for statement in statements:
+    for statement in script.splitlines(keepends=True):
         # Ignore the Byte Order Mark, if found
         if statement.strip() == '\uFEFF':
             continue
@@ -294,10 +293,10 @@ def run_module():
         if statement.strip().upper() != 'GO':
             current_batch.append(statement)
         else:
-            queries.append('\n'.join(current_batch))
+            queries.append(''.join(current_batch))
             current_batch = []
     if len(current_batch) > 0:
-        queries.append('\n'.join(current_batch))
+        queries.append(''.join(current_batch))
 
     result['changed'] = True
     if module.check_mode:
