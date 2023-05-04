@@ -40,7 +40,7 @@ EXAMPLES = '''
   community.general.ipbase_info:
   register: my_ip_info
 
-- name: "Get IP geolocation information of a specific IP
+- name: "Get IP geolocation information of a specific IP"
   community.general.ipbase_info:
     ip: "8.8.8.8"
   register: my_ip_info
