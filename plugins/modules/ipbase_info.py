@@ -47,9 +47,8 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
----
 data:
-    description: The data retrieved from ipbase.com.
+    description: "The data retrieved from ipbase.com."
     returned: success
     type: dict
     sample: {
