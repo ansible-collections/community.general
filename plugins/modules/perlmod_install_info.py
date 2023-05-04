@@ -187,7 +187,7 @@ from ansible.module_utils.parsing.convert_bool import boolean
 
 def check_installed(amodule, perlmod):
     """Returns True if perl can import the specified module."""
-    (rc, _, _) = amodule.run_command(
+    (rc, dummy, dummy) = amodule.run_command(
         ["perl", "-e", "use %s" % (perlmod,)])
     return rc == 0
 
@@ -200,7 +200,7 @@ def dnf_or_yum(amodule, which_cmd, update, modules):
         cmd.append('--refresh')
     cmd.append('whatprovides')
     cmd.extend(want)
-    (_, stdout, _) = amodule.run_command(cmd)
+    (dummy, stdout, dummy) = amodule.run_command(cmd)
     packages = set()
     for line in stdout.split('\n'):
         line = re.split(r'\s+', line)
@@ -219,7 +219,7 @@ def apt(amodule, update, modules):
         amodule.run_command(['apt-file', 'update'])
 
     # Get list of include paths from perl
-    (_, stdout, _) = amodule.run_command(['perl', '-V'])
+    (dummy, stdout, dummy) = amodule.run_command(['perl', '-V'])
     in_inc = False
     perlpath = []
     for line in (r.strip() for r in stdout.split('\n')):
@@ -239,7 +239,7 @@ def apt(amodule, update, modules):
         # Convert module name into tail end of a module path
         tail = '/' + name.replace('::', '/') + '.pm'
         # Search for it with apt-file
-        (_, stdout, _) = amodule.run_command(
+        (dummy, stdout, dummy) = amodule.run_command(
             ['apt-file', 'search', tail])
         for line in stdout.split('\n'):
             # package: path is output format
@@ -271,7 +271,7 @@ def cpanm(amodule, modules):
         # support.
         tempdir = tempfile.mkdtemp()
         try:
-            (rc, stdout, _) = amodule.run_command(
+            (rc, stdout, dummy) = amodule.run_command(
                 ['cpanm', '--local-lib-contained',
                  tempdir, '--scandeps', module])
         finally:
