@@ -49,71 +49,29 @@ EXAMPLES = '''
 RETURN = '''
 ---
 data:
-  ip:
-    description: "Public IP address of the host."
-    type: str
-    sample: "1.1.1.1"
-  hostname:
-    description: "The hostname of the IP address."
-    type: str
-    sample: "one.one.one.one"
-  continent_code:
-    description: The ISO 3166-1 alpha-2 continent code."
-    type: str
-    sample: "NA"
-  continent_name:
-    description: "The continent name."
-    type: str
-    sample: "North America"
-  country_code:
-    description: "The ISO 3166-1 alpha-2 country code."
-    type: str
-    sample: "US"
-  country_name:
-    description: "The country name."
-    type: str
-    sample: "United States"
-  is_in_european_union:
-    description: "Is the country in the European Union?"
-    type: bool
-    sample: true
-  region_code:
-    description: "The ISO 3166-2 alpha-2 region code."
-    type: str
-    sample: "US-CA"
-  region_name:
-    description: "The state or province name."
-    type: str
-    sample: "California"
-  city_name:
-    description: "The city name."
-    type: str
-    sample: "Los Angeles"
-  latitude:
-    description: "The latitude of the location."
-    type: float
-    sample: 34.053611755371094
-  longitude:
-    description: "The longitude of the location."
-    type: float
-    sample: -118.24549865722656
-  as_name:
-    description: "The autonomous system name (AS name)"
-    type: str
-    sample: "Cloudflare, Inc."
-  as_number:
-    description: "The autonomous system number (ASN)"
-    type: int
-    sample: 13335
-  zip:
-    description: "The zip code."
-    type: str
-    sample: "90012"
-  timezone:
-    description: "The timezone ID."
-    type: str
-    sample: "America/Los_Angeles"
+    description: The data retrieved from ipbase.com.
+    returned: success
+    type: dict
+    sample: {
+        "as_name": "T-Mobile Austria GmbH",
+        "as_number": 8412,
+        "city": "Vienna",
+        "continent": "Europe",
+        "continent_code": "EU",
+        "country": "Austria",
+        "country_code": "AT",
+        "hostname": "81-223-100.100.static.upcbusiness.at",
+        "ip": "81.223.100.100",
+        "is_in_european_union": true,
+        "latitude": 48.1861686706543,
+        "longitude": 16.403240203857422,
+        "region": "Vienna",
+        "region_code": "AT-9",
+        "timezone": "Europe/Vienna",
+        "zip": "1030"
+    }
 '''
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible.module_utils.urls import fetch_url
