@@ -206,7 +206,6 @@ query_results_dict:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
 import json
-import re
 PYMSSQL_IMP_ERR = None
 try:
     import pymssql
@@ -281,7 +280,25 @@ def run_module():
         cursor = conn.cursor(as_dict=True)
         query_results_key = 'query_results_dict'
 
-    queries = re.split(r'\n[Gg][Oo]\n', script)
+    # Process the script into batches
+    statements = script.split('\n')
+    queries = []
+    current_batch = []
+    for statement in statements:
+        # Ignore the Byte Order Mark, if found
+        if statement.strip() == '\uFEFF':
+            continue
+
+        # Assume each 'GO' is on its own line but may have leading/trailing whitespace
+        # and be of mixed-case
+        if statement.strip().upper() != 'GO':
+            current_batch.append(statement)
+        else:
+            queries.append('\n'.join(current_batch))
+            current_batch = []
+    if len(current_batch) > 0:
+        queries.append('\n'.join(current_batch))
+
     result['changed'] = True
     if module.check_mode:
         module.exit_json(**result)

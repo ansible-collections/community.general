@@ -1,3 +1,4 @@
 minor_changes:
-  - mssql_script_module - Handle error condition for empty resultsets to allow for non-returning SQL statements (eg. UPDATE/INSERT)
-  - mssql_script_module - Allow for "GO" statement to be mixed-case for scripts not using strict syntax
+  - mssql_script - handle error condition for empty resultsets to allow for non-returning SQL statements (for example ``UPDATE`` and ``INSERT``) (https://github.com/ansible-collections/community.general/pull/6457).
+  - mssql_script - allow for ``GO`` statement to be mixed-case for scripts not using strict syntax (https://github.com/ansible-collections/community.general/pull/6457).
+  - mssql_script - improve batching logic to allow a wider variety of input scripts. For example, SQL scripts slurped from Windows machines which may contain carriage return (''\r'') characters.
