@@ -80,7 +80,7 @@ def _select_names(spec):
             for d in spec_split:
                 dep_names.remove(d)
         else:
-            spec_split = spec[1:].split(":")
+            spec_split = spec.split(":")
             dep_names = []
             for d in spec_split:
                 _deps[d]  # ensure it exists
