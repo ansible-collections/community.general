@@ -26,12 +26,6 @@ options:
     required: false
     default: "The primary outgoing IP address of the host."
     type: str
-  http_agent:
-    description:
-      - "HTTP user agent to use."
-    required: false
-    default: "ansible-ipbase-module/0.0.1"
-    type: str
 notes:
   - "Check U(https://ipbase.com/) for more information."
 '''
@@ -41,10 +35,9 @@ EXAMPLES = '''
 - name: "Get IP geolocation information of the primary outgoing IP"
   community.general.ipbase_info:
 
-- name: "Get IP geolocation information of a specific IP (and set a custom http user agent)"
+- name: "Get IP geolocation information of a specific IP
   community.general.ipbase_info:
     ip: "8.8.8.8"
-    http_agent: "my-user-agent/0.0.0"
 '''
 
 RETURN = '''
@@ -118,7 +111,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-USER_AGENT = 'ansible-ipbase-module/0.0.1'
+USER_AGENT = 'ansible-ipbase-module/0.1.0'
 BASE_URL = 'https://api.ipbase.com/v2/info?hostname=1'
 
 
@@ -130,16 +123,20 @@ class IpbaseFacts(object):
     def info(self, ip):
         url = BASE_URL
         if ip:
-            url = '{0}{1}'.format(BASE_URL, ip)
+            url += '&ip=' + str(ip)
 
         response, info = fetch_url(
-            self.module, url, force=True, timeout=10)
+            self.module,
+            url,
+            force=True,
+            timeout=10,
+            headers={
+                'Accept': 'application/json',
+                'User-Agent': USER_AGENT,
+            })
 
-        try:
-            info['status'] == 200
-        except AssertionError:
-            self.module.fail_json(msg='Could not get {0} page, '
-                                  'check for connectivity!'.format(BASE_URL))
+        if(info['status'] != 200):
+            self.module.fail_json(msg='The API request to ipbase.com returned an error status code {0}'.format(info['status']))
         else:
             try:
                 content = response.read()
@@ -167,14 +164,13 @@ class IpbaseFacts(object):
             except ValueError:
                 self.module.fail_json(
                     msg='Failed to parse the ipbase.com response: '
-                    '{0} {1}'.format(BASE_URL, content))
+                    '{0} {1}'.format(url, content))
             else:
                 return result
 
 
 def main():
     module_args = dict(
-        http_agent=dict(default=USER_AGENT),
         ip=dict(type='str', required=False, no_log=False),
     )
 
