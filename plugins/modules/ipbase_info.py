@@ -79,7 +79,7 @@ USER_AGENT = 'ansible-ipbase-module/0.1.0'
 BASE_URL = 'https://api.ipbase.com/v2/info?hostname=1'
 
 
-class IpbaseFacts(object):
+class IpbaseInfo(object):
 
     def __init__(self, module):
         self.module = module
@@ -154,7 +154,7 @@ def main():
     ip = module.params['ip']
     apikey = module.params['apikey']
 
-    ipbase = IpbaseFacts(module)
+    ipbase = IpbaseInfo(module)
     module.exit_json(**ipbase.info(ip, apikey))
 
 
