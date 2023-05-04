@@ -23,7 +23,7 @@ requirements:
     - C(cpanm) executable in search path if you want to be able to search for
       packages using cpanm
 
-version_added: "6.6.0"
+version_added: "7.0.0"
 
 description:
     - Searches dnf, yum, apt, and/or cpanm to determine the best source from
