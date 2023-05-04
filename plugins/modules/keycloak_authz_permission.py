@@ -13,6 +13,8 @@ DOCUMENTATION = '''
 ---
 module: keycloak_authz_permission
 
+version_added: 7.0.0
+
 short_description: Allows administration of Keycloak client authorization permissions via Keycloak API.
 
 description:
