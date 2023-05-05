@@ -13,7 +13,6 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 
 
-
 IPBASE_DATA = {
     "result": b"""
 {
@@ -185,9 +184,7 @@ IPBASE_DATA = {
 }
 
 
-
 class TestIpbase(unittest.TestCase):
-
     def test_info(self,):
         "test the json data extraction"
 
