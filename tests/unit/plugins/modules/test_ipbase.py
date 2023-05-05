@@ -203,4 +203,5 @@ class TestIpbase(unittest.TestCase):
 
         result = json.loads(IPBASE_DATA['result'])
 
-        self.assertEqual(json_data, result)
+        self.maxDiff = None
+        self.assertDictEqual(json_data, result)
