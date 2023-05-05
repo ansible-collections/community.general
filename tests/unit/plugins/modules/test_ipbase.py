@@ -9,10 +9,9 @@ __metaclass__ = type
 import json
 
 from ansible_collections.community.general.plugins.modules.ipbase_info import IpbaseInfo
+from ansible_collections.community.general.tests.unit.compat import unittest
+from ansible_collections.community.general.tests.unit.compat.mock import Mock
 
-
-def pass_function(*args, **kwargs):
-    pass
 
 
 IPBASE_DATA = {
@@ -186,22 +185,25 @@ IPBASE_DATA = {
 }
 
 
-def test_info(mocker):
-    "test the json data extraction"
 
-    params = {
-        "ip": "1.1.1.1",
-        "apikey": "aaa"
-    }
-    module = mocker.Mock()
-    module.params = params
+class TestIpbase(unittest.TestCase):
 
-    IpbaseInfo._get_url_data = mocker.Mock()
-    IpbaseInfo._get_url_data.return_value = json.loads(IPBASE_DATA['response'])
-    jenkins_plugin = IpbaseInfo(module)
+    def test_info(self,):
+        "test the json data extraction"
 
-    json_data = jenkins_plugin.info()
+        params = {
+            "ip": "1.1.1.1",
+            "apikey": "aaa"
+        }
+        module = Mock()
+        module.params = params
 
-    result = json.loads(IPBASE_DATA['result'])
+        IpbaseInfo._get_url_data = Mock()
+        IpbaseInfo._get_url_data.return_value = json.loads(IPBASE_DATA['response'])
+        jenkins_plugin = IpbaseInfo(module)
 
-    assert json_data == result
+        json_data = jenkins_plugin.info()
+
+        result = json.loads(IPBASE_DATA['result'])
+
+        self.assertEqual(json_data, result)
