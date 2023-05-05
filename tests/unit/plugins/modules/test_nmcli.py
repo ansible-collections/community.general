@@ -4259,3 +4259,294 @@ def test_macvlan_mod(mocked_generic_connection_modify, capfd):
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'fake_conn',
+        'ifname': 'fake_eth0',
+        'state': 'present',
+        'slave_type': 'bridge',
+        'master': 'fake_br0',
+        '_ansible_check_mode': False,
+    }
+]
+
+
+TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION_SHOW_OUTPUT = """\
+connection.id:                          fake_conn
+connection.type:                        802-3-ethernet
+connection.interface-name:              fake_eth0
+connection.autoconnect:                 yes
+connection.master:                      --
+connection.slave-type:                  --
+802-3-ethernet.mtu:                     auto
+"""
+
+
+TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION_UNCHANGED_SHOW_OUTPUT = """\
+connection.id:                          fake_conn
+connection.type:                        802-3-ethernet
+connection.interface-name:              fake_eth0
+connection.autoconnect:                 yes
+connection.master:                      fake_br0
+connection.slave-type:                  bridge
+802-3-ethernet.mtu:                     auto
+"""
+
+
+@pytest.fixture
+def mocked_slave_type_bridge_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION, indirect=['patch_ansible_module'])
+def test_create_slave_type_bridge(mocked_slave_type_bridge_create, capfd):
+    """
+    Test : slave for bridge created
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'ethernet'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'fake_conn'
+    con_master_index = args[0].index('connection.master')
+    slave_type_index = args[0].index('connection.slave-type')
+    assert args[0][con_master_index + 1] == 'fake_br0'
+    assert args[0][slave_type_index + 1] == 'bridge'
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.fixture
+def mocked_create_slave_type_bridge_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION_UNCHANGED_SHOW_OUTPUT, ""))
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_SLAVE_TYPE_BRIDGE_CONNECTION, indirect=['patch_ansible_module'])
+def test_slave_type_bridge_unchanged(mocked_create_slave_type_bridge_unchanged, capfd):
+    """
+    Test : Existent slave for bridge unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+TESTCASE_SLAVE_TYPE_BOND_CONNECTION = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'fake_conn',
+        'ifname': 'fake_eth0',
+        'state': 'present',
+        'slave_type': 'bond',
+        'master': 'fake_bond0',
+        '_ansible_check_mode': False,
+    }
+]
+
+
+TESTCASE_SLAVE_TYPE_BOND_CONNECTION_SHOW_OUTPUT = """\
+connection.id:                          fake_conn
+connection.type:                        802-3-ethernet
+connection.interface-name:              fake_eth0
+connection.autoconnect:                 yes
+connection.master:                      --
+connection.slave-type:                  --
+802-3-ethernet.mtu:                     auto
+"""
+
+
+TESTCASE_SLAVE_TYPE_BOND_CONNECTION_UNCHANGED_SHOW_OUTPUT = """\
+connection.id:                          fake_conn
+connection.type:                        802-3-ethernet
+connection.interface-name:              fake_eth0
+connection.autoconnect:                 yes
+connection.master:                      fake_bond0
+connection.slave-type:                  bond
+802-3-ethernet.mtu:                     auto
+"""
+
+
+@pytest.fixture
+def mocked_slave_type_bond_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_SLAVE_TYPE_BOND_CONNECTION_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_SLAVE_TYPE_BOND_CONNECTION, indirect=['patch_ansible_module'])
+def test_create_slave_type_bond(mocked_slave_type_bond_create, capfd):
+    """
+    Test : slave for bond created
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'ethernet'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'fake_conn'
+    con_master_index = args[0].index('connection.master')
+    slave_type_index = args[0].index('connection.slave-type')
+    assert args[0][con_master_index + 1] == 'fake_bond0'
+    assert args[0][slave_type_index + 1] == 'bond'
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.fixture
+def mocked_create_slave_type_bond_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_SLAVE_TYPE_BOND_CONNECTION_UNCHANGED_SHOW_OUTPUT, ""))
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_SLAVE_TYPE_BOND_CONNECTION, indirect=['patch_ansible_module'])
+def test_slave_type_bond_unchanged(mocked_create_slave_type_bond_unchanged, capfd):
+    """
+    Test : Existent slave for bridge unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+TESTCASE_SLAVE_TYPE_TEAM_CONNECTION = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'fake_conn',
+        'ifname': 'fake_eth0',
+        'state': 'present',
+        'slave_type': 'team',
+        'master': 'fake_team0',
+        '_ansible_check_mode': False,
+    }
+]
+
+
+TESTCASE_SLAVE_TYPE_TEAM_CONNECTION_SHOW_OUTPUT = """\
+connection.id:                          fake_conn
+connection.type:                        802-3-ethernet
+connection.interface-name:              fake_eth0
+connection.autoconnect:                 yes
+connection.master:                      --
+connection.slave-type:                  --
+802-3-ethernet.mtu:                     auto
+"""
+
+
+TESTCASE_SLAVE_TYPE_TEAM_CONNECTION_UNCHANGED_SHOW_OUTPUT = """\
+connection.id:                          fake_conn
+connection.type:                        802-3-ethernet
+connection.interface-name:              fake_eth0
+connection.autoconnect:                 yes
+connection.master:                      fake_team0
+connection.slave-type:                  team
+802-3-ethernet.mtu:                     auto
+"""
+
+
+@pytest.fixture
+def mocked_slave_type_team_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_SLAVE_TYPE_TEAM_CONNECTION_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_SLAVE_TYPE_TEAM_CONNECTION, indirect=['patch_ansible_module'])
+def test_create_slave_type_team(mocked_slave_type_team_create, capfd):
+    """
+    Test : slave for bond created
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'ethernet'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'fake_conn'
+    con_master_index = args[0].index('connection.master')
+    slave_type_index = args[0].index('connection.slave-type')
+    assert args[0][con_master_index + 1] == 'fake_team0'
+    assert args[0][slave_type_index + 1] == 'team'
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.fixture
+def mocked_create_slave_type_team_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_SLAVE_TYPE_TEAM_CONNECTION_UNCHANGED_SHOW_OUTPUT, ""))
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_SLAVE_TYPE_TEAM_CONNECTION, indirect=['patch_ansible_module'])
+def test_slave_type_team_unchanged(mocked_create_slave_type_team_unchanged, capfd):
+    """
+    Test : Existent slave for bridge unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
