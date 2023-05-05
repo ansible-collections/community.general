@@ -197,11 +197,11 @@ def test_info(mocker):
     module.params = params
 
     IpbaseInfo._get_url_data = mocker.Mock()
-    IpbaseInfo._get_url_data.return_value = json.load(IPBASE_DATA['response'])
+    IpbaseInfo._get_url_data.return_value = json.loads(IPBASE_DATA['response'])
     jenkins_plugin = IpbaseInfo(module)
 
     json_data = jenkins_plugin.info()
 
-    result = json.load(IPBASE_DATA['result'])
+    result = json.loads(IPBASE_DATA['result'])
 
     assert json_data == result
