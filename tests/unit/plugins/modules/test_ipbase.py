@@ -40,7 +40,7 @@ IPBASE_DATA = {
 {
   "data": {
     "ip": "1.1.1.1",
-    "hostname": null,
+    "hostname": "one.one.one.one",
     "type": "v4",
     "range_type": {
       "type": "PUBLIC",
