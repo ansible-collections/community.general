@@ -108,7 +108,11 @@ class IpbaseInfo(object):
             else:
                 return result
 
-    def info(self, ip, apikey):
+    def info(self):
+
+        ip = self.module.params['ip']
+        apikey = self.module.params['apikey']
+
         url = BASE_URL
         if ip:
             url += '&ip=' + str(ip)
@@ -151,11 +155,8 @@ def main():
         supports_check_mode=True,
     )
 
-    ip = module.params['ip']
-    apikey = module.params['apikey']
-
     ipbase = IpbaseInfo(module)
-    module.exit_json(**ipbase.info(ip, apikey))
+    module.exit_json(**ipbase.info())
 
 
 if __name__ == '__main__':

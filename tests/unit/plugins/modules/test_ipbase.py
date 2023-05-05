@@ -6,7 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from io import BytesIO
+import json
 
 from ansible_collections.community.general.plugins.modules.ipbase_info import IpbaseInfo
 
@@ -197,9 +197,11 @@ def test_info(mocker):
     module.params = params
 
     IpbaseInfo._get_url_data = mocker.Mock()
-    IpbaseInfo._get_url_data.return_value = BytesIO(IPBASE_DATA['response'])
+    IpbaseInfo._get_url_data.return_value = str(IPBASE_DATA['response'])
     jenkins_plugin = IpbaseInfo(module)
 
-    json_data = jenkins_plugin.info(params["ip"], params["apikey"])
+    json_data = jenkins_plugin.info()
 
-    assert json_data == IPBASE_DATA['result']
+    result = json.load(IPBASE_DATA['result'])
+
+    assert json_data == result
