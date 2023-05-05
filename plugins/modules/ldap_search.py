@@ -61,6 +61,17 @@ options:
     description:
       - Set to C(true) to return the full attribute schema of entries, not
         their attribute values. Overrides I(attrs) when provided.
+  base64_attributes:
+    description:
+      - If provided, all attribute values returned that are listed in this option
+        will be Base64 encoded.
+      - If the special value C(*) appears in this list, all attributes will be
+        Base64 encoded.
+      - All other attribute values will be converted to UTF-8 strings. If they
+        contain binary data, please note that invalid UTF-8 bytes will be omitted.
+    type: list
+    elements: str
+    version_added: 7.0.0
 extends_documentation_fragment:
   - community.general.ldap.documentation
   - community.general.attributes
@@ -81,10 +92,27 @@ EXAMPLES = r"""
   register: ldap_group_gids
 """
 
+RESULTS = """
+results:
+  description:
+    - For every entry found, one dictionary will be returned.
+    - Every dictionary contains a key C(dn) with the entry's DN as a value.
+    - Every attribute of the entry found is added to the dictionary. If the key
+      has precisely one value, that value is taken directly, otherwise the key's
+      value is a list.
+    - Note that all values (for single-element lists) and list elements (for multi-valued
+      lists) will be UTF-8 strings. Some might contain Base64-encoded binary data; which
+      ones is determined by the I(base64_attributes) option.
+  type: list
+  elements: dict
+"""
+
+import base64
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.six import string_types, text_type
 from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
 
 LDAP_IMP_ERR = None
@@ -105,6 +133,7 @@ def main():
             filter=dict(type='str', default='(objectClass=*)'),
             attrs=dict(type='list', elements='str'),
             schema=dict(type='bool', default=False),
+            base64_attributes=dict(type='list', elements='str'),
         ),
         supports_check_mode=True,
     )
@@ -118,16 +147,30 @@ def main():
     except Exception as exception:
         module.fail_json(msg="Attribute action failed.", details=to_native(exception))
 
-    module.exit_json(changed=False)
+
+def _normalize_string(val, convert_to_base64):
+    if isinstance(val, string_types):
+        if isinstance(val, text_type):
+            val = to_bytes(val, encoding='utf-8')
+        if convert_to_base64:
+            val = to_text(base64.b64encode(val))
+        else:
+            # See https://github.com/ansible/ansible/issues/80258#issuecomment-1477038952 for details.
+            # We want to make sure that all strings are properly UTF-8 encoded, even if they were not,
+            # or happened to be byte strings.
+            val = to_text(val, 'utf-8', errors='replace')
+            # See also https://github.com/ansible-collections/community.general/issues/5704.
+    return val
 
 
-def _extract_entry(dn, attrs):
+def _extract_entry(dn, attrs, base64_attributes):
     extracted = {'dn': dn}
     for attr, val in list(attrs.items()):
+        convert_to_base64 = '*' in base64_attributes or attr in base64_attributes
         if len(val) == 1:
-            extracted[attr] = val[0]
+            extracted[attr] = _normalize_string(val[0], convert_to_base64)
         else:
-            extracted[attr] = val
+            extracted[attr] = [_normalize_string(v, convert_to_base64) for v in val]
     return extracted
 
 
@@ -140,9 +183,10 @@ class LdapSearch(LdapGeneric):
         self._load_scope()
         self._load_attrs()
         self._load_schema()
+        self._base64_attributes = set(self.module.params['base64_attributes'] or [])
 
     def _load_schema(self):
-        self.schema = self.module.boolean(self.module.params['schema'])
+        self.schema = self.module.params['schema']
         if self.schema:
             self.attrsonly = 1
         else:
@@ -179,7 +223,7 @@ class LdapSearch(LdapGeneric):
                     if self.schema:
                         ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
                     else:
-                        ldap_entries.append(_extract_entry(result[0], result[1]))
+                        ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
             return ldap_entries
         except ldap.NO_SUCH_OBJECT:
             self.module.fail_json(msg="Base not found: {0}".format(self.dn))
