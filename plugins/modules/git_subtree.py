@@ -12,7 +12,6 @@ module: git_subtree
 short_description: Ansible module that mimic git subtree add/pull in an idempotent way.
 description:
     - This module mimics the functionality of the git subtree command by adding a subtree from a source repository to a subdirectory in the main repository.
-version_added: "2.16"
 author:
     - Riadh Hamdi (@riadhhamdi) (rhamdi@redhat.com)
 options:
