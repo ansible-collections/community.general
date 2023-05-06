@@ -300,31 +300,35 @@ def main():
                         prj_set = False
                         break
 
-        if not prj_set and not module.check_mode:
-            cmd = "project -s"
-            rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
-            if rc != 0:
-                result["cmd"] = cmd
-                result["rc"] = rc
-                result["stdout"] = stdout
-                result["stderr"] = stderr
-                module.fail_json(
-                    msg="Could not get quota realtime block report.", **result
-                )
+        if state == "present" and not prj_set:
+            if not module.check_mode:
+                cmd = "project -s %s" % name
+                rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
+                if rc != 0:
+                    result["cmd"] = cmd
+                    result["rc"] = rc
+                    result["stdout"] = stdout
+                    result["stderr"] = stderr
+                    module.fail_json(
+                        msg="Could not get quota realtime block report.", **result
+                    )
 
             result["changed"] = True
 
-        elif not prj_set and module.check_mode:
-            result["changed"] = True
+        elif state == "absent" and prj_set and name != quota_default:
+            if not module.check_mode:
+                cmd = "project -C %s" % name
+                rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
+                if rc != 0:
+                    result["cmd"] = cmd
+                    result["rc"] = rc
+                    result["stdout"] = stdout
+                    result["stderr"] = stderr
+                    module.fail_json(
+                        msg="Failed to clear managed tree from project quota control.", **result
+                    )
 
-    # Set limits
-    if state == "absent":
-        bhard = 0
-        bsoft = 0
-        ihard = 0
-        isoft = 0
-        rtbhard = 0
-        rtbsoft = 0
+            result["changed"] = True
 
     current_bsoft, current_bhard = quota_report(
         module, xfs_quota_bin, mountpoint, name, quota_type, "b"
@@ -335,6 +339,23 @@ def main():
     current_rtbsoft, current_rtbhard = quota_report(
         module, xfs_quota_bin, mountpoint, name, quota_type, "rtb"
     )
+
+    # Set limits
+    if state == "absent":
+        bhard = 0
+        bsoft = 0
+        ihard = 0
+        isoft = 0
+        rtbhard = 0
+        rtbsoft = 0
+
+        # Ensure that a non-existing quota does not trigger a change
+        current_bsoft = current_bsoft if current_bsoft is not None else 0
+        current_bhard = current_bhard if current_bhard is not None else 0
+        current_isoft = current_isoft if current_isoft is not None else 0
+        current_ihard = current_ihard if current_ihard is not None else 0
+        current_rtbsoft = current_rtbsoft if current_rtbsoft is not None else 0
+        current_rtbhard = current_rtbhard if current_rtbhard is not None else 0
 
     result["xfs_quota"] = dict(
         bsoft=current_bsoft,
@@ -370,23 +391,21 @@ def main():
         limit.append("rtbhard=%s" % rtbhard)
         result["rtbhard"] = int(rtbhard)
 
-    if len(limit) > 0 and not module.check_mode:
-        if name == quota_default:
-            cmd = "limit %s -d %s" % (type_arg, " ".join(limit))
-        else:
-            cmd = "limit %s %s %s" % (type_arg, " ".join(limit), name)
+    if len(limit) > 0:
+        if not module.check_mode:
+            if name == quota_default:
+                cmd = "limit %s -d %s" % (type_arg, " ".join(limit))
+            else:
+                cmd = "limit %s %s %s" % (type_arg, " ".join(limit), name)
 
-        rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
-        if rc != 0:
-            result["cmd"] = cmd
-            result["rc"] = rc
-            result["stdout"] = stdout
-            result["stderr"] = stderr
-            module.fail_json(msg="Could not set limits.", **result)
+            rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
+            if rc != 0:
+                result["cmd"] = cmd
+                result["rc"] = rc
+                result["stdout"] = stdout
+                result["stderr"] = stderr
+                module.fail_json(msg="Could not set limits.", **result)
 
-        result["changed"] = True
-
-    elif len(limit) > 0 and module.check_mode:
         result["changed"] = True
 
     module.exit_json(**result)
