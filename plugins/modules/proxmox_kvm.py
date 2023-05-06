@@ -270,6 +270,12 @@ options:
       - Memory size in MB for instance.
       - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(512).
     type: int
+  migrate:
+    description:
+      - Migrate the VM to I(node) if it is on another node.
+    type: bool
+    default: false
+    version_added: 7.0.0
   migrate_downtime:
     description:
       - Sets maximum tolerated downtime (in seconds) for migrations.
@@ -800,6 +806,15 @@ EXAMPLES = '''
     name: spynal
     node: sabrewulf
     revert: 'template,cpulimit'
+
+- name: Migrate VM on second node
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf-2
+    migrate: true
 '''
 
 RETURN = '''
@@ -1062,6 +1077,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             return False
         return True
 
+    def migrate_vm(self, vm, target_node):
+        vmid = vm['vmid']
+        proxmox_node = self.proxmox_api.nodes(vm['node'])
+        taskid = proxmox_node.qemu(vmid).migrate.post(vmid=vmid, node=vm['node'], target=target_node, online=1)
+        if not self.wait_for_task(vm['node'], taskid):
+            self.module.fail_json(msg='Reached timeout while waiting for migrating VM. Last line in task before timeout: %s' %
+                                  proxmox_node.tasks(taskid).log.get()[:1])
+            return False
+        return True
+
 
 def main():
     module_args = proxmox_auth_argument_spec()
@@ -1109,6 +1134,7 @@ def main():
         lock=dict(choices=['migrate', 'backup', 'snapshot', 'rollback']),
         machine=dict(type='str'),
         memory=dict(type='int'),
+        migrate=dict(type='bool', default=False),
         migrate_downtime=dict(type='int'),
         migrate_speed=dict(type='int'),
         name=dict(type='str'),
@@ -1168,6 +1194,7 @@ def main():
     cpu = module.params['cpu']
     cores = module.params['cores']
     delete = module.params['delete']
+    migrate = module.params['migrate']
     memory = module.params['memory']
     name = module.params['name']
     newid = module.params['newid']
@@ -1209,7 +1236,7 @@ def main():
     # If vmid is not defined then retrieve its value from the vm name,
     # the cloned vm name or retrieve the next free VM id from ProxmoxAPI.
     if not vmid:
-        if state == 'present' and not update and not clone and not delete and not revert:
+        if state == 'present' and not update and not clone and not delete and not revert and not migrate:
             try:
                 vmid = proxmox.get_nextvmid()
             except Exception:
@@ -1255,6 +1282,18 @@ def main():
             module.exit_json(changed=True, vmid=vmid, msg="Settings has reverted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to revert settings on VM {0} with vmid {1}: Maybe is not a pending task...   '.format(name, vmid) + str(e))
+
+    if migrate:
+        try:
+            vm = proxmox.get_vm(vmid)
+            vm_node = vm['node']
+            if node != vm_node:
+                proxmox.migrate_vm(vm, node)
+                module.exit_json(changed=True, vmid=vmid, msg="VM {0} has been migrated from {1} to {2}".format(vmid, vm_node, node))
+            else:
+                module.exit_json(changed=False, vmid=vmid, msg="VM {0} is already on {1}".format(vmid, node))
+        except Exception as e:
+            module.fail_json(vmid=vmid, msg='Unable to migrate VM {0} from {1} to {2}: {3}'.format(vmid, vm_node, node, e))
 
     if state == 'present':
         try:
