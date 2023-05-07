@@ -61,7 +61,7 @@ options:
         default: 'auto'
     try_yum:
         description: Specify whether to check for modules using the dnf package
-          manager. Defaults to true if C(try_dnf) is false and yum executable
+          manager. Defaults to C(true) if I(try_dnf=false) and C(yum) executable
           is available.
         type: str
         choices:
