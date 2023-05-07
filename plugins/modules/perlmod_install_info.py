@@ -29,7 +29,10 @@ version_added: "7.0.0"
 description:
     - Searches dnf, yum, apt, and/or cpanm to determine the best source from
       which to install a Perl module.
-    - Prefers the OS repositories over cpanm.
+    - Prefers the OS repositories over cpanm. Only returns modules from CPAN
+      when it is searchable (I(try_cpan) is C(auto) or C(true) and the C(cpanm)
+      executable is available) and the returned modules were not found
+      in any other source.
     - Specify module names as you would specify them with the C(use) command in
       a Perl script.
     - Does not actually install modules. Instead, returns information about
@@ -37,7 +40,7 @@ description:
       tasks to do the actual installation.
     - Note that this module will not fail by default if it cannot locate a
       requested module. If you want that behavior, include a C(failed_when)
-      which checks for C(missing) being non-empty.
+      which checks for C(missing) being defined as shown in the examples.
 
 options:
     name:
@@ -140,35 +143,34 @@ installed:
     description: List of modules that are already installed
     type: list
     elements: str
-    returned: when C(try_installed) is true and installed modules were found
+    returned: when I(try_installed) is C(true) and installed modules were found
     sample: ['Net::DNS']
 dnf:
     description: List of dnf requirements that should be installed to provide
       at least some of the required Perl modules
     type: list
     elements: str
-    returned: when C(try_dnf) is true and requested modules were found in dnf
+    returned: when I(try_dnf) is C(true) and requested modules were found in dnf
     sample: ['perl(Net::DNS)']
 yum:
     description: List of yum requirements that should be installed to provide
       at least some of the required Perl modules
     type: list
     elements: str
-    returned: when C(try_yum) is true and requested modules were found in yum
+    returned: when I(try_yum) is C(true) and requested modules were found in yum
     sample: ['perl(Net::DNS)']
 apt:
     description: List of apt packages that should be installed to provide at
       least some of the required Perl modules
     type: list
     elements: str
-    returned: when C(try_apt) is true and requested modules were found in apt
+    returned: when I(try_apt) is C(true) and requested modules were found in apt
     sample: ['libnet-dns-perl']
 cpanm:
     description: List of modules that should be installed via CPAN
     type: list
     elements: str
-    returned: when C(try_cpanm) is true and requested modules were found in
-      CPAN and nowhere else
+    returned: when requested modules were found in CPAN
     sample: ['Net::DNS']
 missing:
     description: List of Perl modules that could not be found
