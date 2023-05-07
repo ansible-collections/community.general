@@ -50,7 +50,7 @@
     script: "SELECT 1"
 
 - name: Execute a malformed query
-  ws1cs.db.mssql_script:
+  community.general.mssql_script:
     login_user: "{{ mssql_login_user }}"
     login_password: "{{ mssql_login_password }}"
     login_host: "{{ mssql_host }}"
@@ -149,7 +149,7 @@
       - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0'  # column 'b0s0' of first row
 
 - name: Multiple batches with no resultsets and mixed-case GO
-  ws1cs.db.mssql_script:
+  community.general.mssql_script:
     login_user: "{{ mssql_login_user }}"
     login_password: "{{ mssql_login_password }}"
     login_host: "{{ mssql_host }}"

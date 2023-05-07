@@ -323,7 +323,7 @@ def run_module():
                 query_results.append([])
             else:
                 error_msg = '%s: %s' % (type(e).__name__, str(e))
-                return module.fail_json(msg="query failed", query=query, error=error_msg, **result)
+                module.fail_json(msg="query failed", query=query, error=error_msg, **result)
 
     # ensure that the result is json serializable
     qry_results = json.loads(json.dumps(query_results, default=clean_output))
