@@ -267,7 +267,7 @@ def cpanm(amodule, modules):
     dependencies = set()
     for module in modules:
         # It would be better to use TemporaryDirectory rather htan mkdtemp,
-        # but it's not supported in Python 2.7, which Ansible still needs ot
+        # but it's not supported in Python 2.7, which Ansible still needs to
         # support.
         tempdir = tempfile.mkdtemp()
         try:
