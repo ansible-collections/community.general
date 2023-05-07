@@ -1,0 +1,2 @@
+bugfixes:
+  - "terraform - fix broken ``warn()`` call (https://github.com/ansible-collections/community.general/pull/6497)."
