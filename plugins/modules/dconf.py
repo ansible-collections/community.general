@@ -156,30 +156,14 @@ from ansible_collections.community.general.plugins.module_utils import deps
 
 # Python 2 doesn't have ModuleNotFoundError
 try:
-    import_errors = (AttributeError, ImportError, ModuleNotFoundError)
+    import_errors = (ImportError, ModuleNotFoundError)
 except NameError:
-    import_errors = (AttributeError, ImportError,)
+    import_errors = (ImportError,)
 
 glib_module_name = 'gi.repository.GLib'
 
 try:
-    # Note: When you call `__import__` without `fromlist`, it returns the
-    # top-level module object, even if you tell it to import a submodule. In
-    # others words, `__import__("gi.repository.GLib")` returns the `gi` module
-    # object, not the `gi.repository.GLib` module object.
-    # On the other hand, when you call it _with_ `fromlist`, it returns the
-    # module object the particular symbols you listed are being imported from.
-    # We're taking advantage of that here.
-    # Of note: You don't get an error when you specify a nonexistent symbol
-    # in `fromlist`, so it doesn't really matter what we list in it, but just
-    # to avoid confusion (and in case that behavior changes later) we are
-    # listing the symbols that we actually want to import. This, by the way, is
-    # why `AttributeError` is listed above in `import_errors`, so that we'll
-    # catch it if it turns out that either `Variant` or `GError` is
-    # unexpectedly missing.
-    mod = __import__(glib_module_name, fromlist=('Variant', 'GError'))
-    Variant = mod.Variant
-    GError = mod.GError
+    from gi.repository.GLib import Variant, GError
 except import_errors:
     Variant = None
     GError = AttributeError
