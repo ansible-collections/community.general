@@ -769,15 +769,6 @@ EXAMPLES = '''
     node: sabrewulf
     state: absent
 
-- name: Get VM current state
-  community.general.proxmox_kvm:
-    api_user: root@pam
-    api_password: secret
-    api_host: helldorado
-    name: spynal
-    node: sabrewulf
-    state: current
-
 - name: Update VM configuration
   community.general.proxmox_kvm:
     api_user: root@pam
