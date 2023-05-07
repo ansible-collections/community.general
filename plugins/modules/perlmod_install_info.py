@@ -52,7 +52,7 @@ options:
         default: true
     try_dnf:
         description: Specify whether to check for modules using the dnf package
-          manager. Defaults to true if dnf executable is available.
+          manager. Defaults to C(true) if C(dnf) executable is available.
         type: str
         choices:
         - 'auto'
@@ -71,7 +71,7 @@ options:
         default: 'auto'
     try_apt:
         description: Specify whether to check for modules using the apt package
-          manager. Defaults to true if apt-file executable is available.
+          manager. Defaults to C(true) if C(apt-file) executable is available.
         type: str
         choices:
         - 'auto'
@@ -79,8 +79,8 @@ options:
         - 'false'
         default: 'auto'
     try_cpanm:
-        description: specify whether to check for modules using cpanm. Defaults
-          to true if cpanm executable is available.
+        description: Specify whether to check for modules using cpanm. Defaults
+          to C(true) if C(cpanm) executable is available.
         type: str
         choices:
         - 'auto'
