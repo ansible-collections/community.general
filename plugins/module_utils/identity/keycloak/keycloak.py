@@ -747,8 +747,15 @@ class KeycloakAPI(object):
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
         users_url += '?username=%s&exact=true' % username
         try:
-            return json.loads(to_native(open_url(users_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
-                                                 validate_certs=self.validate_certs).read()))
+            userrep = None
+            users = json.loads(to_native(open_url(users_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+                                                  validate_certs=self.validate_certs).read()))
+            for user in users:
+                if user['username'] == username:
+                    userrep = user
+                    break
+            return userrep
+
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain the user for realm %s and username %s: %s'
                                       % (realm, username, str(e)))
