@@ -29,14 +29,14 @@ schedules:
     always: true
     branches:
       include:
+        - stable-7
         - stable-6
-        - stable-5
   - cron: 0 11 * * 0
     displayName: Weekly (old stable branches)
     always: true
     branches:
       include:
-        - stable-4
+        - stable-5
 
 variables:
   - name: checkoutPath
