@@ -1834,6 +1834,16 @@ releases:
     - 5761-callback-types.yml
     - 5933-linting.yml
     release_date: '2023-03-26'
+  4.8.11:
+    changes:
+      major_changes:
+      - The community.general 4.x.y release stream is now effectively **End of Life**.
+        No more releases will be made, and regular CI runs will stop.
+      release_summary: Final maintenance release of community.general major version
+        4.
+    fragments:
+    - eol.yml
+    release_date: '2023-05-08'
   4.8.2:
     changes:
       bugfixes:

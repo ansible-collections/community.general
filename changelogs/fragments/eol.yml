@@ -1,4 +1,0 @@
-release_summary: Final maintenance release of community.general major version 4.
-major_changes:
-  - The community.general 4.x.y release stream is now effectively **End of Life**.
-    No more releases will be made, and regular CI runs will stop.
