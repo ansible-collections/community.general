@@ -184,8 +184,6 @@ project_variable:
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.six import string_types
-from ansible.module_utils.six import integer_types
 
 GITLAB_IMP_ERR = None
 try:
@@ -196,45 +194,8 @@ except Exception:
     HAS_GITLAB_PACKAGE = False
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables
 )
-
-
-def vars_to_variables(vars, module):
-    # transform old vars to new variables structure
-    variables = list()
-    for item, value in vars.items():
-        if (isinstance(value, string_types) or
-           isinstance(value, (integer_types, float))):
-            variables.append(
-                {
-                    "name": item,
-                    "value": str(value),
-                    "masked": False,
-                    "protected": False,
-                    "variable_type": "env_var",
-                }
-            )
-
-        elif isinstance(value, dict):
-
-            new_item = {
-                "name": item,
-                "value": value.get('value'),
-                "masked": value.get('masked'),
-                "protected": value.get('protected'),
-                "variable_type": value.get('variable_type'),
-            }
-
-            if value.get('environment_scope'):
-                new_item['environment_scope'] = value.get('environment_scope')
-
-            variables.append(new_item)
-
-        else:
-            module.fail_json(msg="value must be of type string, integer, float or dict")
-
-    return variables
 
 
 class GitlabProjectVariables(object):
@@ -322,7 +283,7 @@ def compare(requested_variables, existing_variables, state):
 def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
     change = False
-    return_value = dict(added=list(), updated=list(), removed=list(), untouched=list())
+    return_value = dict(added=[], updated=[], removed=[], untouched=[])
 
     gitlab_keys = this_gitlab.list_all_project_variables()
     before = [x.attributes for x in gitlab_keys]
@@ -391,7 +352,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     if module.check_mode:
         return_value = dict(added=added, updated=updated, removed=return_value['removed'], untouched=untouched)
 
-    if return_value['added'] or return_value['removed'] or return_value['updated']:
+    if any(return_value[x] for x in ['added', 'removed', 'updated']):
         change = True
 
     gitlab_keys = this_gitlab.list_all_project_variables()
@@ -452,7 +413,7 @@ def main():
 
     if state == 'present':
         if any(x['value'] is None for x in variables):
-            module.fail_json(msg='value parameter is required in state present')
+            module.fail_json(msg='value parameter is required for all variables in state present')
 
     gitlab_instance = gitlab_authentication(module)
 

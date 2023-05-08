@@ -166,50 +166,9 @@ group_variable:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.six import string_types
-from ansible.module_utils.six import integer_types
-
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables
 )
-
-
-def vars_to_variables(vars, module):
-    # transform old vars to new variables structure
-    variables = list()
-    for item, value in vars.items():
-        if (isinstance(value, string_types) or
-           isinstance(value, (integer_types, float))):
-            variables.append(
-                {
-                    "name": item,
-                    "value": str(value),
-                    "masked": False,
-                    "protected": False,
-                    "variable_type": "env_var",
-                }
-            )
-
-        elif isinstance(value, dict):
-            new_item = {"name": item, "value": value.get('value')}
-
-            new_item = {
-                "name": item,
-                "value": value.get('value'),
-                "masked": value.get('masked'),
-                "protected": value.get('protected'),
-                "variable_type": value.get('variable_type'),
-            }
-
-            if value.get('environment_scope'):
-                new_item['environment_scope'] = value.get('environment_scope')
-
-            variables.append(new_item)
-
-        else:
-            module.fail_json(msg="value must be of type string, integer, float or dict")
-
-    return variables
 
 
 class GitlabGroupVariables(object):
