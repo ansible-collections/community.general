@@ -275,8 +275,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self.display.vvvv('Added host %s hostname %s\n' % (host['name'], hostname))
 
             # Add host to profile group
-            group_name = self._add_safe_group_name(host['profile'], child=hostname)
-            self.display.vvvv('Added host %s to profile group %s\n' % (hostname, group_name))
+            if host['profile'] != '':
+                group_name = self._add_safe_group_name(host['profile'], child=hostname)
+                self.display.vvvv('Added host %s to profile group %s\n' % (hostname, group_name))
+            else:
+                self.display.warning('Host %s has an empty profile\n' % (hostname))
 
             # Add host to groups specified by group_by fields
             for group_by in self.group_by:
