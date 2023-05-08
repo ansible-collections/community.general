@@ -169,8 +169,8 @@ class TestIpbase(unittest.TestCase):
         params = {
             "ip": "1.1.1.1",
             "apikey": "aaa",
-            "lanugage": "de",
             "hostname": True,
+            "language": "de",
         }
         module = Mock()
         module.params = params
