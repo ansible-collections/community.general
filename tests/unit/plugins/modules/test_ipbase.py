@@ -14,28 +14,6 @@ from ansible_collections.community.general.tests.unit.compat.mock import Mock
 
 
 IPBASE_DATA = {
-    "result": b"""
-{
-  "data": {
-    "as_name": "Cloudflare, Inc.",
-    "as_number": 13335,
-    "city": "Los Angeles",
-    "continent": "North America",
-    "continent_code": "NA",
-    "country": "United States",
-    "country_code": "US",
-    "hostname": "one.one.one.one",
-    "ip": "1.1.1.1",
-    "is_in_european_union": false,
-    "latitude": 34.053611755371094,
-    "longitude": -118.24549865722656,
-    "region": "California",
-    "region_code": "US-CA",
-    "timezone": "America/Los_Angeles",
-    "zip": "90012"
-  }
-}
-""",
     "response": b"""
 {
   "data": {
@@ -190,18 +168,20 @@ class TestIpbase(unittest.TestCase):
 
         params = {
             "ip": "1.1.1.1",
-            "apikey": "aaa"
+            "apikey": "aaa",
+            "lanugage": "de",
+            "hostname": True,
         }
         module = Mock()
         module.params = params
 
+        data = json.loads(IPBASE_DATA['response'].decode("utf-8"))
+
         IpbaseInfo._get_url_data = Mock()
-        IpbaseInfo._get_url_data.return_value = json.loads(IPBASE_DATA['response'].decode("utf-8"))
+        IpbaseInfo._get_url_data.return_value = data
         jenkins_plugin = IpbaseInfo(module)
 
         json_data = jenkins_plugin.info()
 
-        result = json.loads(IPBASE_DATA['result'].decode("utf-8"))
-
         self.maxDiff = None
-        self.assertDictEqual(json_data, result)
+        self.assertDictEqual(json_data, data)

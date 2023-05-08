@@ -10,19 +10,19 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: ipbase_info
-version_added: 7.0.0
-short_description: Retrieve IP geolocation and other facts of a host's IP address
+module: "ipbase_info"
+version_added: "7.0.0"
+short_description: "Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API"
 description:
   - "Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API"
 author: "Dominik Kukacka (@dominikkukacka)"
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+  - "community.general.attributes"
+  - "community.general.attributes.info_module"
 options:
   ip:
     description:
-      - "The IP you want to get the info for."
+      - "The IP you want to get the info for. If not specified the API will detect the IP automatically."
     required: false
     type: str
   apikey:
@@ -30,6 +30,18 @@ options:
       - "The apikey for the request if you need more requests."
     required: false
     type: str
+  hostname:
+    description:
+      - "If the hostname parameter is set to 1, the API response will contain the hostname of the ip."
+    required: false
+    type: bool
+    default: false
+  language:
+    description:
+      - "An ISO Alpha 2 Language Code for localizing the IP data"
+    required: false
+    type: str
+    default: "en"
 notes:
   - "Check U(https://ipbase.com/) for more information."
 '''
@@ -43,40 +55,175 @@ EXAMPLES = '''
   community.general.ipbase_info:
     ip: "8.8.8.8"
   register: my_ip_info
+
+
+- name: "Get IP geolocation information of a specific IP with all other possible parameters"
+  community.general.ipbase_info:
+    ip: "8.8.8.8"
+    apikey: "xxxxxxxxxxxxxxxxxxxxxx"
+    hostname: True
+    language: "de"
+  register: my_ip_info
+
 '''
 
 RETURN = '''
 data:
-    description: "The data retrieved from ipbase.com."
-    returned: success
-    type: dict
-    sample: {
-        "as_name": "T-Mobile Austria GmbH",
-        "as_number": 8412,
-        "city": "Vienna",
-        "continent": "Europe",
-        "continent_code": "EU",
-        "country": "Austria",
-        "country_code": "AT",
-        "hostname": "81-223-100.100.static.upcbusiness.at",
-        "ip": "81.223.100.100",
-        "is_in_european_union": true,
-        "latitude": 48.1861686706543,
-        "longitude": 16.403240203857422,
-        "region": "Vienna",
-        "region_code": "AT-9",
-        "timezone": "Europe/Vienna",
-        "zip": "1030"
+  description: "Json parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for more information."
+  returned: success
+  type: dict
+  sample: {
+    "ip": "1.1.1.1",
+    "hostname": "one.one.one.one",
+    "type": "v4",
+    "range_type": {
+      "type": "PUBLIC",
+      "description": "Public address"
+    },
+    "connection": {
+      "asn": 13335,
+      "organization": "Cloudflare, Inc.",
+      "isp": "APNIC Research and Development",
+      "range": "1.1.1.1/32"
+    },
+    "location": {
+      "geonames_id": 5332870,
+      "latitude": 34.053611755371094,
+      "longitude": -118.24549865722656,
+      "zip": "90012",
+      "continent": {
+        "code": "NA",
+        "name": "North America",
+        "name_translated": "North America"
+      },
+      "country": {
+        "alpha2": "US",
+        "alpha3": "USA",
+        "calling_codes": [
+          "+1"
+        ],
+        "currencies": [
+          {
+            "symbol": "$",
+            "name": "US Dollar",
+            "symbol_native": "$",
+            "decimal_digits": 2,
+            "rounding": 0,
+            "code": "USD",
+            "name_plural": "US dollars"
+          }
+        ],
+        "emoji": "...",
+        "ioc": "USA",
+        "languages": [
+          {
+            "name": "English",
+            "name_native": "English"
+          }
+        ],
+        "name": "United States",
+        "name_translated": "United States",
+        "timezones": [
+          "America/New_York",
+          "America/Detroit",
+          "America/Kentucky/Louisville",
+          "America/Kentucky/Monticello",
+          "America/Indiana/Indianapolis",
+          "America/Indiana/Vincennes",
+          "America/Indiana/Winamac",
+          "America/Indiana/Marengo",
+          "America/Indiana/Petersburg",
+          "America/Indiana/Vevay",
+          "America/Chicago",
+          "America/Indiana/Tell_City",
+          "America/Indiana/Knox",
+          "America/Menominee",
+          "America/North_Dakota/Center",
+          "America/North_Dakota/New_Salem",
+          "America/North_Dakota/Beulah",
+          "America/Denver",
+          "America/Boise",
+          "America/Phoenix",
+          "America/Los_Angeles",
+          "America/Anchorage",
+          "America/Juneau",
+          "America/Sitka",
+          "America/Metlakatla",
+          "America/Yakutat",
+          "America/Nome",
+          "America/Adak",
+          "Pacific/Honolulu"
+        ],
+        "is_in_european_union": false,
+        "fips": "US",
+        "geonames_id": 6252001,
+        "hasc_id": "US",
+        "wikidata_id": "Q30"
+      },
+      "city": {
+        "fips": "644000",
+        "alpha2": null,
+        "geonames_id": 5368753,
+        "hasc_id": null,
+        "wikidata_id": "Q65",
+        "name": "Los Angeles",
+        "name_translated": "Los Angeles"
+      },
+      "region": {
+        "fips": "US06",
+        "alpha2": "US-CA",
+        "geonames_id": 5332921,
+        "hasc_id": "US.CA",
+        "wikidata_id": "Q99",
+        "name": "California",
+        "name_translated": "California"
+      }
+    },
+    "tlds": [
+      ".us"
+    ],
+    "timezone": {
+      "id": "America/Los_Angeles",
+      "current_time": "2023-05-04T04:30:28-07:00",
+      "code": "PDT",
+      "is_daylight_saving": true,
+      "gmt_offset": -25200
+    },
+    "security": {
+      "is_anonymous": false,
+      "is_datacenter": false,
+      "is_vpn": false,
+      "is_bot": false,
+      "is_abuser": true,
+      "is_known_attacker": true,
+      "is_proxy": false,
+      "is_spam": false,
+      "is_tor": false,
+      "is_icloud_relay": false,
+      "threat_score": 100
+    },
+    "domains": {
+      "count": 10943,
+      "domains": [
+        "eliwise.academy",
+        "accountingprose.academy",
+        "pistola.academy",
+        "1and1-test-ntlds-fr.accountant",
+        "omnergy.africa"
+      ]
     }
+  }
 '''
 
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible.module_utils.urls import fetch_url
 
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 
-USER_AGENT = 'ansible-ipbase-module/0.1.0'
-BASE_URL = 'https://api.ipbase.com/v2/info?hostname=1'
+
+USER_AGENT = 'ansible-community.general.ipbase_info/0.1.0'
+BASE_URL = 'https://api.ipbase.com/v2/info'
 
 
 class IpbaseInfo(object):
@@ -112,42 +259,36 @@ class IpbaseInfo(object):
 
         ip = self.module.params['ip']
         apikey = self.module.params['apikey']
+        hostname = self.module.params['hostname']
+        language = self.module.params['language']
 
         url = BASE_URL
+
+        params = {}
         if ip:
-            url += '&ip=' + str(ip)
+            params['ip'] = ip
 
         if apikey:
-            url += '&apikey=' + str(apikey)
+            params['apikey'] = apikey
 
-        response = self._get_url_data(url)
+        if hostname:
+            params['hostname'] = 1
 
-        result = dict(
-            ip=response['data']['ip'],
-            hostname=response['data']['hostname'],
-            continent=response['data']['location']['continent']['name'],
-            continent_code=response['data']['location']['continent']['code'],
-            country=response['data']['location']['country']['name'],
-            country_code=response['data']['location']['country']['alpha2'],
-            is_in_european_union=response['data']['location']['country']['is_in_european_union'],
-            region=response['data']['location']['region']['name'],
-            region_code=response['data']['location']['region']['alpha2'],
-            city=response['data']['location']['city']['name'],
-            zip=response['data']['location']['zip'],
-            latitude=response['data']['location']['latitude'],
-            longitude=response['data']['location']['longitude'],
-            timezone=response['data']['timezone']['id'],
-            as_name=response['data']['connection']['organization'],
-            as_number=response['data']['connection']['asn'],
-        )
+        if language:
+            params['language'] = language
 
-        return dict(data=result)
+        if params:
+            url += '?' + urlencode(params)
+
+        return self._get_url_data(url)
 
 
 def main():
     module_args = dict(
         ip=dict(type='str', required=False, no_log=False),
         apikey=dict(type='str', required=False, no_log=True),
+        hostname=dict(type='bool', required=False, no_log=False, default=False),
+        language=dict(type='str', required=False, no_log=False, default='en'),
     )
 
     module = AnsibleModule(
