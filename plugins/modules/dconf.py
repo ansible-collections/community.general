@@ -154,17 +154,11 @@ from ansible.module_utils.common.respawn import (
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils import deps
 
-# Python 2 doesn't have ModuleNotFoundError
-try:
-    import_errors = (ImportError, ModuleNotFoundError)
-except NameError:
-    import_errors = (ImportError,)
-
 glib_module_name = 'gi.repository.GLib'
 
 try:
     from gi.repository.GLib import Variant, GError
-except import_errors:
+except ImportError:
     Variant = None
     GError = AttributeError
 
