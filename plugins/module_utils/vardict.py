@@ -18,35 +18,43 @@ class _Variable(object):
         self.initial_value = None
         self.value = None
 
-        self.diff = diff
-        self.change = diff if change is None else change
-        self.output = output
-        self.fact = fact
-        self._verbosity = 0
-        self._set_verbosity(verbosity)
+        self.diff = None
+        self._change = None
+        self.output = None
+        self.fact = None
+        self._verbosity = None
+        self.set(output=output, diff=diff, change=change, fact=fact, verbosity=verbosity)
 
-    @property
-    def verbosity(self):
+    def getchange(self):
+        return self.diff if self._change is None else self._change
+
+    def setchange(self, value):
+        self._change = value
+
+    def getverbosity(self):
         return self._verbosity
 
-    def _set_verbosity(self, v):
+    def setverbosity(self, v):
         if not (0 <= v <= 4):
             raise ValueError("verbosity must be an int in the range 0 to 4")
         self._verbosity = v
 
-    def set(self, diff=None, output=None, change=None, fact=None, initial_value=NOTHING, verbosity=None):
-        if diff is not None:
-            self.diff = diff
+    change = property(getchange, setchange)
+    verbosity = property(getverbosity, setverbosity)
+
+    def set(self, output=None, diff=None, change=None, fact=None, initial_value=NOTHING, verbosity=None):
         if output is not None:
             self.output = output
         if change is not None:
             self.change = change
+        if diff is not None:
+            self.diff = diff
         if fact is not None:
             self.fact = fact
         if initial_value is not _Variable.NOTHING:
             self.initial_value = copy.deepcopy(initial_value)
         if verbosity is not None:
-            self._set_verbosity(verbosity)
+            self.verbosity = verbosity
 
     def set_value(self, value):
         if not self.init:
@@ -64,9 +72,9 @@ class _Variable(object):
 
     @property
     def diff_result(self):
-        if not (self.diff and self.has_changed):
-            return
-        return {'before': self.initial_value, 'after': self.value}
+        if self.diff and self.has_changed:
+            return {'before': self.initial_value, 'after': self.value}
+        return
 
     def __str__(self):
         return "<_Variable: value={0}, initial={1}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
@@ -108,12 +116,12 @@ class VarDict(object):
         if name in self.reserved_names:
             raise ValueError("Name {0} is reserved".format(name))
         if name in self.__vars__:
-            meta = self.var(name)
-            meta.set(**kwargs)
+            var = self.var(name)
+            var.set(**kwargs)
         else:
-            meta = _Variable(**kwargs)
-        meta.set_value(value)
-        self.__vars__[name] = meta
+            var = _Variable(**kwargs)
+        var.set_value(value)
+        self.__vars__[name] = var
 
     def output(self, verbosity=0):
         return dict((n, v.value) for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity))
