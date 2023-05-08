@@ -140,40 +140,43 @@ EXAMPLES = r'''
 
 RETURN = r'''
 installed:
-    description: List of modules that are already installed
+    description: List of modules that are already installed.
     type: list
     elements: str
     returned: when I(try_installed) is C(true) and installed modules were found
     sample: ['Net::DNS']
 dnf:
     description: List of dnf requirements that should be installed to provide
-      at least some of the required Perl modules
+      at least some of the required Perl modules.
     type: list
     elements: str
     returned: when I(try_dnf) is C(true) and requested modules were found in dnf
     sample: ['perl(Net::DNS)']
 yum:
     description: List of yum requirements that should be installed to provide
-      at least some of the required Perl modules
+      at least some of the required Perl modules.
     type: list
     elements: str
     returned: when I(try_yum) is C(true) and requested modules were found in yum
     sample: ['perl(Net::DNS)']
 apt:
     description: List of apt packages that should be installed to provide at
-      least some of the required Perl modules
+      least some of the required Perl modules.
     type: list
     elements: str
     returned: when I(try_apt) is C(true) and requested modules were found in apt
     sample: ['libnet-dns-perl']
 cpanm:
-    description: List of modules that should be installed via CPAN
+    description: List of modules that should be installed via CPAN. OS
+      repositories are preferred over CPAN, so a module is only
+      returned here if it isn't in any of the OS repositories that
+      were searched.
     type: list
     elements: str
     returned: when requested modules were found in CPAN
     sample: ['Net::DNS']
 missing:
-    description: List of Perl modules that could not be found
+    description: List of Perl modules that could not be found.
     type: list
     elements: str
     returned: when there are missing modules
