@@ -143,10 +143,18 @@ EXAMPLES = r"""
 
 
 import os
+import sys
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.respawn import (
+    has_respawned,
+    probe_interpreters_for_module,
+    respawn_module,
+)
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils import deps
+
+glib_module_name = 'gi.repository.GLib'
 
 try:
     from gi.repository.GLib import Variant, GError
@@ -414,6 +422,34 @@ def main():
             ('state', 'present', ['value']),
         ],
     )
+
+    if Variant is None:
+        # This interpreter can't see the GLib module. To try to fix that, we'll
+        # look in common locations for system-owned interpreters that can see
+        # it; if we find one, we'll respawn under it. Otherwise we'll proceed
+        # with degraded performance, without the ability to parse GVariants.
+        # Later (in a different PR) we'll actually deprecate this degraded
+        # performance level and fail with an error if the library can't be
+        # found.
+
+        if has_respawned():
+            # This shouldn't be possible; short-circuit early if it happens.
+            module.fail_json(
+                msg="%s must be installed and visible from %s." %
+                (glib_module_name, sys.executable))
+
+        interpreters = ['/usr/bin/python3', '/usr/bin/python2',
+                        '/usr/bin/python']
+
+        interpreter = probe_interpreters_for_module(
+            interpreters, glib_module_name)
+
+        if interpreter:
+            # Found the Python bindings; respawn this module under the
+            # interpreter where we found them.
+            respawn_module(interpreter)
+            # This is the end of the line for this process, it will exit here
+            # once the respawned module has completed.
 
     # Try to be forgiving about the user specifying a boolean as the value, or
     # more accurately about the fact that YAML and Ansible are quite insistent
