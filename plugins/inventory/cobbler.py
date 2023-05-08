@@ -56,6 +56,15 @@ DOCUMENTATION = '''
         default: []
         elements: str
         version_added: 4.4.0
+      inventory_hostname:
+        description:
+          - What to use for the ansible inventory hostname.
+          - By default the networking hostname is used if defined, otherwise the DNS name of the management or first non-static interface.
+          - If set to I(system), the cobbler system name is used.
+        type: str
+        choices: [ 'hostname', 'system' ]
+        default: hostname
+        version_added: 7.1.0
       group_by:
         description: Keys to group hosts by
         type: list
@@ -201,6 +210,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self.exclude_profiles = self.get_option('exclude_profiles')
         self.include_profiles = self.get_option('include_profiles')
         self.group_by = self.get_option('group_by')
+        self.inventory_hostname = self.get_option('inventory_hostname')
 
         for profile in self._get_profiles():
             if profile['parent']:
@@ -238,7 +248,10 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
         for host in self._get_systems():
             # Get the FQDN for the host and add it to the right groups
-            hostname = host['hostname']  # None
+            if self.inventory_hostname == 'system':
+                hostname = host['name']  # None
+            else:
+                hostname = host['hostname']  # None
             interfaces = host['interfaces']
 
             if self._exclude_profile(host['profile']):
