@@ -211,7 +211,7 @@ EXAMPLES = """
   community.general.terraform:
     project_path: '{{ project_dir }}'
     state: present
-    camplex_vars: true
+    complex_vars: true
     variables:
       vm_name: "{{ inventory_hostname }}"
       vm_vcpus: 2
