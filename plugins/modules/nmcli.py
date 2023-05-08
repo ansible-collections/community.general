@@ -86,7 +86,6 @@ options:
     slave_type:
         description:
             - Type of the device of this slave's master connection (for example C(bond)).
-            - Mandatory if I(master) is defined.
         type: str
         choices: [ 'bond', 'bridge', 'team' ]
         version_added: 7.0.0
@@ -1619,8 +1618,6 @@ class Nmcli(object):
     def extra_options_validation(self):
         """ Additional validation of options set passed to module that cannot be implemented in module's argspecs. """
         if self.type not in ("bridge-slave", "team-slave", "bond-slave"):
-            if self.master is not None and self.slave_type is None:
-                self.module.fail_json(msg="'slave_type' option is required when 'master' is specified.")
             if self.master is None and self.slave_type is not None:
                 self.module.fail_json(msg="'master' option is required when 'slave_type' is specified.")
 
