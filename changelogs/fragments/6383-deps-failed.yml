@@ -1,2 +1,0 @@
-minor_changes:
-  - deps module utils - add function ``failed()`` providing the ability to check the dependency check result without triggering an exception (https://github.com/ansible-collections/community.general/pull/6383).

@@ -1,2 +1,0 @@
-bugfixes:
-  - gitlab_runner - fix ``KeyError`` on runner creation and update (https://github.com/ansible-collections/community.general/issues/6112).

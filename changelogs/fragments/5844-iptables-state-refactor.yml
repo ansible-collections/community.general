@@ -1,2 +1,0 @@
-minor_changes:
-    - iptables_state - minor refactoring within the module (https://github.com/ansible-collections/community.general/pull/5844).

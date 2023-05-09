@@ -1,2 +1,0 @@
-minor_changes:
-  - spotinst_aws_elastigroup - add ``elements`` attribute when missing in ``list`` parameters (https://github.com/ansible-collections/community.general/pull/5553).
