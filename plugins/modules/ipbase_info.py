@@ -32,7 +32,7 @@ options:
     type: str
   hostname:
     description:
-      - "If the hostname parameter is set to 1, the API response will contain the hostname of the IP."
+      - "If the hostname parameter is set to C(true), the API response will contain the hostname of the IP."
     required: false
     type: bool
     default: false
