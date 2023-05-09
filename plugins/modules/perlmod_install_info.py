@@ -106,7 +106,7 @@ author:
 
 EXAMPLES = r'''
 # Search and fail if the package can't be found
-- name: Search for Net::DNS if it isn't already installed
+- name: Search for Net::DNS if it is not already installed
   community.general.perlmod_install_info:
     name: Net::DNS
   register: perlmod_info
