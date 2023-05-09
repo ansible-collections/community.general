@@ -112,7 +112,7 @@ EXAMPLES = r'''
   register: perlmod_info
   failed_when: perlmod_info.missing is defined
 
-- name: Search for two modules, even if they're already installed
+- name: Search for two modules, even if they are already installed
   community.general.perlmod_install_info:
     name:
     - URI
