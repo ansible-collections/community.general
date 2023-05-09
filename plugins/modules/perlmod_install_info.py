@@ -120,7 +120,7 @@ EXAMPLES = r'''
   try_installed: false
   register: perlmod_info
 
-- name: install dnf packages identified by perlmod_install_info
+- name: Install dnf packages identified by perlmod_install_info
   dnf:
     name: "{{perlmod_info.dnf}}"
   when: perlmod_info.dnf is defined
