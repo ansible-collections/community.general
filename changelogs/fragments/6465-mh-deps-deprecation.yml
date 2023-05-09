@@ -1,2 +1,0 @@
-deprecated_features:
-  - ModuleHelper module_utils - ``deps`` mixin for MH classes deprecated in favour of using the ``deps`` module_utils (https://github.com/ansible-collections/community.general/pull/6465).

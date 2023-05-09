@@ -1,2 +1,0 @@
-minor_changes:
-  - nmcli - new module option ``slave_type`` added to allow creation of various types of slave devices (https://github.com/ansible-collections/community.general/issues/473, https://github.com/ansible-collections/community.general/pull/6108).

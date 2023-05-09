@@ -1,2 +1,0 @@
-minor_changes:
-  - mattermost, rocketchat, slack - replace missing default favicon with docs.ansible.com favicon (https://github.com/ansible-collections/community.general/pull/5928).

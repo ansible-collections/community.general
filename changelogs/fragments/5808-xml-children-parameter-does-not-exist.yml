@@ -1,2 +1,0 @@
-bugfixes:
-- xml - fixed a bug where empty ``children`` list would not be set (https://github.com/ansible-collections/community.general/pull/5808).

@@ -1,2 +1,0 @@
-bugfixes:
-  - opkg - fixes bug when using ``update_cache=true`` (https://github.com/ansible-collections/community.general/issues/6004).

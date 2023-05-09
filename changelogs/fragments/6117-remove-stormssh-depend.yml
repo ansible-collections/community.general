@@ -1,2 +1,0 @@
-minor_changes:
-      - ssh_config - vendored StormSSH's config parser to avoid having to install StormSSH to use the module (https://github.com/ansible-collections/community.general/pull/6117).

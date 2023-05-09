@@ -1,2 +1,0 @@
-minor_changes:
-  - "osx_defaults - include stderr in error messages (https://github.com/ansible-collections/community.general/pull/6011)."

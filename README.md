@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Community General Collection
 
-[![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
+[![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=stable-7)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
 [![EOL CI](https://github.com/ansible-collections/community.general/workflows/EOL%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.general/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
@@ -73,13 +73,13 @@ We are actively accepting new contributors.
 
 All types of contributions are very welcome.
 
-You don't know how to start? Refer to our [contribution guide](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md)!
+You don't know how to start? Refer to our [contribution guide](https://github.com/ansible-collections/community.general/blob/stable-7/CONTRIBUTING.md)!
 
-The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md#people) file. If you have questions or need help, feel free to mention them in the proposals.
+The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/stable-7/commit-rights.md#people) file. If you have questions or need help, feel free to mention them in the proposals.
 
 You can find more information in the [developer guide for collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html).
 
-Also for some notes specific to this collection see [our CONTRIBUTING documentation](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md).
+Also for some notes specific to this collection see [our CONTRIBUTING documentation](https://github.com/ansible-collections/community.general/blob/stable-7/CONTRIBUTING.md).
 
 ### Running tests
 
@@ -89,7 +89,7 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 
 To learn how to maintain / become a maintainer of this collection, refer to:
 
-* [Committer guidelines](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md).
+* [Committer guidelines](https://github.com/ansible-collections/community.general/blob/stable-7/commit-rights.md).
 * [Maintainer guidelines](https://github.com/ansible/community-docs/blob/main/maintaining.rst).
 
 It is necessary for maintainers of this collection to be subscribed to:
@@ -117,7 +117,7 @@ See the [Releasing guidelines](https://github.com/ansible/community-docs/blob/ma
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.rst).
+See the [changelog](https://github.com/ansible-collections/community.general/blob/stable-7/CHANGELOG.rst).
 
 ## Roadmap
 
@@ -136,8 +136,8 @@ See [this issue](https://github.com/ansible-collections/community.general/issues
 
 This collection is primarily licensed and distributed as a whole under the GNU General Public License v3.0 or later.
 
-See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.general/blob/main/COPYING) for the full text.
+See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.general/blob/stable-7/COPYING) for the full text.
 
-Parts of the collection are licensed under the [BSD 2-Clause license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/BSD-2-Clause.txt), the [MIT license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/MIT.txt), and the [PSF 2.0 license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/PSF-2.0.txt).
+Parts of the collection are licensed under the [BSD 2-Clause license](https://github.com/ansible-collections/community.general/blob/stable-7/LICENSES/BSD-2-Clause.txt), the [MIT license](https://github.com/ansible-collections/community.general/blob/stable-7/LICENSES/MIT.txt), and the [PSF 2.0 license](https://github.com/ansible-collections/community.general/blob/stable-7/LICENSES/PSF-2.0.txt).
 
 All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `.reuse/dep5`. This conforms to the [REUSE specification](https://reuse.software/spec/).

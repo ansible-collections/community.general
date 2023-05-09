@@ -1,2 +1,0 @@
-bugfixes:
-  - jenkins_build - fix the logical flaw when deleting a Jenkins build (https://github.com/ansible-collections/community.general/pull/5514).

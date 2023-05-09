@@ -1,2 +1,0 @@
-minor_changes:
-  - keycloak_group - add new optional module parameter ``parents`` to properly handle keycloak subgroups (https://github.com/ansible-collections/community.general/pull/5814).
