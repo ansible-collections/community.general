@@ -288,7 +288,6 @@
           - autoconf
           - automake
           - libtool
-          - m4
         state: absent
       check_mode: true
       register: pkgng_example7_cleanup
@@ -296,9 +295,9 @@
     - name: Ensure pkgng autoremove works correctly
       assert:
         that:
-          - pkgng_example7_prepare_install.changed
+          - pkgng_example7_prepare_install is changed
           - "'autoremoved' is in(pkgng_example7.msg)"
-          - not pkgng_example7_cleanup.changed
+          - pkgng_example7_cleanup is not changed
 
 ##
 ## pkgng - example - single annotations
@@ -513,11 +512,14 @@
   # NOTE: FreeBSD 13.1 fails to update the package catalogue for unknown reasons (someone with FreeBSD
   #       knowledge has to take a look)
   #
+  # NOTE: FreeBSD 13.2 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
   # See also
   # https://github.com/ansible-collections/community.general/issues/5795
   when: >-
     (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('12.3', '<'))
-    or ansible_distribution_version is version('13.2', '>=')
+    or ansible_distribution_version is version('13.3', '>=')
   block:
     - name: Setup testjail
       include: setup-testjail.yml
