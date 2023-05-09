@@ -125,7 +125,7 @@ EXAMPLES = r'''
     name: "{{perlmod_info.dnf}}"
   when: perlmod_info.dnf is defined
 
-- name: install yum packages identified by perlmod_install_info
+- name: Install yum packages identified by perlmod_install_info
   yum:
     name: "{{perlmod_info.yum}}"
   when: perlmod_info.yum is defined
