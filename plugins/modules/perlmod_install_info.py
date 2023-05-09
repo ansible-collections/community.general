@@ -130,7 +130,7 @@ EXAMPLES = r'''
     name: "{{perlmod_info.yum}}"
   when: perlmod_info.yum is defined
 
-- name: install yum packages identified by perlmod_install_info
+- name: Install yum packages identified by perlmod_install_info
   apt:
     name: "{{perlmod_info.apt}}"
   when: perlmod_info.apt is defined
