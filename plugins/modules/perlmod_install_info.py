@@ -113,7 +113,7 @@ EXAMPLES = r'''
   failed_when: perlmod_info.missing is defined
 
 - name: Search for two modules, even if they're already installed
-  perlmod_install_info:
+  community.general.perlmod_install_info:
     name:
     - URI
     - WWW::Mechanize
