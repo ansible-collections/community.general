@@ -146,31 +146,47 @@ installed:
     returned: when I(try_installed) is C(true) and installed modules were found
     sample: ['Net::DNS']
 dnf:
-    description: List of dnf requirements that should be installed to provide
-      at least some of the required Perl modules.
+    description:
+      - List of dnf requirements that should be installed to provide at least
+        some of the required Perl modules.
+      - This value is returned when I(try_dnf) is C(true), or C(auto) and dnf
+        is available, and at least some of the requested modules were found in
+        dnf.
     type: list
     elements: str
-    returned: when I(try_dnf) is C(true) and requested modules were found in dnf
+    returned: when some of the requested modules were found in dnf
     sample: ['perl(Net::DNS)']
 yum:
-    description: List of yum requirements that should be installed to provide
-      at least some of the required Perl modules.
+    description:
+      - List of yum requirements that should be installed to provide at least
+        some of the required Perl modules.
+      - This value is returned when I(try_yum) is C(true), or C(auto) and yum
+        is available, and at least some of the requested modules were found in
+        yum.
     type: list
     elements: str
-    returned: when I(try_yum) is C(true) and requested modules were found in yum
+    returned: when some of the requested modules were found in yum
     sample: ['perl(Net::DNS)']
 apt:
-    description: List of apt packages that should be installed to provide at
-      least some of the required Perl modules.
+    description:
+      - List of apt requirements that should be installed to provide at least
+        some of the required Perl modules.
+      - This value is returned when I(try_apt) is C(true), or C(auto) and apt
+        is available, and at least some of the requested modules were found in
+        apt.
     type: list
     elements: str
-    returned: when I(try_apt) is C(true) and requested modules were found in apt
+    returned: when some of the requested modules were found in apt
     sample: ['libnet-dns-perl']
 cpanm:
-    description: List of modules that should be installed via CPAN. OS
-      repositories are preferred over CPAN, so a module is only
-      returned here if it isn't in any of the OS repositories that
-      were searched.
+    description:
+      - List of modules that should be installed from CPAN to provide at least
+        some of the required Perl modules.
+      - This value is returned when I(try_cpanm) is C(true), or C(auto) and
+        C(cpanm) is available, and at least some of the requested modules were
+        found in CPAN.
+      - OS repositories are preferred over CPAN, so a module is only returned
+        here if it isn't in any of other options that were searched.
     type: list
     elements: str
     returned: when requested modules were found in CPAN
