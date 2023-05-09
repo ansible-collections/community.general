@@ -88,6 +88,16 @@ options:
             - If C(true), the registered node will not upload its installed packages information to Satellite server.
         type: bool
         default: false
+deprecated:
+    removed_in: 10.0.0
+    why: |
+      RHN hosted at redhat.com was discontinued years ago, and Spacewalk 5
+      (which uses RHN) is EOL since 2020, May 31st; while this module could
+      work on Uyuni / SUSE Manager (fork of Spacewalk 5), we have not heard
+      about anyone using it in those setups.
+    alternative: |
+      Contact the community.general maintainers to report the usage of this
+      module, and potentially step up to maintain it.
 '''
 
 EXAMPLES = r'''
