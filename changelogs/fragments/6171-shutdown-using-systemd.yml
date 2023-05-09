@@ -1,2 +1,2 @@
-bugfixes:
+minor_changes:
   - shutdown - if no shutdown commands are found in the `search_paths` then the module will attempt to shutdown the system using `systemctl shutdown` (https://github.com/ansible-collections/community.general/issues/4269).
