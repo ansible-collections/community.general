@@ -61,7 +61,7 @@ EXAMPLES = '''
   community.general.ipbase_info:
     ip: "8.8.8.8"
     apikey: "xxxxxxxxxxxxxxxxxxxxxx"
-    hostname: True
+    hostname: true
     language: "de"
   register: my_ip_info
 
