@@ -14,6 +14,8 @@ short_description: Shut down a machine
 notes:
   - C(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use I(search_paths)
     to specify locations to search if the default paths do not work.
+  - The I(msg) and I(delay) options are not supported when a shutdown command is not found in I(search_paths), instead
+    the module will attempt to shutdown the system by calling C(systemctl shutdown).
 description:
   - Shut downs a machine.
 version_added: "1.1.0"
