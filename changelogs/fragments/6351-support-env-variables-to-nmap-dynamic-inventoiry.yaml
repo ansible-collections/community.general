@@ -1,2 +1,0 @@
-minor_changes:
-  - nmap inventory plugin - added environment variables for configure ``address`` and ``exclude`` (https://github.com/ansible-collections/community.general/issues/6351).

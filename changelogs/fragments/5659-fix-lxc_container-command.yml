@@ -1,2 +1,0 @@
-bugfixes:
- - lxc_container - fix the arguments of the lxc command which broke the creation and cloning of containers (https://github.com/ansible-collections/community.general/issues/5578).

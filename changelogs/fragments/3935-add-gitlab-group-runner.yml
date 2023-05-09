@@ -1,2 +1,0 @@
-minor_changes:
-    - 'gitlab_runner - allow to register group runner (https://github.com/ansible-collections/community.general/pull/3935).'
