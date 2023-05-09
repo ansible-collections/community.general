@@ -96,6 +96,10 @@ options:
         type: bool
         default: false
 
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes.info_module
+
 author:
     - Jonathan Kamens (@jikamens)
 '''
