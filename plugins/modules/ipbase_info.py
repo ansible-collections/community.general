@@ -27,12 +27,12 @@ options:
     type: str
   apikey:
     description:
-      - "The apikey for the request if you need more requests."
+      - "The API key for the request if you need more requests."
     required: false
     type: str
   hostname:
     description:
-      - "If the hostname parameter is set to 1, the API response will contain the hostname of the ip."
+      - "If the hostname parameter is set to 1, the API response will contain the hostname of the IP."
     required: false
     type: bool
     default: false
@@ -69,7 +69,7 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-  description: "Json parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for more information."
+  description: "JSON parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for the detailled structure of the response."
   returned: success
   type: dict
   sample: {
@@ -242,7 +242,7 @@ class IpbaseInfo(object):
                 'User-Agent': USER_AGENT,
             })
 
-        if (info['status'] != 200):
+        if info['status'] != 200:
             self.module.fail_json(msg='The API request to ipbase.com returned an error status code {0}'.format(info['status']))
         else:
             try:
