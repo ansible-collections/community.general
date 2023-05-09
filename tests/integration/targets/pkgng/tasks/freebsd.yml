@@ -512,11 +512,14 @@
   # NOTE: FreeBSD 13.1 fails to update the package catalogue for unknown reasons (someone with FreeBSD
   #       knowledge has to take a look)
   #
+  # NOTE: FreeBSD 13.2 fails to update the package catalogue for unknown reasons (someone with FreeBSD
+  #       knowledge has to take a look)
+  #
   # See also
   # https://github.com/ansible-collections/community.general/issues/5795
   when: >-
     (ansible_distribution_version is version('12.01', '>=') and ansible_distribution_version is version('12.3', '<'))
-    or ansible_distribution_version is version('13.2', '>=')
+    or ansible_distribution_version is version('13.3', '>=')
   block:
     - name: Setup testjail
       include: setup-testjail.yml
