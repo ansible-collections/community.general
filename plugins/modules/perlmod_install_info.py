@@ -91,8 +91,9 @@ options:
         - 'false'
         default: 'auto'
     update:
-        description: Specify whether to update package manager databases before
-          searching.
+        description:
+          - Specify whether to update package manager databases before searching.
+          - B(Note) that the system's state will be modified if I(update=true).
         type: bool
         default: false
 
