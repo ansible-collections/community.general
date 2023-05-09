@@ -1,2 +1,0 @@
-minor_changes:
-  - sudoers - adds ``host`` parameter for setting hostname restrictions in sudoers rules (https://github.com/ansible-collections/community.general/issues/5702).

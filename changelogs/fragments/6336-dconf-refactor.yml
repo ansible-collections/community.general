@@ -1,2 +1,0 @@
-minor_changes:
-  - dconf - minor refactoring improving parameters and dependencies validation (https://github.com/ansible-collections/community.general/pull/6336).

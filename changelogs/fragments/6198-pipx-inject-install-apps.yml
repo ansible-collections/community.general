@@ -1,2 +1,0 @@
-minor_changes:
-  - pipx - optional ``install_apps`` parameter added to install applications from injected packages (https://github.com/ansible-collections/community.general/pull/6198).

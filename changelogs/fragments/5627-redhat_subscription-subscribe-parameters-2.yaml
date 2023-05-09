@@ -1,3 +1,0 @@
-bugfixes:
-  - redhat_subscription - do not ignore ``consumer_name`` and other variables if ``activationkey`` is specified
-    (https://github.com/ansible-collections/community.general/issues/3486, https://github.com/ansible-collections/community.general/pull/5627).

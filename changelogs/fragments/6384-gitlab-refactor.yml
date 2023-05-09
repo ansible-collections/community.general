@@ -1,2 +1,0 @@
-minor_changes:
-  - gitlab_group_variable, gitlab_project_variable - refactor function out to module utils (https://github.com/ansible-collections/community.general/pull/6384).

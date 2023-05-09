@@ -1,2 +1,0 @@
-minor_changes:
-  - mksysb - improved the output of the module in case of errors (https://github.com/ansible-collections/community.general/issues/6263).

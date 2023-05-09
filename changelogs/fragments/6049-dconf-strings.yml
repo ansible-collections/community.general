@@ -1,2 +1,0 @@
-minor_changes:
-  - dconf - parse GVariants for equality comparison when the Python module ``gi.repository`` is available (https://github.com/ansible-collections/community.general/pull/6049).

@@ -1,2 +1,0 @@
-minor_changes:
-  - homebrew_cask - allows passing ``--greedy`` option to ``upgrade_all`` (https://github.com/ansible-collections/community.general/pull/6267).

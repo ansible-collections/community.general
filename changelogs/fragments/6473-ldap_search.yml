@@ -1,4 +1,0 @@
-breaking_changes:
-  - "ldap_search - convert all string-like values to UTF-8 (https://github.com/ansible-collections/community.general/issues/5704, https://github.com/ansible-collections/community.general/pull/6473)."
-minor_changes:
-  - "ldap_search - the new ``base64_attributes`` allows to specify which attribute values should be Base64 encoded (https://github.com/ansible-collections/community.general/pull/6473)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - opkg - allow installing a package in a certain version (https://github.com/ansible-collections/community.general/pull/5688).

@@ -1,2 +1,0 @@
-minor_changes:
-  - "dconf - be forgiving about boolean values: convert them to GVariant booleans automatically (https://github.com/ansible-collections/community.general/pull/6206)."

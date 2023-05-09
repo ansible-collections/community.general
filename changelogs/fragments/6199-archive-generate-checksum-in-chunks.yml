@@ -1,2 +1,0 @@
-bugfixes:
-  - archive - reduce RAM usage by generating CRC32 checksum over chunks (https://github.com/ansible-collections/community.general/pull/6274).

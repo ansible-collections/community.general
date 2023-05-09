@@ -1,2 +1,0 @@
-minor_changes:
-  - dconf - if ``gi.repository.GLib`` is missing, try to respawn in a Python interpreter that has it (https://github.com/ansible-collections/community.general/pull/6491).

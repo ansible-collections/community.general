@@ -1,2 +1,0 @@
-minor_changes:
-   - nmcli - add ``macvlan`` connection type (https://github.com/ansible-collections/community.general/pull/6312).

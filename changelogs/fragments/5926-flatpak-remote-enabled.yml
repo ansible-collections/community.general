@@ -1,2 +1,0 @@
-minor_changes:
-  - flatpak_remote - add new boolean option ``enabled``. It controls, whether the remote is enabled or not (https://github.com/ansible-collections/community.general/pull/5926).

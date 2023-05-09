@@ -1,4 +1,0 @@
-minor_changes:
-  - redhat_subscription - the registration is done using the D-Bus ``rhsm`` service instead of spawning a ``subscription-manager register`` command, if possible;
-    this avoids passing plain-text credentials as arguments to ``subscription-manager register``, which can be seen while that command runs
-    (https://github.com/ansible-collections/community.general/pull/6122).

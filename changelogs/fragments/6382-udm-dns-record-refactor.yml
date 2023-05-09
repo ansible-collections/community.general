@@ -1,2 +1,0 @@
-minor_changes:
-  - udm_dns_record - minor refactor to the code (https://github.com/ansible-collections/community.general/pull/6382).

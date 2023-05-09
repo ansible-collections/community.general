@@ -1,2 +1,0 @@
-bugfixes:
-  - "various plugins and modules - remove unnecessary imports (https://github.com/ansible-collections/community.general/pull/5940)."

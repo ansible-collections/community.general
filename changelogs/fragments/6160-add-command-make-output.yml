@@ -1,2 +1,0 @@
-minor_changes:
-  - make - add ``command`` return value to the module output (https://github.com/ansible-collections/community.general/pull/6160).

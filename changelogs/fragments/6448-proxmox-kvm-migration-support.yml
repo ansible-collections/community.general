@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox_kvm - adds ``migrate`` parameter to manage online migrations between hosts (https://github.com/ansible-collections/community.general/pull/6448)

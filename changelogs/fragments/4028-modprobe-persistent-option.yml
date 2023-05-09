@@ -1,3 +1,0 @@
----
-minor_changes:
-  - modprobe - add ``persistent`` option (https://github.com/ansible-collections/community.general/issues/4028, https://github.com/ansible-collections/community.general/pull/542).

@@ -1,2 +1,0 @@
-bugfixes:
-  - interfaces_file - fix reading options in lines not starting with a space (https://github.com/ansible-collections/community.general/issues/6120).

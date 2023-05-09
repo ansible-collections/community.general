@@ -1,3 +1,0 @@
-minor_changes:
-  - dig lookup plugin - Support multiple domains to be queried as indicated in docs
-    (https://github.com/ansible-collections/community.general/pull/6334).

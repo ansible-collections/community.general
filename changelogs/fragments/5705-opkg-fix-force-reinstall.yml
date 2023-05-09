@@ -1,2 +1,0 @@
-bugfixes:
-  - opkg - fix issue that ``force=reinstall`` would not reinstall an existing package (https://github.com/ansible-collections/community.general/pull/5705).

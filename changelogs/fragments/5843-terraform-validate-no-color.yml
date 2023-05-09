@@ -1,2 +1,0 @@
-bugfixes:
-- terraform module - disable ANSI escape sequences during validation phase (https://github.com/ansible-collections/community.general/pull/5843).

@@ -1,2 +1,0 @@
-bugfixes:
-  - "archive - avoid deprecated exception class on Python 3 (https://github.com/ansible-collections/community.general/pull/6180)."
