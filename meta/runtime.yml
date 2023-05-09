@@ -126,6 +126,16 @@ plugin_routing:
       deprecation:
         removal_version: 9.0.0
         warning_text: This module relies on the deprecated package pyrax.
+    rhn_channel:
+      deprecation:
+        removal_version: 10.0.0
+        warning_text: RHN is EOL, please contact the community.general maintainers
+          if still using this; see the module documentation for more details.
+    rhn_register:
+      deprecation:
+        removal_version: 10.0.0
+        warning_text: RHN is EOL, please contact the community.general maintainers
+          if still using this; see the module documentation for more details.
     database.aerospike.aerospike_migrations:
       redirect: community.general.aerospike_migrations
       deprecation:
