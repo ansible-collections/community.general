@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 from ansible.errors import AnsibleError, AnsibleConnectionFailure
@@ -80,13 +81,6 @@ class ActionModule(ActionBase):
                     getattr(self, default_value))))
         return value
 
-    def get_shutdown_command_args(self, distribution):
-        args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
-        # Convert seconds to minutes. If less that 60, set it to 0.
-        delay_sec = self.delay
-        shutdown_message = self._task.args.get('msg', self.DEFAULT_SHUTDOWN_MESSAGE)
-        return args.format(delay_sec=delay_sec, delay_min=delay_sec // 60, message=shutdown_message)
-
     def get_distribution(self, task_vars):
         # FIXME: only execute the module if we don't already have the facts we need
         distribution = {}
@@ -101,7 +95,8 @@ class ActionModule(ActionBase):
                     to_native(module_output['module_stdout']).strip(),
                     to_native(module_output['module_stderr']).strip()))
             distribution['name'] = module_output['ansible_facts']['ansible_distribution'].lower()
-            distribution['version'] = to_text(module_output['ansible_facts']['ansible_distribution_version'].split('.')[0])
+            distribution['version'] = to_text(
+                module_output['ansible_facts']['ansible_distribution_version'].split('.')[0])
             distribution['family'] = to_text(module_output['ansible_facts']['ansible_os_family'].lower())
             display.debug("{action}: distribution: {dist}".format(action=self._task.action, dist=distribution))
             return distribution
@@ -109,6 +104,23 @@ class ActionModule(ActionBase):
             raise AnsibleError('Failed to get distribution information. Missing "{0}" in output.'.format(ke.args[0]))
 
     def get_shutdown_command(self, task_vars, distribution):
+        def find_command(command, find_search_paths):
+            display.debug('{action}: running find module looking in {paths} to get path for "{command}"'.format(
+                action=self._task.action,
+                command=command,
+                paths=find_search_paths))
+            find_result = self._execute_module(
+                task_vars=task_vars,
+                # prevent collection search by calling with ansible.legacy (still allows library/ override of find)
+                module_name='ansible.legacy.find',
+                module_args={
+                    'paths': find_search_paths,
+                    'patterns': [command],
+                    'file_type': 'any'
+                }
+            )
+            return [x['path'] for x in find_result['files']]
+
         shutdown_bin = self._get_value_from_facts('SHUTDOWN_COMMANDS', distribution, 'DEFAULT_SHUTDOWN_COMMAND')
         default_search_paths = ['/sbin', '/usr/sbin', '/usr/local/sbin']
         search_paths = self._task.args.get('search_paths', default_search_paths)
@@ -127,45 +139,53 @@ class ActionModule(ActionBase):
         except TypeError:
             raise AnsibleError(err_msg.format(search_paths))
 
-        display.debug('{action}: running find module looking in {paths} to get path for "{command}"'.format(
-            action=self._task.action,
-            command=shutdown_bin,
-            paths=search_paths))
-        find_result = self._execute_module(
-            task_vars=task_vars,
-            # prevent collection search by calling with ansible.legacy (still allows library/ override of find)
-            module_name='ansible.legacy.find',
-            module_args={
-                'paths': search_paths,
-                'patterns': [shutdown_bin],
-                'file_type': 'any'
-            }
-        )
+        full_path = find_command(shutdown_bin, search_paths)  # find the path to the shutdown command
+        if not full_path:  # if we could not find the shutdown command
+            display.vvv('Unable to find command "{0}" in search paths: {1}, will attempt a shutdown using systemd '
+                        'directly.'.format(shutdown_bin, search_paths))  # tell the user we will try with systemd
+            systemctl_search_paths = ['/bin', '/usr/bin']
+            full_path = find_command('systemctl', systemctl_search_paths)  # find the path to the systemctl command
+            if not full_path:  # if we couldn't find systemctl
+                raise AnsibleError(
+                    'Could not find command "{0}" in search paths: {1} or systemctl command in search paths: {2}, unable to shutdown.'.
+                    format(shutdown_bin, search_paths, systemctl_search_paths))  # we give up here
+            else:
+                return "{0} poweroff".format(full_path[0])  # done, since we cannot use args with systemd shutdown
 
-        full_path = [x['path'] for x in find_result['files']]
-        if not full_path:
-            raise AnsibleError('Unable to find command "{0}" in search paths: {1}'.format(shutdown_bin, search_paths))
-        self._shutdown_command = full_path[0]
-        return self._shutdown_command
+        # systemd case taken care of, here we add args to the command
+        args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
+        # Convert seconds to minutes. If less that 60, set it to 0.
+        delay_sec = self.delay
+        shutdown_message = self._task.args.get('msg', self.DEFAULT_SHUTDOWN_MESSAGE)
+        return '{0} {1}'. \
+            format(
+                full_path[0],
+                args.format(
+                    delay_sec=delay_sec,
+                    delay_min=delay_sec // 60,
+                    message=shutdown_message
+                )
+            )
 
     def perform_shutdown(self, task_vars, distribution):
         result = {}
         shutdown_result = {}
-        shutdown_command = self.get_shutdown_command(task_vars, distribution)
-        shutdown_command_args = self.get_shutdown_command_args(distribution)
-        shutdown_command_exec = '{0} {1}'.format(shutdown_command, shutdown_command_args)
+        shutdown_command_exec = self.get_shutdown_command(task_vars, distribution)
 
         self.cleanup(force=True)
         try:
             display.vvv("{action}: shutting down server...".format(action=self._task.action))
-            display.debug("{action}: shutting down server with command '{command}'".format(action=self._task.action, command=shutdown_command_exec))
+            display.debug("{action}: shutting down server with command '{command}'".
+                          format(action=self._task.action, command=shutdown_command_exec))
             if self._play_context.check_mode:
                 shutdown_result['rc'] = 0
             else:
                 shutdown_result = self._low_level_execute_command(shutdown_command_exec, sudoable=self.DEFAULT_SUDOABLE)
         except AnsibleConnectionFailure as e:
             # If the connection is closed too quickly due to the system being shutdown, carry on
-            display.debug('{action}: AnsibleConnectionFailure caught and handled: {error}'.format(action=self._task.action, error=to_text(e)))
+            display.debug(
+                '{action}: AnsibleConnectionFailure caught and handled: {error}'.format(action=self._task.action,
+                                                                                        error=to_text(e)))
             shutdown_result['rc'] = 0
 
         if shutdown_result['rc'] != 0:
