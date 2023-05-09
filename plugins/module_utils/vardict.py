@@ -83,7 +83,7 @@ class _Variable(object):
 
 
 class VarDict(object):
-    reserved_names = ('__vars__', 'var', 'set_meta', 'set', 'output', 'diff', 'facts', 'change_vars', 'has_changed')
+    reserved_names = ('__vars__', 'var', 'set_meta', 'set', 'output', 'diff', 'facts', 'has_changed')
 
     def __init__(self):
         self.__vars__ = dict()
@@ -138,8 +138,6 @@ class VarDict(object):
         facts_result = dict((n, v.value) for n, v in self.__vars__.items() if v.fact)
         return facts_result if facts_result else None
 
-    def change_vars(self):
-        return [m.value for m in self.__vars__ if m.change]
-
-    def has_changed(self, v):
-        return self.__vars__[v].has_changed
+    @property
+    def has_changed(self):
+        return any(True for var in self.__vars__.values() if var.has_changed)
