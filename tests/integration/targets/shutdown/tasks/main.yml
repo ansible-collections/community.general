@@ -7,13 +7,7 @@
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-- name: Install systemd-sysv on Ubuntu 18 and Debian
-  apt:
-    name: systemd-sysv
-    state: present
-  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')
-  register: systemd_sysv_install
+#
 
 - name: Execute shutdown with custom message and delay
   community.general.shutdown:
@@ -34,29 +28,44 @@
       - '"Custom Message" in shutdown_result["shutdown_command"]'
       - '"Shut down initiated by Ansible" in shutdown_result_minus["shutdown_command"]'
       - '"Custom Message" not in shutdown_result_minus["shutdown_command"]'
-  when: ansible_os_family not in ['Alpine', 'AIX']
+  when:
+    - 'ansible_os_family not in ["Alpine", "AIX"]'
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+    - '"systemctl" not in shutdown_result_minus["shutdown_command"]'
 
-- name: Verify shutdown command is present except Alpine, VMKernel
+- name: Verify shutdown command is present except Alpine or AIX or systemd
   assert:
     that: '"shutdown" in shutdown_result["shutdown_command"]'
-  when: ansible_os_family != 'Alpine' and ansible_system != 'VMKernel'
+  when:
+    - "ansible_os_family != 'Alpine'"
+    - "ansible_system != 'VMKernel'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
 
-- name: Verify shutdown command is present in Alpine
+- name: Verify shutdown command is present in Alpine except systemd
   assert:
     that: '"poweroff" in shutdown_result["shutdown_command"]'
-  when: ansible_os_family == 'Alpine'
+  when: 
+    - "ansible_os_family == 'Alpine'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
 
-- name: Verify shutdown command is present in VMKernel
+
+- name: Verify shutdown command is present in VMKernel except systemd
   assert:
     that: '"halt" in shutdown_result["shutdown_command"]'
-  when: ansible_system == 'VMKernel'
+  when: 
+    - "ansible_system == 'VMKernel'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
 
-- name: Verify shutdown delay is present in minutes in Linux
+- name: Verify shutdown delay is present in minutes in Linux except systemd
   assert:
     that:
       - '"-h 1" in shutdown_result["shutdown_command"]'
       - '"-h 0" in shutdown_result_minus["shutdown_command"]'
-  when: ansible_system == 'Linux' and ansible_os_family != 'Alpine'
+  when:
+    - "ansible_system == 'Linux'"
+    - "ansible_os_family != 'Alpine'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+    - '"systemctl" not in shutdown_result_minus["shutdown_command"]'
 
 - name: Verify shutdown delay is present in minutes in Void, MacOSX, OpenBSD
   assert:
@@ -86,8 +95,30 @@
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_system == 'VMKernel'
 
-- name: Remove systemd-sysv in ubuntu 18 in case it has been installed in test
+- name: Ensure that systemd-sysv is absent in Ubuntu 18 and Debian
+  apt:
+    name: sytemd-sysv
+    state: absent
+  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')
+  register: systemd_sysv_install
+
+- name: Gather package facts
+  package_facts:
+    manager: apt
+  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')
+
+- name: Execute shutdown if no systemd-sysv
+  community.general.shutdown:
+  register: shutdown_result
+  check_mode: true
+  when: 
+    - "(ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')"
+    - '"systemd-sysv" not in ansible_facts.packages'
+
+- name: Install systemd_sysv in case it has been removed in test
   apt:
     name: systemd-sysv
-    state: absent
-  when: systemd_sysv_install is changed
+    state: present
+  when:
+    - "(ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')"
+    - "systemd_sysv_install is changed"
