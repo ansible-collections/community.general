@@ -1,0 +1,10 @@
+deprecated_features:
+  - |
+    rhn_channel, rhn_register - RHN hosted at redhat.com was discontinued years
+    ago, and Spacewalk 5 (which uses RHN) is EOL since 2020, May 31st;
+    while these modules could work on Uyuni / SUSE Manager (fork of Spacewalk 5),
+    we have not heard about anyone using them in those setups. Hence, these
+    modules are deprecated, and will be removed in community.general 10.0.0
+    in case there are no reports about being still useful, and potentially
+    noone that steps up to maintain them
+    (https://github.com/ansible-collections/community.general/pull/6493).
