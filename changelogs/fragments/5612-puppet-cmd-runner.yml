@@ -1,2 +1,0 @@
-minor_changes:
-  - puppet - refactored module to use ``CmdRunner`` for executing ``puppet`` (https://github.com/ansible-collections/community.general/pull/5612).

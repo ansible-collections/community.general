@@ -1,2 +1,0 @@
-minor_changes:
-   - java_certs - add more detailed error output when extracting certificate from PKCS12 fails (https://github.com/ansible-collections/community.general/pull/5550).

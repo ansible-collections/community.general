@@ -1,2 +1,0 @@
-minor_changes:
-  - bitwarden lookup plugin - implement filtering results by ``collection_id`` parameter (https://github.com/ansible-collections/community.general/issues/5849).

@@ -1,2 +1,0 @@
-minor_changes:
-  - terraform - remove state file check condition and error block, because in the native implementation of terraform will not cause errors due to the non-existent file (https://github.com/ansible-collections/community.general/pull/6296).

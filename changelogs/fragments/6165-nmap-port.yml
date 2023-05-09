@@ -1,2 +1,0 @@
-minor_changes:
- - nmap inventory plugin - add new option ``port`` for port specific scan (https://github.com/ansible-collections/community.general/pull/6165).

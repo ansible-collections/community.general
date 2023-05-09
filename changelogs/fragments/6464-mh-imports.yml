@@ -1,2 +1,0 @@
-minor_changes:
-  - module_helper module utils - updated the imports to make more MH features available at ``plugins/module_utils/module_helper.py`` (https://github.com/ansible-collections/community.general/pull/6464).

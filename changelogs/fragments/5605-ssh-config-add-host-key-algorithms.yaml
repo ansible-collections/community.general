@@ -1,2 +1,0 @@
-minor_changes:
-  - ssh_config - add ``host_key_algorithms`` option (https://github.com/ansible-collections/community.general/pull/5605).

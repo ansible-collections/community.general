@@ -1,2 +1,0 @@
-minor_changes:
-  - sudoers - add ``setenv`` parameters to support passing environment variables via sudo. (https://github.com/ansible-collections/community.general/pull/5883)
