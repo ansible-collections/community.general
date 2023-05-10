@@ -231,7 +231,7 @@ author:
 
 EXAMPLES = '''
     - name: Create a user user1
-      keycloak_user:
+      community.general.keycloak_user:
         auth_keycloak_url: http://localhost:8080/auth
         auth_username: admin
         auth_password: password
