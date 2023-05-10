@@ -24,7 +24,8 @@ options:
         type: str
     ref:
         description:
-            - The repository ref while adding or pulling subtree. Example a branch (main,develop..) of a specific tag
+            - The repository ref while adding or pulling subtree.
+            - For example a branch (C(main), C(develop), ...) or a specific tag.
         required: true
         type: str
     prefix:
