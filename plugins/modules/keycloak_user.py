@@ -19,13 +19,10 @@ DOCUMENTATION = '''
 module: keycloak_user
 short_description: Create and configure a user in Keycloak
 description:
-    - This module creates, removes, or updates Keycloak users.
+    - This module creates, removes or update Keycloak users.
 version_added: 7.1.0
 options:
     auth_username:
-        description:
-            - Username to authenticate for API access with.
-        type: str
         aliases: []
     realm:
         description:
@@ -262,7 +259,8 @@ EXAMPLES = '''
         - name: group1
           state: present
     state: present
-    - name: Create a user user1
+
+    - name: Re-create a User
       community.general.keycloak_user:
         auth_keycloak_url: http://localhost:8080/auth
         auth_username: admin
@@ -323,14 +321,14 @@ EXAMPLES = '''
     state: present
     force: true
 
-- name: Remove User
-  community.general.keycloak_user:
-    auth_keycloak_url: http://localhost:8080/auth
-    auth_username: admin
-    auth_password: password
-    realm: master
-    username: user1
-    state: absent
+    - name: Remove User.
+      community.general.keycloak_user:
+        auth_keycloak_url: http://localhost:8080/auth
+        auth_username: admin
+        auth_password: password
+        realm: master
+        username: user1
+        state: absent
 '''
 
 RETURN = '''
