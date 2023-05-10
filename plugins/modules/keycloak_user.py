@@ -93,7 +93,7 @@ options:
         suboptions:
             client_id:
                 description:
-                    - Client ID of the client role. Not the technical id of the client.
+                    - Client ID of the client role. Not the technical ID of the client.
                 type: str
                 required: true
                 aliases:
