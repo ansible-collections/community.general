@@ -218,7 +218,7 @@ options:
 extends_documentation_fragment:
     - keycloak
 notes:
-    - module does not modify userId.
+    - The module does not modify the user ID of an existing user.
 author:
     - Philippe Gauthier (@elfelip)
 '''
