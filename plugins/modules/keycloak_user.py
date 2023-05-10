@@ -9,10 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 
 DOCUMENTATION = '''
 ---
@@ -22,6 +18,11 @@ description:
     - This module creates, removes or update Keycloak users.
 version_added: 7.0.0
 options:
+    auth_username:
+        description:
+            - Username to authenticate for API access with.
+        type: str
+        aliases: []
     realm:
         description:
             - The name of the realm in which is the client.
@@ -316,7 +317,10 @@ import copy
 
 def main():
     argument_spec = keycloak_argument_spec()
-
+    keycloak_override_spec = dict(
+        auth_username=dict(type='str', aliases=[]),
+    )
+    argument_spec.update(keycloak_override_spec)
     credential_spec = dict(
         type=dict(type='str', required=True),
         value=dict(type='str', required=True),

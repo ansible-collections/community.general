@@ -1,2 +1,2 @@
-breaking_changes:
-  - The alias username for the auth_username parameter of keycloak module_utils have been removed because it conflicted with the username parameter of the new keycloak user module (https://github.com/ansible-collections/community.general/pull/6476).
+bugfixes:
+  - The function get_user_by_username in keycloak.py now return the user representation or None as stated in the documentation (https://github.com/ansible-collections/community.general/pull/6476).
