@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 module: git_subtree
 short_description: Manage git subtree addition and updating
 description:
-    - This module mimics the functionality of the git subtree command by adding a subtree from a source repository to a subdirectory in the main repository.
+    - This module mimics the functionality of the C(git subtree) command by adding a subtree from a source repository to a subdirectory in the main repository.
 author:
     - Riadh Hamdi (@riadhhamdi) (rhamdi@redhat.com)
 options:
