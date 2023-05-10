@@ -168,6 +168,12 @@ options:
       - Script that will be executed during various steps in the containers lifetime.
     type: str
     version_added: '0.2.0'
+  timezone:
+    description:
+      - Timezone used by the container.
+      - The value C(host) configures the same timezone used by Proxmox host.
+    type: str
+    version_added: '7.0.0'
   proxmox_default_behavior:
     description:
       - As of community.general 4.0.0, various options no longer have default values.
@@ -313,6 +319,18 @@ EXAMPLES = r'''
     hostname: example.org
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
+
+- name: Create new container with minimal options and same timezone as proxmox host
+  community.general.proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    timezone: host
 
 - name: Create a new container with nesting enabled and allows the use of CIFS/NFS inside the container.
   community.general.proxmox:
@@ -602,6 +620,7 @@ def main():
         unprivileged=dict(type='bool', default=True),
         description=dict(type='str'),
         hookscript=dict(type='str'),
+        timezone=dict(type='str'),
         proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
         clone=dict(type='int'),
         clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
@@ -704,6 +723,7 @@ def main():
                                     unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                                     description=module.params['description'],
                                     hookscript=module.params['hookscript'],
+                                    timezone=module.params['timezone'],
                                     tags=module.params['tags'])
 
             module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
