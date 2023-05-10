@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: keycloak_user
@@ -321,14 +316,14 @@ EXAMPLES = '''
     state: present
     force: true
 
-    - name: Remove User.
-      community.general.keycloak_user:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_username: admin
-        auth_password: password
-        realm: master
-        username: user1
-        state: absent
+- name: Remove User
+  community.general.keycloak_user:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: admin
+    auth_password: password
+    realm: master
+    username: user1
+    state: absent
 '''
 
 RETURN = '''
@@ -353,7 +348,10 @@ import copy
 
 def main():
     argument_spec = keycloak_argument_spec()
-
+    keycloak_override_spec = dict(
+        auth_username=dict(type='str', aliases=[]),
+    )
+    argument_spec.update(keycloak_override_spec)
     credential_spec = dict(
         type=dict(type='str', required=True),
         value=dict(type='str', required=True),
