@@ -58,7 +58,6 @@ options:
             - "remove"
             - "checksum"
             - "removal-of-dependent-packages"
-        default: ""
         type: str
     update_cache:
         description:
@@ -114,8 +113,8 @@ class Opkg(StateModuleHelper):
         argument_spec=dict(
             name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
-            force=dict(default="", choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space", "postinstall", "remove",
-                                            "checksum", "removal-of-dependent-packages"]),
+            force=dict(choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space",
+                                "postinstall", "remove", "checksum", "removal-of-dependent-packages"]),
             update_cache=dict(default=False, type='bool'),
         ),
     )
