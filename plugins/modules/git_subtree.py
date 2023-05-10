@@ -48,6 +48,13 @@ options:
             - The working directory in which to execute the git command.
         default: null
         type: str
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 '''
 
 EXAMPLES = '''
