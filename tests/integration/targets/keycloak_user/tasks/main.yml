@@ -59,13 +59,12 @@
     state: present
   with_items: "{{ keycloak_user_groups }}"
 
-- name: Creer le user
+- name: Create user
   community.general.keycloak_user:
-    auth_keycloak_url: "{{ keycloak_url }}/auth"
-    auth_username: "{{ keycloak_auth_username }}"
-    auth_password: "{{ keycloak_auth_password }}"
-    auth_client_id: "{{ keycloak_auth_client }}"
-    auth_realm: "{{ keycloak_auth_realm }}"
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
     username: "{{ keycloak_username }}"
     realm: "{{ realm }}"
     first_name: Ceciestes
@@ -73,11 +72,43 @@
     email: ceciestuntestes@test.com
     groups: "{{ keycloak_user_groups }}"
     attributes: "{{ keycloak_user_attributes }}"
-    state: "{{ user_state | default('present') }}"
-  register: result
+    state: present
+  register: create_result
 
-- name: Assert realm role is assigned
+- name: debug
+  debug:
+    var: create_result
+
+- name: Assert user is created
   assert:
     that:
-      - result is changed
-      - result.end_state | selectattr("username", "eq", "{{ keycloak_username }}") | list | count > 0
+      - create_result.changed
+      - create_result.end_state.username == 'test'
+      - create_result.end_state.attributes | length == 3
+      - create_result.end_state.groups | length == 2
+
+- name: Delete User
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    state: absent
+  register: delete_result
+
+- name: debug
+  debug:
+    var: delete_result
+
+- name: Assert user is deleted
+  assert:
+    that:
+      - delete_result.changed
+      - delete_result.end_state | length == 0
