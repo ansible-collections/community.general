@@ -9,7 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-
 DOCUMENTATION = '''
 ---
 module: keycloak_user
@@ -231,7 +230,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a user user1
-    community.general.keycloak_user:
+  community.general.keycloak_user:
     auth_keycloak_url: http://localhost:8080/auth
     auth_username: admin
     auth_password: password
@@ -261,7 +260,7 @@ EXAMPLES = '''
     state: present
 
 - name: Re-create a User
-    community.general.keycloak_user:
+  community.general.keycloak_user:
     auth_keycloak_url: http://localhost:8080/auth
     auth_username: admin
     auth_password: password
@@ -292,7 +291,7 @@ EXAMPLES = '''
     force: yes
 
 - name: Remove User.
-    community.general.keycloak_user:
+  community.general.keycloak_user:
     auth_keycloak_url: http://localhost:8080/auth
     auth_username: admin
     auth_password: password
