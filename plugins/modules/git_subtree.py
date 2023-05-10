@@ -67,6 +67,7 @@ EXAMPLES = '''
     commit_message: "Add subtree from example/repo"
     working_directory: /path/to/main/repository
     
+
 - name: Add/Pull a subtree to the main repository using ssh
   community.general.git_subtree:
     source: git@github.com/example/repo.git
