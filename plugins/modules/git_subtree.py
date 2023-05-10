@@ -90,14 +90,15 @@ EXAMPLES = '''
     
 - name: Add/Pull multiple subtrees to the main repository using http and disabling git password prompt
   community.general.git_subtree:
-    source: "{{item.source}}"
-    ref: "{{item.ref}}"
-    prefix: "{{item.prefix}}"
+    source: "{{ item.source }}"
+    ref: "{{ item.ref }}"
+    prefix: "{{ item.prefix }}"
     squash: true
     commit_message: "Adding role {{item.prefix}} to the collection"
     working_directory: /path/to/main/collection_repository
   environment:
     GIT_TERMINAL_PROMPT: 0
+  loop: "{{ roles_repositories }}"
   vars:
     roles_repositories:
       - source: https://github.com/example/role1.git
