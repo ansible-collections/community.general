@@ -216,7 +216,13 @@ options:
         type: bool
         default: false
 extends_documentation_fragment:
-    - keycloak
+    - community.general.keycloak
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
 notes:
     - The module does not modify the user ID of an existing user.
 author:
