@@ -66,7 +66,6 @@ EXAMPLES = '''
     squash: true
     commit_message: "Add subtree from example/repo"
     working_directory: /path/to/main/repository
-    
 
 - name: Add/Pull a subtree to the main repository using ssh
   community.general.git_subtree:
@@ -76,7 +75,7 @@ EXAMPLES = '''
     squash: true
     commit_message: "Add subtree from example/repo using ssd"
     working_directory: /path/to/main/repository
-    
+
 - name: Add/Pull a subtree to the main repository using http and disabling git password prompt
   community.general.git_subtree:
     source: https://github.com/example/repo.git
@@ -87,7 +86,7 @@ EXAMPLES = '''
     working_directory: /path/to/main/repository
   environment:
     GIT_TERMINAL_PROMPT: 0
-    
+
 - name: Add/Pull multiple subtrees to the main repository using http and disabling git password prompt
   community.general.git_subtree:
     source: "{{ item.source }}"
@@ -113,7 +112,7 @@ EXAMPLES = '''
         squash: true
         ref: 1.0.4
         prefix: roles/role3
-        
+
 - name: Add/Pull a subtree with authentication (read only token)
   community.general.git_subtree:
     source: https://0auth:ghp_2234xxxxxxxxxx5@github.com/example/repo.git
@@ -164,10 +163,7 @@ def main():
             command.append('--squash')
         if commit_message:
             command.extend(['-m', commit_message])
-        try:
-            rc, stdout, stderr = module.run_command(command, cwd=working_directory, check_rc=True)
-        except Exception as e:
-            module.fail_json(msg="Error running command %s" % e.cmd, rc=e.returncode)
+        rc, stdout, stderr = module.run_command(command, cwd=working_directory, check_rc=True)
         mesg = stdout.strip()
         module.exit_json(
             changed=True,
@@ -184,11 +180,7 @@ def main():
             command.append('--squash')
         if commit_message:
             command.extend(['-m', commit_message])
-
-        try:
-            rc, stdout, stderr = module.run_command(command, cwd=working_directory, check_rc=True)
-        except Exception as e:
-            module.fail_json(msg="Error running command %s" % e.cmd, rc=e.returncode)
+        rc, stdout, stderr = module.run_command(command, cwd=working_directory, check_rc=True)
         if 'is already at commit' in stderr:
             mesg = stdout.strip()
             module.exit_json(
