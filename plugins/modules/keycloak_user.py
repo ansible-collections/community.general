@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: keycloak_user
-short_description: create and Configure a user in Keycloak
+short_description: Create and configure a user in Keycloak
 description:
     - This module creates, removes or update Keycloak users.
 version_added: 7.0.0
