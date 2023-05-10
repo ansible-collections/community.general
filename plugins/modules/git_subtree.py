@@ -59,7 +59,7 @@ attributes:
 
 EXAMPLES = '''
 - name: Add/Pull a subtree to the main repository using http
-  git_subtree:
+  community.general.git_subtree:
     source: https://github.com/example/repo.git
     ref: main
     prefix: mydirectory
