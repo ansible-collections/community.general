@@ -66,16 +66,18 @@ EXAMPLES = '''
     squash: true
     commit_message: "Add subtree from example/repo"
     working_directory: /path/to/main/repository
+    
 - name: Add/Pull a subtree to the main repository using ssh
-  git_subtree:
+  community.general.git_subtree:
     source: git@github.com/example/repo.git
     ref: main
     prefix: mydirectory/somesubdirectory
     squash: true
     commit_message: "Add subtree from example/repo using ssd"
     working_directory: /path/to/main/repository
+    
 - name: Add/Pull a subtree to the main repository using http and disabling git password prompt
-  git_subtree:
+  community.general.git_subtree:
     source: https://github.com/example/repo.git
     ref: main
     prefix: mydirectory/somesubdirectory
@@ -84,8 +86,9 @@ EXAMPLES = '''
     working_directory: /path/to/main/repository
   environment:
     GIT_TERMINAL_PROMPT: 0
+    
 - name: Add/Pull multiple subtrees to the main repository using http and disabling git password prompt
-  git_subtree:
+  community.general.git_subtree:
     source: "{{item.source}}"
     ref: "{{item.ref}}"
     prefix: "{{item.prefix}}"
@@ -108,8 +111,9 @@ EXAMPLES = '''
         squash: true
         ref: 1.0.4
         prefix: roles/role3
+        
 - name: Add/Pull a subtree with authentication (read only token)
-  git_subtree:
+  community.general.git_subtree:
     source: https://0auth:ghp_2234xxxxxxxxxx5@github.com/example/repo.git
     ref: main
     prefix: mydirectory/somesubdirectory
