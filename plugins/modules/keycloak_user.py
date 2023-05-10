@@ -9,6 +9,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+ANSIBLE_METADATA = {'metadata_version': '1.1',
+                    'status': ['preview'],
+                    'supported_by': 'community'}
+
+
 DOCUMENTATION = '''
 ---
 module: keycloak_user
@@ -18,6 +23,9 @@ description:
 version_added: 7.1.0
 options:
     auth_username:
+        description:
+            - Username to authenticate for API access with.
+        type: str
         aliases: []
     realm:
         description:
@@ -318,7 +326,7 @@ import copy
 
 def main():
     argument_spec = keycloak_argument_spec()
-    argument_spec['auth_username']['aliases'] = []
+
     credential_spec = dict(
         type=dict(type='str', required=True),
         value=dict(type='str', required=True),
