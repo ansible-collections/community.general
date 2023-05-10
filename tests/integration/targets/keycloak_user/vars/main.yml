@@ -44,4 +44,3 @@ keycloak_user_groups:
   - name: test
     state: present
   - name: test2
-

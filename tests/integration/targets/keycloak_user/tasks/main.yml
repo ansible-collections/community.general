@@ -81,4 +81,3 @@
     that:
       - result is changed
       - result.end_state | selectattr("username", "eq", "{{ keycloak_username }}") | list | count > 0
-
