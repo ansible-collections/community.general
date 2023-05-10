@@ -46,7 +46,7 @@ options:
     working_directory:
         description:
             - The working directory in which to execute the git command.
-        default: null
+        required: true
         type: str
 extends_documentation_fragment:
   - community.general.attributes
@@ -145,7 +145,7 @@ def main():
             prefix=dict(required=True),
             squash=dict(type='bool', default=False),
             commit_message=dict(default=''),
-            working_directory=dict(default=None)
+            working_directory=dict(required=True)
         ),
         supports_check_mode=False,
     )
