@@ -173,7 +173,7 @@ options:
       - Timezone used by the container.
       - The value C(host) configures the same timezone used by Proxmox host.
     type: str
-    version_added: '7.0.0'
+    version_added: '7.1.0'
   proxmox_default_behavior:
     description:
       - As of community.general 4.0.0, various options no longer have default values.
