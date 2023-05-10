@@ -1,0 +1,84 @@
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create new realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_accounts_enabled: true
+    state: present
+  register: client
+
+
+- name: Create new client role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ keycloak_client_role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create new groups
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ item.name }}"
+    state: present
+  with_items: "{{ keycloak_user_groups }}"
+
+- name: Creer le user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ keycloak_url }}/auth"
+    auth_username: "{{ keycloak_auth_username }}"
+    auth_password: "{{ keycloak_auth_password }}"
+    auth_client_id: "{{ keycloak_auth_client }}"
+    auth_realm: "{{ keycloak_auth_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    state: "{{ user_state | default('present') }}"
+  register: result
+
+- name: Assert realm role is assigned
+  assert:
+    that:
+      - result is changed
+      - result.end_state | selectattr("username", "eq", "{{ keycloak_username }}") | list | count > 0
+
