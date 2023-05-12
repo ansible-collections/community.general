@@ -111,6 +111,7 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 import platform
 WORKING_MAC_VERSION_MAS_ACCOUNT = '11.0'
 
+
 class Mas(object):
 
     def __init__(self, module):
@@ -161,14 +162,12 @@ class Mas(object):
 
     def check_signin(self):
         ''' Verifies that the user is signed in to the Mac App Store '''
-        
         # Only check this once per execution
         if self._checked_signin:
-            return
-        
+            return        
         if is_version_greater(self._mac_version, WORKING_MAC_VERSION_MAS_ACCOUNT):
             # Checking if user is signed-in is disabled due to https://github.com/mas-cli/mas/issues/417
-            print('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
+            self.module.log('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
         else:
             rc, out, err = self.run(['account'])
             if out.split("\n", 1)[0].rstrip() == 'Not signed in':
@@ -309,10 +308,10 @@ def main():
 if __name__ == '__main__':
     main()
 
+
 def is_version_greater(version, reference_version):
     version_parts = [int(part) for part in version.split('.')]
     reference_parts = [int(part) for part in reference_version.split('.')]
-    
     if version_parts > reference_parts:
         return True
     else:
