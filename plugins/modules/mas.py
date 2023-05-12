@@ -53,6 +53,8 @@ requirements:
     - macOS 10.11+
     - "mas-cli (U(https://github.com/mas-cli/mas)) 1.5.0+ available as C(mas) in the bin path"
     - The Apple ID to use already needs to be signed in to the Mac App Store (check with C(mas account)).
+    - The feature of `checking if user is signed in` is disabled for anyone using macOS 12.0+
+    - User need to sign in via the Mac App Store GUI beforehand for anyone using macOS 12.0+ due to https://github.com/mas-cli/mas/issues/417
 '''
 
 EXAMPLES = '''
@@ -106,6 +108,8 @@ import os
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
+import platform
+WORKING_MAC_VERSION_MAS_ACCOUNT = '11.0'
 
 class Mas(object):
 
@@ -115,6 +119,7 @@ class Mas(object):
         # Initialize data properties
         self.mas_path = self.module.get_bin_path('mas')
         self._checked_signin = False
+        self._mac_version = platform.mac_ver()[0]
         self._installed = None  # Populated only if needed
         self._outdated = None   # Populated only if needed
         self.count_install = 0
@@ -154,16 +159,29 @@ class Mas(object):
         if rc != 0 or not out.strip() or LooseVersion(out.strip()) < LooseVersion('1.5.0'):
             self.module.fail_json(msg='`mas` tool in version 1.5.0+ needed, got ' + out.strip())
 
+    def is_version_greater(version, reference_version):
+        version_parts = [int(part) for part in version.split('.')]
+        reference_parts = [int(part) for part in reference_version.split('.')]
+        
+        if version_parts > reference_parts:
+            return True
+        else:
+            return False
+
     def check_signin(self):
         ''' Verifies that the user is signed in to the Mac App Store '''
-
+        
         # Only check this once per execution
         if self._checked_signin:
             return
-
-        rc, out, err = self.run(['account'])
-        if out.split("\n", 1)[0].rstrip() == 'Not signed in':
-            self.module.fail_json(msg='You must be signed in to the Mac App Store')
+        
+        if self.is_version_greater(self._mac_version, WORKING_MAC_VERSION_MAS_ACCOUNT):
+            # Checking if user is signed-in is disabled due to https://github.com/mas-cli/mas/issues/417
+            print('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
+        else:
+            rc, out, err = self.run(['account'])
+            if out.split("\n", 1)[0].rstrip() == 'Not signed in':
+                self.module.fail_json(msg='You must be signed in to the Mac App Store')
 
         self._checked_signin = True
 
