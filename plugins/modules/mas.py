@@ -159,15 +159,6 @@ class Mas(object):
         if rc != 0 or not out.strip() or LooseVersion(out.strip()) < LooseVersion('1.5.0'):
             self.module.fail_json(msg='`mas` tool in version 1.5.0+ needed, got ' + out.strip())
 
-    def is_version_greater(version, reference_version):
-        version_parts = [int(part) for part in version.split('.')]
-        reference_parts = [int(part) for part in reference_version.split('.')]
-        
-        if version_parts > reference_parts:
-            return True
-        else:
-            return False
-
     def check_signin(self):
         ''' Verifies that the user is signed in to the Mac App Store '''
         
@@ -175,7 +166,7 @@ class Mas(object):
         if self._checked_signin:
             return
         
-        if self.is_version_greater(self._mac_version, WORKING_MAC_VERSION_MAS_ACCOUNT):
+        if is_version_greater(self._mac_version, WORKING_MAC_VERSION_MAS_ACCOUNT):
             # Checking if user is signed-in is disabled due to https://github.com/mas-cli/mas/issues/417
             print('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
         else:
@@ -317,3 +308,12 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def is_version_greater(version, reference_version):
+    version_parts = [int(part) for part in version.split('.')]
+    reference_parts = [int(part) for part in reference_version.split('.')]
+    
+    if version_parts > reference_parts:
+        return True
+    else:
+        return False
