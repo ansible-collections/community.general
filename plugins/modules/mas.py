@@ -164,7 +164,7 @@ class Mas(object):
         ''' Verifies that the user is signed in to the Mac App Store '''
         # Only check this once per execution
         if self._checked_signin:
-            return        
+            return
         if is_version_greater(self._mac_version, WORKING_MAC_VERSION_MAS_ACCOUNT):
             # Checking if user is signed-in is disabled due to https://github.com/mas-cli/mas/issues/417
             self.module.log('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
