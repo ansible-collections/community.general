@@ -54,7 +54,7 @@ requirements:
     - "mas-cli (U(https://github.com/mas-cli/mas)) 1.5.0+ available as C(mas) in the bin path"
     - The Apple ID to use already needs to be signed in to the Mac App Store (check with C(mas account)).
     - The feature of "checking if user is signed in" is disabled for anyone using macOS 12.0+.
-    - User need to sign in via the Mac App Store GUI beforehand for anyone using macOS 12.0+ due to https://github.com/mas-cli/mas/issues/417
+    - Users need to sign in via the Mac App Store GUI beforehand for anyone using macOS 12.0+ due to U(https://github.com/mas-cli/mas/issues/417).
 '''
 
 EXAMPLES = '''
