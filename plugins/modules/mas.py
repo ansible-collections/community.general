@@ -120,7 +120,7 @@ class Mas(object):
         # Initialize data properties
         self.mas_path = self.module.get_bin_path('mas')
         self._checked_signin = False
-        self._mac_version = platform.mac_ver()[0]
+        self._mac_version = platform.mac_ver()[0] or '0.0'
         self._installed = None  # Populated only if needed
         self._outdated = None   # Populated only if needed
         self.count_install = 0
