@@ -165,7 +165,7 @@ class Mas(object):
         # Only check this once per execution
         if self._checked_signin:
             return
-        if LooseVersion(self._mac_version) > LooseVersion(WORKING_MAC_VERSION_MAS_ACCOUNT):
+        if LooseVersion(self._mac_version) >= LooseVersion(NOT_WORKING_MAC_VERSION_MAS_ACCOUNT):
             # Checking if user is signed-in is disabled due to https://github.com/mas-cli/mas/issues/417
             self.module.log('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
         else:
