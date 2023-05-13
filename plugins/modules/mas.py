@@ -109,7 +109,7 @@ import os
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 import platform
-WORKING_MAC_VERSION_MAS_ACCOUNT = '11.0'
+NOT_WORKING_MAC_VERSION_MAS_ACCOUNT = '12.0'
 
 
 class Mas(object):
