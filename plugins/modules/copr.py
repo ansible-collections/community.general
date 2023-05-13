@@ -97,20 +97,12 @@ except ImportError:
     DNF_IMP_ERR = traceback.format_exc()
     HAS_DNF_PACKAGES = False
 
+from ansible.module_utils.common import respawn
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils import distro  # pylint: disable=import-error
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
 from ansible.module_utils.urls import open_url  # pylint: disable=import-error
-
-HAS_RESPAWN_UTIL = False
-if not HAS_DNF_PACKAGES:
-    try:
-        from ansible.module_utils.common import respawn
-    except ImportError:
-        pass
-    else:
-        HAS_RESPAWN_UTIL = True
 
 
 def _respawn_dnf():
@@ -483,8 +475,7 @@ def run_module():
     params = module.params
 
     if not HAS_DNF_PACKAGES:
-        if HAS_RESPAWN_UTIL:
-            _respawn_dnf()
+        _respawn_dnf()
         module.fail_json(msg=missing_required_lib("dnf"), exception=DNF_IMP_ERR)
 
     CoprModule.ansible_module = module
