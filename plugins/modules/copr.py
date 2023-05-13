@@ -103,6 +103,29 @@ from ansible.module_utils import distro  # pylint: disable=import-error
 from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
 from ansible.module_utils.urls import open_url  # pylint: disable=import-error
 
+HAS_RESPAWN_UTIL = False
+if not HAS_DNF_PACKAGES:
+    try:
+        from ansible.module_utils.common import respawn
+    except ImportError:
+        pass
+    else:
+        HAS_RESPAWN_UTIL = True
+
+
+def _respawn_dnf():
+    if respawn.has_respawned():
+        return
+    system_interpreters = (
+        "/usr/libexec/platform-python",
+        "/usr/bin/python3",
+        "/usr/bin/python2",
+        "/usr/bin/python",
+    )
+    interpreter = respawn.probe_interpreters_for_module(system_interpreters, "dnf")
+    if interpreter:
+        respawn.respawn_module(interpreter)
+
 
 class CoprModule(object):
     """The class represents a copr module.
@@ -460,6 +483,8 @@ def run_module():
     params = module.params
 
     if not HAS_DNF_PACKAGES:
+        if HAS_RESPAWN_UTIL:
+            _respawn_dnf()
         module.fail_json(msg=missing_required_lib("dnf"), exception=DNF_IMP_ERR)
 
     CoprModule.ansible_module = module

@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - "copr - respawn module to use the system python interpreter when the ``dnf`` python module is not available in ``ansible_python_interpreter``
+    (https://github.com/ansible-collections/community.general/pull/6522)."
