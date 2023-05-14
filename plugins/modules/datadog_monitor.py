@@ -194,6 +194,10 @@ EXAMPLES = '''
     type: "metric alert"
     name: "Test monitor"
     state: "present"
+    renotify_interval: 30
+    renotify_occurrences: 1
+    renotify_statuses: ["warn"]
+    notification_preset_name: "show_all"
     query: "datadog.agent.up.over('host:host1').last(2).count_by_status()"
     notification_message: "Host [[host.name]] with IP [[host.ip]] is failing to report to datadog."
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
@@ -395,8 +399,6 @@ def install_monitor(module):
         "renotify_statuses": module.params['renotify_statuses'],
     }
 
-    # if module.params["renotify_interval"] is not None:
-    #     options["renotify_statuses"] = module.params['renotify_statuses'],
     if module.params['type'] == "service check":
         options["thresholds"] = module.params['thresholds'] or {'ok': 1, 'critical': 1, 'warning': 1}
     if module.params['type'] in ["metric alert", "log alert", "query alert", "trace-analytics alert", "rum alert"] and module.params['thresholds'] is not None:
