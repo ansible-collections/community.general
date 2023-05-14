@@ -391,10 +391,11 @@ def install_monitor(module):
         "evaluation_delay": module.params['evaluation_delay'],
         "include_tags": module.params['include_tags'],
         "notification_preset_name": module.params['notification_preset_name'],
+        "renotify_occurrences": module.params['renotify_occurrences'],
+
     }
 
     if module.params["renotify_interval"] is not None:
-        options["renotify_occurrences"] = module.params['renotify_occurrences'],
         options["renotify_statuses"] = module.params['renotify_statuses'],
     if module.params['type'] == "service check":
         options["thresholds"] = module.params['thresholds'] or {'ok': 1, 'critical': 1, 'warning': 1}
