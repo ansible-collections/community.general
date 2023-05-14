@@ -136,7 +136,7 @@ EXAMPLES = r'''
     name: "{{perlmod_info.apt}}"
   when: perlmod_info.apt is defined
 
-- name: install cpanm packages identified by perlmod_install_info
+- name: Install cpanm packages identified by perlmod_install_info
   community.general.cpanm:
     name: "{{item}}"
   with_items: "{{perlmod_info.cpanm}}"
