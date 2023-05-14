@@ -132,7 +132,7 @@ EXAMPLES = r'''
   when: perlmod_info.yum is defined
 
 - name: Install yum packages identified by perlmod_install_info
-  apt:
+  ansible.builtin.apt:
     name: "{{perlmod_info.apt}}"
   when: perlmod_info.apt is defined
 
