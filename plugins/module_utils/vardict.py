@@ -77,7 +77,7 @@ class _Variable(object):
         return
 
     def __str__(self):
-        return "<_Variable: value={0}, initial={1}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
+        return "<_Variable: value={0!r}, initial={1}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
             self.value, self.initial_value, self.diff, self.output, self.change, self.verbosity
         )
 
