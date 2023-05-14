@@ -127,7 +127,7 @@ EXAMPLES = r'''
   when: perlmod_info.dnf is defined
 
 - name: Install yum packages identified by perlmod_install_info
-  yum:
+  ansible.builtin.yum:
     name: "{{perlmod_info.yum}}"
   when: perlmod_info.yum is defined
 
