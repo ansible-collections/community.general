@@ -278,7 +278,7 @@ def main():
             include_tags=dict(required=False, default=True, type='bool'),
             priority=dict(type='int'),
             notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
-            renotify_interval=dict(type='int'),
+            renotify_interval=dict(type='int', default=None),
             renotify_occurrences=dict(type='int'),
             renotify_statuses=dict(type='list', elements='str', default=['alert', 'no data']),
         )
