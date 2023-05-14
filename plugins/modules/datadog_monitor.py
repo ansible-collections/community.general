@@ -275,7 +275,7 @@ def main():
             priority=dict(type='int'),
             notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
             renotify_occurrences=dict(type='int'),
-            renotify_statuses=dict(type='list', elements='str', default=["alert", "no data"]),
+            renotify_statuses=dict(type='list', elements='str'),
         )
     )
 
@@ -393,7 +393,6 @@ def install_monitor(module):
         "notification_preset_name": module.params['notification_preset_name'],
         "renotify_occurrences": module.params['renotify_occurrences'],
         "renotify_statuses": module.params['renotify_statuses'],
-
     }
 
     # if module.params["renotify_interval"] is not None:
