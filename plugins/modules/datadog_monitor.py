@@ -275,7 +275,7 @@ def main():
             priority=dict(type='int'),
             notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
             renotify_occurrences=dict(type='int'),
-            renotify_statuses=dict(type='list', elements='str', default=['alert', 'no data']),
+            renotify_statuses=dict(type='list', elements='str', default=["alert", "no data"]),
         )
     )
 
