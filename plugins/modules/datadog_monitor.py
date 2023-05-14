@@ -392,6 +392,7 @@ def install_monitor(module):
         "include_tags": module.params['include_tags'],
         "notification_preset_name": module.params['notification_preset_name'],
         "renotify_occurrences": module.params['renotify_occurrences'],
+        "renotify_statuses": module.params['renotify_statuses'],
 
     }
 
