@@ -167,6 +167,15 @@ options:
           - Integer from 1 (high) to 5 (low) indicating alert severity.
         type: int
         version_added: 4.6.0
+    notification_preset_name:
+        description:
+          - Toggles the display of additional content sent in the monitor notification.
+        choices:
+            - show_all
+            - hide_query
+            - hide_handles
+            - hide_all
+        type: str
 '''
 
 EXAMPLES = '''
@@ -254,6 +263,7 @@ def main():
             id=dict(),
             include_tags=dict(required=False, default=True, type='bool'),
             priority=dict(type='int'),
+            notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
         )
     )
 
@@ -368,6 +378,7 @@ def install_monitor(module):
         "new_host_delay": module.params['new_host_delay'],
         "evaluation_delay": module.params['evaluation_delay'],
         "include_tags": module.params['include_tags'],
+        "notification_preset_name" : module.params['notification_preset_name'],
     }
 
     if module.params['type'] == "service check":
