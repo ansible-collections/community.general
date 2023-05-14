@@ -176,10 +176,6 @@ options:
             - hide_handles
             - hide_all
         type: str
-    renotify_interval:
-        description:
-            - The number of minutes after the last notification before a monitor re-notifies on the current status. It only re-notifies if it’s not resolved.
-        type: int
     renotify_occurrences:
         description:
             - The number of times re-notification messages should be sent on the current status at the provided re-notification interval.
@@ -278,7 +274,6 @@ def main():
             include_tags=dict(required=False, default=True, type='bool'),
             priority=dict(type='int'),
             notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
-            renotify_interval=dict(type='int', default=None),
             renotify_occurrences=dict(type='int'),
             renotify_statuses=dict(type='list', elements='str', default=['alert', 'no data']),
         )
@@ -396,7 +391,6 @@ def install_monitor(module):
         "evaluation_delay": module.params['evaluation_delay'],
         "include_tags": module.params['include_tags'],
         "notification_preset_name": module.params['notification_preset_name'],
-        "renotify_interval": module.params['renotify_interval'],
         "renotify_occurrences": module.params['renotify_occurrences'],
         "renotify_statuses": module.params['renotify_statuses'],
     }
