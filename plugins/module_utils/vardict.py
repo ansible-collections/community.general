@@ -23,7 +23,7 @@ class _Variable(object):
         self.output = None
         self.fact = None
         self._verbosity = None
-        self.set(output=output, diff=diff, change=change, fact=fact, verbosity=verbosity)
+        self.set_meta(output=output, diff=diff, change=change, fact=fact, verbosity=verbosity)
 
     def getchange(self):
         return self.diff if self._change is None else self._change
@@ -42,7 +42,17 @@ class _Variable(object):
     change = property(getchange, setchange)
     verbosity = property(getverbosity, setverbosity)
 
-    def set(self, output=None, diff=None, change=None, fact=None, initial_value=NOTHING, verbosity=None):
+    def set_meta(self, output=None, diff=None, change=None, fact=None, initial_value=NOTHING, verbosity=None):
+        """Set the metadata for the variable
+
+        Args:
+            output (bool, optional): flag indicating whether the variable should be in the output of the module. Defaults to None.
+            diff (bool, optional): flag indicating whether to generate diff mode output for this variable. Defaults to None.
+            change (bool, optional): flag indicating whether to track if changes happened to this variable. Defaults to None.
+            fact (bool, optional): flag indicating whether the varaiable should be exposed as a fact of the module. Defaults to None.
+            initial_value (any, optional): initial value of the variable, to be used with `change`. Defaults to NOTHING.
+            verbosity (int, optional): level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
+        """
         if output is not None:
             self.output = output
         if change is not None:
@@ -110,14 +120,14 @@ class VarDict(object):
         return self.__vars__[name]
 
     def set_meta(self, name, **kwargs):
-        self.var(name).set(**kwargs)
+        self.var(name).set_meta(**kwargs)
 
     def set(self, name, value, **kwargs):
         if name in self.reserved_names:
             raise ValueError("Name {0} is reserved".format(name))
         if name in self.__vars__:
             var = self.var(name)
-            var.set(**kwargs)
+            var.set_meta(**kwargs)
         else:
             var = _Variable(**kwargs)
         var.set_value(value)
