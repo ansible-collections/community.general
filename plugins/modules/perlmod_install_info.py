@@ -122,7 +122,7 @@ EXAMPLES = r'''
   register: perlmod_info
 
 - name: Install dnf packages identified by perlmod_install_info
-  dnf:
+  ansible.builtin.dnf:
     name: "{{perlmod_info.dnf}}"
   when: perlmod_info.dnf is defined
 
