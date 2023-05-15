@@ -42,7 +42,6 @@ options:
     commit_message:
         description:
             - The commit message to use when committing the subtree changes to the main repository.
-        default: ''
         type: str
     working_directory:
         description:
