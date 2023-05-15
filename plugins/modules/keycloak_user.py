@@ -18,9 +18,6 @@ description:
 version_added: 7.0.0
 options:
     auth_username:
-        description:
-            - Username to authenticate for API access with.
-        type: str
         aliases: []
     realm:
         description:
