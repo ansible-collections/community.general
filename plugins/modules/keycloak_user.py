@@ -322,10 +322,7 @@ import copy
 
 def main():
     argument_spec = keycloak_argument_spec()
-    keycloak_override_spec = dict(
-        auth_username=dict(type='str', aliases=[]),
-    )
-    argument_spec.update(keycloak_override_spec)
+    argument_spec['auth_username']['aliases'] = []
     credential_spec = dict(
         type=dict(type='str', required=True),
         value=dict(type='str', required=True),
