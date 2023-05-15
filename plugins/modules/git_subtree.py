@@ -16,6 +16,7 @@ description:
     - This module mimics the functionality of the C(git subtree) command by adding a subtree from a source repository to a subdirectory in the main repository.
 author:
     - Riadh Hamdi (@riadhhamdi) (rhamdi@redhat.com)
+version_added: 7.1.0
 options:
     source:
         description:
