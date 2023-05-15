@@ -285,7 +285,7 @@ EXAMPLES = '''
         - name: group1
           state: present
     state: present
-    force: yes
+    force: true
 
 - name: Remove User.
   community.general.keycloak_user:
