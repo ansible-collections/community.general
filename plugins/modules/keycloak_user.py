@@ -287,7 +287,7 @@ EXAMPLES = '''
     state: present
     force: true
 
-- name: Remove User.
+- name: Remove User
   community.general.keycloak_user:
     auth_keycloak_url: http://localhost:8080/auth
     auth_username: admin
