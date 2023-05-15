@@ -208,7 +208,7 @@ options:
         type: str
     force:
         description:
-            - If true, allows to remove user and recreate it.
+            - If C(true), allows to remove user and recreate it.
         type: bool
         default: false
 extends_documentation_fragment:
