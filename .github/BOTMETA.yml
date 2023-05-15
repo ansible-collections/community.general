@@ -509,6 +509,8 @@ files:
     maintainers: $team_ansible_core johanwiren
   $modules/git_config.py:
     maintainers: djmattyg007 mgedmin
+  $modules/git_subtree.py:
+    maintainers: riadhhamdi
   $modules/github_:
     maintainers: stpierre
   $modules/github_deploy_key.py:
