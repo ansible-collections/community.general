@@ -50,12 +50,12 @@ options:
         required: true
         type: str
 extends_documentation_fragment:
-  - community.general.attributes
+    - community.general.attributes
 attributes:
-  check_mode:
-    support: none
-  diff_mode:
-    support: none
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 '''
 
 EXAMPLES = '''
@@ -126,13 +126,7 @@ EXAMPLES = '''
     GIT_TERMINAL_PROMPT: 0
 '''
 
-RETURN = '''
-msg:
-  description: The response body content.
-  returned: on success
-  type: str
-  sample: "{}"
-'''
+RETURN = r''' # '''
 
 import os
 from ansible.module_utils.basic import AnsibleModule
