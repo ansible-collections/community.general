@@ -116,17 +116,39 @@ class VarDict(object):
         else:
             self.set(key, value)
 
-    def var(self, name):
+    def _var(self, name):
         return self.__vars__[name]
 
     def set_meta(self, name, **kwargs):
-        self.var(name).set_meta(**kwargs)
+        """Set the metadata for the variable
+
+        Args:
+            name (str): name of the variable having its metadata changed
+            output (bool, optional): flag indicating whether the variable should be in the output of the module. Defaults to None.
+            diff (bool, optional): flag indicating whether to generate diff mode output for this variable. Defaults to None.
+            change (bool, optional): flag indicating whether to track if changes happened to this variable. Defaults to None.
+            fact (bool, optional): flag indicating whether the varaiable should be exposed as a fact of the module. Defaults to None.
+            initial_value (any, optional): initial value of the variable, to be used with `change`. Defaults to NOTHING.
+            verbosity (int, optional): level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
+        """
+        self._var(name).set_meta(**kwargs)
 
     def set(self, name, value, **kwargs):
+        """Set the value and optionally metadata for a variable. The variable is not required to exist prior to calling `set`.
+
+        For details on the accepted metada see the documentation for method `set_meta`.
+
+        Args:
+            name (str): name of the variable being changed
+            value (any): the value of the variable, it can be of any type
+
+        Raises:
+            ValueError: Raised if trying to set a variable with a reserved name.
+        """
         if name in self.reserved_names:
             raise ValueError("Name {0} is reserved".format(name))
         if name in self.__vars__:
-            var = self.var(name)
+            var = self._var(name)
             var.set_meta(**kwargs)
         else:
             var = _Variable(**kwargs)
