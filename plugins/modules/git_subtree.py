@@ -138,7 +138,7 @@ def main():
             ref=dict(required=True),
             prefix=dict(required=True),
             squash=dict(type='bool', default=False),
-            commit_message=dict(default=''),
+            commit_message=dict(required=False),
             working_directory=dict(required=True)
         ),
         supports_check_mode=False,
