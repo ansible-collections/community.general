@@ -15,7 +15,7 @@ def test_var_simple():
     vd = VarDict()
     vd["a"] = 123
 
-    var = vd.var("a")
+    var = vd._var("a")
     assert var.output is True
     assert var.diff is False
     assert var.change is False
@@ -36,7 +36,7 @@ def test_var_diff_scalar():
     vd = VarDict()
     vd.set("aa", 123, diff=True)
 
-    var = vd.var("aa")
+    var = vd._var("aa")
     assert var.output is True
     assert var.diff is True
     assert var.change is True
@@ -62,7 +62,7 @@ def test_var_diff_dict():
     vd = VarDict()
     vd.set("dd", val_before, diff=True)
 
-    var = vd.var("dd")
+    var = vd._var("dd")
     assert var.output is True
     assert var.diff is True
     assert var.change is True
@@ -89,7 +89,7 @@ def test_vardict_set_meta():
     vd = VarDict()
     vd["jj"] = 123
 
-    var = vd.var("jj")
+    var = vd._var("jj")
     assert var.output is True
     assert var.diff is False
     assert var.change is False
