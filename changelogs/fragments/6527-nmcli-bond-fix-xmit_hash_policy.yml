@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - fix bond option xmit_hash_policy (https://github.com/ansible-collections/community.general/pull/6527).
