@@ -960,6 +960,9 @@ files:
     maintainers: $team_solaris dermute
   $modules/pmem.py:
     maintainers: mizumm
+  $modules/pnpm.py:
+    ignore: chrishoffman
+    maintainers: aretrosen
   $modules/portage.py:
     ignore: sayap
     labels: portage
