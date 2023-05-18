@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_kvm - added support for tpmstate0 parameter to configure TPM (Trusted Platform Module) disk. TPM is required for Windows 11 installations.
