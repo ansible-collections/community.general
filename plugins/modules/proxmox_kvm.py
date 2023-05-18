@@ -496,7 +496,8 @@ options:
           - The TPM version to use.
         type: str
         choices: ['1.2', '2.0']
-    version_added: 7.1.1
+    type: dict
+    version_added: 7.2.0
   update:
     description:
       - If C(true), the VM will be updated with new value.
@@ -997,7 +998,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         # Flatten tpmstate option to a string so that it's a string which is what Proxmoxer and the API expect
         if 'tpmstate' in kwargs:
-            kwargs['tmpstate'] = '{}:1,version=v{}'.format(kwargs['tmpstate'].pop('storage'), kwargs['tmpstate'].pop('version'))
+            kwargs['tmpstate'] = '{storage}:1,version=v{version}'.format(storage=kwargs['tmpstate'].pop('storage'), version=kwargs['tmpstate'].pop('version'))
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
