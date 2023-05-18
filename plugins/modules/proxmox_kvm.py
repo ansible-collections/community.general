@@ -482,6 +482,21 @@ options:
       - Timeout for operations.
     type: int
     default: 30
+  tmpstate:
+    description:
+      - A hash/dictionary of options for the Trusted Platform Module disk.
+      - A TPM state disk is required for Windows 11 installations.
+    suboptions:
+      storage:
+        description:
+          - C(storage) is the storage identifier where to create the disk.
+        type: str
+      version:
+        description:
+          - The TPM version to use.
+        type: str
+        choices: ['1.2', '2.0']
+    version_added: 6.5.1
   update:
     description:
       - If C(true), the VM will be updated with new value.
@@ -951,6 +966,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 del kwargs['ide']
             if 'efidisk0' in kwargs:
                 del kwargs['efidisk0']
+            if 'tpmstate' in kwargs:
+                del kwargs['tpmstate']
             if 'net' in kwargs:
                 del kwargs['net']
             if 'force' in kwargs:
@@ -977,6 +994,10 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
+
+        # Flatten tpmstate option to a string so that it's a string which is what Proxmoxer and the API expect
+        if 'tpmstate' in kwargs:
+            kwargs['tmpstate'] = '{}:1,version=v{}'.format(kwargs['tmpstate'].pop('storage'), kwargs['tmpstate'].pop('version'))
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
@@ -1163,6 +1184,7 @@ def main():
         tdf=dict(type='bool'),
         template=dict(type='bool'),
         timeout=dict(type='int', default=30),
+        tpmstate=dict(type='dict'),
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
         vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
