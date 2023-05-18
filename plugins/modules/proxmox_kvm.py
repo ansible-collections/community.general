@@ -999,8 +999,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
         if 'tpmstate0' in kwargs:
             kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(
-                storage=kwargs['tpmstate0'].pop('storage'),
-                version=kwargs['tpmstate0'].pop('version')
+                storage=kwargs['tpmstate0'].get('storage'),
+                version=kwargs['tpmstate0'].get('version')
             )
 
         # Convert all dict in kwargs to elements.
