@@ -482,7 +482,7 @@ options:
       - Timeout for operations.
     type: int
     default: 30
-  tpmstate:
+  tpmstate0:
     description:
       - A hash/dictionary of options for the Trusted Platform Module disk.
       - A TPM state disk is required for Windows 11 installations.
@@ -967,8 +967,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 del kwargs['ide']
             if 'efidisk0' in kwargs:
                 del kwargs['efidisk0']
-            if 'tpmstate' in kwargs:
-                del kwargs['tpmstate']
+            if 'tpmstate0' in kwargs:
+                del kwargs['tpmstate0']
             if 'net' in kwargs:
                 del kwargs['net']
             if 'force' in kwargs:
@@ -996,9 +996,9 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
 
-        # Flatten tpmstate option to a string so that it's a string which is what Proxmoxer and the API expect
-        if 'tpmstate' in kwargs:
-            kwargs['tmpstate'] = '{storage}:1,version=v{version}'.format(storage=kwargs['tmpstate'].pop('storage'), version=kwargs['tmpstate'].pop('version'))
+        # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        if 'tpmstate0' in kwargs:
+            kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(storage=kwargs['tpmstate0'].pop('storage'), version=kwargs['tpmstate0'].pop('version'))
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
@@ -1185,7 +1185,11 @@ def main():
         tdf=dict(type='bool'),
         template=dict(type='bool'),
         timeout=dict(type='int', default=30),
-        tpmstate=dict(type='dict'),
+        tpmstate0=dict(type='dict',
+                       options=dict(
+                           storage=dict(type='str'),
+                           version=dict(type='str', choices=['2.0', '1.2'])
+                       )),
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
         vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
@@ -1379,6 +1383,7 @@ def main():
                               target=module.params['target'],
                               tdf=module.params['tdf'],
                               template=module.params['template'],
+                              tpmstate0=module.params['tpmstate0'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
                               virtio=module.params['virtio'],
