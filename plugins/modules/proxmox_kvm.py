@@ -496,7 +496,7 @@ options:
           - The TPM version to use.
         type: str
         choices: ['1.2', '2.0']
-    version_added: 6.5.1
+    version_added: 7.1.1
   update:
     description:
       - If C(true), the VM will be updated with new value.
