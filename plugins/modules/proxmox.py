@@ -170,8 +170,8 @@ options:
     version_added: '0.2.0'
   timezone:
     description:
-      - Timezone used by the container.
-      - The value C(host) configures the same timezone used by Proxmox host.
+      - Timezone used by the container, accepts values like C(Europe/Paris).
+      - The special value C(host) configures the same timezone used by Proxmox host.
     type: str
     version_added: '7.1.0'
   proxmox_default_behavior:
