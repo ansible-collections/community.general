@@ -482,7 +482,7 @@ options:
       - Timeout for operations.
     type: int
     default: 30
-  tmpstate:
+  tpmstate:
     description:
       - A hash/dictionary of options for the Trusted Platform Module disk.
       - A TPM state disk is required for Windows 11 installations.
