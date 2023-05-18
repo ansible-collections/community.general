@@ -77,11 +77,11 @@ from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
 
-class BitwardenException(AnsibleError):
+class BitwardenSecretsManagerException(AnsibleError):
     pass
 
 
-class Bitwarden(object):
+class BitwardenSecretsManager(object):
 
     def __init__(self, path='bws'):
         self._cli_path = path
@@ -95,7 +95,7 @@ class Bitwarden(object):
         out, err = p.communicate(to_bytes(stdin))
         rc = p.wait()
         if rc != expected_rc:
-            raise BitwardenException(err)
+            raise BitwardenSecretsManagerException(err)
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
     def get_secret(self, secret_id, bws_access_token):
@@ -121,7 +121,7 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         bws_access_token = self.get_option('bws_access_token')
 
-        return [_bitwarden.get_secret(term, bws_access_token) for term in terms]
+        return [_bitwarden_secrets_manager.get_secret(term, bws_access_token) for term in terms]
 
 
-_bitwarden = Bitwarden()
+_bitwarden_secrets_manager = BitwardenSecretsManager()
