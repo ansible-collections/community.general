@@ -145,9 +145,8 @@ EXAMPLES = """
     path: /app/location
     state: latest
 """
-
-import os
 import json
+import os
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
@@ -213,10 +212,10 @@ class Pnpm(object):
 
                 cwd = self.path
 
-            _, out, _ = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
-            return out
+            _rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
+            return out, err
 
-        return ""
+        return "", ""
 
     def missing(self):
         if not os.path.isfile(os.path.join(self.path, "pnpm-lock.yaml")):
@@ -224,7 +223,10 @@ class Pnpm(object):
 
         cmd = ["list", "--json"]
         try:
-            data = json.loads(self._exec(cmd, True, False) or "{}")
+            _exe, err = self._exec(cmd, True, False)
+            if err:
+                raise Exception(err)
+            data = json.loads(_exe or "{}")
         except Exception as e:
             self.module.fail_json(
                 msg="Failed to parse pnpm output with error %s" % to_native(e)
@@ -267,7 +269,10 @@ class Pnpm(object):
 
         cmd = ["outdated", "--format", "json"]
         try:
-            data = json.loads(self._exec(cmd, True, False) or "{}")
+            _exe, err = self._exec(cmd, True, False)
+            if err:
+                raise Exception(err)
+            data = json.loads(_exe or "{}")
         except Exception as e:
             self.module.fail_json(
                 msg="Failed to parse pnpm output with error %s" % to_native(e)
@@ -356,7 +361,7 @@ def main():
 
     if globally:
         _rc, out, _err = module.run_command(executable + ["root", "-g"], check_rc=True)
-        path, _ = os.path.split(out.strip())
+        path, _tail = os.path.split(out.strip())
 
     pnpm = Pnpm(
         module,
@@ -373,33 +378,34 @@ def main():
     )
 
     changed = False
+    out = ""
+    err = ""
     if state == "present":
         if not name:
             changed = True
-            pnpm.install()
+            out, err = pnpm.install()
         else:
             missing = pnpm.missing()
             if missing:
                 changed = True
-                pnpm.install()
-
+                out, err = pnpm.install()
     elif state == "latest":
         outdated = pnpm.list_outdated()
         if name:
             missing = pnpm.missing()
             if missing or name in outdated:
                 changed = True
-                pnpm.install()
+                out, err = pnpm.install()
         elif len(outdated):
             changed = True
-            pnpm.update()
+            out, err = pnpm.update()
     else:  # absent
         missing = pnpm.missing()
         if not missing:
             changed = True
-            pnpm.uninstall()
+            out, err = pnpm.uninstall()
 
-    module.exit_json(changed=changed)
+    module.exit_json(changed=changed, out=out, err=err)
 
 
 if __name__ == "__main__":
