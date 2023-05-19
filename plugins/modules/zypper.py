@@ -329,7 +329,7 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
         # 0: success
         # 106: signature verification failed
         # 102: ZYPPER_EXIT_INF_REBOOT_NEEDED - Returned after a successful installation of a patch which requires reboot of computer.
-        # 103: zypper was upgraded, run same command again        
+        # 103: zypper was upgraded, run same command again
         if packages is None:
             firstrun = True
             packages = {}
