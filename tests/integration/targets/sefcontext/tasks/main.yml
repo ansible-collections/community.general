@@ -17,5 +17,5 @@
     msg: SELinux is {{ ansible_selinux.status }}
   when: ansible_selinux is defined and ansible_selinux != False
 
-- include: sefcontext.yml
+- include_tasks: sefcontext.yml
   when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'

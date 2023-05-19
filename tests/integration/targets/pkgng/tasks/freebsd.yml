@@ -522,7 +522,7 @@
     or ansible_distribution_version is version('13.3', '>=')
   block:
     - name: Setup testjail
-      include: setup-testjail.yml
+      include_tasks: setup-testjail.yml
 
     - name: Install package in jail as rootdir
       include_tasks: install_single_package.yml

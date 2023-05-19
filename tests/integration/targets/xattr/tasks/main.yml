@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Setup
-  include: setup.yml
+  include_tasks: setup.yml
 
 - name: Check availability of xattr support
   command: setfattr -n user.foo {{ test_file }}
@@ -17,5 +17,5 @@
   register: xattr
 
 - name: Test
-  include: test.yml
+  include_tasks: test.yml
   when: xattr is not failed

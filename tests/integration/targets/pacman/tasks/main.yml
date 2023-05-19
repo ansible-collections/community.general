@@ -11,9 +11,9 @@
 - when: ansible_os_family == 'Archlinux'
   block:
     # Add more tests here by including more task files:
-    - include: 'basic.yml'
-    - include: 'package_urls.yml'
-    - include: 'remove_nosave.yml'
-    - include: 'update_cache.yml'
-    - include: 'locally_installed_package.yml'
-    - include: 'reason.yml'
+    - include_tasks: 'basic.yml'
+    - include_tasks: 'package_urls.yml'
+    - include_tasks: 'remove_nosave.yml'
+    - include_tasks: 'update_cache.yml'
+    - include_tasks: 'locally_installed_package.yml'
+    - include_tasks: 'reason.yml'

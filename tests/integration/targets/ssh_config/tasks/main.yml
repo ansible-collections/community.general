@@ -242,4 +242,4 @@
       - short_name.hosts_removed == []
 
 - name: Include integration tests for additional options (e.g. proxycommand, proxyjump)
-  include: 'options.yml'
+  include_tasks: 'options.yml'

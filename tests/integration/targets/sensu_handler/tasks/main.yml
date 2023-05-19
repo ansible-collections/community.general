@@ -122,8 +122,8 @@
       - failure is failed
       - "'the following are missing: type' in failure['msg']"
 
-- include: pipe.yml
-- include: tcp.yml
-- include: udp.yml
-- include: set.yml
-- include: transport.yml
+- include_tasks: pipe.yml
+- include_tasks: tcp.yml
+- include_tasks: udp.yml
+- include_tasks: set.yml
+- include_tasks: transport.yml

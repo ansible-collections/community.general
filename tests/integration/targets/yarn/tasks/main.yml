@@ -11,7 +11,7 @@
 
 # ============================================================
 
-- include: run.yml
+- include_tasks: run.yml
   vars:
     nodejs_version: '{{ item.node_version }}'
     nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_system|lower }}-x{{ ansible_userspace_bits }}'
