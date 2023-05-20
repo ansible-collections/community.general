@@ -49,8 +49,8 @@ notes:
     I(value="'myvalue'") - with single quotes as part of the Ansible parameter
     value.
   - When using loops in combination with a value like
-    :code:`"[('xkb', 'us'), ('xkb', 'se')]"`, you need to be aware of possible
-    type conversions. Applying a filter :code:`"{{ item.value | string }}"`
+    C("[('xkb', 'us'), ('xkb', 'se')]"), you need to be aware of possible
+    type conversions. Applying a filter C("{{ item.value | string }}")
     to the parameter variable can avoid potential conversion problems.
   - The easiest way to figure out exact syntax/value you need to provide for a
     key is by making the configuration change in application affected by the
