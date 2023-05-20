@@ -450,21 +450,21 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         # Version limited features
         minimum_version = {
-            'tags': 7,
+            'tags': '6.1',
+            'timezone': '6.3'
         }
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Remove all empty kwarg entries
         kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
-        version = self.version()
-        pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
+        pve_version = self.version()
 
         # Fail on unsupported features
         for option, version in minimum_version.items():
-            if pve_major_version < version and option in kwargs:
-                self.module.fail_json(changed=False, msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_major_version}".
-                                      format(option=option, version=version, pve_major_version=pve_major_version))
+            if pve_version < LooseVersion(version) and option in kwargs:
+                self.module.fail_json(changed=False, msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_version}".
+                                      format(option=option, version=version, pve_version=pve_version))
 
         if VZ_TYPE == 'lxc':
             kwargs['cpulimit'] = cpus
