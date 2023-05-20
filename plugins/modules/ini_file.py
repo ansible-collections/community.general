@@ -210,15 +210,20 @@ def do_ini(module, filename, section=None, option=None, values=None,
         after_header='%s (content)' % filename,
     )
 
-    if not os.path.exists(filename):
+    if os.path.islink(filename):
+        target_filename = os.path.realpath(filename)
+    else:
+        target_filename = filename
+
+    if not os.path.exists(target_filename):
         if not create:
-            module.fail_json(rc=257, msg='Destination %s does not exist!' % filename)
-        destpath = os.path.dirname(filename)
+            module.fail_json(rc=257, msg='Destination %s does not exist!' % target_filename)
+        destpath = os.path.dirname(target_filename)
         if not os.path.exists(destpath) and not module.check_mode:
             os.makedirs(destpath)
         ini_lines = []
     else:
-        with io.open(filename, 'r', encoding="utf-8-sig") as ini_file:
+        with io.open(target_filename, 'r', encoding="utf-8-sig") as ini_file:
             ini_lines = [to_text(line) for line in ini_file.readlines()]
 
     if module._diff:
@@ -404,7 +409,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
     backup_file = None
     if changed and not module.check_mode:
         if backup:
-            backup_file = module.backup_local(filename)
+            backup_file = module.backup_local(target_filename)
 
         encoded_ini_lines = [to_bytes(line) for line in ini_lines]
         try:
@@ -416,10 +421,10 @@ def do_ini(module, filename, section=None, option=None, values=None,
             module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
 
         try:
-            module.atomic_move(tmpfile, filename)
+            module.atomic_move(tmpfile, target_filename)
         except IOError:
             module.ansible.fail_json(msg='Unable to move temporary \
-                                   file %s to %s, IOError' % (tmpfile, filename), traceback=traceback.format_exc())
+                                   file %s to %s, IOError' % (tmpfile, target_filename), traceback=traceback.format_exc())
 
     return (changed, backup_file, diff, msg)
 

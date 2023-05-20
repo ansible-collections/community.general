@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "ini_file - Follow the symlinks instead of replacing them (https://github.com/ansible-collections/community.general/issues/6470)."

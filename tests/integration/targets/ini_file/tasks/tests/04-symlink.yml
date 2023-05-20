@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Create a file
+  ansible.builtin.copy:
+    content: |
+      [main]
+      foo=BAR
+    dest: "{{ remote_tmp_dir }}/my_original_file.ini"
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: "{{ remote_tmp_dir }}/my_original_file.ini"
+    dest: "{{ remote_tmp_dir }}/symlink.ini"
+    state: link
+
+- name: Set a value
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/symlink.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+  register: result
+- ansible.builtin.assert:
+    that:
+      - result is changed
+- name: Set a value (idempotency)
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/symlink.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+  register: result
+- ansible.builtin.assert:
+    that:
+      - "not (result is changed)"
+- name: Set a value (on the final file)
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/my_original_file.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+  register: result
+- ansible.builtin.assert:
+    that:
+      - "not (result is changed)"
