@@ -13,7 +13,7 @@ DOCUMENTATION = """
     requirements:
       - bws (command line utility)
     short_description: Retrieve secrets from Bitwarden Secrets Manager
-    version_added: 6.6.0
+    version_added: 7.0.0
     description:
       - Retrieve secrets from Bitwarden Secrets Manager.
     options:
