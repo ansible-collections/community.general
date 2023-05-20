@@ -17,7 +17,7 @@ def main():
     suffix = ':{env}'.format(env=env["ANSIBLE_COLLECTIONS_PATH"]) if 'ANSIBLE_COLLECTIONS_PATH' in env else ''
     env['ANSIBLE_COLLECTIONS_PATH'] = '{root}{suffix}'.format(root=os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd()))), suffix=suffix)
     p = subprocess.run(
-        ['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--disallow-semantic-markup', '--skip-rstcheck', '.'],
+        ['antsibull-docs', 'lint-collection-docs', '--plugin-docs', '--skip-rstcheck', '.'],
         env=env,
         check=False,
     )
