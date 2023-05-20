@@ -76,8 +76,10 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
+
 class BitwardenSecretsManagerException(AnsibleLookupError):
     pass
+
 
 class BitwardenSecretsManager(object):
     def __init__(self, path='bws'):
@@ -111,6 +113,7 @@ class BitwardenSecretsManager(object):
 
         return AnsibleJSONDecoder().raw_decode(out)[0]
 
+
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
@@ -118,4 +121,3 @@ class LookupModule(LookupBase):
         _bitwarden_secrets_manager = BitwardenSecretsManager()
 
         return [_bitwarden_secrets_manager.get_secret(term, bws_access_token) for term in terms]
-
