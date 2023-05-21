@@ -333,9 +333,9 @@ def emerge_packages(module, packages):
     """Run emerge command against given list of atoms."""
     p = module.params
 
-    if p['noreplace'] and not (p['update'] or p['state'] == 'latest'):
+    if p['noreplace'] and not p['changed_use'] and not p['newuse'] and not (p['update'] or p['state'] == 'latest'):
         for package in packages:
-            if p['noreplace'] and not query_package(module, package, 'emerge'):
+            if p['noreplace'] and not p['changed_use'] and not p['newuse'] and not query_package(module, package, 'emerge'):
                 break
         else:
             module.exit_json(changed=False, msg='Packages already present.')
