@@ -29,7 +29,7 @@
       shell: apache2ctl -M | sort
       register: modules_before
     - name: include only on supported systems
-      include: actualtest.yml
+      include_tasks: actualtest.yml
   always:
     - name: get list of enabled modules
       shell: apache2ctl -M | sort

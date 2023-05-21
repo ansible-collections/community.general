@@ -36,4 +36,4 @@
 - when: ansible_os_family == "Archlinux"
   block:
     - name: ArchLinux specific setup
-      include: archlinux.yml
+      include_tasks: archlinux.yml
