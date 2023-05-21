@@ -2046,6 +2046,9 @@ class Nmcli(object):
                 if key in self.SECRET_OPTIONS:
                     self.edit_commands += ['set %s %s' % (key, value)]
                     continue
+                if key == 'xmit_hash_policy':
+                    cmd.extend(['+bond.options', 'xmit_hash_policy=%s' % value])
+                    continue
                 cmd.extend([key, value])
 
         return self.execute_command(cmd)
