@@ -500,6 +500,7 @@ TESTCASE_BOND = [
         'conn_name': 'non_existent_nw_device',
         'ifname': 'bond_non_existant',
         'mode': 'active-backup',
+        'xmit_hash_policy': 'layer3+4',
         'ip4': '10.10.10.10/24',
         'gw4': '10.10.10.1',
         'state': 'present',
@@ -522,7 +523,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
-bond.options:                           mode=active-backup,primary=non_existent_primary
+bond.options:                           mode=active-backup,primary=non_existent_primary,xmit_hash_policy=layer3+4
 """
 
 TESTCASE_BRIDGE = [
@@ -1897,7 +1898,8 @@ def test_bond_connection_create(mocked_generic_connection_create, capfd):
 
     for param in ['ipv4.gateway', 'primary', 'connection.autoconnect',
                   'connection.interface-name', 'bond_non_existant',
-                  'mode', 'active-backup', 'ipv4.addresses']:
+                  'mode', 'active-backup', 'ipv4.addresses',
+                  '+bond.options', 'xmit_hash_policy=layer3+4']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
