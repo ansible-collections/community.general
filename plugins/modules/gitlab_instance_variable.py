@@ -181,8 +181,6 @@ class GitlabInstanceVariables(object):
             "protected": var_obj.get('protected'),
             "variable_type": var_obj.get('variable_type'),
         }
-        if var_obj.get('environment_scope') is not None:
-            var["environment_scope"] = var_obj.get('environment_scope')
 
         self.instance.variables.create(var)
         return True
@@ -197,7 +195,7 @@ class GitlabInstanceVariables(object):
     def delete_variable(self, var_obj):
         if self._module.check_mode:
             return True
-        self.instance.variables.delete(var_obj.get('key'), filter={'environment_scope': var_obj.get('environment_scope')})
+        self.instance.variables.delete(var_obj.get('key'))
         return True
 
 
@@ -216,13 +214,13 @@ def compare(requested_variables, existing_variables, state):
     if state == 'present':
         existing_key_scope_vars = list()
         for item in existing_variables:
-            existing_key_scope_vars.append({'key': item.get('key'), 'environment_scope': item.get('environment_scope')})
+            existing_key_scope_vars.append({'key': item.get('key')})
 
         for var in requested_variables:
             if var in existing_variables:
                 untouched.append(var)
             else:
-                compare_item = {'key': var.get('name'), 'environment_scope': var.get('environment_scope')}
+                compare_item = {'key': var.get('name')}
                 if compare_item in existing_key_scope_vars:
                     updated.append(var)
                 else:
@@ -249,8 +247,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['protected'] = False
         if item.get('masked') is None:
             item['masked'] = False
-        if item.get('environment_scope') is None:
-            item['environment_scope'] = '*'
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
 
@@ -322,7 +318,6 @@ def main():
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
-            environment_scope=dict(type='str', default='*'),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
