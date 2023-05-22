@@ -324,10 +324,11 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
             m.fail_json(msg=errmsg, rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
         else:
             return {}, rc, stdout, stderr
-    elif rc in [0, 106, 103]:
+    elif rc in [0, 102, 103, 106]:
         # zypper exit codes
         # 0: success
         # 106: signature verification failed
+        # 102: ZYPPER_EXIT_INF_REBOOT_NEEDED - Returned after a successful installation of a patch which requires reboot of computer.
         # 103: zypper was upgraded, run same command again
         if packages is None:
             firstrun = True
@@ -587,12 +588,12 @@ def main():
         elif state in ['installed', 'present', 'latest']:
             packages_changed, retvals = package_present(module, name, state == 'latest')
 
-    retvals['changed'] = retvals['rc'] == 0 and bool(packages_changed)
+    retvals['changed'] = retvals['rc'] in [0, 102] and bool(packages_changed)
 
     if module._diff:
         set_diff(module, retvals, packages_changed)
 
-    if retvals['rc'] != 0:
+    if retvals['rc'] not in [0, 102]:
         module.fail_json(msg="Zypper run failed.", **retvals)
 
     if not retvals['changed']:
