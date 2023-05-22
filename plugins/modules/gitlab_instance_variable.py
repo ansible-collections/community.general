@@ -142,7 +142,7 @@ instance_variable:
       type: list
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     updated:
-      description: A list of variables whose values were changed.
+      description: A list pre-existing variables whose values have been set.
       returned: always
       type: list
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
@@ -213,7 +213,7 @@ class GitlabInstanceVariables(object):
 def compare(requested_variables, existing_variables, state):
     # we need to do this, because it was determined in a previous version - more or less buggy
     # basically it is not necessary and might results in more/other bugs!
-    # but it is required  and only relevant for check mode!!
+    # but it is required and only relevant for check mode!!
     # logic represents state 'present' when not purge. all other can be derived from that
     # untouched => equal in both
     # updated => name and scope are equal
