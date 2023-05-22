@@ -109,6 +109,13 @@ options:
       - Allow option without value and without '=' symbol.
     type: bool
     default: false
+  follow:
+    description:
+    - This flag indicates that filesystem links, if they exist, should be followed.
+    - I(follow=yes) and I(state=link) can modify I(src) when combined with parameters such as I(mode).
+    type: bool
+    default: no
+    version_added: 7.2.0
 notes:
    - While it is possible to add an I(option) without specifying a I(value), this makes no sense.
    - As of Ansible 2.3, the I(dest) option has been changed to I(path) as default, but I(dest) still works as well.
@@ -191,7 +198,7 @@ def update_section_line(changed, section_lines, index, changed_lines, newline, m
 
 def do_ini(module, filename, section=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
-           create=True, allow_no_value=False):
+           create=True, allow_no_value=False, follow=False):
 
     if section is not None:
         section = to_text(section)
@@ -210,7 +217,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         after_header='%s (content)' % filename,
     )
 
-    if os.path.islink(filename):
+    if follow and os.path.islink(filename):
         target_filename = os.path.realpath(filename)
     else:
         target_filename = filename
@@ -443,7 +450,8 @@ def main():
             exclusive=dict(type='bool', default=True),
             no_extra_spaces=dict(type='bool', default=False),
             allow_no_value=dict(type='bool', default=False),
-            create=dict(type='bool', default=True)
+            create=dict(type='bool', default=True),
+            follow=dict(type='bool', default=False)
         ),
         mutually_exclusive=[
             ['value', 'values']
@@ -463,6 +471,7 @@ def main():
     no_extra_spaces = module.params['no_extra_spaces']
     allow_no_value = module.params['allow_no_value']
     create = module.params['create']
+    follow = module.params['follow']
 
     if state == 'present' and not allow_no_value and value is None and not values:
         module.fail_json(msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
@@ -472,7 +481,7 @@ def main():
     elif values is None:
         values = []
 
-    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value)
+    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value, follow)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
