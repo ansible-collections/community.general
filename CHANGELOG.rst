@@ -6,6 +6,22 @@ Community General Release Notes
 
 This changelog describes changes after version 6.0.0.
 
+v7.0.1
+======
+
+Release Summary
+---------------
+
+Bugfix release for Ansible 8.0.0rc1.
+
+Bugfixes
+--------
+
+- nmcli - fix bond option ``xmit_hash_policy`` (https://github.com/ansible-collections/community.general/pull/6527).
+- portage - fix ``changed_use`` and ``newuse`` not triggering rebuilds (https://github.com/ansible-collections/community.general/issues/6008, https://github.com/ansible-collections/community.general/pull/6548).
+- proxmox_tasks_info - remove ``api_user`` + ``api_password`` constraint from ``required_together`` as it causes to require ``api_password`` even when API token param is used (https://github.com/ansible-collections/community.general/issues/6201).
+- zypper - added handling of zypper exitcode 102. Changed state is set correctly now and rc 102 is still preserved to be evaluated by the playbook (https://github.com/ansible-collections/community.general/pull/6534).
+
 v7.0.0
 ======
 
