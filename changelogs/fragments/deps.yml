@@ -1,2 +1,0 @@
-bugfixes:
-  - "deps module utils - do not fail when dependency cannot be found (https://github.com/ansible-collections/community.general/pull/6479)."
