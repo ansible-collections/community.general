@@ -151,7 +151,7 @@ instance_variable:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables
 )
 
 
