@@ -160,8 +160,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        required_together=[('api_token_id', 'api_token_secret'),
-                           ('api_user', 'api_password')],
+        required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
         supports_check_mode=True)
     result = dict(changed=False)
