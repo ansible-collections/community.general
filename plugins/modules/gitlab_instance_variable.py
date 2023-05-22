@@ -13,9 +13,11 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 module: gitlab_instance_variable
 short_description: Creates, updates, or deletes GitLab instance variables
+version_added: 7.1.0
 description:
   - Creates a instance variable if it does not exist.
   - When a instance variable does exist, its value will be updated if the values are different.
+  - Support for instance variables requires GitLab >= 13.0.
   - Variables which are untouched in the playbook, but are not untouched in the GitLab instance,
     they stay untouched (I(purge) is C(false)) or will be deleted (I(purge) is C(true)).
 author:
@@ -51,7 +53,6 @@ options:
       - When the list element is a simple key-value pair, set masked and protected to false.
       - When the list element is a dict with the keys I(value), I(masked) and I(protected), the user can
         have full control about whether a value should be masked, protected or both.
-      - Support for group variables requires GitLab >= 13.0.
       - A I(value) must be a string or a number.
       - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
@@ -120,7 +121,7 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-group_variable:
+instance_variable:
   description: Four lists of the variablenames which were added, updated, removed or exist.
   returned: always
   type: dict
@@ -386,7 +387,7 @@ def main():
     untouched = [x.get(untouched_key_name) for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
-    module.exit_json(changed=changed, group_variable=return_value)
+    module.exit_json(changed=changed, instance_variable=return_value)
 
 
 if __name__ == '__main__':
