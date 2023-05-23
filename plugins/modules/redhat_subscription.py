@@ -155,13 +155,15 @@ options:
         default: []
         type: list
         elements: raw
-    remove_consumed_pools:
+    keep_consumed_pools:
         description:
             - |
-              When using I(pool_ids), remove the currently consumed subscription. Set to C(true) by default to
-              keep the existing behavior. When set to false, only add the listed pools if needed.
+              When using I(pool_ids), f set to C(true), keep the currently consumed subscriptions.
+              When set to C(false), delete all currently consumed subscriptions from the system and consume
+              the subscriptions pool IDs defined in I(pool_ids).
+              It is set to C(false) by default to keep the historical behavior of the module.
         type: bool
-        default: true
+        default: false
         version_added: 7.1.0
     consumer_type:
         description:
@@ -861,7 +863,7 @@ class Rhsm(RegistrationBase):
         return {'changed': changed, 'subscribed_pool_ids': subscribed_pool_ids,
                 'unsubscribed_serials': serials}
 
-    def update_subscriptions_by_pool_ids(self, pool_ids, remove_consumed_pools):
+    def update_subscriptions_by_pool_ids(self, pool_ids, keep_consumed_pools):
         changed = False
         consumed_pools = RhsmPools(self.module, consumed=True)
 
@@ -873,7 +875,7 @@ class Rhsm(RegistrationBase):
             existing_pools[pool_id] = quantity_used
 
             quantity = pool_ids.get(pool_id, 0)
-            if quantity is not None and quantity != quantity_used and remove_consumed_pools:
+            if quantity is not None and quantity != quantity_used and not keep_consumed_pools:
                 serials_to_remove.append(p.Serial)
 
         serials = self.unsubscribe(serials=serials_to_remove)
@@ -1088,7 +1090,7 @@ def main():
             'environment': {},
             'pool': {'default': '^$'},
             'pool_ids': {'default': [], 'type': 'list', 'elements': 'raw'},
-            'remove_consumed_pools': {'default': True, 'type': 'bool'},
+            'keep_consumed_pools': {'default': False, 'type': 'bool'},
             'consumer_type': {},
             'consumer_name': {},
             'consumer_id': {},
@@ -1155,7 +1157,7 @@ def main():
         else:
             pool_id, quantity = value, None
         pool_ids[pool_id] = quantity
-    remove_consumed_pools = module.params['remove_consumed_pools']
+    keep_consumed_pools = module.params['keep_consumed_pools']
     consumer_type = module.params["consumer_type"]
     consumer_name = module.params["consumer_name"]
     consumer_id = module.params["consumer_id"]
@@ -1193,7 +1195,7 @@ def main():
             if pool != '^$' or pool_ids:
                 try:
                     if pool_ids:
-                        result = rhsm.update_subscriptions_by_pool_ids(pool_ids, remove_consumed_pools)
+                        result = rhsm.update_subscriptions_by_pool_ids(pool_ids, keep_consumed_pools)
                     else:
                         result = rhsm.update_subscriptions(pool)
                 except Exception as e:
