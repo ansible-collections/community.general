@@ -232,9 +232,9 @@ def ensure(module, client):
     state = module.params['state']
 
     if state in ['present', 'enabled']:
-        ipaenabledflag = 'TRUE'
+        ipaenabledflag = True
     else:
-        ipaenabledflag = 'FALSE'
+        ipaenabledflag = False
 
     host = module.params['host']
     hostcategory = module.params['hostcategory']
