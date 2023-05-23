@@ -497,7 +497,7 @@ options:
         type: str
         choices: ['1.2', '2.0']
     type: dict
-    version_added: 7.2.0
+    version_added: 7.1.0
   update:
     description:
       - If C(true), the VM will be updated with new value.
