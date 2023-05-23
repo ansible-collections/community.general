@@ -159,9 +159,10 @@ options:
         description:
             - |
               When using I(pool_ids), remove the currently consumed subscription. Set to C(true) by default to
-              keep the existing behaviour. When set to false, only add the listed pools if needed.
+              keep the existing behavior. When set to false, only add the listed pools if needed.
         type: bool
         default: true
+        version_added: 7.1.0
     consumer_type:
         description:
             - The type of unit to register, defaults to system
