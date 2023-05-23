@@ -176,15 +176,18 @@ options:
             - hide_handles
             - hide_all
         type: str
+        version_added: 7.2.0
     renotify_occurrences:
         description:
             - The number of times re-notification messages should be sent on the current status at the provided re-notification interval.
         type: int
+        version_added: 7.2.0
     renotify_statuses:
         description:
             - The types of monitor statuses for which re-notification messages are sent. Valid values are alert, warn, no data.
         type: list
         elements: str
+        version_added: 7.2.0
 
 '''
 
