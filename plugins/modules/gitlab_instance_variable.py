@@ -48,21 +48,9 @@ options:
       - When set to C(true), delete all variables which are not mentioned in the task.
     default: false
     type: bool
-  vars:
-    description:
-      - When the list element is a simple key-value pair, set masked and protected to false.
-      - When the list element is a dict with the keys I(value), I(masked) and I(protected), the user can
-        have full control about whether a value should be masked, protected or both.
-      - A I(value) must be a string or a number.
-      - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
-      - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
-        See GitLab documentation on acceptable values for a masked variable (U(https://docs.gitlab.com/ce/ci/variables/#masked-variables)).
-    default: {}
-    type: dict
   variables:
     description:
       - A list of dictionaries that represents CI/CD variables.
-      - This modules works internal with this sructure, even if the older I(vars) parameter is used.
     default: []
     type: list
     elements: dict
@@ -116,8 +104,8 @@ EXAMPLES = r'''
     api_url: https://gitlab.com
     api_token: secret_access_token
     state: absent
-    vars:
-      ACCESS_KEY_ID: acab1221cbad
+    variables:
+      - name: ACCESS_KEY_ID
 '''
 
 RETURN = r'''
@@ -151,7 +139,7 @@ instance_variable:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables
 )
 
 
@@ -164,11 +152,11 @@ class GitlabInstanceVariables(object):
     def list_all_instance_variables(self):
         page_nb = 1
         variables = []
-        vars_page = self.instance.variables.list(page=page_nb)
-        while len(vars_page) > 0:
-            variables += vars_page
+        gl_varibales_page = self.instance.variables.list(page=page_nb)
+        while len(gl_varibales_page) > 0:
+            variables += gl_varibales_page
             page_nb += 1
-            vars_page = self.instance.variables.list(page=page_nb)
+            gl_varibales_page = self.instance.variables.list(page=page_nb)
         return variables
 
     def create_variable(self, var_obj):
@@ -237,7 +225,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     gitlab_keys = this_gitlab.list_all_instance_variables()
     before = [x.attributes for x in gitlab_keys]
 
-    gitlab_keys = this_gitlab.list_all_instance_variables()
     existing_variables = filter_returned_variables(gitlab_keys)
 
     for item in requested_variables:
@@ -312,7 +299,6 @@ def main():
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
         purge=dict(type='bool', required=False, default=False),
-        vars=dict(type='dict', required=False, default=dict(), no_log=True),
         variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
             name=dict(type='str', required=True),
             value=dict(type='str', no_log=True),
@@ -331,7 +317,6 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
-            ['vars', 'variables'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -344,13 +329,9 @@ def main():
     ensure_gitlab_package(module)
 
     purge = module.params['purge']
-    var_list = module.params['vars']
     state = module.params['state']
 
-    if var_list:
-        variables = vars_to_variables(var_list, module)
-    else:
-        variables = module.params['variables']
+    variables = module.params['variables']
 
     if state == 'present':
         if any(x['value'] is None for x in variables):
@@ -372,7 +353,7 @@ def main():
     removed = [x.get('key') for x in raw_return_value['removed']]
     untouched = [x.get(untouched_key_name) for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
-
+    
     module.exit_json(changed=changed, instance_variable=return_value)
 
 
