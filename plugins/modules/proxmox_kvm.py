@@ -491,11 +491,13 @@ options:
         description:
           - O(tmpstate0.storage) is the storage identifier where to create the disk.
         type: str
+        required: true
       version:
         description:
           - The TPM version to use.
         type: str
         choices: ['1.2', '2.0']
+        required: true
     type: dict
     version_added: 7.1.0
   update:
@@ -1190,8 +1192,8 @@ def main():
         timeout=dict(type='int', default=30),
         tpmstate0=dict(type='dict',
                        options=dict(
-                           storage=dict(type='str'),
-                           version=dict(type='str', choices=['2.0', '1.2'])
+                           storage=dict(type='str', required=True),
+                           version=dict(type='str', choices=['2.0', '1.2'], required=True)
                        )),
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
