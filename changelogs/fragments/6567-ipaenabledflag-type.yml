@@ -1,2 +1,2 @@
 bugfixes:
-  - value of ipaenabledflag should be boolean type (https://github.com/ansible-collections/community.general/issues/5894).
+  - ipa_hbacrule - value of ``ipaenabledflag`` should be boolean type (https://github.com/ansible-collections/community.general/issues/5894).
