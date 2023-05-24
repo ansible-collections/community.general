@@ -112,10 +112,10 @@ options:
   follow:
     description:
     - This flag indicates that filesystem links, if they exist, should be followed.
-    - I(follow=yes) and I(state=link) can modify I(src) when combined with parameters such as I(mode).
+    - I(follow=true) can modify I(src) when combined with parameters such as I(mode).
     type: bool
-    default: no
-    version_added: 7.2.0
+    default: false
+    version_added: 7.1.0
 notes:
    - While it is possible to add an I(option) without specifying a I(value), this makes no sense.
    - As of Ansible 2.3, the I(dest) option has been changed to I(path) as default, but I(dest) still works as well.
