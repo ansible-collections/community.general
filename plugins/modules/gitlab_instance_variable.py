@@ -343,6 +343,12 @@ def main():
 
     changed, raw_return_value, before, after = native_python_main(this_gitlab, purge, variables, state, module)
 
+    # postprocessing
+    for item in after:
+        item['name'] = item.pop('key')
+    for item in before:
+        item['name'] = item.pop('key')
+
     untouched_key_name = 'key'
     if not module.check_mode:
         untouched_key_name = 'name'
@@ -353,7 +359,7 @@ def main():
     removed = [x.get('key') for x in raw_return_value['removed']]
     untouched = [x.get(untouched_key_name) for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
-    
+
     module.exit_json(changed=changed, instance_variable=return_value)
 
 
