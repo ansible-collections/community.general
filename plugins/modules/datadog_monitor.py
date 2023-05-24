@@ -176,18 +176,22 @@ options:
             - hide_handles
             - hide_all
         type: str
-        version_added: 7.2.0
+        version_added: 7.1.0
     renotify_occurrences:
         description:
             - The number of times re-notification messages should be sent on the current status at the provided re-notification interval.
         type: int
-        version_added: 7.2.0
+        version_added: 7.1.0
     renotify_statuses:
         description:
             - The types of monitor statuses for which re-notification messages are sent. Valid values are alert, warn, no data.
+        choices:
+            - alert
+            - warn
+            - no data
         type: list
         elements: str
-        version_added: 7.2.0
+        version_added: 7.1.0
 
 '''
 
@@ -282,7 +286,7 @@ def main():
             priority=dict(type='int'),
             notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
             renotify_occurrences=dict(type='int'),
-            renotify_statuses=dict(type='list', elements='str'),
+            renotify_statuses=dict(type='list', elements='str', choices=['alert', 'warn', 'no data']),
         )
     )
 
