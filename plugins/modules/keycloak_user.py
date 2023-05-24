@@ -47,7 +47,7 @@ options:
             - emailVerified
     first_name:
         description:
-            - User firstName.
+            - The user's first name.
         required: false
         type: str
         aliases:
