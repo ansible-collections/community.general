@@ -497,7 +497,7 @@ options:
           - The TPM version to use.
         type: str
         choices: ['1.2', '2.0']
-        required: true
+        default: 2.0
     type: dict
     version_added: 7.1.0
   update:
@@ -1193,7 +1193,7 @@ def main():
         tpmstate0=dict(type='dict',
                        options=dict(
                            storage=dict(type='str', required=True),
-                           version=dict(type='str', choices=['2.0', '1.2'], required=True)
+                           version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
                        )),
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
