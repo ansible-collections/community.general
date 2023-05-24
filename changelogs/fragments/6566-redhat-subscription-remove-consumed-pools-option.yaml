@@ -3,4 +3,4 @@ minor_changes:
   - redhat_subscription - add ``keep_consumed_pools`` parameters to keep
     currently consumed subscriptions when subscribing with ``pool_ids``
     (https://github.com/ansible-collections/community.general/issues/3871,
-    https://github.com/ansible-collections/community.general/pull/6566)
+    https://github.com/ansible-collections/community.general/pull/6566).
