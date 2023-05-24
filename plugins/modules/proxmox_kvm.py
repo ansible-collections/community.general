@@ -489,7 +489,7 @@ options:
     suboptions:
       storage:
         description:
-          - C(storage) is the storage identifier where to create the disk.
+          - O(tmpstate0.storage) is the storage identifier where to create the disk.
         type: str
       version:
         description:
