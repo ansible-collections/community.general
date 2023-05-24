@@ -26,7 +26,7 @@ options:
         type: str
     username:
         description:
-            - username for the user.
+            - Username for the user.
         required: true
         type: str
     id:
