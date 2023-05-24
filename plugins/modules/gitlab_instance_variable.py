@@ -18,8 +18,8 @@ description:
   - Creates a instance variable if it does not exist.
   - When a instance variable does exist, its value will be updated if the values are different.
   - Support for instance variables requires GitLab >= 13.0.
-  - Variables which are untouched in the playbook, but are not untouched in the GitLab instance,
-    they stay untouched (I(purge) is C(false)) or will be deleted (I(purge) is C(true)).
+  - Variables which are not mentioned in the modules options, but are present on the GitLab instance,
+    will either stay (I(purge=false)) or will be deleted (I(purge=true)).
 author:
   - Benedikt Braunger (@benibr)
 requirements:
@@ -45,7 +45,7 @@ options:
     choices: ["present", "absent"]
   purge:
     description:
-      - When set to C(true), delete all variables which are not untouched in the task.
+      - When set to C(true), delete all variables which are not mentioned in the task.
     default: false
     type: bool
   vars:
