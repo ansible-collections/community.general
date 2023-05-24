@@ -36,7 +36,6 @@ options:
     enabled:
         description:
             - Enabled user.
-        default: true
         type: bool
     email_verified:
         description:
@@ -346,7 +345,7 @@ def main():
         first_name=dict(type='str', aliases=['firstName']),
         last_name=dict(type='str', aliases=['lastName']),
         email=dict(type='str'),
-        enabled=dict(type='bool', default=True),
+        enabled=dict(type='bool'),
         email_verified=dict(type='bool', default=False, aliases=['emailVerified']),
         federation_link=dict(type='str', aliases=['federationLink']),
         service_account_client_id=dict(type='str', aliases=['serviceAccountClientId']),
