@@ -149,12 +149,8 @@ class GitlabMergeRequest(object):
             if (user.username == username):
                 return user
 
-    def get_users(self, users):
-        return [self.get_user(user) for user in users]
-
-
-    def get_user_id(self, user):
-        return user.id
+    def get_user_ids(self, users):
+        return [self.get_user(user).id for user in users]
 
     '''
     @param options Options of the Merge Request
@@ -189,40 +185,34 @@ class GitlabMergeRequest(object):
             self._module.exit_json(changed=True, msg="Successfully updated the Merge Request %s" % mr.title)
 
         try:
-            # mr.save()
             self.project.mergerequests.update(mr.iid, options)
-        except (gitlab.exceptions.GitlabUpdateError) as e:
+        except gitlab.exceptions.GitlabUpdateError as e:
             self._module.fail_json(msg="Failed to update Merge Request: %s " % to_native(e))
 
-    def update_mr_options(self, mr, options):
-        changed = False
-        print("HERE2")
-        print(mr)
+    def mr_has_changed(self, mr, options):
         for key, value in options.items():
             if value is not None:
                 # see https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27355
                 if key == 'remove_source_branch':
                     key = 'force_remove_source_branch'
 
-                if key == 'assignee_ids' or key == 'assignee_id':
-                    key = 'assignees'
+                if key == 'assignee_ids':
+                    if options[key] != sorted([user["id"] for user in getattr(mr, 'assignees')]):
+                        return True
 
-                if key == 'labels':
-                    # new_value = self.sort_labels(options[key])
-                    # original_val = getattr(mr, key).sort()
-                    # original_val.sort()
-                    if options[key] != getattr(mr, key).sort():
-                        setattr(mr, key, options[key])
-                        changed = True
+                elif key == 'reviewer_ids':
+                    if options[key] != sorted([user["id"] for user in getattr(mr, 'reviewers')]):
+                        return True
+
+                elif key == 'labels':
+                    if options[key] != sorted(getattr(mr, key)):
+                        return True
 
                 elif getattr(mr, key) != value:
-                    setattr(mr, key, value)
-                    changed = True
+                    return True
 
-        return (changed, mr)
+        return False
 
-    def sort_labels(self, labels):
-        return labels.split(",").sort()
 
 def main():
     argument_spec = basic_auth_argument_spec()
@@ -233,7 +223,7 @@ def main():
         target_branch=dict(type='str', required=True),
         title=dict(type='str', required=True),
         description=dict(description='str', required=False),
-        labels=dict(type='str', required=False),
+        labels=dict(type='str', default="", required=False),
         description_path=dict(type='str', required=False),
         remove_source_branch=dict(type='bool', default=False, required=False),
         state_filter=dict(type='str', default="opened", choices=["opened", "closed", "locked", "merged"]),
@@ -309,44 +299,28 @@ def main():
             except IOError as e:
                 module.fail_json(msg='Cannot open {0}: {1}'.format(description_path, e))
 
-        if assignee_ids:
-            assignee_ids = [this_gitlab.get_user_id(user) for user in this_gitlab.get_users(assignee_ids.split(","))]
+        assignee_ids = sorted(this_gitlab.get_user_ids(assignee_ids.split(","))) if assignee_ids else []
+        reviewer_ids = sorted(this_gitlab.get_user_ids(reviewer_ids.split(","))) if reviewer_ids else []
+        labels = sorted(labels.split(",")) if labels else []
 
-        if reviewer_ids:
-            reviewer_ids = [this_gitlab.get_user_id(user) for user in this_gitlab.get_users(reviewer_ids.split(","))]
+        options = {
+            "target_branch": target_branch,
+            "title": title,
+            "description": description,
+            "labels": labels,
+            "remove_source_branch": remove_source_branch,
+            "reviewer_ids": reviewer_ids,
+            "assignee_ids": assignee_ids,
+        }
 
         if not this_mr:
-            # TODO check docs
-            options = {
-                "source_branch": source_branch,
-                "target_branch": target_branch,
-                "title": title,
-                "description": description,
-                "labels": this_gitlab.sort_labels(labels),
-                "remove_source_branch": remove_source_branch,
-                "reviewer_ids": reviewer_ids,
-                "assignee_ids": assignee_ids,
-            }
+            options["source_branch"] = source_branch
 
             this_gitlab.create_mr(options)
             module.exit_json(changed=True, msg="Created the Merge Request {t} from branch {d} to branch {s}.".format(t=title,d=target_branch,s=source_branch))
         else:
-
-            options = {
-                "target_branch": target_branch,
-                "title": title,
-                "description": description,
-                "labels": this_gitlab.sort_labels(labels),
-                "remove_source_branch": remove_source_branch,
-                "reviewer_ids": reviewer_ids,
-                "assignee_ids": assignee_ids,
-            }
-
-            changed, mr = this_gitlab.update_mr_options(this_mr, options)
-            print("HERE")
-            print(mr)
-            if changed:
-                this_gitlab.update_mr(mr, options)
+            if this_gitlab.mr_has_changed(this_mr, options):
+                this_gitlab.update_mr(this_mr, options)
                 module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} updated.".format(t=title,d=target_branch,s=source_branch))
             else:
                 module.exit_json(changed=False, msg="Merge Request {t} from branch {d} to branch {s} already exist".format(t=title, d=target_branch, s=source_branch))
