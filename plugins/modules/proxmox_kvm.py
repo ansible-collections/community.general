@@ -480,7 +480,7 @@ options:
   timeout:
     description:
       - Timeout for operations.
-      - When used with I(stopped) C(state) the option set a graceful timeout for VM stop after which a VM will be forcefully stopped.
+      - When used with I(stopped) C(state) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
     type: int
     default: 30
   update:
