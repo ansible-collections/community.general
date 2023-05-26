@@ -1,3 +1,3 @@
 ---
 minor_changes:
-  - proxmox_kvm - re-use ``timeout`` module param to forcefully shutdown a virtual machine when ``state`` is ``stopped``. Fixes request (https://github.com/ansible-collections/community.general/issues/6257).
+  - proxmox_kvm - re-use ``timeout`` module param to forcefully shutdown a virtual machine when ``state`` is ``stopped`` (https://github.com/ansible-collections/community.general/issues/6257).
