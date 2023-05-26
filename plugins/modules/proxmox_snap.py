@@ -211,9 +211,8 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
         snapshots = self.snapshot(vm, vmid).get()[:-1]
         if trim > 0 and len(snapshots) > trim:
             # sort by age, oldest first
-            for snap in sorted(snapshots, key= lambda x: x['snaptime'])[:len(snapshots) - trim]:
+            for snap in sorted(snapshots, key=lambda x: x['snaptime'])[:len(snapshots) - trim]:
                 self.snapshot(vm, vmid)(snap['name']).delete()
-
 
     def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate, unbind, trim):
         if self.module.check_mode:
