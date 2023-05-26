@@ -1288,7 +1288,7 @@ def main():
             else:
                 module.exit_json(changed=False, vmid=vmid, msg="VM {0} is already on {1}".format(vmid, node))
         except Exception as e:
-            module.fail_json(vmid=vmid, msg='Unable to migrate VM {0}: {3}'.format(vmid, e))
+            module.fail_json(vmid=vmid, msg='Unable to migrate VM {0} from {1} to {2}: {3}'.format(vmid, vm_node, node, e))
 
     if state == 'present':
         try:
