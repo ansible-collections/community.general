@@ -184,7 +184,7 @@ options:
         version_added: 7.1.0
     renotify_statuses:
         description:
-            - The types of monitor statuses for which re-notification messages are sent. Valid values are alert, warn, no data.
+            - The types of monitor statuses for which re-notification messages are sent.
         choices:
             - alert
             - warn
