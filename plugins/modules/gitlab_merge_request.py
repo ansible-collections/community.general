@@ -12,10 +12,10 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_merge_request
-short_description: Create or delete a branch
+short_description: Create, update or delete a merge requests.
 version_added: 4.2.0
 description:
-  - This module allows to create or delete branches.
+  - This module allows to create, update or merge requests.
 author:
   - paytroff (@paytroff)
 requirements:
@@ -28,14 +28,14 @@ extends_documentation_fragment:
 
 attributes:
   check_mode:
-    support: none
+    support: full
   diff_mode:
     support: none
 
 options:
   state:
     description:
-      - Create or delete branch.
+      - Create or delete merge request.
     default: present
     type: str
     choices: ["present", "absent"]
@@ -44,15 +44,59 @@ options:
       - The path or name of the project.
     required: true
     type: str
-  branch:
+  source_branch:
     description:
-      - The name of the branch that needs to be created.
+      - Merge request's source branch.
+      - Ignored while updating existing merge request.
     required: true
     type: str
-  ref_branch:
+  target_branch:
     description:
-      - Reference branch to create from.
-      - This must be specified if I(state=present).
+      - Merge request's target branch.
+    required: true
+    type: str
+  title:
+    description:
+      - A title for the merge request.
+    type: str
+    required: true
+  description:
+    description:
+      - A description for the merge request.
+      - Gets overriden by a content of file specified at description_path, if found.
+    type: str
+  description_path:
+    description:
+      - A path of file containing merge request's description.
+      - Accepts markdown formatted files.
+    type: str
+  labels:
+    description:
+      - Comma separated list of label names.
+    type: str
+    default: ""
+  remove_source_branch:
+    description:
+      - Flag indicating if a merge request should remove the source branch when merging.
+    type: bool
+    default: false
+  state_filter:
+    description:
+      - Filter specifying state of merge requests while searching.
+      - If empty string, merge requests of all states are searched.
+      - Possible values are "opened", "closed", "locked", "merged" or empty string.
+    type: str
+    choices: ["opened", "closed", "locked", "merged"]
+    default: opened
+  assignee_ids:
+    description:
+      - Comma separated list of assignees usernames omitting "@" character.
+      - Set to empty string to unassign all assignees.
+    type: str
+  reviewer_ids:
+    description:
+      - Comma separated list of reviewers usernames omitting "@" character.
+      - Set to empty string to unassign all reviewers.
     type: str
 '''
 
@@ -80,8 +124,6 @@ EXAMPLES = '''
 RETURN = '''
 '''
 
-import traceback
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.common.text.converters import to_native, to_text
@@ -94,29 +136,28 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 
 class GitlabMergeRequest(object):
 
-    def __init__(self, module, project_path, gitlab_instance):
+    def __init__(self, module, project, gitlab_instance):
         self.repo = gitlab_instance
         self._module = module
-        self.project = self.get_project(project_path)
+        self.project = self.get_project(project)
 
     '''
-    @param project_path Name of the project
+    @param project Name of the project
     '''
-    def get_project(self, project_path):
+    def get_project(self, project):
         try:
-            return self.repo.projects.get(project_path)
+            return self.repo.projects.get(project)
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg="Failed to get the project: %s" % to_native(e))
 
     '''
-   @param branch Name of the branch
-   '''
+    @param branch Name of the branch
+    '''
     def get_branch(self, branch):
         try:
             return self.project.branches.get(branch)
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg="Failed to get the branch: %s" % to_native(e))
-
 
     '''
     @param title Title of the Merge Request
@@ -135,7 +176,7 @@ class GitlabMergeRequest(object):
             self._module.fail_json(msg="Multiple Merge Requests matched search criteria.")
         if len(mrs) == 1:
             try:
-               return self.project.mergerequests.get(id=mrs[0].iid)
+                return self.project.mergerequests.get(id=mrs[0].iid)
             except gitlab.exceptions.GitlabGetError as e:
                 self._module.fail_json(msg="Failed to get the Merge Request: %s" % to_native(e))
 
@@ -157,20 +198,19 @@ class GitlabMergeRequest(object):
     '''
     def create_mr(self, options):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully created the Merge Request %s" % options.title)
+            self._module.exit_json(changed=True, msg="Successfully created the Merge Request %s" % options["title"])
 
         try:
             return self.project.mergerequests.create(options)
         except gitlab.exceptions.GitlabCreateError as e:
             self._module.fail_json(msg="Failed to create Merge Request: %s " % to_native(e))
 
-
     '''
     @param mr Merge Request object to delete
     '''
     def delete_mr(self, mr):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully deleted the Merge Request %s" % mr.title)
+            self._module.exit_json(changed=True, msg="Successfully deleted the Merge Request %s" % mr["title"])
 
         try:
             mr.delete()
@@ -182,7 +222,7 @@ class GitlabMergeRequest(object):
     '''
     def update_mr(self, mr, options):
         if self._module.check_mode:
-            self._module.exit_json(changed=True, msg="Successfully updated the Merge Request %s" % mr.title)
+            self._module.exit_json(changed=True, msg="Successfully updated the Merge Request %s" % mr["title"])
 
         try:
             self.project.mergerequests.update(mr.iid, options)
@@ -218,11 +258,11 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project_path=dict(type='str', required=True),
+        project=dict(type='str', required=True),
         source_branch=dict(type='str', required=True),
         target_branch=dict(type='str', required=True),
         title=dict(type='str', required=True),
-        description=dict(description='str', required=False),
+        description=dict(type='str', required=False),
         labels=dict(type='str', default="", required=False),
         description_path=dict(type='str', required=False),
         remove_source_branch=dict(type='bool', default=False, required=False),
@@ -250,12 +290,13 @@ def main():
         ],
         required_if=[
             ['state', 'present', ['source_branch', 'target_branch', 'title'], True],
+            ['state', 'absent', ['source_branch', 'target_branch', 'title'], True],
         ],
         supports_check_mode=True
     )
     ensure_gitlab_package(module)
 
-    project_path = module.params['project_path']
+    project = module.params['project']
     source_branch = module.params['source_branch']
     target_branch = module.params['target_branch']
     title = module.params['title']
@@ -274,7 +315,7 @@ def main():
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
     gitlab_instance = gitlab_authentication(module)
-    this_gitlab = GitlabMergeRequest(module=module, project_path=project_path, gitlab_instance=gitlab_instance)
+    this_gitlab = GitlabMergeRequest(module=module, project=project, gitlab_instance=gitlab_instance)
 
     r_source_branch = this_gitlab.get_branch(source_branch)
     if not r_source_branch:
@@ -317,16 +358,18 @@ def main():
             options["source_branch"] = source_branch
 
             this_gitlab.create_mr(options)
-            module.exit_json(changed=True, msg="Created the Merge Request {t} from branch {d} to branch {s}.".format(t=title,d=target_branch,s=source_branch))
+            module.exit_json(changed=True, msg="Created the Merge Request {t} from branch {d} to branch {s}.".format(t=title, d=target_branch, s=source_branch))
         else:
             if this_gitlab.mr_has_changed(this_mr, options):
                 this_gitlab.update_mr(this_mr, options)
-                module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} updated.".format(t=title,d=target_branch,s=source_branch))
+                module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} updated.".format(t=title, d=target_branch, s=source_branch))
             else:
-                module.exit_json(changed=False, msg="Merge Request {t} from branch {d} to branch {s} already exist".format(t=title, d=target_branch, s=source_branch))
+                module.exit_json(
+                    changed=False, msg="Merge Request {t} from branch {d} to branch {s} already exist".format(t=title, d=target_branch, s=source_branch)
+                )
     elif this_mr and state == "absent":
         this_gitlab.delete_mr(this_mr)
-        module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} deleted.".format(t=title,d=target_branch,s=source_branch))
+        module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} deleted.".format(t=title, d=target_branch, s=source_branch))
     else:
         module.exit_json(changed=False, msg="No changes are needed.")
 
