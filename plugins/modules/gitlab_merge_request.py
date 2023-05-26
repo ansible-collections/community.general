@@ -225,7 +225,7 @@ class GitlabMergeRequest(object):
             self._module.exit_json(changed=True, msg="Successfully updated the Merge Request %s" % mr["title"])
 
         try:
-            self.project.mergerequests.update(mr.iid, options)
+            return self.project.mergerequests.update(mr.iid, options)
         except gitlab.exceptions.GitlabUpdateError as e:
             self._module.fail_json(msg="Failed to update Merge Request: %s " % to_native(e))
 
@@ -361,17 +361,21 @@ def main():
             module.exit_json(changed=True, msg="Created the Merge Request {t} from branch {d} to branch {s}.".format(t=title, d=target_branch, s=source_branch))
         else:
             if this_gitlab.mr_has_changed(this_mr, options):
-                this_gitlab.update_mr(this_mr, options)
-                module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} updated.".format(t=title, d=target_branch, s=source_branch))
+                mr = this_gitlab.update_mr(this_mr, options)
+                module.exit_json(
+                    changed=True, msg="Merge Request {t} from branch {d} to branch {s} updated.".format(t=title, d=target_branch, s=source_branch),
+                    mr=mr
+                )
             else:
                 module.exit_json(
-                    changed=False, msg="Merge Request {t} from branch {d} to branch {s} already exist".format(t=title, d=target_branch, s=source_branch)
+                    changed=False, msg="Merge Request {t} from branch {d} to branch {s} already exist".format(t=title, d=target_branch, s=source_branch),
+                    mr=this_mr.asdict()
                 )
     elif this_mr and state == "absent":
         this_gitlab.delete_mr(this_mr)
         module.exit_json(changed=True, msg="Merge Request {t} from branch {d} to branch {s} deleted.".format(t=title, d=target_branch, s=source_branch))
     else:
-        module.exit_json(changed=False, msg="No changes are needed.")
+        module.exit_json(changed=False, msg="No changes are needed.", mr=this_mr.asdict())
 
 
 if __name__ == '__main__':
