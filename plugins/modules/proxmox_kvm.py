@@ -497,7 +497,7 @@ options:
           - The TPM version to use.
         type: str
         choices: ['1.2', '2.0']
-        default: 2.0
+        default: '2.0'
     type: dict
     version_added: 7.1.0
   update:
