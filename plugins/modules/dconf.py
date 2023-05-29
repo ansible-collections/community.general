@@ -46,11 +46,11 @@ notes:
   - Keep in mind that the C(dconf) CLI tool, which this module wraps around,
     utilises an unusual syntax for the values (GVariant). For example, if you
     wanted to provide a string value, the correct syntax would be
-    I(value="'myvalue'") - with single quotes as part of the Ansible parameter
+    O(value="'myvalue'") - with single quotes as part of the Ansible parameter
     value.
   - When using loops in combination with a value like
-    "[('xkb', 'us'), ('xkb', 'se')]", you need to be aware of possible
-    type conversions. Applying a filter C({{ item.value | string }})
+    V("[('xkb', 'us'\), ('xkb', 'se'\)]"), you need to be aware of possible
+    type conversions. Applying a filter V({{ item.value | string }})
     to the parameter variable can avoid potential conversion problems.
   - The easiest way to figure out exact syntax/value you need to provide for a
     key is by making the configuration change in application affected by the
@@ -76,7 +76,7 @@ options:
       - Value to set for the specified dconf key. Value should be specified in
         GVariant format. Due to complexity of this format, it is best to have a
         look at existing values in the dconf database.
-      - Required for I(state=present).
+      - Required for O(state=present).
       - Although the type is specified as "raw", it should typically be
         specified as a string. However, boolean values in particular are
         handled properly even when specified as booleans rather than strings
