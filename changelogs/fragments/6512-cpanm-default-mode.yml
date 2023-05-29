@@ -1,0 +1,2 @@
+deprecated_features:
+  - cpanm - value ``compatibility`` is deprecated as default for parameter ``mode`` (https://github.com/ansible-collections/community.general/pull/6512).
