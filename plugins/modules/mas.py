@@ -53,6 +53,8 @@ requirements:
     - macOS 10.11+
     - "mas-cli (U(https://github.com/mas-cli/mas)) 1.5.0+ available as C(mas) in the bin path"
     - The Apple ID to use already needs to be signed in to the Mac App Store (check with C(mas account)).
+    - The feature of "checking if user is signed in" is disabled for anyone using macOS 12.0+.
+    - Users need to sign in via the Mac App Store GUI beforehand for anyone using macOS 12.0+ due to U(https://github.com/mas-cli/mas/issues/417).
 '''
 
 EXAMPLES = '''
@@ -106,6 +108,9 @@ import os
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
+import platform
+NOT_WORKING_MAC_VERSION_MAS_ACCOUNT = '12.0'
+
 
 class Mas(object):
 
@@ -115,6 +120,7 @@ class Mas(object):
         # Initialize data properties
         self.mas_path = self.module.get_bin_path('mas')
         self._checked_signin = False
+        self._mac_version = platform.mac_ver()[0] or '0.0'
         self._installed = None  # Populated only if needed
         self._outdated = None   # Populated only if needed
         self.count_install = 0
@@ -156,14 +162,16 @@ class Mas(object):
 
     def check_signin(self):
         ''' Verifies that the user is signed in to the Mac App Store '''
-
         # Only check this once per execution
         if self._checked_signin:
             return
-
-        rc, out, err = self.run(['account'])
-        if out.split("\n", 1)[0].rstrip() == 'Not signed in':
-            self.module.fail_json(msg='You must be signed in to the Mac App Store')
+        if LooseVersion(self._mac_version) >= LooseVersion(NOT_WORKING_MAC_VERSION_MAS_ACCOUNT):
+            # Checking if user is signed-in is disabled due to https://github.com/mas-cli/mas/issues/417
+            self.module.log('WARNING: You must be signed in via the Mac App Store GUI beforehand else error will occur')
+        else:
+            rc, out, err = self.run(['account'])
+            if out.split("\n", 1)[0].rstrip() == 'Not signed in':
+                self.module.fail_json(msg='You must be signed in to the Mac App Store')
 
         self._checked_signin = True
 
