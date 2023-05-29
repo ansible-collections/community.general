@@ -43,7 +43,7 @@ jobs:
       - name: Perform sanity testing
         uses: felixfontein/ansible-test-gh-action@main
         with:
-          ansible-core-github-repository-slug: felixfontein/ansible
+          ansible-core-github-repository-slug: ${{ contains(fromJson('["2.10", "2.11"]'), matrix.ansible) && 'felixfontein/ansible' || 'ansible/ansible' }}
           ansible-core-version: stable-${{ matrix.ansible }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
@@ -82,7 +82,7 @@ jobs:
           Ansible version ${{ matrix.ansible }}
         uses: felixfontein/ansible-test-gh-action@main
         with:
-          ansible-core-github-repository-slug: felixfontein/ansible
+          ansible-core-github-repository-slug: ${{ contains(fromJson('["2.10", "2.11"]'), matrix.ansible) && 'felixfontein/ansible' || 'ansible/ansible' }}
           ansible-core-version: stable-${{ matrix.ansible }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pre-test-cmd: >-
@@ -172,7 +172,7 @@ jobs:
           under Python ${{ matrix.python }}
         uses: felixfontein/ansible-test-gh-action@main
         with:
-          ansible-core-github-repository-slug: felixfontein/ansible
+          ansible-core-github-repository-slug: ${{ contains(fromJson('["2.10", "2.11"]'), matrix.ansible) && 'felixfontein/ansible' || 'ansible/ansible' }}
           ansible-core-version: stable-${{ matrix.ansible }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           docker-image: ${{ matrix.docker }}
