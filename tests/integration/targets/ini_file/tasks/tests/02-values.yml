@@ -660,7 +660,6 @@
       # comment in section
       var2 = foo
       var2 = foobar
-      # var2 = bar
 
       [section2]
       var3 = ccc
@@ -669,7 +668,7 @@
   assert:
     that:
       - result23 is changed
-      - result23.msg == 'option added'
+      - result23.msg == 'option changed'
       - content23 == expected23
 
 
@@ -714,7 +713,7 @@
   assert:
     that:
       - result24 is changed
-      - result24.msg == 'option changed'
+      - result24.msg == 'option added'
       - content24 == expected24
 
 
