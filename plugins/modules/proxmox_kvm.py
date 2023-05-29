@@ -444,7 +444,7 @@ options:
       - Indicates desired state of the instance.
       - If C(current), the current state of the VM will be fetched. You can access it with C(results.status)
     type: str
-    choices: ['present', 'started', 'absent', 'stopped', 'restarted','current']
+    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current']
     default: present
   storage:
     description:
@@ -480,6 +480,7 @@ options:
   timeout:
     description:
       - Timeout for operations.
+      - When used with I(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
     type: int
     default: 30
   update:
@@ -889,6 +890,9 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
     def wait_for_task(self, node, taskid):
         timeout = self.module.params['timeout']
+        if self.module.params['state'] == 'stopped':
+            # Increase task timeout in case of stopped state to be sure it waits longer than VM stop operation itself
+            timeout += 10
 
         while timeout:
             if self.api_task_ok(node, taskid):
@@ -1058,10 +1062,10 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             return False
         return True
 
-    def stop_vm(self, vm, force):
+    def stop_vm(self, vm, force, timeout):
         vmid = vm['vmid']
         proxmox_node = self.proxmox_api.nodes(vm['node'])
-        taskid = proxmox_node.qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0))
+        taskid = proxmox_node.qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0), timeout=timeout)
         if not self.wait_for_task(vm['node'], taskid):
             self.module.fail_json(msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s' %
                                   proxmox_node.tasks(taskid).log.get()[:1])
@@ -1293,7 +1297,7 @@ def main():
             elif proxmox.get_vmid(name, ignore_missing=True) and not (update or clone):
                 module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
             elif not node:
-                module.fail.json(msg='node is mandatory for creating/updating VM')
+                module.fail_json(msg='node is mandatory for creating/updating VM')
             elif update and not any([vmid, name]):
                 module.fail_json(msg='vmid or name is mandatory for updating VM')
             elif not proxmox.get_node(node):
@@ -1409,7 +1413,7 @@ def main():
             if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
-            if proxmox.stop_vm(vm, force=module.params['force']):
+            if proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout']):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
         except Exception as e:
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
