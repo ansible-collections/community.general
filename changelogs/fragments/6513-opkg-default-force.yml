@@ -1,0 +1,2 @@
+minor_changes:
+  - opkg - remove default value ``""`` for parameter ``force`` as it causes the same behaviour of not having that parameter (https://github.com/ansible-collections/community.general/pull/6513).
