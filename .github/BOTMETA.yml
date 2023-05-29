@@ -333,6 +333,9 @@ files:
   $module_utils/utm_utils.py:
     labels: utm_utils
     maintainers: $team_e_spirit
+  $module_utils/vardict.py:
+    labels: vardict
+    maintainers: russoz
   $module_utils/wdc_redfish_utils.py:
     labels: wdc_redfish_utils
     maintainers: $team_wdc
