@@ -167,6 +167,32 @@ options:
           - Integer from 1 (high) to 5 (low) indicating alert severity.
         type: int
         version_added: 4.6.0
+    notification_preset_name:
+        description:
+          - Toggles the display of additional content sent in the monitor notification.
+        choices:
+            - show_all
+            - hide_query
+            - hide_handles
+            - hide_all
+        type: str
+        version_added: 7.1.0
+    renotify_occurrences:
+        description:
+            - The number of times re-notification messages should be sent on the current status at the provided re-notification interval.
+        type: int
+        version_added: 7.1.0
+    renotify_statuses:
+        description:
+            - The types of monitor statuses for which re-notification messages are sent.
+        choices:
+            - alert
+            - warn
+            - no data
+        type: list
+        elements: str
+        version_added: 7.1.0
+
 '''
 
 EXAMPLES = '''
@@ -175,6 +201,10 @@ EXAMPLES = '''
     type: "metric alert"
     name: "Test monitor"
     state: "present"
+    renotify_interval: 30
+    renotify_occurrences: 1
+    renotify_statuses: ["warn"]
+    notification_preset_name: "show_all"
     query: "datadog.agent.up.over('host:host1').last(2).count_by_status()"
     notification_message: "Host [[host.name]] with IP [[host.ip]] is failing to report to datadog."
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
@@ -254,6 +284,9 @@ def main():
             id=dict(),
             include_tags=dict(required=False, default=True, type='bool'),
             priority=dict(type='int'),
+            notification_preset_name=dict(choices=['show_all', 'hide_query', 'hide_handles', 'hide_all']),
+            renotify_occurrences=dict(type='int'),
+            renotify_statuses=dict(type='list', elements='str', choices=['alert', 'warn', 'no data']),
         )
     )
 
@@ -368,6 +401,9 @@ def install_monitor(module):
         "new_host_delay": module.params['new_host_delay'],
         "evaluation_delay": module.params['evaluation_delay'],
         "include_tags": module.params['include_tags'],
+        "notification_preset_name": module.params['notification_preset_name'],
+        "renotify_occurrences": module.params['renotify_occurrences'],
+        "renotify_statuses": module.params['renotify_statuses'],
     }
 
     if module.params['type'] == "service check":
