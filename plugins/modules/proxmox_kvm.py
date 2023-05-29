@@ -483,6 +483,24 @@ options:
       - When used with I(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
     type: int
     default: 30
+  tpmstate0:
+    description:
+      - A hash/dictionary of options for the Trusted Platform Module disk.
+      - A TPM state disk is required for Windows 11 installations.
+    suboptions:
+      storage:
+        description:
+          - O(tpmstate0.storage) is the storage identifier where to create the disk.
+        type: str
+        required: true
+      version:
+        description:
+          - The TPM version to use.
+        type: str
+        choices: ['1.2', '2.0']
+        default: '2.0'
+    type: dict
+    version_added: 7.1.0
   update:
     description:
       - If C(true), the VM will be updated with new value.
@@ -942,7 +960,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             urlencoded_ssh_keys = quote(kwargs['sshkeys'], safe='')
             kwargs['sshkeys'] = str(urlencoded_ssh_keys)
 
-        # If update, don't update disk (virtio, efidisk0, ide, sata, scsi) and network interface
+        # If update, don't update disk (virtio, efidisk0, tpmstate0, ide, sata, scsi) and network interface
         # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
         if update:
             if 'virtio' in kwargs:
@@ -955,6 +973,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 del kwargs['ide']
             if 'efidisk0' in kwargs:
                 del kwargs['efidisk0']
+            if 'tpmstate0' in kwargs:
+                del kwargs['tpmstate0']
             if 'net' in kwargs:
                 del kwargs['net']
             if 'force' in kwargs:
@@ -981,6 +1001,13 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
+
+        # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        if 'tpmstate0' in kwargs:
+            kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(
+                storage=kwargs['tpmstate0'].get('storage'),
+                version=kwargs['tpmstate0'].get('version')
+            )
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
@@ -1167,6 +1194,11 @@ def main():
         tdf=dict(type='bool'),
         template=dict(type='bool'),
         timeout=dict(type='int', default=30),
+        tpmstate0=dict(type='dict',
+                       options=dict(
+                           storage=dict(type='str', required=True),
+                           version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
+                       )),
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
         vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
@@ -1360,6 +1392,7 @@ def main():
                               target=module.params['target'],
                               tdf=module.params['tdf'],
                               template=module.params['template'],
+                              tpmstate0=module.params['tpmstate0'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
                               virtio=module.params['virtio'],
