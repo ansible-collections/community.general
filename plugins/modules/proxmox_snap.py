@@ -74,10 +74,10 @@ options:
       - Name of the snapshot that has to be created/deleted/restored.
     default: 'ansible_snap'
     type: str
-  trim:
+  retention:
     description:
-      - Trim snapshots if there are more than C(trim) snapshots.
-      - If C(trim) is set to 0, all snapshots will be kept.
+      - remove old snapshots if there are more than C(retention) snapshots.
+      - If C(retention) is set to 0, all snapshots will be kept.
     default: 0
     type: int
     version_added: 7.1.0
@@ -109,7 +109,7 @@ EXAMPLES = r'''
     vmid: 100
     state: present
     snapname: snapshot-42
-    trim: 2
+    retention: 2
 
 - name: Create new snapshot for a container with configured mountpoints
   community.general.proxmox_snap:
@@ -207,15 +207,15 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
-    def snapshot_trim(self, vm, vmid, trim):
+    def snapshot_retention(self, vm, vmid, retention):
         # ignore the last snapshot, which is the current state
         snapshots = self.snapshot(vm, vmid).get()[:-1]
-        if trim > 0 and len(snapshots) > trim:
+        if retention > 0 and len(snapshots) > retention:
             # sort by age, oldest first
-            for snap in sorted(snapshots, key=lambda x: x['snaptime'])[:len(snapshots) - trim]:
+            for snap in sorted(snapshots, key=lambda x: x['snaptime'])[:len(snapshots) - retention]:
                 self.snapshot(vm, vmid)(snap['name']).delete()
 
-    def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate, unbind, trim):
+    def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate, unbind, retention):
         if self.module.check_mode:
             return True
 
@@ -252,7 +252,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
         if vm['type'] == 'lxc' and unbind is True and mountpoints:
             self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
 
-        self.snapshot_trim(vm, vmid, trim)
+        self.snapshot_retention(vm, vmid, retention)
         return timeout > 0
 
     def snapshot_remove(self, vm, vmid, timeout, snapname, force):
@@ -300,7 +300,7 @@ def main():
         force=dict(type='bool', default=False),
         unbind=dict(type='bool', default=False),
         vmstate=dict(type='bool', default=False),
-        trim=dict(type='int', default=0),
+        retention=dict(type='int', default=0),
     )
     module_args.update(snap_args)
 
@@ -320,7 +320,7 @@ def main():
     force = module.params['force']
     unbind = module.params['unbind']
     vmstate = module.params['vmstate']
-    trim = module.params['trim']
+    retention = module.params['retention']
 
     # If hostname is set get the VM id from ProxmoxAPI
     if not vmid and hostname:
@@ -336,7 +336,7 @@ def main():
                 if i['name'] == snapname:
                     module.exit_json(changed=False, msg="Snapshot %s is already present" % snapname)
 
-            if proxmox.snapshot_create(vm, vmid, timeout, snapname, description, vmstate, unbind, trim):
+            if proxmox.snapshot_create(vm, vmid, timeout, snapname, description, vmstate, unbind, retention):
                 if module.check_mode:
                     module.exit_json(changed=False, msg="Snapshot %s would be created" % snapname)
                 else:
