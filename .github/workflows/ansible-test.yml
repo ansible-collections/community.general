@@ -30,6 +30,7 @@ jobs:
       matrix:
         ansible:
           - '2.11'
+          - '2.12'
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
     # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
     # image for these stable branches. The list of branches where this is necessary will
@@ -75,6 +76,10 @@ jobs:
             python: '2.7'
           - ansible: '2.11'
             python: '3.5'
+          - ansible: '2.12'
+            python: '2.6'
+          - ansible: '2.12'
+            python: '3.8'
 
     steps:
       - name: >-
@@ -163,7 +168,49 @@ jobs:
           # - ansible: '2.11'
           #   docker: default
           #   python: '3.5'
-          #   target: azp/generic/2/
+          #   target: azp/generic/1/
+          # 2.12
+          - ansible: '2.12'
+            docker: centos6
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.12'
+            docker: centos6
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.12'
+            docker: centos6
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.12'
+            docker: fedora34
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.12'
+            docker: fedora34
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.12'
+            docker: fedora34
+            python: ''
+            target: azp/posix/3/
+          - ansible: '2.12'
+            docker: ubuntu1804
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.12'
+            docker: ubuntu1804
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.12'
+            docker: ubuntu1804
+            python: ''
+            target: azp/posix/3/
+          # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
+          # - ansible: '2.12'
+          #   docker: default
+          #   python: '3.8'
+          #   target: azp/generic/1/
 
     steps:
       - name: >-
