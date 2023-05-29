@@ -112,19 +112,6 @@ stages:
             - test: 2
             - test: 3
             - test: 4
-  - stage: Sanity_2_12
-    displayName: Sanity 2.12
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Test {0}
-          testFormat: 2.12/sanity/{0}
-          targets:
-            - test: 1
-            - test: 2
-            - test: 3
-            - test: 4
 ### Units
   - stage: Units_devel
     displayName: Units devel
@@ -173,17 +160,6 @@ stages:
           testFormat: 2.13/units/{0}/1
           targets:
             - test: 2.7
-            - test: 3.8
-  - stage: Units_2_12
-    displayName: Units 2.12
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.12/units/{0}/1
-          targets:
-            - test: 2.6
             - test: 3.8
 
 ## Remote
@@ -251,22 +227,6 @@ stages:
               test: macos/12.0
             - name: RHEL 8.5
               test: rhel/8.5
-          groups:
-            - 1
-            - 2
-            - 3
-  - stage: Remote_2_12
-    displayName: Remote 2.12
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.12/{0}
-          targets:
-            - name: macOS 11.1
-              test: macos/11.1
-            - name: RHEL 8.4
-              test: rhel/8.4
             - name: FreeBSD 13.0
               test: freebsd/13.0
           groups:
@@ -343,24 +303,6 @@ stages:
             - 1
             - 2
             - 3
-  - stage: Docker_2_12
-    displayName: Docker 2.12
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          testFormat: 2.12/linux/{0}
-          targets:
-            - name: CentOS 6
-              test: centos6
-            - name: Fedora 34
-              test: fedora34
-            - name: Ubuntu 18.04
-              test: ubuntu1804
-          groups:
-            - 1
-            - 2
-            - 3
 
 ### Community Docker
   - stage: Docker_community_devel
@@ -424,44 +366,29 @@ stages:
           testFormat: 2.13/generic/{0}/1
           targets:
             - test: 3.9
-  - stage: Generic_2_12
-    displayName: Generic 2.12
-    dependsOn: []
-    jobs:
-      - template: templates/matrix.yml
-        parameters:
-          nameFormat: Python {0}
-          testFormat: 2.12/generic/{0}/1
-          targets:
-            - test: 3.8
 
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
       - Sanity_devel
-      - Sanity_2_12
       - Sanity_2_13
       - Sanity_2_14
       - Sanity_2_15
       - Units_devel
-      - Units_2_12
       - Units_2_13
       - Units_2_14
       - Units_2_15
       - Remote_devel
-      - Remote_2_12
       - Remote_2_13
       - Remote_2_14
       - Remote_2_15
       - Docker_devel
-      - Docker_2_12
       - Docker_2_13
       - Docker_2_14
       - Docker_2_15
       - Docker_community_devel
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
 #      - Generic_devel
-#      - Generic_2_12
 #      - Generic_2_13
 #      - Generic_2_14
 #      - Generic_2_15
