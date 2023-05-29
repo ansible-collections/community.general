@@ -531,6 +531,8 @@ files:
     maintainers: paytroff
   $modules/gitlab_project_variable.py:
     maintainers: markuman
+  $modules/gitlab_instance_variable.py:
+    maintainers: benibr
   $modules/gitlab_runner.py:
     maintainers: SamyCoenen
   $modules/gitlab_user.py:
