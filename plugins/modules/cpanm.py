@@ -68,9 +68,9 @@ options:
   mode:
     description:
       - Controls the module behavior. See notes below for more details.
+      - Default is C(compatibility) but that behavior is deprecated and will be changed to C(new) in community.general 9.0.0.
     type: str
     choices: [compatibility, new]
-    default: compatibility
     version_added: 3.0.0
   name_check:
     description:
@@ -158,7 +158,7 @@ class CPANMinus(ModuleHelper):
             mirror_only=dict(type='bool', default=False),
             installdeps=dict(type='bool', default=False),
             executable=dict(type='path'),
-            mode=dict(type='str', choices=['compatibility', 'new'], default='compatibility'),
+            mode=dict(type='str', choices=['compatibility', 'new']),
             name_check=dict(type='str')
         ),
         required_one_of=[('name', 'from_path')],
@@ -176,6 +176,14 @@ class CPANMinus(ModuleHelper):
 
     def __init_module__(self):
         v = self.vars
+        if v.mode is None:
+            self.deprecate(
+                "The default value 'compatibility' for parameter 'mode' is being deprecated "
+                "and it will be replaced by 'new'",
+                version="9.0.0",
+                collection_name="community.general"
+            )
+            v.mode = "compatibility"
         if v.mode == "compatibility":
             if v.name_check:
                 self.do_raise("Parameter name_check can only be used with mode=new")
