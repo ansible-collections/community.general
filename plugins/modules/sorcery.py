@@ -165,6 +165,8 @@ import re
 import shutil
 import sys
 
+from ansible.module_utils.basic import AnsibleModule
+
 
 # auto-filled at module init
 SORCERY = {
@@ -645,9 +647,6 @@ def main():
     if params['name']:
         manage_spells(module)
 
-
-# import module snippets
-from ansible.module_utils.basic import AnsibleModule
 
 if __name__ == '__main__':
     main()
