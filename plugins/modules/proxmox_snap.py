@@ -80,6 +80,7 @@ options:
       - If C(trim) is set to 0, all snapshots will be kept.
     default: 0
     type: int
+    version_added: 7.1.0
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
