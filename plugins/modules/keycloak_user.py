@@ -135,7 +135,7 @@ options:
                 required: true
             temporary:
                 description:
-                    - If true, the users require to reset this credentials at next logon.
+                    - If C(true), the users are required to reset their credentials at next login.
                 type: bool
                 default: false
     required_actions:
