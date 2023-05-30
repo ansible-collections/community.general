@@ -166,4 +166,4 @@ class ProxmoxAnsible(object):
         try:
             return self.proxmox_api.storage.get(type=type)
         except Exception as e:
-            self.module.fail_json(msg="Unagle to retrieve storages information with type %s: %s" % (type, e))
+            self.module.fail_json(msg="Unable to retrieve storages information with type %s: %s" % (type, e))
