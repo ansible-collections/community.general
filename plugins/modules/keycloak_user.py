@@ -256,7 +256,7 @@ EXAMPLES = '''
     state: present
 
 - name: Re-create a User
-    community.general.keycloak_user:
+  community.general.keycloak_user:
     auth_keycloak_url: http://localhost:8080/auth
     auth_username: admin
     auth_password: password
@@ -269,20 +269,20 @@ EXAMPLES = '''
     emailVerified: false
     credentials:
         - type: password
-        value: password
-        temporary: false
+          value: password
+          temporary: false
     attributes:
         - name: attr1
-        values:
+          values:
             - value1
-        state: present
+          state: present
         - name: attr2
-        values:
+          values:
             - value2
-        state: absent
+          state: absent
     groups:
         - name: group1
-        state: present
+          state: present
     state: present
 
 - name: Re-create a User
