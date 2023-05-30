@@ -201,7 +201,7 @@ options:
         type: str
     state:
         description:
-            - Control if the user must exists or not
+            - Control whether the user should exists or not.
         choices: [ "present", "absent" ]
         default: present
         type: str
