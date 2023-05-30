@@ -315,17 +315,24 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
+
+        # Create the span and log attributes
+        attributes = {
+            "ansible.task.module": task_data.action,
+            "ansible.task.message": message,
+            "ansible.task.name": name,
+            "ansible.task.result": rc,
+            "ansible.task.host.name": host_data.name,
+            "ansible.task.host.status": host_data.status
+        }
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
             names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
             values = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.values())
-            self.set_span_attribute(span, ("ansible.task.args.name"), names)
-            self.set_span_attribute(span, ("ansible.task.args.value"), values)
-        self.set_span_attribute(span, "ansible.task.module", task_data.action)
-        self.set_span_attribute(span, "ansible.task.message", message)
-        self.set_span_attribute(span, "ansible.task.name", name)
-        self.set_span_attribute(span, "ansible.task.result", rc)
-        self.set_span_attribute(span, "ansible.task.host.name", host_data.name)
-        self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
+            attributes[("ansible.task.args.name")] = names
+            attributes[("ansible.task.args.value")] = values
+
+        self.set_span_attributes(span, attributes)
+
         # This will allow to enrich the service map
         self.add_attributes_for_service_map_if_possible(span, task_data)
         # Send logs
@@ -333,21 +340,21 @@ class OpenTelemetrySource(object):
             span.add_event(task_data.dump, attributes={"ansible.task.name": name, "ansible.task.host.name": host_data.name})
         span.end(end_time=host_data.finish)
 
-    def set_span_attribute(self, span, attributeName, attributeValue):
-        """ update the span attribute with the given attribute and value if not None """
+    def set_span_attributes(self, span, attributes):
+        """ update the span attributes with the given attributes if not None """
 
         if span is None and self._display is not None:
             self._display.warning('span object is None. Please double check if that is expected.')
         else:
-            if attributeValue is not None:
-                span.set_attribute(attributeName, attributeValue)
+            if attributes is not None:
+                span.set_attributes(attributes)
 
     def add_attributes_for_service_map_if_possible(self, span, task_data):
         """Update the span attributes with the service that the task interacted with, if possible."""
 
         redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
         if redacted_url:
-            self.set_span_attribute(span, "http.url", redacted_url.geturl())
+            span.set_attribute("http.url", redacted_url.geturl())
 
     @staticmethod
     def parse_and_redact_url_if_possible(args):
