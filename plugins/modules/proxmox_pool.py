@@ -27,6 +27,7 @@ options:
       - The pool id.
     type: str
     aliases: [ "name" ]
+    required: true
   state:
     description:
      - Indicate desired state of the pool.

@@ -26,12 +26,14 @@ options:
       - The pool id.
     type: str
     aliases: [ "name" ]
+    required: true
   member:
     description:
       - Specify the member name.
       - For I(type=storage) it is a storage name.
       - For I(type=vm) either vmid or vm name could be used.
     type: str
+    required: true
   type:
     description:
       - Member type to add/remove from the pool.
