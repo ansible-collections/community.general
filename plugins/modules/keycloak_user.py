@@ -125,7 +125,7 @@ options:
         suboptions:
             type:
                 description:
-                    - Credential type
+                    - Credential type.
                 type: str
                 required: true
             value:
