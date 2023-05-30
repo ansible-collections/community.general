@@ -130,7 +130,7 @@ options:
                 required: true
             value:
                 description:
-                    - Value of the credential
+                    - Value of the credential.
                 type: str
                 required: true
             temporary:
