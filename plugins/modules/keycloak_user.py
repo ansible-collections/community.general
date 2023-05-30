@@ -163,7 +163,7 @@ options:
         suboptions:
             name:
                 description:
-                    - Name of the attributes
+                    - Name of the attribute.
                 type: str
             values:
                 description:
