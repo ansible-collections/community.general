@@ -934,7 +934,7 @@ files:
   $modules/pamd.py:
     maintainers: kevensen
   $modules/parted.py:
-    maintainers: ColOfAbRiX rosowiecki jake2184
+    maintainers: ColOfAbRiX jake2184
   $modules/pear.py:
     ignore: jle64
     labels: pear
