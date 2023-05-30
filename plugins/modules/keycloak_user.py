@@ -302,7 +302,7 @@ user:
   returned: on success
   type: dict
 msg:
-  description: Message if it is the case
+  description: Message if it is the case.
   returned: always
   type: str
 changed:
