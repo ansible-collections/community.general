@@ -306,7 +306,7 @@ msg:
   returned: always
   type: str
 changed:
-  description: Return True if the operation changed the client on the keycloak server, false otherwise.
+  description: Return C(true) if the operation changed the client on the keycloak server, C(false) otherwise.
   returned: always
   type: bool
 '''
