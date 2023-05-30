@@ -96,7 +96,7 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
                     return True
             return False
         except Exception as e:
-            self.module.fail_json(msg="Unable to retrieve pools: {}".format(e))
+            self.module.fail_json(msg="Unable to retrieve pools: {0}".format(e))
 
     def is_pool_empty(self, poolid):
         """Check whether pool has members
@@ -114,15 +114,15 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
         :return: None
         """
         if self.is_pool_exists(poolid):
-            self.module.exit_json(changed=False, poolid=poolid, msg="Pool {} already exists".format(poolid))
+            self.module.exit_json(changed=False, poolid=poolid, msg="Pool {0} already exists".format(poolid))
 
         if self.module.check_mode:
-            self.module.exit_json(changed=True, poolid=poolid, msg="Pool {} already exists".format(poolid))
+            self.module.exit_json(changed=True, poolid=poolid, msg="Pool {0} already exists".format(poolid))
 
         try:
             self.proxmox_api.pools.post(poolid=poolid, comment=comment)
         except Exception as e:
-            self.module.fail_json(msg="Failed to create pool with ID {}: {}".format(poolid, e))
+            self.module.fail_json(msg="Failed to create pool with ID {0}: {1}".format(poolid, e))
 
     def delete_pool(self, poolid):
         """Delete Proxmox VE pool
@@ -131,18 +131,18 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
         :return: None
         """
         if not self.is_pool_exists(poolid):
-            self.module.exit_json(changed=False, poolid=poolid, msg="Pool {poolid} doesn't exist".format(poolid))
+            self.module.exit_json(changed=False, poolid=poolid, msg="Pool {0} doesn't exist".format(poolid))
 
         if self.module.check_mode:
-            self.module.exit_json(changed=True, poolid=poolid, msg="Pool {poolid} doesn't exist".format(poolid))
+            self.module.exit_json(changed=True, poolid=poolid, msg="Pool {0} doesn't exist".format(poolid))
 
         if self.is_pool_empty(poolid):
             try:
                 self.proxmox_api.pools(poolid).delete()
             except Exception as e:
-                self.module.fail_json(msg="Failed to delete pool with ID {}: {}".format(poolid, e))
+                self.module.fail_json(msg="Failed to delete pool with ID {0}: {1}".format(poolid, e))
         else:
-            self.module.fail_json(msg="Can't delete pool {} with members. Please remove members from pool first.".format(poolid))
+            self.module.fail_json(msg="Can't delete pool {0} with members. Please remove members from pool first.".format(poolid))
 
 
 def main():
@@ -170,10 +170,10 @@ def main():
 
     if state == "present":
         proxmox.create_pool(poolid, comment)
-        module.exit_json(changed=True, poolid=poolid, msg="Pool {} successfully created".format(poolid))
+        module.exit_json(changed=True, poolid=poolid, msg="Pool {0} successfully created".format(poolid))
     else:
         proxmox.delete_pool(poolid)
-        module.exit_json(changed=True, poolid=poolid, msg="Pool {} successfully deleted".format(poolid))
+        module.exit_json(changed=True, poolid=poolid, msg="Pool {0} successfully deleted".format(poolid))
 
 
 if __name__ == "__main__":
