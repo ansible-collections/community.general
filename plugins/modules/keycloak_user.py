@@ -167,7 +167,7 @@ options:
                 type: str
             values:
                 description:
-                    - Values for the attribute as list
+                    - Values for the attribute as list.
                 type: list
                 elements: str
             state:
