@@ -108,7 +108,7 @@ options:
         suboptions:
             name:
                 description:
-                    - Name of the group
+                    - Name of the group.
                 type: str
             state:
                 description:
