@@ -81,6 +81,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 class ProxmoxPoolAnsible(ProxmoxAnsible):
 
+
     def is_pool_exists(self, poolid):
         """Check whether pool already exist
 
@@ -95,7 +96,6 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
             return False
         except Exception as e:
             self.module.fail_json(msg=f"Unable to retrieve pools: {e}")
-
 
     def is_pool_empty(self, poolid):
         """Check whether pool has members
@@ -143,6 +143,7 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
         else:
             self.module.fail_json(msg=f"Can't delete pool {poolid} with members. Please remove members from pool first.")
 
+
 def main():
     module_args = proxmox_auth_argument_spec()
     pools_args = dict(
@@ -172,6 +173,7 @@ def main():
     else:
         proxmox.delete_pool(poolid)
         module.exit_json(changed=True, poolid=poolid, msg=f"Pool {poolid} successfully deleted")
+
 
 if __name__ == "__main__":
     main()

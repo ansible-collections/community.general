@@ -111,6 +111,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 class ProxmoxPoolMemberAnsible(ProxmoxAnsible):
 
+
     def pool_members(self, poolid):
         vms = []
         storage = []
@@ -227,6 +228,7 @@ def main():
     else:
         diff = proxmox.delete_pool_member(poolid, member, member_type)
         module.exit_json(changed=True, poolid=poolid, member=member, diff=diff, msg=f"Member {member} deleted from the pool {poolid}")
+
 
 if __name__ == "__main__":
     main()
