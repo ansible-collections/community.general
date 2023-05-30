@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2023, Ondrej Zvara (ozvara1@gmail.com)
+# Based on code:
 # Copyright (c) 2021, Lennert Mertens (lennert@nubera.be)
 # Copyright (c) 2021, Werner Dijkerman (ikben@werner-dijkerman.nl)
 # Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
@@ -17,7 +19,7 @@ version_added: 4.2.0
 description:
   - This module allows to create, update or merge requests.
 author:
-  - paytroff (@paytroff)
+  - zvaraondrej (@zvaraondrej)
 requirements:
   - python >= 2.7
   - python-gitlab >= 2.3.0
@@ -102,26 +104,49 @@ options:
 
 
 EXAMPLES = '''
-- name: Create branch branch2 from main
+- name: Create Merge Request from branch1 to branch2
   community.general.gitlab_merge_request:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
-    branch: branch2
-    ref_branch: main
+    source_branch: branch1
+    target_branch: branch2
+    title: "Ansible demo MR"
+    description: "Demo MR description"
+    labels: "Ansible,Demo"
+    state_filter: "opened"
+    remove_source_branch: True
     state: present
 
-- name: Delete branch branch2
+- name: Delete Merge Request from branch1 to branch2
   community.general.gitlab_merge_request:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
-    branch: branch2
+    source_branch: branch1
+    target_branch: branch2
+    title: "Ansible demo MR"
+    state_filter: "opened"
     state: absent
-
 '''
 
-RETURN = '''
+RETURN = r'''
+msg:
+  description: Success or failure message.
+  returned: always
+  type: str
+  sample: "Success"
+
+error:
+  description: API object.
+  returned: failed
+  type: str
+  sample: "400: path is already in use"
+
+mr:
+  description: API object.
+  returned: success
+  type: dict
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -180,6 +205,9 @@ class GitlabMergeRequest(object):
             except gitlab.exceptions.GitlabGetError as e:
                 self._module.fail_json(msg="Failed to get the Merge Request: %s" % to_native(e))
 
+    '''
+    @param username Name of the user
+    '''
     def get_user(self, username):
         try:
             users = self.project.users.list(search=username, all=True)
@@ -190,6 +218,9 @@ class GitlabMergeRequest(object):
             if (user.username == username):
                 return user
 
+    '''
+    @param users List of usernames
+    '''
     def get_user_ids(self, users):
         return [self.get_user(user).id for user in users]
 
@@ -229,6 +260,10 @@ class GitlabMergeRequest(object):
         except gitlab.exceptions.GitlabUpdateError as e:
             self._module.fail_json(msg="Failed to update Merge Request: %s " % to_native(e))
 
+    '''
+    @param mr Merge Request object to evaluate
+    @param options New options to update MR with
+    '''
     def mr_has_changed(self, mr, options):
         for key, value in options.items():
             if value is not None:
@@ -311,7 +346,7 @@ def main():
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
-        module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
+        module.fail_json(msg="community.general.gitlab_merge_request requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
     gitlab_instance = gitlab_authentication(module)
