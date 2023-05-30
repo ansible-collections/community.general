@@ -172,7 +172,7 @@ options:
                 elements: str
             state:
                 description:
-                    - Control if the attribute must exists or not
+                    - Control whether the attribute must exists or not.
                 choices: [ "present", "absent" ]
                 default: present
                 type: str
