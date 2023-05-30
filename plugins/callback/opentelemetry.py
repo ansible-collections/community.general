@@ -337,7 +337,7 @@ class OpenTelemetrySource(object):
         self.add_attributes_for_service_map_if_possible(span, task_data)
         # Send logs
         if not disable_logs:
-            span.add_event(task_data.dump, attributes={"ansible.task.name": name, "ansible.task.host.name": host_data.name})
+            span.add_event(task_data.dump, attributes=attributes)
         span.end(end_time=host_data.finish)
 
     def set_span_attributes(self, span, attributes):
