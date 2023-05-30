@@ -1,2 +1,2 @@
 minor_changes:
-  - opentelemetry - Add span attributes in the span event (https://github.com/ansible-collections/community.general/pull/6531).
+  - opentelemetry callback plugin - add span attributes in the span event (https://github.com/ansible-collections/community.general/pull/6531).
