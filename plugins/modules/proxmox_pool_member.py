@@ -190,7 +190,8 @@ class ProxmoxPoolMemberAnsible(ProxmoxAnsible):
                     vmid = self.get_vmid(member)
 
                 if vmid not in current_vms_members:
-                    self.module.exit_json(changed=False, poolid=poolid, member=member, diff=diff, msg="VM {0} is not part of the pool {1}".format(member, poolid))
+                    self.module.exit_json(changed=False, poolid=poolid, member=member,
+                                          diff=diff, msg="VM {0} is not part of the pool {1}".format(member, poolid))
 
                 all_members_after.remove(member)
                 if self.module.check_mode:
