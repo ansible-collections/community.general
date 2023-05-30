@@ -95,7 +95,7 @@ options:
                     - clientId
             roles:
                 description:
-                    - List of client roles to assign to the user
+                    - List of client roles to assign to the user.
                 type: list
                 required: true
                 elements: str
