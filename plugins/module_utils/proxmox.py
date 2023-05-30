@@ -155,7 +155,7 @@ class ProxmoxAnsible(object):
         try:
             return self.proxmox_api.pools(poolid).get()
         except Exception as e:
-            self.module.fail_json(msg=f"Unable to retrieve pool {poolid} information: {e}")
+            self.module.fail_json(msg="Unable to retrieve pool %s information: %s" % (poolid, e))
 
     def get_storages(self, type):
         """Retrieve storages information
@@ -166,4 +166,4 @@ class ProxmoxAnsible(object):
         try:
             return self.proxmox_api.storage.get(type=type)
         except Exception as e:
-            self.module.fail_json(msg=f"Unagle to retrieve storages information with type {type}: {e}")
+            self.module.fail_json(msg="Unagle to retrieve storages information with type %s: %s" % (type, e))
