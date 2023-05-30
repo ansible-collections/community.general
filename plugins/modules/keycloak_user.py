@@ -112,7 +112,7 @@ options:
                 type: str
             state:
                 description:
-                    - Control if the user must be member of this group or not
+                    - Control whether the user must be member of this group or not.
                 choices: [ "present", "absent" ]
                 default: present
                 type: str
