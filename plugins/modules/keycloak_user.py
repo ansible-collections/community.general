@@ -255,35 +255,35 @@ EXAMPLES = '''
           state: present
     state: present
 
-    - name: Re-create a User
-      community.general.keycloak_user:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_username: admin
-        auth_password: password
-        realm: master
-        username: user1
-        firstName: user1
-        lastName: user1
-        email: user1
-        enabled: true
-        emailVerified: false
-        credentials:
-          - type: password
-            value: password
-            temporary: false
-        attributes:
-          - name: attr1
-            values:
-              - value1
-            state: present
-          - name: attr2
-            values:
-              - value2
-            state: absent
-        groups:
-          - name: group1
-            state: present
+- name: Re-create a User
+    community.general.keycloak_user:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: admin
+    auth_password: password
+    realm: master
+    username: user1
+    firstName: user1
+    lastName: user1
+    email: user1
+    enabled: true
+    emailVerified: false
+    credentials:
+        - type: password
+        value: password
+        temporary: false
+    attributes:
+        - name: attr1
+        values:
+            - value1
         state: present
+        - name: attr2
+        values:
+            - value2
+        state: absent
+    groups:
+        - name: group1
+        state: present
+    state: present
 
 - name: Re-create a User
   community.general.keycloak_user:
