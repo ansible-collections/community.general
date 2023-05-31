@@ -360,10 +360,6 @@ def main():
     if not r_target_branch:
         module.fail_json(msg="Destination branch {b} not exist.".format(b=r_target_branch))
 
-    r_target_branch = this_gitlab.get_branch(target_branch)
-    if not r_target_branch:
-        module.fail_json(msg="Destination branch {b} not exist.".format(b=r_target_branch))
-
     this_mr = this_gitlab.get_mr(title, source_branch, target_branch, state_filter)
 
     if state == "present":
