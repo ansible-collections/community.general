@@ -147,6 +147,11 @@ class _Format(object):
 
     @staticmethod
     def as_default_type(_type, arg="", ignore_none=None):
+        #
+        # DEPRECATION: This method is deprecated and will be removed in community.general 10.0.0
+        #
+        # Instead of using the implicit formats provided here, use the explicit necessary format method.
+        #
         fmt = _Format
         if _type == "dict":
             return fmt.as_func(lambda d: ["--{0}={1}".format(*a) for a in iteritems(d)], ignore_none=ignore_none)
