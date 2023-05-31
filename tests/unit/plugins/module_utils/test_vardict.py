@@ -122,3 +122,12 @@ def test_vardict_change():
     assert vd.has_changed is False
     vd.xx = 12345
     assert vd.has_changed is True
+
+
+def test_vardict_dict():
+    vd = VarDict()
+    vd.set("xx", 123)
+    vd.set("yy", 456)
+    vd.set("zz", 789)
+
+    assert vd.as_dict() == {"xx": 123, "yy": 456, "zz": 789}
