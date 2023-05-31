@@ -83,7 +83,7 @@ DOCUMENTATION = '''
         ini:
           - section: callback_opentelemetry
             key: disable_attributes_in_logs
-        version_added: 6.6.2
+        version_added: 7.1.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
