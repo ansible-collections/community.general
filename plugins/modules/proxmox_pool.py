@@ -13,7 +13,7 @@ module: proxmox_pool
 short_description: Pool management for Proxmox VE cluster
 description:
   - Create or delete a pool for Proxmox VE clusters.
-  - For pool members management please consult proxmox_pool_member module.
+  - For pool members management please consult M(proxmox_pool_member) module.
 version_added: 7.1.0
 author: "Sergei Antipov (@UnderGreen) <greendayonfire@gmail.com>"
 attributes:
@@ -24,21 +24,21 @@ attributes:
 options:
   poolid:
     description:
-      - The pool id.
+      - The pool ID.
     type: str
     aliases: [ "name" ]
     required: true
   state:
     description:
      - Indicate desired state of the pool.
-     - The pool must be empty prior deleting it with I(state=absent).
+     - The pool must be empty prior deleting it with O(state=absent).
     choices: ['present', 'absent']
     default: present
     type: str
   comment:
     description:
       - Specify the description for the pool.
-      - Param is ignored when pool already exists or I(state=absent).
+      - Parameter is ignored when pool already exists or O(state=absent).
     type: str
 
 extends_documentation_fragment:
@@ -66,7 +66,7 @@ EXAMPLES = """
 
 RETURN = """
 poolid:
-  description: The pool id.
+  description: The pool ID.
   returned: success
   type: str
   sample: test

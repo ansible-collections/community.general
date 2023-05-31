@@ -23,15 +23,15 @@ attributes:
 options:
   poolid:
     description:
-      - The pool id.
+      - The pool ID.
     type: str
     aliases: [ "name" ]
     required: true
   member:
     description:
       - Specify the member name.
-      - For I(type=storage) it is a storage name.
-      - For I(type=vm) either vmid or vm name could be used.
+      - For O(type=storage) it is a storage name.
+      - For O(type=vm) either vmid or vm name could be used.
     type: str
     required: true
   type:
@@ -92,7 +92,7 @@ EXAMPLES = """
 
 RETURN = """
 poolid:
-  description: The pool id.
+  description: The pool ID.
   returned: success
   type: str
   sample: test
