@@ -443,7 +443,8 @@ def main():
     #
     if permission and state == 'present':
         kc.update_authz_permission(payload=payload, permission_type=permission_type, id=permission['id'], client_id=cid, realm=realm)
-        result['changed'] = False
+        # Assume that something changed, although we don't know if that is the case.
+        result['changed'] = True
         result['msg'] = 'Notice: unable to check current resources, scopes and policies for permission. \
                          Applying desired state without checking the current state.'
         result['end_state'] = payload

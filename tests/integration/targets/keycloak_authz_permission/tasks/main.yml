@@ -211,7 +211,7 @@
 - name: Assert that scope permission was updated correctly
   assert:
     that:
-      - result.changed == False
+      - result.changed == True
       - result.end_state != {}
       - result.end_state.scopes|length == 2
       - result.end_state.policies == []
@@ -244,7 +244,7 @@
 - name: Assert that nothing changed
   assert:
     that:
-      - result.changed == False
+      - result.changed == True
       - result.end_state != {}
       - result.end_state.scopes|length == 2
       - result.end_state.policies == []
@@ -412,7 +412,7 @@
 - name: Assert that resource permission was updated correctly
   assert:
     that:
-      - result.changed == False
+      - result.changed == True
       - result.end_state != {}
       - result.end_state.policies == []
       - result.end_state.resources|length == 1
