@@ -137,6 +137,12 @@ options:
       - URI of the image for the update.
     type: str
     version_added: '0.2.0'
+  update_image_file:
+    required: false
+    description:
+      - Filename, with optional path, of the image for the update.
+    type: str
+    version_added: '7.1.0'
   update_protocol:
     required: false
     description:
@@ -541,6 +547,26 @@ EXAMPLES = '''
         username: operator
         password: supersecretpwd
 
+  - name: Multipart HTTP push update
+    community.general.redfish_command:
+      category: Update
+      command: MultipartHTTPPushUpdate
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      update_image_file: ~/images/myupdate.img
+
+  - name: Multipart HTTP push with additional options
+    community.general.redfish_command:
+      category: Update
+      command: MultipartHTTPPushUpdate
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      update_image_file: ~/images/myupdate.img
+      update_targets:
+        - /redfish/v1/UpdateService/FirmwareInventory/BMC
+
   - name: Perform requested operations to continue the update
     community.general.redfish_command:
       category: Update
@@ -697,7 +723,7 @@ CATEGORY_COMMANDS_ALL = {
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
                 "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
                 "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
-    "Update": ["SimpleUpdate", "PerformRequestedOperations"],
+    "Update": ["SimpleUpdate", "MultipartHTTPPushUpdate", "PerformRequestedOperations"],
 }
 
 
@@ -726,6 +752,7 @@ def main():
             boot_override_mode=dict(choices=['Legacy', 'UEFI']),
             resource_id=dict(),
             update_image_uri=dict(),
+            update_image_file=dict(),
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
             update_creds=dict(
@@ -791,6 +818,7 @@ def main():
     # update options
     update_opts = {
         'update_image_uri': module.params['update_image_uri'],
+        'update_image_file': module.params['update_image_file'],
         'update_protocol': module.params['update_protocol'],
         'update_targets': module.params['update_targets'],
         'update_creds': module.params['update_creds'],
@@ -938,6 +966,10 @@ def main():
         for command in command_list:
             if command == "SimpleUpdate":
                 result = rf_utils.simple_update(update_opts)
+                if 'update_status' in result:
+                    return_values['update_status'] = result['update_status']
+            elif command == "MultipartHTTPPushUpdate":
+                result = rf_utils.multipath_http_push_update(update_opts)
                 if 'update_status' in result:
                     return_values['update_status'] = result['update_status']
             elif command == "PerformRequestedOperations":

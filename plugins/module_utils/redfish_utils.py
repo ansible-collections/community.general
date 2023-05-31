@@ -7,6 +7,9 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import json
+import os
+import random
+import string
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
@@ -153,7 +156,7 @@ class RedfishUtils(object):
                     'msg': "Failed GET request to '%s': '%s'" % (uri, to_text(e))}
         return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
 
-    def post_request(self, uri, pyld):
+    def post_request(self, uri, pyld, multipart=False):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
@@ -162,7 +165,14 @@ class RedfishUtils(object):
             # header since this can cause conflicts with some services
             if self.sessions_uri is not None and uri == (self.root_uri + self.sessions_uri):
                 basic_auth = False
-            resp = open_url(uri, data=json.dumps(pyld),
+            if multipart:
+                # Multipart requests require special handling to encode the request body
+                multipart_encoder = self._prepare_multipart(pyld)
+                data = multipart_encoder[0]
+                req_headers['content-type'] = multipart_encoder[1]
+            else:
+                data = json.dumps(pyld)
+            resp = open_url(uri, data=data,
                             headers=req_headers, method="POST",
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
@@ -297,6 +307,59 @@ class RedfishUtils(object):
             return {'ret': False,
                     'msg': "Failed DELETE request to '%s': '%s'" % (uri, to_text(e))}
         return {'ret': True, 'resp': resp}
+
+    @staticmethod
+    def _prepare_multipart(fields):
+        """Prepares a multipart body based on a set of fields provided.
+
+        Ideally it would have been good to use the existing 'prepare_multipart'
+        found in ansible.module_utils.urls, but it takes files and encodes them
+        as Base64 strings, which is not expected by Redfish services.  It also
+        adds escaping of certain bytes in the payload, such as inserting '\r'
+        any time it finds a standlone '\n', which corrupts the image payload
+        send to the service.  This implementation is simplified to Redfish's
+        usage and doesn't necessarily represent an exhaustive method of
+        building multipart requests.
+        """
+
+        def write_buffer(body, line):
+            # Adds to the multipart body based on the provided data type
+            # At this time there is only support for strings, dictionaries, and bytes (default)
+            if isinstance(line, str):
+                body.append(bytes(line, 'utf-8'))
+            elif isinstance(line, dict):
+                body.append(bytes(json.dumps(line), 'utf-8'))
+            else:
+                body.append(line)
+            return
+
+        # Generate a random boundary marker; may need to consider probing the
+        # payload for potential conflicts in the future
+        boundary = ''.join(random.choice(string.digits + string.ascii_letters) for i in range(30))
+        body = []
+        for form in fields:
+            # Fill in the form details
+            write_buffer(body, '--' + boundary)
+
+            # Insert the headers (Content-Disposition and Content-Type)
+            if 'filename' in fields[form]:
+                name = os.path.basename(fields[form]['filename']).replace('"', '\\"')
+                write_buffer(body, 'Content-Disposition: form-data; name="{}"; filename="{}"'.format(form, name))
+            else:
+                write_buffer(body, 'Content-Disposition: form-data; name="{}"'.format(form))
+            write_buffer(body, 'Content-Type: {}'.format(fields[form]['mime_type']))
+            write_buffer(body, '')
+
+            # Insert the payload; read from the file if not given by the caller
+            if 'content' not in fields[form]:
+                with open(to_bytes(fields[form]['filename'], errors='surrogate_or_strict'), 'rb') as f:
+                    fields[form]['content'] = f.read()
+            write_buffer(body, fields[form]['content'])
+
+        # Finalize the entire request
+        write_buffer(body, '--' + boundary + '--')
+        write_buffer(body, '')
+        return (b'\r\n'.join(body), 'multipart/form-data; boundary=' + boundary)
 
     @staticmethod
     def _get_extended_message(error):
@@ -1570,6 +1633,51 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True,
                 'msg': "SimpleUpdate requested",
+                'update_status': self._operation_results(response['resp'], response['data'])}
+
+    def multipath_http_push_update(self, update_opts):
+        image_file = update_opts.get('update_image_file')
+        targets = update_opts.get('update_targets')
+        apply_time = update_opts.get('update_apply_time')
+
+        # Ensure the image file is provided
+        if not image_file:
+            return {'ret': False, 'msg':
+                    'Must specify update_image_file for the MultipartHTTPPushUpdate command'}
+        if not os.path.isfile(image_file):
+            return {'ret': False, 'msg':
+                    'Must specify a valid file for the MultipartHTTPPushUpdate command'}
+        try:
+            with open(image_file, 'rb') as f:
+                image_payload = f.read()
+        except:
+            return {'ret': False, 'msg':
+                    'Could not read file {}'.format(image_file)}
+
+        # Check that multipart HTTP push updates are supported
+        response = self.get_request(self.root_uri + self.update_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        if 'MultipartHttpPushUri' not in data:
+            return {'ret': False, 'msg': 'Service does not support MultipartHttpPushUri'}
+        update_uri = data['MultipartHttpPushUri']
+
+        # Assemble the JSON payload portion of the request
+        payload = {"@Redfish.OperationApplyTime": "Immediate"}
+        if targets:
+            payload["Targets"] = targets
+        if apply_time:
+            payload["@Redfish.OperationApplyTime"] = apply_time
+        multipart_payload = {
+            'UpdateParameters': {'content': json.dumps(payload), 'mime_type': 'application/json'},
+            'UpdateFile': {'filename': image_file, 'content': image_payload, 'mime_type': 'application/octet-stream'}
+        }
+        response = self.post_request(self.root_uri + update_uri, multipart_payload, multipart=True)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True,
+                'msg': "MultipartHTTPPushUpdate requested",
                 'update_status': self._operation_results(response['resp'], response['data'])}
 
     def get_update_status(self, update_handle):
