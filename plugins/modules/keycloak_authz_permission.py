@@ -40,7 +40,7 @@ description:
 
 attributes:
     check_mode:
-        support: none
+        support: full
     diff_mode:
         support: none
 
@@ -305,7 +305,7 @@ def main():
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=False,
+                           supports_check_mode=True,
                            required_one_of=(
                                [['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
@@ -442,22 +442,35 @@ def main():
     # The approach taken here is a).
     #
     if permission and state == 'present':
-        kc.update_authz_permission(payload=payload, permission_type=permission_type, id=permission['id'], client_id=cid, realm=realm)
+        if module.check_mode:
+            result['msg'] = 'Notice: unable to check current resources, scopes and policies for permission. \
+                            Would apply desired state without checking the current state.'
+        else:
+            kc.update_authz_permission(payload=payload, permission_type=permission_type, id=permission['id'], client_id=cid, realm=realm)
+            result['msg'] = 'Notice: unable to check current resources, scopes and policies for permission. \
+                            Applying desired state without checking the current state.'
+
         # Assume that something changed, although we don't know if that is the case.
         result['changed'] = True
-        result['msg'] = 'Notice: unable to check current resources, scopes and policies for permission. \
-                         Applying desired state without checking the current state.'
         result['end_state'] = payload
     elif not permission and state == 'present':
-        kc.create_authz_permission(payload=payload, permission_type=permission_type, client_id=cid, realm=realm)
+        if module.check_mode:
+            result['msg'] = 'Would create permission'
+        else:
+            kc.create_authz_permission(payload=payload, permission_type=permission_type, client_id=cid, realm=realm)
+            result['msg'] = 'Permission created'
+
         result['changed'] = True
-        result['msg'] = 'Permission created'
         result['end_state'] = payload
     elif permission and state == 'absent':
-        kc.remove_authz_permission(
-            id=permission['id'], client_id=cid, realm=realm)
+        if module.check_mode:
+            result['msg'] = 'Would remove permission'
+        else:
+            kc.remove_authz_permission(id=permission['id'], client_id=cid, realm=realm)
+            result['msg'] = 'Permission removed'
+
         result['changed'] = True
-        result['msg'] = 'Permission removed'
+
     elif not permission and state == 'absent':
         result['changed'] = False
     else:
