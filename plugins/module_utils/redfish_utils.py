@@ -13,6 +13,7 @@ import string
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlparse
@@ -344,10 +345,10 @@ class RedfishUtils(object):
             # Insert the headers (Content-Disposition and Content-Type)
             if 'filename' in fields[form]:
                 name = os.path.basename(fields[form]['filename']).replace('"', '\\"')
-                write_buffer(body, 'Content-Disposition: form-data; name="{}"; filename="{}"'.format(form, name))
+                write_buffer(body, 'Content-Disposition: form-data; name="%s"; filename="%s"' % (form, name))
             else:
-                write_buffer(body, 'Content-Disposition: form-data; name="{}"'.format(form))
-            write_buffer(body, 'Content-Type: {}'.format(fields[form]['mime_type']))
+                write_buffer(body, 'Content-Disposition: form-data; name="%s"' % form)
+            write_buffer(body, 'Content-Type: %s' % fields[form]['mime_type'])
             write_buffer(body, '')
 
             # Insert the payload; read from the file if not given by the caller
@@ -1650,9 +1651,9 @@ class RedfishUtils(object):
         try:
             with open(image_file, 'rb') as f:
                 image_payload = f.read()
-        except:
+        except Exception as e:
             return {'ret': False, 'msg':
-                    'Could not read file {}'.format(image_file)}
+                    'Could not read file %s' % image_file}
 
         # Check that multipart HTTP push updates are supported
         response = self.get_request(self.root_uri + self.update_uri)

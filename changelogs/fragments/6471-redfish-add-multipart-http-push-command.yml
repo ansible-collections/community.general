@@ -1,3 +1,2 @@
 minor_changes:
   - redfish_command - add ``MultipartHTTPPushUpdate`` command (https://github.com/ansible-collections/community.general/issues/6471)
-
