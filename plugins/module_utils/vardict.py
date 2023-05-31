@@ -173,3 +173,6 @@ class VarDict(object):
     @property
     def has_changed(self):
         return any(True for var in self.__vars__.values() if var.has_changed)
+
+    def as_dict(self):
+        return dict((name, var.value) for name, var in self.__vars__.items())
