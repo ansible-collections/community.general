@@ -73,6 +73,17 @@ DOCUMENTATION = '''
           - section: callback_opentelemetry
             key: disable_logs
         version_added: 5.8.0
+      disable_attributes_in_logs:
+        default: false
+        type: bool
+        description:
+          - Disable populating span attributes to the logs.
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_DISABLE_ATTRIBUTES_IN_LOGS
+        ini:
+          - section: callback_opentelemetry
+            key: disable_attributes_in_logs
+        version_added: 6.6.2
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
@@ -244,7 +255,7 @@ class OpenTelemetrySource(object):
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs):
+    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs, disable_attributes_in_logs):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -280,9 +291,9 @@ class OpenTelemetrySource(object):
             for task in tasks:
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
-                        self.update_span_data(task, host_data, span, disable_logs)
+                        self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
 
-    def update_span_data(self, task_data, host_data, span, disable_logs):
+    def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
         """ update the span with the given TaskData and HostData """
 
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
@@ -337,8 +348,9 @@ class OpenTelemetrySource(object):
         self.add_attributes_for_service_map_if_possible(span, task_data)
         # Send logs
         if not disable_logs:
-            span.add_event(task_data.dump, attributes=attributes)
-        span.end(end_time=host_data.finish)
+            # This will avoid populating span attributes to the logs
+            span.add_event(task_data.dump, attributes={} if disable_attributes_in_logs else attributes)
+            span.end(end_time=host_data.finish)
 
     def set_span_attributes(self, span, attributes):
         """ update the span attributes with the given attributes if not None """
@@ -441,6 +453,7 @@ class CallbackModule(CallbackBase):
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
         self.hide_task_arguments = None
+        self.disable_attributes_in_logs = None
         self.disable_logs = None
         self.otel_service_name = None
         self.ansible_playbook = None
@@ -471,6 +484,8 @@ class CallbackModule(CallbackBase):
                                   "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
+
+        self.disable_attributes_in_logs = self.get_option('disable_attributes_in_logs')
 
         self.disable_logs = self.get_option('disable_logs')
 
@@ -569,7 +584,8 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             status,
             self.traceparent,
-            self.disable_logs
+            self.disable_logs,
+            self.disable_attributes_in_logs
         )
 
     def v2_runner_on_async_failed(self, result, **kwargs):
