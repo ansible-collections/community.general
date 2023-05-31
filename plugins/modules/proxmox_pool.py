@@ -13,7 +13,7 @@ module: proxmox_pool
 short_description: Pool management for Proxmox VE cluster
 description:
   - Create or delete a pool for Proxmox VE clusters.
-  - For pool members management please consult M(proxmox_pool_member) module.
+  - For pool members management please consult M(community.general.proxmox_pool_member) module.
 version_added: 7.1.0
 author: "Sergei Antipov (@UnderGreen) <greendayonfire@gmail.com>"
 attributes:
