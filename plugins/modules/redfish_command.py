@@ -752,7 +752,7 @@ def main():
             boot_override_mode=dict(choices=['Legacy', 'UEFI']),
             resource_id=dict(),
             update_image_uri=dict(),
-            update_image_file=dict(),
+            update_image_file=dict(type='path'),
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
             update_creds=dict(
