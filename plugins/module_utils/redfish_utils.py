@@ -345,7 +345,7 @@ class RedfishUtils(object):
             # Insert the headers (Content-Disposition and Content-Type)
             if 'filename' in fields[form]:
                 name = os.path.basename(fields[form]['filename']).replace('"', '\\"')
-                write_buffer(body, 'Content-Disposition: form-data; name="%s"; filename="%s"' % (form, name))
+                write_buffer(body, u'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_text(form), to_text(name)))
             else:
                 write_buffer(body, 'Content-Disposition: form-data; name="%s"' % form)
             write_buffer(body, 'Content-Type: %s' % fields[form]['mime_type'])
