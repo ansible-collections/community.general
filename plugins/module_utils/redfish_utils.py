@@ -327,7 +327,7 @@ class RedfishUtils(object):
             # Adds to the multipart body based on the provided data type
             # At this time there is only support for strings, dictionaries, and bytes (default)
             if isinstance(line, text_type):
-                body.append(bytes(line, 'utf-8'))
+                body.append(to_bytes(line, encoding='utf-8'))
             elif isinstance(line, dict):
                 body.append(bytes(json.dumps(line), 'utf-8'))
             else:
