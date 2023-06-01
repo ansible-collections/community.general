@@ -141,7 +141,7 @@ options:
     required: false
     description:
       - Filename, with optional path, of the image for the update.
-    type: str
+    type: path
     version_added: '7.1.0'
   update_protocol:
     required: false
