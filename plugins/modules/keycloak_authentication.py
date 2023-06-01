@@ -14,10 +14,11 @@ module: keycloak_authentication
 short_description: Configure authentication in Keycloak
 
 description:
-    - This module actually can only make a copy of an existing authentication flow, add an execution to it and configure it.
-    - It can also delete the flow.
+    - This module supports creation, making a copy, deletion and configuration of an authentication flow.
+    - It can also add or update an authentication execution to a flow (step or sub-flow). Deletion is not supported.
+    - This module also supports registration, update and deletion of an authentication required action.
 
-version_added: "3.3.0"
+version_added: "7.0.0"
 
 attributes:
     check_mode:
@@ -26,78 +27,179 @@ attributes:
         support: full
 
 options:
-    realm:
+    bind_flow:
         description:
-            - The name of the realm in which is the authentication.
-        required: true
+            - Assign the authentication flow to be used by a realm authentication flow.
+        choices: [ "browserFlow", "clientAuthenticationFlow", "directGrantFlow", "dockerAuthenticationFlow", "registrationFlow", "resetCredentialsFlow" ]
         type: str
-    alias:
+    config:
         description:
-            - Alias for the authentication flow.
-        required: true
-        type: str
-    description:
-        description:
-            - Description of the flow.
-        type: str
-    providerId:
-        description:
-            - C(providerId) for the new flow when not copied from an existing flow.
-        type: str
-    copyFrom:
-        description:
-            - C(flowAlias) of the authentication flow to use for the copy.
-        type: str
-    authenticationExecutions:
-        description:
-            - Configuration structure for the executions.
-        type: list
-        elements: dict
+            - Configuration for a configurable authentication flow.
         suboptions:
-            providerId:
+            alias:
                 description:
-                    - C(providerID) for the new flow when not copied from an existing flow.
+                    - Unique name of the configuration.
                 type: str
-            displayName:
+            config:
                 description:
-                    - Name of the execution or subflow to create or update.
+                    - The inner parameters of the configuration specific to the authentication execution.
+                type: dict
+            id:
+                description:
+                    - ID of the configuration used for updating.
                 type: str
-            requirement:
+        type: dict
+    copy_from:
+        description:
+            - Unique name of the authentication flow to copy from.
+        type: str
+    execution:
+        description:
+            - Authentication execution (step or sub-flow) of the authentication flow.
+        suboptions:
+            alias:
                 description:
-                    - Control status of the subflow or execution.
-                choices: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
-                type: str
-            flowAlias:
-                description:
-                    - Alias of parent flow.
+                    - Name of the authentication execution taken from its configuration.
                 type: str
             authenticationConfig:
                 description:
-                    - Describe the config of the authentication.
-                type: dict
+                    - ID of the authentication execution's configuration.
+                type: str
+            authenticationFlow:
+                description:
+                    - Indicates, if the authentication execution is a step (false) or a sub-flow (true).
+                required: true
+                type: bool
+            configurable:
+                description:
+                    - Indicates, if the authentication execution is configurable (depends on the provider).
+                type: bool
+            description:
+                description:
+                    - Description of the authentication execution.
+                type: str
+            displayName:
+                description:
+                    - Display name of the authentication execution.
+                type: str
+            flowId:
+                description:
+                    - ID of the authentication execution sub-flow.
+                type: str
+            id:
+                description:
+                    - ID of the authentication execution (step or sub-flow).
+                type: str
             index:
                 description:
-                    - Priority order of the execution.
+                    - The priortiy of an inner authentication execution of its outer authentication execution.
                 type: int
-            subFlowType:
+            level:
                 description:
-                    - For new subflows, optionally specify the type.
-                    - Is only used at creation.
-                choices: ["basic-flow", "form-flow"]
-                default: "basic-flow"
+                    - The priority of the authentication execution in the authentication flow.
+                type: int
+            providerId:
+                description:
+                    - ID (specific name) of the provider.
                 type: str
-                version_added: 6.6.0
-    state:
+            requirement:
+                choices: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
+                default: "DISABLED"
+                description:
+                    - Indicates the requirement of the authentication flow.
+                type: str
+            requirementChoices:
+                elements: str
+                default: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
+                description:
+                    - A list of requirement choices of the authentication execution.
+                type: list
+            flowType:
+                choices: [ "basic-flow", "client-flow" ]
+                default: "basic-flow"
+                description:
+                    - Indicates the flow type of the authentication execution (sub-flow).
+                type: str
+        type: dict
+    flow:
         description:
-            - Control if the authentication flow must exists or not.
-        choices: [ "present", "absent" ]
-        default: present
+            - Authentication flow.
+        suboptions:
+            alias:
+                description:
+                    - Unique name of the authentication flow.
+                required: true
+                type: str
+            builtIn:
+                default: false
+                description:
+                    - Indicates, if the authentication is built-in or not.
+                type: bool
+            description:
+                description:
+                    - Description of the authentication flow.
+                type: str
+            id:
+                description:
+                    - ID of the authentication flow.
+                type: str
+            providerId:
+                choices: [ "basic-flow", "client-flow" ]
+                default: "basic-flow"
+                description:
+                    - Indicates, if the authentication flow is a basic or a client flow.
+                type: str
+            topLevel:
+                default: true
+                description:
+                    - Indicates, if the authentication flow is top-level or not.
+                type: bool
+        type: dict
+    realm:
+        description:
+            - Name of the realm, to which the authentication is modified using this module.
+        required: true
         type: str
-    force:
-        type: bool
-        default: false
+    required_action:
+        suboptions:
+            alias:
+                description:
+                    - Unique name of the required action.
+                required: true
+                type: str
+            config:
+                description:
+                    - Configuration for the required action.
+                type: dict
+            defaultAction:
+                default: false
+                description:
+                    - Indicates, if any new user will have the required action assigned to it.
+                type: bool
+            enabled:
+                default: false
+                description:
+                    - Indicates, if the required action is enabled or not.
+                type: bool
+            name:
+                description:
+                    - Displayed name of the required action.
+                type: str
+            priority:
+                description:
+                    - Priority of the required action.
+                type: int
+            providerId:
+                description:
+                    - Provider ID of the required action.
+                type: str
+        type: dict
+    state:
+        choices: [ "absent", "present" ]
         description:
-            - If C(true), allows to remove the authentication flow and recreate it.
+            - Control if the realm authentication is going to be updated (creation/update) or deleted.
+        required: true
+        type: str
 
 extends_documentation_fragment:
     - community.general.keycloak
@@ -109,77 +211,116 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create an authentication flow from first broker login and add an execution to it.
+    - name: Create an authentication flow and add an configurable authentication execution step with a configuration to it, and add assign it to a realm authentication flow.
       community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        copyFrom: "first broker login"
-        authenticationExecutions:
-          - providerId: "test-execution1"
-            requirement: "REQUIRED"
-            authenticationConfig:
-              alias: "test.execution1.property"
-              config:
-                test1.property: "value"
-          - providerId: "test-execution2"
-            requirement: "REQUIRED"
-            authenticationConfig:
-              alias: "test.execution2.property"
-              config:
-                test2.property: "value"
-        state: present
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        bind_flow: "resetCredentialsFlow"
+        config:
+          alias: "Require OTP for password reset"
+          config:
+            defaultOtpOutcome: "force"
+            otpControlAttribute: "force"
+        execution:
+          authenticationFlow: False
+          displayName: "Conditional OTP Form"
+          providerId: "auth-conditional-otp-form"
+          requirement: "REQUIRED"
+        flow:
+          alias: "test_flow"
+          description: "This is a test flow."
+        realm: "master"
+        state: "present"
 
-    - name: Re-create the authentication flow
+    - name: Add an authentication execution sub-flow to the newly created authentication flow.
       community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        copyFrom: "first broker login"
-        authenticationExecutions:
-          - providerId: "test-provisioning"
-            requirement: "REQUIRED"
-            authenticationConfig:
-              alias: "test.provisioning.property"
-              config:
-                test.provisioning.property: "value"
-        state: present
-        force: true
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        execution:
+          alias: "test_sub_flow"
+          authenticationFlow: True
+          description: "This is a test sub-flow."
+          providerId: "registration-page-form"
+          type: "basic-flow"
+        flow:
+          alias: "test_flow"
+        realm: "master"
+        state: "present"
 
-    - name: Create an authentication flow with subflow containing an execution.
+    - name: Add an authentication execution step to the newly created authentication execution sub-flow.
       community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        copyFrom: "first broker login"
-        authenticationExecutions:
-          - providerId: "test-execution1"
-            requirement: "REQUIRED"
-          - displayName: "New Subflow"
-            requirement: "REQUIRED"
-          - providerId: "auth-cookie"
-            requirement: "REQUIRED"
-            flowAlias: "New Sublow"
-        state: present
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        execution:
+          authenticationFlow: False
+          providerId: "reset-credentials-choose-user"
+          requirement: "REQUIRED"
+        flow:
+          alias: "test_sub_flow"
+        realm: "master"
+        state: "present"
 
-    - name: Remove authentication.
+    - name: Delete the authentication flow.
       community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        state: absent
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        flow:
+          alias: "test_flow"
+        realm: "master"
+        state: "absent"
+
+    - name: Register a new required action.
+      community.general.keycloak_authentication:
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        realm: "master"
+        require_action:
+          alias: "test_required_action"
+          name: "Test Required Action"
+          enabled: true
+          defaultAction: false
+          priority: 999
+        state: "present"
+
+    - name: Update the newly registered required action.
+      community.general.keycloak_authentication:
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        realm: "master"
+        require_action:
+          alias: "test_flow"
+          priority: 111
+        state: "present"
+
+    - name: Delete the updated registered required action.
+      community.general.keycloak_authentication:
+        auth_client_id: "admin-cli"
+        auth_keycloak_url: "http://localhost:8080"
+        auth_password: "password"
+        auth_realm: "master"
+        auth_username: "admin"
+        realm: "master"
+        require_action:
+          alias: "test_required_action"
+        state: "absent" 
 '''
 
 RETURN = '''
@@ -225,101 +366,6 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
-def find_exec_in_executions(searched_exec, executions):
-    """
-    Search if exec is contained in the executions.
-    :param searched_exec: Execution to search for.
-    :param executions: List of executions.
-    :return: Index of the execution, -1 if not found..
-    """
-    for i, existing_exec in enumerate(executions, start=0):
-        if ("providerId" in existing_exec and "providerId" in searched_exec and
-                existing_exec["providerId"] == searched_exec["providerId"] or
-                "displayName" in existing_exec and "displayName" in searched_exec and
-                existing_exec["displayName"] == searched_exec["displayName"]):
-            return i
-    return -1
-
-
-def create_or_update_executions(kc, config, realm='master'):
-    """
-    Create or update executions for an authentication flow.
-    :param kc: Keycloak API access.
-    :param config: Representation of the authentication flow including it's executions.
-    :param realm: Realm
-    :return: tuple (changed, dict(before, after)
-        WHERE
-        bool changed indicates if changes have been made
-        dict(str, str) shows state before and after creation/update
-    """
-    try:
-        changed = False
-        after = ""
-        before = ""
-        if "authenticationExecutions" in config:
-            # Get existing executions on the Keycloak server for this alias
-            existing_executions = kc.get_executions_representation(config, realm=realm)
-            for new_exec_index, new_exec in enumerate(config["authenticationExecutions"], start=0):
-                if new_exec["index"] is not None:
-                    new_exec_index = new_exec["index"]
-                exec_found = False
-                # Get flowalias parent if given
-                if new_exec["flowAlias"] is not None:
-                    flow_alias_parent = new_exec["flowAlias"]
-                else:
-                    flow_alias_parent = config["alias"]
-                # Check if same providerId or displayName name between existing and new execution
-                exec_index = find_exec_in_executions(new_exec, existing_executions)
-                if exec_index != -1:
-                    # Remove key that doesn't need to be compared with existing_exec
-                    exclude_key = ["flowAlias", "subFlowType"]
-                    for index_key, key in enumerate(new_exec, start=0):
-                        if new_exec[key] is None:
-                            exclude_key.append(key)
-                    # Compare the executions to see if it need changes
-                    if not is_struct_included(new_exec, existing_executions[exec_index], exclude_key) or exec_index != new_exec_index:
-                        exec_found = True
-                        before += str(existing_executions[exec_index]) + '\n'
-                    id_to_update = existing_executions[exec_index]["id"]
-                    # Remove exec from list in case 2 exec with same name
-                    existing_executions[exec_index].clear()
-                elif new_exec["providerId"] is not None:
-                    kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
-                    exec_found = True
-                    exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
-                    after += str(new_exec) + '\n'
-                elif new_exec["displayName"] is not None:
-                    kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec["subFlowType"])
-                    exec_found = True
-                    exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
-                    after += str(new_exec) + '\n'
-                if exec_found:
-                    changed = True
-                    if exec_index != -1:
-                        # Update the existing execution
-                        updated_exec = {
-                            "id": id_to_update
-                        }
-                        # add the execution configuration
-                        if new_exec["authenticationConfig"] is not None:
-                            kc.add_authenticationConfig_to_execution(updated_exec["id"], new_exec["authenticationConfig"], realm=realm)
-                        for key in new_exec:
-                            # remove unwanted key for the next API call
-                            if key not in ("flowAlias", "authenticationConfig", "subFlowType"):
-                                updated_exec[key] = new_exec[key]
-                        if new_exec["requirement"] is not None:
-                            kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
-                        diff = exec_index - new_exec_index
-                        kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
-                        after += str(kc.get_executions_representation(config, realm=realm)[new_exec_index]) + '\n'
-        return changed, dict(before=before, after=after)
-    except Exception as e:
-        kc.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s'
-                            % (config["alias"], realm, str(e)))
-
-
 def main():
     """
     Module execution
@@ -329,34 +375,109 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
+        bind_flow=dict(
+            type='str',
+            choices=[
+                "browserFlow",
+                "clientAuthenticationFlow",
+                "directGrantFlow",
+                "dockerAuthenticationFlow",
+                "registrationFlow",
+                "resetCredentialsFlow",
+            ]
+        ),
+        config=dict(
+            type='dict',
+            options=dict(
+                alias=dict(type='str'),
+                config=dict(type='dict'),
+                id=dict(type='str')
+            )
+        ),
+        copy_from=dict(type='str'),
+        execution=dict(
+            type='dict',
+            options=dict(
+                alias=dict(type='str'),
+                authenticationConfig=dict(type='str'),
+                authenticationFlow=dict(type='bool', required=True),
+                configurable=dict(type='bool'),
+                description=dict(type='str'),
+                displayName=dict(type='str'),
+                flowId=dict(type='str'),
+                id=dict(type='str'),
+                index=dict(type='int'),
+                level=dict(type='int'),
+                providerId=dict(type='str', required=True),
+                requirement=dict(
+                    type='str',
+                    default='DISABLED',
+                    choices=[
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                        "CONDITIONAL"
+                    ]
+                ),
+                requirementChoices=dict(type="str"),
+                flowType=dict(
+                    type='str',
+                    default='basic-flow',
+                    choices=[
+                        "basic-flow",
+                        "client-flow",
+                    ]
+                ),
+            )
+        ),
+        flow=dict(
+            type='dict',
+            options=dict(
+                alias=dict(type='str', required=True),
+                builtIn=dict(type='bool', default=False),
+                description=dict(type='str'),
+                id=dict(type='str'),
+                providerId=dict(
+                    type='str',
+                    default='basic-flow',
+                    choices=[
+                        'basic-flow',
+                        'client-flow',
+                    ]
+                ),
+                topLevel=dict(type='bool', default=True)
+            )
+        ),
         realm=dict(type='str', required=True),
-        alias=dict(type='str', required=True),
-        providerId=dict(type='str'),
-        description=dict(type='str'),
-        copyFrom=dict(type='str'),
-        authenticationExecutions=dict(type='list', elements='dict',
-                                      options=dict(
-                                          providerId=dict(type='str'),
-                                          displayName=dict(type='str'),
-                                          requirement=dict(choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"], type='str'),
-                                          flowAlias=dict(type='str'),
-                                          authenticationConfig=dict(type='dict'),
-                                          index=dict(type='int'),
-                                          subFlowType=dict(choices=["basic-flow", "form-flow"], default='basic-flow', type='str'),
-                                      )),
-        state=dict(choices=["absent", "present"], default='present'),
-        force=dict(type='bool', default=False),
+        required_action=dict(
+            type='dict',
+            options=dict(
+                alias=dict(type='str', required=True),
+                config=dict(type='dict'),
+                defaultAction=dict(type='bool', default=False),
+                enabled=dict(type='bool', default=False),
+                name=dict(type='str'),
+                priority=dict(type='int'),
+                providerId=dict(type='str')
+            )
+        ),
+        state=dict(
+            type='str',
+            choices=['absent', 'present'],
+            required=True
+        ),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']])
-                           )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
+        required_together=([['auth_realm', 'auth_username', 'auth_password']])
+    )
 
-    result = dict(changed=False, msg='', flow={})
+    result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
 
     # Obtain access token, initialize API
     try:
@@ -366,116 +487,486 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
+    # Convenience variables
+    bind_flow = module.params.get('bind_flow')
+    desired_config = module.params.get('config')
+    copy_from = module.params.get('copy_from')
+    desired_execution = module.params.get('execution')
+    desired_flow = module.params.get('flow')
+    desired_required_action = module.params.get('required_action')
     realm = module.params.get('realm')
     state = module.params.get('state')
-    force = module.params.get('force')
 
-    new_auth_repr = {
-        "alias": module.params.get("alias"),
-        "copyFrom": module.params.get("copyFrom"),
-        "providerId": module.params.get("providerId"),
-        "authenticationExecutions": module.params.get("authenticationExecutions"),
-        "description": module.params.get("description"),
-        "builtIn": module.params.get("builtIn"),
-        "subflow": module.params.get("subflow"),
-    }
+    # Delete unused parameters
+    dicts = [desired_execution, desired_flow, desired_required_action]
+    for d in dicts:
+        if d is not None:
+            for k in list(d.keys()):
+                if d[k] is None:
+                    del d[k]
 
-    auth_repr = kc.get_authentication_flow_by_alias(alias=new_auth_repr["alias"], realm=realm)
+    if state == 'present':
+        # Handle authentication flow
+        if desired_flow:
+            # Get authentication flow
+            before_flow = kc.get_authentication_flow_by_alias(
+                alias=desired_flow['alias'],
+                realm=realm
+            )
 
-    # Cater for when it doesn't exist (an empty dict)
-    if not auth_repr:
-        if state == 'absent':
-            # Do nothing and exit
-            if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = new_auth_repr["alias"] + ' absent'
-            module.exit_json(**result)
+            if before_flow:
+                # Get authentication executions
+                before_executions = kc.get_authentication_executions(
+                    alias=desired_flow['alias'],
+                    realm=realm
+                )
+            else:
+                before_executions = []
 
-        elif state == 'present':
-            # Process a creation
-            result['changed'] = True
+            # Update
+            if before_flow:
+                # Fill in parameters
+                for k, v in before_flow.items():
+                    if k not in desired_flow or desired_flow[k] is None:
+                        desired_flow[k] = v
+                
+                # Differences found
+                if desired_flow != before_flow:
+                    if not module.check_mode:
+                        kc.update_authentication_flow(
+                            realm=realm,
+                            id=desired_flow['id'],
+                            flow=desired_flow
+                        )
 
-            if module._diff:
-                result['diff'] = dict(before='', after=new_auth_repr)
+                        desired_flow = kc.get_authentication_flow_by_alias(
+                            alias=desired_flow['alias'],
+                            realm=realm
+                        )
 
-            if module.check_mode:
-                module.exit_json(**result)
+                    if module._diff:
+                        result['diff']['before']["flow"] = before_flow,
+                        result['diff']['after']["flow"] = desired_flow
 
-            # If copyFrom is defined, create authentication flow from a copy
-            if "copyFrom" in new_auth_repr and new_auth_repr["copyFrom"] is not None:
-                auth_repr = kc.copy_auth_flow(config=new_auth_repr, realm=realm)
-            else:  # Create an empty authentication flow
-                auth_repr = kc.create_empty_auth_flow(config=new_auth_repr, realm=realm)
+                    result['changed'] = True
+                    result['end_state']["flow"] = desired_flow
+            # Create
+            else:
+                # Create from a copy
+                if copy_from:
+                    if not module.check_mode:
+                        kc.copy_authentication_flow(
+                            alias=copy_from,
+                            name=desired_flow['alias'],
+                            realm=realm
+                        )
+                else:
+                    if not module.check_mode:
+                        kc.create_authentication_flow(
+                            flow=desired_flow,
+                            realm=realm
+                        )
+                    
+                    desired_flow = kc.get_authentication_flow_by_alias(
+                        alias=desired_flow['alias'],
+                        realm=realm
+                    )
 
-            # If the authentication still not exist on the server, raise an exception.
-            if auth_repr is None:
-                result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
-                module.fail_json(**result)
-
-            # Configure the executions for the flow
-            create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
-
-            # Get executions created
-            exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
-            if exec_repr is not None:
-                auth_repr["authenticationExecutions"] = exec_repr
-            result['end_state'] = auth_repr
-
-    else:
-        if state == 'present':
-            # Process an update
-
-            if force:  # If force option is true
-                # Delete the actual authentication flow
-                result['changed'] = True
                 if module._diff:
-                    result['diff'] = dict(before=auth_repr, after=new_auth_repr)
-                if module.check_mode:
-                    module.exit_json(**result)
-                kc.delete_authentication_flow_by_id(id=auth_repr["id"], realm=realm)
-                # If copyFrom is defined, create authentication flow from a copy
-                if "copyFrom" in new_auth_repr and new_auth_repr["copyFrom"] is not None:
-                    auth_repr = kc.copy_auth_flow(config=new_auth_repr, realm=realm)
-                else:  # Create an empty authentication flow
-                    auth_repr = kc.create_empty_auth_flow(config=new_auth_repr, realm=realm)
-                # If the authentication still not exist on the server, raise an exception.
-                if auth_repr is None:
-                    result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
-                    module.fail_json(**result)
-            # Configure the executions for the flow
+                    result['diff']['before']['flow'] = {}
+                    result['diff']['after']['flow'] = desired_flow
+                
+                result['changed'] = True
+                result['end_state']['flow'] = desired_flow
+            
+            # Bind flow
+            if bind_flow:
+                # Get realm info
+                realm_info =  kc.get_realm_info_by_id(
+                    realm=realm
+                )
 
-            if module.check_mode:
-                module.exit_json(**result)
-            changed, diff = create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
-            result['changed'] |= changed
+                # Not assigned yet
+                if (
+                    (bind_flow in realm_info and realm_info[bind_flow] != desired_flow['alias']) or
+                    bind_flow not in realm_info
+                ):
+                    if not module.check_mode:
+                        kc.update_realm(
+                            realmrep={
+                                bind_flow: desired_flow['alias']
+                            },
+                            realm=realm
+                        )
+                    
+                        if module._diff:
+                            result['diff']['before']['bind_flow'] = {
+                                bind_flow: realm_info[bind_flow]
+                            }
+                            result['diff']['after']['bind_flow'] = {
+                                bind_flow: desired_flow['alias']
+                            }
 
-            if module._diff:
-                result['diff'] = diff
+                    result['changed'] = True
+                    result['end_state']['bind_flow'] = {
+                        bind_flow: desired_flow['alias']
+                    }
 
-            # Get executions created
-            exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
-            if exec_repr is not None:
-                auth_repr["authenticationExecutions"] = exec_repr
-            result['end_state'] = auth_repr
+            # Handle authentication execution (step and sub-flow)
+            if desired_execution:
+                # Try to find closest match
+                found_match = False
+                if before_executions:
+                    # Search using ID or flow ID
+                    for before_execution in before_executions:
+                        if (
+                            'id' in desired_execution and 'id' in before_execution and
+                            desired_execution['id'] == before_execution['id']
+                        ) or (
+                            'flowId' in desired_execution and 'flowId' in before_execution and
+                            desired_execution['flowId'] == before_execution['flowId']
+                        ):
+                            found_match = True
+                            break
+                    
+                    if not found_match:
+                        # Search using index and level
+                        for before_execution in before_executions:
+                            if (
+                                'index' in desired_execution and 'index' in before_execution and
+                                'level' in desired_execution and 'level' in before_execution and
+                                desired_execution['index'] == before_execution['index'] and
+                                desired_execution['level'] == before_execution['level']
+                            ):
+                                found_match = True
+                                break
 
+                    if not found_match:
+                        # Search using displayName
+                        for before_execution in before_executions:
+                            if (
+                                'displayName' in desired_execution and 'displayName' in before_execution and
+                                desired_execution['displayName'] == before_execution['displayName']
+                            ):
+                                found_match = True
+                                break
+
+                    # Update
+                    if found_match:
+                        # Sanitize authentication execution step (authenticationFlow not needed during update)
+                        del desired_execution['authenticationFlow']
+
+                        # Fill in parameters
+                        for k, v in before_execution.items():
+                            if k not in desired_execution or desired_execution[k] is None:
+                                desired_execution[k] = v
+                            
+                        # Sanitize
+                        del desired_execution['flowType']
+                        
+                        # Differences found
+                        if desired_execution != before_execution:
+                            if not module.check_mode:
+                                kc.update_authentication_execution(
+                                    alias=desired_flow['alias'],
+                                    rep=desired_execution,
+                                    realm=realm
+                                )
+
+                                # Handle priority (index) increase/decrease
+                                if before_execution['index'] - desired_execution['index'] != 0:
+                                    kc.change_execution_priority(
+                                        executionId=desired_execution['id'],
+                                        diff=before_execution['index'] - desired_execution['index'],
+                                        realm=realm
+                                    )
+                            
+                            if module._diff:
+                                result['diff']['before']['execution'] = before_execution
+                                        
+                            result['changed'] = True
+
+                # Create (also not found)
+                if found_match is False:
+                    if not module.check_mode:
+                        # Sub-Flow
+                        if desired_execution['authenticationFlow']:
+                            data = {}
+                            if 'alias' in desired_execution:
+                                data['alias'] = desired_execution['alias']
+                            else:
+                                data['alias'] = desired_execution['displayName']
+                            data['provider'] = 'registration-page-form'
+                            data['type'] = desired_execution['flowType']
+                            kc.create_authentication_execution_subflow(
+                                alias=desired_flow['alias'],
+                                data=data,
+                                realm=realm
+                            )
+
+                            # Find the newly create authentication execution
+                            before_executions = kc.get_authentication_executions(
+                                alias=desired_flow['alias'],
+                                realm=realm
+                            )
+
+                            for index, before_execution in enumerate(before_executions):
+                                parentFound = False
+
+                                # Looking for parent flow (sub-flow)
+                                if (
+                                    'authenticationFlow' in before_execution and before_execution['authenticationFlow'] and
+                                    before_execution['displayName'] == desired_flow['alias']
+                                ):
+                                    parentFound = True
+                                    parentLevel = before_execution['level']
+                                
+                                if parentFound:
+                                    # Level difference found
+                                    if before_execution == parentLevel:
+                                        # Get the previous one
+                                        before_execution = before_executions[index]
+                                        break
+                        # Step
+                        else:
+                            data = {}
+                            data['provider'] = desired_execution['providerId']
+                            kc.create_authentication_execution_step(
+                                alias=desired_flow['alias'],
+                                data=data,
+                                realm=realm
+                            )
+
+                            # Get the newly created authentication execution step
+                            before_execution = kc.get_authentication_executions(
+                                alias=desired_flow['alias'],
+                                realm=realm
+                            )[-1]
+
+                        # Sanitize
+                        del desired_execution['flowType']
+                        del desired_execution['authenticationFlow']
+
+                        # Fill in parameters
+                        for k, v in before_execution.items():
+                            if k not in desired_execution or desired_execution[k] is None:
+                                desired_execution[k] = v
+                        
+                        kc.update_authentication_execution(
+                            alias=desired_flow['alias'],
+                            rep=desired_execution,
+                            realm=realm
+                        )
+
+                        # Handle priority (index) increase/decrease
+                        if before_execution['index'] - desired_execution['index'] != 0:
+                            kc.change_execution_priority(
+                                executionId=desired_execution['id'],
+                                diff=before_execution['index'] - desired_execution['index'],
+                                realm=realm
+                            )
+                    
+                    if module._diff:
+                        result['diff']['before']['execution'] = {},
+                
+                    result['changed'] = True
+                    
+                # Handle authentication execution configuration (only if configurable)
+                if desired_config and 'configurable' in desired_execution and desired_execution['configurable']:
+                    # Update
+                    if 'authenticationConfig' in desired_execution and desired_execution['authenticationConfig']:
+                        before_config = kc.get_authenticator_config(
+                            id=desired_execution['authenticationConfig'],
+                            realm=realm
+                        )
+
+                        # Fill in parameters
+                        for k, v in before_config.items():
+                            if k not in desired_config or desired_config[k] is None:
+                                desired_config[k] = v
+
+                        # Differences found
+                        if desired_config != before_config:
+                            if not module.check_mode:
+                                kc.update_authenticator_config(
+                                    id=desired_config['id'],
+                                    rep=desired_config,
+                                    realm=realm
+                                )
+                            
+                            if module._diff:
+                                result['diff']['before']['config'] = before_config
+                    # Create
+                    else:
+                        if not module.check_mode:
+                            kc.create_authenticator_config(
+                                executionId=desired_execution['id'],
+                                rep=desired_config,
+                                realm=realm
+                            )
+
+                        if module._diff:
+                            result['diff']['before']['config'] = {}
+
+                    # Get the latest version of the authentication execution
+                    desired_execution = list(
+                            filter(lambda execution: execution['id'] == desired_execution['id'],
+                                kc.get_authentication_executions(
+                                    alias=desired_flow['alias'],
+                                    realm=realm
+                                )
+                            )
+                    )[0]
+
+                    # Get the lastest version of the authenticator configuration
+                    desired_config = kc.get_authenticator_config(
+                        id=desired_execution['authenticationConfig'],
+                        realm=realm
+                    )
+
+                    if module._diff:
+                        result['diff']['after']['config'] = desired_config
+
+                    result['changed'] = True
+                    result['end_state']['config'] = desired_config
+
+                # Get the latest version of the authentication execution
+                desired_execution = list(
+                    filter(lambda execution: execution['id'] == desired_execution['id'],
+                        kc.get_authentication_executions(
+                            alias=desired_flow['alias'],
+                            realm=realm
+                        )
+                    )
+                )[0]
+                
+                if module._diff:
+                    result['diff']['execution']['after'] = desired_execution
+
+                result['end_state']['execution'] = desired_execution
+
+        # Handle required action
+        if desired_required_action:
+            # Get required action
+            before_required_action = kc.get_required_action(
+                alias=desired_required_action['alias'], 
+                realm=realm
+            )
+
+            # Update
+            if before_required_action:
+                # Fill in parameters
+                for k, v in before_required_action.items():
+                    if k not in desired_required_action or desired_required_action[k] is None:
+                        desired_required_action[k] = v
+
+                # Differences found
+                if desired_required_action != before_required_action:
+                    if module._diff:
+                        result['diff']['before']['required_action'] = before_required_action,
+                        result['diff']['after']['required_action'] = desired_required_action
+
+                    if not module.check_mode:
+                        kc.update_required_action(
+                            alias=desired_required_action['alias'],
+                            realm=realm,
+                            rep=desired_required_action
+                        )
+
+                    result['changed'] = True
+                    result['end_state']['required_action'] = desired_required_action
+            # Register
+            else:
+                # Use the alias as the name of the required action if not provided
+                if 'name' not in desired_required_action:
+                    desired_required_action['name'] = desired_required_action['alias']
+
+                # providerId == alias, so set it, if it's not already
+                if 'providerId' not in desired_required_action:
+                    desired_required_action['providerId'] = desired_required_action['alias']
+
+                if not module.check_mode:
+                    kc.register_required_action(
+                        rep=desired_required_action,
+                        realm=realm
+                    )
+
+                # Get the newly registered required action
+                before_required_action = kc.get_required_action(
+                    alias=desired_required_action['alias'],
+                    realm=realm
+                )
+
+                # Fill in parameters
+                for k, v in before_required_action.items():
+                    if k not in desired_required_action or desired_required_action[k] is None:
+                        desired_required_action[k] = v
+
+                if module._diff:
+                    result['diff']['before']['required_action'] = {},
+                    result['diff']['after']['required_action'] = desired_required_action
+                
+                result['changed'] = True
+                result['end_state']['required_action'] = desired_required_action
+    else:
+        # Handling flow and executions
+        if desired_flow:
+            # Get authentication flow:
+            before_flow = kc.get_authentication_flow_by_alias(
+                alias=desired_flow['alias'],
+                realm=realm
+            )
+            
+            # Delete
+            if before_flow:
+                if module._diff:
+                    result['diff']['before']['required_action'] = before_flow
+                    result['diff']['after']['required_action'] = {}
+
+                if not module.check_mode:
+                    kc.delete_authentication_flow_by_id(
+                        id=before_flow['id'],
+                        realm=realm
+                    )
+
+                result['changed'] = True
+                result['end_state']['authentication_flow'] = {}
+
+        # Handle required action
+        if desired_required_action:
+            # Get required action
+            before_required_action = kc.get_required_action(
+                alias=desired_required_action['alias'], 
+                realm=realm
+            )
+
+            # Delete
+            if before_required_action:
+                if module._diff:
+                    result['diff']['before']['required_action'] = before_required_action,
+                    result['diff']['after']['required_action'] = {}
+
+                if not module.check_mode:
+                    kc.delete_required_action(
+                        alias=desired_required_action['alias'], 
+                        realm=realm
+                    )
+                
+                result['changed'] = True
+                result['end_state']['required_action'] = {}
+
+    # Handle msg
+    if result['changed']:
+        if module.check_mode:
+            result['msg'] = 'Authentication would be updated'
         else:
-            # Process a deletion (because state was not 'present')
-            result['changed'] = True
-
-            if module._diff:
-                result['diff'] = dict(before=auth_repr, after='')
-
-            if module.check_mode:
-                module.exit_json(**result)
-
-            # delete it
-            kc.delete_authentication_flow_by_id(id=auth_repr["id"], realm=realm)
-
-            result['msg'] = 'Authentication flow: {alias} id: {id} is deleted'.format(alias=new_auth_repr['alias'],
-                                                                                      id=auth_repr["id"])
-
+            result['msg'] = 'Authentication updated'
+    else:
+        if module.check_mode:
+            result['msg'] = 'Authentication would not be updated'
+        else:
+            result['msg'] = 'Authentication not updated'
+    
     module.exit_json(**result)
 
 

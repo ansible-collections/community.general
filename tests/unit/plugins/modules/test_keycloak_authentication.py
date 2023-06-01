@@ -21,9 +21,29 @@ from ansible.module_utils.six import StringIO
 
 
 @contextmanager
-def patch_keycloak_api(get_authentication_flow_by_alias=None, copy_auth_flow=None, create_empty_auth_flow=None,
-                       get_executions_representation=None, delete_authentication_flow_by_id=None):
-    """Mock context manager for patching the methods in PwPolicyIPAClient that contact the IPA server
+def patch_keycloak_api(
+    get_authentication_flow_by_alias=None,
+    get_authentication_executions=None,
+    update_authentication_flow=None,
+    copy_authentication_flow=None,
+    create_authentication_flow=None,
+    get_realm_info_by_id=None,
+    update_realm=None,
+    update_authentication_execution=None,
+    change_execution_priority=None,
+    create_authentication_execution_subflow=None,
+    create_authentication_execution_step=None,
+    get_authenticator_config=None,
+    update_authenticator_config=None,
+    create_authenticator_config=None,
+    get_required_action=None,
+    update_required_action=None,
+    register_required_action=None,
+    delete_authentication_flow_by_id=None,
+    delete_required_action=None,
+):
+    """
+    Mock context manager for patching the methods in PwPolicyIPAClient that contact the IPA server
 
     Patches the `login` and `_post_json` methods
 
@@ -38,18 +58,46 @@ def patch_keycloak_api(get_authentication_flow_by_alias=None, copy_auth_flow=Non
     """
 
     obj = keycloak_authentication.KeycloakAPI
-    with patch.object(obj, 'get_authentication_flow_by_alias', side_effect=get_authentication_flow_by_alias) \
-            as mock_get_authentication_flow_by_alias:
-        with patch.object(obj, 'copy_auth_flow', side_effect=copy_auth_flow) \
-                as mock_copy_auth_flow:
-            with patch.object(obj, 'create_empty_auth_flow', side_effect=create_empty_auth_flow) \
-                    as mock_create_empty_auth_flow:
-                with patch.object(obj, 'get_executions_representation', return_value=get_executions_representation) \
-                        as mock_get_executions_representation:
-                    with patch.object(obj, 'delete_authentication_flow_by_id', side_effect=delete_authentication_flow_by_id) \
-                            as mock_delete_authentication_flow_by_id:
-                        yield mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow, \
-                            mock_get_executions_representation, mock_delete_authentication_flow_by_id
+    with patch.object(obj, 'get_authentication_flow_by_alias', side_effect=get_authentication_flow_by_alias) as mock_get_authentication_flow_by_alias:
+        with patch.object(obj, 'get_authentication_executions', side_effect=get_authentication_executions) as mock_get_authentication_executions:
+            with patch.object(obj, 'update_authentication_flow', side_effect=update_authentication_flow) as mock_update_authentication_flow:
+                with patch.object(obj, 'copy_authentication_flow', side_effect=copy_authentication_flow) as mock_copy_authentication_flow:
+                    with patch.object(obj, 'create_authentication_flow', side_effect=create_authentication_flow) as mock_create_authentication_flow:
+                        with patch.object(obj, 'get_realm_info_by_id', side_effect=get_realm_info_by_id) as mock_get_realm_info_by_id:
+                            with patch.object(obj, 'update_realm', side_effect=update_realm) as mock_update_realm:
+                                with patch.object(obj, 'update_authentication_execution', side_effect=update_authentication_execution) as mock_update_authentication_execution:
+                                    with patch.object(obj, 'change_execution_priority', side_effect=change_execution_priority) as mock_change_execution_priority:
+                                        with patch.object(obj, 'create_authentication_execution_subflow', side_effect=create_authentication_execution_subflow) as mock_create_authentication_execution_subflow:
+                                            with patch.object(obj, 'create_authentication_execution_step', side_effect=create_authentication_execution_step) as mock_create_authentication_execution_step:
+                                                with patch.object(obj, 'get_authenticator_config', side_effect=get_authenticator_config) as mock_get_authenticator_config:
+                                                    with patch.object(obj, 'update_authenticator_config', side_effect=update_authenticator_config) as mock_update_authenticator_config:
+                                                        with patch.object(obj, 'create_authenticator_config', side_effect=create_authenticator_config) as mock_create_authenticator_config:
+                                                            with patch.object(obj, 'get_required_action', side_effect=get_required_action) as mock_get_required_action:
+                                                                with patch.object(obj, 'update_required_action', side_effect=update_required_action) as mock_update_required_action:
+                                                                    with patch.object(obj, 'register_required_action', side_effect=register_required_action) as mock_register_required_action:
+                                                                        with patch.object(obj, 'delete_authentication_flow_by_id', side_effect=delete_authentication_flow_by_id) as mock_delete_authentication_flow_by_id:
+                                                                            with patch.object(obj, 'delete_required_action', side_effect=delete_required_action) as mock_delete_required_action:
+                                                                                yield (
+                                                                                    mock_get_authentication_flow_by_alias,
+                                                                                    mock_get_authentication_executions,
+                                                                                    mock_update_authentication_flow,
+                                                                                    mock_copy_authentication_flow,
+                                                                                    mock_create_authentication_flow,
+                                                                                    mock_get_realm_info_by_id,
+                                                                                    mock_update_realm,
+                                                                                    mock_update_authentication_execution,
+                                                                                    mock_change_execution_priority,
+                                                                                    mock_create_authentication_execution_subflow,
+                                                                                    mock_create_authentication_execution_step,
+                                                                                    mock_get_authenticator_config,
+                                                                                    mock_update_authenticator_config,
+                                                                                    mock_create_authenticator_config,
+                                                                                    mock_get_required_action,
+                                                                                    mock_update_required_action,
+                                                                                    mock_register_required_action,
+                                                                                    mock_delete_authentication_flow_by_id,
+                                                                                    mock_delete_required_action,
+                                                                                )
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -98,522 +146,1194 @@ class TestKeycloakAuthentication(ModuleTestCase):
         super(TestKeycloakAuthentication, self).setUp()
         self.module = keycloak_authentication
 
-    def test_create_auth_flow_from_copy(self):
-        """Add a new authentication flow from copy of an other flow"""
+    def test_create_authentication_flow(self):
+        """Add a new authentication flow."""
 
         module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'copyFrom': 'first broker login',
-            'authenticationExecutions': [
-                {
-                    'providerId': 'identity-provider-redirector',
-                    'requirement': 'ALTERNATIVE',
-                },
-            ],
-            'state': 'present',
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "bind_flow": "clientAuthenticationFlow",
+            "execution": {
+                "authenticationFlow": False,
+                "displayName": "Reset Password",
+                "providerId": "reset-password",
+                "requirement": "REQUIRED",
+            },
+            "flow": {
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+            },
+            "realm": "master",
+            "state": "present",
         }
-        return_value_auth_flow_before = [{}]
-        return_value_copied = [{
-            'id': '2ac059fc-c548-414f-9c9e-84d42bd4944e',
-            'alias': 'first broker login',
-            'description': 'browser based authentication',
-            'providerId': 'basic-flow',
-            'topLevel': True,
-            'builtIn': False,
-            'authenticationExecutions': [
-                {
-                    'authenticator': 'auth-cookie',
-                    'requirement': 'ALTERNATIVE',
-                    'priority': 10,
-                    'userSetupAllowed': False,
-                    'autheticatorFlow': False
-                },
-            ],
-        }]
-        return_value_executions_after = [
+
+        return_value_authentication_flow = [
+            {},
             {
-                'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'ALTERNATIVE',
-                'displayName': 'Identity Provider Redirector',
-                'requirementChoices': ['REQUIRED', 'DISABLED'],
-                'configurable': True,
-                'providerId': 'identity-provider-redirector',
-                'level': 0,
-                'index': 0
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+                "providerId": "basic-flow",
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [],
             },
             {
-                'id': 'fdc208e9-c292-48b7-b7d1-1d98315ee893',
-                'requirement': 'ALTERNATIVE',
-                'displayName': 'Cookie',
-                'requirementChoices': [
-                    'REQUIRED',
-                    'ALTERNATIVE',
-                    'DISABLED'
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+                "providerId": "basic-flow",
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [
+                    {
+                        "authenticator": "reset-password",
+                        "authenticatorFlow": False,
+                        "requirement": "REQUIRED",
+                        "priority": 0,
+                        "authenticatorFlow": False,
+                        "userSetupAllowed": False,
+                    },
                 ],
-                'configurable': False,
-                'providerId': 'auth-cookie',
-                'level': 0,
-                'index': 1
             },
         ]
+
+        return_value_authentication_execution = [
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "DISABLED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+            ],
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "REQUIRED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+            ],
+        ]
+
+        # Truncated realm info
+        return_value_realm_info = [
+            {
+                "clientAuthenticationFlow": ""
+            },
+        ]
+
         changed = True
 
         set_module_args(module_args)
 
         # Run the module
-
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, copy_auth_flow=return_value_copied,
-                                    get_executions_representation=return_value_executions_after) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+            with patch_keycloak_api(
+                get_authentication_flow_by_alias=return_value_authentication_flow,
+                get_authentication_executions=return_value_authentication_execution,
+                get_realm_info_by_id=return_value_realm_info,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
         # Verify number of call on each mock
-        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 2)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 2)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 1)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 1)
+        self.assertEqual(len(mock_update_realm.mock_calls), 1)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 1)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 1)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
-    def test_create_auth_flow_from_copy_idempotency(self):
-        """Add an already existing authentication flow from copy of an other flow to test idempotency"""
+    def test_create_authentication_flow_idempotency(self):
+        """Add a new authentication flow, even though it already exists."""
 
         module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'copyFrom': 'first broker login',
-            'authenticationExecutions': [
-                {
-                    'providerId': 'identity-provider-redirector',
-                    'requirement': 'ALTERNATIVE',
-                },
-            ],
-            'state': 'present',
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "bind_flow": "clientAuthenticationFlow",
+            "execution": {
+                "authenticationFlow": False,
+                "displayName": "Reset Password",
+                "providerId": "reset-password",
+                "requirement": "REQUIRED",
+            },
+            "flow": {
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+            },
+            "realm": "master",
+            "state": "present",
         }
-        return_value_auth_flow_before = [{
-            'id': '71275d5e-e11f-4be4-b119-0abfa87987a4',
-            'alias': 'Test create authentication flow copy',
-            'description': '',
-            'providerId': 'basic-flow',
-            'topLevel': True,
-            'builtIn': False,
-            'authenticationExecutions': [
-                {
-                    'authenticator': 'identity-provider-redirector',
-                    'requirement': 'ALTERNATIVE',
-                    'priority': 0,
-                    'userSetupAllowed': False,
-                    'autheticatorFlow': False
-                },
-                {
-                    'authenticator': 'auth-cookie',
-                    'requirement': 'ALTERNATIVE',
-                    'priority': 0,
-                    'userSetupAllowed': False,
-                    'autheticatorFlow': False
-                },
-            ],
-        }]
-        return_value_executions_after = [
+
+        return_value_authentication_flow = [
             {
-                'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'ALTERNATIVE',
-                'displayName': 'Identity Provider Redirector',
-                'requirementChoices': ['REQUIRED', 'DISABLED'],
-                'configurable': True,
-                'providerId': 'identity-provider-redirector',
-                'level': 0,
-                'index': 0
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+                "providerId": "basic-flow",
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [],
             },
             {
-                'id': 'fdc208e9-c292-48b7-b7d1-1d98315ee893',
-                'requirement': 'ALTERNATIVE',
-                'displayName': 'Cookie',
-                'requirementChoices': [
-                    'REQUIRED',
-                    'ALTERNATIVE',
-                    'DISABLED'
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+                "providerId": "basic-flow",
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [
+                    {
+                        "authenticator": "reset-password",
+                        "authenticatorFlow": False,
+                        "requirement": "REQUIRED",
+                        "priority": 0,
+                        "authenticatorFlow": False,
+                        "userSetupAllowed": False,
+                    },
                 ],
-                'configurable': False,
-                'providerId': 'auth-cookie',
-                'level': 0,
-                'index': 1
             },
         ]
+
+        return_value_authentication_execution = [
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "REQUIRED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+            ],
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "REQUIRED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+            ],
+        ]
+
+        # Truncated realm info
+        return_value_realm_info = [
+            {
+                "clientAuthenticationFlow": "Test create authentication flow"
+            },
+        ]
+
         changed = False
 
         set_module_args(module_args)
 
         # Run the module
-
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+            with patch_keycloak_api(
+                get_authentication_flow_by_alias=return_value_authentication_flow,
+                get_authentication_executions=return_value_authentication_execution,
+                get_realm_info_by_id=return_value_realm_info,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 2)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 1)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
-    def test_create_auth_flow_without_copy(self):
-        """Add authentication without copy"""
-
+    def test_update_authentication_flow_add_execution_subflow(self):
+        """Update an existing authentication flow by adding a new authentication execution sub-flow."""
+        
         module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'authenticationExecutions': [
-                {
-                    'providerId': 'identity-provider-redirector',
-                    'requirement': 'ALTERNATIVE',
-                    'authenticationConfig': {
-                        'alias': 'name',
-                        'config': {
-                            'defaultProvider': 'value'
-                        },
-                    },
-                },
-            ],
-            'state': 'present',
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "execution": {
+                "authenticationFlow": True,
+                "displayName": "Browser - Conditional OTP",
+                "providerId": "registration-page-form",
+                "requirement": "REQUIRED",
+            },
+            "flow": {
+                "alias": "Test create authentication flow",
+            },
+            "realm": "master",
+            "state": "present",
         }
-        return_value_auth_flow_before = [{}]
-        return_value_created_empty_flow = [
+
+        return_value_authentication_flow = [
             {
-                "alias": "Test of the keycloak_auth module",
-                "authenticationExecutions": [],
-                "builtIn": False,
-                "description": "",
-                "id": "513f5baa-cc42-47bf-b4b6-1d23ccc0a67f",
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
                 "providerId": "basic-flow",
-                "topLevel": True
-            },
-        ]
-        return_value_executions_after = [
-            {
-                'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'ALTERNATIVE',
-                'displayName': 'Identity Provider Redirector',
-                'requirementChoices': ['REQUIRED', 'DISABLED'],
-                'configurable': True,
-                'providerId': 'identity-provider-redirector',
-                'level': 0,
-                'index': 0
-            },
-        ]
-        changed = True
-
-        set_module_args(module_args)
-
-        # Run the module
-
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
-
-        # Verify number of call on each mock
-        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
-        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
-
-        # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
-
-    def test_update_auth_flow_adding_exec(self):
-        """Update authentication flow by adding execution"""
-
-        module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'authenticationExecutions': [
-                {
-                    'providerId': 'identity-provider-redirector',
-                    'requirement': 'ALTERNATIVE',
-                    'authenticationConfig': {
-                        'alias': 'name',
-                        'config': {
-                            'defaultProvider': 'value'
-                        },
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [
+                    {
+                        "authenticator": "reset-password",
+                        "authenticatorFlow": False,
+                        "requirement": "REQUIRED",
+                        "priority": 0,
+                        "authenticatorFlow": False,
+                        "userSetupAllowed": False,
                     },
-                },
-            ],
-            'state': 'present',
-        }
-        return_value_auth_flow_before = [{
-            'id': '71275d5e-e11f-4be4-b119-0abfa87987a4',
-            'alias': 'Test create authentication flow copy',
-            'description': '',
-            'providerId': 'basic-flow',
-            'topLevel': True,
-            'builtIn': False,
-            'authenticationExecutions': [
-                {
-                    'authenticator': 'auth-cookie',
-                    'requirement': 'ALTERNATIVE',
-                    'priority': 0,
-                    'userSetupAllowed': False,
-                    'autheticatorFlow': False
-                },
-            ],
-        }]
-        return_value_executions_after = [
-            {
-                'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'DISABLED',
-                'displayName': 'Identity Provider Redirector',
-                'requirementChoices': ['REQUIRED', 'DISABLED'],
-                'configurable': True,
-                'providerId': 'identity-provider-redirector',
-                'level': 0,
-                'index': 0
-            },
-            {
-                'id': 'fdc208e9-c292-48b7-b7d1-1d98315ee893',
-                'requirement': 'ALTERNATIVE',
-                'displayName': 'Cookie',
-                'requirementChoices': [
-                    'REQUIRED',
-                    'ALTERNATIVE',
-                    'DISABLED'
                 ],
-                'configurable': False,
-                'providerId': 'auth-cookie',
-                'level': 0,
-                'index': 1
             },
-        ]
-        changed = True
-
-        set_module_args(module_args)
-
-        # Run the module
-
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
-
-        # Verify number of call on each mock
-        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
-        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
-
-        # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
-
-    def test_delete_auth_flow(self):
-        """Delete authentication flow"""
-
-        module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'state': 'absent',
-        }
-        return_value_auth_flow_before = [{
-            'id': '71275d5e-e11f-4be4-b119-0abfa87987a4',
-            'alias': 'Test create authentication flow copy',
-            'description': '',
-            'providerId': 'basic-flow',
-            'topLevel': True,
-            'builtIn': False,
-            'authenticationExecutions': [
-                {
-                    'authenticator': 'auth-cookie',
-                    'requirement': 'ALTERNATIVE',
-                    'priority': 0,
-                    'userSetupAllowed': False,
-                    'autheticatorFlow': False
-                },
-            ],
-        }]
-        changed = True
-
-        set_module_args(module_args)
-
-        # Run the module
-
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
-
-        # Verify number of call on each mock
-        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 0)
-        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 1)
-
-        # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
-
-    def test_delete_auth_flow_idempotency(self):
-        """Delete second time authentication flow to test idempotency"""
-
-        module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'state': 'absent',
-        }
-        return_value_auth_flow_before = [{}]
-        changed = False
-
-        set_module_args(module_args)
-
-        # Run the module
-
-        with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
-
-        # Verify number of call on each mock
-        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 0)
-        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
-
-        # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
-
-    def test_force_update_auth_flow(self):
-        """Delete authentication flow and create new one"""
-
-        module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'realm': 'realm-name',
-            'alias': 'Test create authentication flow copy',
-            'authenticationExecutions': [
-                {
-                    'providerId': 'identity-provider-redirector',
-                    'requirement': 'ALTERNATIVE',
-                    'authenticationConfig': {
-                        'alias': 'name',
-                        'config': {
-                            'defaultProvider': 'value'
-                        },
-                    },
-                },
-            ],
-            'state': 'present',
-            'force': 'yes',
-        }
-        return_value_auth_flow_before = [{
-            'id': '71275d5e-e11f-4be4-b119-0abfa87987a4',
-            'alias': 'Test create authentication flow copy',
-            'description': '',
-            'providerId': 'basic-flow',
-            'topLevel': True,
-            'builtIn': False,
-            'authenticationExecutions': [
-                {
-                    'authenticator': 'auth-cookie',
-                    'requirement': 'ALTERNATIVE',
-                    'priority': 0,
-                    'userSetupAllowed': False,
-                    'autheticatorFlow': False
-                },
-            ],
-        }]
-        return_value_created_empty_flow = [
             {
-                "alias": "Test of the keycloak_auth module",
-                "authenticationExecutions": [],
-                "builtIn": False,
-                "description": "",
-                "id": "513f5baa-cc42-47bf-b4b6-1d23ccc0a67f",
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
                 "providerId": "basic-flow",
-                "topLevel": True
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [
+                    {
+                        "authenticator": "reset-password",
+                        "authenticatorFlow": False,
+                        "requirement": "REQUIRED",
+                        "priority": 0,
+                        "authenticatorFlow": False,
+                        "userSetupAllowed": False,
+                    },
+                    {
+                        "authenticatorFlow": True,
+                        "requirement": "ALTERNATIVE",
+                        "priority": 1,
+                        "autheticatorFlow": True,
+                        "flowAlias": "Browser - Conditional OTP",
+                        "userSetupAllowed": False,
+                    }
+                ],
             },
         ]
-        return_value_executions_after = [
-            {
-                'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'DISABLED',
-                'displayName': 'Identity Provider Redirector',
-                'requirementChoices': ['REQUIRED', 'DISABLED'],
-                'configurable': True,
-                'providerId': 'identity-provider-redirector',
-                'level': 0,
-                'index': 0
-            },
+
+        return_value_authentication_execution = [
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "REQUIRED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+            ],
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "REQUIRED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+                {
+                    "id": "d0c3d9fa-92c7-4b90-a1c1-515ccea9a0ee",
+                    "requirement": "DISABLED",
+                    "displayName": "Browser - Conditional OTP",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                        "CONDITIONAL",
+                    ],
+                    "configurable": False,
+                    "authenticationFlow": True,
+                    "flowId": "9491b181-450a-4753-b563-5900eb9d957b",
+                    "level": 1,
+                    "index": 1,
+                },
+            ],
+            [
+                {
+                    "id": "91113e19-2808-42c5-9749-d9c16e4b8c5e",
+                    "requirement": "REQUIRED",
+                    "displayName": "Reset Password",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                    ],
+                    "configurable": False,
+                    "providerId": "reset-password",
+                    "level": 0,
+                    "index": 0,
+                },
+                {
+                    "id": "d0c3d9fa-92c7-4b90-a1c1-515ccea9a0ee",
+                    "requirement": "REQUIRED",
+                    "displayName": "Browser - Conditional OTP",
+                    "requirementChoices": [
+                        "REQUIRED",
+                        "ALTERNATIVE",
+                        "DISABLED",
+                        "CONDITIONAL",
+                    ],
+                    "configurable": False,
+                    "authenticationFlow": True,
+                    "flowId": "9491b181-450a-4753-b563-5900eb9d957b",
+                    "level": 0,
+                    "index": 1,
+                },
+            ],
         ]
+
         changed = True
 
         set_module_args(module_args)
 
         # Run the module
-
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
-                                    get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
-                    as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+            with patch_keycloak_api(
+                get_authentication_flow_by_alias=return_value_authentication_flow,
+                get_authentication_executions=return_value_authentication_execution,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
-        self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 3)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 1)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 1)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+    
+    def test_delete_authentication_flow(self):
+        """Delete an existing authentication flow."""
+        
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "flow": {
+                "alias": "Test create authentication flow",
+            },
+            "realm": "master",
+            "state": "absent",
+        }
+
+        return_value_authentication_flow = [
+            {
+                "id": "b0c64a16-acf6-4600-9dfc-db37a4801d9d",
+                "alias": "Test create authentication flow",
+                "description": "This is a test authentication flow.",
+                "providerId": "basic-flow",
+                "topLevel": True,
+                "builtIn": False,
+                "authenticationExecutions": [
+                    {
+                        "authenticator": "reset-password",
+                        "authenticatorFlow": False,
+                        "requirement": "REQUIRED",
+                        "priority": 0,
+                        "authenticatorFlow": False,
+                        "userSetupAllowed": False,
+                    },
+                ],
+            },
+        ]
+
+        changed = True
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_authentication_flow_by_alias=return_value_authentication_flow,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 1)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+    
+    def test_delete_authentication_flow_idempotency(self):
+        """Delete a non-existing authentication flow."""
+
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "flow": {
+                "alias": "Test create authentication flow",
+            },
+            "realm": "master",
+            "state": "absent",
+        }
+
+        return_value_authentication_flow = [
+            {},
+        ]
+
+        changed = False
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_authentication_flow_by_alias=return_value_authentication_flow,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_register_required_action(self):
+        """Register a new required action."""
+        
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "required_action": {
+                "alias": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+            },
+            "realm": "master",
+            "state": "present",
+        }
+
+        return_value_required_action = [
+            {},
+            {
+                "alias": "TEST_REQUIRED_ACTION",
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "defaultAction": False,
+                "priority": 0,
+                "config": {},
+            },
+        ]
+
+        changed = True
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_required_action=return_value_required_action,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 2)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_register_required_action_idempotency(self):
+        """Register a new required action, even though it already is registered."""
+
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "required_action": {
+                "alias": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+            },
+            "realm": "master",
+            "state": "present",
+        }
+
+        return_value_required_action = [
+            {
+                "alias": "TEST_REQUIRED_ACTION",
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "defaultAction": False,
+                "priority": 0,
+                "config": {},
+            },
+        ]
+
+        changed = False
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_required_action=return_value_required_action,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_update_required_action(self):
+        """Updated a registered required action."""
+
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "required_action": {
+                "alias": "TEST_REQUIRED_ACTION",
+                "enabled": False,
+            },
+            "realm": "master",
+            "state": "present",
+        }
+
+        return_value_required_action = [
+            {
+                "alias": "TEST_REQUIRED_ACTION",
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "defaultAction": False,
+                "priority": 0,
+                "config": {},
+            },
+        ]
+
+        changed = True
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_required_action=return_value_required_action,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_update_required_action_idempotency(self):
+        """Updated a registered required action, even though nothing is going to be updated."""
+
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "required_action": {
+                "alias": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+            },
+            "realm": "master",
+            "state": "present",
+        }
+
+        return_value_required_action = [
+            {
+                "alias": "TEST_REQUIRED_ACTION",
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "defaultAction": False,
+                "priority": 0,
+                "config": {},
+            },
+        ]
+
+        changed = False
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_required_action=return_value_required_action,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_delete_required_action(self):
+        """Delete a registered required action."""
+
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "required_action": {
+                "alias": "TEST_REQUIRED_ACTION",
+            },
+            "realm": "master",
+            "state": "absent",
+        }
+
+        return_value_required_action = [
+            {
+                "alias": "TEST_REQUIRED_ACTION",
+                "name": "Test required action",
+                "providerId": "TEST_REQUIRED_ACTION",
+                "enabled": True,
+                "defaultAction": False,
+                "priority": 0,
+                "config": {},
+            },
+        ]
+
+        changed = True
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_required_action=return_value_required_action,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 1)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_delete_required_action_idempotency(self):
+        """Delete a not registered required action."""
+
+        module_args = {
+            "auth_client_id": "admin-cli",
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "auth_username": "admin",
+            "required_action": {
+                "alias": "TEST_REQUIRED_ACTION",
+            },
+            "realm": "master",
+            "state": "absent",
+        }
+
+        return_value_required_action = [
+            {},
+        ]
+
+        changed = False
+        
+        set_module_args(module_args)
+
+        # Run the module
+        with mock_good_connection():
+            with patch_keycloak_api(
+                get_required_action=return_value_required_action,
+            ) as (
+                mock_get_authentication_flow_by_alias,
+                mock_get_authentication_executions,
+                mock_update_authentication_flow,
+                mock_copy_authentication_flow,
+                mock_create_authentication_flow,
+                mock_get_realm_info_by_id,
+                mock_update_realm,
+                mock_update_authentication_execution,
+                mock_change_execution_priority,
+                mock_create_authentication_execution_subflow,
+                mock_create_authentication_execution_step,
+                mock_get_authenticator_config,
+                mock_update_authenticator_config,
+                mock_create_authenticator_config,
+                mock_get_required_action,
+                mock_update_required_action,
+                mock_register_required_action,
+                mock_delete_authentication_flow_by_id,
+                mock_delete_required_action,
+            ):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+        
+        # Verify number of call on each mock
+        self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
+        self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_copy_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_flow.mock_calls), 0)
+        self.assertEqual(len(mock_get_realm_info_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_update_realm.mock_calls), 0)
+        self.assertEqual(len(mock_update_authentication_execution.mock_calls), 0)
+        self.assertEqual(len(mock_change_execution_priority.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_subflow.mock_calls), 0)
+        self.assertEqual(len(mock_create_authentication_execution_step.mock_calls), 0)
+        self.assertEqual(len(mock_get_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_update_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_create_authenticator_config.mock_calls), 0)
+        self.assertEqual(len(mock_get_required_action.mock_calls), 1)
+        self.assertEqual(len(mock_update_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_register_required_action.mock_calls), 0)
+        self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
+        self.assertEqual(len(mock_delete_required_action.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
