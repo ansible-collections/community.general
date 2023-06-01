@@ -329,7 +329,7 @@ class RedfishUtils(object):
             if isinstance(line, text_type):
                 body.append(to_bytes(line, encoding='utf-8'))
             elif isinstance(line, dict):
-                body.append(bytes(json.dumps(line), 'utf-8'))
+                body.append(to_bytes(json.dumps(line), encoding='utf-8'))
             else:
                 body.append(line)
             return
