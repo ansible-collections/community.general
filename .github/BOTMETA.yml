@@ -693,6 +693,8 @@ files:
     maintainers: mattock
   $modules/keycloak_authz_permission.py:
     maintainers: mattock
+  $modules/keycloak_authz_permission_info.py:
+    maintainers: mattock
   $modules/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope.py:

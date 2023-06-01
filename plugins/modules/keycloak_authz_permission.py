@@ -107,14 +107,6 @@ options:
         elements: str
         default: []
         required: false
-    query_state:
-        description:
-            - Query the authorization permission and add it to the result object.
-            - This adds an extra Keycloak Admin API call for each authorization permission.
-            - This is intended mainly for integration tests, not for general use.
-        type: bool
-        default: false
-        required: false
     client_id:
         description:
             - The clientId of the keycloak client that should have the authorization scope.
@@ -230,47 +222,6 @@ end_state:
             returned: when I(state=present)
             sample:
                 - 9da05cd2-b273-4354-bbd8-0c133918a454
-
-queried_state:
-    description: State of the resource (a policy) as seen by Keycloak.
-    returned: on success
-    type: complex
-    contains:
-        id:
-            description: ID of the authorization permission.
-            type: str
-            returned: when I(state=present)
-            sample: 9da05cd2-b273-4354-bbd8-0c133918a454
-        name:
-            description: Name of the authorization permission.
-            type: str
-            returned: when I(state=present)
-            sample: ResourcePermission
-        description:
-            description: Description of the authorization permission.
-            type: str
-            returned: when I(state=present)
-            sample: Resource Permission
-        type:
-            description: Type of the authorization permission.
-            type: str
-            returned: when I(state=present)
-            sample: resource
-        decisionStrategy:
-            description: The decision strategy.
-            type: str
-            returned: when I(state=present)
-            sample: UNANIMOUS
-        logic:
-            description: The logic used for the permission (part of the payload, but has a fixed value).
-            type: str
-            returned: when I(state=present)
-            sample: POSITIVE
-        config:
-            description: Configuration of the permission (empty in all observed cases).
-            type: dict
-            returned: when I(state=present)
-            sample: {}
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
@@ -298,8 +249,7 @@ def main():
         scopes=dict(type='list', elements='str', default=[], required=False),
         policies=dict(type='list', elements='str', default=[], required=False),
         client_id=dict(type='str', required=True),
-        realm=dict(type='str', required=True),
-        query_state=dict(type='bool', default=False)
+        realm=dict(type='str', required=True)
     )
 
     argument_spec.update(meta_args)
@@ -322,7 +272,6 @@ def main():
     resources = module.params.get('resources')
     scopes = module.params.get('scopes')
     policies = module.params.get('policies')
-    query_state = module.params.get('query_state')
 
     if permission_type == 'scope' and state == 'present':
         if scopes == []:
@@ -476,9 +425,6 @@ def main():
     else:
         module.fail_json(msg='Unable to determine what to do with permission %s of client %s in realm %s' % (
             name, client_id, realm))
-
-    if query_state:
-        result['queried_state'] = kc.get_authz_permission_by_name(name=name, client_id=cid, realm=realm)
 
     module.exit_json(**result)
 
