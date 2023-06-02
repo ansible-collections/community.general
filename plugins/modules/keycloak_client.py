@@ -947,9 +947,11 @@ def main():
             for binding in new_param_value:
                 flow_id = kc.get_authentication_flow_by_alias(
                     alias=new_param_value[binding], realm=realm, case_sensitive=False
-                )["id"]
-                print(flow_id)
-                final_param_value[binding] = flow_id
+                ).get("id")
+                if flow_id:
+                    final_param_value[binding] = flow_id
+                else:
+                    final_param_value[binding] = new_param_value[binding]
             new_param_value = final_param_value
 
         changeset[camel(client_param)] = new_param_value
