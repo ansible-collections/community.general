@@ -81,6 +81,10 @@ URL_AUTHENTICATION_EXECUTION_CONFIG = "{url}/admin/realms/{realm}/authentication
 URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/raise-priority"
 URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/lower-priority"
 URL_AUTHENTICATION_CONFIG = "{url}/admin/realms/{realm}/authentication/config/{id}"
+URL_AUTHENTICATION_REGISTER_REQUIRED_ACTION = "{url}/admin/realms/{realm}/authentication/register-required-action"
+URL_AUTHENTICATION_REQUIRED_ACTIONS = "{url}/admin/realms/{realm}/authentication/required-actions"
+URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS = "{url}/admin/realms/{realm}/authentication/required-actions/{alias}"
+URL_AUTHENTICATION_UNREGISTERED_REQUIRED_ACTIONS = "{url}/admin/realms/{realm}/authentication/unregistered-required-actions"
 
 URL_IDENTITY_PROVIDERS = "{url}/admin/realms/{realm}/identity-provider/instances"
 URL_IDENTITY_PROVIDER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}"
@@ -1808,6 +1812,317 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Unable to delete role %s for client %s in realm %s: %s'
                                       % (name, clientid, realm, str(e)))
 
+    def create_authentication_flow(self, flow, realm='master'):
+        """
+        Create a new authentication flow.
+        :param flow:  Authentication flow representation.
+        :param realm: Realm name (not id).
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_FLOWS.format(
+                    url=self.baseurl,
+                    realm=realm
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(flow),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to create flow %s in realm %s: %s'
+                % (flow["alias"], realm, str(e))
+            )
+
+    def copy_authentication_flow(self, alias, name, realm='master'):
+        """
+        Copy an existing authentication flow under a new name.
+        :param alias: Name of the existing authentication flow.
+        :param data:  JSON containing 'newName' attribute.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        data = {
+            "newName": name
+        }
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_FLOWS.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    copyfrom=quote(alias)
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(data),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to create flow %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
+
+    def update_authentication_flow(self, id, flow, realm='master'):
+        """
+        Update an existing authentication flow.
+        :param id:    Flow id.
+        :param flow:  Authentication flow representation.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_FLOW.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=id
+                ),
+                method='PUT',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(flow),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to update flow %s in realm %s: %s'
+                % (flow['alias'], realm, str(e))
+            )
+
+    def get_authentication_executions(self, alias, realm='master'):
+        """
+        Get authentication executions of a flow.
+        :param alias: Flow alias.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return json.load(
+                open_url(
+                    URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                        url=self.baseurl,
+                        realm=realm,
+                        flowalias=quote(alias)
+                    ),
+                    method='GET',
+                    http_agent=self.http_agent, headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs
+                )
+            )
+        except Exception:
+            return None
+
+    def create_authentication_execution_step(self, alias, data, realm='master'):
+        """
+        Add a new authentication execution to an existing flow.
+        :param alias: Alias of parent flow.
+        :param data:  The new execution JSON data containing 'provider' attribute.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    flowalias=quote(alias)
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(data),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to create the execution for flow %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
+
+    def create_authentication_execution_subflow(self, alias, data, realm='master'):
+        """
+        Add new flow with new execution to existing flow.
+        :param alias: Alias of parent flow.
+        :param data:  The new authentication flow / execution JSON data containing
+                      'alias', 'type', 'provider', and 'description' attributes.
+        :param realm: Realm name.
+        :return: HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    flowalias=quote(alias)
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(data),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg="Unable to create new sub-flow %s for flow %s in realm %s: %s"
+                % (alias, data['alias'], realm, str(e))
+            )
+
+    def update_authentication_execution(self, alias, rep, realm='master'):
+        """
+        Update an existing authentication execution of a flow.
+        :param alias: Alias of the parent flow.
+        :param rep:   The authentication execution representation.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    flowalias=quote(alias)
+                ),
+                method='PUT',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(rep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to update the execution for flow %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
+
+    def get_authenticator_config(self, id, realm='master'):
+        """
+        Get an existing authenticator configuration.
+        :param id:    ID of the authenticator configuration.
+        :param realm: Realm name.
+        :return:      Authenticator configuration representation.
+        """
+
+        try:
+            return json.load(
+                open_url(
+                    URL_AUTHENTICATION_CONFIG.format(
+                        url=self.baseurl,
+                        realm=realm,
+                        id=id
+                    ),
+                    method='GET',
+                    http_agent=self.http_agent,
+                    headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs
+                )
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to get the authenticator configuration %s in realm %s: %s'
+                % (id, realm, str(e))
+            )
+
+    def update_authenticator_config(self, id, rep, realm='master'):
+        """
+        Update an existing authenticator configuration.
+        :param id:    ID of the authenticator configuration.
+        :param rep:   Authenticator configuration representation.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_CONFIG.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=id
+                ),
+                method='PUT',
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                data=json.dumps(rep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to update the authenticator configuration %s in realm %s: %s'
+                % (id, realm, str(e))
+            )
+
+    def create_authenticator_config(self, executionId, rep, realm='master'):
+        """
+        Create a new authenticator configuration.
+        :param executionId: ID of the authenticator configuration.
+        :param rep:         Authenticator configuration representation.
+        :param realm:       Realm name.
+        :return:            HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_EXECUTION_CONFIG.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=executionId
+                ),
+                method='POST',
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                data=json.dumps(rep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to create a new authenticator configuration for execution %s in realm %s: %s'
+                % (executionId, realm, str(e))
+            )
+
+    def update_authentication_execution_config(self, id, rep, realm='master'):
+        """
+        Update an existing authentication with a new configuration.
+        :param id:    Alias of the parent flow.
+        :param rep:   The authentication execution configuration representation.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_EXECUTION_CONFIG.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=id
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(rep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to update the configuration for execution %s in realm %s: %s'
+                % (id, realm, str(e))
+            )
+
     def get_authentication_flow_by_alias(self, alias, realm='master'):
         """
         Get an authentication flow by it's alias
@@ -1831,19 +2146,29 @@ class KeycloakAPI(object):
 
     def delete_authentication_flow_by_id(self, id, realm='master'):
         """
-        Delete an authentication flow from Keycloak
-        :param id: id of authentication flow to be deleted
-        :param realm: realm of client to be deleted
-        :return: HTTPResponse object on success
+        Delete an authentication flow.
+        :param id:    Flow id.
+        :param realm: Realm name.
+        :return:      HTTPResponse object on success.
         """
-        flow_url = URL_AUTHENTICATION_FLOW.format(url=self.baseurl, realm=realm, id=id)
 
         try:
-            return open_url(flow_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            validate_certs=self.validate_certs)
+            return open_url(
+                URL_AUTHENTICATION_FLOW.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=id
+                ),
+                method='DELETE',
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
         except Exception as e:
-            self.module.fail_json(msg='Could not delete authentication flow %s in realm %s: %s'
-                                  % (id, realm, str(e)))
+            self.module.fail_json(
+                msg='Unable to delete the flow %s in realm %s: %s'
+                % (id, realm, str(e))
+            )
 
     def copy_auth_flow(self, config, realm='master'):
         """
@@ -2090,6 +2415,115 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
+
+    def register_required_action(self, rep, realm='master'):
+        """
+        Register required action.
+        :param rep:   JSON containing 'providerId', and 'name' attributes.
+        :param realm: Realm name (not id).
+        :return:      Representation of the required action.
+        """
+
+        data = {
+            'name': rep['name'],
+            'providerId': rep['providerId']
+        }
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_REGISTER_REQUIRED_ACTION.format(
+                    url=self.baseurl,
+                    realm=realm
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(data),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to register required action %s in realm %s: %s'
+                % (rep["name"], realm, str(e))
+            )
+
+    def get_required_action(self, alias, realm='master'):
+        """
+        Get required action for alias.
+        :param alias: Alias of required action.
+        :param realm: Realm name (not id).
+        :return:      Representation of the required action.
+        """
+        try:
+            required_action = json.load(
+                open_url(
+                    URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
+                        url=self.baseurl,
+                        alias=quote(alias),
+                        realm=realm
+                    ),
+                    method='GET',
+                    http_agent=self.http_agent, headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs
+                )
+            )
+
+            return required_action
+        except Exception as e:
+            return None
+
+    def update_required_action(self, alias, rep, realm='master'):
+        """
+        Update required action.
+        :param alias: Alias of required action.
+        :param rep:   JSON describing new state of required action.
+        :param realm: Realm name (not id).
+        :return:      HTTPResponse object on success.
+        """
+        try:
+            return open_url(
+                URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
+                    url=self.baseurl,
+                    alias=quote(alias),
+                    realm=realm
+                ),
+                method='PUT',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(rep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to update required action %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
+
+    def delete_required_action(self, alias, realm='master'):
+        """
+        Delete required action.
+        :param alias: Alias of required action.
+        :param realm: Realm name (not id).
+        :return:      HTTPResponse object on success.
+        """
+        try:
+            return open_url(
+                URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
+                    url=self.baseurl,
+                    alias=quote(alias),
+                    realm=realm
+                ),
+                method='DELETE',
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to delete required action %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
 
     def get_identity_providers(self, realm='master'):
         """ Fetch representations for identity providers in a realm
