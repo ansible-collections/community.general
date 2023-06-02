@@ -101,6 +101,7 @@ options:
             providerId:
                 description:
                     - ID (specific name) of the provider.
+                required: true
                 type: str
             requirement:
                 choices: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
@@ -161,6 +162,8 @@ options:
         required: true
         type: str
     required_action:
+        description:
+            - Authentication required action.
         suboptions:
             alias:
                 description:
@@ -211,7 +214,7 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create an authentication flow and add an configurable authentication execution step with a configuration to it, and add assign it to a realm authentication flow.
+    - name: Create an authentication flow with a configurable execution step with a configuration to it, and add assign it to a realm authentication flow.
       community.general.keycloak_authentication:
         auth_client_id: "admin-cli"
         auth_keycloak_url: "http://localhost:8080"
@@ -320,7 +323,7 @@ EXAMPLES = '''
         realm: "master"
         require_action:
           alias: "test_required_action"
-        state: "absent" 
+        state: "absent"
 '''
 
 RETURN = '''
@@ -362,7 +365,7 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak \
-    import KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError, is_struct_included
+    import KeycloakAPI, keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -419,7 +422,11 @@ def main():
                         "CONDITIONAL"
                     ]
                 ),
-                requirementChoices=dict(type="str"),
+                requirementChoices=dict(
+                    default=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"],
+                    elements="str",
+                    type="list",
+                ),
                 flowType=dict(
                     type='str',
                     default='basic-flow',
@@ -529,7 +536,7 @@ def main():
                 for k, v in before_flow.items():
                     if k not in desired_flow or desired_flow[k] is None:
                         desired_flow[k] = v
-                
+
                 # Differences found
                 if desired_flow != before_flow:
                     if not module.check_mode:
@@ -545,7 +552,7 @@ def main():
                         )
 
                     if module._diff:
-                        result['diff']['before']["flow"] = before_flow,
+                        result['diff']['before']["flow"] = before_flow
                         result['diff']['after']["flow"] = desired_flow
 
                     result['changed'] = True
@@ -566,7 +573,7 @@ def main():
                             flow=desired_flow,
                             realm=realm
                         )
-                    
+
                     desired_flow = kc.get_authentication_flow_by_alias(
                         alias=desired_flow['alias'],
                         realm=realm
@@ -575,14 +582,14 @@ def main():
                 if module._diff:
                     result['diff']['before']['flow'] = {}
                     result['diff']['after']['flow'] = desired_flow
-                
+
                 result['changed'] = True
                 result['end_state']['flow'] = desired_flow
-            
+
             # Bind flow
             if bind_flow:
                 # Get realm info
-                realm_info =  kc.get_realm_info_by_id(
+                realm_info = kc.get_realm_info_by_id(
                     realm=realm
                 )
 
@@ -598,7 +605,7 @@ def main():
                             },
                             realm=realm
                         )
-                    
+
                         if module._diff:
                             result['diff']['before']['bind_flow'] = {
                                 bind_flow: realm_info[bind_flow]
@@ -628,7 +635,7 @@ def main():
                         ):
                             found_match = True
                             break
-                    
+
                     if not found_match:
                         # Search using index and level
                         for before_execution in before_executions:
@@ -660,10 +667,10 @@ def main():
                         for k, v in before_execution.items():
                             if k not in desired_execution or desired_execution[k] is None:
                                 desired_execution[k] = v
-                            
+
                         # Sanitize
                         del desired_execution['flowType']
-                        
+
                         # Differences found
                         if desired_execution != before_execution:
                             if not module.check_mode:
@@ -680,10 +687,10 @@ def main():
                                         diff=before_execution['index'] - desired_execution['index'],
                                         realm=realm
                                     )
-                            
+
                             if module._diff:
                                 result['diff']['before']['execution'] = before_execution
-                                        
+
                             result['changed'] = True
 
                 # Create (also not found)
@@ -720,7 +727,7 @@ def main():
                                 ):
                                     parentFound = True
                                     parentLevel = before_execution['level']
-                                
+
                                 if parentFound:
                                     # Level difference found
                                     if before_execution == parentLevel:
@@ -751,7 +758,7 @@ def main():
                         for k, v in before_execution.items():
                             if k not in desired_execution or desired_execution[k] is None:
                                 desired_execution[k] = v
-                        
+
                         kc.update_authentication_execution(
                             alias=desired_flow['alias'],
                             rep=desired_execution,
@@ -765,12 +772,12 @@ def main():
                                 diff=before_execution['index'] - desired_execution['index'],
                                 realm=realm
                             )
-                    
+
                     if module._diff:
-                        result['diff']['before']['execution'] = {},
-                
+                        result['diff']['before']['execution'] = {}
+
                     result['changed'] = True
-                    
+
                 # Handle authentication execution configuration (only if configurable)
                 if desired_config and 'configurable' in desired_execution and desired_execution['configurable']:
                     # Update
@@ -793,7 +800,7 @@ def main():
                                     rep=desired_config,
                                     realm=realm
                                 )
-                            
+
                             if module._diff:
                                 result['diff']['before']['config'] = before_config
                     # Create
@@ -810,12 +817,10 @@ def main():
 
                     # Get the latest version of the authentication execution
                     desired_execution = list(
-                            filter(lambda execution: execution['id'] == desired_execution['id'],
-                                kc.get_authentication_executions(
-                                    alias=desired_flow['alias'],
-                                    realm=realm
-                                )
-                            )
+                        filter(lambda execution: execution['id'] == desired_execution['id'], kc.get_authentication_executions(
+                            alias=desired_flow['alias'],
+                            realm=realm
+                        ))
                     )[0]
 
                     # Get the lastest version of the authenticator configuration
@@ -832,14 +837,12 @@ def main():
 
                 # Get the latest version of the authentication execution
                 desired_execution = list(
-                    filter(lambda execution: execution['id'] == desired_execution['id'],
-                        kc.get_authentication_executions(
-                            alias=desired_flow['alias'],
-                            realm=realm
-                        )
-                    )
+                    filter(lambda execution: execution['id'] == desired_execution['id'], kc.get_authentication_executions(
+                        alias=desired_flow['alias'],
+                        realm=realm
+                    ))
                 )[0]
-                
+
                 if module._diff:
                     result['diff']['execution']['after'] = desired_execution
 
@@ -849,7 +852,7 @@ def main():
         if desired_required_action:
             # Get required action
             before_required_action = kc.get_required_action(
-                alias=desired_required_action['alias'], 
+                alias=desired_required_action['alias'],
                 realm=realm
             )
 
@@ -863,7 +866,7 @@ def main():
                 # Differences found
                 if desired_required_action != before_required_action:
                     if module._diff:
-                        result['diff']['before']['required_action'] = before_required_action,
+                        result['diff']['before']['required_action'] = before_required_action
                         result['diff']['after']['required_action'] = desired_required_action
 
                     if not module.check_mode:
@@ -903,9 +906,9 @@ def main():
                         desired_required_action[k] = v
 
                 if module._diff:
-                    result['diff']['before']['required_action'] = {},
+                    result['diff']['before']['required_action'] = {}
                     result['diff']['after']['required_action'] = desired_required_action
-                
+
                 result['changed'] = True
                 result['end_state']['required_action'] = desired_required_action
     else:
@@ -916,7 +919,7 @@ def main():
                 alias=desired_flow['alias'],
                 realm=realm
             )
-            
+
             # Delete
             if before_flow:
                 if module._diff:
@@ -936,22 +939,22 @@ def main():
         if desired_required_action:
             # Get required action
             before_required_action = kc.get_required_action(
-                alias=desired_required_action['alias'], 
+                alias=desired_required_action['alias'],
                 realm=realm
             )
 
             # Delete
             if before_required_action:
                 if module._diff:
-                    result['diff']['before']['required_action'] = before_required_action,
+                    result['diff']['before']['required_action'] = before_required_action
                     result['diff']['after']['required_action'] = {}
 
                 if not module.check_mode:
                     kc.delete_required_action(
-                        alias=desired_required_action['alias'], 
+                        alias=desired_required_action['alias'],
                         realm=realm
                     )
-                
+
                 result['changed'] = True
                 result['end_state']['required_action'] = {}
 
@@ -966,7 +969,7 @@ def main():
             result['msg'] = 'Authentication would not be updated'
         else:
             result['msg'] = 'Authentication not updated'
-    
+
     module.exit_json(**result)
 
 

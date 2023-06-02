@@ -58,25 +58,101 @@ def patch_keycloak_api(
     """
 
     obj = keycloak_authentication.KeycloakAPI
-    with patch.object(obj, 'get_authentication_flow_by_alias', side_effect=get_authentication_flow_by_alias) as mock_get_authentication_flow_by_alias:
-        with patch.object(obj, 'get_authentication_executions', side_effect=get_authentication_executions) as mock_get_authentication_executions:
-            with patch.object(obj, 'update_authentication_flow', side_effect=update_authentication_flow) as mock_update_authentication_flow:
-                with patch.object(obj, 'copy_authentication_flow', side_effect=copy_authentication_flow) as mock_copy_authentication_flow:
-                    with patch.object(obj, 'create_authentication_flow', side_effect=create_authentication_flow) as mock_create_authentication_flow:
-                        with patch.object(obj, 'get_realm_info_by_id', side_effect=get_realm_info_by_id) as mock_get_realm_info_by_id:
-                            with patch.object(obj, 'update_realm', side_effect=update_realm) as mock_update_realm:
-                                with patch.object(obj, 'update_authentication_execution', side_effect=update_authentication_execution) as mock_update_authentication_execution:
-                                    with patch.object(obj, 'change_execution_priority', side_effect=change_execution_priority) as mock_change_execution_priority:
-                                        with patch.object(obj, 'create_authentication_execution_subflow', side_effect=create_authentication_execution_subflow) as mock_create_authentication_execution_subflow:
-                                            with patch.object(obj, 'create_authentication_execution_step', side_effect=create_authentication_execution_step) as mock_create_authentication_execution_step:
-                                                with patch.object(obj, 'get_authenticator_config', side_effect=get_authenticator_config) as mock_get_authenticator_config:
-                                                    with patch.object(obj, 'update_authenticator_config', side_effect=update_authenticator_config) as mock_update_authenticator_config:
-                                                        with patch.object(obj, 'create_authenticator_config', side_effect=create_authenticator_config) as mock_create_authenticator_config:
-                                                            with patch.object(obj, 'get_required_action', side_effect=get_required_action) as mock_get_required_action:
-                                                                with patch.object(obj, 'update_required_action', side_effect=update_required_action) as mock_update_required_action:
-                                                                    with patch.object(obj, 'register_required_action', side_effect=register_required_action) as mock_register_required_action:
-                                                                        with patch.object(obj, 'delete_authentication_flow_by_id', side_effect=delete_authentication_flow_by_id) as mock_delete_authentication_flow_by_id:
-                                                                            with patch.object(obj, 'delete_required_action', side_effect=delete_required_action) as mock_delete_required_action:
+    with patch.object(
+        obj,
+        'get_authentication_flow_by_alias',
+        side_effect=get_authentication_flow_by_alias
+    ) as mock_get_authentication_flow_by_alias:
+        with patch.object(
+            obj,
+            'get_authentication_executions',
+            side_effect=get_authentication_executions
+        ) as mock_get_authentication_executions:
+            with patch.object(
+                obj,
+                'update_authentication_flow',
+                side_effect=update_authentication_flow
+            ) as mock_update_authentication_flow:
+                with patch.object(
+                    obj,
+                    'copy_authentication_flow',
+                    side_effect=copy_authentication_flow
+                ) as mock_copy_authentication_flow:
+                    with patch.object(
+                        obj,
+                        'create_authentication_flow',
+                        side_effect=create_authentication_flow
+                    ) as mock_create_authentication_flow:
+                        with patch.object(
+                            obj,
+                            'get_realm_info_by_id',
+                            side_effect=get_realm_info_by_id
+                        ) as mock_get_realm_info_by_id:
+                            with patch.object(
+                                obj,
+                                'update_realm',
+                                side_effect=update_realm
+                            ) as mock_update_realm:
+                                with patch.object(
+                                    obj,
+                                    'update_authentication_execution',
+                                    side_effect=update_authentication_execution
+                                ) as mock_update_authentication_execution:
+                                    with patch.object(
+                                        obj,
+                                        'change_execution_priority',
+                                        side_effect=change_execution_priority
+                                    ) as mock_change_execution_priority:
+                                        with patch.object(
+                                            obj,
+                                            'create_authentication_execution_subflow',
+                                            side_effect=create_authentication_execution_subflow
+                                        ) as mock_create_authentication_execution_subflow:
+                                            with patch.object(
+                                                obj,
+                                                'create_authentication_execution_step',
+                                                side_effect=create_authentication_execution_step
+                                            ) as mock_create_authentication_execution_step:
+                                                with patch.object(
+                                                    obj,
+                                                    'get_authenticator_config',
+                                                    side_effect=get_authenticator_config
+                                                ) as mock_get_authenticator_config:
+                                                    with patch.object(
+                                                        obj,
+                                                        'update_authenticator_config',
+                                                        side_effect=update_authenticator_config
+                                                    ) as mock_update_authenticator_config:
+                                                        with patch.object(
+                                                            obj,
+                                                            'create_authenticator_config',
+                                                            side_effect=create_authenticator_config
+                                                        ) as mock_create_authenticator_config:
+                                                            with patch.object(
+                                                                obj,
+                                                                'get_required_action',
+                                                                side_effect=get_required_action
+                                                            ) as mock_get_required_action:
+                                                                with patch.object(
+                                                                    obj,
+                                                                    'update_required_action',
+                                                                    side_effect=update_required_action
+                                                                ) as mock_update_required_action:
+                                                                    with patch.object(
+                                                                        obj,
+                                                                        'register_required_action',
+                                                                        side_effect=register_required_action
+                                                                    ) as mock_register_required_action:
+                                                                        with patch.object(
+                                                                            obj,
+                                                                            'delete_authentication_flow_by_id',
+                                                                            side_effect=delete_authentication_flow_by_id
+                                                                        ) as mock_delete_authentication_flow_by_id:
+                                                                            with patch.object(
+                                                                                obj,
+                                                                                'delete_required_action',
+                                                                                side_effect=delete_required_action
+                                                                            ) as mock_delete_required_action:
                                                                                 yield (
                                                                                     mock_get_authentication_flow_by_alias,
                                                                                     mock_get_authentication_executions,
@@ -191,7 +267,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "authenticationExecutions": [
                     {
                         "authenticator": "reset-password",
-                        "authenticatorFlow": False,
                         "requirement": "REQUIRED",
                         "priority": 0,
                         "authenticatorFlow": False,
@@ -345,7 +420,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "authenticationExecutions": [
                     {
                         "authenticator": "reset-password",
-                        "authenticatorFlow": False,
                         "requirement": "REQUIRED",
                         "priority": 0,
                         "authenticatorFlow": False,
@@ -457,7 +531,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
     def test_update_authentication_flow_add_execution_subflow(self):
         """Update an existing authentication flow by adding a new authentication execution sub-flow."""
-        
+
         module_args = {
             "auth_client_id": "admin-cli",
             "auth_keycloak_url": "http://keycloak.url/auth",
@@ -488,7 +562,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "authenticationExecutions": [
                     {
                         "authenticator": "reset-password",
-                        "authenticatorFlow": False,
                         "requirement": "REQUIRED",
                         "priority": 0,
                         "authenticatorFlow": False,
@@ -506,7 +579,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "authenticationExecutions": [
                     {
                         "authenticator": "reset-password",
-                        "authenticatorFlow": False,
                         "requirement": "REQUIRED",
                         "priority": 0,
                         "authenticatorFlow": False,
@@ -663,10 +735,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
-    
+
     def test_delete_authentication_flow(self):
         """Delete an existing authentication flow."""
-        
+
         module_args = {
             "auth_client_id": "admin-cli",
             "auth_keycloak_url": "http://keycloak.url/auth",
@@ -691,7 +763,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "authenticationExecutions": [
                     {
                         "authenticator": "reset-password",
-                        "authenticatorFlow": False,
                         "requirement": "REQUIRED",
                         "priority": 0,
                         "authenticatorFlow": False,
@@ -702,7 +773,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = True
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -756,7 +827,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
-    
+
     def test_delete_authentication_flow_idempotency(self):
         """Delete a non-existing authentication flow."""
 
@@ -778,7 +849,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = False
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -835,7 +906,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
     def test_register_required_action(self):
         """Register a new required action."""
-        
+
         module_args = {
             "auth_client_id": "admin-cli",
             "auth_keycloak_url": "http://keycloak.url/auth",
@@ -866,7 +937,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = True
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -953,7 +1024,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = False
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -1038,7 +1109,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = True
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -1123,7 +1194,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = False
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -1207,7 +1278,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = True
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -1283,7 +1354,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         ]
 
         changed = False
-        
+
         set_module_args(module_args)
 
         # Run the module
@@ -1313,7 +1384,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
             ):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
-        
+
         # Verify number of call on each mock
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 0)
         self.assertEqual(len(mock_get_authentication_executions.mock_calls), 0)

@@ -1819,7 +1819,7 @@ class KeycloakAPI(object):
         :param realm: Realm name (not id).
         :return:      HTTPResponse object on success.
         """
-        
+
         try:
             return open_url(
                 URL_AUTHENTICATION_FLOWS.format(
@@ -1839,7 +1839,7 @@ class KeycloakAPI(object):
             )
 
     def copy_authentication_flow(self, alias, name, realm='master'):
-        """ 
+        """
         Copy an existing authentication flow under a new name.
         :param alias: Name of the existing authentication flow.
         :param data:  JSON containing 'newName' attribute.
@@ -1899,7 +1899,7 @@ class KeycloakAPI(object):
             )
 
     def get_authentication_executions(self, alias, realm='master'):
-        """ 
+        """
         Get authentication executions of a flow.
         :param alias: Flow alias.
         :param realm: Realm name.
@@ -1924,7 +1924,7 @@ class KeycloakAPI(object):
             return None
 
     def create_authentication_execution_step(self, alias, data, realm='master'):
-        """ 
+        """
         Add a new authentication execution to an existing flow.
         :param alias: Alias of parent flow.
         :param data:  The new execution JSON data containing 'provider' attribute.
@@ -1981,14 +1981,14 @@ class KeycloakAPI(object):
             )
 
     def update_authentication_execution(self, alias, rep, realm='master'):
-        """ 
+        """
         Update an existing authentication execution of a flow.
         :param alias: Alias of the parent flow.
         :param rep:   The authentication execution representation.
         :param realm: Realm name.
         :return:      HTTPResponse object on success.
         """
-        
+
         try:
             return open_url(
                 URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
@@ -2007,9 +2007,9 @@ class KeycloakAPI(object):
                 msg='Unable to update the execution for flow %s in realm %s: %s'
                 % (alias, realm, str(e))
             )
-    
+
     def get_authenticator_config(self, id, realm='master'):
-        """ 
+        """
         Get an existing authenticator configuration.
         :param id:    ID of the authenticator configuration.
         :param realm: Realm name.
@@ -2038,7 +2038,7 @@ class KeycloakAPI(object):
             )
 
     def update_authenticator_config(self, id, rep, realm='master'):
-        """ 
+        """
         Update an existing authenticator configuration.
         :param id:    ID of the authenticator configuration.
         :param rep:   Authenticator configuration representation.
@@ -2065,9 +2065,9 @@ class KeycloakAPI(object):
                 msg='Unable to update the authenticator configuration %s in realm %s: %s'
                 % (id, realm, str(e))
             )
-    
+
     def create_authenticator_config(self, executionId, rep, realm='master'):
-        """ 
+        """
         Create a new authenticator configuration.
         :param executionId: ID of the authenticator configuration.
         :param rep:         Authenticator configuration representation.
@@ -2096,14 +2096,14 @@ class KeycloakAPI(object):
             )
 
     def update_authentication_execution_config(self, id, rep, realm='master'):
-        """ 
+        """
         Update an existing authentication with a new configuration.
         :param id:    Alias of the parent flow.
         :param rep:   The authentication execution configuration representation.
         :param realm: Realm name.
         :return:      HTTPResponse object on success.
         """
-        
+
         try:
             return open_url(
                 URL_AUTHENTICATION_EXECUTION_CONFIG.format(
@@ -2415,9 +2415,9 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
-    
+
     def register_required_action(self, rep, realm='master'):
-        """ 
+        """
         Register required action.
         :param rep:   JSON containing 'providerId', and 'name' attributes.
         :param realm: Realm name (not id).
@@ -2448,7 +2448,7 @@ class KeycloakAPI(object):
             )
 
     def get_required_action(self, alias, realm='master'):
-        """ 
+        """
         Get required action for alias.
         :param alias: Alias of required action.
         :param realm: Realm name (not id).
@@ -2468,13 +2468,13 @@ class KeycloakAPI(object):
                     validate_certs=self.validate_certs
                 )
             )
-            
+
             return required_action
         except Exception as e:
             return None
 
     def update_required_action(self, alias, rep, realm='master'):
-        """ 
+        """
         Update required action.
         :param alias: Alias of required action.
         :param rep:   JSON describing new state of required action.
@@ -2501,7 +2501,7 @@ class KeycloakAPI(object):
             )
 
     def delete_required_action(self, alias, realm='master'):
-        """ 
+        """
         Delete required action.
         :param alias: Alias of required action.
         :param realm: Realm name (not id).
