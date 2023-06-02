@@ -1,0 +1,2 @@
+breaking_changes:
+  - keycloak authentication plugin - refactor of existing plugin, while adding expanded support for authentication flows, executions (steps and sub-flows) and required actions (https://github.com/ansible-collections/community.general/pull/6616).
