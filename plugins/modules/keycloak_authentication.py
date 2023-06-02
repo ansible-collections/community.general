@@ -111,7 +111,6 @@ options:
                 type: str
             requirementChoices:
                 elements: str
-                default: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
                 description:
                     - A list of requirement choices of the authentication execution.
                 type: list
@@ -423,7 +422,6 @@ def main():
                     ]
                 ),
                 requirementChoices=dict(
-                    default=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"],
                     elements="str",
                     type="list",
                 ),
