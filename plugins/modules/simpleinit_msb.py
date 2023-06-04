@@ -77,24 +77,10 @@ EXAMPLES = '''
     enabled: yes
 '''
 
-import glob
 import os
-import platform
 import re
-import select
-import shlex
-import string
-import subprocess
-import tempfile
-import time
-
-try:
-    import json
-except ImportError:
-    import simplejson as json
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.service import fail_if_missing
 
 
 class SimpleinitMSB(object):
