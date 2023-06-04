@@ -14,7 +14,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: simpleinit_msb
-short_description: manage services on Source Mage GNU/Linux
+short_description: Manage services on Source Mage GNU/Linux
+version_added: 7.1.0
 description:
     - Controls services on remote hosts using simpleinit-msb
 author: "Vlad Glagolev (@vaygr)"
