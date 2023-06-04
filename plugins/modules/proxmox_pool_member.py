@@ -157,10 +157,9 @@ class ProxmoxPoolMemberAnsible(ProxmoxAnsible):
                                           diff=diff, msg="VM {0} is already part of the pool {1}".format(member, poolid))
 
                 all_members_after.append(member)
-                if self.module.check_mode:
-                    return diff
 
-                self.proxmox_api.pools(poolid).put(vms=[vmid])
+                if not self.module.check_mode:
+                    self.proxmox_api.pools(poolid).put(vms=[vmid])
                 return diff
         except Exception as e:
             self.module.fail_json(msg="Failed to add a new member ({0}) to the pool {1}: {2}".format(member, poolid, e))
@@ -194,10 +193,9 @@ class ProxmoxPoolMemberAnsible(ProxmoxAnsible):
                                           diff=diff, msg="VM {0} is not part of the pool {1}".format(member, poolid))
 
                 all_members_after.remove(member)
-                if self.module.check_mode:
-                    return diff
 
-                self.proxmox_api.pools(poolid).put(vms=[vmid], delete=1)
+                if not self.module.check_mode:
+                    self.proxmox_api.pools(poolid).put(vms=[vmid], delete=1)
                 return diff
         except Exception as e:
             self.module.fail_json(msg="Failed to delete a member ({0}) from the pool {1}: {2}".format(member, poolid, e))

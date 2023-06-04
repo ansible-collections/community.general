@@ -83,7 +83,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 class ProxmoxPoolAnsible(ProxmoxAnsible):
 
-    def is_pool_exists(self, poolid):
+    def is_pool_existsing(self, poolid):
         """Check whether pool already exist
 
         :param poolid: str - name of the pool
@@ -113,11 +113,11 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
         :param comment: str, optional - Description of a pool
         :return: None
         """
-        if self.is_pool_exists(poolid):
+        if self.is_pool_existsing(poolid):
             self.module.exit_json(changed=False, poolid=poolid, msg="Pool {0} already exists".format(poolid))
 
         if self.module.check_mode:
-            self.module.exit_json(changed=True, poolid=poolid, msg="Pool {0} already exists".format(poolid))
+            return
 
         try:
             self.proxmox_api.pools.post(poolid=poolid, comment=comment)
@@ -130,11 +130,11 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
         :param poolid: str - name of the pool
         :return: None
         """
-        if not self.is_pool_exists(poolid):
+        if not self.is_pool_existsing(poolid):
             self.module.exit_json(changed=False, poolid=poolid, msg="Pool {0} doesn't exist".format(poolid))
 
         if self.module.check_mode:
-            self.module.exit_json(changed=True, poolid=poolid, msg="Pool {0} doesn't exist".format(poolid))
+            return
 
         if self.is_pool_empty(poolid):
             try:
