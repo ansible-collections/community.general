@@ -43,8 +43,8 @@ options:
             service if it is not already started, even if your chosen init
             system wouldn't normally.
     enabled:
+        type: bool
         required: false
-        choices: [ "yes", "no" ]
         description:
         - Whether the service should start on boot. B(At least one of state and
           enabled are required.)
@@ -89,15 +89,15 @@ class SimpleinitMSB(object):
     """
 
     def __init__(self, module):
-        self.module         = module
-        self.name           = module.params['name']
-        self.state          = module.params['state']
-        self.enable         = module.params['enabled']
-        self.changed        = False
-        self.running        = None
-        self.action         = None
-        self.telinit_cmd    = None
-        self.svc_change     = False
+        self.module = module
+        self.name = module.params['name']
+        self.state = module.params['state']
+        self.enable = module.params['enabled']
+        self.changed = False
+        self.running = None
+        self.action = None
+        self.telinit_cmd = None
+        self.svc_change = False
 
     def execute_command(self, cmd):
         return self.module.run_command(cmd)
@@ -238,10 +238,10 @@ class SimpleinitMSB(object):
 
 def main():
     module = AnsibleModule(
-        argument_spec = dict(
-            name = dict(required=True, aliases=['service']),
-            state = dict(choices=['running', 'started', 'stopped', 'restarted', 'reloaded']),
-            enabled = dict(type='bool'),
+        argument_spec=dict(
+            name=dict(required=True, aliases=['service']),
+            state=dict(choices=['running', 'started', 'stopped', 'restarted', 'reloaded']),
+            enabled=dict(type='bool'),
         ),
         supports_check_mode=True,
         required_one_of=[['state', 'enabled']],
