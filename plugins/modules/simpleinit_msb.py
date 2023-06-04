@@ -192,25 +192,6 @@ class SimpleinitMSB(object):
 
         return (rc, out, err)
 
-        #
-        # If we've gotten to the end, the service needs to be updated
-        #
-        self.changed = True
-
-        args = (self.telinit_cmd, self.name, action)
-
-        if self.module.check_mode:
-            self.module.exit_json(changed=self.changed)
-
-        (rc, out, err) = self.execute_command("%s %s %s" % args)
-        if rc != 0:
-            if err:
-                self.module.fail_json(msg="Error when trying to %s %s: rc=%s %s" % (action, self.name, rc, err))
-            else:
-                self.module.fail_json(msg="Failure for %s %s: rc=%s %s" % (action, self.name, rc, out))
-
-        return (rc, out, err)
-
     def service_exists(self):
         (rc, out, err) = self.execute_command("%s list" % self.telinit_cmd)
 
