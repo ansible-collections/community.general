@@ -33,6 +33,7 @@ options:
         required: true
         aliases: ['service']
     state:
+        type: str
         required: false
         choices: [ running, started, stopped, restarted, reloaded ]
         description:
