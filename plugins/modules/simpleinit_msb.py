@@ -43,7 +43,7 @@ options:
             service.  C(reloaded) will always reload. B(At least one of state
             and enabled are required.) Note that reloaded will start the
             service if it is not already started, even if your chosen init
-            system wouldn't normally.
+            system would not normally.
     enabled:
         type: bool
         required: false
