@@ -4,5 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Has-snap include
-  ansible.builtin.include_tasks: test.yml
   when: has_snap
+  block:
+    - name: Include test
+      ansible.builtin.include_tasks: test.yml
+    - name: Include test_channel
+      ansible.builtin.include_tasks: test_channel.yml

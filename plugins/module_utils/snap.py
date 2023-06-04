@@ -20,6 +20,7 @@ _state_map = dict(
     absent='remove',
     enabled='enable',
     disabled='disable',
+    refresh='refresh',
 )
 
 

@@ -35,7 +35,9 @@ options:
     state:
         description:
             - Desired state of the package.
-        required: false
+            - >
+              When I(state=present) the module will use C(snap install) if the snap is not installed,
+              and C(snap refresh) if it is installed but from a different channel.
         default: present
         choices: [ absent, present, enabled, disabled ]
         type: str
@@ -159,10 +161,14 @@ from ansible_collections.community.general.plugins.module_utils.snap import snap
 
 
 class Snap(StateModuleHelper):
+    NOT_INSTALLED = 0
+    CHANNEL_MISMATCH = 1
+    INSTALLED = 2
+
     __disable_re = re.compile(r'(?:\S+\s+){5}(?P<notes>\S+)')
     __set_param_re = re.compile(r'(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)')
     __list_re = re.compile(r'^(?P<name>\S+)\s+\S+\s+\S+\s+(?P<channel>\S+)')
-    __install_re = re.compile(r'(?P<name>\S+)\s.+\sinstalled')
+    __install_re = re.compile(r'(?P<name>\S+)\s.+\s(installed|refreshed)')
     module = dict(
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
@@ -184,33 +190,41 @@ class Snap(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = snap_runner(self.module)
+        self.vars.set("snap_status", self.snap_status(self.vars.name, self.vars.channel), output=False)
+        self.vars.set("snap_status_map", dict(zip(self.vars.name, self.vars.snap_status)), output=False)
 
-    def _run_multiple_commands(self, commands, actionable_names, bundle=True):
+    def _run_multiple_commands(self, commands, actionable_names, bundle=True, refresh=False):
         results_cmd = []
         results_rc = []
         results_out = []
         results_err = []
+        results_run_info = []
+
+        state = "refresh" if refresh else self.vars.state
 
         with self.runner(commands + ["name"]) as ctx:
             if bundle:
-                rc, out, err = ctx.run(name=actionable_names)
+                rc, out, err = ctx.run(state=state, name=actionable_names)
                 results_cmd.append(commands + actionable_names)
                 results_rc.append(rc)
                 results_out.append(out)
                 results_err.append(err)
+                results_run_info.append(ctx.run_info)
             else:
                 for name in actionable_names:
-                    rc, out, err = ctx.run(name=name)
+                    rc, out, err = ctx.run(state=state, name=name)
                     results_cmd.append(commands + [name])
                     results_rc.append(rc)
                     results_out.append(out)
                     results_err.append(err)
+                    results_run_info.append(ctx.run_info)
 
         return [
             '; '.join([to_native(x) for x in results_cmd]),
             self._first_non_zero(results_rc),
             '\n'.join(results_out),
             '\n'.join(results_err),
+            results_run_info,
         ]
 
     def __quit_module__(self):
@@ -229,7 +243,6 @@ class Snap(StateModuleHelper):
 
             if isinstance(value, (str, float, bool, numbers.Integral)):
                 option_map[full_key] = str(value)
-
             else:
                 option_map.update(self.convert_json_subtree_to_map(json_subtree=value, prefix=full_key))
 
@@ -253,25 +266,32 @@ class Snap(StateModuleHelper):
 
         try:
             option_map = self.convert_json_to_map(out)
-
         except Exception as e:
             self.do_raise(
                 msg="Parsing option map returned by 'snap get {0}' triggers exception '{1}', output:\n'{2}'".format(snap_name, str(e), out))
 
         return option_map
 
-    def is_snap_installed(self, snap_name, channel):
-        with self.runner("_list name") as ctx:
-            rc, out, err = ctx.run(name=snap_name)
-        if rc != 0:
-            return False
+    def snap_status(self, snap_name, channel):
+        def _status_check(name, channel, installed):
+            match = [c for n, c in installed if n == name]
+            if not match:
+                return Snap.NOT_INSTALLED
+            if channel and channel != match[0]:
+                return Snap.CHANNEL_MISMATCH
+            else:
+                return Snap.INSTALLED
+
+        with self.runner("_list") as ctx:
+            rc, out, err = ctx.run(check_rc=True)
         out = out.split('\n')[1:]
         out = [self.__list_re.match(x) for x in out]
         out = [(m.group('name'), m.group('channel')) for m in out if m]
-        if channel is None:
-            return any(snap_name == m[0] for m in out)
-        else:
-            return any((snap_name, channel) == m for m in out)
+        if self.verbosity >= 4:
+            self.vars.status_out = out
+            self.vars.status_run_info = ctx.run_info
+
+        return [_status_check(n, channel, out) for n in snap_name]
 
     def is_snap_enabled(self, snap_name):
         with self.runner("_list name") as ctx:
@@ -285,7 +305,7 @@ class Snap(StateModuleHelper):
         notes = match.group('notes')
         return "disabled" not in notes.split(',')
 
-    def process_actionable_snaps(self, actionable_snaps):
+    def _present(self, actionable_snaps, refresh=False):
         self.changed = True
         self.vars.snaps_installed = actionable_snaps
 
@@ -297,14 +317,16 @@ class Snap(StateModuleHelper):
         has_multiple_snaps = len(actionable_snaps) > 1
 
         if has_one_pkg_params and has_multiple_snaps:
-            self.vars.cmd, rc, out, err = self._run_multiple_commands(params, actionable_snaps, bundle=False)
+            self.vars.cmd, rc, out, err, run_info = self._run_multiple_commands(params, actionable_snaps, bundle=False, refresh=refresh)
         else:
-            self.vars.cmd, rc, out, err = self._run_multiple_commands(params, actionable_snaps)
+            self.vars.cmd, rc, out, err, run_info = self._run_multiple_commands(params, actionable_snaps, refresh=refresh)
+        if self.verbosity >= 4:
+            self.vars.run_info = run_info
 
         if rc == 0:
             match_install = [self.__install_re.match(line) for line in out.split('\n')]
             match_install = [m.group('name') in actionable_snaps for m in match_install if m]
-            if len(match_install) == len(commands):
+            if len(match_install) == len(actionable_snaps):
                 return
 
         classic_snap_pattern = re.compile(r'^error: This revision of snap "(?P<package_name>\w+)"'
@@ -322,10 +344,13 @@ class Snap(StateModuleHelper):
 
         self.vars.meta('classic').set(output=True)
         self.vars.meta('channel').set(output=True)
-        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s, self.vars.channel)]
 
-        if actionable_snaps:
-            self.process_actionable_snaps(actionable_snaps)
+        actionable_refresh = [snap for snap in self.vars.name if self.vars.snap_status_map[snap] == Snap.CHANNEL_MISMATCH]
+        if actionable_refresh:
+            self._present(actionable_refresh, refresh=True)
+        actionable_install = [snap for snap in self.vars.name if self.vars.snap_status_map[snap] == Snap.NOT_INSTALLED]
+        if actionable_install:
+            self._present(actionable_install)
 
         self.set_options()
 
@@ -333,7 +358,7 @@ class Snap(StateModuleHelper):
         if self.vars.options is None:
             return
 
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s, self.vars.channel)]
+        actionable_snaps = [s for s in self.vars.name if self.vars.snap_status_map[s] != Snap.NOT_INSTALLED]
         overall_options_changed = []
 
         for snap_name in actionable_snaps:
@@ -383,7 +408,7 @@ class Snap(StateModuleHelper):
         if overall_options_changed:
             self.vars.options_changed = overall_options_changed
 
-    def _generic_state_action(self, actionable_func, actionable_var, params=None):
+    def _generic_state_action(self, actionable_func, actionable_var, params):
         actionable_snaps = [s for s in self.vars.name if actionable_func(s)]
         if not actionable_snaps:
             return
@@ -391,9 +416,9 @@ class Snap(StateModuleHelper):
         self.vars[actionable_var] = actionable_snaps
         if self.check_mode:
             return
-        if params is None:
-            params = ['state']
-        self.vars.cmd, rc, out, err = self._run_multiple_commands(params, actionable_snaps)
+        self.vars.cmd, rc, out, err, run_info = self._run_multiple_commands(params, actionable_snaps)
+        if self.verbosity >= 4:
+            self.vars.run_info = run_info
         if rc == 0:
             return
         msg = "Ooops! Snap operation failed while executing '{cmd}', please examine logs and " \
@@ -401,7 +426,7 @@ class Snap(StateModuleHelper):
         self.do_raise(msg=msg)
 
     def state_absent(self):
-        self._generic_state_action(lambda s: self.is_snap_installed(s, self.vars.channel), "snaps_removed", ['classic', 'channel', 'state'])
+        self._generic_state_action(lambda s: self.vars.snap_status_map[s] != Snap.NOT_INSTALLED, "snaps_removed", ['classic', 'channel', 'state'])
 
     def state_enabled(self):
         self._generic_state_action(lambda s: not self.is_snap_enabled(s), "snaps_enabled", ['classic', 'channel', 'state'])
