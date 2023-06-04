@@ -216,7 +216,7 @@ class SimpleinitMSB(object):
 
         service_exists = False
 
-        rex = re.compile('^\w+\s+%s$' % self.name)
+        rex = re.compile(r'^\w+\s+%s$' % self.name)
 
         for line in out.splitlines():
             if rex.match(line):
