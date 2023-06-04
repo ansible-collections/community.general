@@ -34,7 +34,7 @@ options:
         aliases: ['service']
     state:
         required: false
-        choices: [ started, stopped, restarted, reloaded ]
+        choices: [ running, started, stopped, restarted, reloaded ]
         description:
           - C(started)/C(stopped) are idempotent actions that will not run
             commands unless necessary.  C(restarted) will always bounce the
@@ -235,8 +235,6 @@ class SimpleinitMSB(object):
 
         return(rc_state, stdout, stderr)
 
-# ===========================================
-# Main control flow
 
 def main():
     module = AnsibleModule(
