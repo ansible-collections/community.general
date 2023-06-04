@@ -108,12 +108,14 @@
           poolid: "{{ poolid }}"
           member: "{{ member }}"
           type: "{{ member_type }}"
+        diff: true
         register: result
 
       - assert:
           that:
             - result is changed
             - result is success
+            - "'{{ member }}' in result.diff.after.members"
 
       - name: Add non-existing storage into pool should fail
         proxmox_pool_member:
