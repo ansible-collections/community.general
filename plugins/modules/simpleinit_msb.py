@@ -215,7 +215,7 @@ class SimpleinitMSB(object):
 
         rc_state, stdout, stderr = self.execute_command("%s %s" % (svc_cmd, self.action))
 
-        return(rc_state, stdout, stderr)
+        return (rc_state, stdout, stderr)
 
 
 def main():
