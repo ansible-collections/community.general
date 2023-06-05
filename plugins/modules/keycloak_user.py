@@ -39,7 +39,7 @@ options:
         type: bool
     email_verified:
         description:
-            - check the validity of user email.
+            - Check the validity of user email.
         default: false
         type: bool
         aliases:
