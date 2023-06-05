@@ -1757,7 +1757,6 @@ class KeycloakAPI(object):
                                       % (rolerep['name'], realm, str(e)))
 
     def update_role_composites(self, rolerep, composites, clientid=None, realm='master'):
-        if composites is not None:
             # Get existing composites
             existing_composites = self.get_role_composites(rolerep=rolerep, clientid=clientid, realm=realm)
             composites_to_be_created = []
