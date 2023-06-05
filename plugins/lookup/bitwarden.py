@@ -12,6 +12,8 @@ DOCUMENTATION = """
     requirements:
       - bw (command line utility)
       - be logged into bitwarden
+      - bitwarden vault unlocked
+      - C(BW_SESSION) environment variable set
     short_description: Retrieve secrets from Bitwarden
     version_added: 5.4.0
     description:
