@@ -18,7 +18,7 @@ description:
     - It can also add or update an authentication execution to a flow (step or sub-flow). Deletion is not supported.
     - This module also supports registration, update and deletion of an authentication required action.
 
-version_added: "7.0.0"
+version_added: "3.3.0"
 
 attributes:
     check_mode:
@@ -32,6 +32,7 @@ options:
             - Assign the authentication flow to be used by a realm authentication flow.
         choices: [ "browserFlow", "clientAuthenticationFlow", "directGrantFlow", "dockerAuthenticationFlow", "registrationFlow", "resetCredentialsFlow" ]
         type: str
+        version_added: 7.1.0
     config:
         description:
             - Configuration for a configurable authentication flow.
@@ -40,19 +41,24 @@ options:
                 description:
                     - Unique name of the configuration.
                 type: str
+                version_added: 7.1.0
             config:
                 description:
                     - The inner parameters of the configuration specific to the authentication execution.
                 type: dict
+                version_added: 7.1.0
             id:
                 description:
                     - ID of the configuration used for updating.
                 type: str
+                version_added: 7.1.0
         type: dict
+        version_added: 7.1.0
     copy_from:
         description:
             - Unique name of the authentication flow to copy from.
         type: str
+        version_added: 7.1.0
     execution:
         description:
             - Authentication execution (step or sub-flow) of the authentication flow.
@@ -61,66 +67,81 @@ options:
                 description:
                     - Name of the authentication execution taken from its configuration.
                 type: str
+                version_added: 7.1.0
             authenticationConfig:
                 description:
                     - ID of the authentication execution's configuration.
                 type: str
+                version_added: 7.1.0
             authenticationFlow:
                 description:
                     - Indicates, if the authentication execution is a step (false) or a sub-flow (true).
                 required: true
                 type: bool
+                version_added: 7.1.0
             configurable:
                 description:
                     - Indicates, if the authentication execution is configurable (depends on the provider).
                 type: bool
+                version_added: 7.1.0
             description:
                 description:
                     - Description of the authentication execution.
                 type: str
+                version_added: 7.1.0
             displayName:
                 description:
                     - Display name of the authentication execution.
                 type: str
+                version_added: 7.1.0
             flowId:
                 description:
                     - ID of the authentication execution sub-flow.
                 type: str
+                version_added: 7.1.0
             id:
                 description:
                     - ID of the authentication execution (step or sub-flow).
                 type: str
+                version_added: 7.1.0
             index:
                 description:
                     - The priortiy of an inner authentication execution of its outer authentication execution.
                 type: int
+                version_added: 7.1.0
             level:
                 description:
                     - The priority of the authentication execution in the authentication flow.
                 type: int
+                version_added: 7.1.0
             providerId:
                 description:
                     - ID (specific name) of the provider.
                 required: true
                 type: str
+                version_added: 7.1.0
             requirement:
                 choices: [ "REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL" ]
                 default: "DISABLED"
                 description:
                     - Indicates the requirement of the authentication flow.
                 type: str
+                version_added: 7.1.0
             requirementChoices:
                 elements: str
                 description:
                     - A list of requirement choices of the authentication execution.
                 type: list
+                version_added: 7.1.0
             flowType:
                 choices: [ "basic-flow", "client-flow" ]
                 default: "basic-flow"
                 description:
                     - Indicates the flow type of the authentication execution (sub-flow).
                 type: str
+                version_added: 7.1.0
         type: dict
+        version_added: 7.1.0
     flow:
         description:
             - Authentication flow.
@@ -130,36 +151,44 @@ options:
                     - Unique name of the authentication flow.
                 required: true
                 type: str
+                version_added: 7.1.0
             builtIn:
                 default: false
                 description:
                     - Indicates, if the authentication is built-in or not.
                 type: bool
+                version_added: 7.1.0
             description:
                 description:
                     - Description of the authentication flow.
                 type: str
+                version_added: 7.1.0
             id:
                 description:
                     - ID of the authentication flow.
                 type: str
+                version_added: 7.1.0
             providerId:
                 choices: [ "basic-flow", "client-flow" ]
                 default: "basic-flow"
                 description:
                     - Indicates, if the authentication flow is a basic or a client flow.
                 type: str
+                version_added: 7.1.0
             topLevel:
                 default: true
                 description:
                     - Indicates, if the authentication flow is top-level or not.
                 type: bool
+                version_added: 7.1.0
         type: dict
+        version_added: 7.1.0
     realm:
         description:
             - Name of the realm, to which the authentication is modified using this module.
         required: true
         type: str
+        version_added: 7.1.0
     required_action:
         description:
             - Authentication required action.
@@ -169,33 +198,41 @@ options:
                     - Unique name of the required action.
                 required: true
                 type: str
+                version_added: 7.1.0
             config:
                 description:
                     - Configuration for the required action.
                 type: dict
+                version_added: 7.1.0
             defaultAction:
                 default: false
                 description:
                     - Indicates, if any new user will have the required action assigned to it.
                 type: bool
+                version_added: 7.1.0
             enabled:
                 default: false
                 description:
                     - Indicates, if the required action is enabled or not.
                 type: bool
+                version_added: 7.1.0
             name:
                 description:
                     - Displayed name of the required action.
                 type: str
+                version_added: 7.1.0
             priority:
                 description:
                     - Priority of the required action.
                 type: int
+                version_added: 7.1.0
             providerId:
                 description:
                     - Provider ID of the required action.
                 type: str
+                version_added: 7.1.0
         type: dict
+        version_added: 7.1.0
     state:
         choices: [ "absent", "present" ]
         description:
