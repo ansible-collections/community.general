@@ -140,7 +140,7 @@ options:
                 default: false
     required_actions:
         description:
-            - requiredActions user Auth.
+            - RequiredActions user Auth.
         default: []
         type: list
         elements: str
