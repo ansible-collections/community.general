@@ -148,7 +148,7 @@ options:
             - requiredActions
     federated_identities:
         description:
-            - list of IDP of user.
+            - List of IDPs of user.
         default: []
         type: list
         elements: str
