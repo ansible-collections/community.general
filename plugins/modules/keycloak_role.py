@@ -354,6 +354,9 @@ def main():
             kc.create_client_role(desired_role, clientid, realm)
             after_role = kc.get_client_role(name, clientid, realm)
 
+        if after_role['composite']:
+            after_role['composites'] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
+
         result['end_state'] = after_role
 
         result['msg'] = 'Role {name} has been created'.format(name=name)
@@ -368,7 +371,7 @@ def main():
                 for composite in composites:
                     before_composite = {}
                     if composite['clientRole']:
-                        composite_client = kc.get_client_by_id(id=composite['containerId'])
+                        composite_client = kc.get_client_by_id(id=composite['containerId'], realm=realm)
                         before_composite['client_id'] = composite_client['clientId']
                     else:
                         before_composite['client_id'] = None
@@ -401,6 +404,8 @@ def main():
             else:
                 kc.update_client_role(desired_role, clientid, realm)
                 after_role = kc.get_client_role(name, clientid, realm)
+            if after_role['composite']:
+                after_role['composites'] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
 
             result['end_state'] = after_role
 
