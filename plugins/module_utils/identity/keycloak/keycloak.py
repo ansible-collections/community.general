@@ -207,42 +207,42 @@ def is_struct_included(struct1, struct2, exclude=None):
         description:
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
-    try:
-        if isinstance(struct1, list) and isinstance(struct2, list):
-            if len(struct1) == 0 and len(struct2) == 0:
-                return True
+    if isinstance(struct1, list) and isinstance(struct2, list):
+        if len(struct1) == 0 and len(struct2) == 0:
+            return True
+        found = False
+        for item1 in struct1:
             found = False
-            for item1 in struct1:
-                found = False
-                if isinstance(item1, list) or isinstance(item1, dict):
-                    found1 = False
-                    for item2 in struct2:
-                        if is_struct_included(item1, item2, exclude):
-                            found1 = True
-                    if found1:
-                        found = True
-                else:
-                    if item1 not in struct2:
-                        return False
-                    else:
-                        found = True
-                if not found:
+            if isinstance(item1, list) or isinstance(item1, dict):
+                found1 = False
+                for item2 in struct2:
+                    if is_struct_included(item1, item2, exclude):
+                        found1 = True
+                if found1:
+                    found = True
+            else:
+                if item1 not in struct2:
                     return False
-            return found
-        elif isinstance(struct1, dict) and isinstance(struct2, dict):
-            if len(struct1) == 0 and len(struct2) == 0:
-                return True
+                else:
+                    found = True
+            if not found:
+                return False
+        return found
+    elif isinstance(struct1, dict) and isinstance(struct2, dict):
+        if len(struct1) == 0 and len(struct2) == 0:
+            return True
+        try:
             for key in struct1:
                 if not (exclude and key in exclude):
                     if not is_struct_included(struct1[key], struct2[key], exclude):
                         return False
-            return True
-        elif isinstance(struct1, bool) and isinstance(struct2, bool):
-            return struct1 == struct2
-        else:
-            return to_text(struct1, 'utf-8') == to_text(struct2, 'utf-8')
-    except KeyError:
-        return False
+        except KeyError:
+            return False
+        return True
+    elif isinstance(struct1, bool) and isinstance(struct2, bool):
+        return struct1 == struct2
+    else:
+        return to_text(struct1, 'utf-8') == to_text(struct2, 'utf-8')
 
 
 class KeycloakAPI(object):
@@ -1758,54 +1758,54 @@ class KeycloakAPI(object):
                                       % (rolerep['name'], realm, str(e)))
 
     def update_role_composites(self, rolerep, composites, clientid=None, realm='master'):
-            # Get existing composites
-            existing_composites = self.get_role_composites(rolerep=rolerep, clientid=clientid, realm=realm)
-            composites_to_be_created = []
-            composites_to_be_deleted = []
-            for composite in composites:
-                composite_found = False
-                existing_composite_client = None
-                for existing_composite in existing_composites:
-                    if existing_composite["clientRole"]:
-                        existing_composite_client = self.get_client_by_id(existing_composite["containerId"], realm=realm)
-                        if ("client_id" in composite
-                                and composite['client_id'] is not None
-                                and existing_composite_client["clientId"] == composite["client_id"]
-                                and composite["name"] == existing_composite["name"]):
-                            composite_found = True
+        # Get existing composites
+        existing_composites = self.get_role_composites(rolerep=rolerep, clientid=clientid, realm=realm)
+        composites_to_be_created = []
+        composites_to_be_deleted = []
+        for composite in composites:
+            composite_found = False
+            existing_composite_client = None
+            for existing_composite in existing_composites:
+                if existing_composite["clientRole"]:
+                    existing_composite_client = self.get_client_by_id(existing_composite["containerId"], realm=realm)
+                    if ("client_id" in composite
+                            and composite['client_id'] is not None
+                            and existing_composite_client["clientId"] == composite["client_id"]
+                            and composite["name"] == existing_composite["name"]):
+                        composite_found = True
+                        break
+                else:
+                    if (("client_id" not in composite or composite['client_id'] is None)
+                            and composite["name"] == existing_composite["name"]):
+                        composite_found = True
+                        break
+            if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
+                if "client_id" in composite and composite['client_id'] is not None:
+                    client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                    for client_role in client_roles:
+                        if client_role['name'] == composite['name']:
+                            composites_to_be_created.append(client_role)
                             break
-                    else:
-                        if (("client_id" not in composite or composite['client_id'] is None)
-                                and composite["name"] == existing_composite["name"]):
-                            composite_found = True
+                else:
+                    realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                    composites_to_be_created.append(realm_role)
+            elif composite_found and 'state' in composite and composite['state'] == 'absent':
+                if "client_id" in composite and composite['client_id'] is not None:
+                    client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                    for client_role in client_roles:
+                        if client_role['name'] == composite['name']:
+                            composites_to_be_deleted.append(client_role)
                             break
-                if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
-                    if "client_id" in composite and composite['client_id'] is not None:
-                        client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
-                        for client_role in client_roles:
-                            if client_role['name'] == composite['name']:
-                                composites_to_be_created.append(client_role)
-                                break
-                    else:
-                        realm_role = self.get_realm_role(name=composite["name"], realm=realm)
-                        composites_to_be_created.append(realm_role)
-                elif composite_found and 'state' in composite and composite['state'] == 'absent':
-                    if "client_id" in composite and composite['client_id'] is not None:
-                        client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
-                        for client_role in client_roles:
-                            if client_role['name'] == composite['name']:
-                                composites_to_be_deleted.append(client_role)
-                                break
-                    else:
-                        realm_role = self.get_realm_role(name=composite["name"], realm=realm)
-                        composites_to_be_deleted.append(realm_role)
+                else:
+                    realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                    composites_to_be_deleted.append(realm_role)
 
-            if len(composites_to_be_created) > 0:
-                # create new composites
-                self.create_role_composites(rolerep=rolerep, composites=composites_to_be_created, clientid=clientid, realm=realm)
-            if len(composites_to_be_deleted) > 0:
-                # delete new composites
-                self.delete_role_composites(rolerep=rolerep, composites=composites_to_be_deleted, clientid=clientid, realm=realm)
+        if len(composites_to_be_created) > 0:
+            # create new composites
+            self.create_role_composites(rolerep=rolerep, composites=composites_to_be_created, clientid=clientid, realm=realm)
+        if len(composites_to_be_deleted) > 0:
+            # delete new composites
+            self.delete_role_composites(rolerep=rolerep, composites=composites_to_be_deleted, clientid=clientid, realm=realm)
 
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
@@ -1929,7 +1929,8 @@ class KeycloakAPI(object):
                 del rolerep['composites']
             update_role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
-            self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
+            if composites is not None:
+                self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
             return update_role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
