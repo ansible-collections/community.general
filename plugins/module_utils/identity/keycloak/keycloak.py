@@ -216,24 +216,37 @@ def is_struct_included(struct1, struct2, exclude=None):
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
     if isinstance(struct1, list) and isinstance(struct2, list):
+        if len(struct1) == 0 and len(struct2) == 0:
+            return True
+        found = False
         for item1 in struct1:
-            if isinstance(item1, (list, dict)):
+            found = False
+            if isinstance(item1, list) or isinstance(item1, dict):
+                found1 = False
                 for item2 in struct2:
-                    if not is_struct_included(item1, item2, exclude):
-                        return False
+                    if is_struct_included(item1, item2, exclude):
+                        found1 = True
+                if found1:
+                    found = True
             else:
                 if item1 not in struct2:
                     return False
-        return True
+                else:
+                    found = True
+            if not found:
+                return False
+        return found
     elif isinstance(struct1, dict) and isinstance(struct2, dict):
+        if len(struct1) == 0 and len(struct2) == 0:
+            return True
         try:
             for key in struct1:
                 if not (exclude and key in exclude):
                     if not is_struct_included(struct1[key], struct2[key], exclude):
                         return False
-            return True
         except KeyError:
             return False
+        return True
     elif isinstance(struct1, bool) and isinstance(struct2, bool):
         return struct1 == struct2
     else:
@@ -1694,6 +1707,111 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
 
+    def get_role_composites(self, rolerep, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            return json.loads(to_native(open_url(
+                composite_url,
+                method='GET',
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg='Could not get role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def create_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            # create new composites
+            return open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(composites), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def delete_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            # create new composites
+            return open_url(composite_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(composites), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def update_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+            # Get existing composites
+            existing_composites = self.get_role_composites(rolerep=rolerep, clientid=clientid, realm=realm)
+            composites_to_be_created = []
+            composites_to_be_deleted = []
+            for composite in composites:
+                composite_found = False
+                existing_composite_client = None
+                for existing_composite in existing_composites:
+                    if existing_composite["clientRole"]:
+                        existing_composite_client = self.get_client_by_id(existing_composite["containerId"], realm=realm)
+                        if ("client_id" in composite
+                                and composite['client_id'] is not None
+                                and existing_composite_client["clientId"] == composite["client_id"]
+                                and composite["name"] == existing_composite["name"]):
+                            composite_found = True
+                            break
+                    else:
+                        if (("client_id" not in composite or composite['client_id'] is None)
+                                and composite["name"] == existing_composite["name"]):
+                            composite_found = True
+                            break
+                if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
+                    if "client_id" in composite and composite['client_id'] is not None:
+                        client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                        for client_role in client_roles:
+                            if client_role['name'] == composite['name']:
+                                composites_to_be_created.append(client_role)
+                                break
+                    else:
+                        realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                        composites_to_be_created.append(realm_role)
+                elif composite_found and 'state' in composite and composite['state'] == 'absent':
+                    if "client_id" in composite and composite['client_id'] is not None:
+                        client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                        for client_role in client_roles:
+                            if client_role['name'] == composite['name']:
+                                composites_to_be_deleted.append(client_role)
+                                break
+                    else:
+                        realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                        composites_to_be_deleted.append(realm_role)
+
+            if len(composites_to_be_created) > 0:
+                # create new composites
+                self.create_role_composites(rolerep=rolerep, composites=composites_to_be_created, clientid=clientid, realm=realm)
+            if len(composites_to_be_deleted) > 0:
+                # delete new composites
+                self.delete_role_composites(rolerep=rolerep, composites=composites_to_be_deleted, clientid=clientid, realm=realm)
+
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
 
@@ -1792,8 +1910,14 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            composites = None
+            if "composites" in rolerep:
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep['composites']
+            update_role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
+            return update_role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
