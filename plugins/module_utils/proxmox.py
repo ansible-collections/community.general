@@ -145,3 +145,25 @@ class ProxmoxAnsible(object):
     def api_task_ok(self, node, taskid):
         status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
         return status['status'] == 'stopped' and status['exitstatus'] == 'OK'
+
+    def get_pool(self, poolid):
+        """Retrieve pool information
+
+        :param poolid: str - name of the pool
+        :return: dict - pool information
+        """
+        try:
+            return self.proxmox_api.pools(poolid).get()
+        except Exception as e:
+            self.module.fail_json(msg="Unable to retrieve pool %s information: %s" % (poolid, e))
+
+    def get_storages(self, type):
+        """Retrieve storages information
+
+        :param type: str, optional - type of storages
+        :return: list of dicts - array of storages
+        """
+        try:
+            return self.proxmox_api.storage.get(type=type)
+        except Exception as e:
+            self.module.fail_json(msg="Unable to retrieve storages information with type %s: %s" % (type, e))
