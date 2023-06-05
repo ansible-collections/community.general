@@ -79,7 +79,7 @@ options:
             - serviceAccountClientId
     client_consents:
         description:
-            - client Authenticator Type.
+            - Client Authenticator Type.
         type: list
         elements: dict
         default: []
