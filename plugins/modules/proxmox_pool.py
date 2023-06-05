@@ -133,10 +133,10 @@ class ProxmoxPoolAnsible(ProxmoxAnsible):
         if not self.is_pool_existing(poolid):
             self.module.exit_json(changed=False, poolid=poolid, msg="Pool {0} doesn't exist".format(poolid))
 
-        if self.module.check_mode:
-            return
-
         if self.is_pool_empty(poolid):
+            if self.module.check_mode:
+                return
+
             try:
                 self.proxmox_api.pools(poolid).delete()
             except Exception as e:
