@@ -31,7 +31,7 @@ options:
         type: str
     id:
         description:
-            - ID of the user on the keycloak server if known.
+            - ID of the user on the Keycloak server if known.
         type: str
     enabled:
         description:
