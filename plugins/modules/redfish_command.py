@@ -547,22 +547,26 @@ EXAMPLES = '''
         username: operator
         password: supersecretpwd
 
-  - name: Multipart HTTP push update
+  - name: Multipart HTTP push update; timeout is 600 seconds to allow for a
+      large image transfer
     community.general.redfish_command:
       category: Update
       command: MultipartHTTPPushUpdate
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+      timeout: 600
       update_image_file: ~/images/myupdate.img
 
-  - name: Multipart HTTP push with additional options
+  - name: Multipart HTTP push with additional options; timeout is 600 seconds
+      to allow for a large image transfer
     community.general.redfish_command:
       category: Update
       command: MultipartHTTPPushUpdate
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+      timeout: 600
       update_image_file: ~/images/myupdate.img
       update_targets:
         - /redfish/v1/UpdateService/FirmwareInventory/BMC

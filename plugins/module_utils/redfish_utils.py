@@ -1638,6 +1638,16 @@ class RedfishUtils(object):
                 'update_status': self._operation_results(response['resp'], response['data'])}
 
     def multipath_http_push_update(self, update_opts):
+        """
+        Provides a software update via the URI specified by the
+        MultipartHttpPushUri property.  Callers should adjust the 'timeout'
+        variable in the base object to accommodate the size of the image and
+        speed of the transfer.  For example, a 200MB image will likely take
+        more than the default 10 second timeout.
+
+        :param update_opts: The parameters for the update operation
+        :return: dict containing the response of the update request
+        """
         image_file = update_opts.get('update_image_file')
         targets = update_opts.get('update_targets')
         apply_time = update_opts.get('update_apply_time')
