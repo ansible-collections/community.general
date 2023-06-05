@@ -156,7 +156,7 @@ options:
             - federatedIdentities
     attributes:
         description:
-            - list user attributes.
+            - List of user attributes.
         required: false
         type: list
         elements: dict
