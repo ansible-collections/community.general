@@ -1,0 +1,3 @@
+minor_changes:
+  - bitwarden lookup plugin: When looking for items using an item id, the item is now accessed directly with bw get item instead of searching through all items. 
+This doubles the lookup speed.
