@@ -53,7 +53,7 @@ options:
             - firstName
     last_name:
         description:
-            - User lastName.
+            - The user's last name.
         required: false
         type: str
         aliases:
