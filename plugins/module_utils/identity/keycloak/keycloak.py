@@ -1695,7 +1695,8 @@ class KeycloakAPI(object):
                 del rolerep["composites"]
             role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                                      data=json.dumps(rolerep), validate_certs=self.validate_certs)
-            self.update_role_composites(rolerep=rolerep, composites=composites, realm=realm)
+            if composites is not None:
+                self.update_role_composites(rolerep=rolerep, composites=composites, realm=realm)
             return role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
