@@ -1,2 +1,0 @@
-minor_changes:
-  - new module for keycloak users (https://github.com/ansible-collections/community.general/pull/6476).
