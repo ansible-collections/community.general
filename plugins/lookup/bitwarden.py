@@ -111,9 +111,9 @@ class Bitwarden(object):
 
         # Prepare set of params for Bitwarden CLI
         if search_field == 'id':
-          params = ['get', 'item', search_value]
+            params = ['get', 'item', search_value]
         else:
-          params = ['list', 'items', '--search', search_value]
+            params = ['list', 'items', '--search', search_value]
 
         if collection_id:
             params.extend(['--collectionid', collection_id])
@@ -123,7 +123,7 @@ class Bitwarden(object):
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
         if search_field == 'id':
-          initial_matches = [initial_matches]
+            initial_matches = [initial_matches]
         # Filter to only include results from the right field.
         return [item for item in initial_matches if item[search_field] == search_value]
 
