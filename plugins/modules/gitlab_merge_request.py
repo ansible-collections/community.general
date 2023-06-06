@@ -14,10 +14,14 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_merge_request
-short_description: Create, update, or delete a merge requests
+short_description: Create, update, or delete GitLab merge requests
 version_added: 7.1.0
 description:
-  - This module allows to create, update, or merge requests.
+  - Creates a merge request if it does not exist.
+  - When a merge request does exist, it will be updated if the provided parameters are different.
+  - When a merge request does exist and I(state=absent), the merge request will be deleted.
+  - Existing merge requests are matched based on I(title), I(source_branch), I(target_branch),
+    and I(state_filter) filters.
 author:
   - zvaraondrej (@zvaraondrej)
 requirements:
@@ -85,8 +89,6 @@ options:
   state_filter:
     description:
       - Filter specifying state of merge requests while searching.
-      - If empty string, merge requests of all states are searched.
-      - Possible values are "opened", "closed", "locked", "merged" or empty string.
     type: str
     choices: ["opened", "closed", "locked", "merged"]
     default: opened
@@ -136,12 +138,6 @@ msg:
   returned: always
   type: str
   sample: "Success"
-
-error:
-  description: API object.
-  returned: failed
-  type: str
-  sample: "400: path is already in use"
 
 mr:
   description: API object.
@@ -299,7 +295,7 @@ def main():
         title=dict(type='str', required=True),
         description=dict(type='str', required=False),
         labels=dict(type='str', default="", required=False),
-        description_path=dict(type='str', required=False),
+        description_path=dict(type='path', required=False),
         remove_source_branch=dict(type='bool', default=False, required=False),
         state_filter=dict(type='str', default="opened", choices=["opened", "closed", "locked", "merged"]),
         assignee_ids=dict(type='str', required=False),
