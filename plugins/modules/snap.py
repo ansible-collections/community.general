@@ -54,7 +54,7 @@ options:
         description:
             - Define which release of a snap is installed and tracked for updates.
               This option can only be specified if there is a single snap in the task.
-            - If not passed, the C(snap) command will default to I(stable).
+            - If not passed, the C(snap) command will default to V(stable).
         type: str
         required: false
     options:
