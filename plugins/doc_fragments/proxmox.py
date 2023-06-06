@@ -38,7 +38,7 @@ options:
     version_added: 1.3.0
   validate_certs:
     description:
-      - If C(false), SSL certificates will not be validated.
+      - If V(false), SSL certificates will not be validated.
       - This should only be used on personally controlled sites using self-signed certificates.
     type: bool
     default: false
@@ -55,7 +55,7 @@ options:
   node:
     description:
       - Proxmox VE node on which to operate.
-      - Only required for I(state=present).
+      - Only required for O(state=present).
       - For every other states it will be autodiscovered.
     type: str
   pool:

@@ -15,7 +15,7 @@ DOCUMENTATION = '''
     description:
       - This lookup returns a list of results from an LMDB DB corresponding to a list of items given to it.
     requirements:
-      - lmdb (python library https://lmdb.readthedocs.io/en/release/)
+      - lmdb (Python library U(https://lmdb.readthedocs.io/en/release/))
     options:
       _terms:
         description: List of keys to query.
