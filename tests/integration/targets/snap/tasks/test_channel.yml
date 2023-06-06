@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure package is not installed (microk8s)
+  community.general.snap:
+    name: microk8s
+    state: absent
+
+# Test for https://github.com/ansible-collections/community.general/issues/1606
+- name: Install package (microk8s)
+  community.general.snap:
+    name: microk8s
+    classic: true
+    state: present
+  register: install_microk8s
+
+- name: Install package with channel (microk8s)
+  community.general.snap:
+    name: microk8s
+    classic: true
+    channel: 1.20/stable
+    state: present
+  register: install_microk8s_chan
+
+- name: Install package with channel (microk8s) again
+  community.general.snap:
+    name: microk8s
+    classic: true
+    channel: 1.20/stable
+    state: present
+  register: install_microk8s_chan_again
+
+- name: Remove package (microk8s)
+  community.general.snap:
+    name: microk8s
+    state: absent
+  register: remove_microk8s
+
+- assert:
+    that:
+      - install_microk8s is changed
+      - install_microk8s_chan is changed
+      - install_microk8s_chan_again is not changed
+      - remove_microk8s is changed

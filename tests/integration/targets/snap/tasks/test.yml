@@ -1,0 +1,235 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure package is not installed (hello-world)
+  community.general.snap:
+    name: hello-world
+    state: absent
+
+- name: Install package (hello-world) (check mode)
+  community.general.snap:
+    name: hello-world
+    state: present
+  register: install_check
+  check_mode: true
+
+- name: Install package (hello-world)
+  community.general.snap:
+    name: hello-world
+    state: present
+  register: install
+
+- name: Install package again (hello-world) (check mode)
+  community.general.snap:
+    name: hello-world
+    state: present
+  register: install_again_check
+  check_mode: true
+
+- name: Install package again (hello-world)
+  community.general.snap:
+    name: hello-world
+    state: present
+  register: install_again
+
+- name: Assert package has been installed just once (hello-world)
+  assert:
+    that:
+      - install is changed
+      - install_check is changed
+      - install_again is not changed
+      - install_again_check is not changed
+
+- name: Check package has been installed correctly (hello-world)
+  command: hello-world
+  environment:
+    PATH: /snap/bin/
+
+- name: Remove package (hello-world) (check mode)
+  community.general.snap:
+    name: hello-world
+    state: absent
+  register: remove_check
+  check_mode: true
+
+- name: Remove package (hello-world)
+  community.general.snap:
+    name: hello-world
+    state: absent
+  register: remove
+
+- name: Remove package again (hello-world) (check mode)
+  community.general.snap:
+    name: hello-world
+    state: absent
+  register: remove_again_check
+  check_mode: true
+
+- name: Remove package again (hello-world)
+  community.general.snap:
+    name: hello-world
+    state: absent
+  register: remove_again
+
+- name: Assert package has been removed just once (hello-world)
+  assert:
+    that:
+      - remove is changed
+      - remove_check is changed
+      - remove_again is not changed
+      - remove_again_check is not changed
+
+- name: Make sure package from classic snap is not installed (nvim)
+  community.general.snap:
+    name: nvim
+    state: absent
+
+- name: Install package from classic snap (nvim)
+  community.general.snap:
+    name: nvim
+    state: present
+    classic: true
+  register: classic_install
+
+# testing classic idempotency
+- name: Install package from classic snap again (nvim)
+  community.general.snap:
+    name: nvim
+    state: present
+    classic: true
+  register: classic_install_again
+
+- name: Assert package has been installed just once (nvim)
+  assert:
+    that:
+      - classic_install is changed
+      - classic_install_again is not changed
+
+# this is just testing if a package which has been installed
+# with true classic can be removed without setting classic to true
+- name: Remove package from classic snap without setting classic to true (nvim)
+  community.general.snap:
+    name: nvim
+    state: absent
+  register: classic_remove_without_true_classic
+
+- name: Remove package from classic snap with setting classic to true (nvim)
+  community.general.snap:
+    name: nvim
+    state: absent
+    classic: true
+  register: classic_remove_with_true_classic
+
+- name: Assert package has been removed without setting classic to true (nvim)
+  assert:
+    that:
+      - classic_remove_without_true_classic is changed
+      - classic_remove_with_true_classic is not changed
+
+
+- name: Make sure package is not installed (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: absent
+
+- name: Install package (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: present
+  register: install
+
+- name: Install package (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    options:
+      - "listening-port=8080"
+  register: install_with_option
+
+- name: Install package again with option (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    options:
+      - "listening-port=8080"
+  register: install_with_option_again
+
+- name: Install package again with different options (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    options:
+      - "listening-port=8088"
+      - "document-root-dir=/tmp"
+  register: install_with_option_changed
+
+- name: Remove package (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: absent
+  register: remove
+
+- name: Assert package has been installed with options just once and only changed options trigger a change (uhttpd)
+  assert:
+    that:
+      - install is changed
+      - install_with_option is changed
+      - "install_with_option.options_changed[0] == 'uhttpd:listening-port=8080'"
+      - install_with_option_again is not changed
+      - install_with_option_changed is changed
+      - "'uhttpd:listening-port=8088' in install_with_option_changed.options_changed"
+      - "'uhttpd:document-root-dir=/tmp' in install_with_option_changed.options_changed"
+      - "'uhttpd:listening-port=8080' not in install_with_option_changed.options_changed"
+      - remove is changed
+
+- name: Install two packages at the same time
+  community.general.snap:
+    name:
+      - hello-world
+      - uhttpd
+    state: present
+  register: install_two
+
+- name: Install two packages at the same time (again)
+  community.general.snap:
+    name:
+      - hello-world
+      - uhttpd
+    state: present
+  register: install_two_again
+
+- name: Remove packages (hello-world & uhttpd)
+  community.general.snap:
+    name:
+      - hello-world
+      - uhttpd
+    state: absent
+  register: install_two_remove
+
+- name: Remove packages again (hello-world & uhttpd)
+  community.general.snap:
+    name:
+      - hello-world
+      - uhttpd
+    state: absent
+  register: install_two_remove_again
+
+- name: Assert installation of two packages
+  assert:
+    that:
+      - install_two is changed
+      - "'hello-world' in install_two.snaps_installed"
+      - "'uhttpd' in install_two.snaps_installed"
+      - install_two.snaps_removed is not defined
+      - install_two_again is not changed
+      - install_two_again.snaps_installed is not defined
+      - install_two_again.snaps_removed is not defined
+      - install_two_remove is changed
+      - install_two_again.snaps_installed is not defined
+      - "'hello-world' in install_two_remove.snaps_removed"
+      - "'uhttpd' in install_two_remove.snaps_removed"
+      - install_two_remove_again is not changed
+      - install_two_remove_again.snaps_installed is not defined
+      - install_two_remove_again.snaps_removed is not defined
