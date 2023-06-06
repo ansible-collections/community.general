@@ -328,7 +328,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken. 
+  description: Message as to what action was taken.
   returned: always
   type: str
   sample: User f18c709c-03d6-11ee-970b-c74bf2721112 created
@@ -340,7 +340,7 @@ existing:
   description: Representation of the existing user.
   returned: on success
   type: dict
-end_state
+end_state:
   description: Representation of the user after module execution
   returned: on success
   type: dict
