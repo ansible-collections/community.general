@@ -327,16 +327,25 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-user:
-  description: JSON representation for the user.
-  returned: on success
-  type: dict
 msg:
-  description: Message if it is the case.
+  description: Message as to what action was taken. 
   returned: always
   type: str
+  sample: User f18c709c-03d6-11ee-970b-c74bf2721112 created
+proposed:
+  description: Representation of the proposed user.
+  returned: on success
+  type: dict
+existing:
+  description: Representation of the existing user.
+  returned: on success
+  type: dict
+end_state
+  description: Representation of the user after module execution
+  returned: on success
+  type: dict
 changed:
-  description: Return C(true) if the operation changed the client on the keycloak server, C(false) otherwise.
+  description: Return C(true) if the operation changed the user on the keycloak server, C(false) otherwise.
   returned: always
   type: bool
 '''
@@ -490,6 +499,7 @@ def main():
                 module.exit_json(**result)
             # Create the user
             after_user = kc.create_user(userrep=desired_user, realm=realm)
+            result["msg"] = 'User %s created' % (after_user['id'])
             # Add user ID to new representation
             desired_user['id'] = after_user["id"]
         else:
@@ -519,6 +529,10 @@ def main():
         # Get the user groups
         after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
         result["end_state"] = after_user
+        if changed:
+            result["msg"] = 'User %s updated' % (after_user['id'])
+        else:
+            result["msg"] = 'No changes made for user %s' % (after_user['id'])
 
     result['changed'] = changed
     module.exit_json(**result)
