@@ -14,14 +14,14 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_merge_request
-short_description: Create, update or delete a merge requests.
-version_added: 4.2.0
+short_description: Create, update, or delete a merge requests
+version_added: 7.1.0
 description:
-  - This module allows to create, update or merge requests.
+  - This module allows to create, update, or merge requests.
 author:
   - zvaraondrej (@zvaraondrej)
 requirements:
-  - python >= 2.7
+  - Python >= 2.7
   - python-gitlab >= 2.3.0
 extends_documentation_fragment:
   - community.general.auth_basic
@@ -65,13 +65,13 @@ options:
   description:
     description:
       - A description for the merge request.
-      - Gets overriden by a content of file specified at description_path, if found.
+      - Gets overriden by a content of file specified at I(description_path), if found.
     type: str
   description_path:
     description:
       - A path of file containing merge request's description.
-      - Accepts markdown formatted files.
-    type: str
+      - Accepts MarkDown formatted files.
+    type: path
   labels:
     description:
       - Comma separated list of label names.
@@ -92,7 +92,7 @@ options:
     default: opened
   assignee_ids:
     description:
-      - Comma separated list of assignees usernames omitting "@" character.
+      - Comma separated list of assignees usernames omitting C(@) character.
       - Set to empty string to unassign all assignees.
     type: str
   reviewer_ids:
