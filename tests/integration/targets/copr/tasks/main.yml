@@ -10,12 +10,6 @@
       ansible_distribution == 'Fedora'
       or (ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
           and ansible_distribution_major_version | int >= 8)
-    # The copr module imports dnf which is only available for the system Python
-    # interpreter.
-    - >
-      not (ansible_distribution == 'CentOS' and
-           ansible_distribution_major_version | int == 8 and not
-           ansible_python_version.startswith('3.6'))
   block:
   - debug: var=copr_chroot
   - name: enable copr project

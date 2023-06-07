@@ -59,7 +59,7 @@ options:
   record_values:
     description:
     - Manage DNS record name with this value.
-    - Mutually exclusive with I(record_values), and exactly one of I(record_value) and I(record_values) has to be specified.
+    - Mutually exclusive with I(record_value), and exactly one of I(record_value) and I(record_values) has to be specified.
     - In the case of 'A' or 'AAAA' record types, this will be the IP address.
     - In the case of 'A6' record type, this will be the A6 Record data.
     - In the case of 'CNAME' record type, this will be the hostname.

@@ -333,6 +333,9 @@ files:
   $module_utils/utm_utils.py:
     labels: utm_utils
     maintainers: $team_e_spirit
+  $module_utils/vardict.py:
+    labels: vardict
+    maintainers: russoz
   $module_utils/wdc_redfish_utils.py:
     labels: wdc_redfish_utils
     maintainers: $team_wdc
@@ -531,6 +534,8 @@ files:
     maintainers: paytroff
   $modules/gitlab_project_variable.py:
     maintainers: markuman
+  $modules/gitlab_instance_variable.py:
+    maintainers: benibr
   $modules/gitlab_runner.py:
     maintainers: SamyCoenen
   $modules/gitlab_user.py:
@@ -929,7 +934,7 @@ files:
   $modules/pamd.py:
     maintainers: kevensen
   $modules/parted.py:
-    maintainers: ColOfAbRiX rosowiecki jake2184
+    maintainers: ColOfAbRiX jake2184
   $modules/pear.py:
     ignore: jle64
     labels: pear
@@ -979,7 +984,7 @@ files:
   $modules/proxmox:
     keywords: kvm libvirt proxmox qemu
     labels: proxmox virt
-    maintainers: $team_virt
+    maintainers: $team_virt UnderGreen
   $modules/proxmox.py:
     ignore: skvidal
     maintainers: UnderGreen

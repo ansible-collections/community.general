@@ -1,11 +1,7 @@
----
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-integration_tests_dependencies:
-- ansible.posix
-- community.crypto
-- community.docker
-unit_tests_dependencies:
-- community.internal_test_tools
+unsupported
+proxmox_pool
+proxmox_pool_member

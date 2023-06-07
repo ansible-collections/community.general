@@ -444,7 +444,7 @@ options:
       - Indicates desired state of the instance.
       - If C(current), the current state of the VM will be fetched. You can access it with C(results.status)
     type: str
-    choices: ['present', 'started', 'absent', 'stopped', 'restarted','current']
+    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current']
     default: present
   storage:
     description:
@@ -480,8 +480,27 @@ options:
   timeout:
     description:
       - Timeout for operations.
+      - When used with I(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
     type: int
     default: 30
+  tpmstate0:
+    description:
+      - A hash/dictionary of options for the Trusted Platform Module disk.
+      - A TPM state disk is required for Windows 11 installations.
+    suboptions:
+      storage:
+        description:
+          - O(tpmstate0.storage) is the storage identifier where to create the disk.
+        type: str
+        required: true
+      version:
+        description:
+          - The TPM version to use.
+        type: str
+        choices: ['1.2', '2.0']
+        default: '2.0'
+    type: dict
+    version_added: 7.1.0
   update:
     description:
       - If C(true), the VM will be updated with new value.
@@ -889,6 +908,9 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
     def wait_for_task(self, node, taskid):
         timeout = self.module.params['timeout']
+        if self.module.params['state'] == 'stopped':
+            # Increase task timeout in case of stopped state to be sure it waits longer than VM stop operation itself
+            timeout += 10
 
         while timeout:
             if self.api_task_ok(node, taskid):
@@ -938,7 +960,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             urlencoded_ssh_keys = quote(kwargs['sshkeys'], safe='')
             kwargs['sshkeys'] = str(urlencoded_ssh_keys)
 
-        # If update, don't update disk (virtio, efidisk0, ide, sata, scsi) and network interface
+        # If update, don't update disk (virtio, efidisk0, tpmstate0, ide, sata, scsi) and network interface
         # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
         if update:
             if 'virtio' in kwargs:
@@ -951,6 +973,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 del kwargs['ide']
             if 'efidisk0' in kwargs:
                 del kwargs['efidisk0']
+            if 'tpmstate0' in kwargs:
+                del kwargs['tpmstate0']
             if 'net' in kwargs:
                 del kwargs['net']
             if 'force' in kwargs:
@@ -977,6 +1001,13 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
+
+        # Flatten tpmstate0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        if 'tpmstate0' in kwargs:
+            kwargs['tpmstate0'] = '{storage}:1,version=v{version}'.format(
+                storage=kwargs['tpmstate0'].get('storage'),
+                version=kwargs['tpmstate0'].get('version')
+            )
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
@@ -1058,10 +1089,10 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             return False
         return True
 
-    def stop_vm(self, vm, force):
+    def stop_vm(self, vm, force, timeout):
         vmid = vm['vmid']
         proxmox_node = self.proxmox_api.nodes(vm['node'])
-        taskid = proxmox_node.qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0))
+        taskid = proxmox_node.qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0), timeout=timeout)
         if not self.wait_for_task(vm['node'], taskid):
             self.module.fail_json(msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s' %
                                   proxmox_node.tasks(taskid).log.get()[:1])
@@ -1163,6 +1194,11 @@ def main():
         tdf=dict(type='bool'),
         template=dict(type='bool'),
         timeout=dict(type='int', default=30),
+        tpmstate0=dict(type='dict',
+                       options=dict(
+                           storage=dict(type='str', required=True),
+                           version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
+                       )),
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
         vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
@@ -1293,7 +1329,7 @@ def main():
             elif proxmox.get_vmid(name, ignore_missing=True) and not (update or clone):
                 module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
             elif not node:
-                module.fail.json(msg='node is mandatory for creating/updating VM')
+                module.fail_json(msg='node is mandatory for creating/updating VM')
             elif update and not any([vmid, name]):
                 module.fail_json(msg='vmid or name is mandatory for updating VM')
             elif not proxmox.get_node(node):
@@ -1356,6 +1392,7 @@ def main():
                               target=module.params['target'],
                               tdf=module.params['tdf'],
                               template=module.params['template'],
+                              tpmstate0=module.params['tpmstate0'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
                               virtio=module.params['virtio'],
@@ -1409,7 +1446,7 @@ def main():
             if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
-            if proxmox.stop_vm(vm, force=module.params['force']):
+            if proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout']):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
         except Exception as e:
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
