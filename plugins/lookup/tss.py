@@ -296,7 +296,7 @@ class TSSClient(object):
             return obj
         else:
             return self._client.get_secret_json(secret_id)
-        
+
     def get_secret_ids_by_folderid(self, term):
         display.debug("tss_lookup term: %s" % term)
         folder_id = self._term_to_folder_id(term)
@@ -310,7 +310,7 @@ class TSSClient(object):
             return int(term)
         except ValueError:
             raise AnsibleOptionsError("Secret ID must be an integer")
-        
+ 
     @staticmethod
     def _term_to_folder_id(term):
         try:
