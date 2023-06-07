@@ -72,8 +72,8 @@ DOCUMENTATION = r'''
             description:
             - If an instance has multiple network interfaces, select which one is the prefered as pattern.
             - Combined with the first number that can be found e.g. 'eth' + 0.
-            - The option has been renamed from O(ignore:prefered_container_network_interface) to O(prefered_instance_network_interface) in community.general 3.8.0.
-              The old name still works as an alias.
+            - The option has been renamed from O(ignore:prefered_container_network_interface) to O(prefered_instance_network_interface)
+              in community.general 3.8.0. The old name still works as an alias.
             type: str
             default: eth
             aliases:
