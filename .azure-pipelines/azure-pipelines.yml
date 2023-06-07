@@ -123,7 +123,6 @@ stages:
           testFormat: devel/units/{0}/1
           targets:
             - test: 2.7
-            - test: 3.5
             - test: 3.6
             - test: 3.7
             - test: 3.8
@@ -139,6 +138,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.15/units/{0}/1
           targets:
+            - test: 3.5
             - test: "3.10"
   - stage: Units_2_14
     displayName: Units 2.14
