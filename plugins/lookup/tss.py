@@ -310,7 +310,7 @@ class TSSClient(object):
             return int(term)
         except ValueError:
             raise AnsibleOptionsError("Secret ID must be an integer")
- 
+
     @staticmethod
     def _term_to_folder_id(term):
         try:
