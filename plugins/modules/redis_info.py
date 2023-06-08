@@ -207,12 +207,6 @@ info:
 import traceback
 
 REDIS_IMP_ERR = None
-# try:
-#     from redis import StrictRedis
-#     HAS_REDIS_PACKAGE = True
-# except ImportError:
-#     REDIS_IMP_ERR = traceback.format_exc()
-#     HAS_REDIS_PACKAGE = False
 try:
     import redis
 except ImportError:
