@@ -197,7 +197,7 @@ class GitlabMergeRequest(object):
     '''
     def get_user(self, username):
         try:
-            users = self.project.users.list(search=username, all=True)
+            users = self.project.users.list(username=username, all=True)
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg="Failed to list the users: %s" % to_native(e))
 
