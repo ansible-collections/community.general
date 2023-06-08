@@ -1,3 +1,3 @@
 ---
 minor_changes:
-  - Composite variables support for Proxmox nodes in dynamic inventory plugin (https://github.com/ansible-collections/community.general/issues/6640).
+  - proxmox inventory plugin - add composite variables support for Proxmox nodes (https://github.com/ansible-collections/community.general/issues/6640).
