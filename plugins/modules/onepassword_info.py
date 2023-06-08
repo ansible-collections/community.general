@@ -78,6 +78,11 @@ options:
                 description:
                     - 1Password username.
                     - Only required for initial sign in.
+            service_account_token:
+                type: str
+                description:
+                    - 1Password service account token.
+                    - Only required for initial sign in.
             master_password:
                 type: str
                 description:
