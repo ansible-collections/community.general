@@ -18,6 +18,7 @@ version_added: '0.2.0'
 description:
     - Gathers information and statistics about Redis servers.
 extends_documentation_fragment:
+    - community.general.redis
     - community.general.attributes
     - community.general.attributes.info_module
 options:
@@ -37,9 +38,13 @@ options:
         type: str
     login_user:
         version_added: 7.1.0
-        description:
-            - The user used to authenticate with, when authentication is enabled for the Redis server.
-        type: str
+    tls:
+        default: false
+        version_added: 7.1.0
+    validate_certs:
+        version_added: 7.1.0
+    ca_certs:
+        version_added: 7.1.0
     section:
         version_added: 7.1.0
         description:
@@ -225,13 +230,13 @@ from ansible_collections.community.general.plugins.module_utils.redis import (
 def main():
     redis_auth_args = redis_auth_argument_spec(tls_default=False)
     module_args = dict(
-        section=dict(type='str', choices=['all', 'clients', 'cluster', 'commandstats', 'cpu',
-                     'default', 'errorstats', 'everything', 'keyspace', 'latencystats', 'memory',
-                     'modules', 'persistence', 'replication', 'sentinel', 'server', 'stats'],
-                     default='default')
+        section=dict(choices=['all', 'clients', 'cluster', 'commandstats', 'cpu', 'default',
+                              'errorstats', 'everything', 'keyspace', 'latencystats', 'memory',
+                              'modules', 'persistence', 'replication', 'sentinel', 'server', 'stats'],
+                     default='default', type='str')
     )
     module_args.update(redis_auth_args)
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode= True)
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     fail_imports(module, module.params['tls'])
     redis_params = redis_auth_params(module)
 
