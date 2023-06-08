@@ -113,28 +113,30 @@ from ansible_collections.community.general.plugins.module_utils.onepassword impo
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None, service_account_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
         self.master_password = master_password
         self.secret_key = secret_key
+        self.service_account_token = service_account_token
 
         self._path = None
         self._version = None
 
     def _check_required_params(self, required_params):
-        non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
-        missing = set(required_params).difference(non_empty_attrs)
-        if missing:
-            prefix = "Unable to sign in to 1Password. Missing required parameter"
-            plural = ""
-            suffix = ": {params}.".format(params=", ".join(missing))
-            if len(missing) > 1:
-                plural = "s"
+        if not self.service_account_token:
+          non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
+          missing = set(required_params).difference(non_empty_attrs)
+          if missing:
+              prefix = "Unable to sign in to 1Password. Missing required parameter"
+              plural = ""
+              suffix = ": {params}.".format(params=", ".join(missing))
+              if len(missing) > 1:
+                  plural = "s"
 
-            msg = "{prefix}{plural}{suffix}".format(prefix=prefix, plural=plural, suffix=suffix)
-            raise AnsibleLookupError(msg)
+              msg = "{prefix}{plural}{suffix}".format(prefix=prefix, plural=plural, suffix=suffix)
+              raise AnsibleLookupError(msg)
 
     @abc.abstractmethod
     def _parse_field(self, data_json, field_name, section_title):
@@ -533,12 +535,13 @@ class OnePassCLIv2(OnePassCLIBase):
 
 
 class OnePass(object):
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None, service_account_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
         self.secret_key = secret_key
         self.master_password = master_password
+        self.service_account_token = service_account_token
 
         self.logged_in = False
         self.token = None
@@ -614,8 +617,9 @@ class LookupModule(LookupBase):
         username = self.get_option("username")
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
+        service_account_token = self.get_option("service_account_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
         op.assert_logged_in()
 
         values = []
