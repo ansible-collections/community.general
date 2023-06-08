@@ -42,6 +42,8 @@ DOCUMENTATION = '''
         description: The username used to sign in.
       secret_key:
         description: The secret key used when performing an initial sign in.
+      service_account_token:
+        description: The access key for a service account.
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
