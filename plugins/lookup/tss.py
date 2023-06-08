@@ -29,10 +29,10 @@ options:
     fetch_secret_ids_from_folder:
         description:
             - Boolean flag which indicates whether secret ids are in a folder is fetched by folder ID or not.
-            - If true then _terms value will be considered as a folder ID else secret ID.
+            - V(true) then the terms will be considered as a folder IDs. Otherwise (default), they are considered as secret IDs.
         required: false
         type: bool
-        version_added: 7.0.0
+        version_added: 7.1.0
     fetch_attachments:
         description:
             - Boolean flag which indicates whether attached files will get downloaded or not.
@@ -202,7 +202,7 @@ EXAMPLES = r"""
                            value_name='itemValue'))['private-key']
           }}
 
-# If fetch_secret_ids_from_folder=True then secret ids are in a folder is fetched based on folder id
+# If fetch_secret_ids_from_folder=true then secret IDs are in a folder is fetched based on folder ID
 - hosts: localhost
   vars:
       secret: >-
@@ -210,7 +210,7 @@ EXAMPLES = r"""
             lookup(
                 'community.general.tss',
                 102,
-                fetch_secret_ids_from_folder=True,
+                fetch_secret_ids_from_folder=true,
                 base_url='https://secretserver.domain.com/SecretServer/',
                 token='thycotic_access_token'
             )
