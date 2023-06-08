@@ -61,6 +61,13 @@ options:
     description:
       - Set to C(true) to return the full attribute schema of entries, not
         their attribute values. Overrides I(attrs) when provided.
+  page_size:
+    default: 0
+    type: int
+    description:
+      - The page size when performing a simple paged result search (RFC 2696).
+        This setting can be tuned to reduce issues with timeouts and server limits.
+      - Setting the page size to 0 (default) disables paged searching.
   base64_attributes:
     description:
       - If provided, all attribute values returned that are listed in this option
@@ -133,6 +140,7 @@ def main():
             filter=dict(type='str', default='(objectClass=*)'),
             attrs=dict(type='list', elements='str'),
             schema=dict(type='bool', default=False),
+            page_size=dict(type='int', default=0),
             base64_attributes=dict(type='list', elements='str'),
         ),
         supports_check_mode=True,
@@ -180,6 +188,7 @@ class LdapSearch(LdapGeneric):
 
         self.filterstr = self.module.params['filter']
         self.attrlist = []
+        self.page_size = self.module.params['page_size']
         self._load_scope()
         self._load_attrs()
         self._load_schema()
@@ -209,22 +218,32 @@ class LdapSearch(LdapGeneric):
         self.module.exit_json(changed=False, results=results)
 
     def perform_search(self):
+        ldap_entries = []
+        controls = []
+        if self.page_size > 0:
+            controls.append(ldap.controls.libldap.SimplePagedResultsControl(True, size=self.page_size, cookie=''))
         try:
-            results = self.connection.search_s(
-                self.dn,
-                self.scope,
-                filterstr=self.filterstr,
-                attrlist=self.attrlist,
-                attrsonly=self.attrsonly
-            )
-            ldap_entries = []
-            for result in results:
-                if isinstance(result[1], dict):
-                    if self.schema:
-                        ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
-                    else:
-                        ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
-            return ldap_entries
+            while True:
+                response = self.connection.search_ext(
+                    self.dn,
+                    self.scope,
+                    filterstr=self.filterstr,
+                    attrlist=self.attrlist,
+                    attrsonly=self.attrsonly,
+                    serverctrls=controls
+                )
+                rtype, results, rmsgid, serverctrls = self.connection.result3(response)
+                for result in results:
+                    if isinstance(result[1], dict):
+                        if self.schema:
+                            ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
+                        else:
+                            ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
+                cookies = [c.cookie for c in serverctrls if c.controlType == ldap.controls.libldap.SimplePagedResultsControl.controlType]
+                if not cookies or not cookies[0]:
+                    return ldap_entries
+                else:
+                    controls[0].cookie = cookies[0]
         except ldap.NO_SUCH_OBJECT:
             self.module.fail_json(msg="Base not found: {0}".format(self.dn))
 
