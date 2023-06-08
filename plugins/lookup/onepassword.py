@@ -554,7 +554,7 @@ class OnePass(object):
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
                 try:
-                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password)
+                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
                 except TypeError as e:
                     raise AnsibleLookupError(e)
 
