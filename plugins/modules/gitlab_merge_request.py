@@ -361,9 +361,8 @@ def main():
     if state == "present":
         if description_path:
             try:
-                f = open(description_path, 'rb')
-                description = to_text(f.read(), errors='surrogate_or_strict')
-                f.close()
+                with open(description_path, 'rb') as f:
+                    description = to_text(f.read(), errors='surrogate_or_strict')
             except IOError as e:
                 module.fail_json(msg='Cannot open {0}: {1}'.format(description_path, e))
 
