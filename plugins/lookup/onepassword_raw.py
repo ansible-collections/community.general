@@ -89,8 +89,9 @@ class LookupModule(LookupBase):
         username = self.get_option("username")
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
+        service_account_token = self.get_option("service_account_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
         op.assert_logged_in()
 
         values = []
