@@ -76,7 +76,7 @@ options:
     type: str
   retention:
     description:
-      - remove old snapshots if there are more than O(retention) snapshots.
+      - Remove old snapshots if there are more than O(retention) snapshots.
       - If O(retention) is set to V(0), all snapshots will be kept.
     default: 0
     type: int
