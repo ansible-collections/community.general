@@ -151,25 +151,16 @@ from ansible.module_utils.common.text.converters import to_native, to_text
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package, find_project
 )
 
 
 class GitlabMergeRequest(object):
 
     def __init__(self, module, project, gitlab_instance):
-        self.repo = gitlab_instance
+        self._gitlab = gitlab_instance
         self._module = module
-        self.project = self.get_project(project)
-
-    '''
-    @param project Name of the project
-    '''
-    def get_project(self, project):
-        try:
-            return self.repo.projects.get(project)
-        except gitlab.exceptions.GitlabGetError as e:
-            self._module.fail_json(msg="Failed to get the project: %s" % to_native(e))
+        self.project = project
 
     '''
     @param branch Name of the branch
@@ -346,7 +337,12 @@ def main():
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
     gitlab_instance = gitlab_authentication(module)
-    this_gitlab = GitlabMergeRequest(module=module, project=project, gitlab_instance=gitlab_instance)
+
+    this_project = find_project(gitlab_instance, project)
+    if this_project is None:
+        module.fail_json(msg="Failed to get the project: %s" % project)
+
+    this_gitlab = GitlabMergeRequest(module=module, project=this_project, gitlab_instance=gitlab_instance)
 
     r_source_branch = this_gitlab.get_branch(source_branch)
     if not r_source_branch:
