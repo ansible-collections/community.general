@@ -36,14 +36,16 @@ options:
             - The password used to authenticate with, when authentication is enabled for the Redis server.
         type: str
     login_user:
+        version_added: 7.1.0
         description:
             - The user used to authenticate with, when authentication is enabled for the Redis server.
         type: str
     section:
+        version_added: 7.1.0
         description:
             - Specific info section to retrieve.
         default: default
-        choices: [ all, clients, cluster, commandstats, cpu, default, errorstats, everything, keyspace, 
+        choices: [ all, clients, cluster, commandstats, cpu, default, errorstats, everything, keyspace,
             latencystats, memory, modules, persistence, replication, sentinel, server, stats ]
         type: str
 
@@ -229,9 +231,9 @@ from ansible_collections.community.general.plugins.module_utils.redis import (
 def main():
     redis_auth_args = redis_auth_argument_spec(tls_default=False)
     module_args = dict(
-        section=dict(type='str', choices=['all', 'clients', 'cluster', 'commandstats', 'cpu', 
-                     'default', 'errorstats', 'everything', 'keyspace', 'latencystats', 'memory', 
-                     'modules', 'persistence', 'replication', 'sentinel', 'server', 'stats'], 
+        section=dict(type='str', choices=['all', 'clients', 'cluster', 'commandstats', 'cpu',
+                     'default', 'errorstats', 'everything', 'keyspace', 'latencystats', 'memory',
+                     'modules', 'persistence', 'replication', 'sentinel', 'server', 'stats'],
                      default='default')
     )
     module_args.update(redis_auth_args)
