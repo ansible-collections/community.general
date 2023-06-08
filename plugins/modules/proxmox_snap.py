@@ -78,6 +78,8 @@ options:
     description:
       - Remove old snapshots if there are more than O(retention) snapshots.
       - If O(retention) is set to V(0), all snapshots will be kept.
+      - This is only used when O(state=present) and when an actual snapshot is created.
+        If no snapshot is created, all existing snapshots will be kept.
     default: 0
     type: int
     version_added: 7.1.0
