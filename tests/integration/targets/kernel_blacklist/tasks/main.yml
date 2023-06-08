@@ -40,6 +40,7 @@
   assert:
     that:
     - bl_test_1 is not changed
+    - "'deprecations' not in bl_test_1"
     - bl_test_1a is not changed
     - orig_stat.stat.size == stat_test_1.stat.size
     - orig_stat.stat.checksum == stat_test_1.stat.checksum
@@ -49,7 +50,7 @@
     expected_content: |
       # Copyright (c) Ansible Project
       # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-      # SPDX-{{ '' }}License-Identifier: GPL-3.0-or-later
+      # SPDX-License-Identifier: GPL-3.0-or-later
 
       blacklist aaaa
       blacklist bbbb
@@ -76,7 +77,7 @@
     content: |
       # Copyright (c) Ansible Project
       # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-      # SPDX-{{ '' }}License-Identifier: GPL-3.0-or-later
+      # SPDX-License-Identifier: GPL-3.0-or-later
 
       blacklist aaaa
       blacklist bbbb
@@ -104,7 +105,7 @@
     content: |
       # Copyright (c) Ansible Project
       # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-      # SPDX-{{ '' }}License-Identifier: GPL-3.0-or-later
+      # SPDX-License-Identifier: GPL-3.0-or-later
 
       blacklist aaaa
       blacklist cccc
