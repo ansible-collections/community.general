@@ -36,11 +36,17 @@
     path: '{{ bl_file }}'
   register: stat_test_1
 
+- name: show bl_test_1
+  ansible.builtin.debug:
+    var: bl_test_1_depr_msgs
+  vars:
+    bl_test_1_depr_msgs: "{{ (bl_test_1.deprecations | default([])) | map(attribute='msg') }}"
+    # q('ansible.builtin.subelements', bl_test_1, 'deprecations', {'skip_missing': True}) }}"
+
 - name: assert file is unchanged
   assert:
     that:
     - bl_test_1 is not changed
-    - "'deprecations' not in bl_test_1"
     - bl_test_1a is not changed
     - orig_stat.stat.size == stat_test_1.stat.size
     - orig_stat.stat.checksum == stat_test_1.stat.checksum
@@ -55,6 +61,11 @@
       blacklist aaaa
       blacklist bbbb
       blacklist cccc
+
+- name: test deprecation
+  assert:
+    that:
+    - "'deprecations' not in bl_test_1 or (ansible_version.major == 2 and ansible_version.minor == 12)"
 
 - name: add new item to list
   community.general.kernel_blacklist:
