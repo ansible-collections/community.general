@@ -385,25 +385,25 @@ def main():
 
             mr = this_gitlab.create_mr(options)
             module.exit_json(
-                changed=True, msg="Created the Merge Request {t} from branch {d} to branch {s}.".format(t=title, d=target_branch, s=source_branch),
+                changed=True, msg="Created the Merge Request {t} from branch {s} to branch {d}.".format(t=title, d=target_branch, s=source_branch),
                 mr=mr.asdict()
             )
         else:
             if this_gitlab.mr_has_changed(this_mr, options):
                 mr = this_gitlab.update_mr(this_mr, options)
                 module.exit_json(
-                    changed=True, msg="Merge Request {t} from branch {d} to branch {s} updated.".format(t=title, d=target_branch, s=source_branch),
+                    changed=True, msg="Merge Request {t} from branch {s} to branch {d} updated.".format(t=title, d=target_branch, s=source_branch),
                     mr=mr
                 )
             else:
                 module.exit_json(
-                    changed=False, msg="Merge Request {t} from branch {d} to branch {s} already exist".format(t=title, d=target_branch, s=source_branch),
+                    changed=False, msg="Merge Request {t} from branch {s} to branch {d} already exist".format(t=title, d=target_branch, s=source_branch),
                     mr=this_mr.asdict()
                 )
     elif this_mr and state == "absent":
         mr = this_gitlab.delete_mr(this_mr)
         module.exit_json(
-            changed=True, msg="Merge Request {t} from branch {d} to branch {s} deleted.".format(t=title, d=target_branch, s=source_branch),
+            changed=True, msg="Merge Request {t} from branch {s} to branch {d} deleted.".format(t=title, d=target_branch, s=source_branch),
             mr=mr
         )
     else:
