@@ -196,14 +196,18 @@ class GitlabMergeRequest(object):
     @param username Name of the user
     '''
     def get_user(self, username):
+        users = []
         try:
-            users = self.project.users.list(username=username, all=True)
+            users = [user for user in self.project.users.list(username=username, all=True) if user.username == username]
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg="Failed to list the users: %s" % to_native(e))
 
-        for user in users:
-            if (user.username == username):
-                return user
+        if len(users) > 1:
+            self._module.fail_json(msg="Multiple Users matched search criteria.")
+        elif len(users) < 1:
+            self._module.fail_json(msg="No User matched search criteria.")
+        else:
+            return users[0]
 
     '''
     @param users List of usernames
