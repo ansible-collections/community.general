@@ -122,7 +122,10 @@ options:
     auto_attach:
         description:
             - Upon successful registration, auto-consume available subscriptions
-            - Added in favor of deprecated autosubscribe in 2.5.
+            - |
+              Added in favor of the deprecated I(autosubscribe) option in
+              Ansible 2.5; please note that I(autosubscribe) will be removed in
+              community.general 9.0.0.
         type: bool
         aliases: [autosubscribe]
     activationkey:
@@ -1074,7 +1077,17 @@ def main():
             'server_port': {},
             'rhsm_baseurl': {},
             'rhsm_repo_ca_cert': {},
-            'auto_attach': {'aliases': ['autosubscribe'], 'type': 'bool'},
+            'auto_attach': {
+                'type': 'bool',
+                'aliases': ['autosubscribe'],
+                'deprecated_aliases': [
+                    {
+                        'name': 'autosubscribe',
+                        'version': '9.0.0',
+                        'collection_name': 'community.general',
+                    },
+                ],
+            },
             'activationkey': {'no_log': True},
             'org_id': {},
             'environment': {},
