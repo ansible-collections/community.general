@@ -231,18 +231,21 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from thycotic.secrets.server import SecretServer, SecretServerError
+    from delinea.secrets.server import SecretServer, SecretServerError
 
     HAS_TSS_SDK = True
+    HAS_DELINEA_SS_SDK = True
 except ImportError:
     try:
-        from delinea.secrets.server import SecretServer, SecretServerError
+        from thycotic.secrets.server import SecretServer, SecretServerError
 
         HAS_TSS_SDK = True
+        HAS_DELINEA_SS_SDK = False
     except ImportError:
         SecretServer = None
         SecretServerError = None
         HAS_TSS_SDK = False
+        HAS_DELINEA_SS_SDK = False
 
 try:
     from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
@@ -387,7 +390,10 @@ class LookupModule(LookupBase):
 
         try:
             if self.get_option("fetch_secret_ids_from_folder"):
-                return [tss.get_secret_ids_by_folderid(term) for term in terms]
+                if HAS_DELINEA_SS_SDK:
+                    return [tss.get_secret_ids_by_folderid(term) for term in terms]
+                else:
+                    raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
             else:
                 return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
         except SecretServerError as error:
