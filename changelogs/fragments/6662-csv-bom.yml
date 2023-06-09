@@ -1,0 +1,2 @@
+bugfixes:
+  - csv module utils - detects and remove unicode BOM markers from incoming CSV content ().
