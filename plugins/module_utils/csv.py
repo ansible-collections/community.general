@@ -55,14 +55,17 @@ def initialize_dialect(dialect, **kwargs):
 
 
 def read_csv(data, dialect, fieldnames=None):
-    BOM = '\ufeff'
+    BOM = u'\ufeff'
     data = to_native(data, errors='surrogate_or_strict')
-    if data.startswith(BOM):
-        data = data[1:]
 
     if PY3:
+        if data.startswith(BOM):
+            data = data[1:]
         fake_fh = StringIO(data)
     else:
+        # type(data) == bytes in Py2, so decoded BOM is 3 bytes long
+        if data.startswith(BOM.encode('utf-8')):
+            data = data[3:]
         fake_fh = BytesIO(data)
 
     reader = csv.DictReader(fake_fh, fieldnames=fieldnames, dialect=dialect)
