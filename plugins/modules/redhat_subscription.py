@@ -140,8 +140,16 @@ options:
     pool:
         description:
             - |
-              Specify a subscription pool name to consume.  Regular expressions accepted. Use I(pool_ids) instead if
-              possible, as it is much faster. Mutually exclusive with I(pool_ids).
+              Specify a subscription pool name to consume.  Regular expressions accepted.
+              Mutually exclusive with I(pool_ids).
+            - |
+              Please use I(pool_ids) instead: specifying pool IDs is much faster,
+              and it avoids to match new pools that become available for the
+              system and are not explicitly wanted.  Also, this option does not
+              support quantities.
+            - |
+              This option is deprecated for the reasons mentioned above,
+              and it will be removed in community.general 10.0.0.
         default: '^$'
         type: str
     pool_ids:
@@ -1078,7 +1086,11 @@ def main():
             'activationkey': {'no_log': True},
             'org_id': {},
             'environment': {},
-            'pool': {'default': '^$'},
+            'pool': {
+                'default': '^$',
+                'removed_in_version': '10.0.0',
+                'removed_from_collection': 'community.general',
+            },
             'pool_ids': {'default': [], 'type': 'list', 'elements': 'raw'},
             'consumer_type': {},
             'consumer_name': {},
