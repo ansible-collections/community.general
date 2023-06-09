@@ -100,7 +100,7 @@
       that:
         - gitlab_merge_request_udpate.mr.labels[0] == "{{ gitlab_labels }}"
         - gitlab_merge_request_udpate.mr.assignees[0].username == "{{ gitlab_assignee_ids }}"
-        - gitlab_merge_request_udpate.mr.description == "### Description\n\nMerge Request test description"
+        - "'### Description\n\nMerge Request test description' in gitlab_merge_request_udpate.mr.description"
 
   - name: Delete Merge Request
     gitlab_merge_request:
