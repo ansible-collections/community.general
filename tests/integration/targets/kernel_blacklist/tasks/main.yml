@@ -36,6 +36,13 @@
     path: '{{ bl_file }}'
   register: stat_test_1
 
+- name: show bl_test_1
+  ansible.builtin.debug:
+    var: bl_test_1_depr_msgs
+  vars:
+    bl_test_1_depr_msgs: "{{ (bl_test_1.deprecations | default([])) | map(attribute='msg') }}"
+    # q('ansible.builtin.subelements', bl_test_1, 'deprecations', {'skip_missing': True}) }}"
+
 - name: assert file is unchanged
   assert:
     that:
@@ -49,11 +56,16 @@
     expected_content: |
       # Copyright (c) Ansible Project
       # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-      # SPDX-{{ '' }}License-Identifier: GPL-3.0-or-later
+      # SPDX{{ '' }}-License-Identifier: GPL-3.0-or-later
 
       blacklist aaaa
       blacklist bbbb
       blacklist cccc
+
+- name: test deprecation
+  assert:
+    that:
+    - "'deprecations' not in bl_test_1 or (ansible_version.major == 2 and ansible_version.minor == 12)"
 
 - name: add new item to list
   community.general.kernel_blacklist:
@@ -76,7 +88,7 @@
     content: |
       # Copyright (c) Ansible Project
       # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-      # SPDX-{{ '' }}License-Identifier: GPL-3.0-or-later
+      # SPDX{{ '' }}-License-Identifier: GPL-3.0-or-later
 
       blacklist aaaa
       blacklist bbbb
@@ -104,7 +116,7 @@
     content: |
       # Copyright (c) Ansible Project
       # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-      # SPDX-{{ '' }}License-Identifier: GPL-3.0-or-later
+      # SPDX{{ '' }}-License-Identifier: GPL-3.0-or-later
 
       blacklist aaaa
       blacklist cccc
