@@ -68,6 +68,7 @@ options:
       - The page size when performing a simple paged result search (RFC 2696).
         This setting can be tuned to reduce issues with timeouts and server limits.
       - Setting the page size to 0 (default) disables paged searching.
+    version_added: 7.1.0
   base64_attributes:
     description:
       - If provided, all attribute values returned that are listed in this option
@@ -240,7 +241,7 @@ class LdapSearch(LdapGeneric):
                         else:
                             ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
                 cookies = [c.cookie for c in serverctrls if c.controlType == ldap.controls.libldap.SimplePagedResultsControl.controlType]
-                if not cookies or not cookies[0]:
+                if self.page_size == 0 or not cookies or not cookies[0]:
                     return ldap_entries
                 else:
                     controls[0].cookie = cookies[0]
