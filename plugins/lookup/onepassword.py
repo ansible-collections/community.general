@@ -477,36 +477,36 @@ class OnePassCLIv2(OnePassCLIBase):
 
     def assert_logged_in(self):
         if self.service_account_token:
-          # maybe not necessary
-          args = ["account", "get"]
-          environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
-          rc, out, err = self._run(args, ignore_errors=False, environment_update=environment_update)
+            # maybe not necessary
+            args = ["account", "get"]
+            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+            rc, out, err = self._run(args, ignore_errors=False, environment_update=environment_update)
 
-          return not bool(rc)
+            return not bool(rc)
 
         else:
 
-          args = ["account", "list"]
-          if self.subdomain:
-              account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
-              args.extend(["--account", account])
+            args = ["account", "list"]
+            if self.subdomain:
+                account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+                args.extend(["--account", account])
 
-          rc, out, err = self._run(args)
+            rc, out, err = self._run(args)
 
-          if out:
-              # Running 'op account get' if there are no accounts configured on the system drops into
-              # an interactive prompt. Only run 'op account get' after first listing accounts to see
-              # if there are any previously configured accounts.
-              args = ["account", "get"]
-              if self.subdomain:
-                  account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
-                  args.extend(["--account", account])
+            if out:
+                # Running 'op account get' if there are no accounts configured on the system drops into
+                # an interactive prompt. Only run 'op account get' after first listing accounts to see
+                # if there are any previously configured accounts.
+                args = ["account", "get"]
+                if self.subdomain:
+                    account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+                    args.extend(["--account", account])
 
-              rc, out, err = self._run(args, ignore_errors=True)
+                rc, out, err = self._run(args, ignore_errors=True)
 
-              return not bool(rc)
+                return not bool(rc)
 
-          return False
+            return False
 
     def full_signin(self):
         if self.service_account_token:
@@ -514,7 +514,7 @@ class OnePassCLIv2(OnePassCLIBase):
             args = [
                 "whoami",
             ]
-            
+
             return self._run(args, environment_update=environment_update)
         else:
             required_params = [
@@ -645,7 +645,7 @@ class LookupModule(LookupBase):
 
         op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
         op.assert_logged_in()
-        
+
         values = []
         for term in terms:
             values.append(op.get_field(term, field, section, vault))
