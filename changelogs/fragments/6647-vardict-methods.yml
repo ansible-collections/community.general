@@ -1,0 +1,2 @@
+minor_changes:
+  - vardict module utils - added convenience methods to ``VarDict`` (https://github.com/ansible-collections/community.general/pull/6647).
