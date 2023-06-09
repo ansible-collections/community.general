@@ -52,6 +52,8 @@ class DependencyMixin(ModuleHelperBase):
         return cls._dependencies[-1]
 
     def fail_on_missing_deps(self):
+        if not self._dependencies:
+            return
         self.module.deprecate(
             'The DependencyMixin is being deprecated. '
             'Modules should use community.general.plugins.module_utils.deps instead.',
