@@ -26,6 +26,13 @@ options:
         description: The integer ID of the secret.
         required: true
         type: int
+    fetch_secret_ids_from_folder:
+        description:
+            - Boolean flag which indicates whether secret ids are in a folder is fetched by folder ID or not.
+            - V(true) then the terms will be considered as a folder IDs. Otherwise (default), they are considered as secret IDs.
+        required: false
+        type: bool
+        version_added: 7.1.0
     fetch_attachments:
         description:
             - Boolean flag which indicates whether attached files will get downloaded or not.
@@ -194,6 +201,26 @@ EXAMPLES = r"""
               | items2dict(key_name='slug',
                            value_name='itemValue'))['private-key']
           }}
+
+# If fetch_secret_ids_from_folder=true then secret IDs are in a folder is fetched based on folder ID
+- hosts: localhost
+  vars:
+      secret: >-
+        {{
+            lookup(
+                'community.general.tss',
+                102,
+                fetch_secret_ids_from_folder=true,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                token='thycotic_access_token'
+            )
+        }}
+  tasks:
+    - ansible.builtin.debug:
+        msg: >
+          the secret id's are {{
+              secret
+          }}
 """
 
 import abc
@@ -204,18 +231,21 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from thycotic.secrets.server import SecretServer, SecretServerError
+    from delinea.secrets.server import SecretServer, SecretServerError
 
     HAS_TSS_SDK = True
+    HAS_DELINEA_SS_SDK = True
 except ImportError:
     try:
-        from delinea.secrets.server import SecretServer, SecretServerError
+        from thycotic.secrets.server import SecretServer, SecretServerError
 
         HAS_TSS_SDK = True
+        HAS_DELINEA_SS_SDK = False
     except ImportError:
         SecretServer = None
         SecretServerError = None
         HAS_TSS_SDK = False
+        HAS_DELINEA_SS_SDK = False
 
 try:
     from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
@@ -270,12 +300,26 @@ class TSSClient(object):
         else:
             return self._client.get_secret_json(secret_id)
 
+    def get_secret_ids_by_folderid(self, term):
+        display.debug("tss_lookup term: %s" % term)
+        folder_id = self._term_to_folder_id(term)
+        display.vvv(u"Secret Server lookup of Secret id's with Folder ID %d" % folder_id)
+
+        return self._client.get_secret_ids_by_folderid(folder_id)
+
     @staticmethod
     def _term_to_secret_id(term):
         try:
             return int(term)
         except ValueError:
             raise AnsibleOptionsError("Secret ID must be an integer")
+
+    @staticmethod
+    def _term_to_folder_id(term):
+        try:
+            return int(term)
+        except ValueError:
+            raise AnsibleOptionsError("Folder ID must be an integer")
 
 
 class TSSClientV0(TSSClient):
@@ -345,6 +389,12 @@ class LookupModule(LookupBase):
         )
 
         try:
-            return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
+            if self.get_option("fetch_secret_ids_from_folder"):
+                if HAS_DELINEA_SS_SDK:
+                    return [tss.get_secret_ids_by_folderid(term) for term in terms]
+                else:
+                    raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
+            else:
+                return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
         except SecretServerError as error:
             raise AnsibleError("Secret Server lookup failure: %s" % error.message)
