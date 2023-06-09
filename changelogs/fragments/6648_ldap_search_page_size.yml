@@ -1,0 +1,2 @@
+minor_changes:
+  - ldap_search module - Add a new ``page_size`` option to enable paged searches
