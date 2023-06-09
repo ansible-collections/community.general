@@ -11,6 +11,13 @@ import copy
 
 
 class VarMeta(object):
+    """
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 10.0.0
+    Modules should use the VarDict from plugins/module_utils/vardict.py instead.
+    """
+
     NOTHING = object()
 
     def __init__(self, diff=False, output=True, change=None, fact=False):
@@ -60,6 +67,12 @@ class VarMeta(object):
 
 
 class VarDict(object):
+    """
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 10.0.0
+    Modules should use the VarDict from plugins/module_utils/vardict.py instead.
+    """
     def __init__(self):
         self._data = dict()
         self._meta = dict()
@@ -123,7 +136,12 @@ class VarDict(object):
 
 
 class VarsMixin(object):
+    """
+    DEPRECATION WARNING
 
+    This class is deprecated and will be removed in community.general 10.0.0
+    Modules should use the VarDict from plugins/module_utils/vardict.py instead.
+    """
     def __init__(self, module=None):
         self.vars = VarDict()
         super(VarsMixin, self).__init__(module)
