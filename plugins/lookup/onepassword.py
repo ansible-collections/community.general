@@ -133,7 +133,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
           if missing:
               prefix = "Unable to sign in to 1Password. Missing required parameter"
               plural = ""
-              suffix = ": {params}.".format(params=", ".join(missing))
+              suffix = ": {params}. Or use a service_account_token.".format(params=", ".join(missing))
               if len(missing) > 1:
                   plural = "s"
 
@@ -476,55 +476,77 @@ class OnePassCLIv2(OnePassCLIBase):
         return ""
 
     def assert_logged_in(self):
-        args = ["account", "list"]
-        if self.subdomain:
-            account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
-            args.extend(["--account", account])
+        if self.service_account_token:
+          # maybe not necessary
+          args = ["account", "get"]
+          environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+          rc, out, err = self._run(args, ignore_errors=False, environment_update=environment_update)
 
-        rc, out, err = self._run(args)
+          return not bool(rc)
 
-        if out:
-            # Running 'op account get' if there are no accounts configured on the system drops into
-            # an interactive prompt. Only run 'op account get' after first listing accounts to see
-            # if there are any previously configured accounts.
-            args = ["account", "get"]
-            if self.subdomain:
-                account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
-                args.extend(["--account", account])
+        else:
 
-            rc, out, err = self._run(args, ignore_errors=True)
+          args = ["account", "list"]
+          if self.subdomain:
+              account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+              args.extend(["--account", account])
 
-            return not bool(rc)
+          rc, out, err = self._run(args)
 
-        return False
+          if out:
+              # Running 'op account get' if there are no accounts configured on the system drops into
+              # an interactive prompt. Only run 'op account get' after first listing accounts to see
+              # if there are any previously configured accounts.
+              args = ["account", "get"]
+              if self.subdomain:
+                  account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+                  args.extend(["--account", account])
+
+              rc, out, err = self._run(args, ignore_errors=True)
+
+              return not bool(rc)
+
+          return False
 
     def full_signin(self):
-        required_params = [
-            "subdomain",
-            "username",
-            "secret_key",
-            "master_password",
-        ]
-        self._check_required_params(required_params)
+        if self.service_account_token:
+            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+            args = [
+                "whoami",
+            ]
+            
+            return self._run(args, environment_update=environment_update)
+        else:
+            required_params = [
+                "subdomain",
+                "username",
+                "secret_key",
+                "master_password",
+            ]
+            self._check_required_params(required_params)
 
-        args = [
-            "account", "add", "--raw",
-            "--address", "{0}.{1}".format(self.subdomain, self.domain),
-            "--email", to_bytes(self.username),
-            "--signin",
-        ]
+            args = [
+                "account", "add", "--raw",
+                "--address", "{0}.{1}".format(self.subdomain, self.domain),
+                "--email", to_bytes(self.username),
+                "--signin",
+            ]
 
-        environment_update = {"OP_SECRET_KEY": self.secret_key}
-        return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
+            environment_update = {"OP_SECRET_KEY": self.secret_key}
+
+            return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
 
     def get_raw(self, item_id, vault=None, token=None):
         args = ["item", "get", item_id, "--format", "json"]
         if vault is not None:
             args += ["--vault={0}".format(vault)]
-        if token is not None:
+        if not self.service_account_token and token is not None:
             args += [to_bytes("--session=") + token]
-
-        return self._run(args)
+        if self.service_account_token:
+            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+            return self._run(args, environment_update=environment_update)
+        else:
+            return self._run(args)
 
     def signin(self):
         self._check_required_params(['master_password'])
@@ -623,9 +645,8 @@ class LookupModule(LookupBase):
 
         op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
         op.assert_logged_in()
-
+        
         values = []
         for term in terms:
             values.append(op.get_field(term, field, section, vault))
-
         return values
