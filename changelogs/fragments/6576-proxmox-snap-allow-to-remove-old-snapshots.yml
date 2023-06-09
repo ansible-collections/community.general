@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - "proxmox_snap - add ``retention`` parameter to delete old snapshots (https://github.com/ansible-collections/community.general/pull/6576)."

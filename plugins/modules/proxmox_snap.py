@@ -74,6 +74,15 @@ options:
       - Name of the snapshot that has to be created/deleted/restored.
     default: 'ansible_snap'
     type: str
+  retention:
+    description:
+      - Remove old snapshots if there are more than O(retention) snapshots.
+      - If O(retention) is set to V(0), all snapshots will be kept.
+      - This is only used when O(state=present) and when an actual snapshot is created.
+        If no snapshot is created, all existing snapshots will be kept.
+    default: 0
+    type: int
+    version_added: 7.1.0
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
@@ -93,6 +102,16 @@ EXAMPLES = r'''
     vmid: 100
     state: present
     snapname: pre-updates
+
+- name: Create new container snapshot and keep only the 2 newest snapshots
+  community.general.proxmox_snap:
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    vmid: 100
+    state: present
+    snapname: snapshot-42
+    retention: 2
 
 - name: Create new snapshot for a container with configured mountpoints
   community.general.proxmox_snap:
@@ -190,7 +209,15 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
-    def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate, unbind):
+    def snapshot_retention(self, vm, vmid, retention):
+        # ignore the last snapshot, which is the current state
+        snapshots = self.snapshot(vm, vmid).get()[:-1]
+        if retention > 0 and len(snapshots) > retention:
+            # sort by age, oldest first
+            for snap in sorted(snapshots, key=lambda x: x['snaptime'])[:len(snapshots) - retention]:
+                self.snapshot(vm, vmid)(snap['name']).delete()
+
+    def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate, unbind, retention):
         if self.module.check_mode:
             return True
 
@@ -217,9 +244,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         while timeout:
             if self.api_task_ok(vm['node'], taskid):
-                if vm['type'] == 'lxc' and unbind is True and mountpoints:
-                    self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
-                return True
+                break
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
                                       self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
@@ -228,7 +253,9 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
             timeout -= 1
         if vm['type'] == 'lxc' and unbind is True and mountpoints:
             self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
-        return False
+
+        self.snapshot_retention(vm, vmid, retention)
+        return timeout > 0
 
     def snapshot_remove(self, vm, vmid, timeout, snapname, force):
         if self.module.check_mode:
@@ -275,6 +302,7 @@ def main():
         force=dict(type='bool', default=False),
         unbind=dict(type='bool', default=False),
         vmstate=dict(type='bool', default=False),
+        retention=dict(type='int', default=0),
     )
     module_args.update(snap_args)
 
@@ -294,6 +322,7 @@ def main():
     force = module.params['force']
     unbind = module.params['unbind']
     vmstate = module.params['vmstate']
+    retention = module.params['retention']
 
     # If hostname is set get the VM id from ProxmoxAPI
     if not vmid and hostname:
@@ -309,7 +338,7 @@ def main():
                 if i['name'] == snapname:
                     module.exit_json(changed=False, msg="Snapshot %s is already present" % snapname)
 
-            if proxmox.snapshot_create(vm, vmid, timeout, snapname, description, vmstate, unbind):
+            if proxmox.snapshot_create(vm, vmid, timeout, snapname, description, vmstate, unbind, retention):
                 if module.check_mode:
                     module.exit_json(changed=False, msg="Snapshot %s would be created" % snapname)
                 else:
