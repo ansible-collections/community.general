@@ -63,7 +63,7 @@ def read_csv(data, dialect, fieldnames=None):
             data = data[1:]
         fake_fh = StringIO(data)
     else:
-        # type(data) == bytes in Py2, so decoded BOM is 3 bytes long
+        # type(data) == bytes in Py2, and encoded BOM is 3 bytes long
         if data.startswith(BOM.encode('utf-8')):
             data = data[3:]
         fake_fh = BytesIO(data)
