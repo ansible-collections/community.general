@@ -106,7 +106,7 @@ class _Variable(object):
 
 
 class VarDict(object):
-    reserved_names = ('__vars__', 'var', 'set_meta', 'set', 'output', 'diff', 'facts', 'has_changed')
+    reserved_names = ('__vars__', '_var', 'var', 'set_meta', 'get_meta', 'set', 'output', 'diff', 'facts', 'has_changed', 'as_dict')
 
     def __init__(self):
         self.__vars__ = dict()
