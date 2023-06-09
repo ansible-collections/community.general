@@ -1,0 +1,6 @@
+deprecated_features:
+- |
+  redhat_subscription - the ``autosubscribe`` alias for the ``auto_attach`` option has been
+  deprecated for many years, although only in the documentation. Officially mark this alias
+  as deprecated, and it will be removed in community.general 9.0.0
+  (https://github.com/ansible-collections/community.general/pull/6646).
