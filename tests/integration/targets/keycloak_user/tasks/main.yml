@@ -1,0 +1,114 @@
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create new realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_accounts_enabled: true
+    state: present
+  register: client
+
+
+- name: Create new client role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ keycloak_client_role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create new groups
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ item.name }}"
+    state: present
+  with_items: "{{ keycloak_user_groups }}"
+
+- name: Create user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    state: present
+  register: create_result
+
+- name: debug
+  debug:
+    var: create_result
+
+- name: Assert user is created
+  assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.username == 'test'
+      - create_result.end_state.attributes | length == 3
+      - create_result.end_state.groups | length == 2
+
+- name: Delete User
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    state: absent
+  register: delete_result
+
+- name: debug
+  debug:
+    var: delete_result
+
+- name: Assert user is deleted
+  assert:
+    that:
+      - delete_result.changed
+      - delete_result.end_state | length == 0
