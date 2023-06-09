@@ -1,0 +1,5 @@
+deprecated_features:
+- |
+  redhat_subscription - the ``pool`` option is deprecated in favour of the
+  more precise and flexible ``pool_ids`` option
+  (https://github.com/ansible-collections/community.general/pull/6650).
