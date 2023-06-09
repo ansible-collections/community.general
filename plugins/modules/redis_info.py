@@ -60,7 +60,6 @@ notes:
   U(https://github.com/andymccurdy/redis-py)
 seealso:
 - module: community.general.redis
-requirements: [ redis ]
 author: "Pavlo Bashynskyi (@levonet)"
 '''
 
@@ -225,6 +224,8 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
     fail_imports, redis_auth_argument_spec, redis_auth_params)
 
+def redis_client(**client_params):
+    return redis.StrictRedis(**client_params)
 
 # Module execution.
 def main():
@@ -241,7 +242,7 @@ def main():
     redis_params = redis_auth_params(module)
 
     # Connect and check
-    client = redis.StrictRedis(**redis_params)
+    client = redis_client(**redis_params)
     try:
         client.ping()
     except Exception as e:

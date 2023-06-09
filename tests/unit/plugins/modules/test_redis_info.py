@@ -17,7 +17,7 @@ class FakeRedisClient(MagicMock):
     def ping(self):
         pass
 
-    def info(self):
+    def info(self, section='default'):
         return {'redis_version': '999.999.999'}
 
 
@@ -26,7 +26,7 @@ class FakeRedisClientFail(MagicMock):
     def ping(self):
         raise Exception('Test Error')
 
-    def info(self):
+    def info(self, section='default'):
         pass
 
 
@@ -41,7 +41,8 @@ class TestRedisInfoModule(ModuleTestCase):
         super(TestRedisInfoModule, self).tearDown()
 
     def patch_redis_client(self, **kwds):
-        return patch('ansible_collections.community.general.plugins.modules.redis_info.redis_client', autospec=True, **kwds)
+        return patch('redis.StrictRedis', autospec=True, **kwds)
+        # return patch('ansible_collections.community.general.plugins.modules.redis_info.redis_client', autospec=True, **kwds)
 
     def test_without_parameters(self):
         """Test without parameters"""
@@ -50,7 +51,7 @@ class TestRedisInfoModule(ModuleTestCase):
                 set_module_args({})
                 self.module.main()
             self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'localhost', 'port': 6379, 'password': None},))
+            self.assertEqual(redis_client.call_args, ({'host': 'localhost', 'port': 6379, 'password': None, 'section': 'default'}))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 
     def test_with_parameters(self):
@@ -60,11 +61,12 @@ class TestRedisInfoModule(ModuleTestCase):
                 set_module_args({
                     'login_host': 'test',
                     'login_port': 1234,
-                    'login_password': 'PASS'
+                    'login_password': 'PASS',
+                    'section': 'replication'
                 })
                 self.module.main()
             self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'test', 'port': 1234, 'password': 'PASS'},))
+            self.assertEqual(redis_client.call_args, ({'host': 'test', 'port': 1234, 'password': 'PASS', 'section': 'replication'}))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 
     def test_with_fail_client(self):
