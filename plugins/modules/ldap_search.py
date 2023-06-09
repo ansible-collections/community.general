@@ -241,10 +241,10 @@ class LdapSearch(LdapGeneric):
                         else:
                             ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
                 cookies = [c.cookie for c in serverctrls if c.controlType == ldap.controls.libldap.SimplePagedResultsControl.controlType]
-                if self.page_size == 0 or not cookies or not cookies[0]:
-                    return ldap_entries
-                else:
+                if self.page_size > 0 and cookies and cookies[0]:
                     controls[0].cookie = cookies[0]
+                else:
+                    return ldap_entries
         except ldap.NO_SUCH_OBJECT:
             self.module.fail_json(msg="Base not found: {0}".format(self.dn))
 
