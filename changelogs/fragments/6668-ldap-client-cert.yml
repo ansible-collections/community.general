@@ -1,2 +1,2 @@
 minor_changes:
-  - ldap - add new arguments ``client_cert`` and ``client_key`` to the ldap modules in order to allow certificate authentication (https://github.com/ansible-collections/community.general/pull/6668).
+  - ldap_* - add new arguments ``client_cert`` and ``client_key`` to the LDAP modules in order to allow certificate authentication (https://github.com/ansible-collections/community.general/pull/6668).
