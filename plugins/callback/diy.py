@@ -18,7 +18,7 @@ DOCUMENTATION = r'''
   extends_documentation_fragment:
     - default_callback
   notes:
-    - Uses the C(default) callback plugin output when a custom callback message(C(msg)) is not provided.
+    - Uses the P(ansible.builtin.default#callback) callback plugin output when a custom callback V(message(msg\)) is not provided.
     - Makes the callback event data available via the C(ansible_callback_diy) dictionary, which can be used in the templating context for the options.
       The dictionary is only available in the templating context for the options. It is not a variable that is available via the other
       various execution contexts, such as playbook, play, task etc.
@@ -40,8 +40,8 @@ DOCUMENTATION = r'''
                     if value C(is not None and not omit and length is greater than 0),
                     then the option is being used with output.
        **Effect**: render value as template and output"
-    - "Valid color values: C(black), C(bright gray), C(blue), C(white), C(green), C(bright blue), C(cyan), C(bright green), C(red), C(bright cyan),
-      C(purple), C(bright red), C(yellow), C(bright purple), C(dark gray), C(bright yellow), C(magenta), C(bright magenta), C(normal)"
+    - "Valid color values: V(black), V(bright gray), V(blue), V(white), V(green), V(bright blue), V(cyan), V(bright green), V(red), V(bright cyan),
+      V(purple), V(bright red), V(yellow), V(bright purple), V(dark gray), V(bright yellow), V(magenta), V(bright magenta), V(normal)"
   seealso:
     - name: default – default Ansible screen output
       description: The official documentation on the B(default) callback plugin.
@@ -62,7 +62,7 @@ DOCUMENTATION = r'''
 
     on_any_msg_color:
       description:
-        - Output color to be used for I(on_any_msg).
+        - Output color to be used for O(on_any_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -86,7 +86,7 @@ DOCUMENTATION = r'''
 
     runner_on_failed_msg_color:
       description:
-        - Output color to be used for I(runner_on_failed_msg).
+        - Output color to be used for O(runner_on_failed_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -110,7 +110,7 @@ DOCUMENTATION = r'''
 
     runner_on_ok_msg_color:
       description:
-        - Output color to be used for I(runner_on_ok_msg).
+        - Output color to be used for O(runner_on_ok_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -134,7 +134,7 @@ DOCUMENTATION = r'''
 
     runner_on_skipped_msg_color:
       description:
-        - Output color to be used for I(runner_on_skipped_msg).
+        - Output color to be used for O(runner_on_skipped_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -158,7 +158,7 @@ DOCUMENTATION = r'''
 
     runner_on_unreachable_msg_color:
       description:
-        - Output color to be used for I(runner_on_unreachable_msg).
+        - Output color to be used for O(runner_on_unreachable_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -182,7 +182,7 @@ DOCUMENTATION = r'''
 
     playbook_on_start_msg_color:
       description:
-        - Output color to be used for I(playbook_on_start_msg).
+        - Output color to be used for O(playbook_on_start_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -206,7 +206,7 @@ DOCUMENTATION = r'''
 
     playbook_on_notify_msg_color:
       description:
-        - Output color to be used for I(playbook_on_notify_msg).
+        - Output color to be used for O(playbook_on_notify_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -230,7 +230,7 @@ DOCUMENTATION = r'''
 
     playbook_on_no_hosts_matched_msg_color:
       description:
-        - Output color to be used for I(playbook_on_no_hosts_matched_msg).
+        - Output color to be used for O(playbook_on_no_hosts_matched_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -254,7 +254,7 @@ DOCUMENTATION = r'''
 
     playbook_on_no_hosts_remaining_msg_color:
       description:
-        - Output color to be used for I(playbook_on_no_hosts_remaining_msg).
+        - Output color to be used for O(playbook_on_no_hosts_remaining_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -278,7 +278,7 @@ DOCUMENTATION = r'''
 
     playbook_on_task_start_msg_color:
       description:
-        - Output color to be used for I(playbook_on_task_start_msg).
+        - Output color to be used for O(playbook_on_task_start_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -302,7 +302,7 @@ DOCUMENTATION = r'''
 
     playbook_on_handler_task_start_msg_color:
       description:
-        - Output color to be used for I(playbook_on_handler_task_start_msg).
+        - Output color to be used for O(playbook_on_handler_task_start_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -326,7 +326,7 @@ DOCUMENTATION = r'''
 
     playbook_on_vars_prompt_msg_color:
       description:
-        - Output color to be used for I(playbook_on_vars_prompt_msg).
+        - Output color to be used for O(playbook_on_vars_prompt_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -350,7 +350,7 @@ DOCUMENTATION = r'''
 
     playbook_on_play_start_msg_color:
       description:
-        - Output color to be used for I(playbook_on_play_start_msg).
+        - Output color to be used for O(playbook_on_play_start_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -374,7 +374,7 @@ DOCUMENTATION = r'''
 
     playbook_on_stats_msg_color:
       description:
-        - Output color to be used for I(playbook_on_stats_msg).
+        - Output color to be used for O(playbook_on_stats_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -398,7 +398,7 @@ DOCUMENTATION = r'''
 
     on_file_diff_msg_color:
       description:
-        - Output color to be used for I(on_file_diff_msg).
+        - Output color to be used for O(on_file_diff_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -422,7 +422,7 @@ DOCUMENTATION = r'''
 
     playbook_on_include_msg_color:
       description:
-        - Output color to be used for I(playbook_on_include_msg).
+        - Output color to be used for O(playbook_on_include_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -446,7 +446,7 @@ DOCUMENTATION = r'''
 
     runner_item_on_ok_msg_color:
       description:
-        - Output color to be used for I(runner_item_on_ok_msg).
+        - Output color to be used for O(runner_item_on_ok_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -470,7 +470,7 @@ DOCUMENTATION = r'''
 
     runner_item_on_failed_msg_color:
       description:
-        - Output color to be used for I(runner_item_on_failed_msg).
+        - Output color to be used for O(runner_item_on_failed_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -494,7 +494,7 @@ DOCUMENTATION = r'''
 
     runner_item_on_skipped_msg_color:
       description:
-        - Output color to be used for I(runner_item_on_skipped_msg).
+        - Output color to be used for O(runner_item_on_skipped_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -518,7 +518,7 @@ DOCUMENTATION = r'''
 
     runner_retry_msg_color:
       description:
-        - Output color to be used for I(runner_retry_msg).
+        - Output color to be used for O(runner_retry_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -542,7 +542,7 @@ DOCUMENTATION = r'''
 
     runner_on_start_msg_color:
       description:
-        - Output color to be used for I(runner_on_start_msg).
+        - Output color to be used for O(runner_on_start_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -566,7 +566,7 @@ DOCUMENTATION = r'''
 
     runner_on_no_hosts_msg_color:
       description:
-        - Output color to be used for I(runner_on_no_hosts_msg).
+        - Output color to be used for O(runner_on_no_hosts_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
@@ -590,7 +590,7 @@ DOCUMENTATION = r'''
 
     playbook_on_setup_msg_color:
       description:
-        - Output color to be used for I(playbook_on_setup_msg).
+        - Output color to be used for O(playbook_on_setup_msg).
         - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy

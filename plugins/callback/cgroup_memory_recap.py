@@ -24,7 +24,7 @@ DOCUMENTATION = '''
     options:
       max_mem_file:
         required: true
-        description: Path to cgroups C(memory.max_usage_in_bytes) file. Example C(/sys/fs/cgroup/memory/ansible_profile/memory.max_usage_in_bytes).
+        description: Path to cgroups C(memory.max_usage_in_bytes) file. Example V(/sys/fs/cgroup/memory/ansible_profile/memory.max_usage_in_bytes).
         env:
           - name: CGROUP_MAX_MEM_FILE
         ini:
@@ -32,7 +32,7 @@ DOCUMENTATION = '''
             key: max_mem_file
       cur_mem_file:
         required: true
-        description: Path to C(memory.usage_in_bytes) file. Example C(/sys/fs/cgroup/memory/ansible_profile/memory.usage_in_bytes).
+        description: Path to C(memory.usage_in_bytes) file. Example V(/sys/fs/cgroup/memory/ansible_profile/memory.usage_in_bytes).
         env:
           - name: CGROUP_CUR_MEM_FILE
         ini:

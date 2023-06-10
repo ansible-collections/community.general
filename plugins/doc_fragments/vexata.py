@@ -39,8 +39,8 @@ options:
     type: str
   validate_certs:
     description:
-      - Allows connection when SSL certificates are not valid. Set to C(false) when certificates are not trusted.
-      - If set to C(true), please make sure Python >= 2.7.9 is installed on the given machine.
+      - Allows connection when SSL certificates are not valid. Set to V(false) when certificates are not trusted.
+      - If set to V(true), please make sure Python >= 2.7.9 is installed on the given machine.
     required: false
     type: bool
     default: false
