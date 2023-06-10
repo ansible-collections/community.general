@@ -52,11 +52,13 @@
 
     - name: Create certificates
       shell: |
-        openssl req -x509 -batch -sha256 -days 1825 -newkey rsa:2048 -noenc -keyout /root/ca.key -out /usr/local/share/ca-certificates/ca.crt
-        openssl req -x509 -batch -sha256 -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -days 365 -newkey rsa:2048 -subj "/CN=$(hostname)" -addext "subjectAltName = DNS:localhost" -noenc -keyout /etc/ldap/localhost.key -out /etc/ldap/localhost.crt
+        openssl req -x509 -batch -sha256 -days 1825 -newkey rsa:2048 -nodes -keyout /root/ca.key -out /usr/local/share/ca-certificates/ca.crt
+        openssl req -batch -sha256 -days 365 -newkey rsa:2048 -subj "/CN=$(hostname)" -addext "subjectAltName = DNS:localhost" -nodes -keyout /etc/ldap/localhost.key -out /etc/ldap/localhost.csr
+        openssl x509 -req  -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -CAcreateserial -in /etc/ldap/localhost.csr -out /etc/ldap/localhost.crt
         chgrp openldap /etc/ldap/localhost.key
         chmod 0640 /etc/ldap/localhost.key
-        openssl req -x509 -batch -sha256 -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -days 365 -newkey rsa:2048 -subj "/UID=ldaptest" -noenc -keyout /root/user.key -out /root/user.crt
+        openssl req -batch -sha256 -days 365 -newkey rsa:2048 -subj "/UID=ldaptest" -nodes -keyout /root/user.key -out /root/user.csr
+        openssl x509 -req  -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -CAcreateserial -in /root/user.csr -out /root/user.crt
 
     - name: Start OpenLDAP service
       become: true
