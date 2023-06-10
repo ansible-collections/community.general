@@ -42,8 +42,8 @@ def gen_specs(**specs):
         'validate_certs': dict(default=True, type='bool'),
         'sasl_class': dict(choices=['external', 'gssapi'], default='external', type='str'),
         'xorder_discovery': dict(choices=['enable', 'auto', 'disable'], default='auto', type='str'),
-        'client_cert': dict(default=None, type='path', aliases=['certfile']),
-        'client_key': dict(default=None, type='path', aliases=['keyfile']),
+        'client_cert': dict(default=None, type='path'),
+        'client_key': dict(default=None, type='path'),
     })
 
     return specs

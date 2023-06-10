@@ -34,14 +34,12 @@ options:
     description:
       - PEM formatted certificate chain file to be used for SSL client authentication.
       - Required if O(client_key) is defined.
-    aliases: [certfile]
     version_added: "7.1.0"
   client_key:
     type: path
     description:
       - PEM formatted file that contains your private key to be used for SSL client authentication.
       - Required if O(client_cert) is defined.
-    aliases: [keyfile]
     version_added: "7.1.0"
   dn:
     required: true
