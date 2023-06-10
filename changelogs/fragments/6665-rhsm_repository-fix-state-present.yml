@@ -1,0 +1,3 @@
+bugfixes:
+  - rhsm_repository - make ``state=present`` work again
+    (https://github.com/ansible-collections/community.general/pull/6665).

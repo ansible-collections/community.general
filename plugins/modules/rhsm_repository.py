@@ -181,7 +181,7 @@ def repository_modify(module, state, name, purge=False):
             if fnmatch(repo['id'], repoid):
                 matched_existing_repo[repoid].append(repo)
                 # Update current_repo_list to return it as result variable
-                updated_repo_list[idx]['enabled'] = True if state == 'enabled' else False
+                updated_repo_list[idx]['enabled'] = True if state in ['enabled', 'present'] else False
 
     changed = False
     results = []
