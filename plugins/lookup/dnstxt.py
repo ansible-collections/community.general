@@ -22,8 +22,8 @@ DOCUMENTATION = '''
         elements: string
       real_empty:
         description:
-          - Return empty result without empty strings, and return empty list instead of C(NXDOMAIN).
-          - The default for this option will likely change to C(true) in the future.
+          - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
+          - The default for this option will likely change to V(true) in the future.
         default: false
         type: bool
         version_added: 6.0.0

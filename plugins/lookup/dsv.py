@@ -13,15 +13,15 @@ short_description: Get secrets from Thycotic DevOps Secrets Vault
 version_added: 1.0.0
 description:
     - Uses the Thycotic DevOps Secrets Vault Python SDK to get Secrets from a
-      DSV I(tenant) using a I(client_id) and I(client_secret).
+      DSV O(tenant) using a O(client_id) and O(client_secret).
 requirements:
     - python-dsv-sdk - https://pypi.org/project/python-dsv-sdk/
 options:
     _terms:
-        description: The path to the secret, e.g. C(/staging/servers/web1).
+        description: The path to the secret, for example V(/staging/servers/web1).
         required: true
     tenant:
-        description: The first format parameter in the default I(url_template).
+        description: The first format parameter in the default O(url_template).
         env:
             - name: DSV_TENANT
         ini:
@@ -31,7 +31,7 @@ options:
     tld:
         default: com
         description: The top-level domain of the tenant; the second format
-            parameter in the default I(url_template).
+            parameter in the default O(url_template).
         env:
             - name: DSV_TLD
         ini:
@@ -47,7 +47,7 @@ options:
               key: client_id
         required: true
     client_secret:
-        description: The client secret associated with the specific I(client_id).
+        description: The client secret associated with the specific O(client_id).
         env:
             - name: DSV_CLIENT_SECRET
         ini:

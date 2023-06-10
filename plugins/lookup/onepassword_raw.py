@@ -18,7 +18,7 @@ DOCUMENTATION = '''
       - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
     short_description: fetch an entire item from 1Password
     description:
-      - C(onepassword_raw) wraps C(op) command line utility to fetch an entire item from 1Password
+      - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.
     options:
       _terms:
         description: identifier(s) (UUID, name, or domain; case-insensitive) of item(s) to retrieve.
@@ -43,9 +43,9 @@ DOCUMENTATION = '''
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
-        performed an initial sign in (meaning C(~/.op/config exists)), then only the C(master_password) is required.
-        You may optionally specify C(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
-      - This lookup can perform an initial login by providing C(subdomain), C(username), C(secret_key), and C(master_password).
+        performed an initial sign in (meaning C(~/.op/config exists)), then only the O(master_password) is required.
+        You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
+      - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
       - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
         needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
         to the 1Password master password.
