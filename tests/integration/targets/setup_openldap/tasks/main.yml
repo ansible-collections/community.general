@@ -56,6 +56,7 @@
         openssl req -x509 -batch -sha256 -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -days 365 -newkey rsa:2048 -subj "/CN=$(hostname)" -addext "subjectAltName = DNS:localhost" -noenc -keyout /etc/ldap/localhost.key -out /etc/ldap/localhost.crt
         chgrp openldap /etc/ldap/localhost.key
         chmod 0640 /etc/ldap/localhost.key
+        openssl req -x509 -batch -sha256 -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -days 365 -newkey rsa:2048 -subj "/UID=ldaptest" -noenc -keyout /root/user.key -out /root/user.crt
 
     - name: Start OpenLDAP service
       become: true
