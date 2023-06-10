@@ -24,6 +24,14 @@ from ansible.module_utils.six.moves import configparser
 
 
 class RegistrationBase(object):
+    """
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 10.0.0.
+    There is no replacement for it; please contact the community.general
+    maintainers in case you are using it.
+    """
+
     def __init__(self, module, username=None, password=None):
         self.module = module
         self.username = username
@@ -71,10 +79,23 @@ class RegistrationBase(object):
 
 
 class Rhsm(RegistrationBase):
+    """
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 9.0.0.
+    There is no replacement for it; please contact the community.general
+    maintainers in case you are using it.
+    """
+
     def __init__(self, module, username=None, password=None):
         RegistrationBase.__init__(self, module, username, password)
         self.config = self._read_config()
         self.module = module
+        self.module.deprecate(
+            'The Rhsm class is deprecated with no replacement.',
+            version='9.0.0',
+            collection_name='community.general',
+        )
 
     def _read_config(self, rhsm_conf='/etc/rhsm/rhsm.conf'):
         '''
@@ -200,14 +221,25 @@ class Rhsm(RegistrationBase):
 
 
 class RhsmPool(object):
-    '''
-        Convenience class for housing subscription information
-    '''
+    """
+    Convenience class for housing subscription information
+
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 9.0.0.
+    There is no replacement for it; please contact the community.general
+    maintainers in case you are using it.
+    """
 
     def __init__(self, module, **kwargs):
         self.module = module
         for k, v in kwargs.items():
             setattr(self, k, v)
+        self.module.deprecate(
+            'The RhsmPool class is deprecated with no replacement.',
+            version='9.0.0',
+            collection_name='community.general',
+        )
 
     def __str__(self):
         return str(self.__getattribute__('_name'))
@@ -223,11 +255,23 @@ class RhsmPool(object):
 
 class RhsmPools(object):
     """
-        This class is used for manipulating pools subscriptions with RHSM
+    This class is used for manipulating pools subscriptions with RHSM
+
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 9.0.0.
+    There is no replacement for it; please contact the community.general
+    maintainers in case you are using it.
     """
+
     def __init__(self, module):
         self.module = module
         self.products = self._load_product_list()
+        self.module.deprecate(
+            'The RhsmPools class is deprecated with no replacement.',
+            version='9.0.0',
+            collection_name='community.general',
+        )
 
     def __iter__(self):
         return self.products.__iter__()

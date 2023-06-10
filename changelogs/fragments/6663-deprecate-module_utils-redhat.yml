@@ -1,0 +1,11 @@
+deprecated_features:
+  - |
+    redhat module utils - the ``module_utils.redhat`` module is deprecated, as
+    effectively unused: the ``Rhsm``, ``RhsmPool``, and ``RhsmPools`` classes
+    will be removed in community.general 9.0.0; the ``RegistrationBase`` class
+    will be removed in community.general 10.0.0 together with the
+    ``rhn_register`` module, as it is the only user of this class; this means
+    that the whole ``module_utils.redhat`` module will be dropped in
+    community.general 10.0.0, so importing it without even using anything of it
+    will fail
+    (https://github.com/ansible-collections/community.general/pull/6663).
