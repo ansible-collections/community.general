@@ -19,9 +19,9 @@ version_added: 7.1.0
 description:
   - Creates a merge request if it does not exist.
   - When a merge request does exist, it will be updated if the provided parameters are different.
-  - When a merge request does exist and I(state=absent), the merge request will be deleted.
-  - Existing merge requests are matched based on I(title), I(source_branch), I(target_branch),
-    and I(state_filter) filters.
+  - When a merge request does exist and O(state=absent), the merge request will be deleted.
+  - Existing merge requests are matched based on O(title), O(source_branch), O(target_branch),
+    and O(state_filter) filters.
 author:
   - zvaraondrej (@zvaraondrej)
 requirements:
@@ -69,7 +69,7 @@ options:
   description:
     description:
       - A description for the merge request.
-      - Gets overriden by a content of file specified at I(description_path), if found.
+      - Gets overriden by a content of file specified at O(description_path), if found.
     type: str
   description_path:
     description:
@@ -99,7 +99,7 @@ options:
     type: str
   reviewer_ids:
     description:
-      - Comma separated list of reviewers usernames omitting "@" character.
+      - Comma separated list of reviewers usernames omitting C(@) character.
       - Set to empty string to unassign all reviewers.
     type: str
 '''
