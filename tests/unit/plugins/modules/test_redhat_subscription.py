@@ -22,7 +22,7 @@ def patch_redhat_subscription(mocker):
     """
     Function used for mocking some parts of redhat_subscription module
     """
-    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.RegistrationBase.REDHAT_REPO')
+    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.Rhsm.REDHAT_REPO')
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.isfile', return_value=False)
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.unlink', return_value=True)
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.AnsibleModule.get_bin_path',

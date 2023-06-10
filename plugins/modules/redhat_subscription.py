@@ -334,32 +334,12 @@ from ansible.module_utils import distro
 SUBMAN_CMD = None
 
 
-class RegistrationBase(object):
+class Rhsm(object):
 
     REDHAT_REPO = "/etc/yum.repos.d/redhat.repo"
 
-    def __init__(self, module, username=None, password=None, token=None):
+    def __init__(self, module):
         self.module = module
-        self.username = username
-        self.password = password
-        self.token = token
-
-    def configure(self):
-        raise NotImplementedError("Must be implemented by a sub-class")
-
-    def enable(self):
-        # Remove any existing redhat.repo
-        if isfile(self.REDHAT_REPO):
-            unlink(self.REDHAT_REPO)
-
-    def register(self):
-        raise NotImplementedError("Must be implemented by a sub-class")
-
-    def unregister(self):
-        raise NotImplementedError("Must be implemented by a sub-class")
-
-    def unsubscribe(self):
-        raise NotImplementedError("Must be implemented by a sub-class")
 
     def update_plugin_conf(self, plugin, enabled=True):
         plugin_conf = '/etc/yum/pluginconf.d/%s.conf' % plugin
@@ -380,22 +360,15 @@ class RegistrationBase(object):
             fd.close()
             self.module.atomic_move(tmpfile, plugin_conf)
 
-    def subscribe(self, **kwargs):
-        raise NotImplementedError("Must be implemented by a sub-class")
-
-
-class Rhsm(RegistrationBase):
-    def __init__(self, module, username=None, password=None, token=None):
-        RegistrationBase.__init__(self, module, username, password, token)
-        self.module = module
-
     def enable(self):
         '''
             Enable the system to receive updates from subscription-manager.
             This involves updating affected yum plugins and removing any
             conflicting yum repositories.
         '''
-        RegistrationBase.enable(self)
+        # Remove any existing redhat.repo
+        if isfile(self.REDHAT_REPO):
+            unlink(self.REDHAT_REPO)
         self.update_plugin_conf('rhnplugin', False)
         self.update_plugin_conf('subscription-manager', True)
 
@@ -1067,9 +1040,6 @@ class SysPurpose(object):
 
 def main():
 
-    # Load RHSM configuration from file
-    rhsm = Rhsm(None)
-
     # Note: the default values for parameters are:
     # 'type': 'str', 'default': None, 'required': False
     # So there is no need to repeat these values for each parameter.
@@ -1144,7 +1114,9 @@ def main():
             msg="Interacting with subscription-manager requires root permissions ('become: true')"
         )
 
-    rhsm.module = module
+    # Load RHSM configuration from file
+    rhsm = Rhsm(module)
+
     state = module.params['state']
     username = module.params['username']
     password = module.params['password']
