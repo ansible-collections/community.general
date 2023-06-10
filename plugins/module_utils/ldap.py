@@ -49,6 +49,10 @@ def gen_specs(**specs):
     return specs
 
 
+def ldap_required_together():
+    return [['client_cert', 'client_key']]
+
+
 class LdapGeneric(object):
     def __init__(self, module):
         # Shortcuts
