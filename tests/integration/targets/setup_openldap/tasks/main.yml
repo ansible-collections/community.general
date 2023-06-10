@@ -44,6 +44,19 @@
         cmd: "export DEBIAN_FRONTEND=noninteractive; cat /root/debconf-slapd.conf | debconf-set-selections; dpkg-reconfigure -f noninteractive slapd"
         creates: "/root/slapd_configured"
 
+    - name: Enable secure ldap
+      lineinfile:
+        path: /etc/default/slapd
+        regexp: "^SLAPD_SERVICES"
+        line: 'SLAPD_SERVICES="ldap:/// ldaps:/// ldapi:///"'
+
+    - name: Create certificates
+      shell: |
+        openssl req -x509 -batch -sha256 -days 1825 -newkey rsa:2048 -noenc -keyout /root/ca.key -out /usr/local/share/ca-certificates/ca.crt
+        openssl req -x509 -batch -sha256 -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -days 365 -newkey rsa:2048 -subj "/CN=$(hostname)" -addext "subjectAltName = DNS:localhost" -noenc -keyout /etc/ldap/localhost.key -out /etc/ldap/localhost.crt
+        chgrp openldap /etc/ldap/localhost.key
+        chmod 0640 /etc/ldap/localhost.key
+
     - name: Start OpenLDAP service
       become: true
       service:
@@ -61,10 +74,14 @@
         mode: '0644'
       loop:
         - rootpw_cnconfig.ldif
+        - cert_cnconfig.ldif
         - initial_config.ldif
 
     - name: Configure admin password for cn=config
-      shell: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/rootpw_cnconfig.ldif"
+      shell: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/{{ item }}"
+      loop:
+        - rootpw_cnconfig.ldif
+        - cert_cnconfig.ldif
 
     - name: Add initial config
       become: true
