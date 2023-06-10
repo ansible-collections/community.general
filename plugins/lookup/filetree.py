@@ -65,7 +65,7 @@ RETURN = r"""
         src:
           description:
           - Full path to file.
-          - Not returned when I(item.state) is set to C(directory).
+          - Not returned when RV(_raw[].state) is set to V(directory).
           type: path
         root:
           description: Allows filtering by original location.
