@@ -19,7 +19,7 @@ DOCUMENTATION = """
     options:
       _terms:
         description:
-          - Depending on the value of I(pattern_type), this is a list of prefixes, suffixes, or regular expressions
+          - Depending on the value of O(pattern_type), this is a list of prefixes, suffixes, or regular expressions
             that will be used to match all variables that should be merged.
         required: true
         type: list
@@ -45,11 +45,11 @@ DOCUMENTATION = """
       override:
         description:
           - Return an error, print a warning or ignore it when a key will be overwritten.
-          - The default behavior C(error) makes the plugin fail when a key would be overwritten.
-          - When C(warn) and C(ignore) are used, note that it is important to know that the variables
+          - The default behavior V(error) makes the plugin fail when a key would be overwritten.
+          - When V(warn) and V(ignore) are used, note that it is important to know that the variables
             are sorted by name before being merged. Keys for later variables in this order will overwrite
             keys of the same name for variables earlier in this order. To avoid potential confusion,
-            better use I(override=error) whenever possible.
+            better use O(override=error) whenever possible.
         type: str
         default: 'error'
         choices:

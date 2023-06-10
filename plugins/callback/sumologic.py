@@ -6,7 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 name: sumologic
 type: notification
 short_description: Sends task result events to Sumologic
@@ -15,8 +15,8 @@ description:
   - This callback plugin will send task results as JSON formatted events to a Sumologic HTTP collector source.
 requirements:
   - Whitelisting this callback plugin
-  - 'Create a HTTP collector source in Sumologic and specify a custom timestamp format of C(yyyy-MM-dd HH:mm:ss ZZZZ) and a custom timestamp locator
-    of C("timestamp": "(.*)")'
+  - 'Create a HTTP collector source in Sumologic and specify a custom timestamp format of V(yyyy-MM-dd HH:mm:ss ZZZZ) and a custom timestamp locator
+    of V("timestamp": "(.*\)")'
 options:
   url:
     description: URL to the Sumologic HTTP collector source.

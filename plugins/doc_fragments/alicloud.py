@@ -41,8 +41,8 @@ options:
   alicloud_assume_role:
     description:
       - If provided with a role ARN, Ansible will attempt to assume this role using the supplied credentials.
-      - The nested assume_role block supports I(alicloud_assume_role_arn), I(alicloud_assume_role_session_name),
-        I(alicloud_assume_role_session_expiration) and I(alicloud_assume_role_policy)
+      - The nested assume_role block supports C(alicloud_assume_role_arn), C(alicloud_assume_role_session_name),
+        C(alicloud_assume_role_session_expiration) and C(alicloud_assume_role_policy).
     type: dict
     aliases: ['assume_role']
   alicloud_assume_role_arn:

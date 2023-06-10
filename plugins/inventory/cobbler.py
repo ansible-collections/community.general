@@ -18,7 +18,7 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to C(community.general.cobbler) for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as it's own.
         required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
@@ -43,7 +43,7 @@ DOCUMENTATION = '''
       exclude_profiles:
         description:
           - Profiles to exclude from inventory.
-          - Ignored if I(include_profiles) is specified.
+          - Ignored if O(include_profiles) is specified.
         type: list
         default: []
         elements: str
@@ -51,7 +51,7 @@ DOCUMENTATION = '''
         description:
           - Profiles to include from inventory.
           - If specified, all other profiles will be excluded.
-          - I(exclude_profiles) is ignored if I(include_profiles) is specified.
+          - O(exclude_profiles) is ignored if O(include_profiles) is specified.
         type: list
         default: []
         elements: str
@@ -60,7 +60,7 @@ DOCUMENTATION = '''
         description:
           - What to use for the ansible inventory hostname.
           - By default the networking hostname is used if defined, otherwise the DNS name of the management or first non-static interface.
-          - If set to I(system), the cobbler system name is used.
+          - If set to V(system), the cobbler system name is used.
         type: str
         choices: [ 'hostname', 'system' ]
         default: hostname
@@ -77,7 +77,7 @@ DOCUMENTATION = '''
         description: Prefix to apply to cobbler groups
         default: cobbler_
       want_facts:
-        description: Toggle, if C(true) the plugin will retrieve host facts from the server
+        description: Toggle, if V(true) the plugin will retrieve host facts from the server
         type: boolean
         default: true
 '''
