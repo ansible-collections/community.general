@@ -32,10 +32,10 @@ DOCUMENTATION = '''
       enable_from_environment:
         type: str
         description:
-          - Whether to enable this callback only if the given environment variable exists and it is set to C(true).
+          - Whether to enable this callback only if the given environment variable exists and it is set to V(true).
           - This is handy when you use Configuration as Code and want to send distributed traces
             if running in the CI rather when running Ansible locally.
-          - For such, it evaluates the given I(enable_from_environment) value as environment variable
+          - For such, it evaluates the given O(enable_from_environment) value as environment variable
             and if set to true this plugin will be enabled.
         env:
           - name: ANSIBLE_OPENTELEMETRY_ENABLE_FROM_ENVIRONMENT

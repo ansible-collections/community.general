@@ -21,7 +21,7 @@ DOCUMENTATION = '''
       - In addition to (default) A record, it is also possible to specify a different record type that should be queried.
         This can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to the FQDN being queried.
       - If multiple values are associated with the requested record, the results will be returned as a comma-separated list.
-        In such cases you may want to pass option I(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
+        In such cases you may want to pass option C(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
         which will result in the record values being returned as a list over which you can iterate later on.
       - By default, the lookup will rely on system-wide configured DNS servers for performing the query.
         It is also possible to explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation.
@@ -34,8 +34,8 @@ DOCUMENTATION = '''
       qtype:
         description:
             - Record type to query.
-            - C(DLV) has been removed in community.general 6.0.0.
-            - C(CAA) has been added in community.general 6.3.0.
+            - V(DLV) has been removed in community.general 6.0.0.
+            - V(CAA) has been added in community.general 6.3.0.
         type: str
         default: 'A'
         choices: [A, ALL, AAAA, CAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
@@ -51,17 +51,17 @@ DOCUMENTATION = '''
       fail_on_error:
         description:
           - Abort execution on lookup errors.
-          - The default for this option will likely change to C(true) in the future.
-            The current default, C(false), is used for backwards compatibility, and will result in empty strings
-            or the string C(NXDOMAIN) in the result in case of errors.
+          - The default for this option will likely change to V(true) in the future.
+            The current default, V(false), is used for backwards compatibility, and will result in empty strings
+            or the string V(NXDOMAIN) in the result in case of errors.
         default: false
         type: bool
         version_added: 5.4.0
       real_empty:
         description:
-          - Return empty result without empty strings, and return empty list instead of C(NXDOMAIN).
-          - The default for this option will likely change to C(true) in the future.
-          - This option will be forced to C(true) if multiple domains to be queried are specified.
+          - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
+          - The default for this option will likely change to V(true) in the future.
+          - This option will be forced to V(true) if multiple domains to be queried are specified.
         default: false
         type: bool
         version_added: 6.0.0

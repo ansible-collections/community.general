@@ -35,10 +35,10 @@ attributes:
 options:
   state:
     description:
-      - C(enabled) reloads firewall and enables firewall on boot.
-      - C(disabled) unloads firewall and disables firewall on boot.
-      - C(reloaded) reloads firewall.
-      - C(reset) disables and resets firewall to installation defaults.
+      - V(enabled) reloads firewall and enables firewall on boot.
+      - V(disabled) unloads firewall and disables firewall on boot.
+      - V(reloaded) reloads firewall.
+      - V(reset) disables and resets firewall to installation defaults.
     type: str
     choices: [ disabled, enabled, reloaded, reset ]
   default:
@@ -50,7 +50,7 @@ options:
   direction:
     description:
       - Select direction for a rule or default policy command.  Mutually
-        exclusive with I(interface_in) and I(interface_out).
+        exclusive with O(interface_in) and O(interface_out).
     type: str
     choices: [ in, incoming, out, outgoing, routed ]
   logging:
@@ -62,24 +62,24 @@ options:
     description:
       - Insert the corresponding rule as rule number NUM.
       - Note that ufw numbers rules starting with 1.
-      - If I(delete=true) and a value is provided for I(insert),
-        then I(insert) is ignored.
+      - If O(delete=true) and a value is provided for O(insert),
+        then O(insert) is ignored.
     type: int
   insert_relative_to:
     description:
-      - Allows to interpret the index in I(insert) relative to a position.
-      - C(zero) interprets the rule number as an absolute index (i.e. 1 is
+      - Allows to interpret the index in O(insert) relative to a position.
+      - V(zero) interprets the rule number as an absolute index (i.e. 1 is
         the first rule).
-      - C(first-ipv4) interprets the rule number relative to the index of the
+      - V(first-ipv4) interprets the rule number relative to the index of the
         first IPv4 rule, or relative to the position where the first IPv4 rule
         would be if there is currently none.
-      - C(last-ipv4) interprets the rule number relative to the index of the
+      - V(last-ipv4) interprets the rule number relative to the index of the
         last IPv4 rule, or relative to the position where the last IPv4 rule
         would be if there is currently none.
-      - C(first-ipv6) interprets the rule number relative to the index of the
+      - V(first-ipv6) interprets the rule number relative to the index of the
         first IPv6 rule, or relative to the position where the first IPv6 rule
         would be if there is currently none.
-      - C(last-ipv6) interprets the rule number relative to the index of the
+      - V(last-ipv6) interprets the rule number relative to the index of the
         last IPv6 rule, or relative to the position where the last IPv6 rule
         would be if there is currently none.
     type: str
@@ -130,32 +130,32 @@ options:
   delete:
     description:
       - Delete rule.
-      - If I(delete=true) and a value is provided for I(insert),
-        then I(insert) is ignored.
+      - If O(delete=true) and a value is provided for O(insert),
+        then O(insert) is ignored.
     type: bool
     default: false
   interface:
     description:
       - Specify interface for the rule.  The direction (in or out) used
-        for the interface depends on the value of I(direction).  See
-        I(interface_in) and I(interface_out) for routed rules that needs
+        for the interface depends on the value of O(direction).  See
+        O(interface_in) and O(interface_out) for routed rules that needs
         to supply both an input and output interface.  Mutually
-        exclusive with I(interface_in) and I(interface_out).
+        exclusive with O(interface_in) and O(interface_out).
     type: str
     aliases: [ if ]
   interface_in:
     description:
       - Specify input interface for the rule.  This is mutually
-        exclusive with I(direction) and I(interface).  However, it is
-        compatible with I(interface_out) for routed rules.
+        exclusive with O(direction) and O(interface).  However, it is
+        compatible with O(interface_out) for routed rules.
     type: str
     aliases: [ if_in ]
     version_added: '0.2.0'
   interface_out:
     description:
       - Specify output interface for the rule.  This is mutually
-        exclusive with I(direction) and I(interface).  However, it is
-        compatible with I(interface_in) for routed rules.
+        exclusive with O(direction) and O(interface).  However, it is
+        compatible with O(interface_in) for routed rules.
     type: str
     aliases: [ if_out ]
     version_added: '0.2.0'

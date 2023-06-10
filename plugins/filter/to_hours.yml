@@ -13,12 +13,12 @@ DOCUMENTATION:
     _input:
       description:
         - The time string to convert.
-        - Can use the units C(y) and C(year) for a year, C(mo) and C(month) for a month, C(w) and C(week) for a week,
-          C(d) and C(day) for a day, C(h) and C(hour) for a hour, C(m), C(min) and C(minute) for minutes, C(s), C(sec)
-          and C(second) for seconds, C(ms), C(msec), C(msecond) and C(millisecond) for milliseconds. The suffix C(s)
-          can be added to a unit as well, so C(seconds) is the same as C(second).
+        - Can use the units V(y) and V(year) for a year, V(mo) and V(month) for a month, V(w) and V(week) for a week,
+          V(d) and V(day) for a day, V(h) and V(hour) for a hour, V(m), V(min) and V(minute) for minutes, V(s), V(sec)
+          and V(second) for seconds, V(ms), V(msec), V(msecond) and V(millisecond) for milliseconds. The suffix V(s)
+          can be added to a unit as well, so V(seconds) is the same as V(second).
         - Valid strings are space separated combinations of an integer with an optional minus sign and a unit.
-        - Examples are C(1h), C(-5m), and C(3h -5m 6s).
+        - Examples are V(1h), V(-5m), and V(3h -5m 6s).
       type: string
       required: true
     year:

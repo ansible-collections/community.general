@@ -21,7 +21,7 @@ options:
     type: str
   bind_pw:
     description:
-      - The password to use with I(bind_dn).
+      - The password to use with O(bind_dn).
     type: str
     default: ''
   ca_path:
@@ -40,12 +40,12 @@ options:
     type: str
     description:
       - Set the referrals chasing behavior.
-      - C(anonymous) follow referrals anonymously. This is the default behavior.
-      - C(disabled) disable referrals chasing. This sets C(OPT_REFERRALS) to off.
+      - V(anonymous) follow referrals anonymously. This is the default behavior.
+      - V(disabled) disable referrals chasing. This sets C(OPT_REFERRALS) to off.
     version_added: 2.0.0
   server_uri:
     description:
-      - The I(server_uri) parameter may be a comma- or whitespace-separated list of URIs containing only the schema, the host, and the port fields.
+      - The O(server_uri) parameter may be a comma- or whitespace-separated list of URIs containing only the schema, the host, and the port fields.
       - The default value lets the underlying LDAP client library look for a UNIX domain socket in its default location.
       - Note that when using multiple URIs you cannot determine to which URI your client gets connected.
       - For URIs containing additional fields, particularly when using commas, behavior is undefined.
@@ -58,14 +58,13 @@ options:
     default: false
   validate_certs:
     description:
-      - If set to C(false), SSL certificates will not be validated.
+      - If set to V(false), SSL certificates will not be validated.
       - This should only be used on sites using self-signed certificates.
     type: bool
     default: true
   sasl_class:
     description:
       - The class to use for SASL authentication.
-      - Possible choices are C(external), C(gssapi).
     type: str
     choices: ['external', 'gssapi']
     default: external
@@ -73,10 +72,9 @@ options:
   xorder_discovery:
     description:
       - Set the behavior on how to process Xordered DNs.
-      - C(enable) will perform a C(ONELEVEL) search below the superior RDN to find the matching DN.
-      - C(disable) will always use the DN unmodified (as passed by the I(dn) parameter).
-      - C(auto) will only perform a search if the first RDN does not contain an index number (C({x})).
-      - Possible choices are C(enable), C(auto), C(disable).
+      - V(enable) will perform a C(ONELEVEL) search below the superior RDN to find the matching DN.
+      - V(disable) will always use the DN unmodified (as passed by the O(dn) parameter).
+      - V(auto) will only perform a search if the first RDN does not contain an index number (C({x})).
     type: str
     choices: ['enable', 'auto', 'disable']
     default: auto

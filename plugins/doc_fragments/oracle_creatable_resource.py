@@ -14,13 +14,13 @@ class ModuleDocFragment(object):
             description: Whether to attempt non-idempotent creation of a resource. By default, create resource is an
                          idempotent operation, and doesn't create the resource if it already exists. Setting this option
                          to true, forcefully creates a copy of the resource, even if it already exists.This option is
-                         mutually exclusive with I(key_by).
+                         mutually exclusive with O(key_by).
             default: false
             type: bool
         key_by:
             description: The list of comma-separated attributes of this resource which should be used to uniquely
                          identify an instance of the resource. By default, all the attributes of a resource except
-                         I(freeform_tags) are used to uniquely identify a resource.
+                         O(freeform_tags) are used to uniquely identify a resource.
             type: list
             elements: str
     """

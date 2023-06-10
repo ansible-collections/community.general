@@ -23,7 +23,7 @@ options:
 
     auth_client_id:
         description:
-            - OpenID Connect I(client_id) to authenticate to the API with.
+            - OpenID Connect C(client_id) to authenticate to the API with.
         type: str
         default: admin-cli
 
@@ -34,7 +34,7 @@ options:
 
     auth_client_secret:
         description:
-            - Client Secret to use in conjunction with I(auth_client_id) (if required).
+            - Client Secret to use in conjunction with O(auth_client_id) (if required).
         type: str
 
     auth_username:

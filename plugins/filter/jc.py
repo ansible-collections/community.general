@@ -25,17 +25,17 @@ DOCUMENTATION = '''
     parser:
       description:
         - The correct parser for the input data.
-        - For example C(ifconfig).
+        - For example V(ifconfig).
         - "Note: use underscores instead of dashes (if any) in the parser module name."
         - See U(https://github.com/kellyjonbrazil/jc#parsers) for the latest list of parsers.
       type: string
       required: true
     quiet:
-      description: Set to C(false) to not suppress warnings.
+      description: Set to V(false) to not suppress warnings.
       type: boolean
       default: true
     raw:
-      description: Set to C(true) to return pre-processed JSON.
+      description: Set to V(true) to return pre-processed JSON.
       type: boolean
       default: false
   requirements:

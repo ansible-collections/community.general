@@ -25,13 +25,13 @@ options:
   wait_time:
     description:
       - The maximum amount of time (in seconds) to wait for the task to complete.
-      - Only applicable if I(wait=true).
+      - Only applicable if O(wait=true).
     type: int
     default: 600
   wait_poll_interval:
     description:
       - The amount of time (in seconds) to wait between checks for task completion.
-      - Only applicable if I(wait=true).
+      - Only applicable if O(wait=true).
     type: int
     default: 2
     '''

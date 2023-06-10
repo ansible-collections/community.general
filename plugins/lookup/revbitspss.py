@@ -25,7 +25,7 @@ options:
         elements: string
     base_url:
         description:
-            - This will be the base URL of the server, for example C(https://server-url-here).
+            - This will be the base URL of the server, for example V(https://server-url-here).
         required: true
         type: string
     api_key:

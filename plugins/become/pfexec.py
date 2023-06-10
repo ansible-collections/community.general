@@ -82,7 +82,7 @@ DOCUMENTATION = '''
             env:
               - name: ANSIBLE_PFEXEC_WRAP_EXECUTION
     notes:
-      - This plugin ignores I(become_user) as pfexec uses it's own C(exec_attr) to figure this out.
+      - This plugin ignores O(become_user) as pfexec uses it's own C(exec_attr) to figure this out.
 '''
 
 from ansible.plugins.become import BecomeBase

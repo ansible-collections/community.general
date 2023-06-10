@@ -58,7 +58,7 @@ DOCUMENTATION = '''
         description:
           - Allows the override of the inventory name based on different attributes.
           - This allows for changing the way limits are used.
-          - The current default, C(address), is sometimes not unique or present. We recommend to use C(name) instead.
+          - The current default, V(address), is sometimes not unique or present. We recommend to use V(name) instead.
         type: string
         default: address
         choices: ['name', 'display_name', 'address']

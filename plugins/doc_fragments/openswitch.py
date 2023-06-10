@@ -23,7 +23,7 @@ options:
   port:
     description:
       - Specifies the port to use when building the connection to the remote
-        device.  This value applies to either I(cli) or I(rest).  The port
+        device.  This value applies to either O(transport=cli) or O(transport=rest).  The port
         value will default to the appropriate transport common port if
         none is provided in the task.  (cli=22, http=80, https=443).  Note
         this argument does not affect the SSH transport.
@@ -41,8 +41,8 @@ options:
   password:
     description:
       - Specifies the password to use to authenticate the connection to
-        the remote device.  This is a common argument used for either I(cli)
-        or I(rest) transports.  Note this argument does not affect the SSH
+        the remote device.  This is a common argument used for either O(transport=cli)
+        or O(transport=rest).  Note this argument does not affect the SSH
         transport. If the value is not specified in the task, the value of
         environment variable C(ANSIBLE_NET_PASSWORD) will be used instead.
     type: str
@@ -56,8 +56,8 @@ options:
   ssh_keyfile:
     description:
       - Specifies the SSH key to use to authenticate the connection to
-        the remote device.  This argument is only used for the I(cli)
-        transports. If the value is not specified in the task, the value of
+        the remote device.  This argument is only used for O(transport=cli).
+        If the value is not specified in the task, the value of
         environment variable C(ANSIBLE_NET_SSH_KEYFILE) will be used instead.
     type: path
   transport:
@@ -71,14 +71,14 @@ options:
     default: ssh
   use_ssl:
     description:
-      - Configures the I(transport) to use SSL if set to C(true) only when the
-        I(transport) argument is configured as rest.  If the transport
-        argument is not I(rest), this value is ignored.
+      - Configures the O(transport) to use SSL if set to V(true) only when the
+        O(transport) argument is configured as rest.  If the transport
+        argument is not V(rest), this value is ignored.
     type: bool
     default: true
   provider:
     description:
-      - Convenience method that allows all I(openswitch) arguments to be passed as
+      - Convenience method that allows all C(openswitch) arguments to be passed as
         a dict object.  All constraints (required, choices, etc) must be
         met either by individual arguments or values in this dict.
     type: dict

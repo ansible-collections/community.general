@@ -15,18 +15,18 @@ class ModuleDocFragment(object):
 options:
   api_key:
     description:
-      - Rackspace API key, overrides I(credentials).
+      - Rackspace API key, overrides O(credentials).
     type: str
     aliases: [ password ]
   credentials:
     description:
-      - File to find the Rackspace credentials in. Ignored if I(api_key) and
-        I(username) are provided.
+      - File to find the Rackspace credentials in. Ignored if O(api_key) and
+        O(username) are provided.
     type: path
     aliases: [ creds_file ]
   env:
     description:
-      - Environment as configured in I(~/.pyrax.cfg),
+      - Environment as configured in C(~/.pyrax.cfg),
         see U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#pyrax-configuration).
     type: str
   region:
@@ -35,7 +35,7 @@ options:
     type: str
   username:
     description:
-      - Rackspace username, overrides I(credentials).
+      - Rackspace username, overrides O(credentials).
     type: str
   validate_certs:
     description:
@@ -61,7 +61,7 @@ options:
   api_key:
     type: str
     description:
-      - Rackspace API key, overrides I(credentials).
+      - Rackspace API key, overrides O(credentials).
     aliases: [ password ]
   auth_endpoint:
     type: str
@@ -71,13 +71,13 @@ options:
   credentials:
     type: path
     description:
-      - File to find the Rackspace credentials in. Ignored if I(api_key) and
-        I(username) are provided.
+      - File to find the Rackspace credentials in. Ignored if O(api_key) and
+        O(username) are provided.
     aliases: [ creds_file ]
   env:
     type: str
     description:
-      - Environment as configured in I(~/.pyrax.cfg),
+      - Environment as configured in C(~/.pyrax.cfg),
         see U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#pyrax-configuration).
   identity_type:
     type: str
@@ -99,7 +99,7 @@ options:
   username:
     type: str
     description:
-      - Rackspace username, overrides I(credentials).
+      - Rackspace username, overrides O(credentials).
   validate_certs:
     description:
       - Whether or not to require SSL validation of API endpoints.

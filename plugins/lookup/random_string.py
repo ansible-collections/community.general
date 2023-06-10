@@ -42,25 +42,25 @@ DOCUMENTATION = r"""
         - Special characters are taken from Python standard library C(string).
           See L(the documentation of string.punctuation,https://docs.python.org/3/library/string.html#string.punctuation)
           for which characters will be used.
-        - The choice of special characters can be changed to setting I(override_special).
+        - The choice of special characters can be changed to setting O(override_special).
         default: true
         type: bool
       min_numeric:
         description:
         - Minimum number of numeric characters in the string.
-        - If set, overrides I(numbers=false).
+        - If set, overrides O(numbers=false).
         default: 0
         type: int
       min_upper:
         description:
         - Minimum number of uppercase alphabets in the string.
-        - If set, overrides I(upper=false).
+        - If set, overrides O(upper=false).
         default: 0
         type: int
       min_lower:
         description:
         - Minimum number of lowercase alphabets in the string.
-        - If set, overrides I(lower=false).
+        - If set, overrides O(lower=false).
         default: 0
         type: int
       min_special:
@@ -71,11 +71,11 @@ DOCUMENTATION = r"""
       override_special:
         description:
         - Overide a list of special characters to use in the string.
-        - If set I(min_special) should be set to a non-default value.
+        - If set O(min_special) should be set to a non-default value.
         type: str
       override_all:
         description:
-        - Override all values of I(numbers), I(upper), I(lower), and I(special) with
+        - Override all values of O(numbers), O(upper), O(lower), and O(special) with
           the given list of characters.
         type: str
       base64:

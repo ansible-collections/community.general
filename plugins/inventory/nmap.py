@@ -23,7 +23,7 @@ DOCUMENTATION = '''
             required: true
             choices: ['nmap', 'community.general.nmap']
         sudo:
-            description: Set to C(true) to execute a C(sudo nmap) plugin scan.
+            description: Set to V(true) to execute a C(sudo nmap) plugin scan.
             version_added: 4.8.0
             default: false
             type: boolean
@@ -36,7 +36,7 @@ DOCUMENTATION = '''
         exclude:
             description:
               - List of addresses to exclude.
-              - For example C(10.2.2.15-25) or C(10.2.2.15,10.2.2.16).
+              - For example V(10.2.2.15-25) or V(10.2.2.15,10.2.2.16).
             type: list
             elements: string
             env:
@@ -45,8 +45,8 @@ DOCUMENTATION = '''
         port:
             description:
                 - Only scan specific port or port range (C(-p)).
-                - For example, you could pass C(22) for a single port, C(1-65535) for a range of ports,
-                  or C(U:53,137,T:21-25,139,8080,S:9) to check port 53 with UDP, ports 21-25 with TCP, port 9 with SCTP, and ports 137, 139, and 8080 with all.
+                - For example, you could pass V(22) for a single port, V(1-65535) for a range of ports,
+                  or V(U:53,137,T:21-25,139,8080,S:9) to check port 53 with UDP, ports 21-25 with TCP, port 9 with SCTP, and ports 137, 139, and 8080 with all.
             type: string
             version_added: 6.5.0
         ports:
@@ -64,14 +64,14 @@ DOCUMENTATION = '''
         udp_scan:
             description:
                 - Scan via UDP.
-                - Depending on your system you might need I(sudo=true) for this to work.
+                - Depending on your system you might need O(sudo=true) for this to work.
             type: boolean
             default: false
             version_added: 6.1.0
         icmp_timestamp:
             description:
                 - Scan via ICMP Timestamp (C(-PP)).
-                - Depending on your system you might need I(sudo=true) for this to work.
+                - Depending on your system you might need O(sudo=true) for this to work.
             type: boolean
             default: false
             version_added: 6.1.0
@@ -81,7 +81,7 @@ DOCUMENTATION = '''
             default: false
             version_added: 6.5.0
         dns_resolve:
-            description: Whether to always (C(true)) or never (C(false)) do DNS resolution.
+            description: Whether to always (V(true)) or never (V(false)) do DNS resolution.
             type: boolean
             default: false
             version_added: 6.1.0

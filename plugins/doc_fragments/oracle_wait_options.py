@@ -15,12 +15,12 @@ class ModuleDocFragment(object):
             default: true
             type: bool
         wait_timeout:
-            description: Time, in seconds, to wait when I(wait=true).
+            description: Time, in seconds, to wait when O(wait=true).
             default: 1200
             type: int
         wait_until:
-            description: The lifecycle state to wait for the resource to transition into when I(wait=true). By default,
-                         when I(wait=true), we wait for the resource to get into ACTIVE/ATTACHED/AVAILABLE/PROVISIONED/
+            description: The lifecycle state to wait for the resource to transition into when O(wait=true). By default,
+                         when O(wait=true), we wait for the resource to get into ACTIVE/ATTACHED/AVAILABLE/PROVISIONED/
                          RUNNING applicable lifecycle state during create operation & to get into DELETED/DETACHED/
                          TERMINATED lifecycle state during delete operation.
             type: str

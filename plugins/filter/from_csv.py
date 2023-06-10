@@ -23,7 +23,7 @@ DOCUMENTATION = '''
     dialect:
       description:
         - The CSV dialect to use when parsing the CSV file.
-        - Possible values include C(excel), C(excel-tab) or C(unix).
+        - Possible values include V(excel), V(excel-tab) or V(unix).
       type: str
       default: excel
     fieldnames:
@@ -35,19 +35,19 @@ DOCUMENTATION = '''
     delimiter:
       description:
         - A one-character string used to separate fields.
-        - When using this parameter, you change the default value used by I(dialect).
+        - When using this parameter, you change the default value used by O(dialect).
         - The default value depends on the dialect used.
       type: str
     skipinitialspace:
       description:
         - Whether to ignore any whitespaces immediately following the delimiter.
-        - When using this parameter, you change the default value used by I(dialect).
+        - When using this parameter, you change the default value used by O(dialect).
         - The default value depends on the dialect used.
       type: bool
     strict:
       description:
         - Whether to raise an exception on bad CSV input.
-        - When using this parameter, you change the default value used by I(dialect).
+        - When using this parameter, you change the default value used by O(dialect).
         - The default value depends on the dialect used.
       type: bool
 '''

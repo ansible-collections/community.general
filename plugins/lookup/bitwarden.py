@@ -25,7 +25,7 @@ DOCUMENTATION = """
         type: list
         elements: str
       search:
-        description: Field to retrieve, for example C(name) or C(id).
+        description: Field to retrieve, for example V(name) or V(id).
         type: str
         default: name
         version_added: 5.7.0

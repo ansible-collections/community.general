@@ -17,9 +17,9 @@ DOCUMENTATION = r'''
         - constructed
     description:
         - Get inventory hosts from OpenNebula cloud.
-        - Uses an YAML configuration file ending with either I(opennebula.yml) or I(opennebula.yaml)
+        - Uses an YAML configuration file ending with either C(opennebula.yml) or C(opennebula.yaml)
           to set parameter values.
-        - Uses I(api_authfile), C(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file.
+        - Uses O(api_authfile), C(~/.one/one_auth), or E(ONE_AUTH) pointing to a OpenNebula credentials file.
     options:
         plugin:
             description: Token that ensures this is a source file for the 'opennebula' plugin.
@@ -31,7 +31,7 @@ DOCUMENTATION = r'''
               - URL of the OpenNebula RPC server.
               - It is recommended to use HTTPS so that the username/password are not
                 transferred over the network unencrypted.
-              - If not set then the value of the C(ONE_URL) environment variable is used.
+              - If not set then the value of the E(ONE_URL) environment variable is used.
             env:
               - name: ONE_URL
             required: true
@@ -39,29 +39,29 @@ DOCUMENTATION = r'''
         api_username:
             description:
               - Name of the user to login into the OpenNebula RPC server. If not set
-                then the value of the C(ONE_USERNAME) environment variable is used.
+                then the value of the E(ONE_USERNAME) environment variable is used.
             env:
               - name: ONE_USERNAME
             type: string
         api_password:
             description:
               - Password or a token of the user to login into OpenNebula RPC server.
-              - If not set, the value of the C(ONE_PASSWORD) environment variable is used.
+              - If not set, the value of the E(ONE_PASSWORD) environment variable is used.
             env:
               - name: ONE_PASSWORD
             required: false
             type: string
         api_authfile:
             description:
-              - If both I(api_username) or I(api_password) are not set, then it will try
+              - If both O(api_username) or O(api_password) are not set, then it will try
                 authenticate with ONE auth file. Default path is C(~/.one/one_auth).
-              - Set environment variable C(ONE_AUTH) to override this path.
+              - Set environment variable E(ONE_AUTH) to override this path.
             env:
               - name: ONE_AUTH
             required: false
             type: string
         hostname:
-            description: Field to match the hostname. Note C(v4_first_ip) corresponds to the first IPv4 found on VM.
+            description: Field to match the hostname. Note V(v4_first_ip) corresponds to the first IPv4 found on VM.
             type: string
             default: v4_first_ip
             choices:
