@@ -1,0 +1,4 @@
+minor_changes:
+  - lvg - add ``old_vg`` parameter for rename feature (https://github.com/ansible-collections/community.general/pull/6682).
+  - lvg - add ``active`` paramater for active switch feature (https://github.com/ansible-collections/community.general/pull/6682).
+  - lvg - add ``reset_vg_uuid``, ``reset_pv_uuid`` parameters for UUID reset feature (https://github.com/ansible-collections/community.general/pull/6682).
