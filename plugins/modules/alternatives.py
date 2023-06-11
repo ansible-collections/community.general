@@ -44,21 +44,21 @@ options:
     description:
       - The path to the symbolic link that should point to the real executable.
       - This option is always required on RHEL-based distributions. On Debian-based distributions this option is
-        required when the alternative I(name) is unknown to the system.
+        required when the alternative O(name) is unknown to the system.
     type: path
   priority:
     description:
-      - The priority of the alternative. If no priority is given for creation C(50) is used as a fallback.
+      - The priority of the alternative. If no priority is given for creation V(50) is used as a fallback.
     type: int
   state:
     description:
-      - C(present) - install the alternative (if not already installed), but do
+      - V(present) - install the alternative (if not already installed), but do
         not set it as the currently selected alternative for the group.
-      - C(selected) - install the alternative (if not already installed), and
+      - V(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
-      - C(auto) - install the alternative (if not already installed), and
+      - V(auto) - install the alternative (if not already installed), and
         set the group to auto mode. Added in community.general 5.1.0.
-      - C(absent) - removes the alternative. Added in community.general 5.1.0.
+      - V(absent) - removes the alternative. Added in community.general 5.1.0.
     choices: [ present, selected, auto, absent ]
     default: selected
     type: str

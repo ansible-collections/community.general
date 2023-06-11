@@ -37,7 +37,7 @@ options:
      description:
          - Identifier of the module as listed by C(apache2ctl -M).
            This is optional and usually determined automatically by the common convention of
-           appending C(_module) to I(name) as well as custom exception for popular modules.
+           appending V(_module) to O(name) as well as custom exception for popular modules.
      required: false
    force:
      description:
