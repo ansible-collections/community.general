@@ -1,0 +1,5 @@
+minor_changes:
+  - |
+    rhsm_release - improve/harden the way ``subscription-manager`` is run;
+    no behaviour change is expected
+    (https://github.com/ansible-collections/community.general/pull/6669).
