@@ -67,7 +67,7 @@ options:
     description:
       - The page size when performing a simple paged result search (RFC 2696).
         This setting can be tuned to reduce issues with timeouts and server limits.
-      - Setting the page size to 0 (default) disables paged searching.
+      - Setting the page size to V(0) (default) disables paged searching.
     version_added: 7.1.0
   base64_attributes:
     description:
@@ -231,7 +231,7 @@ class LdapSearch(LdapGeneric):
                     filterstr=self.filterstr,
                     attrlist=self.attrlist,
                     attrsonly=self.attrsonly,
-                    serverctrls=controls
+                    serverctrls=controls,
                 )
                 rtype, results, rmsgid, serverctrls = self.connection.result3(response)
                 for result in results:
