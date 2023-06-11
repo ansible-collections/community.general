@@ -36,6 +36,10 @@ options:
     description:
       - If state is equal to present or disabled, indicates the desired
         repository state.
+      - |
+        Please note that V(present) and V(absent) are deprecated, and will be
+        removed in community.general 10.0.0; please use V(enabled) and
+        V(disabled) instead.
     choices: [present, enabled, absent, disabled]
     default: "enabled"
     type: str
@@ -252,6 +256,14 @@ def main():
     name = module.params['name']
     state = module.params['state']
     purge = module.params['purge']
+
+    if state in ['present', 'absent']:
+        replacement = 'enabled' if state == 'present' else 'disabled'
+        module.deprecate(
+            'state=%s is deprecated; please use state=%s instead' % (state, replacement),
+            version='10.0.0',
+            collection_name='community.general',
+        )
 
     repository_modify(module, state, name, purge)
 
