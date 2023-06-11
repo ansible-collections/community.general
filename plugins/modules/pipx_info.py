@@ -37,7 +37,7 @@ options:
     include_raw:
         description:
             - Returns the raw output of C(pipx list --json).
-            - The raw output is not affected by I(include_deps) or I(include_injected).
+            - The raw output is not affected by O(include_deps) or O(include_injected).
         type: bool
         default: false
     executable:
@@ -98,20 +98,20 @@ application:
       type: str
       sample: "3.24.0"
     dependencies:
-      description: The dependencies of the installed application, when I(include_deps=true).
+      description: The dependencies of the installed application, when O(include_deps=true).
       returned: success
       type: list
       elements: str
       sample: ["virtualenv"]
     injected:
-      description: The injected packages for the installed application, when I(include_injected=true).
+      description: The injected packages for the installed application, when O(include_injected=true).
       returned: success
       type: dict
       sample:
         licenses: "0.6.1"
 
 raw_output:
-  description: The raw output of the C(pipx list) command, when I(include_raw=true). Used for debugging.
+  description: The raw output of the C(pipx list) command, when O(include_raw=true). Used for debugging.
   returned: success
   type: dict
 

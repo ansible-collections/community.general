@@ -29,20 +29,20 @@ options:
     description:
       - URL of the OpenNebula RPC server.
       - It is recommended to use HTTPS so that the username/password are not
-      - transferred over the network unencrypted.
+        transferred over the network unencrypted.
       - If not set then the value of the C(ONE_URL) environment variable is used.
     type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
-      - then the value of the C(ONE_USERNAME) environment variable is used.
+        then the value of the C(ONE_USERNAME) environment variable is used.
     type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
-      - then the value of the C(ONE_PASSWORD) environment variable is used.
-      - if both I(api_username) or I(api_password) are not set, then it will try
-      - authenticate with ONE auth file. Default path is "~/.one/one_auth".
+        then the value of the C(ONE_PASSWORD) environment variable is used.
+        if both O(api_username) or O(api_password) are not set, then it will try
+        authenticate with ONE auth file. Default path is "~/.one/one_auth".
       - Set environment variable C(ONE_AUTH) to override this path.
     type: str
   template_name:
@@ -60,32 +60,32 @@ options:
     type: bool
   instance_ids:
     description:
-      - A list of instance ids used for states':' C(absent), C(running), C(rebooted), C(poweredoff)
+      - 'A list of instance ids used for states: V(absent), V(running), V(rebooted), V(poweredoff).'
     aliases: ['ids']
     type: list
     elements: int
   state:
     description:
-      - C(present) - create instances from a template specified with C(template_id)/C(template_name).
-      - C(running) - run instances
-      - C(poweredoff) - power-off instances
-      - C(rebooted) - reboot instances
-      - C(absent) - terminate instances
+      - V(present) - create instances from a template specified with C(template_id)/C(template_name).
+      - V(running) - run instances
+      - V(poweredoff) - power-off instances
+      - V(rebooted) - reboot instances
+      - V(absent) - terminate instances
     choices: ["present", "absent", "running", "rebooted", "poweredoff"]
     default: present
     type: str
   hard:
     description:
-      - Reboot, power-off or terminate instances C(hard)
+      - Reboot, power-off or terminate instances C(hard).
     default: false
     type: bool
   wait:
     description:
       - Wait for the instance to reach its desired state before returning. Keep
-      - in mind if you are waiting for instance to be in running state it
-      - doesn't mean that you will be able to SSH on that machine only that
-      - boot process have started on that instance, see 'wait_for' example for
-      - details.
+        in mind if you are waiting for instance to be in running state it
+        doesn't mean that you will be able to SSH on that machine only that
+        boot process have started on that instance, see 'wait_for' example for
+        details.
     default: true
     type: bool
   wait_timeout:
@@ -96,36 +96,36 @@ options:
   attributes:
     description:
       - A dictionary of key/value attributes to add to new instances, or for
-      - setting C(state) of instances with these attributes.
+        setting C(state) of instances with these attributes.
       - Keys are case insensitive and OpenNebula automatically converts them to upper case.
       - Be aware C(NAME) is a special attribute which sets the name of the VM when it's deployed.
       - C(#) character(s) can be appended to the C(NAME) and the module will automatically add
-      - indexes to the names of VMs.
+        indexes to the names of VMs.
       - For example':' C(NAME':' foo-###) would create VMs with names C(foo-000), C(foo-001),...
-      - When used with C(count_attributes) and C(exact_count) the module will
-      - match the base name without the index part.
+      - When used with O(count_attributes) and O(exact_count) the module will
+        match the base name without the index part.
     default: {}
     type: dict
   labels:
     description:
       - A list of labels to associate with new instances, or for setting
-      - C(state) of instances with these labels.
+        C(state) of instances with these labels.
     default: []
     type: list
     elements: str
   count_attributes:
     description:
       - A dictionary of key/value attributes that can only be used with
-      - C(exact_count) to determine how many nodes based on a specific
-      - attributes criteria should be deployed. This can be expressed in
-      - multiple ways and is shown in the EXAMPLES section.
+        O(exact_count) to determine how many nodes based on a specific
+        attributes criteria should be deployed. This can be expressed in
+        multiple ways and is shown in the EXAMPLES section.
     type: dict
   count_labels:
     description:
-      - A list of labels that can only be used with C(exact_count) to determine
-      - how many nodes based on a specific labels criteria should be deployed.
-      - This can be expressed in multiple ways and is shown in the EXAMPLES
-      - section.
+      - A list of labels that can only be used with O(exact_count) to determine
+        how many nodes based on a specific labels criteria should be deployed.
+        This can be expressed in multiple ways and is shown in the EXAMPLES
+        section.
     type: list
     elements: str
   count:
@@ -135,14 +135,14 @@ options:
     type: int
   exact_count:
     description:
-      - Indicates how many instances that match C(count_attributes) and
-      - C(count_labels) parameters should be deployed. Instances are either
-      - created or terminated based on this value.
-      - NOTE':' Instances with the least IDs will be terminated first.
+      - Indicates how many instances that match O(count_attributes) and
+        O(count_labels) parameters should be deployed. Instances are either
+        created or terminated based on this value.
+      - 'B(NOTE:) Instances with the least IDs will be terminated first.'
     type: int
   mode:
     description:
-      - Set permission mode of the instance in octet format, e.g. C(600) to give owner C(use) and C(manage) and nothing to group and others.
+      - Set permission mode of the instance in octet format, for example V(0600) to give owner C(use) and C(manage) and nothing to group and others.
     type: str
   owner_id:
     description:
@@ -159,14 +159,14 @@ options:
   disk_size:
     description:
       - The size of the disk created for new instances (in MB, GB, TB,...).
-      - NOTE':' If The Template hats Multiple Disks the Order of the Sizes is
-      - matched against the order specified in C(template_id)/C(template_name).
+      - 'B(NOTE:) If The Template hats Multiple Disks the Order of the Sizes is
+        matched against the order specified in O(template_id)/O(template_name).'
     type: list
     elements: str
   cpu:
     description:
       - Percentage of CPU divided by 100 required for the new instance. Half a
-      - processor is written 0.5.
+        processor is written 0.5.
     type: float
   vcpu:
     description:
@@ -183,8 +183,8 @@ options:
       - Creates an image from a VM disk.
       - It is a dictionary where you have to specify C(name) of the new image.
       - Optionally you can specify C(disk_id) of the disk you want to save. By default C(disk_id) is 0.
-      - I(NOTE)':' This operation will only be performed on the first VM (if more than one VM ID is passed)
-      - and the VM has to be in the C(poweredoff) state.
+      - 'B(NOTE:) This operation will only be performed on the first VM (if more than one VM ID is passed)
+        and the VM has to be in the C(poweredoff) state.'
       - Also this operation will fail if an image with specified C(name) already exists.
     type: dict
   persistent:
@@ -205,7 +205,7 @@ options:
     type: str
   updateconf:
     description:
-      - When I(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
+      - When O(instance_ids) is provided, updates running VMs with the C(updateconf) API call.
       - When new VMs are being created, emulates the C(updateconf) API call via direct template merge.
       - Allows for complete modifications of the C(CONTEXT) attribute.
     type: dict
@@ -445,12 +445,12 @@ EXAMPLES = '''
 
 RETURN = '''
 instances_ids:
-    description: a list of instances ids whose state is changed or which are fetched with C(instance_ids) option.
+    description: a list of instances ids whose state is changed or which are fetched with O(instance_ids) option.
     type: list
     returned: success
     sample: [ 1234, 1235 ]
 instances:
-    description: a list of instances info whose state is changed or which are fetched with C(instance_ids) option.
+    description: a list of instances info whose state is changed or which are fetched with O(instance_ids) option.
     type: complex
     returned: success
     contains:
@@ -562,7 +562,7 @@ instances:
 tagged_instances:
     description:
         - A list of instances info based on a specific attributes and/or
-        - labels that are specified with C(count_attributes) and C(count_labels)
+        - labels that are specified with O(count_attributes) and O(count_labels)
         - options.
     type: complex
     returned: success

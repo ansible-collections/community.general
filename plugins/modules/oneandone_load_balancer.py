@@ -83,7 +83,7 @@ options:
   datacenter:
     description:
       - ID or country code of the datacenter where the load balancer will be created.
-      - If not specified, it defaults to I(US).
+      - If not specified, it defaults to V(US).
     type: str
     choices: [ "US", "ES", "DE", "GB" ]
     required: false

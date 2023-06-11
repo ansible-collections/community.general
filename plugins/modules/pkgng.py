@@ -31,10 +31,10 @@ options:
     name:
         description:
             - Name or list of names of packages to install/remove.
-            - "With I(name=*), I(state=latest) will operate, but I(state=present) and I(state=absent) will be noops."
+            - "With O(name=*), O(state=latest) will operate, but O(state=present) and O(state=absent) will be noops."
             - >
                 Warning: In Ansible 2.9 and earlier this module had a misfeature
-                where I(name=*) with I(state=latest) or I(state=present) would
+                where O(name=*) with O(state=latest) or O(state=present) would
                 install every package from every package repository, filling up
                 the machines disk. Avoid using them unless you are certain that
                 your role will only be used with newer versions.
@@ -45,7 +45,7 @@ options:
     state:
         description:
             - State of the package.
-            - 'Note: C(latest) added in 2.7.'
+            - 'Note: V(latest) added in Ansible 2.7.'
         choices: [ 'present', 'latest', 'absent' ]
         required: false
         default: present
@@ -59,8 +59,8 @@ options:
     annotation:
         description:
             - A list of keyvalue-pairs of the form
-              C(<+/-/:><key>[=<value>]). A C(+) denotes adding an annotation, a
-              C(-) denotes removing an annotation, and C(:) denotes modifying an
+              C(<+/-/:><key>[=<value>]). A V(+) denotes adding an annotation, a
+              V(-) denotes removing an annotation, and V(:) denotes modifying an
               annotation.
               If setting or modifying annotations, a value must be provided.
         required: false
@@ -79,19 +79,19 @@ options:
         description:
             - For pkgng versions 1.5 and later, pkg will install all packages
               within the specified root directory.
-            - Can not be used together with I(chroot) or I(jail) options.
+            - Can not be used together with O(chroot) or O(jail) options.
         required: false
         type: path
     chroot:
         description:
             - Pkg will chroot in the specified environment.
-            - Can not be used together with I(rootdir) or I(jail) options.
+            - Can not be used together with O(rootdir) or O(jail) options.
         required: false
         type: path
     jail:
         description:
             - Pkg will execute in the given jail name or id.
-            - Can not be used together with I(chroot) or I(rootdir) options.
+            - Can not be used together with O(chroot) or O(rootdir) options.
         type: str
     autoremove:
         description:
@@ -111,7 +111,7 @@ author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
   - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the I(name) option.
+    it is much more efficient to pass the list directly to the O(name) option.
 '''
 
 EXAMPLES = '''
