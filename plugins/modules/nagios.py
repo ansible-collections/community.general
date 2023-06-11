@@ -21,13 +21,13 @@ short_description: Perform common tasks in Nagios related to downtime and notifi
 description:
   - "The C(nagios) module has two basic functions: scheduling downtime and toggling alerts for services or hosts."
   - The C(nagios) module is not idempotent.
-  - All actions require the I(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}}) variable to refer
+  - All actions require the O(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}}) variable to refer
     to the host the playbook is currently running on.
-  - You can specify multiple services at once by separating them with commas, .e.g. I(services=httpd,nfs,puppet).
-  - When specifying what service to handle there is a special service value, I(host), which will handle alerts/downtime/acknowledge for the I(host itself),
-    e.g., I(service=host). This keyword may not be given with other services at the same time.
-    I(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
-    To schedule downtime for all services on particular host use keyword "all", e.g., I(service=all).
+  - You can specify multiple services at once by separating them with commas, .e.g. O(services=httpd,nfs,puppet).
+  - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge for the I(host itself),
+    for example O(service=host). This keyword may not be given with other services at the same time.
+    B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
+    To schedule downtime for all services on particular host use keyword "all", for example O(service=all).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -41,7 +41,7 @@ options:
       - Action to take.
       - servicegroup options were added in 2.0.
       - delete_downtime options were added in 2.2.
-      - The C(acknowledge) and C(forced_check) actions were added in community.general 1.2.0.
+      - The V(acknowledge) and V(forced_check) actions were added in community.general 1.2.0.
     required: true
     choices: [ "downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence",
                "silence_nagios", "unsilence_nagios", "command", "servicegroup_service_downtime",
@@ -59,12 +59,12 @@ options:
   author:
     description:
      - Author to leave downtime comments as.
-       Only used when I(action) is C(downtime) or C(acknowledge).
+       Only used when O(action) is V(downtime) or V(acknowledge).
     type: str
     default: Ansible
   comment:
     description:
-     - Comment when I(action) is C(downtime) or C(acknowledge).
+     - Comment when O(action) is V(downtime) or V(acknowledge).
     type: str
     default: Scheduling downtime
   start:
@@ -75,27 +75,27 @@ options:
   minutes:
     description:
       - Minutes to schedule downtime for.
-      - Only usable with the C(downtime) action.
+      - Only usable with O(action=downtime).
     type: int
     default: 30
   services:
     description:
       - >
         What to manage downtime/alerts for. Separate multiple services with commas.
-        I(service) is an alias for I(services).
-        B(Required) option when I(action) is one of: C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), C(disable_alerts).
+        O(ignore:service) is an alias for O(services).
+        B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).
     aliases: [ "service" ]
     type: str
   servicegroup:
     description:
       - The Servicegroup we want to set downtimes/alerts for.
-        B(Required) option when using the C(servicegroup_service_downtime) amd C(servicegroup_host_downtime).
+        B(Required) option when using the V(servicegroup_service_downtime) and V(servicegroup_host_downtime) O(action).
     type: str
   command:
     description:
       - The raw command to send to nagios, which
         should not include the submitted time header or the line-feed
-        B(Required) option when using the C(command) action.
+        B(Required) option when using the V(command) O(action).
     type: str
 
 author: "Tim Bielawa (@tbielawa)"

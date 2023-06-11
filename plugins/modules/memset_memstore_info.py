@@ -15,7 +15,7 @@ author: "Simon Weald (@glitchcrab)"
 short_description: Retrieve Memstore product usage information
 notes:
     - An API key generated via the Memset customer control panel is needed with the
-      following minimum scope - I(memstore.usage).
+      following minimum scope - C(memstore.usage).
 description:
     - Retrieve Memstore product usage information.
     - This module was called C(memset_memstore_facts) before Ansible 2.9. The usage did not change.
@@ -36,7 +36,7 @@ options:
         required: true
         type: str
         description:
-            - The Memstore product name (i.e. C(mstestyaa1)).
+            - The Memstore product name (that is, C(mstestyaa1)).
 '''
 
 EXAMPLES = '''
