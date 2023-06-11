@@ -16,7 +16,7 @@ short_description: Manage Sensu checks
 description:
   - Manage the checks that should be run on a machine by I(Sensu).
   - Most options do not have a default and will not be added to the check definition unless specified.
-  - All defaults except I(path), I(state), I(backup) and I(metric) are not managed by this module,
+  - All defaults except O(path), O(state), O(backup) and O(metric) are not managed by this module,
   - they are simply specified for your convenience.
 extends_documentation_fragment:
   - community.general.attributes
@@ -42,8 +42,8 @@ options:
     type: str
     description:
       - Path to the json file of the check to be added/removed.
-      - Will be created if it does not exist (unless I(state=absent)).
-      - The parent folders need to exist when I(state=present), otherwise an error will be thrown
+      - Will be created if it does not exist (unless O(state=absent)).
+      - The parent folders need to exist when O(state=present), otherwise an error will be thrown
     default: /etc/sensu/conf.d/checks.json
   backup:
     description:
@@ -54,7 +54,7 @@ options:
   command:
     type: str
     description:
-      - Path to the sensu check to run (not required when I(state=absent))
+      - Path to the sensu check to run (not required when O(state=absent))
   handlers:
     type: list
     elements: str
@@ -82,7 +82,7 @@ options:
   handle:
     description:
       - Whether the check should be handled or not
-      - Default is C(false).
+      - Default is V(false).
     type: bool
   subdue_begin:
     type: str
@@ -105,14 +105,14 @@ options:
   standalone:
     description:
       - Whether the check should be scheduled by the sensu client or server
-      - This option obviates the need for specifying the I(subscribers) option
-      - Default is C(false).
+      - This option obviates the need for specifying the O(subscribers) option
+      - Default is V(false).
     type: bool
   publish:
     description:
       - Whether the check should be scheduled at all.
       - You can still issue it via the sensu api
-      - Default is C(false).
+      - Default is V(false).
     type: bool
   occurrences:
     type: int
@@ -127,7 +127,7 @@ options:
     description:
       - Classifies the check as an aggregate check,
       - making it available via the aggregate API
-      - Default is C(false).
+      - Default is V(false).
     type: bool
   low_flap_threshold:
     type: int

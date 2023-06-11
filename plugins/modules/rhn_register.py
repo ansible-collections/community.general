@@ -32,7 +32,7 @@ attributes:
 options:
     state:
         description:
-          - Whether to register (C(present)), or unregister (C(absent)) a system.
+          - Whether to register (V(present)), or unregister (V(absent)) a system.
         type: str
         choices: [ absent, present ]
         default: present
@@ -47,7 +47,7 @@ options:
     server_url:
         description:
             - Specify an alternative Red Hat Network server URL.
-            - The default is the current value of I(serverURL) from C(/etc/sysconfig/rhn/up2date).
+            - The default is the current value of C(serverURL) from C(/etc/sysconfig/rhn/up2date).
         type: str
     activationkey:
         description:
@@ -80,12 +80,12 @@ options:
         default: []
     enable_eus:
         description:
-            - If C(false), extended update support will be requested.
+            - If V(false), extended update support will be requested.
         type: bool
         default: false
     nopackages:
         description:
-            - If C(true), the registered node will not upload its installed packages information to Satellite server.
+            - If V(true), the registered node will not upload its installed packages information to Satellite server.
         type: bool
         default: false
 deprecated:

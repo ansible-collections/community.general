@@ -61,7 +61,7 @@ options:
     type: str
   force_install:
     description:
-      - Set value to C(true) to force node into install state if it already exists in stacki.
+      - Set value to V(true) to force node into install state if it already exists in stacki.
     type: bool
     default: false
   state:
@@ -73,20 +73,20 @@ options:
   appliance:
     description:
       - Applicance to be used in host creation.
-      - Required if I(state) is C(present) and host does not yet exist.
+      - Required if O(state=present) and host does not yet exist.
     type: str
     default: backend
   rack:
     description:
       - Rack to be used in host creation.
-      - Required if I(state) is C(present) and host does not yet exist.
+      - Required if O(state=present) and host does not yet exist.
     type: int
     default: 0
   rank:
     description:
       - Rank to be used in host creation.
       - In Stacki terminology, the rank is the position of the machine in a rack.
-      - Required if I(state) is C(present) and host does not yet exist.
+      - Required if O(state=present) and host does not yet exist.
     type: int
     default: 0
   network:

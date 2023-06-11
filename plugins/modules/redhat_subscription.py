@@ -27,20 +27,20 @@ notes:
       parameters, which is I(not) secure, as they can be easily stolen by checking the
       process listing on the system. Due to limitations of the D-Bus interface of C(rhsm),
       the module will I(not) use D-Bus for registation when trying either to register
-      using I(token), or when specifying I(environment), or when the system is old
+      using O(token), or when specifying O(environment), or when the system is old
       (typically RHEL 6 and older).
     - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an Organization ID.
-    - Since 2.5 values for I(server_hostname), I(server_insecure), I(rhsm_baseurl),
-      I(server_proxy_hostname), I(server_proxy_port), I(server_proxy_user) and
-      I(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf)
-      config file and default to None.
+    - Since 2.5 values for O(server_hostname), O(server_insecure), O(rhsm_baseurl),
+      O(server_proxy_hostname), O(server_proxy_port), O(server_proxy_user) and
+      O(server_proxy_password) are no longer taken from the C(/etc/rhsm/rhsm.conf)
+      config file and default to V(null).
     - It is possible to interact with C(subscription-manager) only as root,
       so root permissions are required to successfully run this module.
-    - Since community.general 6.5.0, credentials (that is, I(username) and I(password),
-      I(activationkey), or I(token)) are needed only in case the the system is not registered,
-      or I(force_register) is specified; this makes it possible to use the module to tweak an
-      already registered system, for example attaching pools to it (using I(pool), or I(pool_ids)),
-      and modifying the C(syspurpose) attributes (using I(syspurpose)).
+    - Since community.general 6.5.0, credentials (that is, O(username) and O(password),
+      O(activationkey), or O(token)) are needed only in case the the system is not registered,
+      or O(force_register) is specified; this makes it possible to use the module to tweak an
+      already registered system, for example attaching pools to it (using O(pool), or O(pool_ids)),
+      and modifying the C(syspurpose) attributes (using O(syspurpose)).
 requirements:
     - subscription-manager
     - Optionally the C(dbus) Python library; this is usually included in the OS
@@ -55,7 +55,7 @@ attributes:
 options:
     state:
         description:
-          - whether to register and subscribe (C(present)), or unregister (C(absent)) a system
+          - whether to register and subscribe (V(present)), or unregister (V(absent)) a system
         choices: [ "present", "absent" ]
         default: "present"
         type: str
@@ -74,11 +74,11 @@ options:
         version_added: 6.3.0
     server_hostname:
         description:
-            - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server
+            - Specify an alternative Red Hat Subscription Management or Red Hat Satellite or Katello server.
         type: str
     server_insecure:
         description:
-            - Enable or disable https server certificate verification when connecting to C(server_hostname)
+            - Enable or disable https server certificate verification when connecting to O(server_hostname).
         type: str
     server_prefix:
         description:
@@ -104,7 +104,7 @@ options:
         type: str
     server_proxy_scheme:
         description:
-            - Specify an HTTP proxy scheme, for example C(http) or C(https).
+            - Specify an HTTP proxy scheme, for example V(http) or V(https).
         type: str
         version_added: 6.2.0
     server_proxy_port:
@@ -123,8 +123,8 @@ options:
         description:
             - Upon successful registration, auto-consume available subscriptions
             - |
-              Added in favor of the deprecated I(autosubscribe) option in
-              Ansible 2.5; please note that I(autosubscribe) will be removed in
+              Added in favor of the deprecated O(autosubscribe) option in
+              Ansible 2.5; please note that O(autosubscribe) will be removed in
               community.general 9.0.0.
         type: bool
         aliases: [autosubscribe]
@@ -144,9 +144,9 @@ options:
         description:
             - |
               Specify a subscription pool name to consume.  Regular expressions accepted.
-              Mutually exclusive with I(pool_ids).
+              Mutually exclusive with O(pool_ids).
             - |
-              Please use I(pool_ids) instead: specifying pool IDs is much faster,
+              Please use O(pool_ids) instead: specifying pool IDs is much faster,
               and it avoids to match new pools that become available for the
               system and are not explicitly wanted.  Also, this option does not
               support quantities.
@@ -158,11 +158,11 @@ options:
     pool_ids:
         description:
             - |
-              Specify subscription pool IDs to consume. Prefer over I(pool) when possible as it is much faster.
-              A pool ID may be specified as a C(string) - just the pool ID (ex. C(0123456789abcdef0123456789abcdef)),
-              or as a C(dict) with the pool ID as the key, and a quantity as the value (ex.
-              C(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
-              entitlements from a pool (the pool must support this). Mutually exclusive with I(pool).
+              Specify subscription pool IDs to consume. Prefer over O(pool) when possible as it is much faster.
+              A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)),
+              or as a C(dict) with the pool ID as the key, and a quantity as the value (for example
+              V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
+              entitlements from a pool (the pool must support this). Mutually exclusive with O(pool).
         default: []
         type: list
         elements: raw

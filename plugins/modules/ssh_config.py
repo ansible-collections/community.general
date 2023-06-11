@@ -38,20 +38,20 @@ options:
   user:
     description:
       - Which user account this configuration file belongs to.
-      - If none given and I(ssh_config_file) is not specified, C(/etc/ssh/ssh_config) is used.
+      - If none given and O(ssh_config_file) is not specified, C(/etc/ssh/ssh_config) is used.
       - If a user is given, C(~/.ssh/config) is used.
-      - Mutually exclusive with I(ssh_config_file).
+      - Mutually exclusive with O(ssh_config_file).
     type: str
   group:
     description:
       - Which group this configuration file belongs to.
-      - If none given, I(user) is used.
+      - If none given, O(user) is used.
     type: str
   host:
     description:
       - The endpoint this configuration is valid for.
       - Can be an actual address on the internet or an alias that will
-        connect to the value of I(hostname).
+        connect to the value of O(hostname).
     required: true
     type: str
   hostname:
@@ -70,7 +70,7 @@ options:
     description:
       - The path to an identity file (SSH private key) that will be used
         when connecting to this host.
-      - File need to exist and have mode C(0600) to be valid.
+      - File need to exist and have mode V(0600) to be valid.
     type: path
   user_known_hosts_file:
     description:
@@ -84,12 +84,12 @@ options:
   proxycommand:
     description:
       - Sets the C(ProxyCommand) option.
-      - Mutually exclusive with I(proxyjump).
+      - Mutually exclusive with O(proxyjump).
     type: str
   proxyjump:
     description:
       - Sets the C(ProxyJump) option.
-      - Mutually exclusive with I(proxycommand).
+      - Mutually exclusive with O(proxycommand).
     type: str
     version_added: 6.5.0
   forward_agent:
@@ -100,8 +100,8 @@ options:
   ssh_config_file:
     description:
       - SSH config file.
-      - If I(user) and this option are not specified, C(/etc/ssh/ssh_config) is used.
-      - Mutually exclusive with I(user).
+      - If O(user) and this option are not specified, C(/etc/ssh/ssh_config) is used.
+      - Mutually exclusive with O(user).
     type: path
   host_key_algorithms:
     description:
