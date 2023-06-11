@@ -245,17 +245,31 @@ def rename_vg(module, old_vg, vg):
 def activate_vg(module, vg, active):
     changed = False
     vgs_cmd = module.get_bin_path('vgs', True)
+    vgchange_cmd = module.get_bin_path('vgchange', True)
+    rc, vgchange_opts, err = module.run_command('vgchange --help', check_rc=True)
 
-    rc, current_vg_lv_states, err = module.run_command("%s --noheadings -olv_attr %s" % (vgs_cmd, vg))
+    autoactivate_supported = False
+    if '--setautoactivation' in vgchange_opts:
+        autoactivate_supported = True
+
+    autoactivate_enabled = False
+
+    if autoactivate_supported:
+        rc, current_vg_lv_states, err = module.run_command("%s --noheadings -olv_attr,autoactivation --separator ';' %s" % (vgs_cmd, vg))
+    else:
+        rc, current_vg_lv_states, err = module.run_command("%s --noheadings -olv_attr %s" % (vgs_cmd, vg))
 
     lv_active_count = 0
     lv_inactive_count = 0
 
     for line in current_vg_lv_states.splitlines():
-        if line.strip()[4] == 'a':
+        parts = line.strip().split(';')
+        if parts[0][4] == 'a':
             lv_active_count += 1
         else:
             lv_inactive_count += 1
+        if autoactivate_supported:
+            autoactivate_enabled = autoactivate_enabled or parts[1] == 'enabled'
 
     activate_flag = None
     if active and lv_inactive_count > 0:
@@ -263,13 +277,32 @@ def activate_vg(module, vg, active):
     elif not active and lv_active_count > 0:
         activate_flag = 'n'
 
+    # Extra logic necessary because vgchange returns error when autoactivation is already set
+    if autoactivate_supported:
+        if active and not autoactivate_enabled:
+            if module.check_mode:
+                changed = True
+            else:
+                rc, dummy, err = module.run_command("%s --setautoactivation y %s" % (vgchange_cmd, vg))
+                if rc == 0:
+                    changed = True
+                else:
+                    module.fail_json(msg="Failed executing vgchange command.", rc=rc, err=err)
+        elif not active and autoactivate_enabled:
+            if module.check_mode:
+                changed = True
+            else:
+                rc, dummy, err = module.run_command("%s --setautoactivation n %s" % (vgchange_cmd, vg))
+                if rc == 0:
+                    changed = True
+                else:
+                    module.fail_json(msg="Failed executing vgchange command.", rc=rc, err=err)
+
     if activate_flag is not None:
         if module.check_mode:
             changed = True
         else:
-            vgchange_cmd = module.get_bin_path('vgchange', True)
             rc, dummy, err = module.run_command("%s --activate %s %s" % (vgchange_cmd, activate_flag, vg))
-
             if rc == 0:
                 changed = True
             else:
