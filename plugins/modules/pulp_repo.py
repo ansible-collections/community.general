@@ -67,7 +67,7 @@ options:
     aliases: [ importer_ssl_client_cert ]
   feed_client_key:
     description:
-      - Private key to the certificate specified in O(importer_ssl_client_cert),
+      - Private key to the certificate specified in O(feed_client_cert),
         assuming it is not included in the certificate file itself. This can be
         the file content or the path to the file.
     type: str
