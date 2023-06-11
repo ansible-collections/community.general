@@ -79,6 +79,14 @@ options:
     description:
       - List of options to be passed to C(mkfs) command.
     type: str
+  uuid:
+    description:
+      - Set existing filesystem's UUID to the given value.
+      - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
+      - For C(lvm) the value is ignored, it resets the pv UUID if set.
+      - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), C(xfs) filesystems.
+      - B(Not idempotent)
+    type: str
 requirements:
   - Uses specific tools related to the I(fstype) for creating or resizing a
     filesystem (from packages e2fsprogs, xfsprogs, dosfstools, and so on).
@@ -97,6 +105,12 @@ notes:
 seealso:
   - module: community.general.filesize
   - module: ansible.posix.mount
+  - name: xfs_admin(8) manpage for Linux
+    description: Manual page of the GNU/Linux's xfs_admin implementation
+    link: https://man7.org/linux/man-pages/man8/xfs_admin.8.html
+  - name: tune2fs(8) manpage for Linux
+    description: Manual page of the GNU/Linux's tune2fs implementation
+    link: https://man7.org/linux/man-pages/man8/tune2fs.8.html
 '''
 
 EXAMPLES = '''
@@ -120,6 +134,24 @@ EXAMPLES = '''
   community.general.filesystem:
     dev: /path/to/disk.img
     fstype: vfat
+
+- name: Reset an xfs filesystem UUID on /dev/sdb1
+  community.general.filesystem:
+    fstype: xfs
+    dev: /dev/sdb1
+    uuid: generate
+
+- name: Reset an ext4 filesystem UUID on /dev/sdb1
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/sdb1
+    uuid: random
+
+- name: Reset an LVM filesystem (pv) UUID on /dev/sdc
+  community.general.filesystem:
+    fstype: lvm
+    dev: /dev/sdc
+    uuid: random
 '''
 
 import os
@@ -182,6 +214,9 @@ class Filesystem(object):
     GROW = None
     GROW_MAX_SPACE_FLAGS = []
     GROW_MOUNTPOINT_ONLY = False
+    CHANGE_UUID = None
+    CHANGE_UUID_OPTION = None
+    CHANGE_UUID_OPTION_HAS_ARG = True
 
     LANG_ENV = {'LANG': 'C', 'LC_ALL': 'C', 'LC_MESSAGES': 'C'}
 
@@ -255,11 +290,30 @@ class Filesystem(object):
         dummy, out, dummy = self.module.run_command(self.grow_cmd(grow_target), check_rc=True)
         return out
 
+    def change_uuid_cmd(self, new_uuid, target):
+        """Build and return the UUID change command line as list."""
+        cmdline = [self.module.get_bin_path(self.CHANGE_UUID, required=True)]
+        if self.CHANGE_UUID_OPTION_HAS_ARG:
+            cmdline += [self.CHANGE_UUID_OPTION, new_uuid, target]
+        else:
+            cmdline += [self.CHANGE_UUID_OPTION, target]
+        return cmdline
+
+    def change_uuid(self, new_uuid, dev):
+        """Change filesystem UUID. Returns stdout of used command"""
+        if self.module.check_mode:
+            self.module.exit_json(change=True, msg='Changing %s filesystem UUID on device %s' % (self.fstype, dev))
+
+        dummy, out, dummy = self.module.run_command(self.change_uuid_cmd(new_uuid=new_uuid, target=str(dev)), check_rc=True)
+        return out
+
 
 class Ext(Filesystem):
     MKFS_FORCE_FLAGS = ['-F']
     INFO = 'tune2fs'
     GROW = 'resize2fs'
+    CHANGE_UUID = 'tune2fs'
+    CHANGE_UUID_OPTION = "-U"
 
     def get_fs_size(self, dev):
         """Get Block count and Block size and return their product."""
@@ -298,6 +352,8 @@ class XFS(Filesystem):
     INFO = 'xfs_info'
     GROW = 'xfs_growfs'
     GROW_MOUNTPOINT_ONLY = True
+    CHANGE_UUID = "xfs_admin"
+    CHANGE_UUID_OPTION = "-U"
 
     def get_fs_size(self, dev):
         """Get bsize and blocks and return their product."""
@@ -453,6 +509,9 @@ class LVM(Filesystem):
     MKFS_FORCE_FLAGS = ['-f']
     INFO = 'pvs'
     GROW = 'pvresize'
+    CHANGE_UUID = 'pvchange'
+    CHANGE_UUID_OPTION = '-u'
+    CHANGE_UUID_OPTION_HAS_ARG = False
 
     def get_fs_size(self, dev):
         """Get and return PV size, in bytes."""
@@ -525,6 +584,7 @@ def main():
             opts=dict(type='str'),
             force=dict(type='bool', default=False),
             resizefs=dict(type='bool', default=False),
+            uuid=dict(type='str', required=False),
         ),
         required_if=[
             ('state', 'present', ['fstype'])
@@ -538,6 +598,7 @@ def main():
     opts = module.params['opts']
     force = module.params['force']
     resizefs = module.params['resizefs']
+    uuid = module.params['uuid']
 
     mkfs_opts = []
     if opts is not None:
@@ -577,7 +638,7 @@ def main():
         filesystem = klass(module)
 
         same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
-        if same_fs and not resizefs and not force:
+        if same_fs and not resizefs and not uuid and not force:
             module.exit_json(changed=False)
         elif same_fs and resizefs:
             if not filesystem.GROW:
@@ -586,6 +647,13 @@ def main():
             out = filesystem.grow(dev)
 
             module.exit_json(changed=True, msg=out)
+        elif same_fs and uuid:
+            if not filesystem.CHANGE_UUID:
+                module.fail_json(changed=False, msg="module does not support UUID change for %s filesystem yet." % fstype)
+
+            out = filesystem.change_uuid(new_uuid=uuid, dev=dev)
+
+            module.exit_json(changed=True, msgout=out)
         elif fs and not force:
             module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
 

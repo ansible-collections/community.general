@@ -1,0 +1,39 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+
+- when: new_uuid | default(False)
+  block:
+  - name: "Create filesystem ({{ fstype }})"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+    register: fs_result
+
+  - name: "Get UUID of created filesystem"
+    ansible.builtin.shell:
+      cmd: "{{ get_uuid_cmd }}"
+    changed_when: false
+    register: uuid
+
+  - name: "Reset filesystem ({{ fstype }}) UUID"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+      uuid: "{{ new_uuid }}"
+    register: fs_resetuuid_result
+
+  - name: "Get UUID of the filesystem"
+    ansible.builtin.shell:
+      cmd: "{{ get_uuid_cmd }}"
+    changed_when: false
+    register: uuid2
+
+  - name: "Assert that filesystem UUID is changed"
+    ansible.builtin.assert:
+      that:
+        - 'fs_resetuuid_result is changed'
+        - 'fs_resetuuid_result is success'
+        - 'uuid.stdout != uuid2.stdout'
