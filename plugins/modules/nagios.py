@@ -25,9 +25,9 @@ description:
     to the host the playbook is currently running on.
   - You can specify multiple services at once by separating them with commas, .e.g. O(services=httpd,nfs,puppet).
   - When specifying what service to handle there is a special service value, O(host), which will handle alerts/downtime/acknowledge for the I(host itself),
-    for example O(service=host). This keyword may not be given with other services at the same time.
+    for example O(services=host). This keyword may not be given with other services at the same time.
     B(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
-    To schedule downtime for all services on particular host use keyword "all", for example O(service=all).
+    To schedule downtime for all services on particular host use keyword "all", for example O(services=all).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
