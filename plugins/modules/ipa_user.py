@@ -51,7 +51,7 @@ options:
   password:
     description:
     - Password for a user.
-    - Will not be set for an existing user unless I(update_password=always), which is the default.
+    - Will not be set for an existing user unless O(update_password=always), which is the default.
     type: str
   sn:
     description: Surname.
