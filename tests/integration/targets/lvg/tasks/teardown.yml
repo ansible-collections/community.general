@@ -6,6 +6,7 @@
 - name: Remove test volume group
   lvg:
     vg: testvg
+    force: true
     state: absent
 
 - name: Detach loop devices

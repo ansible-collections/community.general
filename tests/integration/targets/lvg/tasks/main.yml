@@ -23,5 +23,11 @@
     - import_tasks: test_grow_reduce.yml
 
     - import_tasks: test_pvresize.yml
+
+    - import_tasks: test_rename.yml
+
+    - import_tasks: test_active_change.yml
+
+    - import_tasks: test_uuid_reset.yml
   always:
     - import_tasks: teardown.yml

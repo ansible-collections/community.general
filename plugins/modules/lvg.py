@@ -72,6 +72,29 @@ options:
     - If C(true), allows to remove volume group with logical volumes.
     type: bool
     default: false
+  old_vg:
+    description:
+    - The old name of the volume group.
+    - If specified, the volume group is renamed.
+    type: str
+    required: false
+  active:
+    description:
+    - Whether the volume group's logical volumes are active and visible to the host.
+    type: bool
+    required: false
+  reset_vg_uuid:
+    description:
+    - Whether the volume group's UUID is regenerated.
+    - B(Not idempotent)
+    type: bool
+    default: false
+  reset_pv_uuid:
+    description:
+    - Whether the volume group's physical volumes' UUIDs are regenerated.
+    - B(Not idempotent)
+    type: bool
+    default: false
 seealso:
 - module: community.general.filesystem
 - module: community.general.lvol
@@ -112,6 +135,35 @@ EXAMPLES = r'''
     vg: resizableVG
     pvs: /dev/sda3
     pvresize: true
+
+- name: Rename a volume group
+  community.general.lvg:
+    vg: vg.newservices
+    old_vg: vg.services
+
+- name: Deactivate a volume group
+  community.general.lvg:
+    vg: vg.services
+    active: false
+
+- name: Activate a volume group
+  community.general.lvg:
+    vg: vg.services
+    active: true
+
+- name: Reset a volume group UUID
+  community.general.lvg:
+    vg: vg.services
+    active: false
+    reset_vg_uuid: true
+
+- name: Reset a volume group and pv UUID
+  community.general.lvg:
+    vg: vg.services
+    pvs: /dev/sdb1,/dev/sdc5
+    active: false
+    reset_vg_uuid: true
+    reset_pv_uuid: true
 '''
 
 import itertools
@@ -156,6 +208,143 @@ def parse_pvs(module, data):
     return pvs
 
 
+def find_vg(module, vg):
+    vgs_cmd = module.get_bin_path('vgs', True)
+    rc, current_vgs, err = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd)
+
+    if rc != 0:
+        module.fail_json(msg="Failed executing vgs command.", rc=rc, err=err)
+
+    vgs = parse_vgs(current_vgs)
+
+    for test_vg in vgs:
+        if test_vg['name'] == vg:
+            this_vg = test_vg
+            break
+    else:
+        this_vg = None
+
+    return this_vg
+
+
+def rename_vg(module, old_vg, vg):
+    vgrename_cmd = module.get_bin_path('vgrename', True)
+    if module.check_mode:
+        this_vg = find_vg(module=module, vg=old_vg)
+    else:
+        rc, dummy, err = module.run_command("%s %s %s" % (vgrename_cmd, old_vg, vg))
+
+        if rc != 0:
+            module.fail_json(msg="Failed executing vgrename command.", rc=rc, err=err)
+
+        this_vg = find_vg(module=module, vg=vg)
+
+    return this_vg
+
+
+def activate_vg(module, vg, active):
+    changed = False
+    vgs_cmd = module.get_bin_path('vgs', True)
+
+    rc, current_vg_lv_states, err = module.run_command("%s --noheadings -olv_attr %s" % (vgs_cmd, vg))
+
+    lv_active_count = 0
+    lv_inactive_count = 0
+
+    for line in current_vg_lv_states.splitlines():
+        if line.strip()[4] == 'a':
+            lv_active_count += 1
+        else:
+            lv_inactive_count += 1
+
+    activate_flag = None
+    if active and lv_inactive_count > 0:
+        activate_flag = 'y'
+    elif not active and lv_active_count > 0:
+        activate_flag = 'n'
+
+    if activate_flag is not None:
+        if module.check_mode:
+            changed = True
+        else:
+            vgchange_cmd = module.get_bin_path('vgchange', True)
+            rc, dummy, err = module.run_command("%s --activate %s %s" % (vgchange_cmd, activate_flag, vg))
+
+            if rc == 0:
+                changed = True
+            else:
+                module.fail_json(msg="Failed executing vgchange command.", rc=rc, err=err)
+
+    return changed
+
+
+def resize_pv(module, device):
+    changed = False
+    pvresize_cmd = module.get_bin_path('pvresize', True)
+    pvdisplay_cmd = module.get_bin_path('pvdisplay', True)
+    pvdisplay_ops = ["--units", "b", "--columns", "--noheadings", "--nosuffix"]
+    pvdisplay_cmd_device_options = [pvdisplay_cmd, device] + pvdisplay_ops
+    rc, dev_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "dev_size"])
+    dev_size = int(dev_size.replace(" ", ""))
+    rc, pv_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pv_size"])
+    pv_size = int(pv_size.replace(" ", ""))
+    rc, pe_start, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pe_start"])
+    pe_start = int(pe_start.replace(" ", ""))
+    rc, vg_extent_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "vg_extent_size"])
+    vg_extent_size = int(vg_extent_size.replace(" ", ""))
+    if (dev_size - (pe_start + pv_size)) > vg_extent_size:
+        if module.check_mode:
+            changed = True
+        else:
+            rc, dummy, err = module.run_command([pvresize_cmd, device])
+            if rc != 0:
+                module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err)
+            else:
+                changed = True
+
+    return changed
+
+
+def reset_uuid_pv(module, device):
+    changed = False
+    pvs_cmd = module.get_bin_path('pvs', True)
+    pvs_cmd_with_opts = [pvs_cmd, '--noheadings', '-o', 'uuid', device]
+    pvchange_cmd = module.get_bin_path('pvchange', True)
+    pvchange_cmd_with_opts = [pvchange_cmd, '-u', device]
+    rc, orig_uuid, err = module.run_command(pvs_cmd_with_opts)
+    if module.check_mode:
+        changed = True
+    else:
+        pvchange_rc, dummy, pvchange_err = module.run_command(pvchange_cmd_with_opts)
+        rc, new_uuid, err = module.run_command(pvs_cmd_with_opts)
+        if orig_uuid.strip() == new_uuid.strip():
+            module.fail_json(msg="Failed executing pvchange command.", rc=pvchange_rc, err=pvchange_err)
+        else:
+            changed = True
+
+    return changed
+
+
+def reset_uuid_vg(module, vg):
+    changed = False
+    vgs_cmd = module.get_bin_path('vgs', True)
+    vgs_cmd_with_opts = [vgs_cmd, '--noheadings', '-o', 'uuid', vg]
+    vgchange_cmd = module.get_bin_path('vgchange', True)
+    vgchange_cmd_with_opts = [vgchange_cmd, '-u', vg]
+    rc, orig_uuid, err = module.run_command(vgs_cmd_with_opts)
+    if module.check_mode:
+        changed = True
+    else:
+        vgchange_rc, dummy, vgchange_err = module.run_command(vgchange_cmd_with_opts)
+        rc, new_uuid, err = module.run_command(vgs_cmd_with_opts)
+        if orig_uuid.strip() == new_uuid.strip():
+            module.fail_json(msg="Failed executing vgchange command.", rc=vgchange_rc, err=vgchange_err)
+        else:
+            changed = True
+
+    return changed
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -167,7 +356,14 @@ def main():
             vg_options=dict(type='str', default=''),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             force=dict(type='bool', default=False),
+            old_vg=dict(type="str", default=''),
+            active=dict(type='bool', default=None),
+            reset_vg_uuid=dict(type='bool', default=False),
+            reset_pv_uuid=dict(type='bool', default=False),
         ),
+        required_if=[
+            ['reset_pv_uuid', True, ['pvs']],
+        ],
         supports_check_mode=True,
     )
 
@@ -178,16 +374,55 @@ def main():
     pesize = module.params['pesize']
     pvoptions = module.params['pv_options'].split()
     vgoptions = module.params['vg_options'].split()
+    old_vg = module.params['old_vg']
+    active = module.params['active']
+    reset_vg_uuid = module.params['reset_vg_uuid']
+    reset_pv_uuid = module.params['reset_pv_uuid']
+
+    if old_vg == vg:
+        module.fail_json(msg="The old_vg and vg values should differ.")
+
+    pvs_required = not (old_vg or active is not None or reset_vg_uuid)
 
     dev_list = []
     if module.params['pvs']:
         dev_list = list(module.params['pvs'])
-    elif state == 'present':
+    elif state == 'present' and pvs_required:
         module.fail_json(msg="No physical volumes given.")
 
     # LVM always uses real paths not symlinks so replace symlinks with actual path
     for idx, dev in enumerate(dev_list):
         dev_list[idx] = os.path.realpath(dev)
+
+    # Rename VG first
+    changed = False
+    prev_vg = find_vg(module=module, vg=old_vg) if old_vg else None
+    this_vg = find_vg(module=module, vg=vg)
+    if prev_vg is not None:
+        if this_vg is not None:
+            module.fail_json(msg="Cannot rename vg (%s), the specified name (%s) is already in use.")
+        else:
+            if state == 'present':
+                if module.check_mode:
+                    changed = True
+                else:
+                    # Deactivate VG before renaming, if requested
+                    if active is not None and not active:
+                        changed = activate_vg(module=module, vg=old_vg, active=active)
+                    this_vg = rename_vg(module=module, old_vg=old_vg, vg=vg)
+                    changed = True
+            elif state == 'absent':
+                vg = old_vg
+                this_vg = prev_vg
+    elif active is not None and state == 'present':
+        changed = activate_vg(module=module, vg=vg, active=active)
+
+    if reset_vg_uuid and state == 'present':
+        reset_uuid_vg(module=module, vg=vg)
+        changed = True
+
+    if not pvs_required and not dev_list:
+        module.exit_json(changed=changed)
 
     if state == 'present':
         # check given devices
@@ -215,23 +450,6 @@ def main():
         used_pvs = [pv for pv in pvs if pv['name'] in dev_list and pv['vg_name'] and pv['vg_name'] != vg]
         if used_pvs:
             module.fail_json(msg="Device %s is already in %s volume group." % (used_pvs[0]['name'], used_pvs[0]['vg_name']))
-
-    vgs_cmd = module.get_bin_path('vgs', True)
-    rc, current_vgs, err = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd)
-
-    if rc != 0:
-        module.fail_json(msg="Failed executing vgs command.", rc=rc, err=err)
-
-    changed = False
-
-    vgs = parse_vgs(current_vgs)
-
-    for test_vg in vgs:
-        if test_vg['name'] == vg:
-            this_vg = test_vg
-            break
-    else:
-        this_vg = None
 
     if this_vg is None:
         if state == 'present':
@@ -275,29 +493,12 @@ def main():
         devs_to_add = list(set(dev_list) - set(current_devs))
 
         if current_devs:
-            if state == 'present' and pvresize:
+            if state == 'present':
                 for device in current_devs:
-                    pvresize_cmd = module.get_bin_path('pvresize', True)
-                    pvdisplay_cmd = module.get_bin_path('pvdisplay', True)
-                    pvdisplay_ops = ["--units", "b", "--columns", "--noheadings", "--nosuffix"]
-                    pvdisplay_cmd_device_options = [pvdisplay_cmd, device] + pvdisplay_ops
-                    rc, dev_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "dev_size"])
-                    dev_size = int(dev_size.replace(" ", ""))
-                    rc, pv_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pv_size"])
-                    pv_size = int(pv_size.replace(" ", ""))
-                    rc, pe_start, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pe_start"])
-                    pe_start = int(pe_start.replace(" ", ""))
-                    rc, vg_extent_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "vg_extent_size"])
-                    vg_extent_size = int(vg_extent_size.replace(" ", ""))
-                    if (dev_size - (pe_start + pv_size)) > vg_extent_size:
-                        if module.check_mode:
-                            changed = True
-                        else:
-                            rc, dummy, err = module.run_command([pvresize_cmd, device])
-                            if rc != 0:
-                                module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err)
-                            else:
-                                changed = True
+                    if pvresize:
+                        changed = resize_pv(module=module, device=device)
+                    if reset_pv_uuid:
+                        changed = reset_uuid_pv(module=module, device=device)
 
         if devs_to_add or devs_to_remove:
             if module.check_mode:
