@@ -3,8 +3,10 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-
-- when: new_uuid | default(False)
+# Skip UUID reset tests for FreeBSD due to "xfs_admin: only 'rewrite' supported on V5 fs"
+- when: 
+    - new_uuid | default(False)
+    - not (ansible_system == "FreeBSD" and fstype == "xfs")
   block:
   - name: "Create filesystem ({{ fstype }})"
     community.general.filesystem:
