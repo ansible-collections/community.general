@@ -127,7 +127,7 @@ options:
 
     config:
         description:
-            - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(providerId).
+            - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id).
               Examples are given below for V(oidc) and V(saml). It is easiest to obtain valid config values by dumping an already-existing
               identity provider configuration through check-mode in the RV(existing) field.
         type: dict
