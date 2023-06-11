@@ -15,7 +15,7 @@ module: gitlab_project
 short_description: Creates/updates/deletes GitLab Projects
 description:
   - When the project does not exist in GitLab, it will be created.
-  - When the project does exists and I(state=absent), the project will be deleted.
+  - When the project does exists and O(state=absent), the project will be deleted.
   - When changes are made to the project, the project will be updated.
 author:
   - Werner Dijkerman (@dj-wasabi)
@@ -84,9 +84,9 @@ options:
     default: true
   visibility:
     description:
-      - C(private) Project access must be granted explicitly for each user.
-      - C(internal) The project can be cloned by any logged in user.
-      - C(public) The project can be cloned without any authentication.
+      - V(private) Project access must be granted explicitly for each user.
+      - V(internal) The project can be cloned by any logged in user.
+      - V(public) The project can be cloned without any authentication.
     default: private
     type: str
     choices: ["private", "internal", "public"]
@@ -108,7 +108,7 @@ options:
   merge_method:
     description:
       - What requirements are placed upon merges.
-      - Possible values are C(merge), C(rebase_merge) merge commit with semi-linear history, C(ff) fast-forward merges only.
+      - Possible values are V(merge), V(rebase_merge) merge commit with semi-linear history, V(ff) fast-forward merges only.
     type: str
     choices: ["ff", "merge", "rebase_merge"]
     default: merge
@@ -176,78 +176,78 @@ options:
   default_branch:
     description:
       - Default branch name for a new project.
-      - This option is only used on creation, not for updates. This is also only used if I(initialize_with_readme=true).
+      - This option is only used on creation, not for updates. This is also only used if O(initialize_with_readme=true).
     type: str
     version_added: "4.2.0"
   builds_access_level:
     description:
-      - C(private) means that repository CI/CD is allowed only to project members.
-      - C(disabled) means that repository CI/CD is disabled.
-      - C(enabled) means that repository CI/CD is enabled.
+      - V(private) means that repository CI/CD is allowed only to project members.
+      - V(disabled) means that repository CI/CD is disabled.
+      - V(enabled) means that repository CI/CD is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.2.0"
   forking_access_level:
     description:
-      - C(private) means that repository forks is allowed only to project members.
-      - C(disabled) means that repository forks are disabled.
-      - C(enabled) means that repository forks are enabled.
+      - V(private) means that repository forks is allowed only to project members.
+      - V(disabled) means that repository forks are disabled.
+      - V(enabled) means that repository forks are enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.2.0"
   container_registry_access_level:
     description:
-      - C(private) means that container registry is allowed only to project members.
-      - C(disabled) means that container registry is disabled.
-      - C(enabled) means that container registry is enabled.
+      - V(private) means that container registry is allowed only to project members.
+      - V(disabled) means that container registry is disabled.
+      - V(enabled) means that container registry is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.2.0"
   releases_access_level:
     description:
-      - C(private) means that accessing release is allowed only to project members.
-      - C(disabled) means that accessing release is disabled.
-      - C(enabled) means that accessing release is enabled.
+      - V(private) means that accessing release is allowed only to project members.
+      - V(disabled) means that accessing release is disabled.
+      - V(enabled) means that accessing release is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"
   environments_access_level:
     description:
-      - C(private) means that deployment to environment is allowed only to project members.
-      - C(disabled) means that deployment to environment is disabled.
-      - C(enabled) means that deployment to environment is enabled.
+      - V(private) means that deployment to environment is allowed only to project members.
+      - V(disabled) means that deployment to environment is disabled.
+      - V(enabled) means that deployment to environment is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"
   feature_flags_access_level:
     description:
-      - C(private) means that feature rollout is allowed only to project members.
-      - C(disabled) means that feature rollout is disabled.
-      - C(enabled) means that feature rollout is enabled.
+      - V(private) means that feature rollout is allowed only to project members.
+      - V(disabled) means that feature rollout is disabled.
+      - V(enabled) means that feature rollout is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"
   infrastructure_access_level:
     description:
-      - C(private) means that configuring infrastructure is allowed only to project members.
-      - C(disabled) means that configuring infrastructure is disabled.
-      - C(enabled) means that configuring infrastructure is enabled.
+      - V(private) means that configuring infrastructure is allowed only to project members.
+      - V(disabled) means that configuring infrastructure is disabled.
+      - V(enabled) means that configuring infrastructure is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"
   monitor_access_level:
     description:
-      - C(private) means that monitoring health is allowed only to project members.
-      - C(disabled) means that monitoring health is disabled.
-      - C(enabled) means that monitoring health is enabled.
+      - V(private) means that monitoring health is allowed only to project members.
+      - V(disabled) means that monitoring health is disabled.
+      - V(enabled) means that monitoring health is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"
   security_and_compliance_access_level:
     description:
-      - C(private) means that accessing security and complicance tab is allowed only to project members.
-      - C(disabled) means that accessing security and complicance tab is disabled.
-      - C(enabled) means that accessing security and complicance tab is enabled.
+      - V(private) means that accessing security and complicance tab is allowed only to project members.
+      - V(disabled) means that accessing security and complicance tab is disabled.
+      - V(enabled) means that accessing security and complicance tab is enabled.
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "6.4.0"

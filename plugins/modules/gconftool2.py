@@ -36,18 +36,18 @@ options:
     description:
     - Preference keys typically have simple values such as strings,
       integers, or lists of strings and integers.
-      This is ignored unless I(state=present). See man gconftool-2(1).
+      This is ignored unless O(state=present). See man gconftool-2(1).
   value_type:
     type: str
     description:
     - The type of value being set.
-      This is ignored unless I(state=present). See man gconftool-2(1).
+      This is ignored unless O(state=present). See man gconftool-2(1).
     choices: [ bool, float, int, string ]
   state:
     type: str
     description:
     - The action to take upon the key/value.
-    - State C(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
+    - State V(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
     required: true
     choices: [ absent, get, present ]
   config_source:
@@ -57,8 +57,8 @@ options:
       See man gconftool-2(1).
   direct:
     description:
-    - Access the config database directly, bypassing server.  If I(direct) is
-      specified then the I(config_source) must be specified as well.
+    - Access the config database directly, bypassing server.  If O(direct) is
+      specified then the O(config_source) must be specified as well.
       See man gconftool-2(1).
     type: bool
     default: false
@@ -85,15 +85,15 @@ RETURN = '''
     sample: string
   value:
     description:
-      - The value of the preference key after executing the module or C(null) if key is removed.
-      - From community.general 7.0.0 onwards it returns C(null) for a non-existent I(key), and returns C("") before that.
+      - The value of the preference key after executing the module or V(null) if key is removed.
+      - From community.general 7.0.0 onwards it returns V(null) for a non-existent O(key), and returned V("") before that.
     returned: success
     type: str
     sample: "Serif 12"
   previous_value:
     description:
       - The value of the preference key before executing the module.
-      - From community.general 7.0.0 onwards it returns C(null) for a non-existent I(key), and returns C("") before that.
+      - From community.general 7.0.0 onwards it returns V(null) for a non-existent O(key), and returned V("") before that.
     returned: success
     type: str
     sample: "Serif 12"

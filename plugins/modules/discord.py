@@ -43,7 +43,7 @@ options:
   content:
     description:
       - Content of the message to the Discord channel.
-      - At least one of I(content) and I(embeds) must be specified.
+      - At least one of O(content) and O(embeds) must be specified.
     type: str
   username:
     description:
@@ -55,7 +55,7 @@ options:
     type: str
   tts:
     description:
-      - Set this to C(true) if this is a TTS (Text to Speech) message.
+      - Set this to V(true) if this is a TTS (Text to Speech) message.
     type: bool
     default: false
   embeds:
@@ -63,7 +63,7 @@ options:
       - Send messages as Embeds to the Discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
       - "Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object)"
-      - At least one of I(content) and I(embeds) must be specified.
+      - At least one of O(content) and O(embeds) must be specified.
     type: list
     elements: dict
 '''
