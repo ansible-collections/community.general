@@ -1,0 +1,4 @@
+minor_changes:
+  - vardict module utils - added convenience methods to ``VarDict`` (https://github.com/ansible-collections/community.general/pull/6647).
+breaking_changes:
+  - vardict module utils - ``VarDict`` will no longer accept variables named ``_var``, ``get_meta``, and ``as_dict`` (https://github.com/ansible-collections/community.general/pull/6647).
