@@ -356,7 +356,7 @@ def main():
             vg_options=dict(type='str', default=''),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             force=dict(type='bool', default=False),
-            old_vg=dict(type="str", default=''),
+            old_vg=dict(type="str", default=None),
             active=dict(type='bool', default=None),
             reset_vg_uuid=dict(type='bool', default=False),
             reset_pv_uuid=dict(type='bool', default=False),
@@ -382,7 +382,7 @@ def main():
     if old_vg == vg:
         module.fail_json(msg="The old_vg and vg values should differ.")
 
-    pvs_required = not (old_vg or active is not None or reset_vg_uuid)
+    pvs_required = not (old_vg is not None or active is not None or reset_vg_uuid)
 
     dev_list = []
     if module.params['pvs']:
@@ -396,7 +396,7 @@ def main():
 
     # Rename VG first
     changed = False
-    prev_vg = find_vg(module=module, vg=old_vg) if old_vg else None
+    prev_vg = find_vg(module=module, vg=old_vg) if old_vg is not None else None
     this_vg = find_vg(module=module, vg=vg)
     if prev_vg is not None:
         if this_vg is not None:
