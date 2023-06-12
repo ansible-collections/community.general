@@ -82,7 +82,7 @@ options:
             - If C(true), the role is a composition of other realm and/or client role.
         default: false
         type: bool
-        version_added: 7.0.0
+        version_added: 7.1.0
     composites:
         description:
             - List of roles to include to the composite realm role.
