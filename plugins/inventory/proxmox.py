@@ -590,6 +590,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 ip = self._get_node_ip(node['node'])
                 self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
+            # Setting composite variables
+            variables = self.inventory.get_host(node['node']).get_vars()
+            self._set_composite_vars(self.get_option('compose'), variables, node['node'], strict=self.strict)
+
             # add LXC/Qemu groups for the node
             for ittype in ('lxc', 'qemu'):
                 node_type_group = self._group('%s_%s' % (node['node'], ittype))
