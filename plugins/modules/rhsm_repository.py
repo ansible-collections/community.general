@@ -18,7 +18,7 @@ description:
 author: Giovanni Sciortino (@giovannisciortino)
 notes:
   - In order to manage RHSM repositories the system must be already registered
-    to RHSM manually or using the Ansible C(redhat_subscription) module.
+    to RHSM manually or using the Ansible M(community.general.redhat_subscription) module.
   - It is possible to interact with C(subscription-manager) only as root,
     so root permissions are required to successfully run this module.
 
@@ -49,8 +49,8 @@ options:
     elements: str
   purge:
     description:
-      - Disable all currently enabled repositories that are not not specified in C(name).
-        Only set this to C(True) if passing in a list of repositories to the C(name) field.
+      - Disable all currently enabled repositories that are not not specified in O(name).
+        Only set this to V(true) if passing in a list of repositories to the O(name) field.
         Using this with C(loop) will most likely not have the desired result.
     type: bool
     default: false

@@ -216,8 +216,8 @@ options:
                 elements: str
             sync:
                 description:
-                    - When this option is true, then syspurpose attributes are synchronized with
-                      RHSM server immediately. When this option is false, then syspurpose attributes
+                    - When this option is V(true), then syspurpose attributes are synchronized with
+                      RHSM server immediately. When this option is V(false), then syspurpose attributes
                       will be synchronized with RHSM server by rhsmcertd daemon.
                 type: bool
                 default: false
