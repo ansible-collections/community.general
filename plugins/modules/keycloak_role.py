@@ -79,7 +79,7 @@ options:
             - Values may be single values (e.g. a string) or a list of strings.
     composite:
         description:
-            - If C(true), the role is a composition of other realm and/or client role.
+            - If V(true), the role is a composition of other realm and/or client role.
         default: false
         type: bool
         version_added: 7.1.0
