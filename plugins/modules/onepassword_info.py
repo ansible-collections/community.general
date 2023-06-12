@@ -83,6 +83,7 @@ options:
                 description:
                     - 1Password service account token.
                     - Only required for initial sign in.
+                version_added: 7.1.0
             master_password:
                 type: str
                 description:
