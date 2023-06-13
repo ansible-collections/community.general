@@ -115,7 +115,6 @@ from ansible.module_utils.six import with_metaclass
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 
-
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
@@ -303,23 +302,26 @@ class OnePassCLIv1(OnePassCLIBase):
         return not bool(rc)
 
     def full_signin(self):
-        required_params = [
-            "subdomain",
-            "username",
-            "secret_key",
-            "master_password",
-        ]
-        self._check_required_params(required_params)
+        if self.service_account_token:
+            raise AnsibleLookupError("Onepassword CLI V1 is not supporting Service Accounts. Please use V2.")
+        else:
+            required_params = [
+                "subdomain",
+                "username",
+                "secret_key",
+                "master_password",
+            ]
+            self._check_required_params(required_params)
 
-        args = [
-            "signin",
-            "{0}.{1}".format(self.subdomain, self.domain),
-            to_bytes(self.username),
-            to_bytes(self.secret_key),
-            "--raw",
-        ]
+            args = [
+                "signin",
+                "{0}.{1}".format(self.subdomain, self.domain),
+                to_bytes(self.username),
+                to_bytes(self.secret_key),
+                "--raw",
+            ]
 
-        return self._run(args, command_input=to_bytes(self.master_password))
+            return self._run(args, command_input=to_bytes(self.master_password))
 
     def get_raw(self, item_id, vault=None, token=None):
         args = ["get", "item", item_id]
@@ -635,6 +637,7 @@ class OnePass(object):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
+
         self.set_options(var_options=variables, direct=kwargs)
 
         field = self.get_option("field")
