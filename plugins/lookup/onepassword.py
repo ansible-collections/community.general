@@ -133,8 +133,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
     def _check_required_params(self, required_params):
         if not self.service_account_token:
-            non_empty_attrs = dict(
-                (param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
+            non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
             missing = set(required_params).difference(non_empty_attrs)
             if missing:
                 prefix = "Unable to sign in to 1Password. Missing required parameter"
@@ -661,4 +660,5 @@ class LookupModule(LookupBase):
         values = []
         for term in terms:
             values.append(op.get_field(term, field, section, vault))
+
         return values
