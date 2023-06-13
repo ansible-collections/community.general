@@ -131,18 +131,17 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         self._version = None
 
     def _check_required_params(self, required_params):
-        if not self.service_account_token:
-            non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
-            missing = set(required_params).difference(non_empty_attrs)
-            if missing:
-                prefix = "Unable to sign in to 1Password. Missing required parameter"
-                plural = ""
-                suffix = ": {params}. Or use a service_account_token.".format(params=", ".join(missing))
-                if len(missing) > 1:
-                    plural = "s"
+        non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
+        missing = set(required_params).difference(non_empty_attrs)
+        if missing:
+            prefix = "Unable to sign in to 1Password. Missing required parameter"
+            plural = ""
+            suffix = ": {params}.".format(params=", ".join(missing))
+            if len(missing) > 1:
+                plural = "s"
 
-                msg = "{prefix}{plural}{suffix}".format(prefix=prefix, plural=plural, suffix=suffix)
-                raise AnsibleLookupError(msg)
+            msg = "{prefix}{plural}{suffix}".format(prefix=prefix, plural=plural, suffix=suffix)
+            raise AnsibleLookupError(msg)
 
     @abc.abstractmethod
     def _parse_field(self, data_json, field_name, section_title):
@@ -516,6 +515,7 @@ class OnePassCLIv2(OnePassCLIBase):
 
     def full_signin(self):
         if self.service_account_token:
+            self._check_required_params(['service_account_token'])
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
             args = [
                 "whoami",
