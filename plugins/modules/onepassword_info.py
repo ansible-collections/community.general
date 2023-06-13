@@ -78,12 +78,6 @@ options:
                 description:
                     - 1Password username.
                     - Only required for initial sign in.
-            service_account_token:
-                type: str
-                description:
-                    - 1Password service account token.
-                    - Only required for initial sign in.
-                version_added: 7.1.0
             master_password:
                 type: str
                 description:
@@ -381,7 +375,6 @@ def main():
                 username=dict(type='str'),
                 master_password=dict(required=True, type='str', no_log=True),
                 secret_key=dict(type='str', no_log=True),
-                service_account_token=dict(type='str', no_log=True),
             ), default=None),
             search_terms=dict(required=True, type='list', elements='dict'),
         ),
