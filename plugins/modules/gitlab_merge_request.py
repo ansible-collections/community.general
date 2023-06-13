@@ -18,8 +18,9 @@ short_description: Create, update, or delete GitLab merge requests
 version_added: 7.1.0
 description:
   - Creates a merge request if it does not exist.
-  - When a merge request does exist, it will be updated if the provided parameters are different.
-  - When a merge request does exist and O(state=absent), the merge request will be deleted.
+  - When a single merge request does exist, it will be updated if the provided parameters are different.
+  - When a single merge request does exist and O(state=absent), the merge request will be deleted.
+  - When multiple merge requests are detected, the task fails.
   - Existing merge requests are matched based on O(title), O(source_branch), O(target_branch),
     and O(state_filter) filters.
 author:
@@ -366,6 +367,8 @@ def main():
             except IOError as e:
                 module.fail_json(msg='Cannot open {0}: {1}'.format(description_path, e))
 
+        # sorting necessary in order to properly detect changes, as we don't want to get false positive
+        # results due to differences in ids ordering; see `mr_has_changed()`
         assignee_ids = sorted(this_gitlab.get_user_ids(assignee_ids.split(","))) if assignee_ids else []
         reviewer_ids = sorted(this_gitlab.get_user_ids(reviewer_ids.split(","))) if reviewer_ids else []
         labels = sorted(labels.split(",")) if labels else []
