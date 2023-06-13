@@ -46,7 +46,7 @@ DOCUMENTATION = '''
       service_account_token:
         description:
           - The access key for a service account.
-          - Only works with version 2 of the CLI tool.
+          - Only works with 1Password CLI version 2 or later.
         type: str
         version_added: 7.1.0
       vault:
