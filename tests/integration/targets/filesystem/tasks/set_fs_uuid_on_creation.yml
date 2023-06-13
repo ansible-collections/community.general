@@ -10,15 +10,14 @@
   block:
 
   - name: "Generate a random UUID"
-    ansible.builtin.command:
-      cmd: "uuidgen -r"
-    register: random_uuid
+    ansible.builtin.set_fact:
+      random_uuid: '{{ "first_random_uuid" | ansible.builtin.to_uuid }}'
 
   - name: "Create filesystem ({{ fstype }}) with UUID"
     community.general.filesystem:
       dev: '{{ dev }}'
       fstype: '{{ fstype }}'
-      uuid: '{{ random_uuid.stdout }}'
+      uuid: '{{ random_uuid }}'
     register: fs_result
 
   - name: "Get UUID of the created filesystem"
@@ -29,26 +28,25 @@
 
   - name: "Assert that filesystem UUID is the random UUID set on creation"
     ansible.builtin.assert:
-      that: (random_uuid.stdout | replace('-','')) == ( uuid.stdout | replace('-',''))
+      that: (random_uuid | replace('-','')) == ( uuid.stdout | replace('-',''))
 
   - name: "Remove filesystem"
     community.general.filesystem:
       dev: '{{ dev }}'
       state: absent
 
-  - name: "Generate a second random UUID"
-    ansible.builtin.command:
-      cmd: "uuidgen -r"
-    register: random_uuid2
-
   - when: fstype in ["ext2", "ext3", "ext4", "ext4dev", "lvm"]
     block:
+    - name: "Generate a second random UUID"
+      ansible.builtin.set_fact:
+        random_uuid2: '{{ "second_random_uuid" | ansible.builtin.to_uuid }}'
+
     - name: "Create filesystem ({{ fstype }}) with fix UUID as opt"
       community.general.filesystem:
         dev: '{{ dev }}'
         fstype: '{{ fstype }}'
-        opts: "{{ ((fstype == 'lvm') | ansible.builtin.ternary('--norestorefile --uuid', '-U')) + ' ' + random_uuid2.stdout }}"
-        uuid: '{{ random_uuid.stdout }}'
+        opts: "{{ ((fstype == 'lvm') | ansible.builtin.ternary('--norestorefile --uuid ', '-U ')) + random_uuid2 }}"
+        uuid: '{{ random_uuid }}'
       register: fs_result2
 
     - name: "Get UUID of the created filesystem"
@@ -59,7 +57,7 @@
 
     - name: "Assert that filesystem UUID is the random UUID set on creation with opt"
       ansible.builtin.assert:
-        that: (random_uuid.stdout | replace('-','')) == ( uuid.stdout | replace('-',''))
+        that: (random_uuid2 | replace('-','')) == ( uuid2.stdout | replace('-',''))
 
     - name: "Remove filesystem"
       community.general.filesystem:
