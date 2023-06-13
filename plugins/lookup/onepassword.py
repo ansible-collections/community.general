@@ -115,6 +115,7 @@ from ansible.module_utils.six import with_metaclass
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 
+
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
