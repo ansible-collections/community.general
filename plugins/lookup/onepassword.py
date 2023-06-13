@@ -554,7 +554,11 @@ class OnePassCLIv2(OnePassCLIBase):
         if self.service_account_token:
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
             return self._run(args, environment_update=environment_update)
-        else:
+            
+        if token is not None:
+            args += [to_bytes("--session=") + token]
+            
+        return self._run(args)
             return self._run(args)
 
     def signin(self):
