@@ -1,0 +1,67 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Skip UUID set at creation tests for FreeBSD due to "xfs_admin: only 'rewrite' supported on V5 fs"
+- when: 
+    - new_uuid | default(False)
+    - not (ansible_system == "FreeBSD" and fstype == "xfs")
+  block:
+
+  - name: "Generate a random UUID"
+    ansible.builtin.command:
+      cmd: "uuidgen -r"
+    register: random_uuid
+
+  - name: "Create filesystem ({{ fstype }}) with UUID"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+      uuid: '{{ random_uuid.stdout }}'
+    register: fs_result
+
+  - name: "Get UUID of the created filesystem"
+    ansible.builtin.shell:
+      cmd: "{{ get_uuid_cmd }}"
+    changed_when: false
+    register: uuid
+
+  - name: "Assert that filesystem UUID is the random UUID set on creation"
+    ansible.builtin.assert:
+      that: (random_uuid.stdout | replace('-','')) == ( uuid.stdout | replace('-',''))
+
+  - name: "Remove filesystem"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      state: absent
+
+  - name: "Generate a second random UUID"
+    ansible.builtin.command:
+      cmd: "uuidgen -r"
+    register: random_uuid2
+
+  - when: fstype in ["ext2", "ext3", "ext4", "ext4dev", "lvm"]
+    block:
+    - name: "Create filesystem ({{ fstype }}) with fix UUID as opt"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        opts: "{{ ((fstype == 'lvm') | ansible.builtin.ternary('--norestorefile --uuid', '-U')) + ' ' + random_uuid2.stdout }}"
+        uuid: '{{ random_uuid.stdout }}'
+      register: fs_result2
+
+    - name: "Get UUID of the created filesystem"
+      ansible.builtin.shell:
+        cmd: "{{ get_uuid_cmd }}"
+      changed_when: false
+      register: uuid2
+
+    - name: "Assert that filesystem UUID is the random UUID set on creation with opt"
+      ansible.builtin.assert:
+        that: (random_uuid.stdout | replace('-','')) == ( uuid.stdout | replace('-',''))
+
+    - name: "Remove filesystem"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        state: absent

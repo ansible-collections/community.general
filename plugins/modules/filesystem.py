@@ -81,7 +81,8 @@ options:
     type: str
   uuid:
     description:
-      - Set existing filesystem's UUID to the given value.
+      - Set filesystem's UUID to the given value.
+      - The UUID options specified in O(opts) take precedence over this value.
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
       - Supported for O(fstype) being one of C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
@@ -211,6 +212,8 @@ class Filesystem(object):
 
     MKFS = None
     MKFS_FORCE_FLAGS = []
+    MKFS_SET_UUID_OPTIONS = None
+    MKFS_SET_UUID_EXTRA_OPTIONS = []
     INFO = None
     GROW = None
     GROW_MAX_SPACE_FLAGS = []
@@ -236,13 +239,19 @@ class Filesystem(object):
         """
         raise NotImplementedError()
 
-    def create(self, opts, dev):
+    def create(self, opts, dev, uuid=None):
         if self.module.check_mode:
             return
+
+        if uuid and self.MKFS_SET_UUID_OPTIONS:
+            if not (set(self.MKFS_SET_UUID_OPTIONS) & set(opts)):
+                opts += [self.MKFS_SET_UUID_OPTIONS[0], uuid] + self.MKFS_SET_UUID_EXTRA_OPTIONS
 
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
         cmd = [mkfs] + self.MKFS_FORCE_FLAGS + opts + [str(dev)]
         self.module.run_command(cmd, check_rc=True)
+        if uuid and self.CHANGE_UUID and self.MKFS_SET_UUID_OPTIONS is None:
+            self.change_uuid(new_uuid=uuid, dev=dev)
 
     def wipefs(self, dev):
         if self.module.check_mode:
@@ -311,6 +320,7 @@ class Filesystem(object):
 
 class Ext(Filesystem):
     MKFS_FORCE_FLAGS = ['-F']
+    MKFS_SET_UUID_OPTIONS = ['-U']
     INFO = 'tune2fs'
     GROW = 'resize2fs'
     CHANGE_UUID = 'tune2fs'
@@ -508,6 +518,8 @@ class VFAT(Filesystem):
 class LVM(Filesystem):
     MKFS = 'pvcreate'
     MKFS_FORCE_FLAGS = ['-f']
+    MKFS_SET_UUID_OPTIONS = ['-u', '--uuid']
+    MKFS_SET_UUID_EXTRA_OPTIONS = ['--norestorefile']
     INFO = 'pvs'
     GROW = 'pvresize'
     CHANGE_UUID = 'pvchange'
@@ -659,7 +671,7 @@ def main():
             module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
 
         # create fs
-        filesystem.create(mkfs_opts, dev)
+        filesystem.create(opts=mkfs_opts, dev=dev, uuid=uuid)
         changed = True
 
     elif fs:
