@@ -208,7 +208,7 @@ def is_struct_included(struct1, struct2, exclude=None):
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
     if isinstance(struct1, list) and isinstance(struct2, list):
-        if len(struct1) == 0 and len(struct2) == 0:
+        if not struct1 and not struct2:
             return True
         found = False
         for item1 in struct1:
