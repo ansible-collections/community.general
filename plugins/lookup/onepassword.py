@@ -559,7 +559,6 @@ class OnePassCLIv2(OnePassCLIBase):
             args += [to_bytes("--session=") + token]
             
         return self._run(args)
-            return self._run(args)
 
     def signin(self):
         self._check_required_params(['master_password'])
