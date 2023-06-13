@@ -555,7 +555,7 @@ class OnePassCLIv2(OnePassCLIBase):
             
         if token is not None:
             args += [to_bytes("--session=") + token]
-            
+
         return self._run(args)
 
     def signin(self):
