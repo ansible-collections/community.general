@@ -218,24 +218,17 @@ def is_struct_included(struct1, struct2, exclude=None):
     if isinstance(struct1, list) and isinstance(struct2, list):
         if len(struct1) == 0 and len(struct2) == 0:
             return True
-        found = False
         for item1 in struct1:
-            found = False
-            if isinstance(item1, list) or isinstance(item1, dict):
-                found1 = False
+            if isinstance(item1, (list, dict)):
                 for item2 in struct2:
                     if is_struct_included(item1, item2, exclude):
-                        found1 = True
-                if found1:
-                    found = True
+                        break
+                else:
+                    return False
             else:
                 if item1 not in struct2:
                     return False
-                else:
-                    found = True
-            if not found:
-                return False
-        return found
+        return True
     elif isinstance(struct1, dict) and isinstance(struct2, dict):
         if len(struct1) == 0 and len(struct2) == 0:
             return True
