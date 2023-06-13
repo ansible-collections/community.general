@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -119,7 +120,8 @@ from ansible_collections.community.general.plugins.module_utils.onepassword impo
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None, service_account_token=None):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
+                 service_account_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -132,7 +134,8 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
     def _check_required_params(self, required_params):
         if not self.service_account_token:
-            non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
+            non_empty_attrs = dict(
+                (param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
             missing = set(required_params).difference(non_empty_attrs)
             if missing:
                 prefix = "Unable to sign in to 1Password. Missing required parameter"
@@ -304,7 +307,8 @@ class OnePassCLIv1(OnePassCLIBase):
 
     def full_signin(self):
         if self.service_account_token:
-            raise AnsibleLookupError("1Password CLI version 1 does not support Service Accounts. Please use version 2 or later.")
+            raise AnsibleLookupError(
+                "1Password CLI version 1 does not support Service Accounts. Please use version 2 or later.")
 
         required_params = [
             "subdomain",
@@ -491,29 +495,27 @@ class OnePassCLIv2(OnePassCLIBase):
 
             return not bool(rc)
 
-        else:
+        args = ["account", "list"]
+        if self.subdomain:
+            account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+            args.extend(["--account", account])
 
-            args = ["account", "list"]
+        rc, out, err = self._run(args)
+
+        if out:
+            # Running 'op account get' if there are no accounts configured on the system drops into
+            # an interactive prompt. Only run 'op account get' after first listing accounts to see
+            # if there are any previously configured accounts.
+            args = ["account", "get"]
             if self.subdomain:
                 account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
                 args.extend(["--account", account])
 
-            rc, out, err = self._run(args)
+            rc, out, err = self._run(args, ignore_errors=True)
 
-            if out:
-                # Running 'op account get' if there are no accounts configured on the system drops into
-                # an interactive prompt. Only run 'op account get' after first listing accounts to see
-                # if there are any previously configured accounts.
-                args = ["account", "get"]
-                if self.subdomain:
-                    account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
-                    args.extend(["--account", account])
+            return not bool(rc)
 
-                rc, out, err = self._run(args, ignore_errors=True)
-
-                return not bool(rc)
-
-            return False
+        return False
 
     def full_signin(self):
         if self.service_account_token:
@@ -566,7 +568,8 @@ class OnePassCLIv2(OnePassCLIBase):
 
 
 class OnePass(object):
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None, service_account_token=None):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
+                 service_account_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -585,7 +588,8 @@ class OnePass(object):
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
                 try:
-                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
+                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password,
+                               self.service_account_token)
                 except TypeError as e:
                     raise AnsibleLookupError(e)
 
@@ -638,7 +642,6 @@ class OnePass(object):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
-
         self.set_options(var_options=variables, direct=kwargs)
 
         field = self.get_option("field")
