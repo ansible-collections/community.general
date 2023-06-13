@@ -83,10 +83,11 @@ options:
     description:
       - Set existing filesystem's UUID to the given value.
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
-      - For C(lvm) the value is ignored, it resets the pv UUID if set.
-      - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), C(xfs) filesystems.
-      - B(Not idempotent)
+      - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
+      - Supported for O(fstype) being one of C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
+      - This is B(not idempotent). Specifying this option will always result in a change.
     type: str
+    version_added: 7.1.0
 requirements:
   - Uses specific tools related to the I(fstype) for creating or resizing a
     filesystem (from packages e2fsprogs, xfsprogs, dosfstools, and so on).
@@ -147,7 +148,7 @@ EXAMPLES = '''
     dev: /dev/sdb1
     uuid: random
 
-- name: Reset an LVM filesystem (pv) UUID on /dev/sdc
+- name: Reset an LVM filesystem (PV) UUID on /dev/sdc
   community.general.filesystem:
     fstype: lvm
     dev: /dev/sdc
@@ -653,7 +654,7 @@ def main():
 
             out = filesystem.change_uuid(new_uuid=uuid, dev=dev)
 
-            module.exit_json(changed=True, msgout=out)
+            module.exit_json(changed=True, msg=out)
         elif fs and not force:
             module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
 
