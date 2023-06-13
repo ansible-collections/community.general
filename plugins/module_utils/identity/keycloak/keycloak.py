@@ -229,7 +229,7 @@ def is_struct_included(struct1, struct2, exclude=None):
                 return False
         return found
     elif isinstance(struct1, dict) and isinstance(struct2, dict):
-        if len(struct1) == 0 and len(struct2) == 0:
+        if not struct1 and not struct2:
             return True
         try:
             for key in struct1:
