@@ -3,29 +3,31 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Skip UUID set at creation tests for FreeBSD due to "xfs_admin: only 'rewrite' supported on V5 fs"
+# UUID set at creation with opts for XFS is not supported
 - when:
     - new_uuid | default(False)
-    - not (ansible_system == "FreeBSD" and fstype == "xfs")
+    - fstype != "xfs"
   block:
 
-  - name: "Generate a random UUID"
+  - name: "Generate random UUIDs"
     ansible.builtin.set_fact:
       random_uuid: '{{ "first_random_uuid" | ansible.builtin.to_uuid }}'
+      random_uuid2: '{{ "second_random_uuid" | ansible.builtin.to_uuid }}'
 
-  - name: "Create filesystem ({{ fstype }}) with UUID"
+  - name: "Create filesystem ({{ fstype }}) with fix UUID as opt"
     community.general.filesystem:
       dev: '{{ dev }}'
       fstype: '{{ fstype }}'
+      opts: "{{ ((fstype == 'lvm') | ansible.builtin.ternary('--norestorefile --uuid ', '-U ')) + random_uuid2 }}"
       uuid: '{{ random_uuid }}'
-    register: fs_result
+    register: fs_result2
 
   - name: "Get UUID of the created filesystem"
     ansible.builtin.shell:
       cmd: "{{ get_uuid_cmd }}"
     changed_when: false
-    register: uuid
+    register: uuid2
 
-  - name: "Assert that filesystem UUID is the random UUID set on creation"
+  - name: "Assert that filesystem UUID is the one set on creation with opt"
     ansible.builtin.assert:
-      that: (random_uuid | replace('-','')) == ( uuid.stdout | replace('-',''))
+      that: (random_uuid2 | replace('-','')) == ( uuid2.stdout | replace('-',''))
