@@ -40,7 +40,9 @@ DOCUMENTATION = '''
       secret_key:
         description: The secret key used when performing an initial sign in.
       service_account_token:
-        description: The access key for a service account.
+        description:
+          - The access key for a service account.
+          - Only works with 1Password CLI version 2 or later.
         type: string
         version_added: 7.1.0
       vault:
