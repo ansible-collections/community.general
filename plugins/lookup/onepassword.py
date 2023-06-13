@@ -304,25 +304,25 @@ class OnePassCLIv1(OnePassCLIBase):
 
     def full_signin(self):
         if self.service_account_token:
-            raise AnsibleLookupError("Onepassword CLI V1 is not supporting Service Accounts. Please use V2.")
-        else:
-            required_params = [
-                "subdomain",
-                "username",
-                "secret_key",
-                "master_password",
-            ]
-            self._check_required_params(required_params)
+            raise AnsibleLookupError("1Password CLI version 1 does not support Service Accounts. Please use version 2 or later.")
 
-            args = [
-                "signin",
-                "{0}.{1}".format(self.subdomain, self.domain),
-                to_bytes(self.username),
-                to_bytes(self.secret_key),
-                "--raw",
-            ]
+        required_params = [
+            "subdomain",
+            "username",
+            "secret_key",
+            "master_password",
+        ]
+        self._check_required_params(required_params)
 
-            return self._run(args, command_input=to_bytes(self.master_password))
+        args = [
+            "signin",
+            "{0}.{1}".format(self.subdomain, self.domain),
+            to_bytes(self.username),
+            to_bytes(self.secret_key),
+            "--raw",
+        ]
+
+        return self._run(args, command_input=to_bytes(self.master_password))
 
     def get_raw(self, item_id, vault=None, token=None):
         args = ["get", "item", item_id]
