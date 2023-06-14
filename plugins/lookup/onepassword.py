@@ -546,7 +546,8 @@ class OnePassCLIv2(OnePassCLIBase):
             args += ["--vault={0}".format(vault)]
 
         if self.service_account_token:
-            self._check_required_params(["vault"])
+            if vault is None:
+                raise AnsibleLookupError("'vault' is required with 'service_account_token'")
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
             return self._run(args, environment_update=environment_update)
 
