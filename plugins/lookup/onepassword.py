@@ -487,7 +487,7 @@ class OnePassCLIv2(OnePassCLIBase):
             args = ["whoami"]
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
             rc, out, err = self._run(args, environment_update=environment_update)
-            
+
             return not bool(rc)
 
         args = ["account", "list"]
