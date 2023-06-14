@@ -160,7 +160,7 @@ options:
     language:
         description:
             - The preferred language/locale for the user.
-            - This should be in a format compatible with the C($LANG) environment variable.
+            - This should be in a format compatible with the E(LANG) environment variable.
         type: str
     passwordhint:
         description:

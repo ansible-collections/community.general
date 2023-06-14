@@ -56,7 +56,7 @@ options:
     choices: ["present", "absent"]
     default: "present"
 notes:
-  - C(HEROKU_API_KEY) and C(TF_VAR_HEROKU_API_KEY) env variable can be used instead setting O(api_key).
+  - E(HEROKU_API_KEY) and E(TF_VAR_HEROKU_API_KEY) environment variables can be used instead setting O(api_key).
   - If you use C(check_mode), you can also pass the C(-v) flag to see affected apps in C(msg), e.g. ["heroku-example-app"].
 '''
 
