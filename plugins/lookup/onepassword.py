@@ -545,9 +545,9 @@ class OnePassCLIv2(OnePassCLIBase):
         args = ["item", "get", item_id, "--format", "json"]
         if vault is not None:
             args += ["--vault={0}".format(vault)]
-        if not self.service_account_token and token is not None:
-            args += [to_bytes("--session=") + token]
+
         if self.service_account_token:
+            self._check_required_params(["vault"])
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
             return self._run(args, environment_update=environment_update)
 
