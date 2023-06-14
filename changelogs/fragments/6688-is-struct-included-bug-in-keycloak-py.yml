@@ -1,0 +1,2 @@
+bugfixes:
+  - is_struct_included return false when comparing composites in keycloak role (https://github.com/ansible-collections/community.general/pull/6688)
