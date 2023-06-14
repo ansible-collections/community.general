@@ -34,7 +34,7 @@ options:
   path:
     description:
       - Path to the INI-style file; this file is created if required.
-      - Before Ansible 2.3 this option was only usable as O(ignore:dest).
+      - Before Ansible 2.3 this option was only usable as O(dest).
     type: path
     required: true
     aliases: [ dest ]
@@ -118,7 +118,7 @@ options:
     version_added: 7.1.0
 notes:
    - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
-   - As of Ansible 2.3, the O(ignore:dest) option has been changed to O(path) as default, but O(ignore:dest) still works as well.
+   - As of Ansible 2.3, the O(dest) option has been changed to O(path) as default, but O(dest) still works as well.
    - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
 author:
     - Jan-Piet Mens (@jpmens)
