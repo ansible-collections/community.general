@@ -123,8 +123,8 @@ options:
         description:
             - Upon successful registration, auto-consume available subscriptions
             - |
-              Added in favor of the deprecated O(ignore:autosubscribe) option in
-              Ansible 2.5; please note that O(ignore:autosubscribe) will be removed in
+              Added in favor of the deprecated O(autosubscribe) option in
+              Ansible 2.5; please note that O(autosubscribe) will be removed in
               community.general 9.0.0.
         type: bool
         aliases: [autosubscribe]
