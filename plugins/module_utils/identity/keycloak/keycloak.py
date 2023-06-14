@@ -216,24 +216,30 @@ def is_struct_included(struct1, struct2, exclude=None):
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
     if isinstance(struct1, list) and isinstance(struct2, list):
+        if not struct1 and not struct2:
+            return True
         for item1 in struct1:
             if isinstance(item1, (list, dict)):
                 for item2 in struct2:
-                    if not is_struct_included(item1, item2, exclude):
-                        return False
+                    if is_struct_included(item1, item2, exclude):
+                        break
+                else:
+                    return False
             else:
                 if item1 not in struct2:
                     return False
         return True
     elif isinstance(struct1, dict) and isinstance(struct2, dict):
+        if not struct1 and not struct2:
+            return True
         try:
             for key in struct1:
                 if not (exclude and key in exclude):
                     if not is_struct_included(struct1[key], struct2[key], exclude):
                         return False
-            return True
         except KeyError:
             return False
+        return True
     elif isinstance(struct1, bool) and isinstance(struct2, bool):
         return struct1 == struct2
     else:
