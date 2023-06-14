@@ -31,7 +31,7 @@ options:
     - API token.
     - Required for api token authentication.
     - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
-    - Can be specified in C(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
+    - Can be specified in E(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
     type: str
     required: false
     version_added: '0.2.0'
