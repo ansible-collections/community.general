@@ -83,6 +83,7 @@ import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.service import daemonize
 
 
 class SimpleinitMSB(object):
@@ -101,8 +102,11 @@ class SimpleinitMSB(object):
         self.telinit_cmd = None
         self.svc_change = False
 
-    def execute_command(self, cmd):
-        return self.module.run_command(cmd)
+    def execute_command(self, cmd, daemon=False):
+        if not daemon:
+            return self.module.run_command(cmd)
+        else:
+            return daemonize(self.module, cmd)
 
     def check_service_changed(self):
         if self.state and self.running is None:
@@ -214,7 +218,7 @@ class SimpleinitMSB(object):
 
         svc_cmd = "%s run %s" % (self.telinit_cmd, self.name)
 
-        rc_state, stdout, stderr = self.execute_command("%s %s" % (svc_cmd, self.action))
+        rc_state, stdout, stderr = self.execute_command("%s %s" % (svc_cmd, self.action), daemon=True)
 
         return (rc_state, stdout, stderr)
 
