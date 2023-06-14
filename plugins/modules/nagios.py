@@ -80,10 +80,8 @@ options:
     default: 30
   services:
     description:
-      - >
-        What to manage downtime/alerts for. Separate multiple services with commas.
-        O(ignore:service) is an alias for O(services).
-        B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).
+      - What to manage downtime/alerts for. Separate multiple services with commas.
+      - B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).
     aliases: [ "service" ]
     type: str
   servicegroup:
