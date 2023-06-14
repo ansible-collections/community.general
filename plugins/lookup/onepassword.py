@@ -514,7 +514,6 @@ class OnePassCLIv2(OnePassCLIBase):
 
     def full_signin(self):
         if self.service_account_token:
-            self._check_required_params(['service_account_token'])
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
             args = [
                 "whoami",
