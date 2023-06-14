@@ -34,7 +34,7 @@ options:
     api_host:
         description:
           - The URL to the Datadog API. Default value is V(https://api.datadoghq.com).
-          - This value can also be set with the C(DATADOG_HOST) environment variable.
+          - This value can also be set with the E(DATADOG_HOST) environment variable.
         required: false
         type: str
         version_added: '0.2.0'
