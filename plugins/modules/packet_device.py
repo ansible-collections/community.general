@@ -40,7 +40,7 @@ attributes:
 options:
   auth_token:
     description:
-      - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in environment variable E(PACKET_API_TOKEN).
     type: str
 
   count:
@@ -161,7 +161,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-# All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
+# All the examples assume that you have your Packet API token in environment variable PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
 # Creating devices

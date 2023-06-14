@@ -26,15 +26,15 @@ options:
     description:
       - URL of the OpenNebula OneFlow API server.
       - It is recommended to use HTTPS so that the username/password are not transferred over the network unencrypted.
-      - If not set then the value of the ONEFLOW_URL environment variable is used.
+      - If not set then the value of the E(ONEFLOW_URL) environment variable is used.
     type: str
   api_username:
     description:
-      - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the C(ONEFLOW_USERNAME) environment variable is used.
+      - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_USERNAME) environment variable is used.
     type: str
   api_password:
     description:
-      - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the C(ONEFLOW_PASSWORD) environment variable is used.
+      - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the E(ONEFLOW_PASSWORD) environment variable is used.
     type: str
   template_name:
     description:

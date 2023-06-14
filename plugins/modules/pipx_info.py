@@ -51,7 +51,7 @@ notes:
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
     - >
-      This module will honor C(pipx) environment variables such as but not limited to C(PIPX_HOME) and C(PIPX_BIN_DIR)
+      This module will honor C(pipx) environment variables such as but not limited to E(PIPX_HOME) and E(PIPX_BIN_DIR)
       passed using the R(environment Ansible keyword, playbooks_environment).
     - This module requires C(pipx) version 0.16.2.1 or above.
     - Please note that C(pipx) requires Python 3.6 or above.

@@ -30,20 +30,20 @@ options:
       - URL of the OpenNebula RPC server.
       - It is recommended to use HTTPS so that the username/password are not
         transferred over the network unencrypted.
-      - If not set then the value of the C(ONE_URL) environment variable is used.
+      - If not set then the value of the E(ONE_URL) environment variable is used.
     type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
-        then the value of the C(ONE_USERNAME) environment variable is used.
+        then the value of the E(ONE_USERNAME) environment variable is used.
     type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
-        then the value of the C(ONE_PASSWORD) environment variable is used.
+        then the value of the E(ONE_PASSWORD) environment variable is used.
         if both O(api_username) or O(api_password) are not set, then it will try
         authenticate with ONE auth file. Default path is "~/.one/one_auth".
-      - Set environment variable C(ONE_AUTH) to override this path.
+      - Set environment variable E(ONE_AUTH) to override this path.
     type: str
   template_name:
     description:
