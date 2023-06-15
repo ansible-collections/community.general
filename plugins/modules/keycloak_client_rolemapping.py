@@ -64,7 +64,7 @@ options:
             - This parameter is required (can be replaced by gid for less API call).
 
     parents:
-        version_added: "6.4.0"
+        version_added: "7.1.0"
         type: list
         description:
             - List of parent groups for the group to handle sorted top to bottom.
