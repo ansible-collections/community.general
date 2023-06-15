@@ -35,11 +35,11 @@ options:
     suboptions:
       group:
         description:
-          - The option's group. One between this and I(groups) is required.
+          - The option's group. One between this and O(values[].groups) is required.
         type: str
       groups:
         description:
-          - List of the option's groups. One between this and I(group) is required.
+          - List of the option's groups. One between this and O(values[].group) is required.
         type: list
         elements: str
       key:
@@ -49,12 +49,12 @@ options:
         required: true
       value:
         description:
-          - The option's value. One between this and I(bool_value) is required.
+          - The option's value. One between this and O(values[].bool_value) is required.
         type: str
       bool_value:
         description:
           - Boolean value.
-          - One between this and I(value) is required.
+          - One between this and O(values[].value) is required.
         type: bool
     required: true
   backup:
