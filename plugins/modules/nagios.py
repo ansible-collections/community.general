@@ -81,19 +81,18 @@ options:
   services:
     description:
       - What to manage downtime/alerts for. Separate multiple services with commas.
-      - B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts).
+      - "B(Required) option when O(action) is one of: V(downtime), V(acknowledge), V(forced_check), V(enable_alerts), V(disable_alerts)."
     aliases: [ "service" ]
     type: str
   servicegroup:
     description:
       - The Servicegroup we want to set downtimes/alerts for.
-        B(Required) option when using the V(servicegroup_service_downtime) and V(servicegroup_host_downtime) O(action).
+      - B(Required) option when using the V(servicegroup_service_downtime) and V(servicegroup_host_downtime) O(action).
     type: str
   command:
     description:
-      - The raw command to send to nagios, which
-        should not include the submitted time header or the line-feed
-        B(Required) option when using the V(command) O(action).
+      - The raw command to send to nagios, which should not include the submitted time header or the line-feed.
+      - B(Required) option when using the V(command) O(action).
     type: str
 
 author: "Tim Bielawa (@tbielawa)"
