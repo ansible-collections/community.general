@@ -513,32 +513,23 @@ class OnePassCLIv2(OnePassCLIBase):
         return False
 
     def full_signin(self):
-        if self.service_account_token:
-            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
-            args = [
-                "whoami",
-            ]
+        required_params = [
+            "subdomain",
+            "username",
+            "secret_key",
+            "master_password",
+        ]
+        self._check_required_params(required_params)
 
-            return self._run(args, environment_update=environment_update)
-        else:
-            required_params = [
-                "subdomain",
-                "username",
-                "secret_key",
-                "master_password",
-            ]
-            self._check_required_params(required_params)
+        args = [
+            "account", "add", "--raw",
+            "--address", "{0}.{1}".format(self.subdomain, self.domain),
+            "--email", to_bytes(self.username),
+            "--signin",
+        ]
 
-            args = [
-                "account", "add", "--raw",
-                "--address", "{0}.{1}".format(self.subdomain, self.domain),
-                "--email", to_bytes(self.username),
-                "--signin",
-            ]
-
-            environment_update = {"OP_SECRET_KEY": self.secret_key}
-
-            return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
+        environment_update = {"OP_SECRET_KEY": self.secret_key}
+        return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
 
     def get_raw(self, item_id, vault=None, token=None):
         args = ["item", "get", item_id, "--format", "json"]
