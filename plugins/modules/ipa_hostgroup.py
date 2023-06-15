@@ -22,8 +22,8 @@ attributes:
 options:
   append:
     description:
-    - If C(true), add the listed I(host) to the I(hostgroup).
-    - If C(false), only the listed I(host) will be in I(hostgroup), removing any other hosts.
+    - If V(true), add the listed O(host) to the O(hostgroup).
+    - If V(false), only the listed O(host) will be in O(hostgroup), removing any other hosts.
     default: false
     type: bool
     version_added: 6.6.0

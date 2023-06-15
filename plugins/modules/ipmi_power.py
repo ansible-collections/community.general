@@ -58,7 +58,7 @@ options:
             - shutdown -- Have system request OS proper shutdown
             - reset -- Request system reset without waiting for OS
             - boot -- If system is off, then 'on', else 'reset'"
-      - Either this option or I(machine) is required.
+      - Either this option or O(machine) is required.
     choices: ['on', 'off', shutdown, reset, boot]
     type: str
   timeout:
@@ -70,7 +70,7 @@ options:
     description:
       - Provide a list of the remote target address for the bridge IPMI request,
         and the power status.
-      - Either this option or I(state) is required.
+      - Either this option or O(state) is required.
     required: false
     type: list
     elements: dict
@@ -83,9 +83,9 @@ options:
         required: true
       state:
         description:
-          - Whether to ensure that the machine specified by I(targetAddress) in desired state.
-          - If this option is not set, the power state is set by I(state).
-          - If both this option and I(state) are set, this option takes precedence over I(state).
+          - Whether to ensure that the machine specified by O(machine[].targetAddress) in desired state.
+          - If this option is not set, the power state is set by O(state).
+          - If both this option and O(state) are set, this option takes precedence over O(state).
         choices: ['on', 'off', shutdown, reset, boot]
         type: str
 
@@ -98,18 +98,18 @@ author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
 RETURN = '''
 powerstate:
     description: The current power state of the machine.
-    returned: success and I(machine) is not provided
+    returned: success and O(machine) is not provided
     type: str
     sample: 'on'
 status:
     description: The current power state of the machine when the machine option is set.
-    returned: success and I(machine) is provided
+    returned: success and O(machine) is provided
     type: list
     elements: dict
     version_added: 4.3.0
     contains:
         powerstate:
-          description: The current power state of the machine specified by I(targetAddress).
+          description: The current power state of the machine specified by RV(status[].targetAddress).
           type: str
         targetAddress:
           description: The remote target address.

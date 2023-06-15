@@ -33,9 +33,9 @@ options:
     required: true
     description:
       - List of commands to execute on iDRAC.
-      - I(SetManagerAttributes), I(SetLifecycleControllerAttributes) and
-        I(SetSystemAttributes) are mutually exclusive commands when C(category)
-        is I(Manager).
+      - V(SetManagerAttributes), V(SetLifecycleControllerAttributes) and
+        V(SetSystemAttributes) are mutually exclusive commands when O(category)
+        is V(Manager).
     type: list
     elements: str
   baseuri:

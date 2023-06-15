@@ -30,8 +30,8 @@ options:
   src:
     description:
       - The remote path of the application ear or war to deploy.
-      - Required when I(state=present).
-      - Ignored when I(state=absent).
+      - Required when O(state=present).
+      - Ignored when O(state=absent).
     type: path
   deploy_path:
     default: /var/lib/jbossas/standalone/deployments
@@ -46,7 +46,7 @@ options:
     type: str
 notes:
   - The JBoss standalone deployment-scanner has to be enabled in standalone.xml
-  - The module can wait until I(deployment) file is deployed/undeployed by deployment-scanner.
+  - The module can wait until O(deployment) file is deployed/undeployed by deployment-scanner.
     Duration of waiting time depends on scan-interval parameter from standalone.xml.
   - Ensure no identically named application is deployed through the JBoss CLI
 seealso:

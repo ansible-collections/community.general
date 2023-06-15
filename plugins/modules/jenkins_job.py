@@ -30,14 +30,14 @@ options:
     description:
       - config in XML format.
       - Required if job does not yet exist.
-      - Mutually exclusive with I(enabled).
-      - Considered if I(state=present).
+      - Mutually exclusive with O(enabled).
+      - Considered if O(state=present).
     required: false
   enabled:
     description:
       - Whether the job should be enabled or disabled.
-      - Mutually exclusive with I(config).
-      - Considered if I(state=present).
+      - Mutually exclusive with O(config).
+      - Considered if O(state=present).
     type: bool
     required: false
   name:
@@ -77,10 +77,10 @@ options:
     type: bool
     default: true
     description:
-      - If set to C(false), the SSL certificates will not be validated.
-        This should only set to C(false) used on personally controlled sites
+      - If set to V(false), the SSL certificates will not be validated.
+        This should only set to V(false) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
-      - The C(python-jenkins) library only handles this by using the environment variable C(PYTHONHTTPSVERIFY).
+      - The C(python-jenkins) library only handles this by using the environment variable E(PYTHONHTTPSVERIFY).
     version_added: 2.3.0
 '''
 

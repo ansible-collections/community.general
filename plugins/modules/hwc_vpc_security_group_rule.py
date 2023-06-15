@@ -19,9 +19,9 @@ description:
     - vpc security group management.
 short_description: Creates a resource of Vpc/SecurityGroupRule in Huawei Cloud
 notes:
-    - If I(id) option is provided, it takes precedence over
-      I(enterprise_project_id) for security group rule selection.
-    - I(security_group_id) is used for security group rule selection. If more
+    - If O(id) option is provided, it takes precedence over
+      O(security_group_id) for security group rule selection.
+    - O(security_group_id) is used for security group rule selection. If more
       than one security group rule with this options exists, execution is
       aborted.
     - No parameter support updating. If one of option is changed, the module

@@ -46,9 +46,9 @@ options:
   value:
     type: str
     description:
-      - If I(option) is not presented for the I(interface) and I(state) is C(present) option will be added.
-        If I(option) already exists and is not C(pre-up), C(up), C(post-up) or C(down), it's value will be updated.
-        C(pre-up), C(up), C(post-up) and C(down) options can't be updated, only adding new options, removing existing
+      - If O(option) is not presented for the O(iface) and O(state) is V(present) option will be added.
+        If O(option) already exists and is not V(pre-up), V(up), V(post-up) or V(down), it's value will be updated.
+        V(pre-up), V(up), V(post-up) and V(down) options cannot be updated, only adding new options, removing existing
         ones or cleaning the whole option set are supported
   backup:
     description:
@@ -59,7 +59,7 @@ options:
   state:
     type: str
     description:
-      - If set to C(absent) the option or section will be removed if present instead of created.
+      - If set to V(absent) the option or section will be removed if present instead of created.
     default: "present"
     choices: [ "present", "absent" ]
 

@@ -14,9 +14,9 @@ module: heroku_collaborator
 short_description: Add or delete app collaborators on Heroku
 description:
   - Manages collaborators for Heroku apps.
-  - If set to C(present) and heroku user is already collaborator, then do nothing.
-  - If set to C(present) and heroku user is not collaborator, then add user to app.
-  - If set to C(absent) and heroku user is collaborator, then delete user from app.
+  - If set to V(present) and heroku user is already collaborator, then do nothing.
+  - If set to V(present) and heroku user is not collaborator, then add user to app.
+  - If set to V(absent) and heroku user is collaborator, then delete user from app.
 author:
   - Marcel Arns (@marns93)
 requirements:
@@ -56,8 +56,8 @@ options:
     choices: ["present", "absent"]
     default: "present"
 notes:
-  - C(HEROKU_API_KEY) and C(TF_VAR_HEROKU_API_KEY) env variable can be used instead setting C(api_key).
-  - If you use I(--check), you can also pass the I(-v) flag to see affected apps in C(msg), e.g. ["heroku-example-app"].
+  - E(HEROKU_API_KEY) and E(TF_VAR_HEROKU_API_KEY) environment variables can be used instead setting O(api_key).
+  - If you use C(check_mode), you can also pass the C(-v) flag to see affected apps in C(msg), e.g. ["heroku-example-app"].
 '''
 
 EXAMPLES = '''

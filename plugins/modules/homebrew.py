@@ -42,9 +42,9 @@ options:
         elements: str
     path:
         description:
-            - "A C(:) separated list of paths to search for C(brew) executable.
-              Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
-              providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
+            - "A V(:) separated list of paths to search for C(brew) executable.
+              Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of C(brew) command,
+              providing an alternative C(brew) path enables managing different set of packages in an alternative location in the system."
         default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
         type: path
     state:
@@ -78,7 +78,7 @@ options:
         version_added: '0.2.0'
 notes:
   - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the I(name) option.
+    it is much more efficient to pass the list directly to the O(name) option.
 '''
 
 EXAMPLES = '''
@@ -87,7 +87,7 @@ EXAMPLES = '''
     name: foo
     state: present
 
-# Install formula foo with 'brew' in alternate path C(/my/other/location/bin)
+# Install formula foo with 'brew' in alternate path (/my/other/location/bin)
 - community.general.homebrew:
     name: foo
     path: /my/other/location/bin

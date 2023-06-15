@@ -65,7 +65,7 @@ options:
   state:
     description:
       - Desired state of the provided backend host.
-      - Note that C(drain) state was added in version 2.4.
+      - Note that V(drain) state was added in version 2.4.
       - It is supported only by HAProxy version 1.5 or later,
       - When used on versions < 1.5, it will be ignored.
     type: str
@@ -73,13 +73,13 @@ options:
     choices: [ disabled, drain, enabled ]
   agent:
     description:
-      - Disable/enable agent checks (depending on I(state) value).
+      - Disable/enable agent checks (depending on O(state) value).
     type: bool
     default: false
     version_added: 1.0.0
   health:
     description:
-      - Disable/enable health checks (depending on I(state) value).
+      - Disable/enable health checks (depending on O(state) value).
     type: bool
     default: false
     version_added: "1.0.0"
@@ -90,8 +90,8 @@ options:
     default: false
   wait:
     description:
-      - Wait until the server reports a status of C(UP) when I(state=enabled),
-        status of C(MAINT) when I(state=disabled) or status of C(DRAIN) when I(state=drain).
+      - Wait until the server reports a status of C(UP) when O(state=enabled),
+        status of C(MAINT) when O(state=disabled) or status of C(DRAIN) when O(state=drain).
     type: bool
     default: false
   wait_interval:
@@ -107,7 +107,7 @@ options:
   weight:
     description:
       - The value passed in argument.
-      - If the value ends with the C(%) sign, then the new weight will be
+      - If the value ends with the V(%) sign, then the new weight will be
         relative to the initially configured weight.
       - Relative weights are only permitted between 0 and 100% and absolute
         weights are permitted between 0 and 256.
