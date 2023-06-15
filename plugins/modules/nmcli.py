@@ -52,22 +52,22 @@ options:
         description:
             - The interface to bind the connection to.
             - The connection will only be applicable to this interface name.
-            - A special value of C('*') can be used for interface-independent connections.
+            - A special value of V('*') can be used for interface-independent connections.
             - The ifname argument is mandatory for all connection types except bond, team, bridge, vlan and vpn.
-            - This parameter defaults to C(conn_name) when left unset for all connection types except vpn that removes it.
+            - This parameter defaults to O(conn_name) when left unset for all connection types except vpn that removes it.
         type: str
     type:
         description:
             - This is the type of device or network connection that you wish to create or modify.
-            - Type C(dummy) is added in community.general 3.5.0.
-            - Type C(generic) is added in Ansible 2.5.
-            - Type C(infiniband) is added in community.general 2.0.0.
-            - Type C(gsm) is added in community.general 3.7.0.
-            - Type C(macvlan) is added in community.general 6.6.0.
-            - Type C(wireguard) is added in community.general 4.3.0.
-            - Type C(vpn) is added in community.general 5.1.0.
-            - Using C(bond-slave), C(bridge-slave) or C(team-slave) implies C(ethernet) connection type with corresponding I(slave_type) option.
-            - If you want to control non-ethernet connection attached to C(bond), C(bridge) or C(team) consider using C(slave_type) option.
+            - Type V(dummy) is added in community.general 3.5.0.
+            - Type V(generic) is added in Ansible 2.5.
+            - Type V(infiniband) is added in community.general 2.0.0.
+            - Type V(gsm) is added in community.general 3.7.0.
+            - Type V(macvlan) is added in community.general 6.6.0.
+            - Type V(wireguard) is added in community.general 4.3.0.
+            - Type V(vpn) is added in community.general 5.1.0.
+            - Using V(bond-slave), V(bridge-slave), or V(team-slave) implies V(ethernet) connection type with corresponding O(slave_type) option.
+            - If you want to control non-ethernet connection attached to V(bond), V(bridge), or V(team) consider using O(slave_type) option.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
             wifi, gsm, wireguard, vpn ]
@@ -85,26 +85,26 @@ options:
         version_added: 5.8.0
     slave_type:
         description:
-            - Type of the device of this slave's master connection (for example C(bond)).
+            - Type of the device of this slave's master connection (for example V(bond)).
         type: str
         choices: [ 'bond', 'bridge', 'team' ]
         version_added: 7.0.0
     master:
         description:
             - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
-            - Mandatory if I(slave_type) is defined.
+            - Mandatory if O(slave_type) is defined.
         type: str
     ip4:
         description:
             - List of IPv4 addresses to this interface.
-            - Use the format C(192.0.2.24/24) or C(192.0.2.24).
-            - If defined and I(method4) is not specified, automatically set C(ipv4.method) to C(manual).
+            - Use the format V(192.0.2.24/24) or V(192.0.2.24).
+            - If defined and O(method4) is not specified, automatically set C(ipv4.method) to V(manual).
         type: list
         elements: str
     gw4:
         description:
             - The IPv4 gateway for this interface.
-            - Use the format C(192.0.2.1).
+            - Use the format V(192.0.2.1).
             - This parameter is mutually_exclusive with never_default4 parameter.
         type: str
     gw4_ignore_auto:
@@ -116,8 +116,8 @@ options:
     routes4:
         description:
             - The list of IPv4 routes.
-            - Use the format C(192.0.3.0/24 192.0.2.1).
-            - To specify more complex routes, use the I(routes4_extended) option.
+            - Use the format V(192.0.3.0/24 192.0.2.1).
+            - To specify more complex routes, use the O(routes4_extended) option.
         type: list
         elements: str
         version_added: 2.0.0
@@ -130,12 +130,12 @@ options:
             ip:
                 description:
                     - IP or prefix of route.
-                    - Use the format C(192.0.3.0/24).
+                    - Use the format V(192.0.3.0/24).
                 type: str
                 required: true
             next_hop:
                 description:
-                    - Use the format C(192.0.2.1).
+                    - Use the format V(192.0.2.1).
                 type: str
             metric:
                 description:
@@ -183,7 +183,7 @@ options:
     dns4:
         description:
             - A list of up to 3 DNS servers.
-            - The entries must be IPv4 addresses, for example C(192.0.2.53).
+            - The entries must be IPv4 addresses, for example V(192.0.2.53).
         elements: str
         type: list
     dns4_search:
@@ -200,28 +200,28 @@ options:
     method4:
         description:
             - Configuration method to be used for IPv4.
-            - If I(ip4) is set, C(ipv4.method) is automatically set to C(manual) and this parameter is not needed.
+            - If O(ip4) is set, C(ipv4.method) is automatically set to V(manual) and this parameter is not needed.
         type: str
         choices: [auto, link-local, manual, shared, disabled]
         version_added: 2.2.0
     may_fail4:
         description:
-            - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
-            - This option applies when C(method4) is not C(disabled).
+            - If you need O(ip4) configured before C(network-online.target) is reached, set this option to V(false).
+            - This option applies when O(method4) is not V(disabled).
         type: bool
         default: true
         version_added: 3.3.0
     ip6:
         description:
             - List of IPv6 addresses to this interface.
-            - Use the format C(abbe::cafe/128) or C(abbe::cafe).
-            - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
+            - Use the format V(abbe::cafe/128) or V(abbe::cafe).
+            - If defined and O(method6) is not specified, automatically set C(ipv6.method) to V(manual).
         type: list
         elements: str
     gw6:
         description:
             - The IPv6 gateway for this interface.
-            - Use the format C(2001:db8::1).
+            - Use the format V(2001:db8::1).
         type: str
     gw6_ignore_auto:
         description:
@@ -232,8 +232,8 @@ options:
     routes6:
         description:
             - The list of IPv6 routes.
-            - Use the format C(fd12:3456:789a:1::/64 2001:dead:beef::1).
-            - To specify more complex routes, use the I(routes6_extended) option.
+            - Use the format V(fd12:3456:789a:1::/64 2001:dead:beef::1).
+            - To specify more complex routes, use the O(routes6_extended) option.
         type: list
         elements: str
         version_added: 4.4.0
@@ -246,12 +246,12 @@ options:
             ip:
                 description:
                     - IP or prefix of route.
-                    - Use the format C(fd12:3456:789a:1::/64).
+                    - Use the format V(fd12:3456:789a:1::/64).
                 type: str
                 required: true
             next_hop:
                 description:
-                    - Use the format C(2001:dead:beef::1).
+                    - Use the format V(2001:dead:beef::1).
                 type: str
             metric:
                 description:
@@ -282,7 +282,7 @@ options:
     dns6:
         description:
             - A list of up to 3 DNS servers.
-            - The entries must be IPv6 addresses, for example C(2001:4860:4860::8888).
+            - The entries must be IPv6 addresses, for example V(2001:4860:4860::8888).
         elements: str
         type: list
     dns6_search:
@@ -299,8 +299,8 @@ options:
     method6:
         description:
             - Configuration method to be used for IPv6
-            - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
-            - C(disabled) was added in community.general 3.3.0.
+            - If O(ip6) is set, C(ipv6.method) is automatically set to V(manual) and this parameter is not needed.
+            - V(disabled) was added in community.general 3.3.0.
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
@@ -313,7 +313,7 @@ options:
     addr_gen_mode6:
         description:
             - Configure method for creating the address for use with IPv6 Stateless Address Autoconfiguration.
-            - C(default) and C(deafult-or-eui64) have been added in community.general 6.5.0.
+            - V(default) and V(default-or-eui64) have been added in community.general 6.5.0.
         type: str
         choices: [default, default-or-eui64, eui64, stable-privacy]
         version_added: 4.2.0
@@ -321,7 +321,7 @@ options:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
             - Can be used when modifying Team, VLAN, Ethernet (Future plans to implement wifi, gsm, pppoe, infiniband)
-            - This parameter defaults to C(1500) when unset.
+            - This parameter defaults to V(1500) when unset.
         type: int
     dhcp_client_id:
         description:
@@ -334,7 +334,7 @@ options:
     miimon:
         description:
             - This is only used with bond - miimon.
-            - This parameter defaults to C(100) when unset.
+            - This parameter defaults to V(100) when unset.
         type: int
     downdelay:
         description:
@@ -406,7 +406,7 @@ options:
         description:
             - This is only used with 'bridge-slave' - 'hairpin mode' for the slave, which allows frames to be sent back out through the slave the
               frame was received on.
-            - The default change to C(false) in community.general 7.0.0. It used to be C(true) before.
+            - The default change to V(false) in community.general 7.0.0. It used to be V(true) before.
         type: bool
         default: false
     runner:
@@ -426,9 +426,9 @@ options:
     runner_fast_rate:
         description:
             - Option specifies the rate at which our link partner is asked to transmit LACPDU
-              packets. If this is C(true) then packets will be sent once per second. Otherwise they
+              packets. If this is V(true) then packets will be sent once per second. Otherwise they
               will be sent every 30 seconds.
-            - Only allowed for C(lacp) runner.
+            - Only allowed for O(runner=lacp).
         type: bool
         version_added: 6.5.0
     vlanid:
@@ -478,13 +478,13 @@ options:
     ip_tunnel_input_key:
        description:
             - The key used for tunnel input packets.
-            - Only used when I(type=gre).
+            - Only used when O(type=gre).
        type: str
        version_added: 3.6.0
     ip_tunnel_output_key:
        description:
             - The key used for tunnel output packets.
-            - Only used when I(type=gre).
+            - Only used when O(type=gre).
        type: str
        version_added: 3.6.0
     zone:
@@ -500,23 +500,25 @@ options:
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless-security.html).'
             - 'For instance to use common WPA-PSK auth with a password:
-              C({key-mgmt: wpa-psk, psk: my_password}).'
+              V({key-mgmt: wpa-psk, psk: my_password}).'
        type: dict
        suboptions:
             auth-alg:
                 description:
-                    - When WEP is used (that is, if I(key-mgmt) = C(none) or C(ieee8021x)) indicate the 802.11 authentication algorithm required by the AP here.
-                    - One of C(open) for Open System, C(shared) for Shared Key, or C(leap) for Cisco LEAP.
-                    - When using Cisco LEAP (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)) the I(leap-username) and I(leap-password) properties
+                    - When WEP is used (that is, if O(wifi_sec.key-mgmt) is V(none) or V(ieee8021x)) indicate the 802.11
+                      authentication algorithm required by the AP here.
+                    - One of V(open) for Open System, V(shared) for Shared Key, or V(leap) for Cisco LEAP.
+                    - When using Cisco LEAP (that is, if O(wifi_sec.key-mgmt=ieee8021x) and O(wifi_sec.auth-alg=leap))
+                      the O(wifi_sec.leap-username) and O(wifi_sec.leap-password) properties
                       must be specified.
                 type: str
                 choices: [ open, shared, leap ]
             fils:
                 description:
                     - Indicates whether Fast Initial Link Setup (802.11ai) must be enabled for the connection.
-                    - One of C(0) (use global default value), C(1) (disable FILS), C(2) (enable FILS if the supplicant and the access point support it) or C(3)
+                    - One of V(0) (use global default value), V(1) (disable FILS), V(2) (enable FILS if the supplicant and the access point support it) or V(3)
                       (enable FILS and fail if not supported).
-                    - When set to C(0) and no global default is set, FILS will be optionally enabled.
+                    - When set to V(0) and no global default is set, FILS will be optionally enabled.
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
@@ -531,20 +533,20 @@ options:
             key-mgmt:
                 description:
                     - Key management used for the connection.
-                    - One of C(none) (WEP or no password protection), C(ieee8021x) (Dynamic WEP), C(owe) (Opportunistic Wireless Encryption), C(wpa-psk) (WPA2
-                      + WPA3 personal), C(sae) (WPA3 personal only), C(wpa-eap) (WPA2 + WPA3 enterprise) or C(wpa-eap-suite-b-192) (WPA3 enterprise only).
+                    - One of V(none) (WEP or no password protection), V(ieee8021x) (Dynamic WEP), V(owe) (Opportunistic Wireless Encryption), V(wpa-psk) (WPA2
+                      + WPA3 personal), V(sae) (WPA3 personal only), V(wpa-eap) (WPA2 + WPA3 enterprise) or V(wpa-eap-suite-b-192) (WPA3 enterprise only).
                     - This property must be set for any Wi-Fi connection that uses security.
                 type: str
                 choices: [ none, ieee8021x, owe, wpa-psk, sae, wpa-eap, wpa-eap-suite-b-192 ]
             leap-password-flags:
-                description: Flags indicating how to handle the I(leap-password) property.
+                description: Flags indicating how to handle the O(wifi_sec.leap-password) property.
                 type: list
                 elements: int
             leap-password:
-                description: The login password for legacy LEAP connections (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)).
+                description: The login password for legacy LEAP connections (that is, if O(wifi_sec.key-mgmt=ieee8021x) and O(wifi_sec.auth-alg=leap)).
                 type: str
             leap-username:
-                description: The login username for legacy LEAP connections (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)).
+                description: The login username for legacy LEAP connections (that is, if O(wifi_sec.key-mgmt=ieee8021x) and O(wifi_sec.auth-alg=leap)).
                 type: str
             pairwise:
                 description:
@@ -557,68 +559,72 @@ options:
             pmf:
                 description:
                     - Indicates whether Protected Management Frames (802.11w) must be enabled for the connection.
-                    - One of C(0) (use global default value), C(1) (disable PMF), C(2) (enable PMF if the supplicant and the access point support it) or C(3)
-                      (enable PMF and fail if not supported).
-                    - When set to C(0) and no global default is set, PMF will be optionally enabled.
+                    - One of V(0) (use global default value), V(1) (disable PMF), V(2) (enable PMF if the
+                      supplicant and the access point support it) or V(3) (enable PMF and fail if not supported).
+                    - When set to V(0) and no global default is set, PMF will be optionally enabled.
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
             proto:
                 description:
                     - List of strings specifying the allowed WPA protocol versions to use.
-                    - Each element may be C(wpa) (allow WPA) or C(rsn) (allow WPA2/RSN).
+                    - Each element may be V(wpa) (allow WPA) or V(rsn) (allow WPA2/RSN).
                     - If not specified, both WPA and RSN connections are allowed.
                 type: list
                 elements: str
                 choices: [ wpa, rsn ]
             psk-flags:
-                description: Flags indicating how to handle the I(psk) property.
+                description: Flags indicating how to handle the O(wifi_sec.psk) property.
                 type: list
                 elements: int
             psk:
                 description:
                     - Pre-Shared-Key for WPA networks.
-                    - For WPA-PSK, it is either an ASCII passphrase of 8 to 63 characters that is (as specified in the 802.11i standard) hashed to derive the
+                    - For WPA-PSK, it is either an ASCII passphrase of 8 to 63 characters that is
+                      (as specified in the 802.11i standard) hashed to derive the
                       actual key, or the key in form of 64 hexadecimal character.
                     - The WPA3-Personal networks use a passphrase of any length for SAE authentication.
                 type: str
             wep-key-flags:
-                description: Flags indicating how to handle the I(wep-key0), I(wep-key1), I(wep-key2), and I(wep-key3) properties.
+                description:
+                  - Flags indicating how to handle the O(wifi_sec.wep-key0), O(wifi_sec.wep-key1),
+                    O(wifi_sec.wep-key2), and O(wifi_sec.wep-key3) properties.
                 type: list
                 elements: int
             wep-key-type:
                 description:
                     - Controls the interpretation of WEP keys.
-                    - Allowed values are C(1), in which case the key is either a 10- or 26-character hexadecimal string, or a 5- or 13-character ASCII
-                      password; or C(2), in which case the passphrase is provided as a string and will be hashed using the de-facto MD5 method to derive the
+                    - Allowed values are V(1), in which case the key is either a 10- or 26-character hexadecimal string, or a 5- or 13-character ASCII
+                      password; or V(2), in which case the passphrase is provided as a string and will be hashed using the de-facto MD5 method to derive the
                       actual WEP key.
                 type: int
                 choices: [ 1, 2 ]
             wep-key0:
                 description:
                     - Index 0 WEP key. This is the WEP key used in most networks.
-                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                    - See the O(wifi_sec.wep-key-type) property for a description of how this key is interpreted.
                 type: str
             wep-key1:
                 description:
                     - Index 1 WEP key. This WEP index is not used by most networks.
-                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                    - See the O(wifi_sec.wep-key-type) property for a description of how this key is interpreted.
                 type: str
             wep-key2:
                 description:
                     - Index 2 WEP key. This WEP index is not used by most networks.
-                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                    - See the O(wifi_sec.wep-key-type) property for a description of how this key is interpreted.
                 type: str
             wep-key3:
                 description:
                     - Index 3 WEP key. This WEP index is not used by most networks.
-                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                    - See the O(wifi_sec.wep-key-type) property for a description of how this key is interpreted.
                 type: str
             wep-tx-keyidx:
                 description:
-                    - When static WEP is used (that is, if I(key-mgmt=none)) and a non-default WEP key index is used by the AP, put that WEP key index here.
-                    - Valid values are C(0) (default key) through C(3).
-                    - Note that some consumer access points (like the Linksys WRT54G) number the keys C(1) - C(4).
+                    - When static WEP is used (that is, if O(wifi_sec.key-mgmt=none)) and a non-default WEP key index
+                      is used by the AP, put that WEP key index here.
+                    - Valid values are V(0) (default key) through V(3).
+                    - Note that some consumer access points (like the Linksys WRT54G) number the keys V(1) to V(4).
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
@@ -627,7 +633,7 @@ options:
                     - Flags indicating which mode of WPS is to be used if any.
                     - There is little point in changing the default setting as NetworkManager will automatically determine whether it is feasible to start WPS
                       enrollment from the Access Point capabilities.
-                    - WPS can be disabled by setting this property to a value of C(1).
+                    - WPS can be disabled by setting this property to a value of V(1).
                 type: int
                 default: 0
        version_added: 3.0.0
@@ -643,34 +649,34 @@ options:
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
             - 'For instance to create a hidden AP mode WiFi connection:
-              C({hidden: true, mode: ap}).'
+              V({hidden: true, mode: ap}).'
        type: dict
        suboptions:
             ap-isolation:
                 description:
                     - Configures AP isolation, which prevents communication between wireless devices connected to this AP.
-                    - This property can be set to a value different from C(-1) only when the interface is configured in AP mode.
-                    - If set to C(1), devices are not able to communicate with each other. This increases security because it protects devices against attacks
+                    - This property can be set to a value different from V(-1) only when the interface is configured in AP mode.
+                    - If set to V(1), devices are not able to communicate with each other. This increases security because it protects devices against attacks
                       from other clients in the network. At the same time, it prevents devices to access resources on the same wireless networks as file
                       shares, printers, etc.
-                    - If set to C(0), devices can talk to each other.
-                    - When set to C(-1), the global default is used; in case the global default is unspecified it is assumed to be C(0).
+                    - If set to V(0), devices can talk to each other.
+                    - When set to V(-1), the global default is used; in case the global default is unspecified it is assumed to be V(0).
                 type: int
                 choices: [ -1, 0, 1 ]
                 default: -1
             assigned-mac-address:
                 description:
                     - The new field for the cloned MAC address.
-                    - It can be either a hardware address in ASCII representation, or one of the special values C(preserve), C(permanent), C(random) or
-                      C(stable).
-                    - This field replaces the deprecated I(cloned-mac-address) on D-Bus, which can only contain explicit hardware addresses.
-                    - Note that this property only exists in D-Bus API. libnm and nmcli continue to call this property I(cloned-mac-address).
+                    - It can be either a hardware address in ASCII representation, or one of the special values V(preserve), V(permanent), V(random) or
+                      V(stable).
+                    - This field replaces the deprecated O(wifi.cloned-mac-address) on D-Bus, which can only contain explicit hardware addresses.
+                    - Note that this property only exists in D-Bus API. libnm and nmcli continue to call this property C(cloned-mac-address).
                 type: str
             band:
                 description:
                     - 802.11 frequency band of the network.
-                    - One of C(a) for 5GHz 802.11a or C(bg) for 2.4GHz 802.11.
-                    - This will lock associations to the Wi-Fi network to the specific band, so for example, if C(a) is specified, the device will not
+                    - One of V(a) for 5GHz 802.11a or V(bg) for 2.4GHz 802.11.
+                    - This will lock associations to the Wi-Fi network to the specific band, so for example, if V(a) is specified, the device will not
                       associate with the same network in the 2.4GHz band even if the network's settings are compatible.
                     - This setting depends on specific driver capability and may not work with all drivers.
                 type: str
@@ -685,38 +691,38 @@ options:
                 description:
                     - Wireless channel to use for the Wi-Fi connection.
                     - The device will only join (or create for Ad-Hoc networks) a Wi-Fi network on the specified channel.
-                    - Because channel numbers overlap between bands, this property also requires the I(band) property to be set.
+                    - Because channel numbers overlap between bands, this property also requires the O(wifi.band) property to be set.
                 type: int
                 default: 0
             cloned-mac-address:
                 description:
-                    - This D-Bus field is deprecated in favor of I(assigned-mac-address) which is more flexible and allows specifying special variants like
-                      C(random).
-                    - For libnm and nmcli, this field is called I(cloned-mac-address).
+                    - This D-Bus field is deprecated in favor of O(wifi.assigned-mac-address) which is more flexible and allows specifying special variants like
+                      V(random).
+                    - For libnm and nmcli, this field is called C(cloned-mac-address).
                 type: str
             generate-mac-address-mask:
                 description:
-                    - With I(cloned-mac-address) setting C(random) or C(stable), by default all bits of the MAC address are scrambled and a
+                    - With O(wifi.cloned-mac-address) setting V(random) or V(stable), by default all bits of the MAC address are scrambled and a
                       locally-administered, unicast MAC address is created. This property allows to specify that certain bits are fixed.
                     - Note that the least significant bit of the first MAC address will always be unset to create a unicast MAC address.
-                    - If the property is C(null), it is eligible to be overwritten by a default connection setting.
-                    - If the value is still c(null) or an empty string, the default is to create a locally-administered, unicast MAC address.
+                    - If the property is V(null), it is eligible to be overwritten by a default connection setting.
+                    - If the value is still V(null) or an empty string, the default is to create a locally-administered, unicast MAC address.
                     - If the value contains one MAC address, this address is used as mask. The set bits of the mask are to be filled with the current MAC
                       address of the device, while the unset bits are subject to randomization.
-                    - Setting C(FE:FF:FF:00:00:00) means to preserve the OUI of the current MAC address and only randomize the lower 3 bytes using the
-                      C(random) or C(stable) algorithm.
+                    - Setting V(FE:FF:FF:00:00:00) means to preserve the OUI of the current MAC address and only randomize the lower 3 bytes using the
+                      V(random) or V(stable) algorithm.
                     - If the value contains one additional MAC address after the mask, this address is used instead of the current MAC address to fill the bits
                       that shall not be randomized.
-                    - For example, a value of C(FE:FF:FF:00:00:00 68:F7:28:00:00:00) will set the OUI of the MAC address to 68:F7:28, while the lower bits are
+                    - For example, a value of V(FE:FF:FF:00:00:00 68:F7:28:00:00:00) will set the OUI of the MAC address to 68:F7:28, while the lower bits are
                       randomized.
-                    - A value of C(02:00:00:00:00:00 00:00:00:00:00:00) will create a fully scrambled globally-administered, burned-in MAC address.
+                    - A value of V(02:00:00:00:00:00 00:00:00:00:00:00) will create a fully scrambled globally-administered, burned-in MAC address.
                     - If the value contains more than one additional MAC addresses, one of them is chosen randomly. For example,
-                      C(02:00:00:00:00:00 00:00:00:00:00:00 02:00:00:00:00:00) will create a fully scrambled MAC address, randomly locally or globally
+                      V(02:00:00:00:00:00 00:00:00:00:00:00 02:00:00:00:00:00) will create a fully scrambled MAC address, randomly locally or globally
                       administered.
                 type: str
             hidden:
                 description:
-                    - If C(true), indicates that the network is a non-broadcasting network that hides its SSID. This works both in infrastructure and AP mode.
+                    - If V(true), indicates that the network is a non-broadcasting network that hides its SSID. This works both in infrastructure and AP mode.
                     - In infrastructure mode, various workarounds are used for a more reliable discovery of hidden networks, such as probe-scanning the SSID.
                       However, these workarounds expose inherent insecurities with hidden SSID networks, and thus hidden SSID networks should be used with
                       caution.
@@ -728,14 +734,14 @@ options:
             mac-address-blacklist:
                 description:
                     - A list of permanent MAC addresses of Wi-Fi devices to which this connection should never apply.
-                    - Each MAC address should be given in the standard hex-digits-and-colons notation (for example, C(00:11:22:33:44:55)).
+                    - Each MAC address should be given in the standard hex-digits-and-colons notation (for example, V(00:11:22:33:44:55)).
                 type: list
                 elements: str
             mac-address-randomization:
                 description:
-                    - One of C(0) (never randomize unless the user has set a global default to randomize and the supplicant supports randomization), C(1)
-                      (never randomize the MAC address), or C(2) (always randomize the MAC address).
-                    - This property is deprecated for I(cloned-mac-address).
+                    - One of V(0) (never randomize unless the user has set a global default to randomize and the supplicant supports randomization), V(1)
+                      (never randomize the MAC address), or V(2) (always randomize the MAC address).
+                    - This property is deprecated for O(wifi.cloned-mac-address).
                 type: int
                 default: 0
                 choices: [ 0, 1, 2 ]
@@ -745,7 +751,7 @@ options:
                     - This property does not change the MAC address of the device (for example for MAC spoofing).
                 type: str
             mode:
-                description: Wi-Fi network mode. If blank, C(infrastructure) is assumed.
+                description: Wi-Fi network mode. If blank, V(infrastructure) is assumed.
                 type: str
                 choices: [ infrastructure, mesh, adhoc, ap ]
                 default: infrastructure
@@ -755,7 +761,7 @@ options:
                 default: 0
             powersave:
                 description:
-                    - One of C(2) (disable Wi-Fi power saving), C(3) (enable Wi-Fi power saving), C(1) (don't touch currently configure setting) or C(0) (use
+                    - One of V(2) (disable Wi-Fi power saving), V(3) (enable Wi-Fi power saving), V(1) (don't touch currently configure setting) or V(0) (use
                       the globally configured value).
                     - All other values are reserved.
                 type: int
@@ -764,7 +770,7 @@ options:
             rate:
                 description:
                     - If non-zero, directs the device to only use the specified bitrate for communication with the access point.
-                    - Units are in Kb/s, so for example C(5500) = 5.5 Mbit/s.
+                    - Units are in Kb/s, so for example V(5500) = 5.5 Mbit/s.
                     - This property is highly driver dependent and not all devices support setting a static bitrate.
                 type: int
                 default: 0
@@ -778,11 +784,11 @@ options:
             wake-on-wlan:
                 description:
                     - The NMSettingWirelessWakeOnWLan options to enable. Not all devices support all options.
-                    - May be any combination of C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_ANY) (C(0x2)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DISCONNECT) (C(0x4)),
-                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_MAGIC) (C(0x8)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_GTK_REKEY_FAILURE) (C(0x10)),
-                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST) (C(0x20)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE) (C(0x40)),
-                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (C(0x80)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (C(0x100)) or the special values
-                      C(0x1) (to use global settings) and C(0x8000) (to disable management of Wake-on-LAN in NetworkManager).
+                    - May be any combination of C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_ANY) (V(0x2)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DISCONNECT) (V(0x4)),
+                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_MAGIC) (V(0x8)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_GTK_REKEY_FAILURE) (V(0x10)),
+                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST) (V(0x20)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE) (V(0x40)),
+                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (V(0x80)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (V(0x100)) or the special values
+                      V(0x1) (to use global settings) and V(0x8000) (to disable management of Wake-on-LAN in NetworkManager).
                     - Note the option values' sum must be specified in order to combine multiple options.
                 type: int
                 default: 1
@@ -790,7 +796,7 @@ options:
     ignore_unsupported_suboptions:
        description:
             - Ignore suboptions which are invalid or unsupported by the version of NetworkManager/nmcli installed on the host.
-            - Only I(wifi) and I(wifi_sec) options are currently affected.
+            - Only O(wifi) and O(wifi_sec) options are currently affected.
        type: bool
        default: false
        version_added: 3.6.0
@@ -801,7 +807,7 @@ options:
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-gsm.html).'
             - 'For instance to use apn, pin, username and password:
-              C({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password}).'
+              V({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password}).'
         type: dict
         version_added: 3.7.0
         suboptions:
@@ -813,18 +819,18 @@ options:
                     - The APN may only be composed of the characters a-z, 0-9, ., and - per GSM 03.60 Section 14.9.
                 type: str
             auto-config:
-                description: When C(true), the settings such as I(gsm.apn), I(gsm.username), or I(gsm.password) will default to values that match the network
+                description: When V(true), the settings such as O(gsm.apn), O(gsm.username), or O(gsm.password) will default to values that match the network
                     the modem will register to in the Mobile Broadband Provider database.
                 type: bool
                 default: false
             device-id:
                 description:
-                    - The device unique identifier (as given by the C(WWAN) management service) which this connection applies to.
+                    - The device unique identifier (as given by the V(WWAN) management service) which this connection applies to.
                     - If given, the connection will only apply to the specified device.
                 type: str
             home-only:
                 description:
-                    - When C(true), only connections to the home network will be allowed.
+                    - When V(true), only connections to the home network will be allowed.
                     - Connections to roaming networks will not be made.
                 type: bool
                 default: false
@@ -849,13 +855,13 @@ options:
                 type: str
             password-flags:
                 description:
-                    - NMSettingSecretFlags indicating how to handle the I(password) property.
+                    - NMSettingSecretFlags indicating how to handle the O(gsm.password) property.
                     - 'Following choices are allowed:
-                      C(0) B(NONE): The system is responsible for providing and storing this secret (default),
-                      C(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
+                      V(0) B(NONE): The system is responsible for providing and storing this secret (default),
+                      V(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
                            asked to retrieve it
-                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
-                      C(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
+                      V(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
+                      V(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
                            (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required.'
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
@@ -867,21 +873,21 @@ options:
                 type: str
             pin-flags:
                 description:
-                    - NMSettingSecretFlags indicating how to handle the I(gsm.pin) property.
-                    - See I(gsm.password-flags) for NMSettingSecretFlags choices.
+                    - NMSettingSecretFlags indicating how to handle the O(gsm.pin) property.
+                    - See O(gsm.password-flags) for NMSettingSecretFlags choices.
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
                 default: 0
             sim-id:
                 description:
                     - The SIM card unique identifier (as given by the C(WWAN) management service) which this connection applies to.
-                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) which contains a SIM card matching
+                    - 'If given, the connection will apply to any device also allowed by O(gsm.device-id) which contains a SIM card matching
                         the given identifier.'
                 type: str
             sim-operator-id:
                 description:
-                    - A MCC/MNC string like C(310260) or C(21601I) identifying the specific mobile network operator which this connection applies to.
-                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) and I(gsm.sim-id) which contains a SIM card
+                    - A MCC/MNC string like V(310260) or V(21601I) identifying the specific mobile network operator which this connection applies to.
+                    - 'If given, the connection will apply to any device also allowed by O(gsm.device-id) and O(gsm.sim-id) which contains a SIM card
                         provisioned by the given operator.'
                 type: str
             username:
@@ -901,8 +907,8 @@ options:
             mode:
                 description:
                     - The macvlan mode, which specifies the communication mechanism between multiple macvlans on the same lower device.
-                    - 'Following choices are allowed: C(1) B(vepa), C(2) B(bridge), C(3) B(private), C(4) B(passthru)
-                      and C(5) B(source)'
+                    - 'Following choices are allowed: V(1) B(vepa), V(2) B(bridge), V(3) B(private), V(4) B(passthru)
+                      and V(5) B(source)'
                 type: int
                 choices: [ 1, 2, 3, 4, 5 ]
                 required: true
@@ -928,7 +934,7 @@ options:
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-wireguard.html).'
             - 'For instance to configure a listen port:
-              C({listen-port: 12345}).'
+              V({listen-port: 12345}).'
         type: dict
         version_added: 4.3.0
         suboptions:
@@ -936,19 +942,19 @@ options:
                 description:
                     - The 32-bit fwmark for outgoing packets.
                     - The use of fwmark is optional and is by default off. Setting it to 0 disables it.
-                    - Note that I(wireguard.ip4-auto-default-route) or I(wireguard.ip6-auto-default-route) enabled, implies to automatically choose a fwmark.
+                    - Note that O(wireguard.ip4-auto-default-route) or O(wireguard.ip6-auto-default-route) enabled, implies to automatically choose a fwmark.
                 type: int
             ip4-auto-default-route:
                 description:
                     - Whether to enable special handling of the IPv4 default route.
-                    - If enabled, the IPv4 default route from I(wireguard.peer-routes) will be placed to a dedicated routing-table and two policy
+                    - If enabled, the IPv4 default route from O(wireguard.peer-routes) will be placed to a dedicated routing-table and two policy
                         routing rules will be added.
                     - The fwmark number is also used as routing-table for the default-route, and if fwmark is zero, an unused fwmark/table is chosen
                         automatically. This corresponds to what wg-quick does with Table=auto and what WireGuard calls "Improved Rule-based Routing"
                 type: bool
             ip6-auto-default-route:
                 description:
-                    - Like I(wireguard.ip4-auto-default-route), but for the IPv6 default route.
+                    - Like O(wireguard.ip4-auto-default-route), but for the IPv6 default route.
                 type: bool
             listen-port:
                 description: The WireGuard connection listen-port. If not specified, the port will be chosen randomly when the
@@ -963,18 +969,18 @@ options:
             peer-routes:
                 description:
                     - Whether to automatically add routes for the AllowedIPs ranges of the peers.
-                    - If C(true) (the default), NetworkManager will automatically add routes in the routing tables according to C(ipv4.route-table) and
+                    - If V(true) (the default), NetworkManager will automatically add routes in the routing tables according to C(ipv4.route-table) and
                         C(ipv6.route-table). Usually you want this automatism enabled.
-                    - If C(false), no such routes are added automatically. In this case, the user may want to configure static routes in C(ipv4.routes)
+                    - If V(false), no such routes are added automatically. In this case, the user may want to configure static routes in C(ipv4.routes)
                         and C(ipv6.routes), respectively.
-                    - Note that if the peer's AllowedIPs is C(0.0.0.0/0) or C(::/0) and the profile's C(ipv4.never-default) or C(ipv6.never-default)
+                    - Note that if the peer's AllowedIPs is V(0.0.0.0/0) or V(::/0) and the profile's C(ipv4.never-default) or C(ipv6.never-default)
                         setting is enabled, the peer route for this peer won't be added automatically.
                 type: bool
             private-key:
                 description: The 256 bit private-key in base64 encoding.
                 type: str
             private-key-flags:
-                description: C(NMSettingSecretFlags) indicating how to handle the I(wireguard.private-key) property.
+                description: C(NMSettingSecretFlags) indicating how to handle the O(wireguard.private-key) property.
                 type: int
                 choices: [ 0, 1, 2 ]
     vpn:
@@ -994,19 +1000,19 @@ options:
                 type: str
                 required: true
             gateway:
-                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1))
-                    or a FQDN address (for example C(vpn.example.com)).
+                description: The gateway to connection. It can be an IP address (for example V(192.0.2.1))
+                    or a FQDN address (for example V(vpn.example.com)).
                 type: str
                 required: true
             password-flags:
                 description:
-                    - NMSettingSecretFlags indicating how to handle the I(password) property.
+                    - NMSettingSecretFlags indicating how to handle the C(vpn.password) property.
                     - 'Following choices are allowed:
-                      C(0) B(NONE): The system is responsible for providing and storing this secret (default);
-                      C(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
+                      V(0) B(NONE): The system is responsible for providing and storing this secret (default);
+                      V(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
                            asked to retrieve it;
-                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed;
-                      C(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
+                      V(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed;
+                      V(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
                            (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required.'
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
@@ -1018,14 +1024,14 @@ options:
             ipsec-enabled:
                 description:
                     - Enable or disable IPSec tunnel to L2TP host.
-                    - This option is need when C(service-type) is C(org.freedesktop.NetworkManager.l2tp).
+                    - This option is need when O(vpn.service-type) is V(org.freedesktop.NetworkManager.l2tp).
                 type: bool
             ipsec-psk:
                 description:
                     - The pre-shared key in base64 encoding.
                     - >
-                      You can encode using this Ansible jinja2 expression: C("0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}").
-                    - This is only used when I(ipsec-enabled=true).
+                      You can encode using this Ansible jinja2 expression: V("0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}").
+                    - This is only used when O(vpn.ipsec-enabled=true).
                 type: str
 '''
 

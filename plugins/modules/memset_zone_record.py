@@ -17,9 +17,9 @@ notes:
   - Zones can be thought of as a logical group of domains, all of which share the
     same DNS records (i.e. they point to the same IP). An API key generated via the
     Memset customer control panel is needed with the following minimum scope -
-    I(dns.zone_create), I(dns.zone_delete), I(dns.zone_list).
+    C(dns.zone_create), C(dns.zone_delete), C(dns.zone_list).
   - Currently this module can only create one DNS record at a time. Multiple records
-    should be created using C(with_items).
+    should be created using C(loop).
 description:
   - Manage DNS records in a Memset account.
 extends_documentation_fragment:

@@ -55,7 +55,7 @@ options:
     variant:
         description:
             - A port variant specification.
-            - 'C(variant) is only supported with state: I(installed)/I(present).'
+            - 'O(variant) is only supported with O(state=installed) and O(state=present).'
         aliases: ['variants']
         type: str
 '''

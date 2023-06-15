@@ -31,23 +31,23 @@ options:
     type: str
   mac:
     description:
-    - Specifies the I(mac) address to attach the nic tag to when not creating an I(etherstub).
-    - Parameters I(mac) and I(etherstub) are mutually exclusive.
+    - Specifies the O(mac) address to attach the nic tag to when not creating an O(etherstub).
+    - Parameters O(mac) and O(etherstub) are mutually exclusive.
     type: str
   etherstub:
     description:
-    - Specifies that the nic tag will be attached to a created I(etherstub).
-    - Parameter I(etherstub) is mutually exclusive with both I(mtu), and I(mac).
+    - Specifies that the nic tag will be attached to a created O(etherstub).
+    - Parameter O(etherstub) is mutually exclusive with both O(mtu), and O(mac).
     type: bool
     default: false
   mtu:
     description:
-    - Specifies the size of the I(mtu) of the desired nic tag.
-    - Parameters I(mtu) and I(etherstub) are mutually exclusive.
+    - Specifies the size of the O(mtu) of the desired nic tag.
+    - Parameters O(mtu) and O(etherstub) are mutually exclusive.
     type: int
   force:
     description:
-    - When I(state) is absent set this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
+    - When O(state=absent) this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
     type: bool
     default: false
   state:

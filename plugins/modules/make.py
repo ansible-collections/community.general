@@ -53,7 +53,7 @@ options:
   target:
     description:
       - The target to run.
-      - Typically this would be something like C(install), C(test), or C(all).
+      - Typically this would be something like V(install), V(test), or V(all).
     type: str
 '''
 
@@ -86,7 +86,7 @@ EXAMPLES = r'''
 RETURN = r'''
 chdir:
   description:
-    - The value of the module parameter I(chdir).
+    - The value of the module parameter O(chdir).
   type: str
   returned: success
 command:
@@ -97,22 +97,22 @@ command:
   version_added: 6.5.0
 file:
   description:
-    - The value of the module parameter I(file).
+    - The value of the module parameter O(file).
   type: str
   returned: success
 jobs:
   description:
-    - The value of the module parameter I(jobs).
+    - The value of the module parameter O(jobs).
   type: int
   returned: success
 params:
   description:
-    - The value of the module parameter I(params).
+    - The value of the module parameter O(params).
   type: dict
   returned: success
 target:
   description:
-    - The value of the module parameter I(target).
+    - The value of the module parameter O(target).
   type: str
   returned: success
 '''

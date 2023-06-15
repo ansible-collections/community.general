@@ -32,10 +32,10 @@ options:
   state:
     type: str
     description:
-      - C(absent) - tags should not exist.
-      - C(present) - tags should exist.
+      - V(absent) - tags should not exist.
+      - V(present) - tags should exist.
       - >
-        C(list) - list current tags.
+        V(list) - list current tags.
         This state is deprecated and will be removed 8.0.0.
         Please use the module M(community.general.manageiq_tags_info) instead.
     choices: ['absent', 'present', 'list']
@@ -44,8 +44,8 @@ options:
     type: list
     elements: dict
     description:
-      - C(tags) - list of dictionaries, each includes C(name) and c(category) keys.
-      - Required if I(state) is C(present) or C(absent).
+      - V(tags) - list of dictionaries, each includes C(name) and C(category) keys.
+      - Required if O(state) is V(present) or V(absent).
   resource_type:
     type: str
     description:
@@ -58,11 +58,11 @@ options:
     type: str
     description:
       - The name of the resource at which tags will be controlled.
-      - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
+      - Must be specified if O(resource_id) is not set. Both options are mutually exclusive.
   resource_id:
     description:
       - The ID of the resource at which tags will be controlled.
-      - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
+      - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
     type: int
     version_added: 2.2.0
 '''

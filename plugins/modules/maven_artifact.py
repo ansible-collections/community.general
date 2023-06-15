@@ -43,14 +43,14 @@ options:
         type: str
         description:
             - The maven version coordinate
-            - Mutually exclusive with I(version_by_spec).
+            - Mutually exclusive with O(version_by_spec).
     version_by_spec:
         type: str
         description:
             - The maven dependency version ranges.
             - See supported version ranges on U(https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution)
             - The range type "(,1.0],[1.2,)" and "(,1.1),(1.1,)" is not supported.
-            - Mutually exclusive with I(version).
+            - Mutually exclusive with O(version).
         version_added: '0.2.0'
     classifier:
         type: str
@@ -111,48 +111,48 @@ options:
         default: 10
     validate_certs:
         description:
-            - If C(false), SSL certificates will not be validated. This should only be set to C(false) when no other option exists.
+            - If V(false), SSL certificates will not be validated. This should only be set to V(false) when no other option exists.
         type: bool
         default: true
     client_cert:
         description:
             - PEM formatted certificate chain file to be used for SSL client authentication.
-            - This file can also include the key as well, and if the key is included, I(client_key) is not required.
+            - This file can also include the key as well, and if the key is included, O(client_key) is not required.
         type: path
         version_added: '1.3.0'
     client_key:
         description:
             - PEM formatted file that contains your private key to be used for SSL client authentication.
-            - If I(client_cert) contains both the certificate and key, this option is not required.
+            - If O(client_cert) contains both the certificate and key, this option is not required.
         type: path
         version_added: '1.3.0'
     keep_name:
         description:
-            - If C(true), the downloaded artifact's name is preserved, i.e the version number remains part of it.
-            - This option only has effect when C(dest) is a directory and C(version) is set to C(latest) or C(version_by_spec)
+            - If V(true), the downloaded artifact's name is preserved, i.e the version number remains part of it.
+            - This option only has effect when I(dest) is a directory and I(version) is set to V(latest) or O(version_by_spec)
               is defined.
         type: bool
         default: false
     verify_checksum:
         type: str
         description:
-            - If C(never), the MD5/SHA1 checksum will never be downloaded and verified.
-            - If C(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
-            - If C(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist,
+            - If V(never), the MD5/SHA1 checksum will never be downloaded and verified.
+            - If V(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
+            - If V(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist,
               to verify if they are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe)
               downloading the artifact, and since some repository software, when acting as a proxy/cache, return a 404 error
               if the artifact has not been cached yet, it may fail unexpectedly.
-              If you still need it, you should consider using C(always) instead - if you deal with a checksum, it is better to
+              If you still need it, you should consider using V(always) instead - if you deal with a checksum, it is better to
               use it to verify integrity after download.
-            - C(always) combines C(download) and C(change).
+            - V(always) combines V(download) and V(change).
         required: false
         default: 'download'
         choices: ['never', 'download', 'change', 'always']
     checksum_alg:
         type: str
         description:
-            - If C(md5), checksums will use the MD5 algorithm. This is the default.
-            - If C(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use
+            - If V(md5), checksums will use the MD5 algorithm. This is the default.
+            - If V(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use
               FIPS-compliant algorithms, since MD5 will be blocked on such systems.
         default: 'md5'
         choices: ['md5', 'sha1']
@@ -162,14 +162,14 @@ options:
         elements: str
         version_added: 5.2.0
         description:
-            - A list of headers that should not be included in the redirection. This headers are sent to the fetch_url C(fetch_url) function.
-            - On ansible-core version 2.12 or later, the default of this option is C([Authorization, Cookie]).
+            - A list of headers that should not be included in the redirection. This headers are sent to the C(fetch_url) function.
+            - On ansible-core version 2.12 or later, the default of this option is V([Authorization, Cookie]).
             - Useful if the redirection URL does not need to have sensitive headers in the request.
             - Requires ansible-core version 2.12 or later.
     directory_mode:
         type: str
         description:
-            - Filesystem permission mode applied recursively to I(dest) when it is a directory.
+            - Filesystem permission mode applied recursively to O(dest) when it is a directory.
 extends_documentation_fragment:
     - ansible.builtin.files
     - community.general.attributes
