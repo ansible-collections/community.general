@@ -76,7 +76,7 @@ options:
             type: str
             description:
               - Identify parent by ID.
-              - Needs less API calls than using I(name).
+              - Needs less API calls than using O(parents[].name).
               - A deep parent chain can be started at any point when first given parent is given as ID.
               - Note that in principle both ID and name can be specified at the same time
                 but current implementation only always use just one of them, with ID
