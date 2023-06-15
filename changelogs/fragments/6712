@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_group module passed parameters to the API call even when not set. create_group is now filtering out 'None' values to remediate this (https://github.com/ansible-collections/community.general/pull/6712).
