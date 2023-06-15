@@ -80,6 +80,7 @@ class TestProxmoxKvmModule(ModuleTestCase):
                     self.module.main()
 
             assert get_vm_mock.call_count == 1
+            assert get_node_mock.call_count == 1
             result = exc_info.value.args[0]
             assert result["changed"] is True
             assert result["msg"] == "VM existing.vm.local with vmid 100 deployed"
