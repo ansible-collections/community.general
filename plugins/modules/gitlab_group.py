@@ -259,7 +259,7 @@ class GitLabGroup(object):
             filtered = {arg_key: arg_value for arg_key, arg_value in arguments.items() if arg_value is not None}
             arguments.clear()
             arguments.update(filtered)
-          
+
             group = self._gitlab.groups.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create group: %s " % to_native(e))
