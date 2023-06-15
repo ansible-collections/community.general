@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 module: monit
 short_description: Manage the state of a program monitored via Monit
 description:
-    - Manage the state of a program monitored via I(Monit).
+    - Manage the state of a program monitored via Monit.
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -25,7 +25,7 @@ attributes:
 options:
   name:
     description:
-      - The name of the I(monit) program/process to manage.
+      - The name of the C(monit) program/process to manage.
     required: true
     type: str
   state:
