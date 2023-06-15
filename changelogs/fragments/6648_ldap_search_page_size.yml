@@ -1,0 +1,2 @@
+minor_changes:
+  - ldap_search - add a new ``page_size`` option to enable paged searches (https://github.com/ansible-collections/community.general/pull/6648).
