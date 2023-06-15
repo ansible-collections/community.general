@@ -42,15 +42,15 @@ options:
         type: str
     firstname:
         description:
-            - First name. Required if I(state=present).
+            - First name. Required if O(state=present).
         type: str
     lastname:
         description:
-            - Last name. Required if I(state=present).
+            - Last name. Required if O(state=present).
         type: str
     password:
         description:
-            - Password. Required if I(state=present).
+            - Password. Required if O(state=present).
         type: str
     birthday:
         description:
@@ -103,13 +103,13 @@ options:
         description:
             - "POSIX groups, the LDAP DNs of the groups will be found with the
                LDAP filter for each group as $GROUP:
-               C((&(objectClass=posixGroup)(cn=$GROUP)))."
+               V((&(objectClass=posixGroup\\)(cn=$GROUP\\)\\))."
         type: list
         elements: str
     home_share:
         description:
             - "Home NFS share. Must be a LDAP DN, e.g.
-               C(cn=home,cn=shares,ou=school,dc=example,dc=com)."
+               V(cn=home,cn=shares,ou=school,dc=example,dc=com)."
         aliases: [ homeShare ]
         type: str
     home_share_path:
@@ -126,7 +126,7 @@ options:
         elements: str
     homedrive:
         description:
-            - Windows home drive, e.g. C("H:").
+            - Windows home drive, for example V("H:").
         type: str
     mail_alternative_address:
         default: []
@@ -189,7 +189,7 @@ options:
     primary_group:
         description:
             - Primary group. This must be the group LDAP DN.
-            - If not specified, it defaults to C(cn=Domain Users,cn=groups,$LDAP_BASE_DN).
+            - If not specified, it defaults to V(cn=Domain Users,cn=groups,$LDAP_BASE_DN).
         aliases: [ primaryGroup ]
         type: str
     profilepath:
@@ -224,7 +224,7 @@ options:
         default: []
     sambahome:
         description:
-            - Windows home path, e.g. C('\\$FQDN\$USERNAME').
+            - Windows home path, for example V('\\$FQDN\$USERNAME').
         type: str
     scriptpath:
         description:
@@ -253,7 +253,7 @@ options:
         type: str
     title:
         description:
-            - Title, e.g. C(Prof.).
+            - Title, for example V(Prof.).
         type: str
     unixhome:
         description:
@@ -262,33 +262,33 @@ options:
         type: str
     userexpiry:
         description:
-            - Account expiry date, e.g. C(1999-12-31).
+            - Account expiry date, for example V(1999-12-31).
             - If not specified, it defaults to the current day plus one year.
         type: str
     position:
         default: ''
         description:
             - "Define the whole position of users object inside the LDAP tree,
-               e.g. C(cn=employee,cn=users,ou=school,dc=example,dc=com)."
+               for example V(cn=employee,cn=users,ou=school,dc=example,dc=com)."
         type: str
     update_password:
         default: always
         choices: [ always, on_create ]
         description:
-            - "C(always) will update passwords if they differ.
-               C(on_create) will only set the password for newly created users."
+            - "V(always) will update passwords if they differ.
+               V(on_create) will only set the password for newly created users."
         type: str
     ou:
         default: ''
         description:
-            - "Organizational Unit inside the LDAP Base DN, e.g. C(school) for
+            - "Organizational Unit inside the LDAP Base DN, for example V(school) for
                LDAP OU C(ou=school,dc=example,dc=com)."
         type: str
     subpath:
         default: 'cn=users'
         description:
-            - "LDAP subpath inside the organizational unit, e.g.
-               C(cn=teachers,cn=users) for LDAP container
+            - "LDAP subpath inside the organizational unit, for example
+               V(cn=teachers,cn=users) for LDAP container
                C(cn=teachers,cn=users,dc=example,dc=com)."
         type: str
 '''
@@ -302,7 +302,7 @@ EXAMPLES = '''
     firstname: Foo
     lastname: Bar
 
-- name: Create a user with the DN C(uid=foo,cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com)
+- name: Create a user with the DN uid=foo,cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com
   community.general.udm_user:
     name: foo
     password: secure_password
@@ -312,7 +312,7 @@ EXAMPLES = '''
     subpath: 'cn=teachers,cn=users'
 
 # or define the position
-- name: Create a user with the DN C(uid=foo,cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com)
+- name: Create a user with the DN uid=foo,cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com
   community.general.udm_user:
     name: foo
     password: secure_password

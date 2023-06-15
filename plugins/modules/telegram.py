@@ -20,7 +20,7 @@ short_description: Send notifications via telegram
 
 description:
     - Send notifications via telegram bot, to a verified group or user.
-    - Also, the user may try to use any other telegram bot API method, if you specify I(api_method) argument.
+    - Also, the user may try to use any other telegram bot API method, if you specify O(api_method) argument.
 notes:
     - You will require a telegram account and create telegram bot to use this module.
 extends_documentation_fragment:
@@ -47,7 +47,7 @@ options:
     type: dict
     description:
       - Any parameters for the method.
-      - For reference to default method, C(SendMessage), see U(https://core.telegram.org/bots/api#sendmessage).
+      - For reference to default method, V(SendMessage), see U(https://core.telegram.org/bots/api#sendmessage).
     version_added: 2.0.0
 
 '''
