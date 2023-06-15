@@ -41,20 +41,20 @@ options:
     description:
       - Requested size of the file.
       - The value is a number (either C(int) or C(float)) optionally followed
-        by a multiplicative suffix, that can be one of C(B) (bytes), C(KB) or
-        C(kB) (= 1000B), C(MB) or C(mB) (= 1000kB), C(GB) or C(gB) (= 1000MB),
-        and so on for C(T), C(P), C(E), C(Z) and C(Y); or alternatively one of
-        C(K), C(k) or C(KiB) (= 1024B); C(M), C(m) or C(MiB) (= 1024KiB);
-        C(G), C(g) or C(GiB) (= 1024MiB); and so on.
+        by a multiplicative suffix, that can be one of V(B) (bytes), V(KB) or
+        V(kB) (= 1000B), V(MB) or V(mB) (= 1000kB), V(GB) or V(gB) (= 1000MB),
+        and so on for V(T), V(P), V(E), V(Z) and V(Y); or alternatively one of
+        V(K), V(k) or V(KiB) (= 1024B); V(M), V(m) or V(MiB) (= 1024KiB);
+        V(G), V(g) or V(GiB) (= 1024MiB); and so on.
       - If the multiplicative suffix is not provided, the value is treated as
-        an integer number of blocks of I(blocksize) bytes each (float values
+        an integer number of blocks of O(blocksize) bytes each (float values
         are rounded to the closest integer).
-      - When the I(size) value is equal to the current file size, does nothing.
-      - When the I(size) value is bigger than the current file size, bytes from
-        I(source) (if I(sparse) is not C(false)) are appended to the file
+      - When the O(size) value is equal to the current file size, does nothing.
+      - When the O(size) value is bigger than the current file size, bytes from
+        O(source) (if O(sparse) is not V(false)) are appended to the file
         without truncating it, in other words, without modifying the existing
         bytes of the file.
-      - When the I(size) value is smaller than the current file size, it is
+      - When the O(size) value is smaller than the current file size, it is
         truncated to the requested value without modifying bytes before this
         value.
       - That means that a file of any arbitrary size can be grown to any other
@@ -65,24 +65,24 @@ options:
   blocksize:
     description:
       - Size of blocks, in bytes if not followed by a multiplicative suffix.
-      - The numeric value (before the unit) C(MUST) be an integer (or a C(float)
+      - The numeric value (before the unit) B(MUST) be an integer (or a C(float)
         if it equals an integer).
       - If not set, the size of blocks is guessed from the OS and commonly
-        results in C(512) or C(4096) bytes, that is used internally by the
-        module or when I(size) has no unit.
+        results in V(512) or V(4096) bytes, that is used internally by the
+        module or when O(size) has no unit.
     type: raw
   source:
     description:
       - Device or file that provides input data to provision the file.
-      - This parameter is ignored when I(sparse=true).
+      - This parameter is ignored when O(sparse=true).
     type: path
     default: /dev/zero
   force:
     description:
       - Whether or not to overwrite the file if it exists, in other words, to
-        truncate it from 0. When C(true), the module is not idempotent, that
-        means it always reports I(changed=true).
-      - I(force=true) and I(sparse=true) are mutually exclusive.
+        truncate it from 0. When V(true), the module is not idempotent, that
+        means it always reports C(changed=true).
+      - O(force=true) and O(sparse=true) are mutually exclusive.
     type: bool
     default: false
   sparse:
@@ -91,7 +91,7 @@ options:
       - This option is effective only on newly created files, or when growing a
         file, only for the bytes to append.
       - This option is not supported on OSes or filesystems not supporting sparse files.
-      - I(force=true) and I(sparse=true) are mutually exclusive.
+      - O(force=true) and O(sparse=true) are mutually exclusive.
     type: bool
     default: false
   unsafe_writes:
@@ -206,7 +206,7 @@ filesize:
       type: int
       sample: 1024
     bytes:
-      description: Size of the file, in bytes, as the product of C(blocks) and C(blocksize).
+      description: Size of the file, in bytes, as the product of RV(filesize.blocks) and RV(filesize.blocksize).
       type: int
       sample: 512000
     iec:

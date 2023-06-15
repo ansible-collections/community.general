@@ -39,8 +39,8 @@ options:
   state:
     description:
       - State of the badge in the project.
-      - On C(present), it adds a badge to a GitLab project.
-      - On C(absent), it removes a badge from a GitLab project.
+      - On V(present), it adds a badge to a GitLab project.
+      - On V(absent), it removes a badge from a GitLab project.
     choices: ['present', 'absent']
     default: 'present'
     type: str
@@ -82,7 +82,7 @@ EXAMPLES = r'''
 RETURN = '''
 badge:
   description: The badge information.
-  returned: when I(state=present)
+  returned: when O(state=present)
   type: dict
   sample:
     id: 1

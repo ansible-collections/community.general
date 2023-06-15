@@ -32,7 +32,7 @@ options:
     type: str
   account_api_token:
     description:
-      - Account API token. See I(account_email) for more information.
+      - Account API token. See O(account_email) for more information.
     type: str
   domain:
     description:
@@ -77,7 +77,7 @@ options:
   solo:
     description:
       - Whether the record should be the only one for that record type and record name.
-      - Only use with C(state) is set to C(present) on a record.
+      - Only use with O(state) is set to V(present) on a record.
     type: 'bool'
     default: false
   sandbox:

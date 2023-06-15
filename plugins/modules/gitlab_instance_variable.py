@@ -19,7 +19,7 @@ description:
   - When a instance variable does exist, its value will be updated if the values are different.
   - Support for instance variables requires GitLab >= 13.0.
   - Variables which are not mentioned in the modules options, but are present on the GitLab instance,
-    will either stay (I(purge=false)) or will be deleted (I(purge=true)).
+    will either stay (O(purge=false)) or will be deleted (O(purge=true)).
 author:
   - Benedikt Braunger (@benibr)
 requirements:
@@ -45,7 +45,7 @@ options:
     choices: ["present", "absent"]
   purge:
     description:
-      - When set to C(true), delete all variables which are not mentioned in the task.
+      - When set to V(true), delete all variables which are not mentioned in the task.
     default: false
     type: bool
   variables:
@@ -63,7 +63,7 @@ options:
       value:
         description:
           - The variable value.
-          - Required when I(state=present).
+          - Required when O(state=present).
         type: str
       masked:
         description:
@@ -77,7 +77,7 @@ options:
         default: false
       variable_type:
         description:
-          - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
+          - Wether a variable is an environment variable (V(env_var)) or a file (V(file)).
         type: str
         choices: [ "env_var", "file" ]
         default: env_var

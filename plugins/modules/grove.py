@@ -39,7 +39,7 @@ options:
     type: str
     description:
       - Message content.
-      - The alias I(message) is deprecated and will be removed in community.general 4.0.0.
+      - The alias O(ignore:message) has been removed in community.general 4.0.0.
     required: true
   url:
     type: str

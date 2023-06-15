@@ -83,7 +83,7 @@ dnsimple_domain_info:
     description: Returns a list of dictionaries of all domains associated with the supplied account ID.
     type: list
     elements: dict
-    returned: success when I(name) is not specified
+    returned: success when O(name) is not specified
     sample:
     - account_id: 1234
       created_at: '2021-10-16T21:25:42Z'
@@ -120,7 +120,7 @@ dnsimple_records_info:
     description: Returns a list of dictionaries with all records for the domain supplied.
     type: list
     elements: dict
-    returned: success when I(name) is specified, but I(record) is not
+    returned: success when O(name) is specified, but O(record) is not
     sample:
     - content: ns1.dnsimple.com admin.dnsimple.com
       created_at: '2021-10-16T19:07:34Z'
@@ -174,7 +174,7 @@ dnsimple_records_info:
         type: str
 dnsimple_record_info:
     description: Returns a list of dictionaries that match the record supplied.
-    returned: success when I(name) and I(record) are specified
+    returned: success when O(name) and O(record) are specified
     type: list
     elements: dict
     sample:

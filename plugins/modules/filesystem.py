@@ -29,12 +29,12 @@ attributes:
 options:
   state:
     description:
-      - If I(state=present), the filesystem is created if it doesn't already
-        exist, that is the default behaviour if I(state) is omitted.
-      - If I(state=absent), filesystem signatures on I(dev) are wiped if it
+      - If O(state=present), the filesystem is created if it doesn't already
+        exist, that is the default behaviour if O(state) is omitted.
+      - If O(state=absent), filesystem signatures on O(dev) are wiped if it
         contains a filesystem (as known by C(blkid)).
-      - When I(state=absent), all other options but I(dev) are ignored, and the
-        module doesn't fail if the device I(dev) doesn't actually exist.
+      - When O(state=absent), all other options but O(dev) are ignored, and the
+        module does not fail if the device O(dev) doesn't actually exist.
     type: str
     choices: [ present, absent ]
     default: present
@@ -43,7 +43,7 @@ options:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
     description:
       - Filesystem type to be created. This option is required with
-        I(state=present) (or if I(state) is omitted).
+        O(state=present) (or if O(state) is omitted).
       - ufs support has been added in community.general 3.4.0.
     type: str
     aliases: [type]
@@ -53,20 +53,20 @@ options:
         regular file (both).
       - When setting Linux-specific filesystem types on FreeBSD, this module
         only works when applying to regular files, aka disk images.
-      - Currently C(lvm) (Linux-only) and C(ufs) (FreeBSD-only) don't support
-        a regular file as their target I(dev).
+      - Currently V(lvm) (Linux-only) and V(ufs) (FreeBSD-only) do not support
+        a regular file as their target O(dev).
       - Support for character devices on FreeBSD has been added in community.general 3.4.0.
     type: path
     required: true
     aliases: [device]
   force:
     description:
-      - If C(true), allows to create new filesystem on devices that already has filesystem.
+      - If V(true), allows to create new filesystem on devices that already has filesystem.
     type: bool
     default: false
   resizefs:
     description:
-      - If C(true), if the block device and filesystem size differ, grow the filesystem into the space.
+      - If V(true), if the block device and filesystem size differ, grow the filesystem into the space.
       - Supported for C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
         Attempts to resize other filesystem types will fail.
       - XFS Will only grow if mounted. Currently, the module is based on commands
@@ -80,20 +80,20 @@ options:
       - List of options to be passed to C(mkfs) command.
     type: str
 requirements:
-  - Uses specific tools related to the I(fstype) for creating or resizing a
+  - Uses specific tools related to the O(fstype) for creating or resizing a
     filesystem (from packages e2fsprogs, xfsprogs, dosfstools, and so on).
   - Uses generic tools mostly related to the Operating System (Linux or
     FreeBSD) or available on both, as C(blkid).
   - On FreeBSD, either C(util-linux) or C(e2fsprogs) package is required.
 notes:
-  - Potential filesystems on I(dev) are checked using C(blkid). In case C(blkid)
+  - Potential filesystems on O(dev) are checked using C(blkid). In case C(blkid)
     is unable to detect a filesystem (and in case C(fstyp) on FreeBSD is also
     unable to detect a filesystem), this filesystem is overwritten even if
-    I(force) is C(false).
+    O(force) is V(false).
   - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide
     a C(blkid) command that is compatible with this module. However, these
     packages conflict with each other, and only the C(util-linux) package
-    provides the command required to not fail when I(state=absent).
+    provides the command required to not fail when O(state=absent).
 seealso:
   - module: community.general.filesize
   - module: ansible.posix.mount

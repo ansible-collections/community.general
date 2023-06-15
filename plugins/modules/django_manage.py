@@ -16,7 +16,7 @@ module: django_manage
 short_description: Manages a Django application
 description:
   - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
-    I(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
+    O(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -29,20 +29,20 @@ options:
     description:
       - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
       - >
-        C(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
-        removed in community.general 9.0.0. Use C(clearsessions) instead.
-      - C(collectstatic) - Collects the static files into C(STATIC_ROOT).
-      - C(createcachetable) - Creates the cache tables for use with the database cache backend.
-      - C(flush) - Removes all data from the database.
-      - C(loaddata) - Searches for and loads the contents of the named I(fixtures) into the database.
-      - C(migrate) - Synchronizes the database state with models and migrations.
+        V(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
+        removed in community.general 9.0.0. Use V(clearsessions) instead.
+      - V(collectstatic) - Collects the static files into C(STATIC_ROOT).
+      - V(createcachetable) - Creates the cache tables for use with the database cache backend.
+      - V(flush) - Removes all data from the database.
+      - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
+      - V(migrate) - Synchronizes the database state with models and migrations.
       - >
-        C(syncdb) - Synchronizes the database state with models and migrations (deprecated in Django 1.7).
-        This parameter will be removed in community.general 9.0.0. Use C(migrate) instead.
-      - C(test) - Runs tests for all installed apps.
+        V(syncdb) - Synchronizes the database state with models and migrations (deprecated in Django 1.7).
+        This parameter will be removed in community.general 9.0.0. Use V(migrate) instead.
+      - V(test) - Runs tests for all installed apps.
       - >
-        C(validate) - Validates all installed models (deprecated in Django 1.7). This parameter will be
-        removed in community.general 9.0.0. Use C(check) instead.
+        V(validate) - Validates all installed models (deprecated in Django 1.7). This parameter will be
+        removed in community.general 9.0.0. Use V(check) instead.
       - Other commands can be entered, but will fail if they are unknown to Django.  Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
     type: str
@@ -55,14 +55,14 @@ options:
     aliases: [app_path, chdir]
   settings:
     description:
-      - The Python path to the application's settings module, such as C(myapp.settings).
+      - The Python path to the application's settings module, such as V(myapp.settings).
     type: path
     required: false
   pythonpath:
     description:
       - A directory to add to the Python path. Typically used to include the settings module if it is located
         external to the application directory.
-      - This would be equivalent to adding I(pythonpath)'s value to the C(PYTHONPATH) environment variable.
+      - This would be equivalent to adding O(pythonpath)'s value to the C(PYTHONPATH) environment variable.
     type: path
     required: false
     aliases: [python_path]
@@ -73,54 +73,54 @@ options:
     aliases: [virtual_env]
   apps:
     description:
-      - A list of space-delimited apps to target. Used by the C(test) command.
+      - A list of space-delimited apps to target. Used by the V(test) command.
     type: str
     required: false
   cache_table:
     description:
-      - The name of the table used for database-backed caching. Used by the C(createcachetable) command.
+      - The name of the table used for database-backed caching. Used by the V(createcachetable) command.
     type: str
     required: false
   clear:
     description:
       - Clear the existing files before trying to copy or link the original file.
-      - Used only with the C(collectstatic) command. The C(--noinput) argument will be added automatically.
+      - Used only with the V(collectstatic) command. The C(--noinput) argument will be added automatically.
     required: false
     default: false
     type: bool
   database:
     description:
-      - The database to target. Used by the C(createcachetable), C(flush), C(loaddata), C(syncdb),
-        and C(migrate) commands.
+      - The database to target. Used by the V(createcachetable), V(flush), V(loaddata), V(syncdb),
+        and V(migrate) commands.
     type: str
     required: false
   failfast:
     description:
-      - Fail the command immediately if a test fails. Used by the C(test) command.
+      - Fail the command immediately if a test fails. Used by the V(test) command.
     required: false
     default: false
     type: bool
     aliases: [fail_fast]
   fixtures:
     description:
-      - A space-delimited list of fixture file names to load in the database. B(Required) by the C(loaddata) command.
+      - A space-delimited list of fixture file names to load in the database. B(Required) by the V(loaddata) command.
     type: str
     required: false
   skip:
     description:
-      - Will skip over out-of-order missing migrations, you can only use this parameter with C(migrate) command.
+      - Will skip over out-of-order missing migrations, you can only use this parameter with V(migrate) command.
     required: false
     type: bool
   merge:
     description:
       - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
-        parameter with C(migrate) command.
+        parameter with V(migrate) command.
     required: false
     type: bool
   link:
     description:
       - Will create links to the files instead of copying them, you can only use this parameter with
-        C(collectstatic) command.
+        V(collectstatic) command.
     required: false
     type: bool
   testrunner:
@@ -133,9 +133,9 @@ options:
   ack_venv_creation_deprecation:
     description:
       - >-
-        When a I(virtualenv) is set but the virtual environment does not exist, the current behavior is
+        When a O(virtualenv) is set but the virtual environment does not exist, the current behavior is
         to create a new virtual environment. That behavior is deprecated and if that case happens it will
-        generate a deprecation warning. Set this flag to C(true) to suppress the deprecation warning.
+        generate a deprecation warning. Set this flag to V(true) to suppress the deprecation warning.
       - Please note that you will receive no further warning about this being removed until the module
         will start failing in such cases from community.general 9.0.0 on.
     type: bool
@@ -146,19 +146,19 @@ notes:
     B(ATTENTION - DEPRECATION): Support for Django releases older than 4.1 will be removed in
     community.general version 9.0.0 (estimated to be released in May 2024).
     Please notice that Django 4.1 requires Python 3.8 or greater.
-  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
+  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the O(virtualenv) parameter
     is specified. This requirement is deprecated and will be removed in community.general version 9.0.0.
-  - This module will create a virtualenv if the I(virtualenv) parameter is specified and a virtual environment does not already
+  - This module will create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not already
     exist at the given location. This behavior is deprecated and will be removed in community.general version 9.0.0.
-  - The parameter I(virtualenv) will remain in use, but it will require the specified virtualenv to exist.
+  - The parameter O(virtualenv) will remain in use, but it will require the specified virtualenv to exist.
     The recommended way to create one in Ansible is by using M(ansible.builtin.pip).
-  - This module assumes English error messages for the C(createcachetable) command to detect table existence,
+  - This module assumes English error messages for the V(createcachetable) command to detect table existence,
     unfortunately.
-  - To be able to use the C(migrate) command with django versions < 1.7, you must have C(south) installed and added
+  - To be able to use the V(migrate) command with django versions < 1.7, you must have C(south) installed and added
     as an app in your settings.
-  - To be able to use the C(collectstatic) command, you must have enabled staticfiles in your settings.
-  - Your C(manage.py) application must be executable (rwxr-xr-x), and must have a valid shebang,
-    i.e. C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
+  - To be able to use the V(collectstatic) command, you must have enabled staticfiles in your settings.
+  - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang,
+    for example C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
 seealso:
   - name: django-admin and manage.py Reference
     description: Reference for C(django-admin) or C(manage.py) commands.

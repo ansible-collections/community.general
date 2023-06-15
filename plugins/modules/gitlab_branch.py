@@ -49,7 +49,7 @@ options:
   ref_branch:
     description:
       - Reference branch to create from.
-      - This must be specified if I(state=present).
+      - This must be specified if O(state=present).
     type: str
 '''
 
