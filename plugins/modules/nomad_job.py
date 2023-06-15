@@ -33,7 +33,7 @@ options:
       description:
         - Name of job for delete, stop and start job without source.
         - Name of job for delete, stop and start job without source.
-        - Either this or I(content) must be specified.
+        - Either this or O(content) must be specified.
       type: str
     state:
       description:
@@ -49,7 +49,7 @@ options:
     content:
       description:
         - Content of Nomad job.
-        - Either this or I(name) must be specified.
+        - Either this or O(name) must be specified.
       type: str
     content_format:
       description:

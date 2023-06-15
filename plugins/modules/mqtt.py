@@ -40,7 +40,7 @@ options:
   password:
     type: str
     description:
-      - Password for C(username) to authenticate against the broker.
+      - Password for O(username) to authenticate against the broker.
   client_id:
     type: str
     description:
@@ -54,8 +54,8 @@ options:
   payload:
     type: str
     description:
-      - Payload. The special string C("None") may be used to send a NULL
-        (i.e. empty) payload which is useful to simply notify with the I(topic)
+      - Payload. The special string V("None") may be used to send a NULL
+        (that is, empty) payload which is useful to simply notify with the O(topic)
         or to clear previously retained messages.
     required: true
   qos:
