@@ -1457,8 +1457,8 @@ def main():
         if not vmid:
             module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
 
+        status = {}
         try:
-            status = {}
             vm = proxmox.get_vm(vmid)
             status['status'] = vm['status']
             if vm['status'] == 'stopped':
