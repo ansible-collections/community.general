@@ -97,7 +97,7 @@ options:
         type: bool
         default: false
         description:
-            - If C(true), allows to remove the authentication flow and recreate it.
+            - If V(true), allows to remove the authentication flow and recreate it.
 
 extends_documentation_fragment:
     - community.general.keycloak

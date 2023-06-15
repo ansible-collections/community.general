@@ -41,9 +41,9 @@ options:
     state:
         description:
             - State of the group.
-            - On C(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
+            - On V(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
             - >-
-              On C(absent), the group will be removed if it exists. Be aware that absenting
+              On V(absent), the group will be removed if it exists. Be aware that absenting
               a group with subgroups will automatically delete all its subgroups too.
         default: 'present'
         type: str
@@ -93,7 +93,7 @@ options:
             type: str
             description:
               - Identify parent by ID.
-              - Needs less API calls than using I(name).
+              - Needs less API calls than using O(parents[].name).
               - A deep parent chain can be started at any point when first given parent is given as ID.
               - Note that in principle both ID and name can be specified at the same time
                 but current implementation only always use just one of them, with ID
@@ -102,14 +102,14 @@ options:
             type: str
             description:
               - Identify parent by name.
-              - Needs more internal API calls than using I(id) to map names to ID's under the hood.
+              - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
               - When giving a parent chain with only names it must be complete up to the top.
               - Note that in principle both ID and name can be specified at the same time
                 but current implementation only always use just one of them, with ID
                 being preferred.
 
 notes:
-    - Presently, the I(realmRoles), I(clientRoles) and I(access) attributes returned by the Keycloak API
+    - Presently, the RV(end_state.realmRoles), RV(end_state.clientRoles), and RV(end_state.access) attributes returned by the Keycloak API
       are read-only for groups. This limitation will be removed in a later version of this module.
 
 extends_documentation_fragment:
