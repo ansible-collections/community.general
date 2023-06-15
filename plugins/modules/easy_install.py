@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 module: easy_install
 short_description: Installs Python libraries
 description:
-    - Installs Python libraries, optionally in a I(virtualenv)
+    - Installs Python libraries, optionally in a C(virtualenv)
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -26,13 +26,13 @@ options:
   name:
     type: str
     description:
-      - A Python library name
+      - A Python library name.
     required: true
   virtualenv:
     type: str
     description:
-      - an optional I(virtualenv) directory path to install into. If the
-        I(virtualenv) does not exist, it is created automatically
+      - An optional O(virtualenv) directory path to install into. If the
+        O(virtualenv) does not exist, it is created automatically.
   virtualenv_site_packages:
     description:
       - Whether the virtual environment will inherit packages from the
@@ -46,21 +46,21 @@ options:
     type: str
     description:
       - The command to create the virtual environment with. For example
-        C(pyvenv), C(virtualenv), C(virtualenv2).
+        V(pyvenv), V(virtualenv), V(virtualenv2).
     default: virtualenv
   executable:
     type: str
     description:
       - The explicit executable or a pathname to the executable to be used to
         run easy_install for a specific version of Python installed in the
-        system. For example C(easy_install-3.3), if there are both Python 2.7
+        system. For example V(easy_install-3.3), if there are both Python 2.7
         and 3.3 installations in the system and you want to run easy_install
         for the Python 3.3 installation.
     default: easy_install
   state:
     type: str
     description:
-      - The desired state of the library. C(latest) ensures that the latest version is installed.
+      - The desired state of the library. V(latest) ensures that the latest version is installed.
     choices: [present, latest]
     default: present
 notes:
@@ -68,8 +68,8 @@ notes:
       libraries. Thus this module is not able to remove libraries. It is
       generally recommended to use the M(ansible.builtin.pip) module which you can first install
       using M(community.general.easy_install).
-    - Also note that I(virtualenv) must be installed on the remote host if the
-      C(virtualenv) parameter is specified.
+    - Also note that C(virtualenv) must be installed on the remote host if the
+      O(virtualenv) parameter is specified.
 requirements: [ "virtualenv" ]
 author: "Matt Wright (@mattupstate)"
 '''
