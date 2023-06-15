@@ -16,7 +16,7 @@ author:
 - André Paramés (@andreparames)
 short_description: Deploy software (or files) from bzr branches
 description:
-    - Manage I(bzr) branches to deploy files or software.
+    - Manage C(bzr) branches to deploy files or software.
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -44,9 +44,9 @@ options:
         type: str
     force:
         description:
-            - If C(true), any modified files in the working
-              tree will be discarded.  Before 1.9 the default
-              value was C(true).
+            - If V(true), any modified files in the working
+              tree will be discarded.  Before Ansible 1.9 the default
+              value was V(true).
         type: bool
         default: false
     executable:

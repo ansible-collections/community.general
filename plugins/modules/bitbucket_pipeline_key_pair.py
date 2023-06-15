@@ -33,7 +33,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - I(username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of I(user).
+      - "B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user)."
     type: str
     required: true
   public_key:
