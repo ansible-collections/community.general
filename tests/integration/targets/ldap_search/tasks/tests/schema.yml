@@ -4,36 +4,22 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - debug:
-    msg: Running tests/basic.yml
+    msg: Running tests/schema.yml
 
 ####################################################################
 ## Search ##########################################################
 ####################################################################
-- name: Test simple search for a user
+- name: Test for ldap schema output
   ldap_search:
     dn: "ou=users,dc=example,dc=com"
     scope: "onelevel"
-    filter: "(uid=ldaptest)"
+    schema: true
   ignore_errors: true
   register: output
 
-- name: assert that test LDAP user can be found
+- name: Assert that the schema output is correct
   assert:
     that:
        - output is not failed
-       - output.results | length == 1
-       - output.results.0.displayName == "LDAP Test"
-
-- name: Test simple search for a user with no results
-  ldap_search:
-    dn: "ou=users,dc=example,dc=com"
-    scope: "onelevel"
-    filter: "(uid=nonexistent)"
-  ignore_errors: true
-  register: output
-
-- name: assert that the output is empty
-  assert:
-    that:
-       - output is not failed
-       - output.results | length == 0
+       - output.results | length >= 1
+       - "{{ 'displayName' in output.results.0.attrs }}"
