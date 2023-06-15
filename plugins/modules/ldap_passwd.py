@@ -72,7 +72,7 @@ modlist:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
+from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
 
 LDAP_IMP_ERR = None
 try:
@@ -133,6 +133,7 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(passwd=dict(no_log=True)),
         supports_check_mode=True,
+        required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:
