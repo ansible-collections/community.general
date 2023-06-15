@@ -49,8 +49,8 @@ options:
         type: bool
         required: false
         description:
-        - Whether the service should start on boot. B(At least one of state and
-          enabled are required.)
+        - Whether the service should start on boot.
+        - At least one of O(state) and O(enabled) are required.
 '''
 
 EXAMPLES = '''
