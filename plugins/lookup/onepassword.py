@@ -42,6 +42,12 @@ DOCUMENTATION = '''
         description: The username used to sign in.
       secret_key:
         description: The secret key used when performing an initial sign in.
+      service_account_token:
+        description:
+          - The access key for a service account.
+          - Only works with 1Password CLI version 2 or later.
+        type: str
+        version_added: 7.1.0
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
@@ -113,12 +119,13 @@ from ansible_collections.community.general.plugins.module_utils.onepassword impo
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None, service_account_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
         self.master_password = master_password
         self.secret_key = secret_key
+        self.service_account_token = service_account_token
 
         self._path = None
         self._version = None
@@ -295,6 +302,10 @@ class OnePassCLIv1(OnePassCLIBase):
         return not bool(rc)
 
     def full_signin(self):
+        if self.service_account_token:
+            raise AnsibleLookupError(
+                "1Password CLI version 1 does not support Service Accounts. Please use version 2 or later.")
+
         required_params = [
             "subdomain",
             "username",
@@ -472,6 +483,13 @@ class OnePassCLIv2(OnePassCLIBase):
         return ""
 
     def assert_logged_in(self):
+        if self.service_account_token:
+            args = ["whoami"]
+            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+            rc, out, err = self._run(args, environment_update=environment_update)
+
+            return not bool(rc)
+
         args = ["account", "list"]
         if self.subdomain:
             account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
@@ -517,6 +535,13 @@ class OnePassCLIv2(OnePassCLIBase):
         args = ["item", "get", item_id, "--format", "json"]
         if vault is not None:
             args += ["--vault={0}".format(vault)]
+
+        if self.service_account_token:
+            if vault is None:
+                raise AnsibleLookupError("'vault' is required with 'service_account_token'")
+            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+            return self._run(args, environment_update=environment_update)
+
         if token is not None:
             args += [to_bytes("--session=") + token]
 
@@ -533,12 +558,14 @@ class OnePassCLIv2(OnePassCLIBase):
 
 
 class OnePass(object):
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
+                 service_account_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
         self.secret_key = secret_key
         self.master_password = master_password
+        self.service_account_token = service_account_token
 
         self.logged_in = False
         self.token = None
@@ -551,7 +578,7 @@ class OnePass(object):
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
                 try:
-                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password)
+                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
                 except TypeError as e:
                     raise AnsibleLookupError(e)
 
@@ -614,8 +641,9 @@ class LookupModule(LookupBase):
         username = self.get_option("username")
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
+        service_account_token = self.get_option("service_account_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
         op.assert_logged_in()
 
         values = []
