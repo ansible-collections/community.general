@@ -20,13 +20,13 @@ description:
   - A diversion is for C(dpkg) the knowledge that only a given package
     (or the local administrator) is allowed to install a file at a given
     location. Other packages shipping their own version of this file will
-    be forced to I(divert) it, i.e. to install it at another location. It
+    be forced to O(divert) it, that is to install it at another location. It
     allows one to keep changes in a file provided by a debian package by
     preventing its overwrite at package upgrade.
   - This module manages diversions of debian packages files using the
     C(dpkg-divert) commandline tool. It can either create or remove a
     diversion for a given file, but also update an existing diversion
-    to modify its I(holder) and/or its I(divert) location.
+    to modify its O(holder) and/or its O(divert) location.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -39,14 +39,14 @@ options:
     description:
       - The original and absolute path of the file to be diverted or
         undiverted. This path is unique, i.e. it is not possible to get
-        two diversions for the same I(path).
+        two diversions for the same O(path).
     required: true
     type: path
   state:
     description:
-      - When I(state=absent), remove the diversion of the specified
-        I(path); when I(state=present), create the diversion if it does
-        not exist, or update its package I(holder) or I(divert) location,
+      - When O(state=absent), remove the diversion of the specified
+        O(path); when O(state=present), create the diversion if it does
+        not exist, or update its package O(holder) or O(divert) location,
         if it already exists.
     type: str
     default: present
@@ -59,31 +59,31 @@ options:
       - The actual package does not have to be installed or even to exist
         for its name to be valid. If not specified, the diversion is hold
         by 'LOCAL', that is reserved by/for dpkg for local diversions.
-      - This parameter is ignored when I(state=absent).
+      - This parameter is ignored when O(state=absent).
     type: str
   divert:
     description:
       - The location where the versions of file will be diverted.
       - Default is to add suffix C(.distrib) to the file path.
-      - This parameter is ignored when I(state=absent).
+      - This parameter is ignored when O(state=absent).
     type: path
   rename:
     description:
-      - Actually move the file aside (when I(state=present)) or back (when
-        I(state=absent)), but only when changing the state of the diversion.
+      - Actually move the file aside (when O(state=present)) or back (when
+        O(state=absent)), but only when changing the state of the diversion.
         This parameter has no effect when attempting to add a diversion that
         already exists or when removing an unexisting one.
-      - Unless I(force=true), renaming fails if the destination file already
+      - Unless O(force=true), renaming fails if the destination file already
         exists (this lock being a dpkg-divert feature, and bypassing it being
         a module feature).
     type: bool
     default: false
   force:
     description:
-      - When I(rename=true) and I(force=true), renaming is performed even if
+      - When O(rename=true) and O(force=true), renaming is performed even if
         the target of the renaming exists, i.e. the existing contents of the
         file at this location will be lost.
-      - This parameter is ignored when I(rename=false).
+      - This parameter is ignored when O(rename=false).
     type: bool
     default: false
 requirements:
