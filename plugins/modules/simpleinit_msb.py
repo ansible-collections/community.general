@@ -54,8 +54,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Example action to start service httpd, if not running
-- community.general.simpleinit_msb:
+- name: Example action to start service httpd, if not running
+  community.general.simpleinit_msb:
     name: httpd
     state: started
 
