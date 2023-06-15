@@ -579,8 +579,8 @@
       [section1]
       var1 = aaa
       # comment in section
-      var2 = foo
-      # var2 = bar
+      # var2 = some value
+      # comment after section
 
       [section2]
       var3 = ccc
@@ -613,8 +613,8 @@
       [section1]
       var1 = aaa
       # comment in section
-      var2 = foo
-      # var2 = bar
+      # var2 = some value
+      # comment after section
 
       [section2]
       var3 = ccc
@@ -629,14 +629,13 @@
       - content22 == expected22
 
 
-- name: "test-values 23 - Ensure 'var2=[foo, foobar]' is 'present' in section '[section1]'"
+- name: "test-values 23 - Ensure 'var2=foo' is 'present' in section '[section1]', replacing commented option 'var2=some value'"
   ini_file:
     path: "{{ output_file }}"
     section: section1
     option: var2
     values: 
       - foo
-      - foobar
     state: present
   register: result23
 
@@ -647,7 +646,6 @@
 
 - name: test-values 23 - set expected content and get current ini file content
   set_fact:
-    content23: "{{ output_content.content | b64decode }}"
     expected23: |
       
       # Some comment to test
@@ -659,12 +657,14 @@
       var1 = aaa
       # comment in section
       var2 = foo
-      var2 = foobar
+      # comment after section
 
       [section2]
       var3 = ccc
       # comment after section
-- name: test-values 23 - assert 'changed' and msg 'option added' and content is as expected
+    content23: "{{ output_content.content | b64decode }}"
+
+- name: test-values 23 - assert 'changed' and msg 'option changed' and content is as expected
   assert:
     that:
       - result23 is changed
@@ -672,14 +672,13 @@
       - content23 == expected23
 
 
-- name: "test-values 24 - Ensure 'var2=[foo, foobar, bar]' is 'present' in section '[section1]' replacing commented option 'var2=bar'"
+- name: "test-values 24 - Ensure 'var2=[foo, foobar]' is 'present' in section '[section1]'"
   ini_file:
     path: "{{ output_file }}"
     section: section1
     option: var2
-    values: 
+    values:
       - foo
-      - bar
       - foobar
     state: present
   register: result24
@@ -691,7 +690,6 @@
 
 - name: test-values 24 - set expected content and get current ini file content
   set_fact:
-    content24: "{{ output_content.content | b64decode }}"
     expected24: |
       
       # Some comment to test
@@ -704,12 +702,14 @@
       # comment in section
       var2 = foo
       var2 = foobar
-      var2 = bar
+      # comment after section
 
       [section2]
       var3 = ccc
       # comment after section
-- name: test-values 24 - assert 'added' and msg 'option changed' and content is as expected
+    content24: "{{ output_content.content | b64decode }}"
+
+- name: test-values 24 - assert 'changed' and msg 'option added' and content is as expected
   assert:
     that:
       - result24 is changed
