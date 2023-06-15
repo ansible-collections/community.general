@@ -18,5 +18,6 @@ homeDirectory: /home/ldaptest
 cn: LDAP Test
 gecos: LDAP Test
 displayName: LDAP Test
+userPassword: test1pass!
 mail: ldap.test@example.com
 sn: Test
