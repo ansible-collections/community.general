@@ -15,27 +15,27 @@ class ModuleDocFragment(object):
 options:
   alicloud_access_key:
     description:
-      - Alibaba Cloud access key. If not set then the value of environment variable C(ALICLOUD_ACCESS_KEY),
-        C(ALICLOUD_ACCESS_KEY_ID) will be used instead.
+      - Alibaba Cloud access key. If not set then the value of environment variable E(ALICLOUD_ACCESS_KEY),
+        E(ALICLOUD_ACCESS_KEY_ID) will be used instead.
     aliases: ['access_key_id', 'access_key']
     type: str
   alicloud_secret_key:
     description:
-      - Alibaba Cloud secret key. If not set then the value of environment variable C(ALICLOUD_SECRET_KEY),
-        C(ALICLOUD_SECRET_ACCESS_KEY) will be used instead.
+      - Alibaba Cloud secret key. If not set then the value of environment variable E(ALICLOUD_SECRET_KEY),
+        E(ALICLOUD_SECRET_ACCESS_KEY) will be used instead.
     aliases: ['secret_access_key', 'secret_key']
     type: str
   alicloud_region:
     description:
       - The Alibaba Cloud region to use. If not specified then the value of environment variable
-        C(ALICLOUD_REGION), C(ALICLOUD_REGION_ID) will be used instead.
+        E(ALICLOUD_REGION), E(ALICLOUD_REGION_ID) will be used instead.
     aliases: ['region', 'region_id']
     required: true
     type: str
   alicloud_security_token:
     description:
       - The Alibaba Cloud security token. If not specified then the value of environment variable
-        C(ALICLOUD_SECURITY_TOKEN) will be used instead.
+        E(ALICLOUD_SECURITY_TOKEN) will be used instead.
     aliases: ['security_token']
     type: str
   alicloud_assume_role:
@@ -48,7 +48,7 @@ options:
   alicloud_assume_role_arn:
     description:
       - The Alibaba Cloud role_arn. The ARN of the role to assume. If ARN is set to an empty string,
-        it does not perform role switching. It supports environment variable ALICLOUD_ASSUME_ROLE_ARN.
+        it does not perform role switching. It supports environment variable E(ALICLOUD_ASSUME_ROLE_ARN).
         ansible will execute with provided credentials.
     aliases: ['assume_role_arn']
     type: str
@@ -56,14 +56,14 @@ options:
     description:
       - The Alibaba Cloud session_name. The session name to use when assuming the role. If omitted,
         'ansible' is passed to the AssumeRole call as session name. It supports environment variable
-        ALICLOUD_ASSUME_ROLE_SESSION_NAME
+        E(ALICLOUD_ASSUME_ROLE_SESSION_NAME).
     aliases: ['assume_role_session_name']
     type: str
   alicloud_assume_role_session_expiration:
     description:
       - The Alibaba Cloud session_expiration. The time after which the established session for assuming
         role expires. Valid value range 900-3600 seconds. Default to 3600 (in this case Alicloud use own default
-        value). It supports environment variable ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION
+        value). It supports environment variable E(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION).
     aliases: ['assume_role_session_expiration']
     type: int
   ecs_role_name:
@@ -79,11 +79,11 @@ options:
   profile:
     description:
       - This is the Alicloud profile name as set in the shared credentials file. It can also be sourced from the
-        ALICLOUD_PROFILE environment variable.
+        E(ALICLOUD_PROFILE) environment variable.
     type: str
   shared_credentials_file:
     description:
-      - This is the path to the shared credentials file. It can also be sourced from the ALICLOUD_SHARED_CREDENTIALS_FILE
+      - This is the path to the shared credentials file. It can also be sourced from the E(ALICLOUD_SHARED_CREDENTIALS_FILE)
         environment variable.
       - If this is not set and a profile is specified,  ~/.aliyun/config.json will be used.
     type: str
@@ -94,16 +94,16 @@ requirements:
 notes:
   - If parameters are not set within the module, the following
     environment variables can be used in decreasing order of precedence
-    C(ALICLOUD_ACCESS_KEY) or C(ALICLOUD_ACCESS_KEY_ID),
-    C(ALICLOUD_SECRET_KEY) or C(ALICLOUD_SECRET_ACCESS_KEY),
-    C(ALICLOUD_REGION) or C(ALICLOUD_REGION_ID),
-    C(ALICLOUD_SECURITY_TOKEN),
-    C(ALICLOUD_ECS_ROLE_NAME),
-    C(ALICLOUD_SHARED_CREDENTIALS_FILE),
-    C(ALICLOUD_PROFILE),
-    C(ALICLOUD_ASSUME_ROLE_ARN),
-    C(ALICLOUD_ASSUME_ROLE_SESSION_NAME),
-    C(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION),
-  - C(ALICLOUD_REGION) or C(ALICLOUD_REGION_ID) can be typically be used to specify the
+    E(ALICLOUD_ACCESS_KEY) or E(ALICLOUD_ACCESS_KEY_ID),
+    E(ALICLOUD_SECRET_KEY) or E(ALICLOUD_SECRET_ACCESS_KEY),
+    E(ALICLOUD_REGION) or E(ALICLOUD_REGION_ID),
+    E(ALICLOUD_SECURITY_TOKEN),
+    E(ALICLOUD_ECS_ROLE_NAME),
+    E(ALICLOUD_SHARED_CREDENTIALS_FILE),
+    E(ALICLOUD_PROFILE),
+    E(ALICLOUD_ASSUME_ROLE_ARN),
+    E(ALICLOUD_ASSUME_ROLE_SESSION_NAME),
+    E(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION),
+  - E(ALICLOUD_REGION) or E(ALICLOUD_REGION_ID) can be typically be used to specify the
     ALICLOUD region, when required, but this can also be configured in the footmark config file
 '''

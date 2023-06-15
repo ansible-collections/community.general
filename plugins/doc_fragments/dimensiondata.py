@@ -29,12 +29,12 @@ options:
   mcp_user:
     description:
       - The username used to authenticate to the CloudControl API.
-      - If not specified, will fall back to C(MCP_USER) from environment variable or C(~/.dimensiondata).
+      - If not specified, will fall back to E(MCP_USER) from environment variable or C(~/.dimensiondata).
     type: str
   mcp_password:
     description:
       - The password used to authenticate to the CloudControl API.
-      - If not specified, will fall back to C(MCP_PASSWORD) from environment variable or C(~/.dimensiondata).
+      - If not specified, will fall back to E(MCP_PASSWORD) from environment variable or C(~/.dimensiondata).
       - Required if O(mcp_user) is specified.
     type: str
   location:
