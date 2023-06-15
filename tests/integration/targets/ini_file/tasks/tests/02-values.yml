@@ -453,7 +453,7 @@
       - content17 == expected17
 
 
-- name: "test-values 18 - Ensure 'beverage=coke' is 'abesent' in section '[drinks]'"
+- name: "test-values 18 - Ensure 'beverage=coke' is 'absent' in section '[drinks]'"
   ini_file:
     path: "{{ output_file }}"
     section: drinks
@@ -483,7 +483,7 @@
       - content18 == expected18
 
 
-- name: "test-values 19 - Ensure non-existant 'beverage=coke' is 'abesent' in section '[drinks]'"
+- name: "test-values 19 - Ensure non-existent 'beverage=coke' is 'absent' in section '[drinks]'"
   ini_file:
     path: "{{ output_file }}"
     section: drinks
