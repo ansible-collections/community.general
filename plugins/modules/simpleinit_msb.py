@@ -77,7 +77,7 @@ EXAMPLES = '''
 # Example action to enable service httpd, and not touch the running state
 - community.general.simpleinit_msb:
     name: httpd
-    enabled: yes
+    enabled: true
 '''
 
 import os
