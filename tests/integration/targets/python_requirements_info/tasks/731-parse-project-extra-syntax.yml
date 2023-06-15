@@ -1,0 +1,65 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install Python sampleprojectpy2 library
+  pip:
+    name: sampleprojectpy2>=1.3.1
+
+- name: Ensure sampleprojectpy2[notreal] is NOT installed
+  python_requirements_info:
+    dependencies: sampleprojectpy2[notreal]>=1.3.1
+  register: py_facts
+  ignore_errors: true
+  
+- name: Ensure python_requirements_info returns correct result
+  assert:
+    that:
+      - py_facts is failed
+
+- name: Ensure sampleprojectpy2[test] is NOT installed
+  python_requirements_info:
+    dependencies: sampleprojectpy2[test]>=1.3.1
+  register: py_facts
+
+- name: Ensure python_requirements_info returns correct result
+  assert:
+    that:
+      - "'sampleprojectpy2' in py_facts.ignored"
+      - py_facts.warnings | length > 0
+
+- name: Ensure sampleprojectpy2[test] is NOT installed and does no fail
+  python_requirements_info:
+    dependencies: sampleprojectpy2[test]>=1.3.2
+  register: py_facts
+
+- name: Ensure python_requirements_info returns correct result
+  assert:
+    that:
+      - "'sampleprojectpy2' in py_facts.ignored"
+      - py_facts.warnings | length > 0
+  
+- name: Ensure sampleprojectpy2[test syntax is invalid
+  python_requirements_info:
+    dependencies: sampleprojectpy2[test
+  register: wrong_spec
+  ignore_errors: true
+
+- assert:
+    that:
+      - wrong_spec is failed
+      - wrong_spec.msg is defined
+      - "'Must be formatted like' in wrong_spec.msg"
+
+- name: Ensure sampleprojectpy2test] syntax is invalid
+  python_requirements_info:
+    dependencies: sampleprojectpy2test]
+  register: wrong_spec
+  ignore_errors: true
+
+- assert:
+    that:
+      - wrong_spec is failed
+      - wrong_spec.msg is defined
+      - "'Must be formatted like' in wrong_spec.msg"

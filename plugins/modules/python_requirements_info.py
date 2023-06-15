@@ -13,6 +13,10 @@ short_description: Show python path and assert dependency versions
 description:
   - Get info about available Python requirements on the target host, including listing required libraries and gathering versions.
   - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
+  - Although the extra identifiers are valid input, only the correctness of the identifier is verified. The library verification is not performed.
+  - This module is almost PEP-508 compliant.
+  - The requirements C(SomeProject == 5.4 ; python_version < "3.8"), C(SomeProject ; sys_platform == 'win32') are not considered valid.
+  - The version operator C(~=) is also not considered valid on every platform.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
@@ -23,8 +27,8 @@ options:
     description: >
       A list of version-likes or module names to check for installation.
       Supported operators: <, >, <=, >=, or ==. The bare module name like
-      I(ansible), the module with a specific version like I(boto3==1.6.1), or a
-      partial version like I(requests>2) are all valid specifications.
+      C(ansible), the module with a specific version like C(boto3==1.6.1), a
+      partial version like C(requests>2) are all valid specifications.
     default: []
 author:
   - Will Thames (@willthames)
@@ -92,7 +96,9 @@ python_system_path:
     - /usr/local/opt/python@2/site-packages/
     - /usr/lib/python/site-packages/
 valid:
-  description: A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be null
+  description:
+  - A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be C(null).
+  - The dependency name will be normalised to no-spaces.
   returned: always
   type: dict
   sample:
@@ -103,7 +109,9 @@ valid:
       desired: botocore<2
       installed: 1.10.60
 mismatched:
-  description: A dictionary of dependencies that did not satisfy the desired version
+  description:
+  - A dictionary of dependencies that did not satisfy the desired version.
+  - The dependency name will be normalised to no-spaces.
   returned: always
   type: dict
   sample:
@@ -111,35 +119,36 @@ mismatched:
       desired: botocore>2
       installed: 1.10.60
 not_found:
-  description: A list of packages that could not be imported at all, and are not installed
+  description:
+  - A list of packages that could not be imported at all, and are not installed.
+  - Only the package name is returned.
   returned: always
   type: list
   sample:
     - boto4
     - requests
+ignored:
+  description:
+  - A list of packages that are ignored by the module because they cannot be verified (e.g. package with extras).
+  - An associated warning is raised.
+  - Only the package name is returned.
+  returned: always
+  type: list
+  sample:
+    - boto4[extra]
+    - requests[security]
 '''
 
-import re
 import sys
-import operator
 
 HAS_DISTUTILS = False
 try:
     import pkg_resources
-    from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
     HAS_DISTUTILS = True
 except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-
-operations = {
-    '<=': operator.le,
-    '>=': operator.ge,
-    '<': operator.lt,
-    '>': operator.gt,
-    '==': operator.eq,
-}
 
 python_version_info = dict(
     major=sys.version_info[0],
@@ -165,40 +174,58 @@ def main():
             python_version_info=python_version_info,
             python_system_path=sys.path,
         )
-    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(?:(==|[><]=?)([0-9.]+))?$')
 
     results = dict(
         not_found=[],
         mismatched={},
         valid={},
+        ignored=[],
+        warnings=[],
     )
 
     for dep in module.params['dependencies']:
-        match = pkg_dep_re.match(dep)
-        if not match:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
-        pkg, op, version = match.groups()
-        if op is not None and op not in operations:
-            module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
         try:
-            existing = pkg_resources.get_distribution(pkg).version
+            req = pkg_resources.Requirement.parse(dep)
+            for _op, version in req.specs:
+                if not version:
+                    raise ValueError
+            dist = pkg_resources.get_distribution(req)
+            if req.extras:
+                if not [extra for extra in req.extras if extra in dist.extras]:
+                    module.fail_json(msg="Provided extras identifiers does not exist in dist-info for dependency '{0}'. \
+                        Valid identifiers are {1}.".format(dep, dist.extras))
+
+                results['warnings'].append("Extra identifier(s) provided for dependency {0}, this dependency will be ignored.".format(dep))
+                results['ignored'].append(req.project_name)
+                continue
         except pkg_resources.DistributionNotFound:
             # not there
-            results['not_found'].append(pkg)
+            results['not_found'].append(req.project_name)
             continue
-        if op is None and version is None:
-            results['valid'][pkg] = {
-                'installed': existing,
-                'desired': None,
-            }
-        elif operations[op](LooseVersion(existing), LooseVersion(version)):
-            results['valid'][pkg] = {
-                'installed': existing,
+        except pkg_resources.VersionConflict as e:
+            if req.extras:
+                if not [extra for extra in req.extras if extra in e.dist.extras]:
+                    module.fail_json(msg="Provided extras identifiers does not exist in dist-info for dependency '{0}'. \
+                        Valid identifiers are {1}.".format(dep, e.dist.extras))
+
+                results['warnings'].append("Extra identifier(s) provided for dependency {0}, this dependency will be ignored.".format(dep))
+                results['ignored'].append(req.project_name)
+                continue
+            results['mismatched'][req.project_name] = {
+                'installed': e.dist.version,
                 'desired': dep,
             }
+            continue
+        except ValueError:
+            module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6' or 'ansible[extra]>2.6'".format(dep))
+        if req.specs is None:
+            results['valid'][req.project_name] = {
+                'installed': dist.version,
+                'desired': None,
+            }
         else:
-            results['mismatched'][pkg] = {
-                'installed': existing,
+            results['valid'][req.project_name] = {
+                'installed': dist.version,
                 'desired': dep,
             }
 
