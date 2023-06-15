@@ -36,7 +36,7 @@ options:
         either the CLI login or the eAPI authentication depending on which
         transport is used. Note this argument does not affect the SSH
         transport. If the value is not specified in the task, the value of
-        environment variable C(ANSIBLE_NET_USERNAME) will be used instead.
+        environment variable E(ANSIBLE_NET_USERNAME) will be used instead.
     type: str
   password:
     description:
@@ -44,7 +44,7 @@ options:
         the remote device.  This is a common argument used for either O(transport=cli)
         or O(transport=rest).  Note this argument does not affect the SSH
         transport. If the value is not specified in the task, the value of
-        environment variable C(ANSIBLE_NET_PASSWORD) will be used instead.
+        environment variable E(ANSIBLE_NET_PASSWORD) will be used instead.
     type: str
   timeout:
     description:
@@ -58,7 +58,7 @@ options:
       - Specifies the SSH key to use to authenticate the connection to
         the remote device.  This argument is only used for O(transport=cli).
         If the value is not specified in the task, the value of
-        environment variable C(ANSIBLE_NET_SSH_KEYFILE) will be used instead.
+        environment variable E(ANSIBLE_NET_SSH_KEYFILE) will be used instead.
     type: path
   transport:
     description:
