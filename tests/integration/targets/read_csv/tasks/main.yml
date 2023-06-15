@@ -11,16 +11,16 @@
 # Create basic CSV file
 - name: Create unique CSV file
   copy:
-    content: |
+    content: &users_content |
       name,uid,gid,gecos
       dag,500,500,Dag Wieërs
       jeroen,501,500,Jeroen Hoekx
-    dest: users_unique.csv
+    dest: "{{ remote_tmp_dir }}/users_unique.csv"
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
   read_csv:
-    path: users_unique.csv
+    path: "{{ remote_tmp_dir }}/users_unique.csv"
     key: name
   register: users_unique
 
@@ -35,10 +35,10 @@
     - users_unique.dict.jeroen.uid == '501'
     - users_unique.dict.jeroen.gid == '500'
 
- # Read a CSV file and access the first item
+# Read a CSV file and access the first item
 - name: Read users from CSV file and return a list
   read_csv:
-    path: users_unique.csv
+    path: "{{ remote_tmp_dir }}/users_unique.csv"
   register: users_unique
 
 - assert:
@@ -61,12 +61,12 @@
       dag;500;500;Dag Wieërs
       jeroen;501;500;Jeroen Hoekx
       dag;502;500;Dag Wieers
-    dest: users_nonunique.csv
+    dest: "{{ remote_tmp_dir }}/users_nonunique.csv"
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
   read_csv:
-    path: users_nonunique.csv
+    path: "{{ remote_tmp_dir }}/users_nonunique.csv"
     key: name
     unique: false
     delimiter: ';'
@@ -87,7 +87,7 @@
 # Read a CSV file using an non-existing dialect
 - name: Read users from CSV file and return a dictionary
   read_csv:
-    path: users_nonunique.csv
+    path: "{{ remote_tmp_dir }}/users_nonunique.csv"
     dialect: placebo
   register: users_placebo
   ignore_errors: true
@@ -104,12 +104,12 @@
     content: |
       dag,500,500,Dag Wieërs
       jeroen,501,500,Jeroen Hoekx
-    dest: users_noheader.csv
+    dest: "{{ remote_tmp_dir }}/users_noheader.csv"
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
   read_csv:
-    path: users_noheader.csv
+    path: "{{ remote_tmp_dir }}/users_noheader.csv"
     key: name
     fieldnames: name,uid,gid,gecos
   register: users_noheader
@@ -133,12 +133,12 @@
       name,uid,gid,gecos
       dag,500,500,Dag Wieërs
       jeroen,501,500,"Jeroen"Hoekx"
-    dest: users_broken.csv
+    dest: "{{ remote_tmp_dir }}/users_broken.csv"
 
 # Read a broken CSV file using strict
 - name: Read users from a broken CSV file
   read_csv:
-    path: users_broken.csv
+    path: "{{ remote_tmp_dir }}/users_broken.csv"
     key: name
     strict: true
   register: users_broken
@@ -148,3 +148,29 @@
     that:
     - users_broken is failed
     - "'Unable to process file' in users_broken.msg"
+
+# Create basic CSV file with BOM
+- name: Create unique CSV file with BOM
+  copy:
+    content: "{{ bom + content }}"
+    dest: "{{ remote_tmp_dir }}/users_bom.csv"
+  vars:
+    content: *users_content
+    bom: "{{ '\ufeff' }}"
+
+ # Read a CSV file and access the first item
+- name: Read users from CSV file and return a list
+  read_csv:
+    path: "{{ remote_tmp_dir }}/users_bom.csv"
+  register: users_bom
+
+- assert:
+    that:
+    - users_bom.list.0.name == 'dag'
+    - users_bom.list.0.gecos == 'Dag Wieërs'
+    - users_bom.list.0.uid == '500'
+    - users_bom.list.0.gid == '500'
+    - users_bom.list.1.name == 'jeroen'
+    - users_bom.list.1.gecos == 'Jeroen Hoekx'
+    - users_bom.list.1.uid == '501'
+    - users_bom.list.1.gid == '500'
