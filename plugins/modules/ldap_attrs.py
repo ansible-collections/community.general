@@ -182,7 +182,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
+from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
 
 import re
 
@@ -300,6 +300,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'exact', 'present']),
         ),
         supports_check_mode=True,
+        required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:
