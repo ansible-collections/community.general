@@ -36,11 +36,11 @@ options:
     type: str
     description:
       - The name of the resource at which tags will be controlled.
-      - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
+      - Must be specified if O(resource_id) is not set. Both options are mutually exclusive.
   resource_id:
     description:
       - The ID of the resource at which tags will be controlled.
-      - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
+      - Must be specified if O(resource_name) is not set. Both options are mutually exclusive.
     type: int
 '''
 

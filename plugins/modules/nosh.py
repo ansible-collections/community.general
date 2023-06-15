@@ -36,26 +36,26 @@ options:
         required: false
         choices: [ started, stopped, reset, restarted, reloaded ]
         description:
-            - C(started)/C(stopped) are idempotent actions that will not run
+            - V(started)/V(stopped) are idempotent actions that will not run
               commands unless necessary.
-              C(restarted) will always bounce the service.
-              C(reloaded) will send a SIGHUP or start the service.
-              C(reset) will start or stop the service according to whether it is
+              V(restarted) will always bounce the service.
+              V(reloaded) will send a SIGHUP or start the service.
+              V(reset) will start or stop the service according to whether it is
               enabled or not.
     enabled:
         required: false
         type: bool
         description:
             - Enable or disable the service, independently of C(*.preset) file
-              preference or running state. Mutually exclusive with I(preset). Will take
-              effect prior to I(state=reset).
+              preference or running state. Mutually exclusive with O(preset). Will take
+              effect prior to O(state=reset).
     preset:
         required: false
         type: bool
         description:
             - Enable or disable the service according to local preferences in C(*.preset) files.
-              Mutually exclusive with I(enabled). Only has an effect if set to true. Will take
-              effect prior to I(state=reset).
+              Mutually exclusive with O(enabled). Only has an effect if set to true. Will take
+              effect prior to O(state=reset).
     user:
         required: false
         default: false
@@ -146,12 +146,12 @@ preset:
     type: bool
     sample: 'False'
 state:
-    description: service process run state, C(None) if the service is not loaded and will not be started
+    description: service process run state, V(none) if the service is not loaded and will not be started
     returned: if state option is used
     type: str
     sample: "reloaded"
 status:
-    description: A dictionary with the key=value pairs returned by C(system-control show-json) or C(None) if the service is not loaded
+    description: A dictionary with the key=value pairs returned by C(system-control show-json) or V(none) if the service is not loaded
     returned: success
     type: complex
     contains:
