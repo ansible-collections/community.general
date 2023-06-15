@@ -15,7 +15,7 @@ short_description: Management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
-  - Since community.general 4.0.0 on, there are no more default values, see I(proxmox_default_behavior).
+  - Since community.general 4.0.0 on, there are no more default values, see O(proxmox_default_behavior).
 attributes:
   check_mode:
     support: none
@@ -29,45 +29,45 @@ options:
   hostname:
     description:
       - the instance hostname
-      - required only for C(state=present)
+      - required only for O(state=present)
       - must be unique if vmid is not passed
     type: str
   ostemplate:
     description:
       - the template for VM creating
-      - required only for C(state=present)
+      - required only for O(state=present)
     type: str
   disk:
     description:
       - This option was previously described as "hard disk size in GB for instance" however several formats describing
         a lxc mount are permitted.
-      - Older versions of Proxmox will accept a numeric value for size using the I(storage) parameter to automatically
+      - Older versions of Proxmox will accept a numeric value for size using the O(storage) parameter to automatically
         choose which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
       - "Additional options are available by using some combination of the following key-value pairs as a
         comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
         [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(3).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(3).
     type: str
   cores:
     description:
       - Specify number of cores per socket.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
     type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
     type: int
   memory:
     description:
       - memory size in MB for instance
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(512).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(512).
     type: int
   swap:
     description:
       - swap memory size in MB for instance
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(0).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(0).
     type: int
   netif:
     description:
@@ -91,7 +91,7 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
     type: bool
   storage:
     description:
@@ -101,7 +101,7 @@ options:
   cpuunits:
     description:
       - CPU weight for a VM
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1000).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1000).
     type: int
   nameserver:
     description:
@@ -114,7 +114,7 @@ options:
   tags:
     description:
       - List of tags to apply to the container.
-      - Tags must start with C([a-z0-9_]) followed by zero or more of the following characters C([a-z0-9_-+.]).
+      - Tags must start with V([a-z0-9_]) followed by zero or more of the following characters V([a-z0-9_-+.]).
       - Tags are only available in Proxmox 7+.
     type: list
     elements: str
@@ -126,10 +126,10 @@ options:
     default: 30
   force:
     description:
-      - forcing operations
-      - can be used only with states C(present), C(stopped), C(restarted)
-      - with C(state=present) force option allow to overwrite existing container
-      - with states C(stopped) , C(restarted) allow to force stop instance
+      - Forcing operations.
+      - Can be used only with states V(present), V(stopped), V(restarted).
+      - with O(state=present) force option allow to overwrite existing container.
+      - with states V(stopped), V(restarted) allow to force stop instance.
     type: bool
     default: false
   purge:
@@ -137,7 +137,7 @@ options:
       - Remove container from all related configurations.
       - For example backup jobs, replication jobs, or HA.
       - Related ACLs and Firewall entries will always be removed.
-      - Used with state C(absent).
+      - Used with O(state=absent).
     type: bool
     default: false
     version_added: 2.3.0
@@ -154,7 +154,7 @@ options:
   unprivileged:
     description:
       - Indicate if the container should be unprivileged.
-      - The default change to C(true) in community.general 7.0.0. It used to be C(false) before.
+      - The default change to V(true) in community.general 7.0.0. It used to be V(false) before.
     type: bool
     default: true
   description:
@@ -170,8 +170,8 @@ options:
     version_added: '0.2.0'
   timezone:
     description:
-      - Timezone used by the container, accepts values like C(Europe/Paris).
-      - The special value C(host) configures the same timezone used by Proxmox host.
+      - Timezone used by the container, accepts values like V(Europe/Paris).
+      - The special value V(host) configures the same timezone used by Proxmox host.
     type: str
     version_added: '7.1.0'
   proxmox_default_behavior:
@@ -179,10 +179,10 @@ options:
       - As of community.general 4.0.0, various options no longer have default values.
         These default values caused problems when users expected different behavior from Proxmox
         by default or filled options which caused problems when set.
-      - The value C(compatibility) (default before community.general 4.0.0) will ensure that the default values
-        are used when the values are not explicitly specified by the user. The new default is C(no_defaults),
+      - The value V(compatibility) (default before community.general 4.0.0) will ensure that the default values
+        are used when the values are not explicitly specified by the user. The new default is V(no_defaults),
         which makes sure these options have no defaults.
-      - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
+      - This affects the O(disk), O(cores), O(cpus), O(memory), O(onboot), O(swap), and O(cpuunits) options.
     type: str
     default: no_defaults
     choices:
@@ -192,18 +192,18 @@ options:
   clone:
     description:
       - ID of the container to be cloned.
-      - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
-      - The type of clone created is defined by the I(clone_type) parameter.
+      - O(description), O(hostname), and O(pool) will be copied from the cloned container if not specified.
+      - The type of clone created is defined by the O(clone_type) parameter.
       - This operator is only supported for Proxmox clusters that use LXC containerization (PVE version >= 4).
     type: int
     version_added: 4.3.0
   clone_type:
     description:
       - Type of the clone created.
-      - C(full) creates a full clone, and I(storage) must be specified.
-      - C(linked) creates a linked clone, and the cloned container must be a template container.
-      - C(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not.
-        I(storage) may be specified, if not it will fall back to the default.
+      - V(full) creates a full clone, and O(storage) must be specified.
+      - V(linked) creates a linked clone, and the cloned container must be a template container.
+      - V(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not.
+        O(storage) may be specified, if not it will fall back to the default.
     type: str
     choices: ['full', 'linked', 'opportunistic']
     default: opportunistic

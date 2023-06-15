@@ -32,8 +32,9 @@ options:
     state:
         type: str
         description:
-            - C(started)/C(stopped) are idempotent actions that will not run commands unless necessary.
-              C(restarted) will always bounce the service. C(reloaded) will always reload.
+            - V(started)/V(stopped) are idempotent actions that will not run commands unless necessary.
+            - V(restarted) will always bounce the service.
+            - V(reloaded) will always reload.
         choices: [ 'started', 'stopped', 'restarted', 'reloaded' ]
     enabled:
         description:
@@ -43,7 +44,7 @@ options:
         type: str
         description:
         - If the service does not respond to the 'running' command, name a
-          substring to look for as would be found in the output of the I(ps)
+          substring to look for as would be found in the output of the C(ps)
           command as a stand-in for a 'running' result.  If the string is found,
           the service will be assumed to be running.
 notes:
