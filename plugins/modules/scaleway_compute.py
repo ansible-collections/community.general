@@ -37,8 +37,8 @@ options:
     description:
     - Manage public IP on a Scaleway server
     - Could be Scaleway IP address UUID
-    - C(dynamic) Means that IP is destroyed at the same time the host is destroyed
-    - C(absent) Means no public IP at all
+    - V(dynamic) Means that IP is destroyed at the same time the host is destroyed
+    - V(absent) Means no public IP at all
     default: absent
 
   enable_ipv6:
@@ -62,13 +62,13 @@ options:
     type: str
     description:
       - Organization identifier.
-      - Exactly one of I(project) and I(organization) must be specified.
+      - Exactly one of O(project) and O(organization) must be specified.
 
   project:
     type: str
     description:
       - Project identifier.
-      - Exactly one of I(project) and I(organization) must be specified.
+      - Exactly one of O(project) and O(organization) must be specified.
     version_added: 4.3.0
 
   state:
