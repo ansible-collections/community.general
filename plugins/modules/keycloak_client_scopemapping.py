@@ -57,25 +57,41 @@ def get_all_mappings(kc, cid, existing_clients, realm):
         if existing_mappings:
             scope_mappings = [sm.get("name") for sm in existing_mappings]
             all_mappings.update({existing_client["clientId"]: list(sorted(scope_mappings))})
+    # Also get realm mappings.
+    existing_realm_mappings = kc.get_realm_scope_mappings(cid, realm=realm)
+    if existing_realm_mappings:
+        scope_mappings = [sm.get("name") for sm in existing_realm_mappings]
+        all_mappings.update({"realm": scope_mappings})
+
     return all_mappings
     
 def update_mappings(kc, cid, before_mappings, desired_mappings, ids, realm):
     # Update scope mappings
-    mappings_update_dict = before_mappings | desired_mappings 
+    mappings_update_dict = before_mappings | desired_mappings
+    available_mappings = kc.get_available_realm_scope_mappings(cid, realm=realm)
+    realm_mappings = kc.get_realm_scope_mappings(cid, realm=realm)
+    name_to_id = dict((sm["name"], sm["id"]) for sm in available_mappings + realm_mappings)
     for client_id, roles in mappings_update_dict.items():
         existing_sm = before_mappings.get(client_id)
-        target_id = ids[client_id]
+        target_id = ids[client_id] if client_id != "realm" else None
         if roles:
             for role in roles:
                 if not existing_sm or role not in existing_sm:
-                    repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
-                    kc.add_client_scope_mapping(cid, target_id, repr, realm=realm)
+                    if client_id != "realm":
+                        repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
+                        kc.add_client_scope_mapping(cid, target_id, repr, realm=realm)
+                    else:
+                        repr = [{"id": name_to_id[role]}]
+                        kc.add_realm_scope_mapping(cid, repr, realm=realm)
         if existing_sm:
             for role in existing_sm:
                 if not roles or role not in roles:
-                    repr = [{"name":role, "description":"", "composite": False, "clientRole": True}]
-                    kc.delete_client_scope_mapping(cid, target_id, repr, realm=realm)
-
+                    if client_id != "realm":
+                        repr = [{"name": role, "description": "", "composite": False, "clientRole": True}]
+                        kc.delete_client_scope_mapping(cid, target_id, repr, realm=realm)
+                    else:
+                        repr = [{"id": name_to_id[role]}]
+                        kc.delete_realm_scope_mapping(cid, repr, realm=realm)
 def delete_proposed_mappings(kc, cid, before_mappings, mappings_to_delete):
     
     new_mappings = deepcopy(before_mappings)
@@ -194,9 +210,12 @@ def main():
             module.exit_json(**result)
         
         for client, roles in changeset.items():
-            for role in roles:
-                kc.delete_client_scope_mapping(cid, ids[client], [{"name" : role}], realm=realm)
-        
+            if client != "realm":
+                for role in roles:
+                    kc.delete_client_scope_mapping(cid, ids[client], [{"name" : role}], realm=realm)
+            else:
+                for role in roles:
+                    kc.delete_realm_scope_mapping(cid, [{"name" : role}], realm=realm)
         result['msg'] = 'Scope mappings %s removed from client %s.' % (changeset, module.params.get("client_id"))
         
         result["proposed"] = {}

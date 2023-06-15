@@ -863,6 +863,60 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not add scope mappings for client %s in realm %s: %s"
                                       % (cid, realm, str(e)))
+
+    def get_realm_scope_mappings(self, cid, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_REALM.format(url=self.baseurl, realm=realm, id=cid)
+        try:
+            return json.loads(to_native(
+                open_url(client_scope_mappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                         timeout=self.connection_timeout,
+                         validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+
+    def get_available_realm_scope_mappings(self, cid, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_REALM.format(url=self.baseurl, realm=realm, id=cid)+"/available"
+        try:
+            return json.loads(to_native(
+                open_url(client_scope_mappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                         timeout=self.connection_timeout,
+                         validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+
+    def add_realm_scope_mapping(self, cid, scope_mapping_rep, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_REALM.format(url=self.baseurl, realm=realm, id=cid)
+        try:
+            open_url(client_scope_mappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders,
+                     data=json.dumps(scope_mapping_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not add scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+
+    def delete_realm_scope_mapping(self, cid, scope_mapping_rep, realm="master"):
+        """
+        TODO:DOC
+        """
+        client_scope_mappings_url = URL_CLIENT_SCOPEMAPPINGS_REALM.format(url=self.baseurl, realm=realm, id=cid)
+        try:
+            open_url(client_scope_mappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders,
+                     data=json.dumps(scope_mapping_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not add scope mappings for client %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
     def get_user_by_username(self, username, realm="master"):
         """ Fetch a keycloak user within a realm based on its username.
 
