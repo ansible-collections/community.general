@@ -43,8 +43,8 @@ options:
     state:
         description:
             - State of the client_rolemapping.
-            - On C(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the client_rolemapping will be removed if it exists.
+            - On V(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+            - On V(absent), the client_rolemapping will be removed if it exists.
         default: 'present'
         type: str
         choices:
@@ -73,7 +73,7 @@ options:
     client_id:
         type: str
         description:
-            - Name of the client to be mapped (different than I(cid)).
+            - Name of the client to be mapped (different than O(cid)).
             - This parameter is required (can be replaced by cid for less API call).
 
     cid:

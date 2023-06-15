@@ -36,8 +36,8 @@ options:
     state:
         description:
             - State of the identity provider.
-            - On C(present), the identity provider will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the identity provider will be removed if it exists.
+            - On V(present), the identity provider will be created if it does not yet exist, or updated with the parameters you provide.
+            - On V(absent), the identity provider will be removed if it exists.
         default: 'present'
         type: str
         choices:
@@ -120,16 +120,16 @@ options:
 
     provider_id:
         description:
-            - Protocol used by this provider (supported values are C(oidc) or C(saml)).
+            - Protocol used by this provider (supported values are V(oidc) or V(saml)).
         aliases:
             - providerId
         type: str
 
     config:
         description:
-            - Dict specifying the configuration options for the provider; the contents differ depending on the value of I(providerId).
-              Examples are given below for C(oidc) and C(saml). It is easiest to obtain valid config values by dumping an already-existing
-              identity provider configuration through check-mode in the I(existing) field.
+            - Dict specifying the configuration options for the provider; the contents differ depending on the value of O(provider_id).
+              Examples are given below for V(oidc) and V(saml). It is easiest to obtain valid config values by dumping an already-existing
+              identity provider configuration through check-mode in the RV(existing) field.
         type: dict
         suboptions:
             hide_on_login_page:
@@ -271,7 +271,8 @@ options:
 
             config:
                 description:
-                    - Dict specifying the configuration options for the mapper; the contents differ depending on the value of I(identityProviderMapper).
+                    - Dict specifying the configuration options for the mapper; the contents differ depending on the value of
+                      O(mappers[].identityProviderMapper).
                 type: dict
 
 extends_documentation_fragment:
