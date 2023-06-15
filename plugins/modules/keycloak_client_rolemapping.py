@@ -69,7 +69,7 @@ options:
         description:
             - List of parent groups for the group to handle sorted top to bottom.
             - >-
-              Set this if your group is a subgroup and your do not provide GID
+              Set this if your group is a subgroup and you do not provide the GID in O(gid).
         elements: dict
         suboptions:
           id:
