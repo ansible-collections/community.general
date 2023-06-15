@@ -9,9 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import pytest
-import sys
 
-from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.modules import proxmox_kvm
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
@@ -59,7 +57,7 @@ class TestProxmoxKvmModule(ModuleTestCase):
 
             assert get_vm_mock.call_count == 1
             result = exc_info.value.args[0]
-            assert result["changed"] == False
+            assert result["changed"] is False
             assert result["msg"] == "VM with vmid <100> already exists"
 
     @patch.object(proxmox_kvm.ProxmoxKvmAnsible, "create_vm")
@@ -83,7 +81,7 @@ class TestProxmoxKvmModule(ModuleTestCase):
 
             assert get_vm_mock.call_count == 1
             result = exc_info.value.args[0]
-            assert result["changed"] == True
+            assert result["changed"] is True
             assert result["msg"] == "VM existing.vm.local with vmid 100 deployed"
 
     def test_parse_mac(self):
