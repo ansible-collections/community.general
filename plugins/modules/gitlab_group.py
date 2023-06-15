@@ -205,11 +205,15 @@ class GitLabGroup(object):
                 'name': name,
                 'path': options['path'],
                 'parent_id': parent_id,
-                'visibility': options['visibility'],
-                'project_creation_level': options['project_creation_level'],
-                'auto_devops_enabled': options['auto_devops_enabled'],
-                'subgroup_creation_level': options['subgroup_creation_level'],
             }
+            if options.get('auto_devops_enabled'):
+                payload['auto_devops_enabled'] = options['auto_devops_enabled']
+            if options.get('visibility'):
+                payload['visibility'] = options['visibility']
+            if options.get('project_creation_level'):
+                payload['project_creation_level'] = options['project_creation_level']
+            if options.get('subgroup_creation_level'):
+                payload['subgroup_creation_level'] = options['subgroup_creation_level']
             if options.get('description'):
                 payload['description'] = options['description']
             if options.get('require_two_factor_authentication'):
