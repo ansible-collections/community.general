@@ -29,13 +29,13 @@ options:
   name:
     description:
       - An FRMI of the package(s) to be installed/removed/updated.
-      - Multiple packages may be specified, separated by C(,).
+      - Multiple packages may be specified, separated by V(,).
     required: true
     type: list
     elements: str
   state:
     description:
-      - Whether to install (I(present), I(latest)), or remove (I(absent)) a package.
+      - Whether to install (V(present), V(latest)), or remove (V(absent)) a package.
     choices: [ absent, latest, present, installed, removed, uninstalled ]
     default: present
     type: str

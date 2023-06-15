@@ -19,10 +19,10 @@ description:
     - Add or remove gpg keys from the pacman keyring.
 notes:
     - Use full-length key ID (40 characters).
-    - Keys will be verified when using I(data), I(file), or I(url) unless I(verify) is overridden.
+    - Keys will be verified when using O(data), O(file), or O(url) unless O(verify) is overridden.
     - Keys will be locally signed after being imported into the keyring.
-    - If the key ID exists in the keyring, the key will not be added unless I(force_update) is specified.
-    - I(data), I(file), I(url), and I(keyserver) are mutually exclusive.
+    - If the key ID exists in the keyring, the key will not be added unless O(force_update) is specified.
+    - O(data), O(file), O(url), and O(keyserver) are mutually exclusive.
 requirements:
     - gpg
     - pacman-key
@@ -73,7 +73,7 @@ options:
     keyring:
         description:
             - The full path to the keyring folder on the remote server.
-            - If not specified, module will use pacman's default (C(/etc/pacman.d/gnupg)).
+            - If not specified, module will use pacman's default (V(/etc/pacman.d/gnupg)).
             - Useful if the remote system requires an alternative gnupg directory.
         type: path
         default: /etc/pacman.d/gnupg
