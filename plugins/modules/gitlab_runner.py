@@ -24,7 +24,7 @@ description:
     To create shared runners, you need to ask your administrator to give you this token.
     It can be found at U(https://$GITLAB_URL/admin/runners/).
 notes:
-  - To create a new runner at least the C(api_token), C(description) and C(api_url) options are required.
+  - To create a new runner at least the O(api_token), O(description) and O(api_url) options are required.
   - Runners need to have unique descriptions.
 author:
   - Samy Coenen (@SamyCoenen)
@@ -47,14 +47,14 @@ options:
   group:
     description:
       - ID or full path of the group in the form group/subgroup.
-      - Mutually exclusive with I(owned) and I(project).
+      - Mutually exclusive with O(owned) and O(project).
     type: str
     version_added: '6.5.0'
   project:
     description:
       - ID or full path of the project in the form of group/name.
-      - Mutually exclusive with I(owned) since community.general 4.5.0.
-      - Mutually exclusive with I(group).
+      - Mutually exclusive with O(owned) since community.general 4.5.0.
+      - Mutually exclusive with O(group).
     type: str
     version_added: '3.7.0'
   description:
@@ -74,13 +74,13 @@ options:
   registration_token:
     description:
       - The registration token is used to register new runners.
-      - Required if I(state) is C(present).
+      - Required if O(state=present).
     type: str
   owned:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
-      - Mutually exclusive with I(project) since community.general 4.5.0.
-      - Mutually exclusive with I(group).
+      - Mutually exclusive with O(project) since community.general 4.5.0.
+      - Mutually exclusive with O(group).
     default: false
     type: bool
     version_added: 2.0.0
@@ -99,12 +99,12 @@ options:
   access_level:
     description:
       - Determines if a runner can pick up jobs only from protected branches.
-      - If I(access_level_on_creation) is not explicitly set to C(true), this option is ignored on registration and
+      - If O(access_level_on_creation) is not explicitly set to V(true), this option is ignored on registration and
         is only applied on updates.
-      - If set to C(not_protected), runner can pick up jobs from both protected and unprotected branches.
-      - If set to C(ref_protected), runner can pick up jobs only from protected branches.
-      - The current default is C(ref_protected). This will change to no default in community.general 8.0.0.
-        From that version on, if this option is not specified explicitly, GitLab will use C(not_protected)
+      - If set to V(not_protected), runner can pick up jobs from both protected and unprotected branches.
+      - If set to V(ref_protected), runner can pick up jobs only from protected branches.
+      - The current default is V(ref_protected). This will change to no default in community.general 8.0.0.
+        From that version on, if this option is not specified explicitly, GitLab will use V(not_protected)
         on creation, and the value set will not be changed on any updates.
     required: false
     choices: ["not_protected", "ref_protected"]
@@ -112,9 +112,9 @@ options:
   access_level_on_creation:
     description:
       - Whether the runner should be registered with an access level or not.
-      - If set to C(true), the value of I(access_level) is used for runner registration.
-      - If set to C(false), GitLab registers the runner with the default access level.
-      - The default of this option changed to C(true) in community.general 7.0.0. Before, it was C(false).
+      - If set to V(true), the value of O(access_level) is used for runner registration.
+      - If set to V(false), GitLab registers the runner with the default access level.
+      - The default of this option changed to V(true) in community.general 7.0.0. Before, it was V(false).
     required: false
     default: true
     type: bool

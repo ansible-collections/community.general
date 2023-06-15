@@ -44,7 +44,7 @@ options:
   ttl:
     description:
     - The TTL to give the new record.
-    - Required when I(state=present).
+    - Required when O(state=present).
     type: int
   type:
     description:
@@ -54,7 +54,7 @@ options:
   values:
     description:
     - The record values.
-    - Required when I(state=present).
+    - Required when O(state=present).
     type: list
     elements: str
   domain:
