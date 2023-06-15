@@ -33,28 +33,28 @@ options:
         required: true
     value:
         description:
-            - The value to set when I(state=present).
-            - The value to add when I(state=value_present).
-            - The value to remove when I(state=value_absent).
+            - The value to set when O(state=present).
+            - The value to add when O(state=value_present).
+            - The value to remove when O(state=value_absent).
         type: str
     state:
         description:
-            - Use I(present) to add the variable.
-            - Use I(absent) to remove the variable.
-            - Use I(value_present) to add the value to the existing variable.
-            - Use I(value_absent) to remove the value from the existing variable.
+            - Use V(present) to add the variable.
+            - Use V(absent) to remove the variable.
+            - Use V(value_present) to add the value to the existing variable.
+            - Use V(value_absent) to remove the value from the existing variable.
         type: str
         default: "present"
         choices: [ absent, present, value_present, value_absent ]
     path:
         description:
-            - Path to file to use instead of C(/etc/rc.conf).
+            - Path to file to use instead of V(/etc/rc.conf).
         type: str
         default: "/etc/rc.conf"
     delim:
         description:
-            - Delimiter to be used instead of C( ).
-            - Only used when I(state=value_present) or I(state=value_absent).
+            - Delimiter to be used instead of V(" ") (space).
+            - Only used when O(state=value_present) or O(state=value_absent).
         default: " "
         type: str
     jail:
@@ -62,7 +62,7 @@ options:
             - Name or ID of the jail to operate on.
         type: str
 notes:
-  - The C(name) cannot contain periods as sysrc does not support OID style names.
+  - The O(name) cannot contain periods as sysrc does not support OID style names.
 '''
 
 EXAMPLES = r'''

@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: spectrum_device
 short_description: Creates/deletes devices in CA Spectrum
@@ -36,7 +36,7 @@ options:
         type: str
         description:
             - SNMP community used for device discovery.
-            - Required when I(state=present).
+            - Required when O(state=present).
         required: true
     landscape:
         type: str
@@ -46,8 +46,8 @@ options:
     state:
         type: str
         description:
-            - On C(present) creates the device when it does not exist.
-            - On C(absent) removes the device when it exists.
+            - On V(present) creates the device when it does not exist.
+            - On V(absent) removes the device when it exists.
         choices: ['present', 'absent']
         default: 'present'
     url:
@@ -55,7 +55,7 @@ options:
         aliases: [ oneclick_url ]
         required: true
         description:
-            - HTTP, HTTPS URL of the Oneclick server in the form C((http|https)://host.domain[:port]).
+            - HTTP, HTTPS URL of the Oneclick server in the form V((http|https\)://host.domain[:port]).
     url_username:
         type: str
         aliases: [ oneclick_user ]
@@ -70,12 +70,12 @@ options:
             - Oneclick user password.
     use_proxy:
         description:
-            - if C(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
+            - if V(false), it will not use a proxy, even if one is defined in an environment variable on the target hosts.
         default: true
         type: bool
     validate_certs:
         description:
-            - If C(false), SSL certificates will not be validated. This should only be used
+            - If V(false), SSL certificates will not be validated. This should only be used
               on personally controlled sites using self-signed certificates.
         default: true
         type: bool

@@ -141,14 +141,14 @@ options:
         default: true
     cd_drive:
         description:
-            - The CD you wish to have mounted on the VM when I(state = 'CD').
+            - The CD you wish to have mounted on the VM when O(state=cd).
         type: str
     timeout:
         description:
             - The timeout you wish to define for power actions.
-            - When I(state = 'up').
-            - When I(state = 'down').
-            - When I(state = 'restarted').
+            - When O(state=up).
+            - When O(state=down).
+            - When O(state=restarted).
         type: int
 '''
 

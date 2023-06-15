@@ -96,8 +96,8 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: This is only present when I(state=present).
-    returned: when I(state=present)
+    description: This is only present when O(state=present).
+    returned: when O(state=present)
     type: dict
     sample: {
       "volume": {
