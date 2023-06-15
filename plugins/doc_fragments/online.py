@@ -39,7 +39,7 @@ notes:
   - Also see the API documentation on U(https://console.online.net/en/api/)
   - If O(api_token) is not set within the module, the following
     environment variables can be used in decreasing order of precedence
-    C(ONLINE_TOKEN), C(ONLINE_API_KEY), C(ONLINE_OAUTH_TOKEN), C(ONLINE_API_TOKEN)
-  - If one wants to use a different O(api_url) one can also set the C(ONLINE_API_URL)
+    E(ONLINE_TOKEN), E(ONLINE_API_KEY), E(ONLINE_OAUTH_TOKEN), E(ONLINE_API_TOKEN).
+  - If one wants to use a different O(api_url) one can also set the E(ONLINE_API_URL)
     environment variable.
 '''
