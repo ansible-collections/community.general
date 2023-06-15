@@ -224,7 +224,7 @@ options:
         default: []
     sambahome:
         description:
-            - Windows home path, for example V('\\$FQDN\$USERNAME').
+            - Windows home path, for example V('\\\\$FQDN\\$USERNAME').
         type: str
     scriptpath:
         description:
