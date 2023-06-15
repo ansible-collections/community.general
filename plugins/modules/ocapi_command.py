@@ -41,17 +41,17 @@ options:
       - Base URI of OOB controller.
     type: str
   proxy_slot_number:
-    description: For proxied inband requests, the slot number of the IOM.  Only applies if I(baseuri) is a proxy server.
+    description: For proxied inband requests, the slot number of the IOM.  Only applies if O(baseuri) is a proxy server.
     type: int
   update_image_path:
     required: false
     description:
-      - For C(FWUpload), the path on the local filesystem of the firmware update image.
+      - For O(command=FWUpload), the path on the local filesystem of the firmware update image.
     type: str
   job_name:
     required: false
     description:
-      - For C(DeleteJob) command, the name of the job to delete.
+      - For O(command=DeleteJob) command, the name of the job to delete.
     type: str
   username:
     required: true

@@ -43,7 +43,7 @@ options:
     user:
         type: str
         description:
-            - PagerDuty user ID. Obsolete. Please, use I(token) for authorization.
+            - PagerDuty user ID. Obsolete. Please, use O(token) for authorization.
     token:
         type: str
         description:
@@ -80,7 +80,7 @@ options:
         default: Created by Ansible
     validate_certs:
         description:
-            - If C(false), SSL certificates will not be validated. This should only be used
+            - If V(false), SSL certificates will not be validated. This should only be used
               on personally controlled sites using self-signed certificates.
         type: bool
         default: true

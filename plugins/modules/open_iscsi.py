@@ -85,7 +85,7 @@ options:
         - Whether the list of target nodes on the portal should be
           (re)discovered and added to the persistent iSCSI database.
         - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup)
-          to manual, hence combined with I(auto_node_startup=true) will always return
+          to manual, hence combined with O(auto_node_startup=true) will always return
           a changed state.
         type: bool
         default: false
@@ -97,7 +97,7 @@ options:
     rescan:
         description:
         - Rescan an established session for discovering new targets.
-        - When I(target) is omitted, will rescan all sessions.
+        - When O(target) is omitted, will rescan all sessions.
         type: bool
         default: false
         version_added: 4.1.0

@@ -23,12 +23,12 @@ attributes:
         support: none
 options:
     cidr_block:
-        description: The CIDR IP address block of the VCN. Required when creating a VCN with I(state=present).
+        description: The CIDR IP address block of the VCN. Required when creating a VCN with O(state=present).
         type: str
         required: false
     compartment_id:
-        description: The OCID of the compartment to contain the VCN. Required when creating a VCN with I(state=present).
-                     This option is mutually exclusive with I(vcn_id).
+        description: The OCID of the compartment to contain the VCN. Required when creating a VCN with O(state=present).
+                     This option is mutually exclusive with O(vcn_id).
         type: str
     display_name:
         description: A user-friendly name. Does not have to be unique, and it's changeable.
@@ -42,13 +42,13 @@ options:
                      with a letter. The value cannot be changed.
         type: str
     state:
-        description: Create or update a VCN with I(state=present). Use I(state=absent) to delete a VCN.
+        description: Create or update a VCN with O(state=present). Use O(state=absent) to delete a VCN.
         type: str
         default: present
         choices: ['present', 'absent']
     vcn_id:
-        description: The OCID of the VCN. Required when deleting a VCN with I(state=absent) or updating a VCN
-                     with I(state=present). This option is mutually exclusive with I(compartment_id).
+        description: The OCID of the VCN. Required when deleting a VCN with O(state=absent) or updating a VCN
+                     with O(state=present). This option is mutually exclusive with O(compartment_id).
         type: str
         aliases: [ 'id' ]
 author: "Rohit Chaware (@rohitChaware)"

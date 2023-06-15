@@ -21,10 +21,10 @@ description:
     check the GNU parted manual.
 requirements:
   - This module requires C(parted) version 1.8.3 and above.
-  - Option I(align) (except C(undefined)) requires C(parted) 2.1 or above.
+  - Option O(align) (except V(undefined)) requires C(parted) 2.1 or above.
   - If the version of C(parted) is below 3.1, it requires a Linux version running
     the C(sysfs) file system C(/sys/).
-  - Requires the C(resizepart) command when using the I(resize) parameter.
+  - Requires the C(resizepart) command when using the O(resize) parameter.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -42,7 +42,7 @@ options:
     required: true
   align:
     description:
-      - Set alignment for newly created partitions. Use C(undefined) for parted default aligment.
+      - Set alignment for newly created partitions. Use V(undefined) for parted default aligment.
     type: str
     choices: [ cylinder, minimal, none, optimal, undefined ]
     default: optimal
@@ -63,16 +63,16 @@ options:
   label:
     description:
       - Disk label type or partition table to use.
-      - If I(device) already contains a different label, it will be changed to I(label)
+      - If O(device) already contains a different label, it will be changed to O(label)
         and any previous partitions will be lost.
-      - A I(name) must be specified for a C(gpt) partition table.
+      - A O(name) must be specified for a V(gpt) partition table.
     type: str
     choices: [ aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun ]
     default: msdos
   part_type:
     description:
-      - May be specified only with I(label=msdos) or I(label=dvh).
-      - Neither I(part_type) nor I(name) may be used with I(label=sun).
+      - May be specified only with O(label=msdos) or O(label=dvh).
+      - Neither O(part_type) nor O(name) may be used with O(label=sun).
     type: str
     choices: [ extended, logical, primary ]
     default: primary
@@ -82,8 +82,8 @@ options:
         that is, the "distance" from the start of the disk. Negative numbers
         specify distance from the end of the disk.
       - The distance can be specified with all the units supported by parted
-        (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
-      - Using negative values may require setting of I(fs_type) (see notes).
+        (except compat) and it is case sensitive, for example V(10GiB), V(15%).
+      - Using negative values may require setting of O(fs_type) (see notes).
     type: str
     default: 0%
   part_end:
@@ -92,7 +92,7 @@ options:
         that is, the "distance" from the start of the disk. Negative numbers
         specify distance from the end of the disk.
       - The distance can be specified with all the units supported by parted
-        (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
+        (except compat) and it is case sensitive, for example V(10GiB), V(15%).
     type: str
     default: 100%
   name:
@@ -106,19 +106,19 @@ options:
   state:
     description:
       - Whether to create or delete a partition.
-      - If set to C(info) the module will only return the device information.
+      - If set to V(info) the module will only return the device information.
     type: str
     choices: [ absent, present, info ]
     default: info
   fs_type:
     description:
       - If specified and the partition does not exist, will set filesystem type to given partition.
-      - Parameter optional, but see notes below about negative I(part_start) values.
+      - Parameter optional, but see notes below about negative O(part_start) values.
     type: str
     version_added: '0.2.0'
   resize:
     description:
-      - Call C(resizepart) on existing partitions to match the size specified by I(part_end).
+      - Call C(resizepart) on existing partitions to match the size specified by O(part_end).
     type: bool
     default: false
     version_added: '1.3.0'
@@ -128,9 +128,9 @@ notes:
     installed on the system is before version 3.1, the module queries the kernel
     through C(/sys/) to obtain disk information. In this case the units CHS and
     CYL are not supported.
-  - Negative I(part_start) start values were rejected if I(fs_type) was not given.
-    This bug was fixed in parted 3.2.153. If you want to use negative I(part_start),
-    specify I(fs_type) as well or make sure your system contains newer parted.
+  - Negative O(part_start) start values were rejected if O(fs_type) was not given.
+    This bug was fixed in parted 3.2.153. If you want to use negative O(part_start),
+    specify O(fs_type) as well or make sure your system contains newer parted.
 '''
 
 RETURN = r'''

@@ -30,8 +30,8 @@ options:
         default: install
         description:
             - Desired state for the application.
-            - The states C(present) and C(absent) are aliases to C(install) and C(uninstall), respectively.
-            - The state C(latest) is equivalent to executing the task twice, with state C(install) and then C(upgrade).
+            - The states V(present) and V(absent) are aliases to V(install) and V(uninstall), respectively.
+            - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade).
               It was added in community.general 5.5.0.
     name:
         type: str
@@ -39,60 +39,60 @@ options:
             - >
               The name of the application to be installed. It must to be a simple package name.
               For passing package specifications or installing from URLs or directories,
-              please use the I(source) option.
+              please use the O(source) option.
     source:
         type: str
         description:
             - >
               If the application source, such as a package with version specifier, or an URL,
               directory or any other accepted specification. See C(pipx) documentation for more details.
-            - When specified, the C(pipx) command will use I(source) instead of I(name).
+            - When specified, the C(pipx) command will use O(source) instead of O(name).
     install_apps:
         description:
             - Add apps from the injected packages.
-            - Only used when I(state=inject).
+            - Only used when O(state=inject).
         type: bool
         default: false
         version_added: 6.5.0
     install_deps:
         description:
             - Include applications of dependent packages.
-            - Only used when I(state=install), I(state=latest), or I(state=inject).
+            - Only used when O(state=install), O(state=latest), or O(state=inject).
         type: bool
         default: false
     inject_packages:
         description:
             - Packages to be injected into an existing virtual environment.
-            - Only used when I(state=inject).
+            - Only used when O(state=inject).
         type: list
         elements: str
     force:
         description:
             - Force modification of the application's virtual environment. See C(pipx) for details.
-            - Only used when I(state=install), I(state=upgrade), I(state=upgrade_all), I(state=latest), or I(state=inject).
+            - Only used when O(state=install), O(state=upgrade), O(state=upgrade_all), O(state=latest), or O(state=inject).
         type: bool
         default: false
     include_injected:
         description:
             - Upgrade the injected packages along with the application.
-            - Only used when I(state=upgrade), I(state=upgrade_all), or I(state=latest).
-            - This is used with I(state=upgrade) and I(state=latest) since community.general 6.6.0.
+            - Only used when O(state=upgrade), O(state=upgrade_all), or O(state=latest).
+            - This is used with O(state=upgrade) and O(state=latest) since community.general 6.6.0.
         type: bool
         default: false
     index_url:
         description:
             - Base URL of Python Package Index.
-            - Only used when I(state=install), I(state=upgrade), I(state=latest), or I(state=inject).
+            - Only used when O(state=install), O(state=upgrade), O(state=latest), or O(state=inject).
         type: str
     python:
         description:
             - Python version to be used when creating the application virtual environment. Must be 3.6+.
-            - Only used when I(state=install), I(state=latest), I(state=reinstall), or I(state=reinstall_all).
+            - Only used when O(state=install), O(state=latest), O(state=reinstall), or O(state=reinstall_all).
         type: str
     system_site_packages:
         description:
             - Give application virtual environment access to the system site-packages directory.
-            - Only used when I(state=install) or I(state=latest).
+            - Only used when O(state=install) or O(state=latest).
         type: bool
         default: false
         version_added: 6.6.0

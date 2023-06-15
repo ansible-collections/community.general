@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 module: puppet
 short_description: Runs puppet
 description:
-  - Runs I(puppet) agent or apply in a reliable manner.
+  - Runs C(puppet) agent or apply in a reliable manner.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -24,7 +24,7 @@ attributes:
 options:
   timeout:
     description:
-      - How long to wait for I(puppet) to finish.
+      - How long to wait for C(puppet) to finish.
     type: str
     default: 30m
   puppetmaster:
@@ -42,8 +42,8 @@ options:
   noop:
     description:
       - Override puppet.conf noop mode.
-      - When C(true), run Puppet agent with C(--noop) switch set.
-      - When C(false), run Puppet agent with C(--no-noop) switch set.
+      - When V(true), run Puppet agent with C(--noop) switch set.
+      - When V(false), run Puppet agent with C(--no-noop) switch set.
       - When unset (default), use default or puppet.conf value if defined.
     type: bool
   facts:
@@ -67,8 +67,8 @@ options:
   logdest:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
-    - C(all) will go to both C(console) and C(syslog).
-    - C(stdout) will be deprecated and replaced by C(console).
+    - V(all) will go to both C(console) and C(syslog).
+    - V(stdout) will be deprecated and replaced by C(console).
     type: str
     choices: [ all, stdout, syslog ]
     default: stdout

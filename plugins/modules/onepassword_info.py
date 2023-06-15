@@ -20,7 +20,7 @@ requirements:
     - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
 notes:
     - Tested with C(op) version 0.5.5
-    - "Based on the C(onepassword) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>."
+    - "Based on the P(community.general.onepassword#lookup) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>."
 short_description: Gather items from 1Password
 description:
     - M(community.general.onepassword_info) wraps the C(op) command line utility to fetch data about one or more 1Password items.
@@ -28,7 +28,7 @@ description:
     - Recommend using with the C(no_log) option to avoid logging the values of the secrets being retrieved.
     - This module was called C(onepassword_facts) before Ansible 2.9, returning C(ansible_facts).
       Note that the M(community.general.onepassword_info) module no longer returns C(ansible_facts)!
-      You must now use the C(register) option to use the facts in other tasks.
+      You must now use the C(register) keyword to use the facts in other tasks.
 extends_documentation_fragment:
     - community.general.attributes
     - community.general.attributes.info_module
@@ -39,7 +39,7 @@ options:
         description:
             - A list of one or more search terms.
             - Each search term can either be a simple string or it can be a dictionary for more control.
-            - When passing a simple string, I(field) is assumed to be C(password).
+            - When passing a simple string, O(search_terms[].field) is assumed to be V(password).
             - When passing a dictionary, the following fields are available.
         suboptions:
             name:
@@ -82,7 +82,7 @@ options:
                 type: str
                 description:
                     - The master password for your subdomain.
-                    - This is always required when specifying C(auto_login).
+                    - This is always required when specifying O(auto_login).
                 required: true
             secret_key:
                 type: str

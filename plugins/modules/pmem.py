@@ -30,10 +30,10 @@ attributes:
 options:
   appdirect:
     description:
-     - Percentage of the total capacity to use in AppDirect Mode (C(0)-C(100)).
+     - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)).
      - Create AppDirect capacity utilizing hardware interleaving across the
        requested PMem modules if applicable given the specified target.
-     - Total of I(appdirect), I(memorymode) and I(reserved) must be C(100)
+     - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100)
     type: int
   appdirect_interleaved:
     description:
@@ -43,20 +43,20 @@ options:
     default: true
   memorymode:
     description:
-     - Percentage of the total capacity to use in Memory Mode (C(0)-C(100)).
+     - Percentage of the total capacity to use in Memory Mode (V(0)-V(100)).
     type: int
   reserved:
     description:
-     - Percentage of the capacity to reserve (C(0)-C(100)). I(reserved) will not be mapped
+     - Percentage of the capacity to reserve (V(0)-V(100)). O(reserved) will not be mapped
        into the system physical address space and will be presented as reserved
        capacity with Show Device and Show Memory Resources Commands.
-     - I(reserved) will be set automatically if this is not configured.
+     - O(reserved) will be set automatically if this is not configured.
     type: int
     required: false
   socket:
     description:
      - This enables to set the configuration for each socket by using the socket ID.
-     - Total of I(appdirect), I(memorymode) and I(reserved) must be C(100) within one socket.
+     - Total of O(appdirect), O(memorymode) and O(reserved) must be V(100) within one socket.
     type: list
     elements: dict
     suboptions:
@@ -66,7 +66,7 @@ options:
         required: true
       appdirect:
         description:
-         - Percentage of the total capacity to use in AppDirect Mode (C(0)-C(100)) within the socket ID.
+         - Percentage of the total capacity to use in AppDirect Mode (V(0)-V(100)) within the socket ID.
         type: int
         required: true
       appdirect_interleaved:
@@ -77,12 +77,12 @@ options:
         default: true
       memorymode:
         description:
-         - Percentage of the total capacity to use in Memory Mode (C(0)-C(100)) within the socket ID.
+         - Percentage of the total capacity to use in Memory Mode (V(0)-V(100)) within the socket ID.
         type: int
         required: true
       reserved:
         description:
-          - Percentage of the capacity to reserve (C(0)-C(100)) within the socket ID.
+          - Percentage of the capacity to reserve (V(0)-V(100)) within the socket ID.
         type: int
   namespace:
     description:
@@ -104,8 +104,8 @@ options:
         choices: ['pmem', 'blk']
       size:
         description:
-          - The size of namespace. This option supports the suffixes C(k) or C(K) or C(KB) for KiB,
-            C(m) or C(M) or C(MB) for MiB, C(g) or C(G) or C(GB) for GiB and C(t) or C(T) or C(TB) for TiB.
+          - The size of namespace. This option supports the suffixes V(k) or V(K) or V(KB) for KiB,
+            V(m) or V(M) or V(MB) for MiB, V(g) or V(G) or V(GB) for GiB and V(t) or V(T) or V(TB) for TiB.
           - This option is required if multiple namespaces are configured.
           - If this option is not set, all of the available space of a region is configured.
         type: str
@@ -113,7 +113,7 @@ options:
   namespace_append:
     description:
      - Enable to append the new namespaces to the system.
-     - The default is C(false) so the all existing namespaces not listed in I(namespace) are removed.
+     - The default is V(false) so the all existing namespaces not listed in O(namespace) are removed.
     type: bool
     default: false
     required: false
@@ -128,8 +128,8 @@ reboot_required:
 result:
     description:
      - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
-     - If I(socket) argument is provided, shows the values in each socket with C(socket) which contains the socket ID.
-     - If I(namespace) argument is provided, shows the detail of each namespace.
+     - If O(socket) argument is provided, shows the values in each socket with C(socket) which contains the socket ID.
+     - If O(namespace) argument is provided, shows the detail of each namespace.
     returned: success
     type: list
     elements: dict

@@ -37,9 +37,9 @@ options:
         type: bool
         default: false
         description:
-            - If I(force) is C(true) and I(state) is C(absent), the module
+            - If O(force) is V(true) and O(state) is V(absent), the module
               will delete the organization, no matter if it contains users
-              or not. By default I(force) is C(false), which will cause the
+              or not. By default O(force) is V(false), which will cause the
               module to fail the deletion of the organization when it contains
               users.
 
@@ -50,9 +50,9 @@ options:
             - present
             - absent
         description:
-            - If C(present), the module adds organization I(name) to
-              Pritunl. If C(absent), attempt to delete the organization
-              from Pritunl (please read about I(force) usage).
+            - If V(present), the module adds organization O(name) to
+              Pritunl. If V(absent), attempt to delete the organization
+              from Pritunl (please read about O(force) usage).
 """
 
 EXAMPLES = """

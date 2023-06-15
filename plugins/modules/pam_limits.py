@@ -15,8 +15,8 @@ author:
 - "Sebastien Rohaut (@usawa)"
 short_description: Modify Linux PAM limits
 description:
-  - The C(pam_limits) module modifies PAM limits.
-  - The default file is C(/etc/security/limits.conf).
+  - The M(community.general.pam_limits) module modifies PAM limits.
+  - The default file is V(/etc/security/limits.conf).
   - For the full documentation, see C(man 5 limits.conf).
 extends_documentation_fragment:
   - community.general.attributes
@@ -68,8 +68,8 @@ options:
     type: str
     description:
       - The value of the limit.
-      - Value must either be C(unlimited), C(infinity) or C(-1), all of which indicate no limit, or a limit of 0 or larger.
-      - Value must be a number in the range -20 to 19 inclusive, if I(limit_item) is set to C(nice) or C(priority).
+      - Value must either be V(unlimited), V(infinity) or V(-1), all of which indicate no limit, or a limit of 0 or larger.
+      - Value must be a number in the range -20 to 19 inclusive, if O(limit_item) is set to V(nice) or V(priority).
       - Refer to the C(man 5 limits.conf) manual pages for more details.
     required: true
   backup:
@@ -81,7 +81,7 @@ options:
     default: false
   use_min:
     description:
-      - If set to C(true), the minimal value will be used or conserved.
+      - If set to V(true), the minimal value will be used or conserved.
       - If the specified value is inferior to the value in the file,
         file content is replaced with the new value, else content is not modified.
     required: false
@@ -89,7 +89,7 @@ options:
     default: false
   use_max:
     description:
-      - If set to C(true), the maximal value will be used or conserved.
+      - If set to V(true), the maximal value will be used or conserved.
       - If the specified value is superior to the value in the file,
         file content is replaced with the new value, else content is not modified.
     required: false
@@ -108,7 +108,7 @@ options:
     required: false
     default: ''
 notes:
-  - If I(dest) file does not exist, it is created.
+  - If O(dest) file does not exist, it is created.
 '''
 
 EXAMPLES = r'''
