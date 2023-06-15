@@ -20,7 +20,7 @@ extends_documentation_fragment:
 description:
     - Creates or extends an archive.
     - The source and archive are on the remote host, and the archive I(is not) copied to the local host.
-    - Source files can be deleted after archival by specifying I(remove=True).
+    - Source files can be deleted after archival by specifying O(remove=True).
 attributes:
   check_mode:
     support: full
@@ -43,20 +43,20 @@ options:
   dest:
     description:
       - The file name of the destination archive. The parent directory must exists on the remote host.
-      - This is required when C(path) refers to multiple files by either specifying a glob, a directory or multiple paths in a list.
+      - This is required when O(path) refers to multiple files by either specifying a glob, a directory or multiple paths in a list.
       - If the destination archive already exists, it will be truncated and overwritten.
     type: path
   exclude_path:
     description:
-      - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from I(path) list and glob expansion.
-      - Use I(exclusion_patterns) to instead exclude files or subdirectories below any of the paths from the I(path) list.
+      - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from O(path) list and glob expansion.
+      - Use O(exclusion_patterns) to instead exclude files or subdirectories below any of the paths from the O(path) list.
     type: list
     elements: path
     default: []
   exclusion_patterns:
     description:
       - Glob style patterns to exclude files or directories from the resulting archive.
-      - This differs from I(exclude_path) which applies only to the source paths from I(path).
+      - This differs from O(exclude_path) which applies only to the source paths from O(path).
     type: list
     elements: path
     version_added: 3.2.0
@@ -73,7 +73,7 @@ options:
     type: bool
     default: false
 notes:
-    - Can produce I(gzip), I(bzip2), I(lzma), and I(zip) compressed files or archives.
+    - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
     - This module uses C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on the target host to create archives.
       These are part of the Python standard library for Python 2 and 3.
 requirements:
@@ -149,11 +149,11 @@ state:
     returned: always
 dest_state:
     description:
-      - The state of the I(dest) file.
+      - The state of the O(dest) file.
       - C(absent) when the file does not exist.
       - C(archive) when the file is an archive.
       - C(compress) when the file is compressed, but not an archive.
-      - C(incomplete) when the file is an archive, but some files under I(path) were not found.
+      - C(incomplete) when the file is an archive, but some files under O(path) were not found.
     type: str
     returned: success
     version_added: 3.4.0

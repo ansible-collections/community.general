@@ -25,38 +25,38 @@ options:
   name:
     description:
       - Name of the encrypted block device as it appears in the C(/etc/crypttab) file, or
-        optionally prefixed with C(/dev/mapper/), as it appears in the filesystem. I(/dev/mapper/)
-        will be stripped from I(name).
+        optionally prefixed with V(/dev/mapper/), as it appears in the filesystem. V(/dev/mapper/)
+        will be stripped from O(name).
     type: str
     required: true
   state:
     description:
-      - Use I(present) to add a line to C(/etc/crypttab) or update its definition
+      - Use V(present) to add a line to C(/etc/crypttab) or update its definition
         if already present.
-      - Use I(absent) to remove a line with matching I(name).
-      - Use I(opts_present) to add options to those already present; options with
+      - Use V(absent) to remove a line with matching O(name).
+      - Use V(opts_present) to add options to those already present; options with
         different values will be updated.
-      - Use I(opts_absent) to remove options from the existing set.
+      - Use V(opts_absent) to remove options from the existing set.
     type: str
     required: true
     choices: [ absent, opts_absent, opts_present, present ]
   backing_device:
     description:
       - Path to the underlying block device or file, or the UUID of a block-device
-        prefixed with I(UUID=).
+        prefixed with V(UUID=).
     type: str
   password:
     description:
       - Encryption password, the path to a file containing the password, or
-        C(-) or unset if the password should be entered at boot.
+        V(-) or unset if the password should be entered at boot.
     type: path
   opts:
     description:
-      - A comma-delimited list of options. See C(crypttab(5) ) for details.
+      - A comma-delimited list of options. See V(crypttab(5\)) for details.
     type: str
   path:
     description:
-      - Path to file to use instead of C(/etc/crypttab).
+      - Path to file to use instead of V(/etc/crypttab).
       - This might be useful in a chroot environment.
     type: path
     default: /etc/crypttab

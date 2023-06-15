@@ -17,7 +17,7 @@ description:
   - Allows the retrieval, addition, modification and deletion of key/value entries in a
     consul cluster via the agent. The entire contents of the record, including
     the indices, flags and session are returned as C(value).
-  - If the C(key) represents a prefix then note that when a value is removed, the existing
+  - If the O(key) represents a prefix then note that when a value is removed, the existing
     value if any is returned as part of the results.
   - See http://www.consul.io/docs/agent/http.html#kv for more details.
 requirements:
@@ -36,14 +36,14 @@ attributes:
 options:
     state:
         description:
-          - The action to take with the supplied key and value. If the state is C(present) and I(value) is set, the key
-            contents will be set to the value supplied and C(changed) will be set to C(true) only if the value was
-            different to the current contents. If the state is C(present) and I(value) is not set, the existing value
-            associated to the key will be returned. The state C(absent) will remove the key/value pair,
-            again C(changed) will be set to true only if the key actually existed
+          - The action to take with the supplied key and value. If the state is V(present) and O(value) is set, the key
+            contents will be set to the value supplied and C(changed) will be set to V(true) only if the value was
+            different to the current contents. If the state is V(present) and O(value) is not set, the existing value
+            associated to the key will be returned. The state V(absent) will remove the key/value pair,
+            again C(changed) will be set to V(true) only if the key actually existed
             prior to the removal. An attempt can be made to obtain or free the
-            lock associated with a key/value pair with the states C(acquire) or
-            C(release) respectively. a valid session must be supplied to make the
+            lock associated with a key/value pair with the states V(acquire) or
+            V(release) respectively. a valid session must be supplied to make the
             attempt changed will be true if the attempt is successful, false
             otherwise.
         type: str
@@ -56,17 +56,17 @@ options:
         required: true
     value:
         description:
-          - The value should be associated with the given key, required if C(state)
-            is C(present).
+          - The value should be associated with the given key, required if O(state)
+            is V(present).
         type: str
     recurse:
         description:
           - If the key represents a prefix, each entry with the prefix can be
-            retrieved by setting this to C(true).
+            retrieved by setting this to V(true).
         type: bool
     retrieve:
         description:
-            - If the I(state) is C(present) and I(value) is set, perform a
+            - If the O(state) is V(present) and O(value) is set, perform a
               read after setting the value and return this value.
         default: true
         type: bool
@@ -82,9 +82,9 @@ options:
         type: str
     cas:
         description:
-          - Used when acquiring a lock with a session. If the C(cas) is C(0), then
+          - Used when acquiring a lock with a session. If the O(cas) is V(0), then
             Consul will only put the key if it does not already exist. If the
-            C(cas) value is non-zero, then the key is only set if the index matches
+            O(cas) value is non-zero, then the key is only set if the index matches
             the ModifyIndex of that key.
         type: str
     flags:

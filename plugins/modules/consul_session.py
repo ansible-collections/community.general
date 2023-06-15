@@ -31,25 +31,25 @@ attributes:
 options:
     id:
         description:
-          - ID of the session, required when I(state) is either C(info) or
-            C(remove).
+          - ID of the session, required when O(state) is either V(info) or
+            V(remove).
         type: str
     state:
         description:
           - Whether the session should be present i.e. created if it doesn't
-            exist, or absent, removed if present. If created, the I(id) for the
-            session is returned in the output. If C(absent), I(id) is
+            exist, or absent, removed if present. If created, the O(id) for the
+            session is returned in the output. If V(absent), O(id) is
             required to remove the session. Info for a single session, all the
             sessions for a node or all available sessions can be retrieved by
-            specifying C(info), C(node) or C(list) for the I(state); for C(node)
-            or C(info), the node I(name) or session I(id) is required as parameter.
+            specifying V(info), V(node) or V(list) for the O(state); for V(node)
+            or V(info), the node O(name) or session O(id) is required as parameter.
         choices: [ absent, info, list, node, present ]
         type: str
         default: present
     name:
         description:
           - The name that should be associated with the session. Required when
-            I(state=node) is used.
+            O(state=node) is used.
         type: str
     delay:
         description:

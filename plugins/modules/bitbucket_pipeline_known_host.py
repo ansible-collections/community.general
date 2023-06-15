@@ -14,7 +14,7 @@ module: bitbucket_pipeline_known_host
 short_description: Manages Bitbucket pipeline known hosts
 description:
   - Manages Bitbucket pipeline known hosts under the "SSH Keys" menu.
-  - The host fingerprint will be retrieved automatically, but in case of an error, one can use I(key) field to specify it manually.
+  - The host fingerprint will be retrieved automatically, but in case of an error, one can use O(key) field to specify it manually.
 author:
   - Evgeniy Krysanov (@catcombo)
 extends_documentation_fragment:
@@ -36,7 +36,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - I(username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of I(user).
+      - "B(Note:) O(ignore:username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of O(user)."
     type: str
     required: true
   name:

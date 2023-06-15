@@ -35,12 +35,12 @@ options:
     description:
       ->
       The base path where to install the Rust packages. Cargo automatically appends
-      C(/bin). In other words, C(/usr/local) will become C(/usr/local/bin).
+      V(/bin). In other words, V(/usr/local) will become V(/usr/local/bin).
     type: path
   version:
     description:
       ->
-      The version to install. If I(name) contains multiple values, the module will
+      The version to install. If O(name) contains multiple values, the module will
       try to install all of them in this version.
     type: str
     required: false

@@ -58,7 +58,7 @@ options:
   state:
     description:
       - Whether the customer should exist or not.
-      - Both I(customer) and I(match) identify a customer that should be added or removed.
+      - Both O(customer) and O(match) identify a customer that should be added or removed.
     type: str
     choices: [ absent, present ]
     default: present

@@ -37,9 +37,9 @@ options:
   type:
     description:
       - The type of installation performed by C(ansible-galaxy).
-      - If I(type) is C(both), then I(requirements_file) must be passed and it may contain both roles and collections.
-      - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
-      - "B(Ansible 2.9): The option C(both) will have the same effect as C(role)."
+      - If O(type=both), then O(requirements_file) must be passed and it may contain both roles and collections.
+      - "Note however that the opposite is not true: if using a O(requirements_file), then O(type) can be any of the three choices."
+      - "B(Ansible 2.9): The option V(both) will have the same effect as V(role)."
     type: str
     choices: [collection, role, both]
     required: true
@@ -48,22 +48,22 @@ options:
       - Name of the collection or role being installed.
       - >
         Versions can be specified with C(ansible-galaxy) usual formats.
-        For example, the collection C(community.docker:1.6.1) or the role C(ansistrano.deploy,3.8.0).
-      - I(name) and I(requirements_file) are mutually exclusive.
+        For example, the collection V(community.docker:1.6.1) or the role V(ansistrano.deploy,3.8.0).
+      - O(name) and O(requirements_file) are mutually exclusive.
     type: str
   requirements_file:
     description:
       - Path to a file containing a list of requirements to be installed.
-      - It works for I(type) equals to C(collection) and C(role).
-      - I(name) and I(requirements_file) are mutually exclusive.
-      - "B(Ansible 2.9): It can only be used to install either I(type=role) or I(type=collection), but not both at the same run."
+      - It works for O(type) equals to V(collection) and V(role).
+      - O(name) and O(requirements_file) are mutually exclusive.
+      - "B(Ansible 2.9): It can only be used to install either O(type=role) or O(type=collection), but not both at the same run."
     type: path
   dest:
     description:
-      - The path to the directory containing your collections or roles, according to the value of I(type).
+      - The path to the directory containing your collections or roles, according to the value of O(type).
       - >
-        Please notice that C(ansible-galaxy) will not install collections with I(type=both), when I(requirements_file)
-        contains both roles and collections and I(dest) is specified.
+        Please notice that C(ansible-galaxy) will not install collections with O(type=both), when O(requirements_file)
+        contains both roles and collections and O(dest) is specified.
     type: path
   no_deps:
     description:
@@ -74,8 +74,8 @@ options:
   force:
     description:
       - Force overwriting an existing role or collection.
-      - Using I(force=true) is mandatory when downgrading.
-      - "B(Ansible 2.9 and 2.10): Must be C(true) to upgrade roles and collections."
+      - Using O(force=true) is mandatory when downgrading.
+      - "B(Ansible 2.9 and 2.10): Must be V(true) to upgrade roles and collections."
     type: bool
     default: false
   ack_ansible29:
@@ -92,7 +92,7 @@ options:
       - Support for those versions will be removed in community.general 8.0.0.
         At the same time, this option will be removed without any deprecation warning!
       - This option is completely ignored if using a version of ansible-core/ansible-base/Ansible greater than C(2.11).
-      - For the sake of conciseness, setting this parameter to C(true) implies I(ack_ansible29=true).
+      - For the sake of conciseness, setting this parameter to V(true) implies O(ack_ansible29=true).
     type: bool
     default: false
 """
@@ -124,29 +124,29 @@ EXAMPLES = """
 
 RETURN = """
   type:
-    description: The value of the I(type) parameter.
+    description: The value of the O(type) parameter.
     type: str
     returned: always
   name:
-    description: The value of the I(name) parameter.
+    description: The value of the O(name) parameter.
     type: str
     returned: always
   dest:
-    description: The value of the I(dest) parameter.
+    description: The value of the O(dest) parameter.
     type: str
     returned: always
   requirements_file:
-    description: The value of the I(requirements_file) parameter.
+    description: The value of the O(requirements_file) parameter.
     type: str
     returned: always
   force:
-    description: The value of the I(force) parameter.
+    description: The value of the O(force) parameter.
     type: bool
     returned: always
   installed_roles:
     description:
-      - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
-      - If I(name) is specified, returns that role name and the version installed per path.
+      - If O(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
+      - If O(name) is specified, returns that role name and the version installed per path.
       - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing roles
@@ -162,8 +162,8 @@ RETURN = """
         ansistrano.deploy: 3.8.0
   installed_collections:
     description:
-      - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
-      - If I(name) is specified, returns that collection name and the version installed per path.
+      - If O(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
+      - If O(name) is specified, returns that collection name and the version installed per path.
       - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing collections
