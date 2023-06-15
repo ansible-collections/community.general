@@ -17,7 +17,7 @@ description:
   - Creates a group variable if it does not exist.
   - When a group variable does exist, its value will be updated when the values are different.
   - Variables which are untouched in the playbook, but are not untouched in the GitLab group,
-    they stay untouched (I(purge) is C(false)) or will be deleted (I(purge) is C(true)).
+    they stay untouched (O(purge=false)) or will be deleted (O(purge=true)).
 author:
   - Florent Madiot (@scodeman)
 requirements:
@@ -48,20 +48,20 @@ options:
     type: str
   purge:
     description:
-      - When set to C(true), delete all variables which are not untouched in the task.
+      - When set to V(true), delete all variables which are not untouched in the task.
     default: false
     type: bool
   vars:
     description:
       - When the list element is a simple key-value pair, set masked and protected to false.
-      - When the list element is a dict with the keys I(value), I(masked) and I(protected), the user can
+      - When the list element is a dict with the keys C(value), C(masked) and C(protected), the user can
         have full control about whether a value should be masked, protected or both.
       - Support for group variables requires GitLab >= 9.5.
       - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
-      - A I(value) must be a string or a number.
-      - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
+      - A C(value) must be a string or a number.
+      - Field C(variable_type) must be a string with either V(env_var), which is the default, or V(file).
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
         See GitLab documentation on acceptable values for a masked variable (U(https://docs.gitlab.com/ce/ci/variables/#masked-variables)).
     default: {}
@@ -70,7 +70,7 @@ options:
     version_added: 4.5.0
     description:
       - A list of dictionaries that represents CI/CD variables.
-      - This modules works internal with this sructure, even if the older I(vars) parameter is used.
+      - This modules works internal with this sructure, even if the older O(vars) parameter is used.
     default: []
     type: list
     elements: dict
@@ -83,7 +83,7 @@ options:
       value:
         description:
           - The variable value.
-          - Required when I(state=present).
+          - Required when O(state=present).
         type: str
       masked:
         description:
@@ -97,7 +97,7 @@ options:
         default: false
       variable_type:
         description:
-          - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
+          - Wether a variable is an environment variable (V(env_var)) or a file (V(file)).
         type: str
         choices: [ "env_var", "file" ]
         default: env_var

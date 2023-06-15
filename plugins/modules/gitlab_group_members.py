@@ -40,22 +40,22 @@ options:
   gitlab_user:
     description:
       - A username or a list of usernames to add to/remove from the GitLab group.
-      - Mutually exclusive with I(gitlab_users_access).
+      - Mutually exclusive with O(gitlab_users_access).
     type: list
     elements: str
   access_level:
     description:
       - The access level for the user.
-      - Required if I(state=present), user state is set to present.
-      - Mutually exclusive with I(gitlab_users_access).
+      - Required if O(state=present), user state is set to present.
+      - Mutually exclusive with O(gitlab_users_access).
     type: str
     choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
   gitlab_users_access:
     description:
       - Provide a list of user to access level mappings.
       - Every dictionary in this list specifies a user (by username) and the access level the user should have.
-      - Mutually exclusive with I(gitlab_user) and I(access_level).
-      - Use together with I(purge_users) to remove all users not specified here from the group.
+      - Mutually exclusive with O(gitlab_user) and O(access_level).
+      - Use together with O(purge_users) to remove all users not specified here from the group.
     type: list
     elements: dict
     suboptions:
@@ -66,7 +66,7 @@ options:
       access_level:
         description:
           - The access level for the user.
-          - Required if I(state=present), user state is set to present.
+          - Required if O(state=present), user state is set to present.
         type: str
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
         required: true
@@ -74,16 +74,16 @@ options:
   state:
     description:
       - State of the member in the group.
-      - On C(present), it adds a user to a GitLab group.
-      - On C(absent), it removes a user from a GitLab group.
+      - On V(present), it adds a user to a GitLab group.
+      - On V(absent), it removes a user from a GitLab group.
     choices: ['present', 'absent']
     default: 'present'
     type: str
   purge_users:
     description:
-      - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
+      - Adds/remove users of the given access_level to match the given O(gitlab_user)/O(gitlab_users_access) list.
         If omitted do not purge orphaned members.
-      - Is only used when I(state=present).
+      - Is only used when O(state=present).
     type: list
     elements: str
     choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']

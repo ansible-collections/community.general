@@ -84,7 +84,7 @@ EXAMPLES = '''
 RETURN = '''
 network:
     description: Dictionary describing the network.
-    returned: On success when I(state=present).
+    returned: On success when O(state=present).
     type: complex
     contains:
         id:
