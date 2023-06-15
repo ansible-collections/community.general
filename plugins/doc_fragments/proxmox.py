@@ -24,7 +24,7 @@ options:
   api_password:
     description:
       - Specify the password to authenticate with.
-      - You can use C(PROXMOX_PASSWORD) environment variable.
+      - You can use E(PROXMOX_PASSWORD) environment variable.
     type: str
   api_token_id:
     description:

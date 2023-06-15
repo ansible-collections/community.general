@@ -22,14 +22,14 @@ options:
   username:
     description:
     - Username that will be used to authenticate against InfluxDB server.
-    - Alias O(ignore:login_username) added in Ansible 2.5.
+    - Alias O(login_username) added in Ansible 2.5.
     type: str
     default: root
     aliases: [ login_username ]
   password:
     description:
     - Password that will be used to authenticate against InfluxDB server.
-    - Alias O(ignore:login_password) added in Ansible 2.5.
+    - Alias O(login_password) added in Ansible 2.5.
     type: str
     default: root
     aliases: [ login_password ]

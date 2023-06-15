@@ -51,16 +51,16 @@ options:
         type: str
 notes:
   - For authentication, you can set identity_endpoint using the
-    C(ANSIBLE_HWC_IDENTITY_ENDPOINT) env variable.
+    E(ANSIBLE_HWC_IDENTITY_ENDPOINT) env variable.
   - For authentication, you can set user using the
-    C(ANSIBLE_HWC_USER) env variable.
-  - For authentication, you can set password using the C(ANSIBLE_HWC_PASSWORD) env
+    E(ANSIBLE_HWC_USER) env variable.
+  - For authentication, you can set password using the E(ANSIBLE_HWC_PASSWORD) env
     variable.
-  - For authentication, you can set domain using the C(ANSIBLE_HWC_DOMAIN) env
+  - For authentication, you can set domain using the E(ANSIBLE_HWC_DOMAIN) env
     variable.
-  - For authentication, you can set project using the C(ANSIBLE_HWC_PROJECT) env
+  - For authentication, you can set project using the E(ANSIBLE_HWC_PROJECT) env
     variable.
-  - For authentication, you can set region using the C(ANSIBLE_HWC_REGION) env variable.
+  - For authentication, you can set region using the E(ANSIBLE_HWC_REGION) env variable.
   - Environment variables values will only be used if the playbook values are
     not set.
 '''

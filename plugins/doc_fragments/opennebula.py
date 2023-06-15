@@ -15,26 +15,26 @@ options:
     api_url:
         description:
             - The ENDPOINT URL of the XMLRPC server.
-            - If not specified then the value of the C(ONE_URL) environment variable, if any, is used.
+            - If not specified then the value of the E(ONE_URL) environment variable, if any, is used.
         type: str
         aliases:
             - api_endpoint
     api_username:
         description:
             - The name of the user for XMLRPC authentication.
-            - If not specified then the value of the C(ONE_USERNAME) environment variable, if any, is used.
+            - If not specified then the value of the E(ONE_USERNAME) environment variable, if any, is used.
         type: str
     api_password:
         description:
             - The password or token for XMLRPC authentication.
-            - If not specified then the value of the C(ONE_PASSWORD) environment variable, if any, is used.
+            - If not specified then the value of the E(ONE_PASSWORD) environment variable, if any, is used.
         type: str
         aliases:
             - api_token
     validate_certs:
         description:
             - Whether to validate the TLS/SSL certificates or not.
-            - This parameter is ignored if C(PYTHONHTTPSVERIFY) environment variable is used.
+            - This parameter is ignored if E(PYTHONHTTPSVERIFY) environment variable is used.
         type: bool
         default: true
     wait_timeout:
