@@ -59,23 +59,23 @@ EXAMPLES = '''
     name: httpd
     state: started
 
-# Example action to stop service httpd, if running
-- community.general.simpleinit_msb:
+- name: Example action to stop service httpd, if running
+  community.general.simpleinit_msb:
     name: httpd
     state: stopped
 
-# Example action to restart service httpd, in all cases
-- community.general.simpleinit_msb:
+- name: Example action to restart service httpd, in all cases
+  community.general.simpleinit_msb:
     name: httpd
     state: restarted
 
-# Example action to reload service httpd, in all cases
-- community.general.simpleinit_msb:
+- name: Example action to reload service httpd, in all cases
+  community.general.simpleinit_msb:
     name: httpd
     state: reloaded
 
-# Example action to enable service httpd, and not touch the running state
-- community.general.simpleinit_msb:
+- name: Example action to enable service httpd, and not touch the running state
+  community.general.simpleinit_msb:
     name: httpd
     enabled: true
 '''
