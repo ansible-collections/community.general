@@ -85,7 +85,7 @@ options:
             type: str
             description:
               - Identify parent by name.
-              - Needs more internal API calls than using I(id) to map names to ID's under the hood.
+              - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
               - When giving a parent chain with only names it must be complete up to the top.
               - Note that in principle both ID and name can be specified at the same time
                 but current implementation only always use just one of them, with ID
