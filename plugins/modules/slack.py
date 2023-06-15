@@ -19,7 +19,7 @@ DOCUMENTATION = """
 module: slack
 short_description: Send Slack notifications
 description:
-  - The C(slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
+  - The M(community.general.slack) module sends notifications to U(http://slack.com) via the Incoming WebHook integration
 author: "Ramon de la Fuente (@ramondelafuente)"
 extends_documentation_fragment:
   - community.general.attributes
@@ -32,8 +32,8 @@ options:
   domain:
     type: str
     description:
-      - Slack (sub)domain for your environment without protocol. (i.e.
-        C(example.slack.com)) In 1.8 and beyond, this is deprecated and may
+      - Slack (sub)domain for your environment without protocol. (For example
+        V(example.slack.com).) In Ansible 1.8 and beyond, this is deprecated and may
         be ignored.  See token documentation for information.
   token:
     type: str
@@ -41,9 +41,9 @@ options:
       - Slack integration token. This authenticates you to the slack service.
         Make sure to use the correct type of token, depending on what method you use.
       - "Webhook token:
-        Prior to 1.8, a token looked like C(3Ffe373sfhRE6y42Fg3rvf4GlK).  In
-        1.8 and above, ansible adapts to the new slack API where tokens look
-        like C(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK).  If tokens
+        Prior to Ansible 1.8, a token looked like V(3Ffe373sfhRE6y42Fg3rvf4GlK).  In
+        Ansible 1.8 and above, Ansible adapts to the new slack API where tokens look
+        like V(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK).  If tokens
         are in the new format then slack will ignore any value of domain.  If
         the token is in the old format the domain is required.  Ansible has no
         control of when slack will get rid of the old API.  When slack does
@@ -55,8 +55,8 @@ options:
         that the incoming webhooks can be added.  The key is on the end of the
         URL given to you in that section."
       - "WebAPI token:
-        Slack WebAPI requires a personal, bot or work application token. These tokens start with C(xoxp-), C(xoxb-)
-        or C(xoxa-), eg. C(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive thread_id.
+        Slack WebAPI requires a personal, bot or work application token. These tokens start with V(xoxp-), V(xoxb-)
+        or V(xoxa-), for example V(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you intend to receive thread_id.
         See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
@@ -68,7 +68,7 @@ options:
   channel:
     type: str
     description:
-      - Channel to send the message to. If absent, the message goes to the channel selected for the I(token).
+      - Channel to send the message to. If absent, the message goes to the channel selected for the O(token).
   thread_id:
     description:
       - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading
@@ -76,7 +76,7 @@ options:
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
-      - If supplied I(channel_id) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel_id }}) to get I(channel_id) from previous task run.
+      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel_id }}) to get RV(ignore:channel_id) from previous task run.
       - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
     version_added: 1.2.0
@@ -88,17 +88,17 @@ options:
   icon_url:
     type: str
     description:
-      - URL for the message sender's icon (default C(https://docs.ansible.com/favicon.ico))
+      - URL for the message sender's icon.
     default: https://docs.ansible.com/favicon.ico
   icon_emoji:
     type: str
     description:
       - Emoji for the message sender. See Slack documentation for options.
-        (if I(icon_emoji) is set, I(icon_url) will not be used)
+      - If O(icon_emoji) is set, O(icon_url) will not be used.
   link_names:
     type: int
     description:
-      - Automatically create links for channels and usernames in I(msg).
+      - Automatically create links for channels and usernames in O(msg).
     default: 1
     choices:
       - 1
@@ -112,7 +112,7 @@ options:
       - 'none'
   validate_certs:
     description:
-      - If C(false), SSL certificates will not be validated. This should only be used
+      - If V(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
     default: true
@@ -139,12 +139,12 @@ options:
   prepend_hash:
     type: str
     description:
-      - Setting for automatically prepending a C(#) symbol on the passed in I(channel_id).
-      - The C(auto) method prepends a C(#) unless I(channel_id) starts with one of C(#), C(@), C(C0), C(GF), C(G0), C(CP).
-        These prefixes only cover a small set of the prefixes that should not have a C(#) prepended.
-        Since an exact condition which I(channel_id) values must not have the C(#) prefix is not known,
-        the value C(auto) for this option will be deprecated in the future. It is best to explicitly set
-        I(prepend_hash=always) or I(prepend_hash=never) to obtain the needed behavior.
+      - Setting for automatically prepending a V(#) symbol on the passed in O(channel).
+      - The V(auto) method prepends a V(#) unless O(channel) starts with one of V(#), V(@), V(C0), V(GF), V(G0), V(CP).
+        These prefixes only cover a small set of the prefixes that should not have a V(#) prepended.
+        Since an exact condition which O(channel) values must not have the V(#) prefix is not known,
+        the value V(auto) for this option will be deprecated in the future. It is best to explicitly set
+        O(prepend_hash=always) or O(prepend_hash=never) to obtain the needed behavior.
     choices:
       - 'always'
       - 'never'

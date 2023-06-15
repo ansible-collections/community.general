@@ -50,8 +50,8 @@ options:
     type: str
   state:
     description:
-      - Indicates the desired (I)bundle state. C(present) ensures the bundle
-        is installed while C(absent) ensures the (I)bundle is not installed.
+      - Indicates the desired (I)bundle state. V(present) ensures the bundle
+        is installed while V(absent) ensures the (I)bundle is not installed.
     default: present
     choices: [present, absent]
     type: str
@@ -62,7 +62,7 @@ options:
     default: false
   url:
     description:
-      - Overrides both I(contenturl) and I(versionurl).
+      - Overrides both O(contenturl) and O(versionurl).
     type: str
   verify:
     description:

@@ -36,43 +36,43 @@ options:
     description:
     - The file type that should have SELinux contexts applied.
     - "The following file type options are available:"
-    - C(a) for all files,
-    - C(b) for block devices,
-    - C(c) for character devices,
-    - C(d) for directories,
-    - C(f) for regular files,
-    - C(l) for symbolic links,
-    - C(p) for named pipes,
-    - C(s) for socket files.
+    - V(a) for all files,
+    - V(b) for block devices,
+    - V(c) for character devices,
+    - V(d) for directories,
+    - V(f) for regular files,
+    - V(l) for symbolic links,
+    - V(p) for named pipes,
+    - V(s) for socket files.
     type: str
     choices: [ a, b, c, d, f, l, p, s ]
     default: a
   setype:
     description:
-    - SELinux type for the specified I(target).
+    - SELinux type for the specified O(target).
     type: str
   substitute:
     description:
-    - Path to use to substitute file context(s) for the specified I(target). The context labeling for the I(target) subtree is made equivalent to this path.
+    - Path to use to substitute file context(s) for the specified O(target). The context labeling for the O(target) subtree is made equivalent to this path.
     - This is also referred to as SELinux file context equivalence and it implements the C(equal) functionality of the SELinux management tools.
     version_added: 6.4.0
     type: str
     aliases: [ equal ]
   seuser:
     description:
-    - SELinux user for the specified I(target).
-    - Defaults to C(system_u) for new file contexts and to existing value when modifying file contexts.
+    - SELinux user for the specified O(target).
+    - Defaults to V(system_u) for new file contexts and to existing value when modifying file contexts.
     type: str
   selevel:
     description:
-    - SELinux range for the specified I(target).
-    - Defaults to C(s0) for new file contexts and to existing value when modifying file contexts.
+    - SELinux range for the specified O(target).
+    - Defaults to V(s0) for new file contexts and to existing value when modifying file contexts.
     type: str
     aliases: [ serange ]
   state:
     description:
-    - Whether the SELinux file context must be C(absent) or C(present).
-    - Specifying C(absent) without either I(setype) or I(substitute) deletes both SELinux type or path substitution mappings that match I(target).
+    - Whether the SELinux file context must be V(absent) or V(present).
+    - Specifying V(absent) without either O(setype) or O(substitute) deletes both SELinux type or path substitution mappings that match O(target).
     type: str
     choices: [ absent, present ]
     default: present
@@ -89,8 +89,8 @@ options:
     default: false
 notes:
 - The changes are persistent across reboots.
-- I(setype) and I(substitute) are mutually exclusive.
-- If I(state=present) then one of I(setype) or I(substitute) is mandatory.
+- O(setype) and O(substitute) are mutually exclusive.
+- If O(state=present) then one of O(setype) or O(substitute) is mandatory.
 - The M(community.general.sefcontext) module does not modify existing files to the new
   SELinux context(s), so it is advisable to first create the SELinux
   file contexts before creating files, or run C(restorecon) manually

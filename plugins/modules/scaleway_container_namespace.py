@@ -51,7 +51,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example C(fr-par)).
+      - Scaleway region to use (for example V(fr-par)).
     required: true
     choices:
       - fr-par
@@ -110,7 +110,7 @@ EXAMPLES = '''
 RETURN = '''
 container_namespace:
   description: The container namespace information.
-  returned: when I(state=present)
+  returned: when O(state=present)
   type: dict
   sample:
     description: ""

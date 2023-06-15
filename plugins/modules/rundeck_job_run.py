@@ -42,7 +42,7 @@ options:
         type: str
         description:
             - Schedule the job execution to run at specific date and time.
-            - ISO-8601 date and time format like C(2021-10-05T15:45:00-03:00).
+            - ISO-8601 date and time format like V(2021-10-05T15:45:00-03:00).
     loglevel:
         type: str
         description:
@@ -64,12 +64,12 @@ options:
         description:
             - Job execution wait timeout in seconds.
             - If the timeout is reached, the job will be aborted.
-            - Keep in mind that there is a sleep based on I(wait_execution_delay) after each job status check.
+            - Keep in mind that there is a sleep based on O(wait_execution_delay) after each job status check.
         default: 120
     abort_on_timeout:
         type: bool
         description:
-            - Send a job abort request if exceeded the I(wait_execution_timeout) specified.
+            - Send a job abort request if exceeded the O(wait_execution_timeout) specified.
         default: false
 extends_documentation_fragment:
   - community.general.rundeck

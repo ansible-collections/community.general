@@ -36,7 +36,7 @@ options:
         description:
             - Desired state of the package.
             - >
-              When I(state=present) the module will use C(snap install) if the snap is not installed,
+              When O(state=present) the module will use C(snap install) if the snap is not installed,
               and C(snap refresh) if it is installed but from a different channel.
         default: present
         choices: [ absent, present, enabled, disabled ]
@@ -60,7 +60,7 @@ options:
     options:
         description:
             - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
-              to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in I(name). Options will
+              to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
               only be applied to active snaps.
         required: false
         type: list

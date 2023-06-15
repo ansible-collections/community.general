@@ -24,15 +24,15 @@ options:
   auto_increment:
     description:
       - Whether or not to increment a single number with the name of the
-        created servers. Only applicable when used with the I(group) attribute
+        created servers. Only applicable when used with the O(group) attribute
         or meta key.
     type: bool
     default: true
   boot_from_volume:
     description:
       - Whether or not to boot the instance from a Cloud Block Storage volume.
-        If C(true) and I(image) is specified a new volume will be created at
-        boot time. I(boot_volume_size) is required with I(image) to create a
+        If V(true) and O(image) is specified a new volume will be created at
+        boot time. O(boot_volume_size) is required with O(image) to create a
         new volume at boot time.
     type: bool
     default: false
@@ -45,11 +45,11 @@ options:
     type: int
     description:
       - Size of the volume to create in Gigabytes. This is only required with
-        I(image) and I(boot_from_volume).
+        O(image) and O(boot_from_volume).
     default: 100
   boot_volume_terminate:
     description:
-      - Whether the I(boot_volume) or newly created volume from I(image) will
+      - Whether the O(boot_volume) or newly created volume from O(image) will
         be terminated when the server is terminated
     type: bool
     default: false
@@ -72,16 +72,16 @@ options:
     type: str
     description:
       - Disk partitioning strategy
-      - If not specified it will assume the value C(auto).
+      - If not specified it will assume the value V(auto).
     choices:
       - auto
       - manual
   exact_count:
     description:
       - Explicitly ensure an exact count of instances, used with
-        state=active/present. If specified as C(true) and I(count) is less than
+        state=active/present. If specified as V(true) and O(count) is less than
         the servers matched, servers will be deleted to match the count. If
-        the number of matched servers is fewer than specified in I(count)
+        the number of matched servers is fewer than specified in O(count)
         additional servers will be added.
     type: bool
     default: false
@@ -116,7 +116,7 @@ options:
     type: str
     description:
       - image to use for the instance. Can be an C(id), C(human_id) or C(name).
-        With I(boot_from_volume), a Cloud Block Storage volume will be created
+        With O(boot_from_volume), a Cloud Block Storage volume will be created
         with this image
   instance_ids:
     type: list
@@ -161,7 +161,7 @@ options:
     type: str
     description:
       - Data to be uploaded to the servers config drive. This option implies
-        I(config_drive). Can be a file path or a string
+        O(config_drive). Can be a file path or a string
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
@@ -176,11 +176,11 @@ author:
     - "Jesse Keating (@omgjlk)"
     - "Matt Martz (@sivel)"
 notes:
-  - I(exact_count) can be "destructive" if the number of running servers in
-    the I(group) is larger than that specified in I(count). In such a case, the
-    I(state) is effectively set to C(absent) and the extra servers are deleted.
-    In the case of deletion, the returned data structure will have C(action)
-    set to C(delete), and the oldest servers in the group will be deleted.
+  - O(exact_count) can be "destructive" if the number of running servers in
+    the O(group) is larger than that specified in O(count). In such a case, the
+    O(state) is effectively set to V(absent) and the extra servers are deleted.
+    In the case of deletion, the returned data structure will have RV(ignore:action)
+    set to V(delete), and the oldest servers in the group will be deleted.
 extends_documentation_fragment:
   - community.general.rackspace.openstack
   - community.general.attributes
