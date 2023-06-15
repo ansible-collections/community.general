@@ -24,7 +24,7 @@ DOCUMENTATION = '''
             required: true
         url:
             description:
-                - Environment variable with the url for the etcd server
+                - Environment variable with the URL for the etcd server
             default: 'http://127.0.0.1:4001'
             env:
               - name: ANSIBLE_ETCD_URL

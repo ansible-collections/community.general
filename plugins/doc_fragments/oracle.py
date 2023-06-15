@@ -18,26 +18,26 @@ class ModuleDocFragment(object):
     options:
         config_file_location:
             description:
-                - Path to configuration file. If not set then the value of the OCI_CONFIG_FILE environment variable,
+                - Path to configuration file. If not set then the value of the E(OCI_CONFIG_FILE) environment variable,
                   if any, is used. Otherwise, defaults to ~/.oci/config.
             type: str
         config_profile_name:
             description:
                 - The profile to load from the config file referenced by O(config_file_location). If not set, then the
-                  value of the OCI_CONFIG_PROFILE environment variable, if any, is used. Otherwise, defaults to the
+                  value of the E(OCI_CONFIG_PROFILE) environment variable, if any, is used. Otherwise, defaults to the
                   "DEFAULT" profile in O(config_file_location).
             default: "DEFAULT"
             type: str
         api_user:
             description:
                 - The OCID of the user, on whose behalf, OCI APIs are invoked. If not set, then the
-                  value of the OCI_USER_OCID environment variable, if any, is used. This option is required if the user
+                  value of the E(OCI_USER_OCID) environment variable, if any, is used. This option is required if the user
                   is not specified through a configuration file (See O(config_file_location)). To get the user's OCID,
                   please refer U(https://docs.us-phoenix-1.oraclecloud.com/Content/API/Concepts/apisigningkey.htm).
             type: str
         api_user_fingerprint:
             description:
-                - Fingerprint for the key pair being used. If not set, then the value of the OCI_USER_FINGERPRINT
+                - Fingerprint for the key pair being used. If not set, then the value of the E(OCI_USER_FINGERPRINT)
                   environment variable, if any, is used. This option is required if the key fingerprint is not
                   specified through a configuration file (See O(config_file_location)). To get the key pair's
                   fingerprint value please refer
