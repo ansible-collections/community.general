@@ -38,10 +38,11 @@ options:
         required: false
         choices: [ running, started, stopped, restarted, reloaded ]
         description:
-          - C(started)/C(stopped) are idempotent actions that will not run
-            commands unless necessary.  C(restarted) will always bounce the
-            service.  C(reloaded) will always reload. B(At least one of state
-            and enabled are required.) Note that reloaded will start the
+          - V(started)/V(stopped) are idempotent actions that will not run
+            commands unless necessary.  V(restarted) will always bounce the
+            service.  V(reloaded) will always reload.
+          - At least one of O(state) and O(enabled) are required.
+          - Note that reloaded will start the
             service if it is not already started, even if your chosen init
             system would not normally.
     enabled:
