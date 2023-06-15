@@ -52,12 +52,12 @@ options:
         type: int
         description:
             - Unix timestamp of event start
-            - If not specified, it defaults to I(now).
+            - If not specified, it defaults to "now".
     stop:
         type: int
         description:
             - Unix timestamp of event end
-            - If not specified, it defaults to I(now) + I(duration).
+            - If not specified, it defaults to "now" + O(duration).
     duration:
         type: int
         description:

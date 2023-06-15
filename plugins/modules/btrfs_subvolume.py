@@ -23,7 +23,7 @@ options:
         default: false
     default:
         description:
-        - Make the subvolume specified by I(name) the filesystem's default subvolume.
+        - Make the subvolume specified by O(name) the filesystem's default subvolume.
         type: bool
         default: false
     filesystem_device:
@@ -49,7 +49,7 @@ options:
     recursive:
         description:
         - When true, indicates that parent/child subvolumes should be created/removedas necessary
-          to complete the operation (for I(state=present) and I(state=absent) respectively).
+          to complete the operation (for O(state=present) and O(state=absent) respectively).
         type: bool
         default: false
     snapshot_source:
@@ -60,11 +60,11 @@ options:
     snapshot_conflict:
         description:
         - Policy defining behavior when a subvolume already exists at the path of the requested snapshot.
-        - C(skip) - Create a snapshot only if a subvolume does not yet exist at the target location, otherwise indicate that no change is required.
+        - V(skip) - Create a snapshot only if a subvolume does not yet exist at the target location, otherwise indicate that no change is required.
           Warning, this option does not yet verify that the target subvolume was generated from a snapshot of the requested source.
-        - C(clobber) - If a subvolume already exists at the requested location, delete it first.
+        - V(clobber) - If a subvolume already exists at the requested location, delete it first.
           This option is not idempotent and will result in a new snapshot being generated on every execution.
-        - C(error) - If a subvolume already exists at the requested location, return an error.
+        - V(error) - If a subvolume already exists at the requested location, return an error.
           This option is not idempotent and will result in an error on replay of the module.
         type: str
         choices: [ skip, clobber, error ]
@@ -77,7 +77,7 @@ options:
         default: present
 
 notes:
-  - If any or all of the options I(filesystem_device), I(filesystem_label) or I(filesystem_uuid) parameters are provided, there is expected
+  - If any or all of the options O(filesystem_device), O(filesystem_label) or O(filesystem_uuid) parameters are provided, there is expected
     to be a matching btrfs filesystem. If none are provided and only a single btrfs filesystem exists or only a single
     btrfs filesystem is mounted, that filesystem will be used; otherwise, the module will take no action and return an error.
 
@@ -201,7 +201,7 @@ modifications:
 
 target_subvolume_id:
     description:
-    - The ID of the subvolume specified with the I(name) parameter, either pre-existing or created as part of module execution.
+    - The ID of the subvolume specified with the O(name) parameter, either pre-existing or created as part of module execution.
     type: int
     sample: 257
     returned: Success and subvolume exists after module execution
