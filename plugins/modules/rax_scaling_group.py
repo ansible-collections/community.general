@@ -36,7 +36,7 @@ options:
     type: str
     description:
       - Disk partitioning strategy
-      - If not specified, it will fallback to C(auto).
+      - If not specified, it will fallback to V(auto).
     choices:
       - auto
       - manual
@@ -53,7 +53,7 @@ options:
   image:
     type: str
     description:
-      - image to use for the instance. Can be an C(id), C(human_id) or C(name)
+      - image to use for the instance. Can be an C(id), C(human_id) or C(name).
     required: true
   key_name:
     type: str
@@ -113,7 +113,7 @@ options:
     type: str
     description:
       - Data to be uploaded to the servers config drive. This option implies
-        I(config_drive). Can be a file path or a string
+        O(config_drive). Can be a file path or a string
   wait:
     description:
       - wait for the scaling group to finish provisioning the minimum amount of

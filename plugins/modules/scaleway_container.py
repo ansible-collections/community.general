@@ -51,7 +51,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example C(fr-par)).
+      - Scaleway region to use (for example V(fr-par)).
     required: true
     choices:
       - fr-par
@@ -109,7 +109,7 @@ options:
   privacy:
     description:
       - Privacy policies define whether a container can be executed anonymously.
-      - Choose C(public) to enable anonymous execution, or C(private) to protect your container with an authentication mechanism provided by the Scaleway API.
+      - Choose V(public) to enable anonymous execution, or V(private) to protect your container with an authentication mechanism provided by the Scaleway API.
     type: str
     default: public
     choices:
@@ -174,7 +174,7 @@ EXAMPLES = '''
 RETURN = '''
 container:
   description: The container information.
-  returned: when I(state=present)
+  returned: when O(state=present)
   type: dict
   sample:
     cpu_limit: 140

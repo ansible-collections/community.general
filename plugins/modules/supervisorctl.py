@@ -27,9 +27,9 @@ options:
     type: str
     description:
       - The name of the supervisord program or group to manage.
-      - The name will be taken as group name when it ends with a colon I(:)
+      - The name will be taken as group name when it ends with a colon V(:).
       - Group support is only available in Ansible version 1.6 or later.
-      - If I(name=all), all programs and program groups will be managed.
+      - If O(name=all), all programs and program groups will be managed.
     required: true
   config:
     type: path
@@ -62,9 +62,9 @@ options:
     description:
       - path to supervisorctl executable
 notes:
-  - When C(state) = I(present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does not exist.
-  - When C(state) = I(restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
-  - When C(state) = I(absent), the module will call C(supervisorctl reread) then C(supervisorctl remove) to remove the target program/group.
+  - When O(state=present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does not exist.
+  - When O(state=restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
+  - When O(state=absent), the module will call C(supervisorctl reread) then C(supervisorctl remove) to remove the target program/group.
 requirements: [ "supervisorctl" ]
 author:
     - "Matt Wright (@mattupstate)"
