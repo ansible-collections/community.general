@@ -77,6 +77,42 @@ options:
         description:
             - A dict of key/value pairs to set as custom attributes for the role.
             - Values may be single values (e.g. a string) or a list of strings.
+    composite:
+        description:
+            - If V(true), the role is a composition of other realm and/or client role.
+        default: false
+        type: bool
+        version_added: 7.1.0
+    composites:
+        description:
+            - List of roles to include to the composite realm role.
+            - If the composite role is a client role, the C(clientId) (not ID of the client) must be specified.
+        default: []
+        type: list
+        elements: dict
+        version_added: 7.1.0
+        suboptions:
+            name:
+                description:
+                    - Name of the role. This can be the name of a REALM role or a client role.
+                type: str
+                required: true
+            client_id:
+                description:
+                    - Client ID if the role is a client role. Do not include this option for a REALM role.
+                    - Use the client ID you can see in the Keycloak console, not the technical ID of the client.
+                type: str
+                required: false
+                aliases:
+                    - clientId
+            state:
+                description:
+                    - Create the composite if present, remove it if absent.
+                type: str
+                choices:
+                    - present
+                    - absent
+                default: present
 
 extends_documentation_fragment:
     - community.general.keycloak
@@ -198,8 +234,9 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
+import copy
 
 
 def main():
@@ -210,6 +247,12 @@ def main():
     """
     argument_spec = keycloak_argument_spec()
 
+    composites_spec = dict(
+        name=dict(type='str', required=True),
+        client_id=dict(type='str', aliases=['clientId'], required=False),
+        state=dict(type='str', default='present', choices=['present', 'absent'])
+    )
+
     meta_args = dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
         name=dict(type='str', required=True),
@@ -217,6 +260,8 @@ def main():
         realm=dict(type='str', default='master'),
         client_id=dict(type='str'),
         attributes=dict(type='dict'),
+        composites=dict(type='list', default=[], options=composites_spec, elements='dict'),
+        composite=dict(type='bool', default=False),
     )
 
     argument_spec.update(meta_args)
@@ -250,7 +295,7 @@ def main():
 
     # Filter and map the parameters names that apply to the role
     role_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id', 'composites'] and
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id'] and
                    module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
@@ -269,10 +314,10 @@ def main():
         new_param_value = module.params.get(param)
         old_value = before_role[param] if param in before_role else None
         if new_param_value != old_value:
-            changeset[camel(param)] = new_param_value
+            changeset[camel(param)] = copy.deepcopy(new_param_value)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_role = before_role.copy()
+    desired_role = copy.deepcopy(before_role)
     desired_role.update(changeset)
 
     result['proposed'] = changeset
@@ -309,6 +354,9 @@ def main():
             kc.create_client_role(desired_role, clientid, realm)
             after_role = kc.get_client_role(name, clientid, realm)
 
+        if after_role['composite']:
+            after_role['composites'] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
+
         result['end_state'] = after_role
 
         result['msg'] = 'Role {name} has been created'.format(name=name)
@@ -316,10 +364,25 @@ def main():
 
     else:
         if state == 'present':
+            compare_exclude = []
+            if 'composites' in desired_role and isinstance(desired_role['composites'], list) and len(desired_role['composites']) > 0:
+                composites = kc.get_role_composites(rolerep=before_role, clientid=clientid, realm=realm)
+                before_role['composites'] = []
+                for composite in composites:
+                    before_composite = {}
+                    if composite['clientRole']:
+                        composite_client = kc.get_client_by_id(id=composite['containerId'], realm=realm)
+                        before_composite['client_id'] = composite_client['clientId']
+                    else:
+                        before_composite['client_id'] = None
+                    before_composite['name'] = composite['name']
+                    before_composite['state'] = 'present'
+                    before_role['composites'].append(before_composite)
+            else:
+                compare_exclude.append('composites')
             # Process an update
-
             # no changes
-            if desired_role == before_role:
+            if is_struct_included(desired_role, before_role, exclude=compare_exclude):
                 result['changed'] = False
                 result['end_state'] = desired_role
                 result['msg'] = "No changes required to role {name}.".format(name=name)
@@ -341,6 +404,8 @@ def main():
             else:
                 kc.update_client_role(desired_role, clientid, realm)
                 after_role = kc.get_client_role(name, clientid, realm)
+            if after_role['composite']:
+                after_role['composites'] = kc.get_role_composites(rolerep=after_role, clientid=clientid, realm=realm)
 
             result['end_state'] = after_role
 

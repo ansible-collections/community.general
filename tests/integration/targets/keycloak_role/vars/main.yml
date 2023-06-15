@@ -12,3 +12,30 @@ client_id: myclient
 role: myrole
 description_1: desc 1
 description_2: desc 2
+
+keycloak_role_name: test
+keycloak_role_description: test
+keycloak_role_composite: true
+keycloak_role_composites:
+  - name: view-clients 
+    client_id: "realm-management"
+    state: present
+  - name: query-clients 
+    client_id: "realm-management"
+    state: present
+  - name: offline_access
+    state: present
+keycloak_client_id: test-client
+keycloak_client_name: test-client
+keycloak_client_description: This is a client for testing purpose
+role_state: present
+
+keycloak_role_composites_with_absent:
+  - name: view-clients 
+    client_id: "realm-management"
+    state: present
+  - name: query-clients 
+    client_id: "realm-management"
+    state: present
+  - name: offline_access
+    state: absent
