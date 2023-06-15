@@ -532,6 +532,8 @@ files:
     notify: jlozadad
   $modules/gitlab_branch.py:
     maintainers: paytroff
+  $modules/gitlab_merge_request.py:
+    maintainers: zvaraondrej
   $modules/gitlab_project_variable.py:
     maintainers: markuman
   $modules/gitlab_instance_variable.py:
