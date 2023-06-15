@@ -36,7 +36,7 @@ options:
       - If the fingerprint of the provided certificate does not match the
         fingerprint of the certificate bundled in the keystore, the keystore
         is regenerated with the provided certificate.
-      - Exactly one of I(certificate) or I(certificate_path) is required.
+      - Exactly one of O(certificate) or O(certificate_path) is required.
     type: str
   certificate_path:
     description:
@@ -44,18 +44,18 @@ options:
       - If the fingerprint of the provided certificate does not match the
         fingerprint of the certificate bundled in the keystore, the keystore
         is regenerated with the provided certificate.
-      - Exactly one of I(certificate) or I(certificate_path) is required.
+      - Exactly one of O(certificate) or O(certificate_path) is required.
     type: path
     version_added: '3.0.0'
   private_key:
     description:
       - Content of the private key used to create the keystore.
-      - Exactly one of I(private_key) or I(private_key_path) is required.
+      - Exactly one of O(private_key) or O(private_key_path) is required.
     type: str
   private_key_path:
     description:
       - Location of the private key used to create the keystore.
-      - Exactly one of I(private_key) or I(private_key_path) is required.
+      - Exactly one of O(private_key) or O(private_key_path) is required.
     type: path
     version_added: '3.0.0'
   private_key_passphrase:
@@ -108,13 +108,13 @@ options:
       - Type of the Java keystore.
       - When this option is omitted and the keystore doesn't already exist, the
         behavior follows C(keytool)'s default store type which depends on
-        Java version; C(pkcs12) since Java 9 and C(jks) prior (may also
-        be C(pkcs12) if new default has been backported to this version).
+        Java version; V(pkcs12) since Java 9 and V(jks) prior (may also
+        be V(pkcs12) if new default has been backported to this version).
       - When this option is omitted and the keystore already exists, the current
         type is left untouched, unless another option leads to overwrite the
         keystore (in that case, this option behaves like for keystore creation).
-      - When I(keystore_type) is set, the keystore is created with this type if
-        it doesn't already exist, or is overwritten to match the given type in
+      - When O(keystore_type) is set, the keystore is created with this type if
+        it does not already exist, or is overwritten to match the given type in
         case of mismatch.
     type: str
     choices:
@@ -122,9 +122,9 @@ options:
       - pkcs12
     version_added: 3.3.0
 requirements:
-  - openssl in PATH (when I(ssl_backend=openssl))
+  - openssl in PATH (when O(ssl_backend=openssl))
   - keytool in PATH
-  - cryptography >= 3.0 (when I(ssl_backend=cryptography))
+  - cryptography >= 3.0 (when O(ssl_backend=cryptography))
 author:
   - Guillaume Grossetie (@Mogztter)
   - quidame (@quidame)
@@ -135,13 +135,13 @@ seealso:
   - module: community.crypto.openssl_pkcs12
   - module: community.general.java_cert
 notes:
-  - I(certificate) and I(private_key) require that their contents are available
-    on the controller (either inline in a playbook, or with the C(file) lookup),
-    while I(certificate_path) and I(private_key_path) require that the files are
+  - O(certificate) and O(private_key) require that their contents are available
+    on the controller (either inline in a playbook, or with the P(ansible.builtin.file#lookup) lookup),
+    while O(certificate_path) and O(private_key_path) require that the files are
     available on the target host.
-  - By design, any change of a value of options I(keystore_type), I(name) or
-    I(password), as well as changes of key or certificate materials will cause
-    the existing I(dest) to be overwritten.
+  - By design, any change of a value of options O(keystore_type), O(name) or
+    O(password), as well as changes of key or certificate materials will cause
+    the existing O(dest) to be overwritten.
 '''
 
 EXAMPLES = '''
