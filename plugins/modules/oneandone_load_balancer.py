@@ -40,7 +40,7 @@ options:
   api_url:
     description:
       - Custom API URL. Overrides the
-        ONEANDONE_API_URL environment variable.
+        E(ONEANDONE_API_URL) environment variable.
     type: str
     required: false
   name:
@@ -83,7 +83,7 @@ options:
   datacenter:
     description:
       - ID or country code of the datacenter where the load balancer will be created.
-      - If not specified, it defaults to I(US).
+      - If not specified, it defaults to V(US).
     type: str
     choices: [ "US", "ES", "DE", "GB" ]
     required: false

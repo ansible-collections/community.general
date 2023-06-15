@@ -34,7 +34,7 @@ options:
   state:
     description:
      - Indicate desired state of the instance snapshot.
-     - The C(rollback) value was added in community.general 4.8.0.
+     - The V(rollback) value was added in community.general 4.8.0.
     choices: ['present', 'absent', 'rollback']
     default: present
     type: str
@@ -49,7 +49,7 @@ options:
       - Allows to snapshot a container even if it has configured mountpoints.
       - Temporarily disables all configured mountpoints, takes snapshot, and finally restores original configuration.
       - If running, the container will be stopped and restarted to apply config changes.
-      - Due to restrictions in the Proxmox API this option can only be used authenticating as C(root@pam) with I(api_password), API tokens do not work either.
+      - Due to restrictions in the Proxmox API this option can only be used authenticating as V(root@pam) with O(api_password), API tokens do not work either.
       - See U(https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config) (PUT tab) for more details.
     default: false
     type: bool
