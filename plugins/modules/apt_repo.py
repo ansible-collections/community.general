@@ -41,7 +41,7 @@ options:
   remove_others:
     description:
       - Remove other then added repositories
-      - Used if I(state=present)
+      - Used if O(state=present)
     type: bool
     default: false
   update:
