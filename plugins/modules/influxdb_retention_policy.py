@@ -46,14 +46,14 @@ options:
     duration:
         description:
             - Determines how long InfluxDB should keep the data. If specified, it
-              should be C(INF) or at least one hour. If not specified, C(INF) is
+              should be V(INF) or at least one hour. If not specified, V(INF) is
               assumed. Supports complex duration expressions with multiple units.
-            - Required only if I(state) is set to C(present).
+            - Required only if O(state) is set to V(present).
         type: str
     replication:
         description:
             - Determines how many independent copies of each point are stored in the cluster.
-            - Required only if I(state) is set to C(present).
+            - Required only if O(state) is set to V(present).
         type: int
     default:
         description:
