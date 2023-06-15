@@ -39,7 +39,7 @@ options:
     elements: str
   pesize:
     description:
-    - "The size of the physical extent. I(pesize) must be a power of 2 of at least 1 sector
+    - "The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector
        (where the sector size is the largest sector size of the PVs currently used in the VG),
        or at least 128KiB."
     - Since Ansible 2.6, pesize can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
@@ -52,7 +52,7 @@ options:
     default: ''
   pvresize:
     description:
-    - If C(true), resize the physical volume to the maximum available size.
+    - If V(true), resize the physical volume to the maximum available size.
     type: bool
     default: false
     version_added: '0.2.0'
@@ -69,7 +69,7 @@ options:
     default: present
   force:
     description:
-    - If C(true), allows to remove volume group with logical volumes.
+    - If V(true), allows to remove volume group with logical volumes.
     type: bool
     default: false
 seealso:

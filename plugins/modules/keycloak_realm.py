@@ -42,8 +42,8 @@ options:
     state:
         description:
             - State of the realm.
-            - On C(present), the realm will be created (or updated if it exists already).
-            - On C(absent), the realm will be removed if it exists.
+            - On V(present), the realm will be created (or updated if it exists already).
+            - On V(absent), the realm will be removed if it exists.
         choices: ['present', 'absent']
         default: 'present'
         type: str

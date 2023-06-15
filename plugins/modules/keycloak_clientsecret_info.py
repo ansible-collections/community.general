@@ -26,8 +26,8 @@ description:
     and a user having the expected roles.
 
   - When retrieving a new client secret, where possible provide the client's
-    I(id) (not I(client_id)) to the module. This removes a lookup to the API to
-    translate the I(client_id) into the client ID.
+    O(id) (not O(client_id)) to the module. This removes a lookup to the API to
+    translate the O(client_id) into the client ID.
 
   - "Note that this module returns the client secret. To avoid this showing up in the logs,
      please add C(no_log: true) to the task."
@@ -48,7 +48,7 @@ options:
 
   client_id:
     description:
-      - The I(client_id) of the client. Passing this instead of I(id) results in an
+      - The O(client_id) of the client. Passing this instead of O(id) results in an
         extra API call.
     aliases:
       - clientId

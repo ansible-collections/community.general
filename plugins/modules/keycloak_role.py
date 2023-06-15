@@ -40,8 +40,8 @@ options:
     state:
         description:
             - State of the role.
-            - On C(present), the role will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the role will be removed if it exists.
+            - On V(present), the role will be created if it does not yet exist, or updated with the parameters you provide.
+            - On V(absent), the role will be removed if it exists.
         default: 'present'
         type: str
         choices:

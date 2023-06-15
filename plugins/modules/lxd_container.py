@@ -40,26 +40,26 @@ options:
         version_added: 4.8.0
     architecture:
         description:
-          - 'The architecture for the instance (for example C(x86_64) or C(i686)).
+          - 'The architecture for the instance (for example V(x86_64) or V(i686)).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
         type: str
         required: false
     config:
         description:
-          - 'The config for the instance (for example C({"limits.cpu": "2"})).
+          - 'The config for the instance (for example V({"limits.cpu": "2"})).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
           - If the instance already exists and its "config" values in metadata
             obtained from the LXD API U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#instances-containers-and-virtual-machines)
             are different, this module tries to apply the configurations.
-          - The keys starting with C(volatile.) are ignored for this comparison when I(ignore_volatile_options=true).
+          - The keys starting with C(volatile.) are ignored for this comparison when O(ignore_volatile_options=true).
         type: dict
         required: false
     ignore_volatile_options:
         description:
-          - If set to C(true), options starting with C(volatile.) are ignored. As a result,
+          - If set to V(true), options starting with C(volatile.) are ignored. As a result,
             they are reapplied for each execution.
-          - This default behavior can be changed by setting this option to C(false).
-          - The default value changed from C(true) to C(false) in community.general 6.0.0.
+          - This default behavior can be changed by setting this option to V(false).
+          - The default value changed from V(true) to V(false) in community.general 6.0.0.
         type: bool
         required: false
         default: false
@@ -72,26 +72,23 @@ options:
     devices:
         description:
           - 'The devices for the instance
-            (for example C({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
+            (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
         type: dict
         required: false
     ephemeral:
         description:
-          - Whether or not the instance is ephemeral (for example C(true) or C(false)).
+          - Whether or not the instance is ephemeral (for example V(true) or V(false)).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).
         required: false
         type: bool
     source:
         description:
           - 'The source for the instance
-            (e.g. { "type": "image",
-                    "mode": "pull",
-                    "server": "https://images.linuxcontainers.org",
-                    "protocol": "lxd",
-                    "alias": "ubuntu/xenial/amd64" }).'
+            (for example V({ "type": "image", "mode": "pull", "server": "https://images.linuxcontainers.org",
+            "protocol": "lxd", "alias": "ubuntu/xenial/amd64" })).'
           - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
-          - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams).'
+          - 'Note that C(protocol) accepts two choices: V(lxd) or V(simplestreams).'
         required: false
         type: dict
     state:
@@ -125,7 +122,7 @@ options:
         type: int
     type:
         description:
-          - Instance type can be either C(virtual-machine) or C(container).
+          - Instance type can be either V(virtual-machine) or V(container).
         required: false
         default: container
         choices:
@@ -135,7 +132,7 @@ options:
         version_added: 4.1.0
     wait_for_ipv4_addresses:
         description:
-          - If this is true, the C(lxd_container) waits until IPv4 addresses
+          - If this is V(true), the C(lxd_container) waits until IPv4 addresses
             are set to the all network interfaces in the instance after
             starting or restarting.
         required: false
@@ -143,14 +140,14 @@ options:
         type: bool
     wait_for_container:
         description:
-            - If set to C(true), the tasks will wait till the task reports a
+            - If set to V(true), the tasks will wait till the task reports a
               success status when performing container operations.
         default: false
         type: bool
         version_added: 4.4.0
     force_stop:
         description:
-          - If this is true, the C(lxd_container) forces to stop the instance
+          - If this is V(true), the C(lxd_container) forces to stop the instance
             when it stops or restarts the instance.
         required: false
         default: false
@@ -201,7 +198,8 @@ notes:
     2.1, the later requires python to be installed in the instance which can
     be done with the command module.
   - You can copy a file from the host to the instance
-    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the C(community.general.lxd) connection plugin.
+    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module
+    and the P(community.general.lxd#connection) connection plugin.
     See the example below.
   - You can copy a file in the created instance to the localhost
     with C(command=lxc file pull instance_name/dir/filename filename).

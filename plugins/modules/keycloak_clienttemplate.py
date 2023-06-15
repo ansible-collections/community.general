@@ -38,8 +38,8 @@ options:
     state:
         description:
             - State of the client template.
-            - On C(present), the client template will be created (or updated if it exists already).
-            - On C(absent), the client template will be removed if it exists
+            - On V(present), the client template will be created (or updated if it exists already).
+            - On V(absent), the client template will be removed if it exists
         choices: ['present', 'absent']
         default: 'present'
         type: str
@@ -67,7 +67,7 @@ options:
 
     protocol:
         description:
-            - Type of client template (either C(openid-connect) or C(saml).
+            - Type of client template.
         choices: ['openid-connect', 'saml']
         type: str
 
@@ -106,38 +106,37 @@ options:
 
             protocol:
                 description:
-                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper.
-                      is active.
+                    - This specifies for which protocol this protocol mapper is active.
                 choices: ['openid-connect', 'saml']
                 type: str
 
             protocolMapper:
                 description:
-                    - The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
+                    - "The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
                       impossible to provide since this may be extended through SPIs by the user of Keycloak,
-                      by default Keycloak as of 3.4 ships with at least
-                    - C(docker-v2-allow-all-mapper)
-                    - C(oidc-address-mapper)
-                    - C(oidc-full-name-mapper)
-                    - C(oidc-group-membership-mapper)
-                    - C(oidc-hardcoded-claim-mapper)
-                    - C(oidc-hardcoded-role-mapper)
-                    - C(oidc-role-name-mapper)
-                    - C(oidc-script-based-protocol-mapper)
-                    - C(oidc-sha256-pairwise-sub-mapper)
-                    - C(oidc-usermodel-attribute-mapper)
-                    - C(oidc-usermodel-client-role-mapper)
-                    - C(oidc-usermodel-property-mapper)
-                    - C(oidc-usermodel-realm-role-mapper)
-                    - C(oidc-usersessionmodel-note-mapper)
-                    - C(saml-group-membership-mapper)
-                    - C(saml-hardcode-attribute-mapper)
-                    - C(saml-hardcode-role-mapper)
-                    - C(saml-role-list-mapper)
-                    - C(saml-role-name-mapper)
-                    - C(saml-user-attribute-mapper)
-                    - C(saml-user-property-mapper)
-                    - C(saml-user-session-note-mapper)
+                      by default Keycloak as of 3.4 ships with at least:"
+                    - V(docker-v2-allow-all-mapper)
+                    - V(oidc-address-mapper)
+                    - V(oidc-full-name-mapper)
+                    - V(oidc-group-membership-mapper)
+                    - V(oidc-hardcoded-claim-mapper)
+                    - V(oidc-hardcoded-role-mapper)
+                    - V(oidc-role-name-mapper)
+                    - V(oidc-script-based-protocol-mapper)
+                    - V(oidc-sha256-pairwise-sub-mapper)
+                    - V(oidc-usermodel-attribute-mapper)
+                    - V(oidc-usermodel-client-role-mapper)
+                    - V(oidc-usermodel-property-mapper)
+                    - V(oidc-usermodel-realm-role-mapper)
+                    - V(oidc-usersessionmodel-note-mapper)
+                    - V(saml-group-membership-mapper)
+                    - V(saml-hardcode-attribute-mapper)
+                    - V(saml-hardcode-role-mapper)
+                    - V(saml-role-list-mapper)
+                    - V(saml-role-name-mapper)
+                    - V(saml-user-attribute-mapper)
+                    - V(saml-user-property-mapper)
+                    - V(saml-user-session-note-mapper)
                     - An exhaustive list of available mappers on your installation can be obtained on
                       the admin console by going to Server Info -> Providers and looking under
                       'protocol-mapper'.
@@ -146,10 +145,10 @@ options:
             config:
                 description:
                     - Dict specifying the configuration options for the protocol mapper; the
-                      contents differ depending on the value of I(protocolMapper) and are not documented
+                      contents differ depending on the value of O(protocol_mappers[].protocolMapper) and are not documented
                       other than by the source of the mappers and its parent class(es). An example is given
                       below. It is easiest to obtain valid config values by dumping an already-existing
-                      protocol mapper configuration through check-mode in the I(existing) field.
+                      protocol mapper configuration through check-mode in the RV(existing) field.
                 type: dict
 
     attributes:
@@ -160,9 +159,9 @@ options:
         type: dict
 
 notes:
-    - The Keycloak REST API defines further fields (namely I(bearerOnly), I(consentRequired), I(standardFlowEnabled),
-      I(implicitFlowEnabled), I(directAccessGrantsEnabled), I(serviceAccountsEnabled), I(publicClient), and
-      I(frontchannelLogout)) which, while available with keycloak_client, do not have any effect on
+    - The Keycloak REST API defines further fields (namely C(bearerOnly), C(consentRequired), C(standardFlowEnabled),
+      C(implicitFlowEnabled), C(directAccessGrantsEnabled), C(serviceAccountsEnabled), C(publicClient), and
+      C(frontchannelLogout)) which, while available with keycloak_client, do not have any effect on
       Keycloak client-templates and are discarded if supplied with an API request changing client-templates. As such,
       they are not available through this module.
 
