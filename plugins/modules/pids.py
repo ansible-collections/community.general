@@ -31,7 +31,7 @@ options:
     type: str
     version_added: 3.0.0
   ignore_case:
-    description: Ignore case in pattern if using the I(pattern) option.
+    description: Ignore case in pattern if using the O(pattern) option.
     type: bool
     default: false
     version_added: 3.0.0

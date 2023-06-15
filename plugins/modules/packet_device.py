@@ -40,7 +40,7 @@ attributes:
 options:
   auth_token:
     description:
-      - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in environment variable E(PACKET_API_TOKEN).
     type: str
 
   count:
@@ -82,8 +82,8 @@ options:
   hostnames:
     description:
       - A hostname of a device, or a list of hostnames.
-      - If given string or one-item list, you can use the C("%d") Python string format to expand numbers from I(count).
-      - If only one hostname, it might be expanded to list if I(count)>1.
+      - If given string or one-item list, you can use the C("%d") Python string format to expand numbers from O(count).
+      - If only one hostname, it might be expanded to list if O(count)>1.
     aliases: [name]
     type: list
     elements: str
@@ -114,8 +114,8 @@ options:
   state:
     description:
       - Desired state of the device.
-      - If set to C(present) (the default), the module call will return immediately after the device-creating HTTP request successfully returns.
-      - If set to C(active), the module call will block until all the specified devices are in state active due to the Packet API, or until I(wait_timeout).
+      - If set to V(present) (the default), the module call will return immediately after the device-creating HTTP request successfully returns.
+      - If set to V(active), the module call will block until all the specified devices are in state active due to the Packet API, or until O(wait_timeout).
     choices: [present, absent, active, inactive, rebooted]
     default: present
     type: str
@@ -135,8 +135,8 @@ options:
 
   wait_timeout:
     description:
-      - How long (seconds) to wait either for automatic IP address assignment, or for the device to reach the C(active) I(state).
-      - If I(wait_for_public_IPv) is set and I(state) is C(active), the module will wait for both events consequently, applying the timeout twice.
+      - How long (seconds) to wait either for automatic IP address assignment, or for the device to reach the V(active) state.
+      - If O(wait_for_public_IPv) is set and O(state=active), the module will wait for both events consequently, applying the timeout twice.
     default: 900
     type: int
 
@@ -161,7 +161,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-# All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
+# All the examples assume that you have your Packet API token in environment variable PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
 # Creating devices

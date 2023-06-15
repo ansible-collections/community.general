@@ -34,9 +34,9 @@ options:
         elements: str
     state:
         description:
-          - C(present) will make sure the package is installed.
-            C(latest) will make sure the latest version of the package is installed.
-            C(absent) will make sure the specified package is not installed.
+          - V(present) will make sure the package is installed.
+          - V(latest) will make sure the latest version of the package is installed.
+          - V(absent) will make sure the specified package is not installed.
         choices: [ absent, latest, present, installed, removed ]
         default: present
         type: str
@@ -46,19 +46,19 @@ options:
             a binary. Requires that the port source tree is already installed.
             Automatically builds and installs the 'sqlports' package, if it is
             not already installed.
-          - Mutually exclusive with I(snapshot).
+          - Mutually exclusive with O(snapshot).
         type: bool
         default: false
     snapshot:
         description:
           - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
-          - Mutually exclusive with I(build).
+          - Mutually exclusive with O(build).
         type: bool
         default: false
         version_added: 1.3.0
     ports_dir:
         description:
-          - When used in combination with the C(build) option, allows overriding
+          - When used in combination with the O(build) option, allows overriding
             the default ports source directory.
         default: /usr/ports
         type: path
@@ -77,7 +77,7 @@ options:
         default: false
 notes:
   - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the I(name) option.
+    it is much more efficient to pass the list directly to the O(name) option.
 '''
 
 EXAMPLES = '''

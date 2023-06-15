@@ -14,7 +14,7 @@ module: proxmox_kvm
 short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster
 description:
   - Allows you to create/delete/stop Qemu(KVM) Virtual Machines in Proxmox VE cluster.
-  - Since community.general 4.0.0 on, there are no more default values, see I(proxmox_default_behavior).
+  - Since community.general 4.0.0 on, there are no more default values, see O(proxmox_default_behavior).
 author: "Abdoul Bah (@helldorado) <bahabdoul at gmail.com>"
 attributes:
   check_mode:
@@ -30,31 +30,31 @@ options:
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(true).
     type: bool
   agent:
     description:
       - Specify if the QEMU Guest Agent should be enabled/disabled.
       - Since community.general 5.5.0, this can also be a string instead of a boolean.
-        This allows to specify values such as C(enabled=1,fstrim_cloned_disks=1).
+        This allows to specify values such as V(enabled=1,fstrim_cloned_disks=1).
     type: str
   args:
     description:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
-      - If I(proxmox_default_behavior) is set to C(compatiblity), this option has a default of
-        C(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait).
+      - If O(proxmox_default_behavior) is set to V(compatiblity), this option has a default of
+        V(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait).
     type: str
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
     type: bool
   balloon:
     description:
       - Specify the amount of RAM for the VM in MB.
       - Using zero disables the balloon driver.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(0).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(0).
     type: int
   bios:
     description:
@@ -63,13 +63,13 @@ options:
     choices: ['seabios', 'ovmf']
   boot:
     description:
-      - Specify the boot order -> boot on floppy C(a), hard disk C(c), CD-ROM C(d), or network C(n).
+      - Specify the boot order -> boot on floppy V(a), hard disk V(c), CD-ROM V(d), or network V(n).
       - You can combine to set order.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(cnd).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(cnd).
     type: str
   bootdisk:
     description:
-      - Enable booting from specified disk. C((ide|sata|scsi|virtio)\d+)
+      - 'Enable booting from specified disk. Format V((ide|sata|scsi|virtio\)\\d+).'
     type: str
   cicustom:
     description:
@@ -84,8 +84,8 @@ options:
   citype:
     description:
       - 'cloud-init: Specifies the cloud-init configuration format.'
-      - The default depends on the configured operating system type (C(ostype)).
-      - We use the C(nocloud) format for Linux, and C(configdrive2) for Windows.
+      - The default depends on the configured operating system type (V(ostype)).
+      - We use the V(nocloud) format for Linux, and V(configdrive2) for Windows.
     type: str
     choices: ['nocloud', 'configdrive2']
     version_added: 1.3.0
@@ -96,17 +96,17 @@ options:
     version_added: 1.3.0
   clone:
     description:
-      - Name of VM to be cloned. If I(vmid) is set, I(clone) can take an arbitrary value but is required for initiating the clone.
+      - Name of VM to be cloned. If O(vmid) is set, O(clone) can take an arbitrary value but is required for initiating the clone.
     type: str
   cores:
     description:
       - Specify number of cores per socket.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
     type: int
   cpu:
     description:
       - Specify emulated CPU type.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(kvm64).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(kvm64).
     type: str
   cpulimit:
     description:
@@ -117,7 +117,7 @@ options:
     description:
       - Specify CPU weight for a VM.
       - You can disable fair-scheduler configuration by setting this to 0
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1000).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1000).
     type: int
   delete:
     description:
@@ -136,24 +136,24 @@ options:
   efidisk0:
     description:
       - Specify a hash/dictionary of EFI disk options.
-      - Requires I(bios=ovmf) to be set to be able to use it.
+      - Requires O(bios=ovmf) to be set to be able to use it.
     type: dict
     suboptions:
       storage:
         description:
-          - C(storage) is the storage identifier where to create the disk.
+          - V(storage) is the storage identifier where to create the disk.
         type: str
       format:
         description:
-          - C(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide,
+          - V(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide,
            section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest
            version, tables 3 to 14) to find out format supported by the provided storage backend.
         type: str
       efitype:
         description:
-          - C(efitype) indicates the size of the EFI disk.
-          - C(2m) will allow for a 2MB EFI disk, which will be enough to persist boot order and new boot entries.
-          - C(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable
+          - V(efitype) indicates the size of the EFI disk.
+          - V(2m) will allow for a 2MB EFI disk, which will be enough to persist boot order and new boot entries.
+          - V(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable
            Secure Boot
         type: str
         choices:
@@ -161,27 +161,27 @@ options:
           - 4m
       pre_enrolled_keys:
         description:
-          - C(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled C(1) in the VM firmware
+          - V(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled V(1) in the VM firmware
            upon creation or not (0).
-          - If set to C(1), Secure Boot will also be enabled by default when the VM is created.
+          - If set to V(1), Secure Boot will also be enabled by default when the VM is created.
         type: bool
     version_added: 4.5.0
   force:
     description:
       - Allow to force stop VM.
-      - Can be used with states C(stopped), C(restarted) and C(absent).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
+      - Can be used with states V(stopped), V(restarted), and V(absent).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
     type: bool
   format:
     description:
       - Target drive's backing file's data format.
       - Used only with clone
-      - Use I(format=unspecified) and I(full=false) for a linked clone.
+      - Use O(format=unspecified) and O(full=false) for a linked clone.
       - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see
         U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
         supported by the provided storage backend.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(qcow2).
-        If I(proxmox_default_behavior) is set to C(no_defaults), not specifying this option is equivalent to setting it to C(unspecified).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(qcow2).
+        If O(proxmox_default_behavior) is set to V(no_defaults), not specifying this option is equivalent to setting it to V(unspecified).
     type: str
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
@@ -197,20 +197,20 @@ options:
     default: true
   hostpci:
     description:
-      - Specify a hash/dictionary of map host pci devices into guest. C(hostpci='{"key":"value", "key":"value"}').
+      - Specify a hash/dictionary of map host pci devices into guest. O(hostpci='{"key":"value", "key":"value"}').
       - Keys allowed are - C(hostpci[n]) where 0 ≤ n ≤ N.
       - Values allowed are -  C("host="HOSTPCIID[;HOSTPCIID2...]",pcie="1|0",rombar="1|0",x-vga="1|0"").
       - The C(host) parameter is Host PCI device pass through. HOSTPCIID syntax is C(bus:dev.func) (hexadecimal numbers).
-      - C(pcie=boolean) I(default=0) Choose the PCI-express bus (needs the q35 machine model).
-      - C(rombar=boolean) I(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
-      - C(x-vga=boolean) I(default=0) Enable vfio-vga device support.
+      - C(pcie=boolean) C(default=0) Choose the PCI-express bus (needs the q35 machine model).
+      - C(rombar=boolean) C(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
+      - C(x-vga=boolean) C(default=0) Enable vfio-vga device support.
       - /!\ This option allows direct access to host hardware. So it is no longer possible to migrate such machines - use with special care.
     type: dict
   hotplug:
     description:
       - Selectively enable hotplug features.
-      - This is a comma separated list of hotplug features C('network', 'disk', 'cpu', 'memory' and 'usb').
-      - Value 0 disables hotplug completely and value 1 is an alias for the default C('network,disk,usb').
+      - This is a comma separated list of hotplug features V(network), V(disk), V(cpu), V(memory), and V(usb).
+      - Value 0 disables hotplug completely and value 1 is an alias for the default V(network,disk,usb).
     type: str
   hugepages:
     description:
@@ -219,7 +219,7 @@ options:
     choices: ['any', '2', '1024']
   ide:
     description:
-      - A hash/dictionary of volume used as IDE hard disk or CD-ROM. C(ide='{"key":"value", "key":"value"}').
+      - A hash/dictionary of volume used as IDE hard disk or CD-ROM. O(ide='{"key":"value", "key":"value"}').
       - Keys allowed are - C(ide[n]) where 0 ≤ n ≤ 3.
       - Values allowed are - C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
@@ -231,7 +231,7 @@ options:
   ipconfig:
     description:
       - 'cloud-init: Set the IP configuration.'
-      - A hash/dictionary of network ip configurations. C(ipconfig='{"key":"value", "key":"value"}').
+      - A hash/dictionary of network ip configurations. O(ipconfig='{"key":"value", "key":"value"}').
       - Keys allowed are - C(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
       - Values allowed are -  C("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
       - 'cloud-init: Specify IP addresses and gateways for the corresponding interface.'
@@ -248,7 +248,7 @@ options:
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(true).
     type: bool
   localtime:
     description:
@@ -263,16 +263,16 @@ options:
   machine:
     description:
       - Specifies the Qemu machine type.
-      - type => C((pc|pc(-i440fx)?-\d+\.\d+(\.pxe)?|q35|pc-q35-\d+\.\d+(\.pxe)?))
+      - 'Type => V((pc|pc(-i440fx\)?-\\d+\\.\\d+(\\.pxe\)?|q35|pc-q35-\\d+\\.\\d+(\\.pxe\)?\)).'
     type: str
   memory:
     description:
       - Memory size in MB for instance.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(512).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(512).
     type: int
   migrate:
     description:
-      - Migrate the VM to I(node) if it is on another node.
+      - Migrate the VM to O(node) if it is on another node.
     type: bool
     default: false
     version_added: 7.0.0
@@ -288,7 +288,7 @@ options:
   name:
     description:
       - Specifies the VM name. Only used on the configuration web interface.
-      - Required only for C(state=present).
+      - Required only for O(state=present).
     type: str
   nameservers:
     description:
@@ -299,7 +299,7 @@ options:
     version_added: 1.3.0
   net:
     description:
-      - A hash/dictionary of network interfaces for the VM. C(net='{"key":"value", "key":"value"}').
+      - A hash/dictionary of network interfaces for the VM. O(net='{"key":"value", "key":"value"}').
       - Keys allowed are - C(net[n]) where 0 ≤ n ≤ N.
       - Values allowed are - C("model="XX:XX:XX:XX:XX:XX",bridge="value",rate="value",tag="value",firewall="1|0",trunks="vlanid"").
       - Model is one of C(e1000 e1000-82540em e1000-82544gc e1000-82545em i82551 i82557b i82559er ne2k_isa ne2k_pci pcnet rtl8139 virtio vmxnet3).
@@ -315,7 +315,7 @@ options:
     type: int
   numa:
     description:
-      - A hash/dictionaries of NUMA topology. C(numa='{"key":"value", "key":"value"}').
+      - A hash/dictionaries of NUMA topology. O(numa='{"key":"value", "key":"value"}').
       - Keys allowed are - C(numa[n]) where 0 ≤ n ≤ N.
       - Values allowed are - C("cpu="<id[-id];...>",hostnodes="<id[-id];...>",memory="number",policy="(bind|interleave|preferred)"").
       - C(cpus) CPUs accessing this NUMA node.
@@ -330,18 +330,18 @@ options:
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(true).
     type: bool
   ostype:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
       - The l26 is Linux 2.6/3.X Kernel.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(l26).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(l26).
     type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'win11', 'l24', 'l26', 'solaris']
   parallel:
     description:
-      - A hash/dictionary of map host parallel devices. C(parallel='{"key":"value", "key":"value"}').
+      - A hash/dictionary of map host parallel devices. O(parallel='{"key":"value", "key":"value"}').
       - Keys allowed are - (parallel[n]) where 0 ≤ n ≤ 2.
       - Values allowed are - C("/dev/parport\d+|/dev/usb/lp\d+").
     type: dict
@@ -351,7 +351,7 @@ options:
     type: bool
   reboot:
     description:
-      - Allow reboot. If set to C(true), the VM exit on reboot.
+      - Allow reboot. If set to V(true), the VM exit on reboot.
     type: bool
   revert:
     description:
@@ -359,7 +359,7 @@ options:
     type: str
   sata:
     description:
-      - A hash/dictionary of volume used as sata hard disk or CD-ROM. C(sata='{"key":"value", "key":"value"}').
+      - A hash/dictionary of volume used as sata hard disk or CD-ROM. O(sata='{"key":"value", "key":"value"}').
       - Keys allowed are - C(sata[n]) where 0 ≤ n ≤ 5.
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
@@ -370,7 +370,7 @@ options:
     type: dict
   scsi:
     description:
-      - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. C(scsi='{"key":"value", "key":"value"}').
+      - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. O(scsi='{"key":"value", "key":"value"}').
       - Keys allowed are - C(sata[n]) where 0 ≤ n ≤ 13.
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
@@ -393,9 +393,9 @@ options:
     version_added: 1.3.0
   serial:
     description:
-      - A hash/dictionary of serial device to create inside the VM. C('{"key":"value", "key":"value"}').
+      - A hash/dictionary of serial device to create inside the VM. V('{"key":"value", "key":"value"}').
       - Keys allowed are - serial[n](str; required) where 0 ≤ n ≤ 3.
-      - Values allowed are - C((/dev/.+|socket)).
+      - Values allowed are - V((/dev/.+|socket\)).
       - /!\ If you pass through a host serial device, it is no longer possible to migrate such machines - use with special care.
     type: dict
   shares:
@@ -421,7 +421,7 @@ options:
   sockets:
     description:
       - Sets the number of CPU sockets. (1 - N).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
     type: int
   sshkeys:
     description:
@@ -431,18 +431,18 @@ options:
   startdate:
     description:
       - Sets the initial date of the real time clock.
-      - Valid format for date are C('now') or C('2016-09-25T16:01:21') or C('2016-09-25').
+      - Valid format for date are V('now') or V('2016-09-25T16:01:21') or V('2016-09-25').
     type: str
   startup:
     description:
-      - Startup and shutdown behavior. C([[order=]\d+] [,up=\d+] [,down=\d+]).
+      - Startup and shutdown behavior. V([[order=]\\d+] [,up=\\d+] [,down=\\d+]).
       - Order is a non-negative number defining the general startup order.
       - Shutdown in done with reverse ordering.
     type: str
   state:
     description:
       - Indicates desired state of the instance.
-      - If C(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - If V(current), the current state of the VM will be fetched. You can access it with C(results.status)
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current']
     default: present
@@ -453,12 +453,12 @@ options:
   tablet:
     description:
       - Enables/disables the USB tablet device.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
     type: bool
   tags:
     description:
       - List of tags to apply to the VM instance.
-      - Tags must start with C([a-z0-9_]) followed by zero or more of the following characters C([a-z0-9_-+.]).
+      - Tags must start with V([a-z0-9_]) followed by zero or more of the following characters V([a-z0-9_-+.]).
       - Tags are only available in Proxmox 6+.
     type: list
     elements: str
@@ -475,12 +475,12 @@ options:
   template:
     description:
       - Enables/disables the template.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
     type: bool
   timeout:
     description:
       - Timeout for operations.
-      - When used with I(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
+      - When used with O(state=stopped) the option sets a graceful timeout for VM stop after which a VM will be forcefully stopped.
     type: int
     default: 30
   tpmstate0:
@@ -503,10 +503,10 @@ options:
     version_added: 7.1.0
   update:
     description:
-      - If C(true), the VM will be updated with new value.
-      - Cause of the operations of the API and security reasons, I have disabled the update of the following parameters
-      - C(net, virtio, ide, sata, scsi). Per example updating C(net) update the MAC address and C(virtio) create always new disk...
-      - Update of C(pool) is disabled. It needs an additional API endpoint not covered by this module.
+      - If V(true), the VM will be updated with new value.
+      - Because of the operations of the API and security reasons, I have disabled the update of the following parameters
+        O(net), O(virtio), O(ide), O(sata), O(scsi). Per example updating O(net) update the MAC address and C(virtio) create always new disk...
+      - Update of O(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: false
   vcpus:
@@ -516,12 +516,12 @@ options:
   vga:
     description:
       - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(std).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(std).
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
   virtio:
     description:
-      - A hash/dictionary of volume used as VIRTIO hard disk. C(virtio='{"key":"value", "key":"value"}').
+      - A hash/dictionary of volume used as VIRTIO hard disk. O(virtio='{"key":"value", "key":"value"}').
       - Keys allowed are - C(virto[n]) where 0 ≤ n ≤ 15.
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
@@ -539,12 +539,12 @@ options:
      - As of community.general 4.0.0, various options no longer have default values.
         These default values caused problems when users expected different behavior from Proxmox
         by default or filled options which caused problems when set.
-      - The value C(compatibility) (default before community.general 4.0.0) will ensure that the default values
-        are used when the values are not explicitly specified by the user. The new default is C(no_defaults),
+      - The value V(compatibility) (default before community.general 4.0.0) will ensure that the default values
+        are used when the values are not explicitly specified by the user. The new default is V(no_defaults),
         which makes sure these options have no defaults.
-      - This affects the I(acpi), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
-        I(cpuunits), I(force), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
-        I(tablet), I(template), I(vga), options.
+      - This affects the O(acpi), O(autostart), O(balloon), O(boot), O(cores), O(cpu),
+        O(cpuunits), O(force), O(format), O(kvm), O(memory), O(onboot), O(ostype), O(sockets),
+        O(tablet), O(template), and O(vga) options.
     type: str
     default: no_defaults
     choices:
