@@ -263,7 +263,8 @@ EXAMPLES = """
     reason_for: all
 """
 
-import re, shlex
+import re
+import shlex
 from ansible.module_utils.basic import AnsibleModule
 from collections import defaultdict, namedtuple
 
