@@ -73,6 +73,7 @@ options:
         from C(util-linux) package to perform operations, so resizing of XFS is
         not supported on FreeBSD systems.
       - vFAT will likely fail if C(fatresize < 1.04).
+      - Mutually exclusive with O(uuid).
     type: bool
     default: false
   opts:
@@ -87,6 +88,7 @@ options:
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
       - Supported for O(fstype) being one of C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
       - This is B(not idempotent). Specifying this option will always result in a change.
+      - Mutually exclusive with O(resizefs).
     type: str
     version_added: 7.1.0
 requirements:
@@ -602,6 +604,9 @@ def main():
         required_if=[
             ('state', 'present', ['fstype'])
         ],
+        mutually_exclusive=[
+            ('resizefs', 'uuid')
+        ],
         supports_check_mode=True,
     )
 
@@ -656,20 +661,21 @@ def main():
         same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
         if same_fs and not resizefs and not uuid and not force:
             module.exit_json(changed=False)
-        elif same_fs and resizefs:
-            if not filesystem.GROW:
-                module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
+        elif same_fs:
+            if resizefs:
+                if not filesystem.GROW:
+                    module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
 
-            out = filesystem.grow(dev)
+                out = filesystem.grow(dev)
 
-            module.exit_json(changed=True, msg=out)
-        elif same_fs and uuid:
-            if not filesystem.CHANGE_UUID:
-                module.fail_json(changed=False, msg="module does not support UUID change for %s filesystem yet." % fstype)
+                module.exit_json(changed=True, msg=out)
+            elif uuid:
+                if not filesystem.CHANGE_UUID:
+                    module.fail_json(changed=False, msg="module does not support UUID change for %s filesystem yet." % fstype)
 
-            out = filesystem.change_uuid(new_uuid=uuid, dev=dev)
+                out = filesystem.change_uuid(new_uuid=uuid, dev=dev)
 
-            module.exit_json(changed=True, msg=out)
+                module.exit_json(changed=True, msg=out)
         elif fs and not force:
             module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
 
