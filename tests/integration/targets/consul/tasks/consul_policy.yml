@@ -1,0 +1,67 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a policy with rules
+  consul_policy:
+    name: foo-access
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+        key "private/foo" {
+            policy = "deny"
+        }
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['policy']['Name'] == 'foo-access'
+- name: Update the rules associated to a policy
+  consul_policy:
+    name: foo-access
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+        key "private/foo" {
+            policy = "deny"
+        }
+        event "bbq" {
+            policy = "write"
+        }
+    token: "{{ consul_management_token }}"
+  register: result
+- assert:
+    that:
+      - result is changed
+- name: Update reports not changed when updating again without changes
+  consul_policy:
+    name: foo-access
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+        key "private/foo" {
+            policy = "deny"
+        }
+        event "bbq" {
+            policy = "write"
+        }
+    token: "{{ consul_management_token }}"
+  register: result
+- assert:
+    that:
+      - result is not changed
+- name: Remove a policy
+  consul_policy:
+    name: foo-access
+    token: "{{ consul_management_token }}"
+    state: absent
+  register: result
+- assert:
+    that:
+      - result is changed
