@@ -650,6 +650,9 @@ def main():
 
         filesystem = klass(module)
 
+        if uuid and not (filesystem.CHANGE_UUID or filesystem.MKFS_SET_UUID_OPTIONS):
+            module.fail_json(changed=False, msg="module does not support UUID option for this filesystem (%s) yet." % fstype)
+
         same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
         if same_fs and not resizefs and not uuid and not force:
             module.exit_json(changed=False)
