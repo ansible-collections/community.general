@@ -289,11 +289,14 @@ class TSSClient(object):
                 if file_download_path and os.path.isdir(file_download_path):
                     if i['isFile']:
                         try:
+                            file_content = i['itemValue'].content
                             with open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "wb") as f:
-                                f.write(i['itemValue'].content)
+                                f.write(file_content)
                             i['itemValue'] = "*** Not Valid For Display ***"
                         except ValueError:
                             raise AnsibleOptionsError("Failed to download {0}".format(str(i['slug'])))
+                        except AttributeError:
+                            display.warning("Could not read file content for {0}".format(str(i['slug'])))
                 else:
                     raise AnsibleOptionsError("File download path does not exist")
             return obj
