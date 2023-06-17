@@ -1,0 +1,44 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install pymssql
+  ansible.builtin.pip:
+    name:
+      - pymssql
+    state: present
+  notify: Remove pymssql
+
+- name: Start container 11111
+  community.docker.docker_container:
+    name: mssql-test-11111
+    image: "{{ mssql_container_image }}"
+    env:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "{{ mssql_login_password }}"
+      MSSQL_PID: Developer
+    ports:
+      - 11111:1433
+    detach: true
+    auto_remove: true
+    memory: 2200M
+  notify: Stop container mssql-test-11111
+
+- name: Check port 11111
+  ansible.builtin.wait_for:
+    host: "{{ mssql_host }}"
+    port: 11111
+    state: started         # Port should be open
+    delay: 10              # Wait 10 secs before first check
+    timeout: 30            # Stop checking after timeout (sec)
+
+- name: Check DB connection 11111
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: 11111
+    script: "SELECT 1"
+
+- ansible.builtin.meta: flush_handlers
