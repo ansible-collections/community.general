@@ -320,7 +320,8 @@ class LookupModule(LookupBase):
 
             if self.backend == 'gopass':
                 self.env['GOPASS_NO_REMINDER'] = "YES"
-            elif os.path.isdir(self.paramvals['directory']):
+
+            if os.path.isdir(self.paramvals['directory']):
                 # Set PASSWORD_STORE_DIR
                 self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
             elif self.is_real_pass():
