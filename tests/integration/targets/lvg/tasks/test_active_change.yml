@@ -19,72 +19,89 @@
 
 - name: Collect all lv active status in testvg
   shell: vgs -olv_active --noheadings testvg | xargs -n1
-  register: cmd_result
+  register: initial_lv_status_result
 
 - name: Assert all lv in testvg are active
-  loop: "{{ cmd_result.stdout_lines }}"
+  loop: "{{ initial_lv_status_result.stdout_lines }}"
   assert:
     that:
       - "'active' == '{{ item }}'"
 
 - name: Deactivate volume group
   lvg:
+    state: inactive
     vg: testvg
-    active: false
-  register: vg_deactivate
+  register: vg_deactivate_result
 
 - name: Collect all lv active status in testvg
   shell: vgs -olv_active --noheadings testvg | xargs -n1
-  register: cmd_result
+  register: deactivated_lv_status_result
 
 - name: Do all assertions to verify expected results
   assert:
     that:
-      - vg_deactivate is changed
-      - "'active' not in cmd_result.stdout"
+      - vg_deactivate_result is changed
+      - "'active' not in deactivated_lv_status_result.stdout"
 
 - name: Deactivate volume group again to verify idempotence
   lvg:
+    state: inactive
     vg: testvg
-    active: false
-  register: repeat_vg_deactivate
+  register: repeated_vg_deactivate_result
 
 - name: Verify vg deactivation idempontency
   assert:
     that:
-      - repeat_vg_deactivate is not changed
+      - repeated_vg_deactivate_result is not changed
 
-- name: Activate volume group 
+- name: Activate volume group in check mode
   lvg:
+    state: active
     vg: testvg
-    active: true
-  register: vg_activate
+  register: check_mode_vg_activate_result
+  check_mode: true
 
 - name: Collect all lv active status in testvg
   shell: vgs -olv_active --noheadings testvg | xargs -n1
-  register: cmd_result
+  register: check_mode_activate_lv_status_result
+
+- name: Verify VG activation in check mode changed without activating LVs
+  assert:
+    that:
+      - check_mode_vg_activate_result is changed
+      - "'active' not in check_mode_activate_lv_status_result.stdout"
+
+- name: Activate volume group
+  lvg:
+    state: active
+    vg: testvg
+  register: vg_activate_result
+
+- name: Collect all lv active status in testvg
+  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  register: activate_lv_status_result
 
 - name: Verify vg activation
   assert:
     that:
-      - vg_activate is changed
+      - vg_activate_result is changed
 
 - name: Assert all lv in testvg are active
-  loop: "{{ cmd_result.stdout_lines }}"
+  loop: "{{ activate_lv_status_result.stdout_lines }}"
   assert:
     that:
       - "'active' == '{{ item }}'"
 
 - name: Activate volume group again to verify idempontency
   lvg:
+    state: active
     vg: testvg
-    active: true
-  register: repeat_vg_activate
+  register: repeated_vg_activate_result
 
 - name: Verify vg activation idempontency
   assert:
     that:
-      - repeat_vg_activate is not changed
+      - repeated_vg_activate_result is not changed
 
 - name: Deactivate lv2 in testvg
   lvol:
@@ -94,21 +111,43 @@
 
 - name: Activate volume group again to verify partially activated vg activation
   lvg:
+    state: active
     vg: testvg
-    active: true
-  register: partial_vg_activate
+  register: partial_vg_activate_result
 
 - name: Verify partially activated vg activation
   assert:
     that:
-      - partial_vg_activate is changed
+      - partial_vg_activate_result is changed
 
 - name: Collect all lv active status in testvg
   shell: vgs -olv_active --noheadings testvg | xargs -n1
-  register: cmd_result
+  register: activate_partial_lv_status_result
 
 - name: Assert all lv in testvg are active
-  loop: "{{ cmd_result.stdout_lines }}"
+  loop: "{{ activate_partial_lv_status_result.stdout_lines }}"
+  assert:
+    that:
+      - "'active' == '{{ item }}'"
+
+- name: Deactive volume group in check mode
+  lvg:
+    state: inactive
+    vg: testvg
+  register: check_mode_vg_deactivate_result
+  check_mode: true
+
+- name: Collect all lv active status in testvg
+  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  register: check_mode_deactivate_lv_status_result
+
+- name: Verify check mode vg deactivation changed
+  assert:
+    that:
+      - check_mode_vg_deactivate_result is changed
+
+- name: Assert all lv in testvg are still active
+  loop: "{{ check_mode_deactivate_lv_status_result.stdout_lines }}"
   assert:
     that:
       - "'active' == '{{ item }}'"

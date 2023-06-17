@@ -18,9 +18,9 @@
 
 - name: Deactivate and reset vg/pv uuid
   lvg:
+    state: inactive
     vg: testvg
     pvs: "{{ loop_device1 }}"
-    active: false
     reset_vg_uuid: true
     reset_pv_uuid: true
   register: vg_uuid_reset
@@ -51,7 +51,7 @@
     vg: testvg
     reset_pv_uuid: true
     pvs: "{{ loop_device1 }}"
-  register: repeat_pv_uuid_reset  
+  register: repeat_pv_uuid_reset
 
 - name: Save testvg uuid
   shell: vgs -ouuid --noheadings testvg | xargs -n1
@@ -69,8 +69,39 @@
       - new_vg_uuid_cmd_result.stdout != repeat_vg_uuid_cmd_result.stdout
       - new_pv_uuid_cmd_result.stdout != repeat_pv_uuid_cmd_result.stdout
 
-- name: Activate volume group 
+- name: Reset vg uuid in check mode
   lvg:
     vg: testvg
-    active: true
+    reset_vg_uuid: true
+  register: check_mode_vg_uuid_reset
+  check_mode: true
+
+- name: Reset pv uuid in check mode
+  lvg:
+    vg: testvg
+    reset_pv_uuid: true
+    pvs: "{{ loop_device1 }}"
+  register: check_mode_pv_uuid_reset
+  check_mode: true
+
+- name: Save testvg uuid
+  shell: vgs -ouuid --noheadings testvg | xargs -n1
+  register: check_mode_vg_uuid_cmd_result
+
+- name: Save pv uuid
+  shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
+  register: check_mode_pv_uuid_cmd_result
+
+- name: Do all assertions to verify expected results
+  assert:
+    that:
+      - check_mode_vg_uuid_reset is changed
+      - check_mode_pv_uuid_reset is changed
+      - check_mode_vg_uuid_cmd_result.stdout == repeat_vg_uuid_cmd_result.stdout
+      - check_mode_pv_uuid_cmd_result.stdout == repeat_pv_uuid_cmd_result.stdout
+
+- name: Activate volume group
+  lvg:
+    state: active
+    vg: testvg
   register: vg_activate

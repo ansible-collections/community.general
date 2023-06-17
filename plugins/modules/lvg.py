@@ -63,38 +63,33 @@ options:
     default: ''
   state:
     description:
-    - Control if the volume group exists.
+    - Control if the volume group exists and it's state.
+    - The states V(active) and V(inactive) implies V(present) state. Added in 7.1.0
+    - "If V(active) or V(inactive), the module manages the VG's logical volumes current state.
+       The module also handles the VG's autoactivation state if supported
+       unless when creating a volume group and the autoactivation option specified in O(vg_options)."
     type: str
-    choices: [ absent, present ]
+    choices: [ absent, present, active, inactive ]
     default: present
   force:
     description:
     - If C(true), allows to remove volume group with logical volumes.
     type: bool
     default: false
-  old_vg:
-    description:
-    - The old name of the volume group.
-    - If specified, the volume group is renamed.
-    type: str
-    required: false
-  active:
-    description:
-    - Whether the volume group's logical volumes are active and visible to the host.
-    type: bool
-    required: false
   reset_vg_uuid:
     description:
     - Whether the volume group's UUID is regenerated.
-    - B(Not idempotent)
+    - This is B(not idempotent). Specifying this parameter always results in a change.
     type: bool
     default: false
+    version_added: 7.1.0
   reset_pv_uuid:
     description:
     - Whether the volume group's physical volumes' UUIDs are regenerated.
-    - B(Not idempotent)
+    - This is B(not idempotent). Specifying this parameter always results in a change.
     type: bool
     default: false
+    version_added: 7.1.0
 seealso:
 - module: community.general.filesystem
 - module: community.general.lvol
@@ -136,32 +131,27 @@ EXAMPLES = r'''
     pvs: /dev/sda3
     pvresize: true
 
-- name: Rename a volume group
-  community.general.lvg:
-    vg: vg.newservices
-    old_vg: vg.services
-
 - name: Deactivate a volume group
   community.general.lvg:
+    state: inactive
     vg: vg.services
-    active: false
 
 - name: Activate a volume group
   community.general.lvg:
+    state: active
     vg: vg.services
-    active: true
 
 - name: Reset a volume group UUID
   community.general.lvg:
+    state: inactive
     vg: vg.services
-    active: false
     reset_vg_uuid: true
 
-- name: Reset a volume group and pv UUID
+- name: Reset both volume group and pv UUID
   community.general.lvg:
+    state: inactive
     vg: vg.services
     pvs: /dev/sdb1,/dev/sdc5
-    active: false
     reset_vg_uuid: true
     reset_pv_uuid: true
 '''
@@ -170,6 +160,8 @@ import itertools
 import os
 
 from ansible.module_utils.basic import AnsibleModule
+
+VG_AUTOACTIVATION_OPT = '--setautoactivation'
 
 
 def parse_vgs(data):
@@ -210,10 +202,7 @@ def parse_pvs(module, data):
 
 def find_vg(module, vg):
     vgs_cmd = module.get_bin_path('vgs', True)
-    rc, current_vgs, err = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd)
-
-    if rc != 0:
-        module.fail_json(msg="Failed executing vgs command.", rc=rc, err=err)
+    dummy, current_vgs, dummy = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd, check_rc=True)
 
     vgs = parse_vgs(current_vgs)
 
@@ -227,37 +216,30 @@ def find_vg(module, vg):
     return this_vg
 
 
-def rename_vg(module, old_vg, vg):
-    vgrename_cmd = module.get_bin_path('vgrename', True)
-    if module.check_mode:
-        this_vg = find_vg(module=module, vg=old_vg)
-    else:
-        rc, dummy, err = module.run_command("%s %s %s" % (vgrename_cmd, old_vg, vg))
+def is_autoactivation_supported(module, vg_cmd):
+    autoactivation_supported = False
+    dummy, vgchange_opts, dummy = module.run_command([vg_cmd, '--help'], check_rc=True)
 
-        if rc != 0:
-            module.fail_json(msg="Failed executing vgrename command.", rc=rc, err=err)
+    if VG_AUTOACTIVATION_OPT in vgchange_opts:
+        autoactivation_supported = True
 
-        this_vg = find_vg(module=module, vg=vg)
-
-    return this_vg
+    return autoactivation_supported
 
 
 def activate_vg(module, vg, active):
     changed = False
-    vgs_cmd = module.get_bin_path('vgs', True)
     vgchange_cmd = module.get_bin_path('vgchange', True)
-    rc, vgchange_opts, err = module.run_command('vgchange --help', check_rc=True)
+    vgs_cmd = module.get_bin_path('vgs', True)
+    vgs_fields = ['lv_attr']
 
-    autoactivate_supported = False
-    if '--setautoactivation' in vgchange_opts:
-        autoactivate_supported = True
+    autoactivation_enabled = False
+    autoactivation_supported = is_autoactivation_supported(module=module, vg_cmd=vgchange_cmd)
 
-    autoactivate_enabled = False
+    if autoactivation_supported:
+        vgs_fields.append('autoactivation')
 
-    if autoactivate_supported:
-        rc, current_vg_lv_states, err = module.run_command("%s --noheadings -olv_attr,autoactivation --separator ';' %s" % (vgs_cmd, vg))
-    else:
-        rc, current_vg_lv_states, err = module.run_command("%s --noheadings -olv_attr %s" % (vgs_cmd, vg))
+    vgs_cmd_with_opts = [vgs_cmd, '--noheadings', '-o', ','.join(vgs_fields), '--separator', ';', vg]
+    dummy, current_vg_lv_states, dummy = module.run_command(vgs_cmd_with_opts, check_rc=True)
 
     lv_active_count = 0
     lv_inactive_count = 0
@@ -268,8 +250,8 @@ def activate_vg(module, vg, active):
             lv_active_count += 1
         else:
             lv_inactive_count += 1
-        if autoactivate_supported:
-            autoactivate_enabled = autoactivate_enabled or parts[1] == 'enabled'
+        if autoactivation_supported:
+            autoactivation_enabled = autoactivation_enabled or parts[1] == 'enabled'
 
     activate_flag = None
     if active and lv_inactive_count > 0:
@@ -278,60 +260,74 @@ def activate_vg(module, vg, active):
         activate_flag = 'n'
 
     # Extra logic necessary because vgchange returns error when autoactivation is already set
-    if autoactivate_supported:
-        if active and not autoactivate_enabled:
+    if autoactivation_supported:
+        if active and not autoactivation_enabled:
             if module.check_mode:
                 changed = True
             else:
-                rc, dummy, err = module.run_command("%s --setautoactivation y %s" % (vgchange_cmd, vg))
-                if rc == 0:
-                    changed = True
-                else:
-                    module.fail_json(msg="Failed executing vgchange command.", rc=rc, err=err)
-        elif not active and autoactivate_enabled:
+                module.run_command([vgchange_cmd, VG_AUTOACTIVATION_OPT, 'y', vg], check_rc=True)
+                changed = True
+        elif not active and autoactivation_enabled:
             if module.check_mode:
                 changed = True
             else:
-                rc, dummy, err = module.run_command("%s --setautoactivation n %s" % (vgchange_cmd, vg))
-                if rc == 0:
-                    changed = True
-                else:
-                    module.fail_json(msg="Failed executing vgchange command.", rc=rc, err=err)
+                module.run_command([vgchange_cmd, VG_AUTOACTIVATION_OPT, 'n', vg], check_rc=True)
+                changed = True
 
     if activate_flag is not None:
         if module.check_mode:
             changed = True
         else:
-            rc, dummy, err = module.run_command("%s --activate %s %s" % (vgchange_cmd, activate_flag, vg))
-            if rc == 0:
-                changed = True
-            else:
-                module.fail_json(msg="Failed executing vgchange command.", rc=rc, err=err)
+            module.run_command([vgchange_cmd, '--activate', activate_flag, vg], check_rc=True)
+            changed = True
 
     return changed
+
+
+def append_vgcreate_options(module, state, vgoptions):
+    vgcreate_cmd = module.get_bin_path('vgcreate', True)
+
+    autoactivation_supported = is_autoactivation_supported(module=module, vg_cmd=vgcreate_cmd)
+
+    if autoactivation_supported and state in ['active', 'inactive']:
+        if VG_AUTOACTIVATION_OPT not in vgoptions:
+            if state == 'active':
+                vgoptions += [VG_AUTOACTIVATION_OPT, 'y']
+            else:
+                vgoptions += [VG_AUTOACTIVATION_OPT, 'n']
+
+
+def get_pv_values_for_resize(module, device):
+    pvdisplay_cmd = module.get_bin_path('pvdisplay', True)
+    pvdisplay_ops = ["--units", "b", "--columns", "--noheadings", "--nosuffix", "--separator", ";", "-o", "dev_size,pv_size,pe_start,vg_extent_size"]
+    pvdisplay_cmd_device_options = [pvdisplay_cmd, device] + pvdisplay_ops
+
+    dummy, pv_values, dummy = module.run_command(pvdisplay_cmd_device_options, check_rc=True)
+
+    values = pv_values.strip().split(';')
+
+    dev_size = int(values[0])
+    pv_size = int(values[1])
+    pe_start = int(values[2])
+    vg_extent_size = int(values[3])
+
+    return (dev_size, pv_size, pe_start, vg_extent_size)
 
 
 def resize_pv(module, device):
     changed = False
     pvresize_cmd = module.get_bin_path('pvresize', True)
-    pvdisplay_cmd = module.get_bin_path('pvdisplay', True)
-    pvdisplay_ops = ["--units", "b", "--columns", "--noheadings", "--nosuffix"]
-    pvdisplay_cmd_device_options = [pvdisplay_cmd, device] + pvdisplay_ops
-    rc, dev_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "dev_size"])
-    dev_size = int(dev_size.replace(" ", ""))
-    rc, pv_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pv_size"])
-    pv_size = int(pv_size.replace(" ", ""))
-    rc, pe_start, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pe_start"])
-    pe_start = int(pe_start.replace(" ", ""))
-    rc, vg_extent_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "vg_extent_size"])
-    vg_extent_size = int(vg_extent_size.replace(" ", ""))
+
+    dev_size, pv_size, pe_start, vg_extent_size = get_pv_values_for_resize(module=module, device=device)
     if (dev_size - (pe_start + pv_size)) > vg_extent_size:
         if module.check_mode:
             changed = True
         else:
-            rc, dummy, err = module.run_command([pvresize_cmd, device])
-            if rc != 0:
-                module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err)
+            # If there is a missing pv on the machine, versions of pvresize rc indicates failure.
+            rc, out, err = module.run_command([pvresize_cmd, device])
+            dummy, new_pv_size, dummy, dummy = get_pv_values_for_resize(module=module, device=device)
+            if pv_size == new_pv_size:
+                module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err, out=out)
             else:
                 changed = True
 
@@ -344,14 +340,17 @@ def reset_uuid_pv(module, device):
     pvs_cmd_with_opts = [pvs_cmd, '--noheadings', '-o', 'uuid', device]
     pvchange_cmd = module.get_bin_path('pvchange', True)
     pvchange_cmd_with_opts = [pvchange_cmd, '-u', device]
-    rc, orig_uuid, err = module.run_command(pvs_cmd_with_opts)
+
+    dummy, orig_uuid, dummy = module.run_command(pvs_cmd_with_opts, check_rc=True)
+
     if module.check_mode:
         changed = True
     else:
-        pvchange_rc, dummy, pvchange_err = module.run_command(pvchange_cmd_with_opts)
-        rc, new_uuid, err = module.run_command(pvs_cmd_with_opts)
+        # If there is a missing pv on the machine, pvchange rc indicates failure.
+        pvchange_rc, pvchange_out, pvchange_err = module.run_command(pvchange_cmd_with_opts)
+        dummy, new_uuid, dummy = module.run_command(pvs_cmd_with_opts, check_rc=True)
         if orig_uuid.strip() == new_uuid.strip():
-            module.fail_json(msg="Failed executing pvchange command.", rc=pvchange_rc, err=pvchange_err)
+            module.fail_json(msg="PV (%s) UUID change failed" % (device), rc=pvchange_rc, err=pvchange_err, out=pvchange_out)
         else:
             changed = True
 
@@ -360,20 +359,13 @@ def reset_uuid_pv(module, device):
 
 def reset_uuid_vg(module, vg):
     changed = False
-    vgs_cmd = module.get_bin_path('vgs', True)
-    vgs_cmd_with_opts = [vgs_cmd, '--noheadings', '-o', 'uuid', vg]
     vgchange_cmd = module.get_bin_path('vgchange', True)
     vgchange_cmd_with_opts = [vgchange_cmd, '-u', vg]
-    rc, orig_uuid, err = module.run_command(vgs_cmd_with_opts)
     if module.check_mode:
         changed = True
     else:
-        vgchange_rc, dummy, vgchange_err = module.run_command(vgchange_cmd_with_opts)
-        rc, new_uuid, err = module.run_command(vgs_cmd_with_opts)
-        if orig_uuid.strip() == new_uuid.strip():
-            module.fail_json(msg="Failed executing vgchange command.", rc=vgchange_rc, err=vgchange_err)
-        else:
-            changed = True
+        module.run_command(vgchange_cmd_with_opts, check_rc=True)
+        changed = True
 
     return changed
 
@@ -387,10 +379,8 @@ def main():
             pv_options=dict(type='str', default=''),
             pvresize=dict(type='bool', default=False),
             vg_options=dict(type='str', default=''),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
+            state=dict(type='str', default='present', choices=['absent', 'present', 'active', 'inactive']),
             force=dict(type='bool', default=False),
-            old_vg=dict(type="str", default=None),
-            active=dict(type='bool', default=None),
             reset_vg_uuid=dict(type='bool', default=False),
             reset_pv_uuid=dict(type='bool', default=False),
         ),
@@ -407,57 +397,25 @@ def main():
     pesize = module.params['pesize']
     pvoptions = module.params['pv_options'].split()
     vgoptions = module.params['vg_options'].split()
-    old_vg = module.params['old_vg']
-    active = module.params['active']
-    reset_vg_uuid = module.params['reset_vg_uuid']
-    reset_pv_uuid = module.params['reset_pv_uuid']
+    reset_vg_uuid = module.boolean(module.params['reset_vg_uuid'])
+    reset_pv_uuid = module.boolean(module.params['reset_pv_uuid'])
 
-    if old_vg == vg:
-        module.fail_json(msg="The old_vg and vg values should differ.")
-
-    pvs_required = not (old_vg is not None or active is not None or reset_vg_uuid)
+    this_vg = find_vg(module=module, vg=vg)
+    present_state = state in ['present', 'active', 'inactive']
+    pvs_required = present_state and this_vg is None
+    changed = False
 
     dev_list = []
     if module.params['pvs']:
         dev_list = list(module.params['pvs'])
-    elif state == 'present' and pvs_required:
+    elif pvs_required:
         module.fail_json(msg="No physical volumes given.")
 
     # LVM always uses real paths not symlinks so replace symlinks with actual path
     for idx, dev in enumerate(dev_list):
         dev_list[idx] = os.path.realpath(dev)
 
-    # Rename VG first
-    changed = False
-    prev_vg = find_vg(module=module, vg=old_vg) if old_vg is not None else None
-    this_vg = find_vg(module=module, vg=vg)
-    if prev_vg is not None:
-        if this_vg is not None:
-            module.fail_json(msg="Cannot rename vg (%s), the specified name (%s) is already in use.")
-        else:
-            if state == 'present':
-                if module.check_mode:
-                    changed = True
-                else:
-                    # Deactivate VG before renaming, if requested
-                    if active is not None and not active:
-                        changed = activate_vg(module=module, vg=old_vg, active=active)
-                    this_vg = rename_vg(module=module, old_vg=old_vg, vg=vg)
-                    changed = True
-            elif state == 'absent':
-                vg = old_vg
-                this_vg = prev_vg
-    elif active is not None and state == 'present':
-        changed = activate_vg(module=module, vg=vg, active=active)
-
-    if reset_vg_uuid and state == 'present':
-        reset_uuid_vg(module=module, vg=vg)
-        changed = True
-
-    if not pvs_required and not dev_list:
-        module.exit_json(changed=changed)
-
-    if state == 'present':
+    if present_state:
         # check given devices
         for test_dev in dev_list:
             if not os.path.exists(test_dev):
@@ -485,7 +443,8 @@ def main():
             module.fail_json(msg="Device %s is already in %s volume group." % (used_pvs[0]['name'], used_pvs[0]['vg_name']))
 
     if this_vg is None:
-        if state == 'present':
+        if present_state:
+            append_vgcreate_options(module=module, state=state, vgoptions=vgoptions)
             # create VG
             if module.check_mode:
                 changed = True
@@ -519,51 +478,61 @@ def main():
                         module.fail_json(msg="Failed to remove volume group %s" % (vg), rc=rc, err=err)
                 else:
                     module.fail_json(msg="Refuse to remove non-empty volume group %s without force=true" % (vg))
+        # activate/inactivate existing VG
+        elif state == 'active':
+            changed = activate_vg(module=module, vg=vg, active=True)
+        elif state == 'inactive':
+            changed = activate_vg(module=module, vg=vg, active=False)
+
+        # reset VG uuid
+        if reset_vg_uuid:
+            changed = reset_uuid_vg(module=module, vg=vg) or changed
 
         # resize VG
-        current_devs = [os.path.realpath(pv['name']) for pv in pvs if pv['vg_name'] == vg]
-        devs_to_remove = list(set(current_devs) - set(dev_list))
-        devs_to_add = list(set(dev_list) - set(current_devs))
+        if dev_list:
+            current_devs = [os.path.realpath(pv['name']) for pv in pvs if pv['vg_name'] == vg]
+            devs_to_remove = list(set(current_devs) - set(dev_list))
+            devs_to_add = list(set(dev_list) - set(current_devs))
 
-        if current_devs:
-            if state == 'present':
-                for device in current_devs:
-                    if pvresize:
-                        changed = resize_pv(module=module, device=device)
-                    if reset_pv_uuid:
-                        changed = reset_uuid_pv(module=module, device=device)
+            if current_devs:
+                if present_state:
+                    for device in current_devs:
+                        if pvresize:
+                            changed = resize_pv(module=module, device=device) or changed
+                        if reset_pv_uuid:
+                            changed = reset_uuid_pv(module=module, device=device) or changed
 
-        if devs_to_add or devs_to_remove:
-            if module.check_mode:
-                changed = True
-            else:
-                if devs_to_add:
-                    devs_to_add_string = ' '.join(devs_to_add)
-                    # create PV
-                    pvcreate_cmd = module.get_bin_path('pvcreate', True)
-                    for current_dev in devs_to_add:
-                        rc, dummy, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
+            if devs_to_add or devs_to_remove:
+                if module.check_mode:
+                    changed = True
+                else:
+                    if devs_to_add:
+                        devs_to_add_string = ' '.join(devs_to_add)
+                        # create PV
+                        pvcreate_cmd = module.get_bin_path('pvcreate', True)
+                        for current_dev in devs_to_add:
+                            rc, dummy, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
+                            if rc == 0:
+                                changed = True
+                            else:
+                                module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
+                        # add PV to our VG
+                        vgextend_cmd = module.get_bin_path('vgextend', True)
+                        rc, dummy, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
-                    # add PV to our VG
-                    vgextend_cmd = module.get_bin_path('vgextend', True)
-                    rc, dummy, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
-                    if rc == 0:
-                        changed = True
-                    else:
-                        module.fail_json(msg="Unable to extend %s by %s." % (vg, devs_to_add_string), rc=rc, err=err)
+                            module.fail_json(msg="Unable to extend %s by %s." % (vg, devs_to_add_string), rc=rc, err=err)
 
-                # remove some PV from our VG
-                if devs_to_remove:
-                    devs_to_remove_string = ' '.join(devs_to_remove)
-                    vgreduce_cmd = module.get_bin_path('vgreduce', True)
-                    rc, dummy, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
-                    if rc == 0:
-                        changed = True
-                    else:
-                        module.fail_json(msg="Unable to reduce %s by %s." % (vg, devs_to_remove_string), rc=rc, err=err)
+                    # remove some PV from our VG
+                    if devs_to_remove:
+                        devs_to_remove_string = ' '.join(devs_to_remove)
+                        vgreduce_cmd = module.get_bin_path('vgreduce', True)
+                        rc, dummy, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
+                        if rc == 0:
+                            changed = True
+                        else:
+                            module.fail_json(msg="Unable to reduce %s by %s." % (vg, devs_to_remove_string), rc=rc, err=err)
 
     module.exit_json(changed=changed)
 
