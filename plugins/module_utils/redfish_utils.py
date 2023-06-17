@@ -903,16 +903,13 @@ class RedfishUtils(object):
                     if response['ret'] is False:
                         return response
                     data = response['data']
-                    controller_name = 'Controller 1'
-                    if 'StorageControllers' in data:
-                        sc = data['StorageControllers']
-                        if sc:
-                            if 'Name' in sc[0]:
-                                controller_name = sc[0]['Name']
-                            else:
-                                sc_id = sc[0].get('Id', '1')
-                                controller_name = 'Controller %s' % sc_id
+                    if 'Name' in data:
+                        controller_name = data['Name']
+                    else:
+                        controller_id = data.get('Id', '1')
+                        controller_name = 'Controller %s' % controller_id
                     volume_results = []
+                    volume_list = []
                     if 'Volumes' in data:
                         # Get a list of all volumes and build respective URIs
                         volumes_uri = data[u'Volumes'][u'@odata.id']
