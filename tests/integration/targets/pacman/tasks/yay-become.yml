@@ -10,13 +10,14 @@
 
 - name: create user
   ansible.builtin.user:
-    name: builder
+    name: yaybuilder
     state: present
+  notify: Remove user yaybuilder
 
 - name: grant sudo powers to builder
   community.general.sudoers:
-    name: builder
-    user: builder
+    name: yaybuilder
+    user: yaybuilder
     commands: ALL
     nopassword: true
 
@@ -28,6 +29,7 @@
     - base-devel
     - git
     - go
+  notify: Remove packages for yay-become
 
 - name: Hack permssions for the remote_tmp_dir
   ansible.builtin.file:
@@ -37,13 +39,13 @@
 - name: Create temp directory for builder
   ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/builder"
-    owner: builder
+    owner: yaybuilder
     state: directory
     mode: '755'
 
 - name: clone yay git repo
   become: true
-  become_user: builder
+  become_user: yaybuilder
   ansible.builtin.git:
     repo: https://aur.archlinux.org/yay.git
     dest: "{{ remote_tmp_dir  }}/builder/yay"
@@ -51,10 +53,11 @@
 
 - name: make package
   become: true
-  become_user: builder
+  become_user: yaybuilder
   ansible.builtin.command:
     chdir: "{{ remote_tmp_dir  }}/builder/yay"
     cmd: makepkg -si --noconfirm
+  notify: Remove yay
 
 - name: Install nmap
   community.general.pacman:
@@ -62,18 +65,3 @@
     state: present
     executable: yay
     extra_args: --builddir /var/cache/yay
-
-- name: Remove packages
-  ansible.builtin.package:
-    name: "{{ item }}"
-    state: absent
-  loop:
-    - base-devel
-    - yay
-    - git
-    - nmap
-
-- name: Remove user
-  ansible.builtin.user:
-    name: builder
-    state: absent
