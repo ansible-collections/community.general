@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2023 Aritra Sen <aretrosen@proton.me>
+# Copyright (c) 2023 Aritra Sen <aretrosen@proton.me>
 # Copyright (c) 2017 Chris Hoffman <christopher.hoffman@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -16,11 +16,12 @@ DOCUMENTATION = """
 ---
 module: pnpm
 short_description: Manage node.js packages with pnpm
+version_added: 7.1.0
 description:
-  - Manage node.js packages with the pnpm package manager (https://pnpm.io/)
+  - Manage node.js packages with the L(pnpm package manager, https://pnpm.io/).
 author:
   - "Aritra Sen (@aretrosen)"
-  - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module)"
+  - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module"
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -31,7 +32,7 @@ attributes:
 options:
   name:
     description:
-      - The name of a node.js library to install
+      - The name of a node.js library to install.
       - All packages in package.json are installed if not provided.
     type: str
     required: false
@@ -47,39 +48,39 @@ options:
     required: false
   global:
     description:
-      - Install the node.js library globally
+      - Install the node.js library globally.
     required: false
     default: false
     type: bool
   executable:
     description:
       - The executable location for pnpm.
-      - The default location it searches for is $PNPM_HOME, fails if not set.
+      - The default location it searches for is C($PATH), fails if not set.
     type: path
     required: false
   ignore_scripts:
     description:
-      - Use the --ignore-scripts flag when installing.
+      - Use the C(--ignore-scripts) flag when installing.
     required: false
     type: bool
     default: false
   no_optional:
     description:
-      - Don't install optional packages, equivalent to --no-optional.
+      - Do not install optional packages, equivalent to C(--no-optional).
     required: false
     type: bool
     default: false
   production:
     description:
       - Install dependencies in production mode.
-      - Pnpm will ignore any dependencies under devDependencies in package.json
+      - Pnpm will ignore any dependencies under devDependencies in package.json.
     required: false
     type: bool
     default: false
   dev:
     description:
       - Install dependencies in development mode.
-      - Pnpm will ignore any regular dependencies in package.json
+      - Pnpm will ignore any regular dependencies in package.json.
     required: false
     default: false
     type: bool
@@ -91,14 +92,14 @@ options:
     type: bool
   state:
     description:
-      - Installation state of the named node.js library
-      - If absent is selected, a name option must be provided
+      - Installation state of the named node.js library.
+      - If absent is selected, a name option must be provided.
     type: str
     required: false
     default: present
     choices: [ "present", "absent", "latest" ]
 requirements:
-    - Pnpm executable present in $PATH, preferably as $PNPM_HOME.
+    - Pnpm executable present in C($PATH).
 """
 
 EXAMPLES = """
