@@ -63,15 +63,6 @@
     executable: yay
     extra_args: --builddir /var/cache/yay
 
-- name: Install XRDP
-  become: true
-  become_user: builder
-  community.general.pacman:
-    name: xrdp
-    state: present
-    executable: yay
-    extra_args: --builddir /var/cache/yay
-
 - name: Remove packages
   ansible.builtin.package:
     name: "{{ item }}"
