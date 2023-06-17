@@ -133,7 +133,8 @@ notes:
     it is much more efficient to pass the list directly to the O(name) option.
   - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand.
     For example, a dedicated build user with permissions to install packages could be necessary.
-  - In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages
+  - >
+    In the tests, while using C(yay) as the O(executable) option, the module failed to install AUR packages
     with the error: C(error: target not found: <pkg>).
 """
 
