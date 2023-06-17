@@ -707,7 +707,7 @@ class Pacman(object):
         installed_pkgs = {}
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
-        query_re = re.compile(r'^(?P<pkg>\S+)\s+(?P<ver>\S+)\s*$')
+        query_re = re.compile(r'^\s*(?P<pkg>\S+)\s+(?P<ver>\S+)\s*$')
         for l in stdout.splitlines():
             query_match = query_re.match(l)
             if not query_match:
@@ -723,7 +723,7 @@ class Pacman(object):
         #     base-devel file
         #     base-devel findutils
         #     ...
-        query_groups_re = re.compile(r'^(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
+        query_groups_re = re.compile(r'^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
         for l in stdout.splitlines():
             query_groups_match = query_groups_re.match(l)
             if not query_groups_match:
@@ -750,7 +750,7 @@ class Pacman(object):
         #     vim-plugins vim-airline-themes
         #     vim-plugins vim-ale
         #     ...
-        sync_groups_re = re.compile(r'^(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
+        sync_groups_re = re.compile(r'^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
         for l in stdout.splitlines():
             sync_groups_match = sync_groups_re.match(l)
             if not sync_groups_match:
@@ -766,6 +766,7 @@ class Pacman(object):
         stdout = stdout.splitlines()
         if stdout and "Avoid running" in stdout[0]:
             stdout = stdout[1:]
+        stdout = "\n".join(stdout)
 
         # non-zero exit with nothing in stdout -> nothing to upgrade, all good
         # stderr can have warnings, so not checked here
@@ -775,7 +776,7 @@ class Pacman(object):
             # Format of lines:
             #     strace 5.14-1 -> 5.15-1
             #     systemd 249.7-1 -> 249.7-2 [ignored]
-            for l in stdout:
+            for l in stdout.splitlines():
                 l = l.strip()
                 if not l:
                     continue
