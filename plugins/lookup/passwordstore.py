@@ -32,6 +32,9 @@ DOCUMENTATION = '''
           - name: passwordstore
         env:
           - name: PASSWORD_STORE_DIR
+        ini:
+          - section: passwordstore_lookup
+            key: directory
       create:
         description: Create the password if it does not already exist. Takes precedence over O(missing).
         type: bool
