@@ -1,79 +1,69 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Pavlo Bashynskyi (@levonet) <levonet@gmail.com>
+# Copyright (c) 2023, Xcelirate (@vicmunoz) <victor1 at teamxcl dot com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
+import pytest
+import json
+from redis import __version__
+
 from ansible_collections.community.general.plugins.modules import redis_info
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
-class FakeRedisClient(MagicMock):
-
-    def ping(self):
-        pass
-
-    def info(self, section='default'):
-        return {'redis_version': '999.999.999'}
+HAS_REDIS_USERNAME_OPTION = True
+if tuple(map(int, __version__.split('.'))) < (3, 4, 0):
+    HAS_REDIS_USERNAME_OPTION = False
 
 
-class FakeRedisClientFail(MagicMock):
+def test_redis_info_with_wrong_argument(capfd):
+    set_module_args({'section': 'test_fake'})
+    with pytest.raises(SystemExit):
+        redis_info.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['failed']
 
-    def ping(self):
-        raise Exception('Test Error')
 
-    def info(self, section='default'):
-        pass
+def test_redis_info_with_fail_client(capfd):
+    set_module_args({})
+    with pytest.raises(SystemExit):
+        redis_info.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['failed']
 
 
-class TestRedisInfoModule(ModuleTestCase):
+def test_redis_info_with_params(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_port': 6379,
+                     'login_user': 'user_test',
+                     'login_password': 'pass_test',
+                     'section': 'cluster'})
+    mocker.patch('redis.Redis.info', return_value={'cluster_enabled': 0})
+    with pytest.raises(SystemExit):
+        redis_info.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert not json.loads(out)['changed']
+    assert json.loads(out)['info'] == {'cluster_enabled': 0}
 
-    def setUp(self):
-        super(TestRedisInfoModule, self).setUp()
-        redis_info.HAS_REDIS_PACKAGE = True
-        self.module = redis_info
 
-    def tearDown(self):
-        super(TestRedisInfoModule, self).tearDown()
-
-    def patch_redis_client(self, **kwds):
-        return patch('redis.StrictRedis', autospec=True, **kwds)
-        # return patch('ansible_collections.community.general.plugins.modules.redis_info.redis_client', autospec=True, **kwds)
-
-    def test_without_parameters(self):
-        """Test without parameters"""
-        with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
-            with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args({})
-                self.module.main()
-            self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'localhost', 'port': 6379, 'password': None, 'section': 'default'}))
-            self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
-
-    def test_with_parameters(self):
-        """Test with all parameters"""
-        with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
-            with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args({
-                    'login_host': 'test',
-                    'login_port': 1234,
-                    'login_password': 'PASS',
-                    'section': 'replication'
-                })
-                self.module.main()
-            self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'test', 'port': 1234, 'password': 'PASS', 'section': 'replication'}))
-            self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
-
-    def test_with_fail_client(self):
-        """Test failure message"""
-        with self.patch_redis_client(side_effect=FakeRedisClientFail) as redis_client:
-            with self.assertRaises(AnsibleFailJson) as result:
-                set_module_args({})
-                self.module.main()
-            self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(result.exception.args[0]['msg'], 'unable to connect to database: Test Error')
+def test_redis_info_without_params(capfd, mocker):
+    set_module_args({})
+    mocker.patch('redis.Redis.info', return_value={'test_without_params': 123})
+    with pytest.raises(SystemExit):
+        redis_info.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert not json.loads(out)['changed']
+    assert json.loads(out)['info'] == {'test_without_params': 123}

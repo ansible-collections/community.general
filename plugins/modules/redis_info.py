@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2020, Pavlo Bashynskyi (@levonet) <levonet@gmail.com>
-# Copyright (c) 2023, Xcelirate (@xcelirate)
-# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2023, Xcelirate (@vicmunoz) <victor1 at teamxcl dot com>
+# GNU General Public License v3.0+
+# (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
@@ -207,25 +208,10 @@ info:
       "used_memory_startup": 791264
     }
 '''
-
-import traceback
-
-REDIS_IMP_ERR = None
-try:
-    import redis
-except ImportError:
-    REDIS_IMP_ERR = traceback.format_exc()
-    redis_found = False
-else:
-    redis_found = True
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
-    fail_imports, redis_auth_argument_spec, redis_auth_params)
+    fail_imports, redis_auth_argument_spec, RedisAnsible)
 
-def redis_client(**client_params):
-    return redis.StrictRedis(**client_params)
 
 # Module execution.
 def main():
@@ -233,22 +219,22 @@ def main():
     module_args = dict(
         section=dict(choices=['all', 'clients', 'cluster', 'commandstats', 'cpu', 'default',
                               'errorstats', 'everything', 'keyspace', 'latencystats', 'memory',
-                              'modules', 'persistence', 'replication', 'sentinel', 'server', 'stats'],
+                              'modules', 'persistence', 'replication', 'sentinel', 'server',
+                              'stats'],
                      default='default', type='str')
     )
     module_args.update(redis_auth_args)
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     fail_imports(module, module.params['tls'])
-    redis_params = redis_auth_params(module)
+    section=module.params['section']
 
     # Connect and check
-    client = redis_client(**redis_params)
+    client = RedisAnsible(module)
     try:
-        client.ping()
-    except Exception as e:
-        module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
-
-    info = client.info(section=module.params['section'])
+        info = client.connection.info(section=section)
+    except Exception as err:
+        msg = 'Failed to get info section "{0}" with exception: {1}'.format(section, str(err))
+        module.fail_json(msg=msg)
     module.exit_json(changed=False, info=info)
 
 
