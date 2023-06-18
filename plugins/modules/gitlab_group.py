@@ -256,7 +256,7 @@ class GitLabGroup(object):
 
         try:
             # Filter out None values
-            filtered = {arg_key: arg_value for arg_key, arg_value in arguments.items() if arg_value is not None}
+            filtered = dict(arg_key=arg_value for arg_key, arg_value in arguments.items() if arg_value is not None)
 
             group = self._gitlab.groups.create(filtered)
         except (gitlab.exceptions.GitlabCreateError) as e:
