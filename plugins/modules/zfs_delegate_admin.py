@@ -15,7 +15,7 @@ short_description: Manage ZFS delegated administration (user admin privileges)
 description:
   - Manages ZFS file system delegated administration permissions, which allow unprivileged users to perform ZFS
     operations normally restricted to the superuser.
-  - See the C(zfs allow) section of C(zfs(1M)) for detailed explanations of options.
+  - See the C(zfs allow) section of V(zfs(1M\)) for detailed explanations of options.
   - This module attempts to adhere to the behavior of the command line tool as much as possible.
 requirements:
   - "A ZFS/OpenZFS implementation that supports delegation with C(zfs allow), including: Solaris >= 10, illumos (all
@@ -30,14 +30,14 @@ attributes:
 options:
   name:
     description:
-      - File system or volume name e.g. C(rpool/myfs).
+      - File system or volume name, for example V(rpool/myfs).
     required: true
     type: str
   state:
     description:
-      - Whether to allow (C(present)), or unallow (C(absent)) a permission.
-      - When set to C(present), at least one "entity" param of I(users), I(groups), or I(everyone) are required.
-      - When set to C(absent), removes permissions from the specified entities, or removes all permissions if no entity params are specified.
+      - Whether to allow (V(present)), or unallow (V(absent)) a permission.
+      - When set to V(present), at least one "entity" param of O(users), O(groups), or O(everyone) are required.
+      - When set to V(absent), removes permissions from the specified entities, or removes all permissions if no entity params are specified.
     choices: [ absent, present ]
     default: present
     type: str
@@ -58,22 +58,22 @@ options:
     default: false
   permissions:
     description:
-      - The list of permission(s) to delegate (required if C(state) is C(present)).
+      - The list of permission(s) to delegate (required if O(state=present)).
       - Supported permissions depend on the ZFS version in use. See for example
         U(https://openzfs.github.io/openzfs-docs/man/8/zfs-allow.8.html) for OpenZFS.
     type: list
     elements: str
   local:
     description:
-      - Apply permissions to C(name) locally (C(zfs allow -l)).
+      - Apply permissions to O(name) locally (C(zfs allow -l)).
     type: bool
   descendents:
     description:
-      - Apply permissions to C(name)'s descendents (C(zfs allow -d)).
+      - Apply permissions to O(name)'s descendents (C(zfs allow -d)).
     type: bool
   recursive:
     description:
-      - Unallow permissions recursively (ignored when C(state) is C(present)).
+      - Unallow permissions recursively (ignored when O(state=present)).
     type: bool
     default: false
 author:

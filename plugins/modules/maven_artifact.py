@@ -129,7 +129,7 @@ options:
     keep_name:
         description:
             - If V(true), the downloaded artifact's name is preserved, i.e the version number remains part of it.
-            - This option only has effect when I(dest) is a directory and I(version) is set to V(latest) or O(version_by_spec)
+            - This option only has effect when O(dest) is a directory and O(version) is set to V(latest) or O(version_by_spec)
               is defined.
         type: bool
         default: false

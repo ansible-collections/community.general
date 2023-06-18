@@ -38,26 +38,26 @@ options:
         required: true
         description:
             - Define if the zone is a forward or reverse DNS zone.
-            - "The available choices are: C(forward_zone), C(reverse_zone)."
+            - "The available choices are: V(forward_zone), V(reverse_zone)."
     zone:
         type: str
         required: true
         description:
-            - DNS zone name, e.g. C(example.com).
+            - DNS zone name, for example V(example.com).
         aliases: [name]
     nameserver:
         type: list
         elements: str
         default: []
         description:
-            - List of appropriate name servers. Required if I(state=present).
+            - List of appropriate name servers. Required if O(state=present).
     interfaces:
         type: list
         elements: str
         default: []
         description:
             - List of interface IP addresses, on which the server should
-              response this zone. Required if I(state=present).
+              response this zone. Required if O(state=present).
 
     refresh:
         type: int
