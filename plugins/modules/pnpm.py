@@ -157,6 +157,7 @@ class Pnpm(object):
     def __init__(self, module, **kwargs):
         self.module = module
         self.name = kwargs["name"]
+        self.version = kwargs["version"]
         self.path = kwargs["path"]
         self.globally = kwargs["globally"]
         self.executable = kwargs["executable"]
@@ -170,7 +171,7 @@ class Pnpm(object):
 
         if self.name is not None:
             self.name_version = self.name
-            if kwargs["version"]:
+            if self.version is not None:
                 self.name_version = self.name_version + "@" + str(self.version)
 
     def _exec(self, args, run_in_check_mode=False, check_rc=True):
@@ -202,13 +203,13 @@ class Pnpm(object):
                     os.makedirs(self.path)
 
                 if not os.path.isdir(self.path):
-                    self.module.fail_json(msg="path %s is not a directory" % self.path)
+                    self.module.fail_json(msg="Path %s is not a directory" % self.path)
 
                 if not self.name_version and not os.path.isfile(
                     os.path.join(self.path, "package.json")
                 ):
                     self.module.fail_json(
-                        msg="package.json does not exist in provided path"
+                        msg="Package.json does not exist in provided path"
                     )
 
                 cwd = self.path
@@ -216,22 +217,31 @@ class Pnpm(object):
             _rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
             return out, err
 
-        return "", ""
+        return None, None
 
     def missing(self):
         if not os.path.isfile(os.path.join(self.path, "pnpm-lock.yaml")):
             return True
 
         cmd = ["list", "--json"]
+
+        if self.name is not None:
+            cmd.append(self.name)
+
         try:
-            _exe, err = self._exec(cmd, True, False)
-            if err:
-                raise Exception(err)
-            data = json.loads(_exe or "{}")
+            out, err = self._exec(cmd, True, False)
+            if err is not None and err != "":
+                raise Exception(out)
+            data = json.loads(out)
         except Exception as e:
             self.module.fail_json(
                 msg="Failed to parse pnpm output with error %s" % to_native(e)
             )
+
+        if "error" in data:
+            return True
+
+        data = data[0]
 
         for typedep in [
             "dependencies",
@@ -239,27 +249,21 @@ class Pnpm(object):
             "optionalDependencies",
             "unsavedDependencies",
         ]:
-            if typedep not in data[0]:
+            if typedep not in data:
                 continue
 
-            for dep, props in data[0][typedep].items():
-                if self.name_version == dep:
-                    return False
-
-                if "version" in props and props["version"]:
-                    dep_version = dep + "@" + str(props["version"])
-                    if self.name_version == dep_version:
-                        return False
+            if self.name in data[typedep].keys():
+                return False
 
         return True
 
     def install(self):
-        if self.name_version:
+        if self.name_version is not None:
             return self._exec(["add", self.name_version])
         return self._exec(["install"])
 
     def update(self):
-        return self._exec(["update"])
+        return self._exec(["update", "--latest"])
 
     def uninstall(self):
         return self._exec(["remove", self.name])
@@ -270,16 +274,27 @@ class Pnpm(object):
 
         cmd = ["outdated", "--format", "json"]
         try:
-            _exe, err = self._exec(cmd, True, False)
-            if err:
-                raise Exception(err)
-            data = json.loads(_exe or "{}")
+            out, err = self._exec(cmd, True, False)
+            # BUG: It will not show correct error sometimes, like when it has
+            # plain text output intermingled with a {}
+            if err is not None and err != "":
+                raise Exception(out)
+
+            # HACK: To fix the above bug, the following hack is implemented
+            data = out.splitlines()
+
+            for i in range(len(data)):
+                if len(data[i]) > 0 and data[i][0] == "{":
+                    out = "".join(data[i:])
+                    break
+
+            data = json.loads(out)
         except Exception as e:
             self.module.fail_json(
                 msg="Failed to parse pnpm output with error %s" % to_native(e)
             )
 
-        return list(data.items().keys())
+        return data.keys()
 
 
 def main():
@@ -316,46 +331,46 @@ def main():
 
     if not name and version:
         module.fail_json(
-            msg="version has no meaning when the package name is not provided"
+            msg="Version has no meaning when the package name is not provided"
         )
 
     if path is None and globally is False:
-        module.fail_json(msg="path must be specified when not using global")
+        module.fail_json(msg="Path must be specified when not using global")
     elif path and globally is True:
-        module.fail_json(msg="cannot specify path if doing global installation")
+        module.fail_json(msg="Cannot specify path if doing global installation")
 
     if globally and (production or dev or optional):
         module.fail_json(
-            msg="production, dev, and optional makes no sense when installing packages globally"
+            msg="Production, dev, and optional makes no sense when installing packages globally"
         )
 
     if name and globally and path:
-        module.fail_json(msg="path should not be mentioned when installing globally")
+        module.fail_json(msg="Path should not be mentioned when installing globally")
 
     if production and dev and optional:
         module.fail_json(
-            msg="production and dev and optional options don't go together"
+            msg="Production and dev and optional options don't go together"
         )
 
     if production and dev:
-        module.fail_json(msg="production and dev options don't go together")
+        module.fail_json(msg="Production and dev options don't go together")
 
     if production and optional:
-        module.fail_json(msg="production and optional options don't go together")
+        module.fail_json(msg="Production and optional options don't go together")
 
     if dev and optional:
-        module.fail_json(msg="dev and optional options don't go together")
+        module.fail_json(msg="Dev and optional options don't go together")
 
     if name and name[0:4] == "http" and version:
-        module.fail_json(msg="semver not supported on remote url downloads")
+        module.fail_json(msg="Semver not supported on remote url downloads")
 
     if not name and optional:
         module.fail_json(
-            msg="optional not available when package name not provided, use no_optional instead"
+            msg="Optional not available when package name not provided, use no_optional instead"
         )
 
     if state == "absent" and not name:
-        module.fail_json(msg="package name is required for uninstalling")
+        module.fail_json(msg="Package name is required for uninstalling")
 
     if state == "latest":
         version = "latest"
@@ -382,27 +397,19 @@ def main():
     out = ""
     err = ""
     if state == "present":
-        if not name:
+        if pnpm.missing():
             changed = True
             out, err = pnpm.install()
-        else:
-            missing = pnpm.missing()
-            if missing:
-                changed = True
-                out, err = pnpm.install()
     elif state == "latest":
         outdated = pnpm.list_outdated()
-        if name:
-            missing = pnpm.missing()
-            if missing or name in outdated:
-                changed = True
-                out, err = pnpm.install()
+        if name is not None and (pnpm.missing() or name in outdated):
+            changed = True
+            out, err = pnpm.install()
         elif len(outdated):
             changed = True
             out, err = pnpm.update()
     else:  # absent
-        missing = pnpm.missing()
-        if not missing:
+        if not pnpm.missing():
             changed = True
             out, err = pnpm.uninstall()
 
