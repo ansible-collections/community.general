@@ -39,7 +39,7 @@ options:
     description:
       - Mattermost webhook api key. Log into your mattermost site, go to
         Menu -> Integration -> Incoming Webhook -> Add Incoming Webhook.
-        This will give you full URL. I(api_key) is the last part.
+        This will give you full URL. O(api_key) is the last part.
         http://mattermost.example.com/hooks/C(API_KEY)
     required: true
   text:

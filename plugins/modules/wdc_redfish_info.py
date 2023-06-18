@@ -33,11 +33,11 @@ options:
     elements: str
   baseuri:
     description:
-      - Base URI of OOB controller.  Must include this or I(ioms).
+      - Base URI of OOB controller.  Must include this or O(ioms).
     type: str
   ioms:
     description:
-      - List of IOM FQDNs for the enclosure.  Must include this or I(baseuri).
+      - List of IOM FQDNs for the enclosure.  Must include this or O(baseuri).
     type: list
     elements: str
   username:

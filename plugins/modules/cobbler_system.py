@@ -30,7 +30,7 @@ options:
   port:
     description:
     - Port number to be used for REST connection.
-    - The default value depends on parameter I(use_ssl).
+    - The default value depends on parameter O(use_ssl).
     type: int
   username:
     description:
