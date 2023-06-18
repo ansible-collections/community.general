@@ -120,6 +120,11 @@ class TestKeycloakRealm(ModuleTestCase):
             'state': 'present',
             'client_id': 'test_client',
             'group_name': 'test_group',
+            'parents': [
+                {
+                    'name': 'parent_group'
+                }
+            ],
             'roles': [
                 {
                     'name': 'test_role1',
@@ -139,7 +144,7 @@ class TestKeycloakRealm(ModuleTestCase):
             "clientRoles": "{}",
             "id": "92f2400e-0ecb-4185-8950-12dcef616c2b",
             "name": "test_group",
-            "path": "/test_group",
+            "path": "/parent_group/test_group",
             "realmRoles": "[]",
             "subGroups": "[]"
         }]
