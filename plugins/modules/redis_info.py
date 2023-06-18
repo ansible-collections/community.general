@@ -226,7 +226,7 @@ def main():
     module_args.update(redis_auth_args)
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     fail_imports(module, module.params['tls'])
-    section=module.params['section']
+    section = module.params['section']
 
     # Connect and check
     client = RedisAnsible(module)
