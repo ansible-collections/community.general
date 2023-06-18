@@ -55,7 +55,7 @@ options:
     version_added: 3.0.0
   workspace:
     description:
-      - The terraform workspace to work with. This sets the C(TF_WORKSPACE) environmental variable
+      - The terraform workspace to work with. This sets the E(TF_WORKSPACE) environmental variable
         that is used to override workspace selection. For more information about workspaces
         have a look at U(https://developer.hashicorp.com/terraform/language/state/workspaces).
     type: str
@@ -83,7 +83,7 @@ options:
     description:
       - The path to a variables file for Terraform to fill into the TF
         configurations. This can accept a list of paths to multiple variables files.
-      - Up until Ansible 2.9, this option was usable as I(variables_file).
+      - Up until Ansible 2.9, this option was usable as O(variables_file).
     type: list
     elements: path
     aliases: [ 'variables_file' ]
@@ -91,18 +91,18 @@ options:
     description:
       - A group of key-values pairs to override template variables or those in variables files.
         By default, only string and number values are allowed, which are passed on unquoted.
-      - Support complex variable structures (lists, dictionaries, numbers, and booleans) to reflect terraform variable syntax when I(complex_vars=true).
+      - Support complex variable structures (lists, dictionaries, numbers, and booleans) to reflect terraform variable syntax when O(complex_vars=true).
       - Ansible integers or floats are mapped to terraform numbers.
       - Ansible strings are mapped to terraform strings.
       - Ansible dictionaries are mapped to terraform objects.
       - Ansible lists are mapped to terraform lists.
       - Ansible booleans are mapped to terraform booleans.
-      - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use I(no_log=true) in production!"
+      - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use C(no_log=true) in production!"
     type: dict
   complex_vars:
     description:
       - Enable/disable capability to handle complex variable structures for C(terraform).
-      - If C(true) the I(variables) also accepts dictionaries, lists, and booleans to be passed to C(terraform).
+      - If V(true) the O(variables) also accepts dictionaries, lists, and booleans to be passed to C(terraform).
         Strings that are passed are correctly quoted.
       - When disabled, supports only simple variables (strings, integers, and floats), and passes them on unquoted.
     type: bool
@@ -135,7 +135,7 @@ options:
     type: bool
   overwrite_init:
     description:
-      - Run init even if C(.terraform/terraform.tfstate) already exists in I(project_path).
+      - Run init even if C(.terraform/terraform.tfstate) already exists in O(project_path).
     default: true
     type: bool
     version_added: '3.2.0'
@@ -165,7 +165,7 @@ options:
   check_destroy:
     description:
       - Apply only when no resources are destroyed. Note that this only prevents "destroy" actions,
-        but not "destroy and re-create" actions. This option is ignored when I(state=absent).
+        but not "destroy and re-create" actions. This option is ignored when O(state=absent).
     type: bool
     default: false
     version_added: '3.3.0'
@@ -251,7 +251,7 @@ EXAMPLES = """
 RETURN = """
 outputs:
   type: complex
-  description: A dictionary of all the TF outputs by their assigned name. Use C(.outputs.MyOutputName.value) to access the value.
+  description: A dictionary of all the TF outputs by their assigned name. Use RV(ignore:outputs.MyOutputName.value) to access the value.
   returned: on success
   sample: '{"bukkit_arn": {"sensitive": false, "type": "string", "value": "arn:aws:s3:::tf-test-bukkit"}'
   contains:

@@ -72,7 +72,7 @@ options:
     - The default value depends on the dialect used.
     type: bool
 seealso:
-  - plugin: community.general.csvfile
+  - plugin: ansible.builtin.csvfile
     plugin_type: lookup
     description: Can be used to do selective lookups in CSV files from Jinja.
 '''

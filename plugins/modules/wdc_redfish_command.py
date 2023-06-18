@@ -38,11 +38,11 @@ options:
     elements: str
   baseuri:
     description:
-      - Base URI of OOB controller.  Must include this or I(ioms).
+      - Base URI of OOB controller.  Must include this or O(ioms).
     type: str
   ioms:
     description:
-      - List of IOM FQDNs for the enclosure.  Must include this or I(baseuri).
+      - List of IOM FQDNs for the enclosure.  Must include this or O(baseuri).
     type: list
     elements: str
   username:
@@ -65,7 +65,7 @@ options:
   resource_id:
     required: false
     description:
-      - ID of the component to modify, such as C(Enclosure), C(IOModuleAFRU), C(PowerSupplyBFRU), C(FanExternalFRU3), or C(FanInternalFRU).
+      - ID of the component to modify, such as V(Enclosure), V(IOModuleAFRU), V(PowerSupplyBFRU), V(FanExternalFRU3), or V(FanInternalFRU).
     type: str
     version_added: 5.4.0
   update_image_uri:

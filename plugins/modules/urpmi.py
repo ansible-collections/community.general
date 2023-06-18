@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 module: urpmi
 short_description: Urpmi manager
 description:
-  - Manages packages with I(urpmi) (such as for Mageia or Mandriva)
+  - Manages packages with C(urpmi) (such as for Mageia or Mandriva)
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -45,19 +45,19 @@ options:
     default: false
   no_recommends:
     description:
-      - Corresponds to the C(--no-recommends) option for I(urpmi).
+      - Corresponds to the C(--no-recommends) option for C(urpmi).
     type: bool
     default: true
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
-        Corresponds to the C(--force) option for I(urpmi).
+        Corresponds to the C(--force) option for C(urpmi).
     type: bool
     default: true
   root:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
-        Corresponds to the C(--root) option for I(urpmi).
+        Corresponds to the C(--root) option for C(urpmi).
     aliases: [ installroot ]
     type: str
 author:

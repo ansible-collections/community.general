@@ -39,7 +39,7 @@ options:
     choices: [ joyent, joyent-minimal, lx, kvm, bhyve ]
     default: joyent
     description:
-      - Type of virtual machine. The C(bhyve) option was added in community.general 0.2.0.
+      - Type of virtual machine. The V(bhyve) option was added in community.general 0.2.0.
     type: str
   boot:
     required: false
@@ -50,7 +50,7 @@ options:
     required: false
     description:
       - Sets a limit on the amount of CPU time that can be used by a VM.
-        Use C(0) for no cap.
+        Use V(0) for no cap.
     type: int
   cpu_shares:
     required: false
@@ -95,7 +95,7 @@ options:
   docker:
     required: false
     description:
-      - Docker images need this flag enabled along with the I(brand) set to C(lx).
+      - Docker images need this flag enabled along with the O(brand) set to C(lx).
     type: bool
   filesystems:
     required: false
@@ -147,8 +147,8 @@ options:
   internal_metadata_namespace:
     required: false
     description:
-      - List of namespaces to be set as I(internal_metadata-only); these namespaces
-        will come from I(internal_metadata) rather than I(customer_metadata).
+      - List of namespaces to be set as C(internal_metadata-only); these namespaces
+        will come from O(internal_metadata) rather than O(customer_metadata).
     type: str
   kernel_version:
     required: false
@@ -164,7 +164,7 @@ options:
     required: false
     description:
       - Resolvers in C(/etc/resolv.conf) will be updated when updating
-        the I(resolvers) property.
+        the O(resolvers) property.
     type: bool
   max_locked_memory:
     required: false
@@ -263,11 +263,11 @@ options:
     choices: [ present, running, absent, deleted, stopped, created, restarted, rebooted ]
     default: running
     description:
-      - States for the VM to be in. Please note that C(present), C(stopped) and C(restarted)
-        operate on a VM that is currently provisioned. C(present) means that the VM will be
-        created if it was absent, and that it will be in a running state. C(absent) will
+      - States for the VM to be in. Please note that V(present), V(stopped) and V(restarted)
+        operate on a VM that is currently provisioned. V(present) means that the VM will be
+        created if it was absent, and that it will be in a running state. V(absent) will
         shutdown the zone before removing it.
-        C(stopped) means the zone will be created if it doesn't exist already, before shutting
+        V(stopped) means the zone will be created if it does not exist already, before shutting
         it down.
     type: str
   tmpfs:
@@ -278,7 +278,7 @@ options:
   uuid:
     required: false
     description:
-      - UUID of the VM. Can either be a full UUID or C(*) for all VMs.
+      - UUID of the VM. Can either be a full UUID or V(*) for all VMs.
     type: str
   vcpus:
     required: false
@@ -309,8 +309,8 @@ options:
   vnc_port:
     required: false
     description:
-      - TCP port to listen of the VNC server. Or set C(0) for random,
-        or C(-1) to disable.
+      - TCP port to listen of the VNC server. Or set V(0) for random,
+        or V(-1) to disable.
     type: int
   zfs_data_compression:
     required: false

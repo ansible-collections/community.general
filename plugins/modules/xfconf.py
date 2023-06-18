@@ -58,15 +58,15 @@ options:
   value_type:
     description:
       - The type of value being set.
-      - When providing more than one I(value_type), the length of the list must
-        be equal to the length of I(value).
-      - If only one I(value_type) is provided, but I(value) contains more than
-        on element, that I(value_type) will be applied to all elements of I(value).
-      - If the I(property) being set is an array and it can possibly have ony one
-        element in the array, then I(force_array=true) must be used to ensure
+      - When providing more than one O(value_type), the length of the list must
+        be equal to the length of O(value).
+      - If only one O(value_type) is provided, but O(value) contains more than
+        on element, that O(value_type) will be applied to all elements of O(value).
+      - If the O(property) being set is an array and it can possibly have ony one
+        element in the array, then O(force_array=true) must be used to ensure
         that C(xfconf-query) will interpret the value as an array rather than a
         scalar.
-      - Support for C(uchar), C(char), C(uint64), and C(int64) has been added in community.general 4.8.0.
+      - Support for V(uchar), V(char), V(uint64), and V(int64) has been added in community.general 4.8.0.
     type: list
     elements: str
     choices: [ string, int, double, bool, uint, uchar, char, uint64, int64, float ]
@@ -74,7 +74,7 @@ options:
     type: str
     description:
       - The action to take upon the property/value.
-      - The state C(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
+      - The state V(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
     choices: [ present, absent ]
     default: "present"
   force_array:
@@ -86,7 +86,7 @@ options:
     version_added: 1.0.0
   disable_facts:
     description:
-      - The value C(false) is no longer allowed since community.general 4.0.0.
+      - The value V(false) is no longer allowed since community.general 4.0.0.
       - This option is deprecated, and will be removed in community.general 8.0.0.
     type: bool
     default: true
@@ -130,9 +130,8 @@ RETURN = '''
     sample: "/Xft/DPI"
   value_type:
     description:
-      - The type of the value that was changed (C(none) for C(reset)
-        state). Either a single string value or a list of strings for array
-        types.
+      - The type of the value that was changed (V(none) for O(state=reset)).
+        Either a single string value or a list of strings for array types.
       - This is a string or a list of strings.
     returned: success
     type: any
