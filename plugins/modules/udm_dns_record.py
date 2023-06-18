@@ -21,7 +21,7 @@ description:
        It uses the python API of the UCS to create a new object or edit it."
 requirements:
     - Univention
-    - ipaddress (for I(type=ptr_record))
+    - ipaddress (for O(type=ptr_record))
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -48,21 +48,21 @@ options:
         required: true
         description:
             - Corresponding DNS zone for this record, e.g. example.com.
-            - For PTR records this has to be the full reverse zone (for example C(1.1.192.in-addr.arpa)).
+            - For PTR records this has to be the full reverse zone (for example V(1.1.192.in-addr.arpa)).
     type:
         type: str
         required: true
         description:
-            - "Define the record type. C(host_record) is a A or AAAA record,
-               C(alias) is a CNAME, C(ptr_record) is a PTR record, C(srv_record)
-               is a SRV record and C(txt_record) is a TXT record."
-            - "The available choices are: C(host_record), C(alias), C(ptr_record), C(srv_record), C(txt_record)."
+            - "Define the record type. V(host_record) is a A or AAAA record,
+               V(alias) is a CNAME, V(ptr_record) is a PTR record, V(srv_record)
+               is a SRV record and V(txt_record) is a TXT record."
+            - "The available choices are: V(host_record), V(alias), V(ptr_record), V(srv_record), V(txt_record)."
     data:
         type: dict
         default: {}
         description:
-            - "Additional data for this record, e.g. ['a': '192.0.2.1'].
-               Required if I(state=present)."
+            - "Additional data for this record, for example V({'a': '192.0.2.1'})."
+            - Required if O(state=present).
 '''
 
 
