@@ -201,6 +201,8 @@ def parse_pvs(module, data):
 
 
 def find_vg(module, vg):
+    if not vg:
+        return None
     vgs_cmd = module.get_bin_path('vgs', True)
     dummy, current_vgs, dummy = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd, check_rc=True)
 
