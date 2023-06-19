@@ -29,6 +29,7 @@
     fstype: '{{ item.0.key }}'
     fssize: '{{ item.0.value.fssize }}'
     grow: '{{ item.0.value.grow }}'
+    new_uuid: '{{ item.0.value.new_uuid }}'
     action: '{{ item.1 }}'
   when:
     # FreeBSD limited support
@@ -83,7 +84,7 @@
     # TODO: something seems to be broken on Alpine
     - 'not (ansible_distribution == "Alpine")'
 
-  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
+  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'reset_fs_uuid', 'overwrite_another_fs', 'remove_fs', 'set_fs_uuid_on_creation', 'set_fs_uuid_on_creation_with_opts'])|list }}"
 
 
 # With FreeBSD extended support (util-linux is not available before 12.2)

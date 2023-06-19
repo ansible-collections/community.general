@@ -1,0 +1,44 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Generate a random UUID"
+  ansible.builtin.set_fact:
+    random_uuid: '{{ "first_random_uuid" | ansible.builtin.to_uuid }}'
+
+# Skip UUID set at creation tests for FreeBSD due to "xfs_admin: only 'rewrite' supported on V5 fs"
+- when:
+    - new_uuid | default(False)
+    - not (ansible_system == "FreeBSD" and fstype == "xfs")
+  block:
+  - name: "Create filesystem ({{ fstype }}) with UUID"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+      uuid: '{{ random_uuid }}'
+    register: fs_result
+
+  - name: "Get UUID of the created filesystem"
+    ansible.builtin.shell:
+      cmd: "{{ get_uuid_cmd }}"
+    changed_when: false
+    register: uuid
+
+  - name: "Assert that filesystem UUID is the random UUID set on creation"
+    ansible.builtin.assert:
+      that: (random_uuid | replace('-','')) == ( uuid.stdout | replace('-',''))
+
+- when: not (new_uuid | default(False))
+  block:
+  - name: "Create filesystem ({{ fstype }}) without UUID support"
+    ignore_errors: true
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+      uuid: '{{ random_uuid }}'
+    register: fs_result
+
+  - name: "Assert that filesystem creation failed"
+    ansible.builtin.assert:
+      that: fs_result is failed
