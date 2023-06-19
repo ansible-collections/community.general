@@ -73,7 +73,7 @@ options:
     state:
         choices: [ "absent", "present" ]
         description:
-            - Control if the realm authentication required actions are going to be registerd/updated or deleted.
+            - Control if the realm authentication required actions are going to be registered/updated (V(present)) or deleted (V(absent)).
         required: true
         type: str
 
