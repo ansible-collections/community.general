@@ -16,7 +16,7 @@ short_description: Manages Datadog downtimes
 version_added: 2.0.0
 description:
   - Manages downtimes within Datadog.
-  - Options as described on U(https://docs.datadoghq.com/api/v1/downtimes/s).
+  - Options as described on U(https://docs.datadoghq.com/api/v1/downtimes/).
 author:
   - Datadog (@Datadog)
 requirements:
