@@ -48,12 +48,10 @@ options:
                     - Configuration for the required action.
                 type: dict
             defaultAction:
-                default: false
                 description:
                     - Indicates, if any new user will have the required action assigned to it.
                 type: bool
             enabled:
-                default: false
                 description:
                     - Indicates, if the required action is enabled or not.
                 type: bool
@@ -87,44 +85,44 @@ author:
 
 EXAMPLES = '''
 - name: Register a new required action.
-    community.general.keycloak_authentication_required_actions:
-    auth_client_id: "admin-cli"
-    auth_keycloak_url: "http://localhost:8080"
-    auth_password: "password"
-    auth_realm: "master"
-    auth_username: "admin"
-    realm: "master"
-    required_action:
-        - alias: "TERMS_AND_CONDITIONS"
-        name: "Terms and conditions"
-        providerId: "TERMS_AND_CONDITIONS"
-        enabled: true
-    state: "present"
+  community.general.keycloak_authentication_required_actions:
+  auth_client_id: "admin-cli"
+  auth_keycloak_url: "http://localhost:8080"
+  auth_password: "password"
+  auth_realm: "master"
+  auth_username: "admin"
+  realm: "master"
+  required_action:
+    - alias: "TERMS_AND_CONDITIONS"
+      name: "Terms and conditions"
+      providerId: "TERMS_AND_CONDITIONS"
+      enabled: true
+  state: "present"
 
 - name: Update the newly registered required action.
-    community.general.keycloak_authentication_required_actions:
-    auth_client_id: "admin-cli"
-    auth_keycloak_url: "http://localhost:8080"
-    auth_password: "password"
-    auth_realm: "master"
-    auth_username: "admin"
-    realm: "master"
-    required_action:
-        - alias: "TERMS_AND_CONDITIONS"
-        enabled: false
-    state: "present"
+  community.general.keycloak_authentication_required_actions:
+  auth_client_id: "admin-cli"
+  auth_keycloak_url: "http://localhost:8080"
+  auth_password: "password"
+  auth_realm: "master"
+  auth_username: "admin"
+  realm: "master"
+  required_action:
+    - alias: "TERMS_AND_CONDITIONS"
+      enabled: false
+  state: "present"
 
 - name: Delete the updated registered required action.
-    community.general.keycloak_authentication_required_actions:
-    auth_client_id: "admin-cli"
-    auth_keycloak_url: "http://localhost:8080"
-    auth_password: "password"
-    auth_realm: "master"
-    auth_username: "admin"
-    realm: "master"
-    required_action:
-        - alias: "TERMS_AND_CONDITIONS"
-    state: "absent"
+  community.general.keycloak_authentication_required_actions:
+  auth_client_id: "admin-cli"
+  auth_keycloak_url: "http://localhost:8080"
+  auth_password: "password"
+  auth_realm: "master"
+  auth_username: "admin"
+  realm: "master"
+  required_action:
+    - alias: "TERMS_AND_CONDITIONS"
+  state: "absent"
 '''
 
 RETURN = '''
