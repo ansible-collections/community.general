@@ -316,14 +316,14 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_active_opt(option, line):
+                if not changed_lines[index] and match_opt(option, line):
                     newline = assignment_format % (option, values.pop(0))
                     (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
                     if len(values) == 0:
                         break
         # remove all remaining option occurrences from the rest of the section
         for index in range(len(section_lines) - 1, 0, -1):
-            if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+            if not changed_lines[index] and match_opt(option, section_lines[index]):
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True
