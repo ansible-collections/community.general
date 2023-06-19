@@ -21,30 +21,30 @@ options:
     suboptions:
       url:
         description:
-          - ManageIQ environment url. C(MIQ_URL) env var if set. otherwise, it is required to pass it.
+          - ManageIQ environment URL. E(MIQ_URL) environment variable if set. Otherwise, it is required to pass it.
         type: str
         required: false
       username:
         description:
-          - ManageIQ username. C(MIQ_USERNAME) env var if set. otherwise, required if no token is passed in.
+          - ManageIQ username. E(MIQ_USERNAME) environment variable if set. Otherwise, required if no token is passed in.
         type: str
       password:
         description:
-          - ManageIQ password. C(MIQ_PASSWORD) env var if set. otherwise, required if no token is passed in.
+          - ManageIQ password. E(MIQ_PASSWORD) environment variable if set. Otherwise, required if no token is passed in.
         type: str
       token:
         description:
-          - ManageIQ token. C(MIQ_TOKEN) env var if set. otherwise, required if no username or password is passed in.
+          - ManageIQ token. E(MIQ_TOKEN) environment variable if set. Otherwise, required if no username or password is passed in.
         type: str
       validate_certs:
         description:
-          - Whether SSL certificates should be verified for HTTPS requests. defaults to True.
+          - Whether SSL certificates should be verified for HTTPS requests.
         type: bool
         default: true
         aliases: [ verify_ssl ]
       ca_cert:
         description:
-          - The path to a CA bundle file or directory with certificates. defaults to None.
+          - The path to a CA bundle file or directory with certificates.
         type: str
         aliases: [ ca_bundle_path ]
 

@@ -13,7 +13,7 @@ DOCUMENTATION = """
       - bw (command line utility)
       - be logged into bitwarden
       - bitwarden vault unlocked
-      - C(BW_SESSION) environment variable set
+      - E(BW_SESSION) environment variable set
     short_description: Retrieve secrets from Bitwarden
     version_added: 5.4.0
     description:
@@ -25,7 +25,7 @@ DOCUMENTATION = """
         type: list
         elements: str
       search:
-        description: Field to retrieve, for example C(name) or C(id).
+        description: Field to retrieve, for example V(name) or V(id).
         type: str
         default: name
         version_added: 5.7.0

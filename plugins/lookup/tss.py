@@ -13,8 +13,8 @@ short_description: Get secrets from Thycotic Secret Server
 version_added: 1.0.0
 description:
     - Uses the Thycotic Secret Server Python SDK to get Secrets from Secret
-      Server using token authentication with I(username) and I(password) on
-      the REST API at I(base_url).
+      Server using token authentication with O(username) and O(password) on
+      the REST API at O(base_url).
     - When using self-signed certificates the environment variable
       C(REQUESTS_CA_BUNDLE) can be set to a file containing the trusted certificates
       (in C(.pem) format).
@@ -26,10 +26,17 @@ options:
         description: The integer ID of the secret.
         required: true
         type: int
+    fetch_secret_ids_from_folder:
+        description:
+            - Boolean flag which indicates whether secret ids are in a folder is fetched by folder ID or not.
+            - V(true) then the terms will be considered as a folder IDs. Otherwise (default), they are considered as secret IDs.
+        required: false
+        type: bool
+        version_added: 7.1.0
     fetch_attachments:
         description:
             - Boolean flag which indicates whether attached files will get downloaded or not.
-            - The download will only happen if I(file_download_path) has been provided.
+            - The download will only happen if O(file_download_path) has been provided.
         required: false
         type: bool
         version_added: 7.0.0
@@ -39,7 +46,7 @@ options:
         type: path
         version_added: 7.0.0
     base_url:
-        description: The base URL of the server, e.g. C(https://localhost/SecretServer).
+        description: The base URL of the server, for example V(https://localhost/SecretServer).
         env:
             - name: TSS_BASE_URL
         ini:
@@ -56,7 +63,7 @@ options:
     password:
         description:
             - The password associated with the supplied username.
-            - Required when I(token) is not provided.
+            - Required when O(token) is not provided.
         env:
             - name: TSS_PASSWORD
         ini:
@@ -66,7 +73,7 @@ options:
         default: ""
         description:
           - The domain with which to request the OAuth2 Access Grant.
-          - Optional when I(token) is not provided.
+          - Optional when O(token) is not provided.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_DOMAIN
@@ -78,7 +85,7 @@ options:
     token:
         description:
           - Existing token for Thycotic authorizer.
-          - If provided, I(username) and I(password) are not needed.
+          - If provided, O(username) and O(password) are not needed.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_TOKEN
@@ -194,6 +201,26 @@ EXAMPLES = r"""
               | items2dict(key_name='slug',
                            value_name='itemValue'))['private-key']
           }}
+
+# If fetch_secret_ids_from_folder=true then secret IDs are in a folder is fetched based on folder ID
+- hosts: localhost
+  vars:
+      secret: >-
+        {{
+            lookup(
+                'community.general.tss',
+                102,
+                fetch_secret_ids_from_folder=true,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                token='thycotic_access_token'
+            )
+        }}
+  tasks:
+    - ansible.builtin.debug:
+        msg: >
+          the secret id's are {{
+              secret
+          }}
 """
 
 import abc
@@ -204,18 +231,21 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from thycotic.secrets.server import SecretServer, SecretServerError
+    from delinea.secrets.server import SecretServer, SecretServerError
 
     HAS_TSS_SDK = True
+    HAS_DELINEA_SS_SDK = True
 except ImportError:
     try:
-        from delinea.secrets.server import SecretServer, SecretServerError
+        from thycotic.secrets.server import SecretServer, SecretServerError
 
         HAS_TSS_SDK = True
+        HAS_DELINEA_SS_SDK = False
     except ImportError:
         SecretServer = None
         SecretServerError = None
         HAS_TSS_SDK = False
+        HAS_DELINEA_SS_SDK = False
 
 try:
     from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
@@ -270,12 +300,26 @@ class TSSClient(object):
         else:
             return self._client.get_secret_json(secret_id)
 
+    def get_secret_ids_by_folderid(self, term):
+        display.debug("tss_lookup term: %s" % term)
+        folder_id = self._term_to_folder_id(term)
+        display.vvv(u"Secret Server lookup of Secret id's with Folder ID %d" % folder_id)
+
+        return self._client.get_secret_ids_by_folderid(folder_id)
+
     @staticmethod
     def _term_to_secret_id(term):
         try:
             return int(term)
         except ValueError:
             raise AnsibleOptionsError("Secret ID must be an integer")
+
+    @staticmethod
+    def _term_to_folder_id(term):
+        try:
+            return int(term)
+        except ValueError:
+            raise AnsibleOptionsError("Folder ID must be an integer")
 
 
 class TSSClientV0(TSSClient):
@@ -345,6 +389,12 @@ class LookupModule(LookupBase):
         )
 
         try:
-            return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
+            if self.get_option("fetch_secret_ids_from_folder"):
+                if HAS_DELINEA_SS_SDK:
+                    return [tss.get_secret_ids_by_folderid(term) for term in terms]
+                else:
+                    raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
+            else:
+                return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
         except SecretServerError as error:
             raise AnsibleError("Secret Server lookup failure: %s" % error.message)

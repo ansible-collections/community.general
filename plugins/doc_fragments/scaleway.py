@@ -43,9 +43,9 @@ options:
     default: true
 notes:
   - Also see the API documentation on U(https://developer.scaleway.com/)
-  - If C(api_token) is not set within the module, the following
+  - If O(api_token) is not set within the module, the following
     environment variables can be used in decreasing order of precedence
-    C(SCW_TOKEN), C(SCW_API_KEY), C(SCW_OAUTH_TOKEN) or C(SCW_API_TOKEN).
-  - If one wants to use a different C(api_url) one can also set the C(SCW_API_URL)
+    E(SCW_TOKEN), E(SCW_API_KEY), E(SCW_OAUTH_TOKEN) or E(SCW_API_TOKEN).
+  - If one wants to use a different O(api_url) one can also set the E(SCW_API_URL)
     environment variable.
 '''

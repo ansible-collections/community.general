@@ -18,7 +18,7 @@ DOCUMENTATION = '''
       - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
     short_description: fetch an entire item from 1Password
     description:
-      - C(onepassword_raw) wraps C(op) command line utility to fetch an entire item from 1Password
+      - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.
     options:
       _terms:
         description: identifier(s) (UUID, name, or domain; case-insensitive) of item(s) to retrieve.
@@ -39,13 +39,19 @@ DOCUMENTATION = '''
         description: The username used to sign in.
       secret_key:
         description: The secret key used when performing an initial sign in.
+      service_account_token:
+        description:
+          - The access key for a service account.
+          - Only works with 1Password CLI version 2 or later.
+        type: string
+        version_added: 7.1.0
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
-        performed an initial sign in (meaning C(~/.op/config exists)), then only the C(master_password) is required.
-        You may optionally specify C(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
-      - This lookup can perform an initial login by providing C(subdomain), C(username), C(secret_key), and C(master_password).
+        performed an initial sign in (meaning C(~/.op/config exists)), then only the O(master_password) is required.
+        You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
+      - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
       - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
         needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
         to the 1Password master password.
@@ -89,8 +95,9 @@ class LookupModule(LookupBase):
         username = self.get_option("username")
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
+        service_account_token = self.get_option("service_account_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
         op.assert_logged_in()
 
         values = []

@@ -46,8 +46,8 @@ options:
     default: true
   ca_certs:
     description:
-      - Path to root certificates file. If not set and I(tls) is
-        set to C(true), certifi ca-certificates will be used.
+      - Path to root certificates file. If not set and O(tls) is
+        set to V(true), certifi ca-certificates will be used.
     type: str
 requirements: [ "redis", "certifi" ]
 

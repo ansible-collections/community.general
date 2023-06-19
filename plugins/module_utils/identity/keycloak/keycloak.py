@@ -9,6 +9,7 @@ __metaclass__ = type
 
 import json
 import traceback
+import copy
 
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode, quote
@@ -64,6 +65,14 @@ URL_CLIENT_GROUP_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/groups/{id
 URL_CLIENT_GROUP_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/groups/{id}/role-mappings/clients/{client}/composite"
 
 URL_USERS = "{url}/admin/realms/{realm}/users"
+URL_USER = "{url}/admin/realms/{realm}/users/{id}"
+URL_USER_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings"
+URL_USER_REALM_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/realm"
+URL_USER_CLIENTS_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients"
+URL_USER_CLIENT_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client_id}"
+URL_USER_GROUPS = "{url}/admin/realms/{realm}/users/{id}/groups"
+URL_USER_GROUP = "{url}/admin/realms/{realm}/users/{id}/groups/{group_id}"
+
 URL_CLIENT_SERVICE_ACCOUNT_USER = "{url}/admin/realms/{realm}/clients/{id}/service-account-user"
 URL_CLIENT_USER_ROLEMAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}"
 URL_CLIENT_USER_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}/available"
@@ -207,24 +216,30 @@ def is_struct_included(struct1, struct2, exclude=None):
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
     if isinstance(struct1, list) and isinstance(struct2, list):
+        if not struct1 and not struct2:
+            return True
         for item1 in struct1:
             if isinstance(item1, (list, dict)):
                 for item2 in struct2:
-                    if not is_struct_included(item1, item2, exclude):
-                        return False
+                    if is_struct_included(item1, item2, exclude):
+                        break
+                else:
+                    return False
             else:
                 if item1 not in struct2:
                     return False
         return True
     elif isinstance(struct1, dict) and isinstance(struct2, dict):
+        if not struct1 and not struct2:
+            return True
         try:
             for key in struct1:
                 if not (exclude and key in exclude):
                     if not is_struct_included(struct1[key], struct2[key], exclude):
                         return False
-            return True
         except KeyError:
             return False
+        return True
     elif isinstance(struct1, bool) and isinstance(struct2, bool):
         return struct1 == struct2
     else:
@@ -1665,6 +1680,9 @@ class KeycloakAPI(object):
         """
         roles_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
@@ -1679,11 +1697,123 @@ class KeycloakAPI(object):
         """
         role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
         try:
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            composites = None
+            if "composites" in rolerep:
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep["composites"]
+            role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                                     data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            if composites is not None:
+                self.update_role_composites(rolerep=rolerep, composites=composites, realm=realm)
+            return role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
+
+    def get_role_composites(self, rolerep, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            return json.loads(to_native(open_url(
+                composite_url,
+                method='GET',
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg='Could not get role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def create_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            # create new composites
+            return open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(composites), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def delete_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            # create new composites
+            return open_url(composite_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(composites), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def update_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        # Get existing composites
+        existing_composites = self.get_role_composites(rolerep=rolerep, clientid=clientid, realm=realm)
+        composites_to_be_created = []
+        composites_to_be_deleted = []
+        for composite in composites:
+            composite_found = False
+            existing_composite_client = None
+            for existing_composite in existing_composites:
+                if existing_composite["clientRole"]:
+                    existing_composite_client = self.get_client_by_id(existing_composite["containerId"], realm=realm)
+                    if ("client_id" in composite
+                            and composite['client_id'] is not None
+                            and existing_composite_client["clientId"] == composite["client_id"]
+                            and composite["name"] == existing_composite["name"]):
+                        composite_found = True
+                        break
+                else:
+                    if (("client_id" not in composite or composite['client_id'] is None)
+                            and composite["name"] == existing_composite["name"]):
+                        composite_found = True
+                        break
+            if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
+                if "client_id" in composite and composite['client_id'] is not None:
+                    client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                    for client_role in client_roles:
+                        if client_role['name'] == composite['name']:
+                            composites_to_be_created.append(client_role)
+                            break
+                else:
+                    realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                    composites_to_be_created.append(realm_role)
+            elif composite_found and 'state' in composite and composite['state'] == 'absent':
+                if "client_id" in composite and composite['client_id'] is not None:
+                    client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                    for client_role in client_roles:
+                        if client_role['name'] == composite['name']:
+                            composites_to_be_deleted.append(client_role)
+                            break
+                else:
+                    realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                    composites_to_be_deleted.append(realm_role)
+
+        if len(composites_to_be_created) > 0:
+            # create new composites
+            self.create_role_composites(rolerep=rolerep, composites=composites_to_be_created, clientid=clientid, realm=realm)
+        if len(composites_to_be_deleted) > 0:
+            # delete new composites
+            self.delete_role_composites(rolerep=rolerep, composites=composites_to_be_deleted, clientid=clientid, realm=realm)
 
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
@@ -1763,11 +1893,29 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
+
+    def convert_role_composites(self, composites):
+        keycloak_compatible_composites = {
+            'client': {},
+            'realm': []
+        }
+        for composite in composites:
+            if 'state' not in composite or composite['state'] == 'present':
+                if "client_id" in composite and composite["client_id"] is not None:
+                    if composite["client_id"] not in keycloak_compatible_composites["client"]:
+                        keycloak_compatible_composites["client"][composite["client_id"]] = []
+                    keycloak_compatible_composites["client"][composite["client_id"]].append(composite["name"])
+                else:
+                    keycloak_compatible_composites["realm"].append(composite["name"])
+        return keycloak_compatible_composites
 
     def update_client_role(self, rolerep, clientid, realm="master"):
         """ Update an existing client role.
@@ -1783,8 +1931,15 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            composites = None
+            if "composites" in rolerep:
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep['composites']
+            update_role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            if composites is not None:
+                self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
+            return update_role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
@@ -2382,3 +2537,245 @@ class KeycloakAPI(object):
                             validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not delete scope %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
+
+    def get_user_by_id(self, user_id, realm='master'):
+        """
+        Get a User by its ID.
+        :param user_id: ID of the user.
+        :param realm: Realm
+        :return: Representation of the user.
+        """
+        try:
+            user_url = URL_USER.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id)
+            userrep = json.load(
+                open_url(
+                    user_url,
+                    method='GET',
+                    headers=self.restheaders))
+            return userrep
+        except Exception as e:
+            self.module.fail_json(msg='Could not get user %s in realm %s: %s'
+                                      % (user_id, realm, str(e)))
+
+    def create_user(self, userrep, realm='master'):
+        """
+        Create a new User.
+        :param userrep: Representation of the user to create
+        :param realm: Realm
+        :return: Representation of the user created.
+        """
+        try:
+            if 'attributes' in userrep and isinstance(userrep['attributes'], list):
+                attributes = copy.deepcopy(userrep['attributes'])
+                userrep['attributes'] = self.convert_user_attributes_to_keycloak_dict(attributes=attributes)
+            users_url = URL_USERS.format(
+                url=self.baseurl,
+                realm=realm)
+            open_url(users_url,
+                     method='POST',
+                     headers=self.restheaders,
+                     data=json.dumps(userrep))
+            created_user = self.get_user_by_username(
+                username=userrep['username'],
+                realm=realm)
+            return created_user
+        except Exception as e:
+            self.module.fail_json(msg='Could not create user %s in realm %s: %s'
+                                      % (userrep['username'], realm, str(e)))
+
+    def convert_user_attributes_to_keycloak_dict(self, attributes):
+        keycloak_user_attributes_dict = {}
+        for attribute in attributes:
+            if ('state' not in attribute or attribute['state'] == 'present') and 'name' in attribute:
+                keycloak_user_attributes_dict[attribute['name']] = attribute['values'] if 'values' in attribute else []
+        return keycloak_user_attributes_dict
+
+    def convert_keycloak_user_attributes_dict_to_module_list(self, attributes):
+        module_attributes_list = []
+        for key in attributes:
+            attr = {}
+            attr['name'] = key
+            attr['values'] = attributes[key]
+            module_attributes_list.append(attr)
+        return module_attributes_list
+
+    def update_user(self, userrep, realm='master'):
+        """
+        Update a User.
+        :param userrep: Representation of the user to update. This representation must include the ID of the user.
+        :param realm: Realm
+        :return: Representation of the updated user.
+        """
+        try:
+            if 'attributes' in userrep and isinstance(userrep['attributes'], list):
+                attributes = copy.deepcopy(userrep['attributes'])
+                userrep['attributes'] = self.convert_user_attributes_to_keycloak_dict(attributes=attributes)
+            user_url = URL_USER.format(
+                url=self.baseurl,
+                realm=realm,
+                id=userrep["id"])
+            open_url(
+                user_url,
+                method='PUT',
+                headers=self.restheaders,
+                data=json.dumps(userrep))
+            updated_user = self.get_user_by_id(
+                user_id=userrep['id'],
+                realm=realm)
+            return updated_user
+        except Exception as e:
+            self.module.fail_json(msg='Could not update user %s in realm %s: %s'
+                                      % (userrep['username'], realm, str(e)))
+
+    def delete_user(self, user_id, realm='master'):
+        """
+        Delete a User.
+        :param user_id: ID of the user to be deleted
+        :param realm: Realm
+        :return: HTTP response.
+        """
+        try:
+            user_url = URL_USER.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id)
+            return open_url(
+                user_url,
+                method='DELETE',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete user %s in realm %s: %s'
+                                      % (user_id, realm, str(e)))
+
+    def get_user_groups(self, user_id, realm='master'):
+        """
+        Get groups for a user.
+        :param user_id: User ID
+        :param realm: Realm
+        :return: Representation of the client groups.
+        """
+        try:
+            groups = []
+            user_groups_url = URL_USER_GROUPS.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id)
+            user_groups = json.load(
+                open_url(
+                    user_groups_url,
+                    method='GET',
+                    headers=self.restheaders))
+            for user_group in user_groups:
+                groups.append(user_group["name"])
+            return groups
+        except Exception as e:
+            self.module.fail_json(msg='Could not get groups for user %s in realm %s: %s'
+                                      % (user_id, realm, str(e)))
+
+    def add_user_in_group(self, user_id, group_id, realm='master'):
+        """
+        Add a user to a group.
+        :param user_id: User ID
+        :param group_id: Group Id to add the user to.
+        :param realm: Realm
+        :return: HTTP Response
+        """
+        try:
+            user_group_url = URL_USER_GROUP.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id,
+                group_id=group_id)
+            return open_url(
+                user_group_url,
+                method='PUT',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not add user %s in group %s in realm %s: %s'
+                                      % (user_id, group_id, realm, str(e)))
+
+    def remove_user_from_group(self, user_id, group_id, realm='master'):
+        """
+        Remove a user from a group for a user.
+        :param user_id: User ID
+        :param group_id: Group Id to add the user to.
+        :param realm: Realm
+        :return: HTTP response
+        """
+        try:
+            user_group_url = URL_USER_GROUP.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id,
+                group_id=group_id)
+            return open_url(
+                user_group_url,
+                method='DELETE',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not remove user %s from group %s in realm %s: %s'
+                                      % (user_id, group_id, realm, str(e)))
+
+    def update_user_groups_membership(self, userrep, groups, realm='master'):
+        """
+        Update user's group membership
+        :param userrep: Representation of the user. This representation must include the ID.
+        :param realm: Realm
+        :return: True if group membership has been changed. False Otherwise.
+        """
+        changed = False
+        try:
+            user_existing_groups = self.get_user_groups(
+                user_id=userrep['id'],
+                realm=realm)
+            groups_to_add_and_remove = self.extract_groups_to_add_to_and_remove_from_user(groups)
+            # If group membership need to be changed
+            if not is_struct_included(groups_to_add_and_remove['add'], user_existing_groups):
+                # Get available goups in the realm
+                realm_groups = self.get_groups(realm=realm)
+                for realm_group in realm_groups:
+                    if "name" in realm_group and realm_group["name"] in groups_to_add_and_remove['add']:
+                        self.add_user_in_group(
+                            user_id=userrep["id"],
+                            group_id=realm_group["id"],
+                            realm=realm)
+                        changed = True
+                    elif "name" in realm_group and realm_group['name'] in groups_to_add_and_remove['remove']:
+                        self.remove_user_from_group(
+                            user_id=userrep['id'],
+                            group_id=realm_group['id'],
+                            realm=realm)
+                        changed = True
+            return changed
+        except Exception as e:
+            self.module.fail_json(msg='Could not update group membership for user %s in realm %s: %s'
+                                      % (userrep['id]'], realm, str(e)))
+
+    def extract_groups_to_add_to_and_remove_from_user(self, groups):
+        groups_extract = {}
+        groups_to_add = []
+        groups_to_remove = []
+        if isinstance(groups, list) and len(groups) > 0:
+            for group in groups:
+                group_name = group['name'] if isinstance(group, dict) and 'name' in group else group
+                if isinstance(group, dict) and ('state' not in group or group['state'] == 'present'):
+                    groups_to_add.append(group_name)
+                else:
+                    groups_to_remove.append(group_name)
+        groups_extract['add'] = groups_to_add
+        groups_extract['remove'] = groups_to_remove
+
+        return groups_extract
+
+    def convert_user_group_list_of_str_to_list_of_dict(self, groups):
+        list_of_groups = []
+        if isinstance(groups, list) and len(groups) > 0:
+            for group in groups:
+                if isinstance(group, str):
+                    group_dict = {}
+                    group_dict['name'] = group
+                    list_of_groups.append(group_dict)
+        return list_of_groups

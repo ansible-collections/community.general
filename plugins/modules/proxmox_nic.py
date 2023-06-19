@@ -24,7 +24,7 @@ attributes:
 options:
   bridge:
     description:
-      - Add this interface to the specified bridge device. The Proxmox VE default bridge is called C(vmbr0).
+      - Add this interface to the specified bridge device. The Proxmox VE default bridge is called V(vmbr0).
     type: str
   firewall:
     description:
@@ -33,7 +33,7 @@ options:
     default: false
   interface:
     description:
-      - Name of the interface, should be C(net[n]) where C(1 ≤ n ≤ 31).
+      - Name of the interface, should be V(net[n]) where C(1 ≤ n ≤ 31).
     type: str
     required: true
   link_down:
@@ -43,7 +43,7 @@ options:
     default: false
   mac:
     description:
-      - C(XX:XX:XX:XX:XX:XX) should be a unique MAC address. This is automatically generated if not specified.
+      - V(XX:XX:XX:XX:XX:XX) should be a unique MAC address. This is automatically generated if not specified.
       - When not specified this module will keep the MAC address the same when changing an existing interface.
     type: str
   model:
@@ -56,13 +56,13 @@ options:
   mtu:
     description:
       - Force MTU, for C(virtio) model only, setting will be ignored otherwise.
-      - Set to C(1) to use the bridge MTU.
+      - Set to V(1) to use the bridge MTU.
       - Value should be C(1 ≤ n ≤ 65520).
     type: int
   name:
     description:
       - Specifies the VM name. Only used on the configuration web interface.
-      - Required only for I(state=present).
+      - Required only for O(state=present).
     type: str
   queues:
     description:

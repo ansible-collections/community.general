@@ -21,8 +21,8 @@ notes:
     bind over a UNIX domain socket. This works well with the default Ubuntu
     install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL
     rule allowing root to modify the server configuration. If you need to use
-    a simple bind to access your server, pass the credentials in I(bind_dn)
-    and I(bind_pw).
+    a simple bind to access your server, pass the credentials in O(bind_dn)
+    and O(bind_pw).
 author:
   - Sebastian Pfahl (@eryx12o45)
 requirements:
@@ -59,13 +59,21 @@ options:
     default: false
     type: bool
     description:
-      - Set to C(true) to return the full attribute schema of entries, not
-        their attribute values. Overrides I(attrs) when provided.
+      - Set to V(true) to return the full attribute schema of entries, not
+        their attribute values. Overrides O(attrs) when provided.
+  page_size:
+    default: 0
+    type: int
+    description:
+      - The page size when performing a simple paged result search (RFC 2696).
+        This setting can be tuned to reduce issues with timeouts and server limits.
+      - Setting the page size to V(0) (default) disables paged searching.
+    version_added: 7.1.0
   base64_attributes:
     description:
       - If provided, all attribute values returned that are listed in this option
         will be Base64 encoded.
-      - If the special value C(*) appears in this list, all attributes will be
+      - If the special value V(*) appears in this list, all attributes will be
         Base64 encoded.
       - All other attribute values will be converted to UTF-8 strings. If they
         contain binary data, please note that invalid UTF-8 bytes will be omitted.
@@ -102,7 +110,7 @@ results:
       value is a list.
     - Note that all values (for single-element lists) and list elements (for multi-valued
       lists) will be UTF-8 strings. Some might contain Base64-encoded binary data; which
-      ones is determined by the I(base64_attributes) option.
+      ones is determined by the O(base64_attributes) option.
   type: list
   elements: dict
 """
@@ -113,7 +121,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.six import string_types, text_type
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
+from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
 
 LDAP_IMP_ERR = None
 try:
@@ -133,9 +141,11 @@ def main():
             filter=dict(type='str', default='(objectClass=*)'),
             attrs=dict(type='list', elements='str'),
             schema=dict(type='bool', default=False),
+            page_size=dict(type='int', default=0),
             base64_attributes=dict(type='list', elements='str'),
         ),
         supports_check_mode=True,
+        required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:
@@ -180,6 +190,7 @@ class LdapSearch(LdapGeneric):
 
         self.filterstr = self.module.params['filter']
         self.attrlist = []
+        self.page_size = self.module.params['page_size']
         self._load_scope()
         self._load_attrs()
         self._load_schema()
@@ -209,22 +220,32 @@ class LdapSearch(LdapGeneric):
         self.module.exit_json(changed=False, results=results)
 
     def perform_search(self):
+        ldap_entries = []
+        controls = []
+        if self.page_size > 0:
+            controls.append(ldap.controls.libldap.SimplePagedResultsControl(True, size=self.page_size, cookie=''))
         try:
-            results = self.connection.search_s(
-                self.dn,
-                self.scope,
-                filterstr=self.filterstr,
-                attrlist=self.attrlist,
-                attrsonly=self.attrsonly
-            )
-            ldap_entries = []
-            for result in results:
-                if isinstance(result[1], dict):
-                    if self.schema:
-                        ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
-                    else:
-                        ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
-            return ldap_entries
+            while True:
+                response = self.connection.search_ext(
+                    self.dn,
+                    self.scope,
+                    filterstr=self.filterstr,
+                    attrlist=self.attrlist,
+                    attrsonly=self.attrsonly,
+                    serverctrls=controls,
+                )
+                rtype, results, rmsgid, serverctrls = self.connection.result3(response)
+                for result in results:
+                    if isinstance(result[1], dict):
+                        if self.schema:
+                            ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
+                        else:
+                            ldap_entries.append(_extract_entry(result[0], result[1], self._base64_attributes))
+                cookies = [c.cookie for c in serverctrls if c.controlType == ldap.controls.libldap.SimplePagedResultsControl.controlType]
+                if self.page_size > 0 and cookies and cookies[0]:
+                    controls[0].cookie = cookies[0]
+                else:
+                    return ldap_entries
         except ldap.NO_SUCH_OBJECT:
             self.module.fail_json(msg="Base not found: {0}".format(self.dn))
 

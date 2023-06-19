@@ -33,8 +33,8 @@ options:
     type: str
 notes:
   - This module requires the C(purity_fb) Python library
-  - You must set C(PUREFB_URL) and C(PUREFB_API) environment variables
-    if I(fb_url) and I(api_token) arguments are not passed to the module directly
+  - You must set E(PUREFB_URL) and E(PUREFB_API) environment variables
+    if O(fb_url) and O(api_token) arguments are not passed to the module directly
 requirements:
   - python >= 2.7
   - purity_fb >= 1.1
@@ -55,8 +55,8 @@ options:
     required: true
 notes:
   - This module requires the C(purestorage) Python library
-  - You must set C(PUREFA_URL) and C(PUREFA_API) environment variables
-    if I(fa_url) and I(api_token) arguments are not passed to the module directly
+  - You must set E(PUREFA_URL) and E(PUREFA_API) environment variables
+    if O(fa_url) and O(api_token) arguments are not passed to the module directly
 requirements:
   - python >= 2.7
   - purestorage

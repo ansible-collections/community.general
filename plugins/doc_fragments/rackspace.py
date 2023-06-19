@@ -15,18 +15,18 @@ class ModuleDocFragment(object):
 options:
   api_key:
     description:
-      - Rackspace API key, overrides I(credentials).
+      - Rackspace API key, overrides O(credentials).
     type: str
     aliases: [ password ]
   credentials:
     description:
-      - File to find the Rackspace credentials in. Ignored if I(api_key) and
-        I(username) are provided.
+      - File to find the Rackspace credentials in. Ignored if O(api_key) and
+        O(username) are provided.
     type: path
     aliases: [ creds_file ]
   env:
     description:
-      - Environment as configured in I(~/.pyrax.cfg),
+      - Environment as configured in C(~/.pyrax.cfg),
         see U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#pyrax-configuration).
     type: str
   region:
@@ -35,7 +35,7 @@ options:
     type: str
   username:
     description:
-      - Rackspace username, overrides I(credentials).
+      - Rackspace username, overrides O(credentials).
     type: str
   validate_certs:
     description:
@@ -46,12 +46,12 @@ requirements:
   - python >= 2.6
   - pyrax
 notes:
-  - The following environment variables can be used, C(RAX_USERNAME),
-    C(RAX_API_KEY), C(RAX_CREDS_FILE), C(RAX_CREDENTIALS), C(RAX_REGION).
-  - C(RAX_CREDENTIALS) and C(RAX_CREDS_FILE) points to a credentials file
+  - The following environment variables can be used, E(RAX_USERNAME),
+    E(RAX_API_KEY), E(RAX_CREDS_FILE), E(RAX_CREDENTIALS), E(RAX_REGION).
+  - E(RAX_CREDENTIALS) and E(RAX_CREDS_FILE) point to a credentials file
     appropriate for pyrax. See U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#authenticating)
-  - C(RAX_USERNAME) and C(RAX_API_KEY) obviate the use of a credentials file
-  - C(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...)
+  - E(RAX_USERNAME) and E(RAX_API_KEY) obviate the use of a credentials file
+  - E(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...)
 '''
 
     # Documentation fragment including attributes to enable communication
@@ -61,7 +61,7 @@ options:
   api_key:
     type: str
     description:
-      - Rackspace API key, overrides I(credentials).
+      - Rackspace API key, overrides O(credentials).
     aliases: [ password ]
   auth_endpoint:
     type: str
@@ -71,13 +71,13 @@ options:
   credentials:
     type: path
     description:
-      - File to find the Rackspace credentials in. Ignored if I(api_key) and
-        I(username) are provided.
+      - File to find the Rackspace credentials in. Ignored if O(api_key) and
+        O(username) are provided.
     aliases: [ creds_file ]
   env:
     type: str
     description:
-      - Environment as configured in I(~/.pyrax.cfg),
+      - Environment as configured in C(~/.pyrax.cfg),
         see U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#pyrax-configuration).
   identity_type:
     type: str
@@ -99,7 +99,7 @@ options:
   username:
     type: str
     description:
-      - Rackspace username, overrides I(credentials).
+      - Rackspace username, overrides O(credentials).
   validate_certs:
     description:
       - Whether or not to require SSL validation of API endpoints.
@@ -113,10 +113,10 @@ requirements:
   - python >= 2.6
   - pyrax
 notes:
-  - The following environment variables can be used, C(RAX_USERNAME),
-    C(RAX_API_KEY), C(RAX_CREDS_FILE), C(RAX_CREDENTIALS), C(RAX_REGION).
-  - C(RAX_CREDENTIALS) and C(RAX_CREDS_FILE) points to a credentials file
+  - The following environment variables can be used, E(RAX_USERNAME),
+    E(RAX_API_KEY), E(RAX_CREDS_FILE), E(RAX_CREDENTIALS), E(RAX_REGION).
+  - E(RAX_CREDENTIALS) and E(RAX_CREDS_FILE) points to a credentials file
     appropriate for pyrax. See U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#authenticating)
-  - C(RAX_USERNAME) and C(RAX_API_KEY) obviate the use of a credentials file
-  - C(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...)
+  - E(RAX_USERNAME) and E(RAX_API_KEY) obviate the use of a credentials file
+  - E(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...)
 '''

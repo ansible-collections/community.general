@@ -49,7 +49,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example C(fr-par)).
+      - Scaleway region to use (for example V(fr-par)).
     required: true
     choices:
       - fr-par
@@ -72,7 +72,7 @@ options:
     type: str
     description:
       - Default visibility policy.
-      - Everyone will be able to pull images from a C(public) registry.
+      - Everyone will be able to pull images from a V(public) registry.
     choices:
       - public
       - private
@@ -99,7 +99,7 @@ EXAMPLES = '''
 RETURN = '''
 container_registry:
   description: The container registry information.
-  returned: when I(state=present)
+  returned: when O(state=present)
   type: dict
   sample:
     created_at: "2022-10-14T09:51:07.949716Z"

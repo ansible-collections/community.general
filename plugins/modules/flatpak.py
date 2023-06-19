@@ -39,8 +39,8 @@ options:
   method:
     description:
     - The installation method to use.
-    - Defines if the I(flatpak) is supposed to be installed globally for the whole C(system)
-      or only for the current C(user).
+    - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system)
+      or only for the current V(user).
     type: str
     choices: [ system, user ]
     default: system
@@ -48,14 +48,14 @@ options:
     description:
     - The name of the flatpak to manage. To operate on several packages this
       can accept a list of packages.
-    - When used with I(state=present), I(name) can be specified as a URL to a
+    - When used with O(state=present), O(name) can be specified as a URL to a
       C(flatpakref) file or the unique reverse DNS name that identifies a flatpak.
     - Both C(https://) and C(http://) URLs are supported.
-    - When supplying a reverse DNS name, you can use the I(remote) option to specify on what remote
+    - When supplying a reverse DNS name, you can use the O(remote) option to specify on what remote
       to look for the flatpak. An example for a reverse DNS name is C(org.gnome.gedit).
-    - When used with I(state=absent), it is recommended to specify the name in the reverse DNS
+    - When used with O(state=absent), it is recommended to specify the name in the reverse DNS
       format.
-    - When supplying a URL with I(state=absent), the module will try to match the
+    - When supplying a URL with O(state=absent), the module will try to match the
       installed flatpak based on the name of the flatpakref to remove it. However, there is no
       guarantee that the names of the flatpakref file and the reverse DNS name of the installed
       flatpak do match.
@@ -74,7 +74,7 @@ options:
   remote:
     description:
     - The flatpak remote (repository) to install the flatpak from.
-    - By default, C(flathub) is assumed, but you do need to add the flathub flatpak_remote before
+    - By default, V(flathub) is assumed, but you do need to add the flathub flatpak_remote before
       you can use this.
     - See the M(community.general.flatpak_remote) module for managing flatpak remotes.
     type: str

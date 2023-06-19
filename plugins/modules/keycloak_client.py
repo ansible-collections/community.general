@@ -40,8 +40,8 @@ options:
     state:
         description:
             - State of the client
-            - On C(present), the client will be created (or updated if it exists already).
-            - On C(absent), the client will be removed if it exists
+            - On V(present), the client will be created (or updated if it exists already).
+            - On V(absent), the client will be removed if it exists
         choices: ['present', 'absent']
         default: 'present'
         type: str
@@ -55,7 +55,7 @@ options:
     client_id:
         description:
             - Client id of client to be worked on. This is usually an alphanumeric name chosen by
-              you. Either this or I(id) is required. If you specify both, I(id) takes precedence.
+              you. Either this or O(id) is required. If you specify both, O(id) takes precedence.
               This is 'clientId' in the Keycloak REST API.
         aliases:
             - clientId
@@ -63,13 +63,13 @@ options:
 
     id:
         description:
-            - Id of client to be worked on. This is usually an UUID. Either this or I(client_id)
+            - Id of client to be worked on. This is usually an UUID. Either this or O(client_id)
               is required. If you specify both, this takes precedence.
         type: str
 
     name:
         description:
-            - Name of the client (this is not the same as I(client_id)).
+            - Name of the client (this is not the same as O(client_id)).
         type: str
 
     description:
@@ -108,12 +108,12 @@ options:
 
     client_authenticator_type:
         description:
-            - How do clients authenticate with the auth server? Either C(client-secret) or
-              C(client-jwt) can be chosen. When using C(client-secret), the module parameter
-              I(secret) can set it, while for C(client-jwt), you can use the keys C(use.jwks.url),
-              C(jwks.url), and C(jwt.credential.certificate) in the I(attributes) module parameter
+            - How do clients authenticate with the auth server? Either V(client-secret) or
+              V(client-jwt) can be chosen. When using V(client-secret), the module parameter
+              O(secret) can set it, while for V(client-jwt), you can use the keys C(use.jwks.url),
+              C(jwks.url), and C(jwt.credential.certificate) in the O(attributes) module parameter
               to configure its behavior.
-              This is 'clientAuthenticatorType' in the Keycloak REST API.
+            - This is 'clientAuthenticatorType' in the Keycloak REST API.
         choices: ['client-secret', 'client-jwt']
         aliases:
             - clientAuthenticatorType
@@ -121,7 +121,7 @@ options:
 
     secret:
         description:
-            - When using I(client_authenticator_type) C(client-secret) (the default), you can
+            - When using O(client_authenticator_type=client-secret) (the default), you can
               specify a secret here (otherwise one will be generated if it does not exit). If
               changing this secret, the module will not register a change currently (but the
               changed secret will be saved).
@@ -246,7 +246,7 @@ options:
 
     protocol:
         description:
-            - Type of client (either C(openid-connect) or C(saml).
+            - Type of client.
         type: str
         choices: ['openid-connect', 'saml']
 
@@ -286,7 +286,7 @@ options:
 
     use_template_config:
         description:
-            - Whether or not to use configuration from the I(client_template).
+            - Whether or not to use configuration from the O(client_template).
               This is 'useTemplateConfig' in the Keycloak REST API.
         aliases:
             - useTemplateConfig
@@ -294,7 +294,7 @@ options:
 
     use_template_scope:
         description:
-            - Whether or not to use scope configuration from the I(client_template).
+            - Whether or not to use scope configuration from the O(client_template).
               This is 'useTemplateScope' in the Keycloak REST API.
         aliases:
             - useTemplateScope
@@ -302,7 +302,7 @@ options:
 
     use_template_mappers:
         description:
-            - Whether or not to use mapper configuration from the I(client_template).
+            - Whether or not to use mapper configuration from the O(client_template).
               This is 'useTemplateMappers' in the Keycloak REST API.
         aliases:
             - useTemplateMappers
@@ -391,38 +391,37 @@ options:
 
             protocol:
                 description:
-                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper.
-                      is active.
+                    - This specifies for which protocol this protocol mapper is active.
                 choices: ['openid-connect', 'saml']
                 type: str
 
             protocolMapper:
                 description:
-                    - The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
+                    - "The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
                       impossible to provide since this may be extended through SPIs by the user of Keycloak,
-                      by default Keycloak as of 3.4 ships with at least
-                    - C(docker-v2-allow-all-mapper)
-                    - C(oidc-address-mapper)
-                    - C(oidc-full-name-mapper)
-                    - C(oidc-group-membership-mapper)
-                    - C(oidc-hardcoded-claim-mapper)
-                    - C(oidc-hardcoded-role-mapper)
-                    - C(oidc-role-name-mapper)
-                    - C(oidc-script-based-protocol-mapper)
-                    - C(oidc-sha256-pairwise-sub-mapper)
-                    - C(oidc-usermodel-attribute-mapper)
-                    - C(oidc-usermodel-client-role-mapper)
-                    - C(oidc-usermodel-property-mapper)
-                    - C(oidc-usermodel-realm-role-mapper)
-                    - C(oidc-usersessionmodel-note-mapper)
-                    - C(saml-group-membership-mapper)
-                    - C(saml-hardcode-attribute-mapper)
-                    - C(saml-hardcode-role-mapper)
-                    - C(saml-role-list-mapper)
-                    - C(saml-role-name-mapper)
-                    - C(saml-user-attribute-mapper)
-                    - C(saml-user-property-mapper)
-                    - C(saml-user-session-note-mapper)
+                      by default Keycloak as of 3.4 ships with at least:"
+                    - V(docker-v2-allow-all-mapper)
+                    - V(oidc-address-mapper)
+                    - V(oidc-full-name-mapper)
+                    - V(oidc-group-membership-mapper)
+                    - V(oidc-hardcoded-claim-mapper)
+                    - V(oidc-hardcoded-role-mapper)
+                    - V(oidc-role-name-mapper)
+                    - V(oidc-script-based-protocol-mapper)
+                    - V(oidc-sha256-pairwise-sub-mapper)
+                    - V(oidc-usermodel-attribute-mapper)
+                    - V(oidc-usermodel-client-role-mapper)
+                    - V(oidc-usermodel-property-mapper)
+                    - V(oidc-usermodel-realm-role-mapper)
+                    - V(oidc-usersessionmodel-note-mapper)
+                    - V(saml-group-membership-mapper)
+                    - V(saml-hardcode-attribute-mapper)
+                    - V(saml-hardcode-role-mapper)
+                    - V(saml-role-list-mapper)
+                    - V(saml-role-name-mapper)
+                    - V(saml-user-attribute-mapper)
+                    - V(saml-user-property-mapper)
+                    - V(saml-user-session-note-mapper)
                     - An exhaustive list of available mappers on your installation can be obtained on
                       the admin console by going to Server Info -> Providers and looking under
                       'protocol-mapper'.
@@ -431,10 +430,10 @@ options:
             config:
                 description:
                     - Dict specifying the configuration options for the protocol mapper; the
-                      contents differ depending on the value of I(protocolMapper) and are not documented
+                      contents differ depending on the value of O(protocol_mappers[].protocolMapper) and are not documented
                       other than by the source of the mappers and its parent class(es). An example is given
                       below. It is easiest to obtain valid config values by dumping an already-existing
-                      protocol mapper configuration through check-mode in the I(existing) field.
+                      protocol mapper configuration through check-mode in the RV(existing) field.
                 type: dict
 
     attributes:
@@ -478,7 +477,7 @@ options:
 
             saml.signature.algorithm:
                 description:
-                    - Signature algorithm used to sign SAML documents. One of C(RSA_SHA256), C(RSA_SHA1), C(RSA_SHA512), or C(DSA_SHA1).
+                    - Signature algorithm used to sign SAML documents. One of V(RSA_SHA256), V(RSA_SHA1), V(RSA_SHA512), or V(DSA_SHA1).
 
             saml.signing.certificate:
                 description:
@@ -503,15 +502,15 @@ options:
 
             saml_name_id_format:
                 description:
-                    - For SAML clients, the NameID format to use (one of C(username), C(email), C(transient), or C(persistent))
+                    - For SAML clients, the NameID format to use (one of V(username), V(email), V(transient), or V(persistent))
 
             saml_signature_canonicalization_method:
                 description:
                     - SAML signature canonicalization method. This is one of four values, namely
-                      C(http://www.w3.org/2001/10/xml-exc-c14n#) for EXCLUSIVE,
-                      C(http://www.w3.org/2001/10/xml-exc-c14n#WithComments) for EXCLUSIVE_WITH_COMMENTS,
-                      C(http://www.w3.org/TR/2001/REC-xml-c14n-20010315) for INCLUSIVE, and
-                      C(http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments) for INCLUSIVE_WITH_COMMENTS.
+                      V(http://www.w3.org/2001/10/xml-exc-c14n#) for EXCLUSIVE,
+                      V(http://www.w3.org/2001/10/xml-exc-c14n#WithComments) for EXCLUSIVE_WITH_COMMENTS,
+                      V(http://www.w3.org/TR/2001/REC-xml-c14n-20010315) for INCLUSIVE, and
+                      V(http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments) for INCLUSIVE_WITH_COMMENTS.
 
             saml_single_logout_service_url_post:
                 description:
@@ -523,12 +522,12 @@ options:
 
             user.info.response.signature.alg:
                 description:
-                    - For OpenID-Connect clients, JWA algorithm for signed UserInfo-endpoint responses. One of C(RS256) or C(unsigned).
+                    - For OpenID-Connect clients, JWA algorithm for signed UserInfo-endpoint responses. One of V(RS256) or V(unsigned).
 
             request.object.signature.alg:
                 description:
                     - For OpenID-Connect clients, JWA algorithm which the client needs to use when sending
-                      OIDC request object. One of C(any), C(none), C(RS256).
+                      OIDC request object. One of V(any), V(none), V(RS256).
 
             use.jwks.url:
                 description:

@@ -532,6 +532,8 @@ files:
     notify: jlozadad
   $modules/gitlab_branch.py:
     maintainers: paytroff
+  $modules/gitlab_merge_request.py:
+    maintainers: zvaraondrej
   $modules/gitlab_project_variable.py:
     maintainers: markuman
   $modules/gitlab_instance_variable.py:
@@ -707,6 +709,8 @@ files:
     maintainers: fynncfchen
   $modules/keycloak_role.py:
     maintainers: laurpaum
+  $modules/keycloak_user.py:
+    maintainers: elfelip
   $modules/keycloak_user_federation.py:
     maintainers: laurpaum
   $modules/keycloak_user_rolemapping.py:
@@ -753,6 +757,8 @@ files:
     maintainers: nerzhul
   $modules/lvg.py:
     maintainers: abulimov
+  $modules/lvg_rename.py:
+    maintainers: lszomor
   $modules/lvol.py:
     maintainers: abulimov jhoekx zigaSRC unkaputtbar112
   $modules/lxc_container.py:

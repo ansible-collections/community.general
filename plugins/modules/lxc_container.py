@@ -111,7 +111,7 @@ options:
           - debug
           - DEBUG
         description:
-          - Set the log level for a container where I(container_log) was set.
+          - Set the log level for a container where O(container_log) was set.
         type: str
         required: false
         default: INFO
@@ -158,7 +158,7 @@ options:
           - clone
         description:
           - Define the state of a container.
-          - If you clone a container using I(clone_name) the newly cloned
+          - If you clone a container using O(clone_name) the newly cloned
             container created in a stopped state.
           - The running container will be stopped while the clone operation is
             happening and upon completion of the clone the original container
@@ -178,17 +178,17 @@ notes:
   - Containers must have a unique name. If you attempt to create a container
     with a name that already exists in the users namespace the module will
     simply return as "unchanged".
-  - The I(container_command) can be used with any state except C(absent). If
-    used with state C(stopped) the container will be C(started), the command
-    executed, and then the container C(stopped) again. Likewise if I(state=stopped)
+  - The O(container_command) can be used with any state except V(absent). If
+    used with state V(stopped) the container will be V(started), the command
+    executed, and then the container V(stopped) again. Likewise if O(state=stopped)
     and the container does not exist it will be first created,
-    C(started), the command executed, and then C(stopped). If you use a "|"
+    V(started), the command executed, and then V(stopped). If you use a "|"
     in the variable you can use common script formatting within the variable
-    itself. The I(container_command) option will always execute as BASH.
-    When using I(container_command), a log file is created in the C(/tmp/) directory
+    itself. The O(container_command) option will always execute as BASH.
+    When using O(container_command), a log file is created in the C(/tmp/) directory
     which contains both C(stdout) and C(stderr) of any command executed.
-  - If I(archive=true) the system will attempt to create a compressed
-    tarball of the running container. The I(archive) option supports LVM backed
+  - If O(archive=true) the system will attempt to create a compressed
+    tarball of the running container. The O(archive) option supports LVM backed
     containers and will create a snapshot of the running container when
     creating the archive.
   - If your distro does not have a package for C(python3-lxc), which is a

@@ -68,7 +68,7 @@ DOCUMENTATION = '''
               - section: machinectl_become_plugin
                 key: password
     notes:
-      - When not using this plugin with user C(root), it only works correctly with a polkit rule which will alter
+      - When not using this plugin with user V(root), it only works correctly with a polkit rule which will alter
         the behaviour of machinectl. This rule must alter the prompt behaviour to ask directly for the user credentials,
         if the user is allowed to perform the action (take a look at the examples section).
         If such a rule is not present the plugin only work if it is used in context with the root user,

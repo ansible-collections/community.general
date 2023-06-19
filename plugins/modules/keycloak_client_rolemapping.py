@@ -43,8 +43,8 @@ options:
     state:
         description:
             - State of the client_rolemapping.
-            - On C(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the client_rolemapping will be removed if it exists.
+            - On V(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+            - On V(absent), the client_rolemapping will be removed if it exists.
         default: 'present'
         type: str
         choices:
@@ -63,6 +63,33 @@ options:
             - Name of the group to be mapped.
             - This parameter is required (can be replaced by gid for less API call).
 
+    parents:
+        version_added: "7.1.0"
+        type: list
+        description:
+            - List of parent groups for the group to handle sorted top to bottom.
+            - >-
+              Set this if your group is a subgroup and you do not provide the GID in O(gid).
+        elements: dict
+        suboptions:
+          id:
+            type: str
+            description:
+              - Identify parent by ID.
+              - Needs less API calls than using O(parents[].name).
+              - A deep parent chain can be started at any point when first given parent is given as ID.
+              - Note that in principle both ID and name can be specified at the same time
+                but current implementation only always use just one of them, with ID
+                being preferred.
+          name:
+            type: str
+            description:
+              - Identify parent by name.
+              - Needs more internal API calls than using O(parents[].id) to map names to ID's under the hood.
+              - When giving a parent chain with only names it must be complete up to the top.
+              - Note that in principle both ID and name can be specified at the same time
+                but current implementation only always use just one of them, with ID
+                being preferred.
     gid:
         type: str
         description:
@@ -73,7 +100,7 @@ options:
     client_id:
         type: str
         description:
-            - Name of the client to be mapped (different than I(cid)).
+            - Name of the client to be mapped (different than O(cid)).
             - This parameter is required (can be replaced by cid for less API call).
 
     cid:
@@ -137,6 +164,24 @@ EXAMPLES = '''
     state: present
     client_id: client1
     group_name: group1
+    roles:
+      - name: role_name1
+        id: role_id1
+      - name: role_name2
+        id: role_id2
+  delegate_to: localhost
+
+- name: Map a client role to a subgroup, authentication with token
+  community.general.keycloak_client_rolemapping:
+    realm: MyCustomRealm
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    token: TOKEN
+    state: present
+    client_id: client1
+    group_name: subgroup1
+    parents:
+      - name: parent-group
     roles:
       - name: role_name1
         id: role_id1
@@ -230,6 +275,13 @@ def main():
         realm=dict(default='master'),
         gid=dict(type='str'),
         group_name=dict(type='str'),
+        parents=dict(
+            type='list', elements='dict',
+            options=dict(
+                id=dict(type='str'),
+                name=dict(type='str')
+            ),
+        ),
         cid=dict(type='str'),
         client_id=dict(type='str'),
         roles=dict(type='list', elements='dict', options=roles_spec),
@@ -259,6 +311,7 @@ def main():
     gid = module.params.get('gid')
     group_name = module.params.get('group_name')
     roles = module.params.get('roles')
+    parents = module.params.get('parents')
 
     # Check the parameters
     if cid is None and client_id is None:
@@ -268,7 +321,7 @@ def main():
 
     # Get the potential missing parameters
     if gid is None:
-        group_rep = kc.get_group_by_name(group_name, realm=realm)
+        group_rep = kc.get_group_by_name(group_name, realm=realm, parents=parents)
         if group_rep is not None:
             gid = group_rep['id']
         else:

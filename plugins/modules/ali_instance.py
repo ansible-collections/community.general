@@ -51,12 +51,12 @@ options:
       type: str
     image_id:
       description:
-        - Image ID used to launch instances. Required when I(state=present) and creating new ECS instances.
+        - Image ID used to launch instances. Required when O(state=present) and creating new ECS instances.
       aliases: ['image']
       type: str
     instance_type:
       description:
-        - Instance type used to launch instances. Required when I(state=present) and creating new ECS instances.
+        - Instance type used to launch instances. Required when O(state=present) and creating new ECS instances.
       aliases: ['type']
       type: str
     security_groups:
@@ -95,7 +95,7 @@ options:
     max_bandwidth_out:
       description:
         - Maximum outgoing bandwidth to the public network, measured in Mbps (Megabits per second).
-          Required when I(allocate_public_ip=true). Ignored when I(allocate_public_ip=false).
+          Required when O(allocate_public_ip=true). Ignored when O(allocate_public_ip=false).
       default: 0
       type: int
     host_name:
@@ -134,16 +134,16 @@ options:
       type: str
     count:
       description:
-        - The number of the new instance. An integer value which indicates how many instances that match I(count_tag)
+        - The number of the new instance. An integer value which indicates how many instances that match O(count_tag)
           should be running. Instances are either created or terminated based on this value.
       default: 1
       type: int
     count_tag:
       description:
-      - I(count) determines how many instances based on a specific tag criteria should be present.
+      - O(count) determines how many instances based on a specific tag criteria should be present.
         This can be expressed in multiple ways and is shown in the EXAMPLES section.
-        The specified count_tag must already exist or be passed in as the I(tags) option.
-        If it is not specified, it will be replaced by I(instance_name).
+        The specified count_tag must already exist or be passed in as the O(tags) option.
+        If it is not specified, it will be replaced by O(instance_name).
       type: str
     allocate_public_ip:
       description:
@@ -159,7 +159,7 @@ options:
       type: str
     period:
       description:
-        - The charge duration of the instance, in months. Required when I(instance_charge_type=PrePaid).
+        - The charge duration of the instance, in months. Required when O(instance_charge_type=PrePaid).
         - The valid value are [1-9, 12, 24, 36].
       default: 1
       type: int
@@ -170,13 +170,13 @@ options:
       default: false
     auto_renew_period:
       description:
-        - The duration of the automatic renew the charge of the instance. Required when I(auto_renew=true).
+        - The duration of the automatic renew the charge of the instance. Required when O(auto_renew=true).
       choices: [1, 2, 3, 6, 12]
       type: int
     instance_ids:
       description:
         - A list of instance ids. It is required when need to operate existing instances.
-          If it is specified, I(count) will lose efficacy.
+          If it is specified, O(count) will lose efficacy.
       type: list
       elements: str
     force:
@@ -186,7 +186,7 @@ options:
       type: bool
     tags:
       description:
-        - A hash/dictionaries of instance tags, to add to the new instance or for starting/stopping instance by tag. C({"key":"value"})
+        - A hash/dictionaries of instance tags, to add to the new instance or for starting/stopping instance by tag. V({"key":"value"})
       aliases: ["instance_tags"]
       type: dict
       version_added: '0.2.0'
@@ -229,7 +229,7 @@ options:
       version_added: '0.2.0'
     period_unit:
       description:
-        - The duration unit that you will buy the resource. It is valid when I(instance_charge_type=PrePaid).
+        - The duration unit that you will buy the resource. It is valid when O(instance_charge_type=PrePaid).
       choices: ['Month', 'Week']
       default: 'Month'
       type: str
@@ -237,10 +237,10 @@ options:
     dry_run:
       description:
         - Specifies whether to send a dry-run request.
-        - If I(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the
+        - If O(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the
           required parameters are set, and validates the request format, service permissions, and available ECS instances.
           If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
-        - If I(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
+        - If O(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
       default: false
       type: bool
       version_added: '0.2.0'

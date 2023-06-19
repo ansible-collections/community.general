@@ -18,7 +18,7 @@ description:
   - Allows users to add or remove flatpak remotes.
   - The flatpak remotes concept is comparable to what is called repositories in other packaging
     formats.
-  - Currently, remote addition is only supported via I(flatpakrepo) file URLs.
+  - Currently, remote addition is only supported via C(flatpakrepo) file URLs.
   - Existing remotes will not be updated.
   - See the M(community.general.flatpak) module for managing flatpaks.
 author:
@@ -42,26 +42,26 @@ options:
     default: flatpak
   flatpakrepo_url:
     description:
-    - The URL to the I(flatpakrepo) file representing the repository remote to add.
-    - When used with I(state=present), the flatpak remote specified under the I(flatpakrepo_url)
-      is added using the specified installation C(method).
-    - When used with I(state=absent), this is not required.
-    - Required when I(state=present).
+    - The URL to the C(flatpakrepo) file representing the repository remote to add.
+    - When used with O(state=present), the flatpak remote specified under the O(flatpakrepo_url)
+      is added using the specified installation O(method).
+    - When used with O(state=absent), this is not required.
+    - Required when O(state=present).
     type: str
   method:
     description:
     - The installation method to use.
-    - Defines if the I(flatpak) is supposed to be installed globally for the whole C(system)
-      or only for the current C(user).
+    - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system)
+      or only for the current V(user).
     type: str
     choices: [ system, user ]
     default: system
   name:
     description:
     - The desired name for the flatpak remote to be registered under on the managed host.
-    - When used with I(state=present), the remote will be added to the managed host under
-      the specified I(name).
-    - When used with I(state=absent) the remote with that name will be removed.
+    - When used with O(state=present), the remote will be added to the managed host under
+      the specified O(name).
+    - When used with O(state=absent) the remote with that name will be removed.
     type: str
     required: true
   state:

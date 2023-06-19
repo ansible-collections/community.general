@@ -34,17 +34,17 @@ options:
     name:
         description:
             - Name or list of names of the package(s) or file(s) to install, upgrade, or remove.
-              Can't be used in combination with C(upgrade).
+              Cannot be used in combination with O(upgrade).
         aliases: [ package, pkg ]
         type: list
         elements: str
 
     state:
         description:
-          - Whether to install (C(present) or C(installed), C(latest)), or remove (C(absent) or C(removed)) a package.
-          - C(present) and C(installed) will simply ensure that a desired package is installed.
-          - C(latest) will update the specified package if it is not of the latest available version.
-          - C(absent) and C(removed) will remove the specified package.
+          - Whether to install (V(present) or V(installed), V(latest)), or remove (V(absent) or V(removed)) a package.
+          - V(present) and V(installed) will simply ensure that a desired package is installed.
+          - V(latest) will update the specified package if it is not of the latest available version.
+          - V(absent) and V(removed) will remove the specified package.
         default: present
         choices: [ absent, installed, latest, present, removed ]
         type: str
@@ -52,9 +52,9 @@ options:
     force:
         description:
             - When removing packages, forcefully remove them, without any checks.
-              Same as I(extra_args="--nodeps --nodeps").
-              When combined with I(update_cache), force a refresh of all package databases.
-              Same as I(update_cache_extra_args="--refresh --refresh").
+              Same as O(extra_args="--nodeps --nodeps").
+            - When combined with O(update_cache), force a refresh of all package databases.
+              Same as O(update_cache_extra_args="--refresh --refresh").
         default: false
         type: bool
 
@@ -79,7 +79,7 @@ options:
 
     extra_args:
         description:
-            - Additional option to pass to pacman when enforcing C(state).
+            - Additional option to pass to pacman when enforcing O(state).
         default: ''
         type: str
 
@@ -87,28 +87,28 @@ options:
         description:
             - Whether or not to refresh the master package lists.
             - This can be run as part of a package installation or as a separate step.
-            - If not specified, it defaults to C(false).
+            - If not specified, it defaults to V(false).
             - Please note that this option only had an influence on the module's C(changed) state
-              if I(name) and I(upgrade) are not specified before community.general 5.0.0.
+              if O(name) and O(upgrade) are not specified before community.general 5.0.0.
               See the examples for how to keep the old behavior.
         type: bool
 
     update_cache_extra_args:
         description:
-            - Additional option to pass to pacman when enforcing C(update_cache).
+            - Additional option to pass to pacman when enforcing O(update_cache).
         default: ''
         type: str
 
     upgrade:
         description:
             - Whether or not to upgrade the whole system.
-              Can't be used in combination with C(name).
-            - If not specified, it defaults to C(false).
+              Cannot be used in combination with O(name).
+            - If not specified, it defaults to V(false).
         type: bool
 
     upgrade_extra_args:
         description:
-            - Additional option to pass to pacman when enforcing C(upgrade).
+            - Additional option to pass to pacman when enforcing O(upgrade).
         default: ''
         type: str
 
@@ -121,8 +121,8 @@ options:
 
     reason_for:
         description:
-            - Set the install reason for C(all) packages or only for C(new) packages.
-            - In case of I(state=latest) already installed packages which will be updated to a newer version are not counted as C(new).
+            - Set the install reason for V(all) packages or only for V(new) packages.
+            - In case of O(state=latest) already installed packages which will be updated to a newer version are not counted as V(new).
         default: new
         choices: [ all, new ]
         type: str
@@ -130,8 +130,8 @@ options:
 
 notes:
   - When used with a C(loop:) each package will be processed individually,
-    it is much more efficient to pass the list directly to the I(name) option.
-  - To use an AUR helper (I(executable) option), a few extra setup steps might be required beforehand.
+    it is much more efficient to pass the list directly to the O(name) option.
+  - To use an AUR helper (O(executable) option), a few extra setup steps might be required beforehand.
     For example, a dedicated build user with permissions to install packages could be necessary.
 """
 
@@ -139,11 +139,11 @@ RETURN = """
 packages:
     description:
         - A list of packages that have been changed.
-        - Before community.general 4.5.0 this was only returned when I(upgrade=true).
+        - Before community.general 4.5.0 this was only returned when O(upgrade=true).
           In community.general 4.5.0, it was sometimes omitted when the package list is empty,
-          but since community.general 4.6.0 it is always returned when I(name) is specified or
-          I(upgrade=true).
-    returned: success and I(name) is specified or I(upgrade=true)
+          but since community.general 4.6.0 it is always returned when O(name) is specified or
+          O(upgrade=true).
+    returned: success and O(name) is specified or O(upgrade=true)
     type: list
     elements: str
     sample: [ package, other-package ]
@@ -151,8 +151,8 @@ packages:
 cache_updated:
     description:
         - The changed status of C(pacman -Sy).
-        - Useful when I(name) or I(upgrade=true) are specified next to I(update_cache=true).
-    returned: success, when I(update_cache=true)
+        - Useful when O(name) or O(upgrade=true) are specified next to O(update_cache=true).
+    returned: success, when O(update_cache=true)
     type: bool
     sample: false
     version_added: 4.6.0
