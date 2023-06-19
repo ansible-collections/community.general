@@ -1,0 +1,59 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Skip UUID reset tests for FreeBSD due to "xfs_admin: only 'rewrite' supported on V5 fs"
+- when:
+    - new_uuid | default(False)
+    - not (ansible_system == "FreeBSD" and fstype == "xfs")
+  block:
+  - name: "Create filesystem ({{ fstype }})"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+    register: fs_result
+
+  - name: "Get UUID of created filesystem"
+    ansible.builtin.shell:
+      cmd: "{{ get_uuid_cmd }}"
+    changed_when: false
+    register: uuid
+
+  - name: "Reset filesystem ({{ fstype }}) UUID"
+    community.general.filesystem:
+      dev: '{{ dev }}'
+      fstype: '{{ fstype }}'
+      uuid: "{{ new_uuid }}"
+    register: fs_resetuuid_result
+
+  - name: "Get UUID of the filesystem"
+    ansible.builtin.shell:
+      cmd: "{{ get_uuid_cmd }}"
+    changed_when: false
+    register: uuid2
+
+  - name: "Assert that filesystem UUID is changed"
+    ansible.builtin.assert:
+      that:
+        - 'fs_resetuuid_result is changed'
+        - 'fs_resetuuid_result is success'
+        - 'uuid.stdout != uuid2.stdout'
+
+  - when:
+    - (grow | bool and (fstype != "vfat" or resize_vfat)) or
+      (fstype == "xfs" and ansible_system == "Linux" and
+      ansible_distribution not in ["CentOS", "Ubuntu"])
+    block:
+    - name: "Reset filesystem ({{ fstype }}) UUID and resizefs"
+      ignore_errors: true
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        uuid: "{{ new_uuid }}"
+        resizefs: true
+      register: fs_resetuuid_and_resizefs_result
+
+    - name: "Assert that filesystem UUID reset and resizefs failed"
+      ansible.builtin.assert:
+        that: fs_resetuuid_and_resizefs_result is failed
