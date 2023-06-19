@@ -189,8 +189,10 @@ stages:
           targets:
             - name: macOS 13.2
               test: macos/13.2
-            - name: RHEL 9.1
-              test: rhel/9.1
+            - name: RHEL 9.2
+              test: rhel/9.2
+            - name: RHEL 8.8
+              test: rhel/8.8
             - name: FreeBSD 13.2
               test: freebsd/13.2
             - name: FreeBSD 12.4
@@ -207,6 +209,10 @@ stages:
         parameters:
           testFormat: 2.15/{0}
           targets:
+            - name: RHEL 9.1
+              test: rhel/9.1
+            - name: RHEL 8.7
+              test: rhel/8.7
             - name: RHEL 7.9
               test: rhel/7.9
             - name: FreeBSD 13.1
