@@ -333,7 +333,7 @@ def main():
     meta_args = dict(
         realm=dict(type='str', required=True),
         alias=dict(type='str', required=True),
-        providerId=dict(type='str'),
+        providerId=dict(type='str', choices=["basic-flow", "client-flow"], default="basic-flow"),
         description=dict(type='str'),
         copyFrom=dict(type='str'),
         authenticationExecutions=dict(type='list', elements='dict',
