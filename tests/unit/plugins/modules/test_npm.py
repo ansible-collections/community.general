@@ -211,7 +211,7 @@ class NPMModuleTestCase(ModuleTestCase):
             'production': 'true',
             'global': 'true',
             'state': 'present',
-        })
+
         self.module_main_command.side_effect = [
             (0, '{}', ''),
             (0, '{}', ''),
