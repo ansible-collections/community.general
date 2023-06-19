@@ -605,7 +605,7 @@ def main():
             ('state', 'present', ['fstype'])
         ],
         mutually_exclusive=[
-            ('resizefs', 'uuid')
+            ('resizefs', 'uuid'),
         ],
         supports_check_mode=True,
     )
@@ -670,8 +670,6 @@ def main():
 
                 module.exit_json(changed=True, msg=out)
             elif uuid:
-                if not filesystem.CHANGE_UUID:
-                    module.fail_json(changed=False, msg="module does not support UUID change for %s filesystem yet." % fstype)
 
                 out = filesystem.change_uuid(new_uuid=uuid, dev=dev)
 
