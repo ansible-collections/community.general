@@ -300,8 +300,9 @@ class TSSClient(object):
                             i['itemValue'] = "*** Not Valid For Display ***"
                 else:
                     raise AnsibleOptionsError("File download path does not exist")
-
-        return self._client.get_secret_json(secret_id)
+            return obj
+        else:
+            return self._client.get_secret_json(secret_id)
 
     def get_secret_ids_by_folderid(self, term):
         display.debug("tss_lookup term: %s" % term)
