@@ -1,0 +1,25 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Contributors to the Ansible project
+# Based on the integraton test for the lvg module
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required packages (Linux)
+  when: ansible_system == 'Linux'
+  ansible.builtin.package:
+    name: lvm2
+    state: present
+
+- name: Test lvg_rename module
+  block:
+    - import_tasks: setup.yml
+
+    - import_tasks: test.yml
+
+  always:
+    - import_tasks: teardown.yml
