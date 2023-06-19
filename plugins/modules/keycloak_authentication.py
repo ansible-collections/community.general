@@ -279,6 +279,8 @@ def create_or_update_executions(kc, config, realm='master'):
                     # Compare the executions to see if it need changes
                     if not is_struct_included(new_exec, existing_executions[exec_index], exclude_key) or exec_index != new_exec_index:
                         exec_found = True
+                        if new_exec['index'] is None:
+                            new_exec_index = exec_index
                         before += str(existing_executions[exec_index]) + '\n'
                     id_to_update = existing_executions[exec_index]["id"]
                     # Remove exec from list in case 2 exec with same name
