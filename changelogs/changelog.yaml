@@ -1402,3 +1402,25 @@ releases:
     - deps.yml
     - passwordstore-lock.yml
     release_date: '2023-05-22'
+  6.6.2:
+    changes:
+      bugfixes:
+      - csv module utils - detects and remove unicode BOM markers from incoming CSV
+        content (https://github.com/ansible-collections/community.general/pull/6662).
+      - gitlab_group - the module passed parameters to the API call even when not
+        set. The module is now filtering out ``None`` values to remediate this (https://github.com/ansible-collections/community.general/pull/6712).
+      - ini_file - fix a bug where the inactive options were not used when possible
+        (https://github.com/ansible-collections/community.general/pull/6575).
+      - keycloak module utils - fix ``is_struct_included`` handling of lists of lists/dictionaries
+        (https://github.com/ansible-collections/community.general/pull/6688).
+      - keycloak module utils - the function ``get_user_by_username`` now return the
+        user representation or ``None`` as stated in the documentation (https://github.com/ansible-collections/community.general/pull/6758).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 6.6.2.yml
+    - 6568-fix-get-user-by-username-in-keycloak-module-utils.yml
+    - 6662-csv-bom.yml
+    - 6688-is-struct-included-bug-in-keycloak-py.yml
+    - 6712-gitlab_group-filtered-for-none-values.yml
+    - ini_file-use-inactive-options-when-possible.yml
+    release_date: '2023-06-19'
