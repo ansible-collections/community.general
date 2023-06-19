@@ -18,10 +18,20 @@
   block:
     - import_tasks: setup.yml
 
+    - import_tasks: setup_missing_pv.yml
+
     - import_tasks: test_indempotency.yml
 
     - import_tasks: test_grow_reduce.yml
 
     - import_tasks: test_pvresize.yml
+
+    - import_tasks: test_active_change.yml
+
+    - import_tasks: test_active_create.yml
+
+    - import_tasks: test_uuid_reset.yml
   always:
     - import_tasks: teardown.yml
+
+    - import_tasks: teardown_missing_pv.yml
