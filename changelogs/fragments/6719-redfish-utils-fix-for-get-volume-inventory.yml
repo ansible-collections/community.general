@@ -1,2 +1,2 @@
 minor_changes:
-  - redfish_utils module utils - fix for ``GetVolumeInventory`` (https://github.com/ansible-collections/community.general/pull/6719).
+  - redfish_utils module utils - fix for ``GetVolumeInventory``, Controller name was getting pouplate correctly and duplicates were seen in the volumes retrieved (https://github.com/ansible-collections/community.general/pull/6719).
