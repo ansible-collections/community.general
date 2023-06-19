@@ -1323,18 +1323,18 @@ def main():
             module.fail_json(vmid=vmid, msg='Unable to migrate VM {0} from {1} to {2}: {3}'.format(vmid, vm_node, node, e))
 
     if state == 'present':
-        try:
-            if proxmox.get_vm(vmid, ignore_missing=True) and not (update or clone):
-                module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
-            elif proxmox.get_vmid(name, ignore_missing=True) and not (update or clone):
-                module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
-            elif not node:
-                module.fail_json(msg='node is mandatory for creating/updating VM')
-            elif update and not any([vmid, name]):
-                module.fail_json(msg='vmid or name is mandatory for updating VM')
-            elif not proxmox.get_node(node):
-                module.fail_json(msg="node '%s' does not exist in cluster" % node)
+        if not (update or clone) and proxmox.get_vm(vmid, ignore_missing=True):
+            module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
+        elif not (update or clone or vmid) and proxmox.get_vmid(name, ignore_missing=True):
+            module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
+        elif not node:
+            module.fail_json(msg='node is mandatory for creating/updating VM')
+        elif update and not any([vmid, name]):
+            module.fail_json(msg='vmid or name is mandatory for updating VM')
+        elif not proxmox.get_node(node):
+            module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
+        try:
             proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
                               archive=module.params['archive'],
                               acpi=module.params['acpi'],
@@ -1405,12 +1405,6 @@ def main():
                                    sata=module.params['sata'],
                                    scsi=module.params['scsi'],
                                    virtio=module.params['virtio'])
-            if update:
-                module.exit_json(changed=True, vmid=vmid, msg="VM %s with vmid %s updated" % (name, vmid))
-            elif clone is not None:
-                module.exit_json(changed=True, vmid=newid, msg="VM %s with newid %s cloned from vm with vmid %s" % (name, newid, vmid))
-            else:
-                module.exit_json(changed=True, msg="VM %s with vmid %s deployed" % (name, vmid), **results)
         except Exception as e:
             if update:
                 module.fail_json(vmid=vmid, msg="Unable to update vm {0} with vmid {1}=".format(name, vmid) + str(e))
@@ -1419,11 +1413,19 @@ def main():
             else:
                 module.fail_json(vmid=vmid, msg="creation of qemu VM %s with vmid %s failed with exception=%s" % (name, vmid, e))
 
+        if update:
+            module.exit_json(changed=True, vmid=vmid, msg="VM %s with vmid %s updated" % (name, vmid))
+        elif clone is not None:
+            module.exit_json(changed=True, vmid=newid, msg="VM %s with newid %s cloned from vm with vmid %s" % (name, newid, vmid))
+        else:
+            module.exit_json(changed=True, msg="VM %s with vmid %s deployed" % (name, vmid), **results)
+
     elif state == 'started':
+        if not vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
         status = {}
         try:
-            if not vmid:
-                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
             vm = proxmox.get_vm(vmid)
             status['status'] = vm['status']
             if vm['status'] == 'running':
@@ -1435,11 +1437,11 @@ def main():
             module.fail_json(vmid=vmid, msg="starting of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'stopped':
+        if not vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
         status = {}
         try:
-            if not vmid:
-                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
-
             vm = proxmox.get_vm(vmid)
 
             status['status'] = vm['status']
@@ -1452,11 +1454,11 @@ def main():
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'restarted':
+        if not vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
         status = {}
         try:
-            if not vmid:
-                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
-
             vm = proxmox.get_vm(vmid)
             status['status'] = vm['status']
             if vm['status'] == 'stopped':
@@ -1471,6 +1473,7 @@ def main():
         status = {}
         if not vmid:
             module.exit_json(changed=False, msg='VM with name = %s is already absent' % name)
+
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:

@@ -107,19 +107,30 @@ class ProxmoxAnsible(object):
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
 
     def version(self):
-        apireturn = self.proxmox_api.version.get()
-        return LooseVersion(apireturn['version'])
+        try:
+            apiversion = self.proxmox_api.version.get()
+            return LooseVersion(apiversion['version'])
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve Proxmox VE version: %s' % e)
 
     def get_node(self, node):
-        nodes = [n for n in self.proxmox_api.nodes.get() if n['node'] == node]
+        try:
+            nodes = [n for n in self.proxmox_api.nodes.get() if n['node'] == node]
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve Proxmox VE node: %s' % e)
         return nodes[0] if nodes else None
 
     def get_nextvmid(self):
-        vmid = self.proxmox_api.cluster.nextid.get()
-        return vmid
+        try:
+            return self.proxmox_api.cluster.nextid.get()
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve next free vmid: %s' % e)
 
     def get_vmid(self, name, ignore_missing=False, choose_first_if_multiple=False):
-        vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
+        try:
+            vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve list of VMs filtered by name %s: %s' % (name, e))
 
         if not vms:
             if ignore_missing:
@@ -132,7 +143,10 @@ class ProxmoxAnsible(object):
         return vms[0]
 
     def get_vm(self, vmid, ignore_missing=False):
-        vms = [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+        try:
+            vms = [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve list of VMs filtered by vmid %s: %s' % (vmid, e))
 
         if vms:
             return vms[0]
@@ -143,8 +157,11 @@ class ProxmoxAnsible(object):
             self.module.fail_json(msg='VM with vmid %s does not exist in cluster' % vmid)
 
     def api_task_ok(self, node, taskid):
-        status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-        return status['status'] == 'stopped' and status['exitstatus'] == 'OK'
+        try:
+            status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
+            return status['status'] == 'stopped' and status['exitstatus'] == 'OK'
+        except Exception as e:
+            self.module.fail_json(msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
 
     def get_pool(self, poolid):
         """Retrieve pool information
