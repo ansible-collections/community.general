@@ -43,6 +43,7 @@ options:
     providerId:
         description:
             - C(providerId) for the new flow when not copied from an existing flow.
+        choices: [ "basic-flow", "client-flow" ]
         type: str
     copyFrom:
         description:
