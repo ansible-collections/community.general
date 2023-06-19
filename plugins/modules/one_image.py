@@ -29,32 +29,32 @@ options:
       - URL of the OpenNebula RPC server.
       - It is recommended to use HTTPS so that the username/password are not
       - transferred over the network unencrypted.
-      - If not set then the value of the C(ONE_URL) environment variable is used.
+      - If not set then the value of the E(ONE_URL) environment variable is used.
     type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
-      - then the value of the C(ONE_USERNAME) environment variable is used.
+      - then the value of the E(ONE_USERNAME) environment variable is used.
     type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
-      - then the value of the C(ONE_PASSWORD) environment variable is used.
+      - then the value of the E(ONE_PASSWORD) environment variable is used.
     type: str
   id:
     description:
-      - A C(id) of the image you would like to manage.
+      - A O(id) of the image you would like to manage.
     type: int
   name:
     description:
-      - A C(name) of the image you would like to manage.
+      - A O(name) of the image you would like to manage.
     type: str
   state:
     description:
-      - C(present) - state that is used to manage the image
-      - C(absent) - delete the image
-      - C(cloned) - clone the image
-      - C(renamed) - rename the image to the C(new_name)
+      - V(present) - state that is used to manage the image
+      - V(absent) - delete the image
+      - V(cloned) - clone the image
+      - V(renamed) - rename the image to the O(new_name)
     choices: ["present", "absent", "cloned", "renamed"]
     default: present
     type: str
@@ -65,7 +65,7 @@ options:
   new_name:
     description:
       - A name that will be assigned to the existing or new image.
-      - In the case of cloning, by default C(new_name) will take the name of the origin image with the prefix 'Copy of'.
+      - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
     type: str
 author:
     - "Milan Ilic (@ilicmilan)"

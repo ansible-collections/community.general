@@ -28,7 +28,7 @@ options:
   state:
     type: str
     description:
-    - Ensure that the alarm with this C(label) exists or does not exist.
+    - Ensure that the alarm with this O(label) exists or does not exist.
     choices: [ "present", "absent" ]
     required: false
     default: present

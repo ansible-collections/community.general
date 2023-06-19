@@ -28,13 +28,13 @@ options:
   src:
     type: str
     description:
-      - One of your catapult telephone numbers the message should come from (must be in E.164 format, like C(+19195551212)).
+      - One of your catapult telephone numbers the message should come from (must be in E.164 format, like V(+19195551212)).
     required: true
   dest:
     type: list
     elements: str
     description:
-      - The phone number or numbers the message should be sent to (must be in E.164 format, like C(+19195551212)).
+      - The phone number or numbers the message should be sent to (must be in E.164 format, like V(+19195551212)).
     required: true
   msg:
     type: str
