@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_authentication_required_actions
 
-short_description: Allows administration of Keycloak authentication required actions.
+short_description: Allows administration of Keycloak authentication required actions
 
 description:
     - This module can register, update and delete required actions.
