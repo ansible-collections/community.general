@@ -13,7 +13,9 @@ DOCUMENTATION = '''
     version_added: 1.0.0
     description:
         - Get inventory hosts from the cobbler service.
-        - "Uses a configuration file as an inventory source, it must end in C(.cobbler.yml) or C(.cobbler.yaml) and has a C(plugin: cobbler) entry."
+        - "Uses a configuration file as an inventory source, it must end in C(.cobbler.yml) or C(.cobbler.yaml) and have a C(plugin: cobbler) entry."
+        - Adds the primary IP addresses to C(cobbler_ipv4_address) and C(cobbler_ipv6_address) host variables if defined in Cobbler.  The primary IP address is
+          defined as the management interface if defined, or the interface who's DNS name matches the hostname of the system, or else the first interface found.
     extends_documentation_fragment:
         - inventory_cache
     options:
@@ -32,12 +34,12 @@ DOCUMENTATION = '''
         env:
             - name: COBBLER_USER
       password:
-        description: Cobbler authentication password
+        description: Cobbler authentication password.
         required: false
         env:
             - name: COBBLER_PASSWORD
       cache_fallback:
-        description: Fallback to cached results if connection to cobbler fails
+        description: Fallback to cached results if connection to cobbler fails.
         type: boolean
         default: false
       exclude_profiles:
@@ -66,20 +68,27 @@ DOCUMENTATION = '''
         default: hostname
         version_added: 7.1.0
       group_by:
-        description: Keys to group hosts by
+        description: Keys to group hosts by.
         type: list
         elements: string
         default: [ 'mgmt_classes', 'owners', 'status' ]
       group:
-        description: Group to place all hosts into
+        description: Group to place all hosts into.
         default: cobbler
       group_prefix:
-        description: Prefix to apply to cobbler groups
+        description: Prefix to apply to cobbler groups.
         default: cobbler_
       want_facts:
-        description: Toggle, if V(true) the plugin will retrieve host facts from the server
+        description: Toggle, if V(true) the plugin will retrieve host facts from the server.
         type: boolean
         default: true
+      want_ip_addresses:
+        description:
+          - Toggle, if V(true) the plugin will add a C(cobbler_ipv4_addresses) and C(cobbleer_ipv6_addresses) dictionary to the defined O(group) mapping
+            interface DNS names to IP addresses.
+        type: boolean
+        default: true
+        version_added: 7.1.0
 '''
 
 EXAMPLES = '''
@@ -94,7 +103,6 @@ import socket
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six import iteritems
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 
 # xmlrpc
@@ -246,6 +254,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self.inventory.add_group(self.group)
             self.display.vvvv('Added site group %s\n' % self.group)
 
+        ip_addresses = {}
+        ipv6_addresses = {}
         for host in self._get_systems():
             # Get the FQDN for the host and add it to the right groups
             if self.inventory_hostname == 'system':
@@ -260,7 +270,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
             # hostname is often empty for non-static IP hosts
             if hostname == '':
-                for (iname, ivalue) in iteritems(interfaces):
+                for iname, ivalue in interfaces.items():
                     if ivalue['management'] or not ivalue['static']:
                         this_dns_name = ivalue.get('dns_name', None)
                         if this_dns_name is not None and this_dns_name != "":
@@ -296,8 +306,45 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 self.inventory.add_child(self.group, hostname)
 
             # Add host variables
+            ip_address = None
+            ipv6_address = None
+            for iname, ivalue in interfaces.items():
+                # Set to first interface or management interface if defined or hostname matches dns_name
+                if ivalue['ip_address'] != "":
+                    if ip_address is None:
+                        ip_address = ivalue['ip_address']
+                    elif ivalue['management']:
+                        ip_address = ivalue['ip_address']
+                    elif ivalue['dns_name'] == hostname and ip_address is None:
+                        ip_address = ivalue['ip_address']
+                if ivalue['ipv6_address'] != "":
+                    if ipv6_address is None:
+                        ipv6_address = ivalue['ipv6_address']
+                    elif ivalue['management']:
+                        ipv6_address = ivalue['ipv6_address']
+                    elif ivalue['dns_name'] == hostname and ipv6_address is None:
+                        ipv6_address = ivalue['ipv6_address']
+
+                # Collect all interface name mappings for adding to group vars
+                if self.get_option('want_ip_addresses'):
+                    if ivalue['dns_name'] != "":
+                        if ivalue['ip_address'] != "":
+                            ip_addresses[ivalue['dns_name']] = ivalue['ip_address']
+                        if ivalue['ipv6_address'] != "":
+                            ip_addresses[ivalue['dns_name']] = ivalue['ipv6_address']
+
+            # Add ip_address to host if defined
+            if ip_address is not None:
+                self.inventory.set_variable(hostname, 'cobbler_ipv4_address', ip_address)
+            if ipv6_address is not None:
+                self.inventory.set_variable(hostname, 'cobbler_ipv6_address', ipv6_address)
+
             if self.get_option('want_facts'):
                 try:
                     self.inventory.set_variable(hostname, 'cobbler', host)
                 except ValueError as e:
                     self.display.warning("Could not set host info for %s: %s" % (hostname, to_text(e)))
+
+        if self.get_option('want_ip_addresses'):
+            self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', ip_addresses)
+            self.inventory.set_variable(self.group, 'cobbler_ipv6_addresses', ipv6_addresses)
