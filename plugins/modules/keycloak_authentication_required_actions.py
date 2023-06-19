@@ -224,8 +224,8 @@ def main():
             options=dict(
                 alias=dict(type='str', required=True),
                 config=dict(type='dict'),
-                defaultAction=dict(type='bool', default=False),
-                enabled=dict(type='bool', default=False),
+                defaultAction=dict(type='bool'),
+                enabled=dict(type='bool'),
                 name=dict(type='str'),
                 priority=dict(type='int'),
                 providerId=dict(type='str')
