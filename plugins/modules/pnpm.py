@@ -36,6 +36,11 @@ options:
       - All packages in package.json are installed if not provided.
     type: str
     required: false
+   alias:
+    description:
+      - Alias of the node.js library.
+    type: str
+    required: false
   path:
     description:
       - The base path to install the node.js libraries.
@@ -111,7 +116,7 @@ EXAMPLES = """
 - name: Install "tailwindcss" node.js package on version 3.3.2
   community.general.pnpm:
     name: tailwindcss
-    version: '3.3.2'
+    version: 3.3.2
     path: /app/location
 
 - name: Install "tailwindcss" node.js package globally.
@@ -130,6 +135,13 @@ EXAMPLES = """
     name: tailwindcss
     path: /app/location
     optional: true
+
+- name: Install "tailwindcss" node.js package version 0.1.3 as tailwind-1
+  community.general.pnpm:
+    name: tailwindcss
+    alias: tailwind-1
+    version: 0.1.3
+    path: /app/location
 
 - name: Remove the globally-installed package "tailwindcss".
   community.general.pnpm:
@@ -157,6 +169,7 @@ class Pnpm(object):
     def __init__(self, module, **kwargs):
         self.module = module
         self.name = kwargs["name"]
+        self.alias = kwargs["alias"]
         self.version = kwargs["version"]
         self.path = kwargs["path"]
         self.globally = kwargs["globally"]
@@ -167,12 +180,15 @@ class Pnpm(object):
         self.dev = kwargs["dev"]
         self.optional = kwargs["optional"]
 
-        self.name_version = None
+        self.alias_name_ver = None
+
+        if self.alias is not None:
+            self.alias_name_ver = self.alias + "@npm:"
 
         if self.name is not None:
-            self.name_version = self.name
+            self.alias_name_ver = (self.alias_name_ver or "") + self.name
             if self.version is not None:
-                self.name_version = self.name_version + "@" + str(self.version)
+                self.alias_name_ver = self.alias_name_ver + "@" + str(self.version)
 
     def _exec(self, args, run_in_check_mode=False, check_rc=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
@@ -205,11 +221,11 @@ class Pnpm(object):
                 if not os.path.isdir(self.path):
                     self.module.fail_json(msg="Path %s is not a directory" % self.path)
 
-                if not self.name_version and not os.path.isfile(
+                if not self.alias_name_ver and not os.path.isfile(
                     os.path.join(self.path, "package.json")
                 ):
                     self.module.fail_json(
-                        msg="Package.json does not exist in provided path"
+                        msg="package.json does not exist in provided path"
                     )
 
                 cwd = self.path
@@ -252,20 +268,27 @@ class Pnpm(object):
             if typedep not in data:
                 continue
 
-            if self.name in data[typedep].keys():
-                return False
+            for dep, prop in data[typedep].items():
+                if self.alias is None or self.alias == dep:
+                    name = prop["from"] if self.alias is not None else dep
+                    if self.name == name:
+                        if self.version is None or self.version == prop["version"]:
+                            return False
+                        break
 
         return True
 
     def install(self):
-        if self.name_version is not None:
-            return self._exec(["add", self.name_version])
+        if self.alias_name_ver is not None:
+            return self._exec(["add", self.alias_name_ver])
         return self._exec(["install"])
 
     def update(self):
         return self._exec(["update", "--latest"])
 
     def uninstall(self):
+        if self.alias is not None:
+            return self._exec(["remove", self.alias])
         return self._exec(["remove", self.name])
 
     def list_outdated(self):
@@ -300,6 +323,7 @@ class Pnpm(object):
 def main():
     arg_spec = dict(
         name=dict(default=None),
+        alias=dict(default=None),
         path=dict(default=None, type="path"),
         version=dict(default=None),
         executable=dict(default=None, type="path"),
@@ -314,6 +338,7 @@ def main():
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
+    alias = module.params["alias"]
     path = module.params["path"]
     version = module.params["version"]
     globally = module.params["global"]
@@ -329,47 +354,48 @@ def main():
     else:
         executable = [module.get_bin_path("pnpm", True)]
 
-    if not name and version:
-        module.fail_json(
-            msg="Version has no meaning when the package name is not provided"
-        )
+    if name is None and version is not None:
+        module.fail_json(msg="version is meaningless when name is not provided")
 
-    if path is None and globally is False:
-        module.fail_json(msg="Path must be specified when not using global")
-    elif path and globally is True:
-        module.fail_json(msg="Cannot specify path if doing global installation")
+    if name is None and alias is not None:
+        module.fail_json(msg="alias is meaningless when name is not provided")
+
+    if path is None and not globally:
+        module.fail_json(msg="path must be specified when not using global")
+    elif path is not None and globally:
+        module.fail_json(msg="Cannot specify path when doing global installation")
 
     if globally and (production or dev or optional):
         module.fail_json(
-            msg="Production, dev, and optional makes no sense when installing packages globally"
+            msg="Options production, dev, and optional is meaningless when installing packages globally"
         )
 
-    if name and globally and path:
-        module.fail_json(msg="Path should not be mentioned when installing globally")
+    if name is not None and path is not None and globally:
+        module.fail_json(msg="path should not be mentioned when installing globally")
 
     if production and dev and optional:
         module.fail_json(
-            msg="Production and dev and optional options don't go together"
+            msg="Options production and dev and optional don't go together"
         )
 
     if production and dev:
-        module.fail_json(msg="Production and dev options don't go together")
+        module.fail_json(msg="Options production and dev don't go together")
 
     if production and optional:
-        module.fail_json(msg="Production and optional options don't go together")
+        module.fail_json(msg="Options production and optional don't go together")
 
     if dev and optional:
-        module.fail_json(msg="Dev and optional options don't go together")
+        module.fail_json(msg="Options dev and optional don't go together")
 
-    if name and name[0:4] == "http" and version:
+    if name is not None and name[0:4] == "http" and version is not None:
         module.fail_json(msg="Semver not supported on remote url downloads")
 
-    if not name and optional:
+    if name is None and optional:
         module.fail_json(
             msg="Optional not available when package name not provided, use no_optional instead"
         )
 
-    if state == "absent" and not name:
+    if state == "absent" and name is None:
         module.fail_json(msg="Package name is required for uninstalling")
 
     if state == "latest":
@@ -382,6 +408,7 @@ def main():
     pnpm = Pnpm(
         module,
         name=name,
+        alias=alias,
         path=path,
         version=version,
         globally=globally,
@@ -402,9 +429,10 @@ def main():
             out, err = pnpm.install()
     elif state == "latest":
         outdated = pnpm.list_outdated()
-        if name is not None and (pnpm.missing() or name in outdated):
-            changed = True
-            out, err = pnpm.install()
+        if name is not None:
+            if pnpm.missing() or name in outdated:
+                changed = True
+                out, err = pnpm.install()
         elif len(outdated):
             changed = True
             out, err = pnpm.update()
