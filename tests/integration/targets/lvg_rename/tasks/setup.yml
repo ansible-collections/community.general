@@ -13,24 +13,24 @@
 - name: Show next free loop device
   ansible.builtin.command:
     cmd: "losetup -f"
-  changed_when: False
+  changed_when: false
   register: loop_device1
 
 - name: "Create loop device for file {{ remote_tmp_dir }}/img1"
   ansible.builtin.command:
     cmd: "losetup -f {{ remote_tmp_dir }}/img1"
-  changed_when: True
+  changed_when: true
 
 - name: Show next free loop device
   ansible.builtin.command:
     cmd: "losetup -f"
-  changed_when: False
+  changed_when: false
   register: loop_device2
 
 - name: "Create loop device for file {{ remote_tmp_dir }}/img2"
   ansible.builtin.command:
     cmd: "losetup -f {{ remote_tmp_dir }}/img2"
-  changed_when: True
+  changed_when: true
 
 - name: Affect name on disk to work on
   ansible.builtin.set_fact:

@@ -8,7 +8,7 @@
   ansible.builtin.command:
     cmd: "pvs --noheadings -ovg_name {{ loop_device1 | default('') }} {{ loop_device2 | default('') }}"
   register: test_vgs_output
-  changed_when: False
+  changed_when: false
 
 - name: Remove test volume groups
   loop: "{{ test_vgs_output.stdout_lines }}"
@@ -26,8 +26,8 @@
     - item | length > 0
   ansible.builtin.command:
     cmd: "lvmdevices --deldev {{ item }}"
-  failed_when: False
-  changed_when: True
+  failed_when: false
+  changed_when: true
 
 - name: Detach loop devices
   loop:
@@ -37,7 +37,7 @@
     - item | length > 0
   ansible.builtin.command:
     cmd: "losetup -d {{ item }}"
-  changed_when: True
+  changed_when: true
 
 - name: Remove device files
   with_sequence: 'count=2'

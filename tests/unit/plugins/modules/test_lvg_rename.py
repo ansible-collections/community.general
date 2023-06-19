@@ -64,7 +64,7 @@ class TestLvgRename(ModuleTestCase):
         expected_msg = 'Both current (Yfj4YG-c8nI-z7w5-B7Fw-i2eM-HqlF-ApFVp0) and new (vg_data_testhost2) VG are missing.'
 
         module_args = {
-            'vg_uuid': 'Yfj4YG-c8nI-z7w5-B7Fw-i2eM-HqlF-ApFVp0',
+            'vg': 'Yfj4YG-c8nI-z7w5-B7Fw-i2eM-HqlF-ApFVp0',
             'vg_new': 'vg_data_testhost2',
         }
         set_module_args(args=module_args)

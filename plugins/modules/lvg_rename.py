@@ -31,9 +31,6 @@ options:
     - See V(vgrename(8\)) for valid values.
     type: str
     required: true
-    aliases:
-      - name
-      - vg_uuid
   vg_new:
     description:
     - The new name of the VG.
@@ -61,8 +58,8 @@ EXAMPLES = r'''
 from ansible.module_utils.basic import AnsibleModule
 
 argument_spec = dict(
-    vg=dict(type='str', required=True, aliases=['vg_uuid', 'name'],),
-    vg_new=dict(type='str', required=True,)
+    vg=dict(type='str', required=True,),
+    vg_new=dict(type='str', required=True,),
 )
 
 
