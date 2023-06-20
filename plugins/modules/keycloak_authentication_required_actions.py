@@ -101,28 +101,28 @@ EXAMPLES = '''
 
 - name: Update the newly registered required action.
   community.general.keycloak_authentication_required_actions:
-  auth_client_id: "admin-cli"
-  auth_keycloak_url: "http://localhost:8080"
-  auth_password: "password"
-  auth_realm: "master"
-  auth_username: "admin"
-  realm: "master"
-  required_action:
-    - alias: "TERMS_AND_CONDITIONS"
-      enabled: false
-  state: "present"
+    auth_client_id: "admin-cli"
+    auth_keycloak_url: "http://localhost:8080"
+    auth_password: "password"
+    auth_realm: "master"
+    auth_username: "admin"
+    realm: "master"
+    required_action:
+      - alias: "TERMS_AND_CONDITIONS"
+        enabled: false
+    state: "present"
 
 - name: Delete the updated registered required action.
   community.general.keycloak_authentication_required_actions:
-  auth_client_id: "admin-cli"
-  auth_keycloak_url: "http://localhost:8080"
-  auth_password: "password"
-  auth_realm: "master"
-  auth_username: "admin"
-  realm: "master"
-  required_action:
-    - alias: "TERMS_AND_CONDITIONS"
-  state: "absent"
+    auth_client_id: "admin-cli"
+    auth_keycloak_url: "http://localhost:8080"
+    auth_password: "password"
+    auth_realm: "master"
+    auth_username: "admin"
+    realm: "master"
+    required_action:
+      - alias: "TERMS_AND_CONDITIONS"
+    state: "absent"
 '''
 
 RETURN = '''
