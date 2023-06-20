@@ -1007,7 +1007,7 @@ releases:
         ansible-core 2.15 or later to see it as it is intended. Alternatively you
         can
 
-        look at `the devel docsite <https://docs.ansible.com/ansible/devel/collections/community/general/>__`
+        look at `the devel docsite <https://docs.ansible.com/ansible/devel/collections/community/general/>`__
 
         for the rendered HTML version of the documentation of the latest release.
 
