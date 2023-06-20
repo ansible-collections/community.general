@@ -110,77 +110,77 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create an authentication flow from first broker login and add an execution to it.
-      community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        copyFrom: "first broker login"
-        authenticationExecutions:
-          - providerId: "test-execution1"
-            requirement: "REQUIRED"
-            authenticationConfig:
-              alias: "test.execution1.property"
-              config:
-                test1.property: "value"
-          - providerId: "test-execution2"
-            requirement: "REQUIRED"
-            authenticationConfig:
-              alias: "test.execution2.property"
-              config:
-                test2.property: "value"
-        state: present
+- name: Create an authentication flow from first broker login and add an execution to it.
+    community.general.keycloak_authentication:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: password
+    realm: master
+    alias: "Copy of first broker login"
+    copyFrom: "first broker login"
+    authenticationExecutions:
+        - providerId: "test-execution1"
+        requirement: "REQUIRED"
+        authenticationConfig:
+            alias: "test.execution1.property"
+            config:
+            test1.property: "value"
+        - providerId: "test-execution2"
+        requirement: "REQUIRED"
+        authenticationConfig:
+            alias: "test.execution2.property"
+            config:
+            test2.property: "value"
+    state: present
 
-    - name: Re-create the authentication flow
-      community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        copyFrom: "first broker login"
-        authenticationExecutions:
-          - providerId: "test-provisioning"
-            requirement: "REQUIRED"
-            authenticationConfig:
-              alias: "test.provisioning.property"
-              config:
-                test.provisioning.property: "value"
-        state: present
-        force: true
+- name: Re-create the authentication flow
+    community.general.keycloak_authentication:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: password
+    realm: master
+    alias: "Copy of first broker login"
+    copyFrom: "first broker login"
+    authenticationExecutions:
+        - providerId: "test-provisioning"
+        requirement: "REQUIRED"
+        authenticationConfig:
+            alias: "test.provisioning.property"
+            config:
+            test.provisioning.property: "value"
+    state: present
+    force: true
 
-    - name: Create an authentication flow with subflow containing an execution.
-      community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        copyFrom: "first broker login"
-        authenticationExecutions:
-          - providerId: "test-execution1"
-            requirement: "REQUIRED"
-          - displayName: "New Subflow"
-            requirement: "REQUIRED"
-          - providerId: "auth-cookie"
-            requirement: "REQUIRED"
-            flowAlias: "New Sublow"
-        state: present
+- name: Create an authentication flow with subflow containing an execution.
+    community.general.keycloak_authentication:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: password
+    realm: master
+    alias: "Copy of first broker login"
+    copyFrom: "first broker login"
+    authenticationExecutions:
+        - providerId: "test-execution1"
+        requirement: "REQUIRED"
+        - displayName: "New Subflow"
+        requirement: "REQUIRED"
+        - providerId: "auth-cookie"
+        requirement: "REQUIRED"
+        flowAlias: "New Sublow"
+    state: present
 
-    - name: Remove authentication.
-      community.general.keycloak_authentication:
-        auth_keycloak_url: http://localhost:8080/auth
-        auth_realm: master
-        auth_username: admin
-        auth_password: password
-        realm: master
-        alias: "Copy of first broker login"
-        state: absent
+- name: Remove authentication.
+    community.general.keycloak_authentication:
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: password
+    realm: master
+    alias: "Copy of first broker login"
+    state: absent
 '''
 
 RETURN = '''
