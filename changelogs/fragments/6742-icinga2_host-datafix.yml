@@ -1,2 +1,0 @@
-bugfixes:
-  - "icinga2_host - fix a key error when updating an existing host (https://github.com/ansible-collections/community.general/pull/6742)."
