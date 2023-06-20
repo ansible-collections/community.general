@@ -111,7 +111,7 @@ author:
 
 EXAMPLES = '''
 - name: Create an authentication flow from first broker login and add an execution to it.
-    community.general.keycloak_authentication:
+  community.general.keycloak_authentication:
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: admin
@@ -120,13 +120,13 @@ EXAMPLES = '''
     alias: "Copy of first broker login"
     copyFrom: "first broker login"
     authenticationExecutions:
-        - providerId: "test-execution1"
+      - providerId: "test-execution1"
         requirement: "REQUIRED"
         authenticationConfig:
             alias: "test.execution1.property"
             config:
             test1.property: "value"
-        - providerId: "test-execution2"
+      - providerId: "test-execution2"
         requirement: "REQUIRED"
         authenticationConfig:
             alias: "test.execution2.property"
@@ -135,7 +135,7 @@ EXAMPLES = '''
     state: present
 
 - name: Re-create the authentication flow
-    community.general.keycloak_authentication:
+  community.general.keycloak_authentication:
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: admin
@@ -144,7 +144,7 @@ EXAMPLES = '''
     alias: "Copy of first broker login"
     copyFrom: "first broker login"
     authenticationExecutions:
-        - providerId: "test-provisioning"
+      - providerId: "test-provisioning"
         requirement: "REQUIRED"
         authenticationConfig:
             alias: "test.provisioning.property"
@@ -154,7 +154,7 @@ EXAMPLES = '''
     force: true
 
 - name: Create an authentication flow with subflow containing an execution.
-    community.general.keycloak_authentication:
+  community.general.keycloak_authentication:
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: admin
@@ -163,17 +163,17 @@ EXAMPLES = '''
     alias: "Copy of first broker login"
     copyFrom: "first broker login"
     authenticationExecutions:
-        - providerId: "test-execution1"
+      - providerId: "test-execution1"
         requirement: "REQUIRED"
-        - displayName: "New Subflow"
+      - displayName: "New Subflow"
         requirement: "REQUIRED"
-        - providerId: "auth-cookie"
+      - providerId: "auth-cookie"
         requirement: "REQUIRED"
         flowAlias: "New Sublow"
     state: present
 
 - name: Remove authentication.
-    community.general.keycloak_authentication:
+  community.general.keycloak_authentication:
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: admin
