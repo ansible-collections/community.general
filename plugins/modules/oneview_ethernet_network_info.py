@@ -33,7 +33,7 @@ options:
     options:
       description:
         - "List with options to gather additional information about an Ethernet Network and related resources.
-          Options allowed: C(associatedProfiles) and C(associatedUplinkGroups)."
+          Options allowed: V(associatedProfiles) and V(associatedUplinkGroups)."
       type: list
       elements: str
 extends_documentation_fragment:

@@ -36,7 +36,7 @@ options:
     type: str
   state:
     description:
-      - Whether to create C(present), drop C(absent) or lock C(locked) a role.
+      - Whether to create V(present), drop V(absent) or lock V(locked) a role.
     choices: ['present', 'absent']
     default: present
     type: str

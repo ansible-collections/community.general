@@ -136,7 +136,7 @@ options:
     suboptions:
       size:
         description:
-        - 'Disk size with unit. Unit must be: C(b), C(kb), C(mb), C(gb), C(tb). VM needs to be shut down to reconfigure this parameter.'
+        - 'Disk size with unit. Unit must be: V(b), V(kb), V(mb), V(gb), V(tb). VM needs to be shut down to reconfigure this parameter.'
         - If no unit is specified, size is assumed to be in bytes.
         type: str
       size_b:

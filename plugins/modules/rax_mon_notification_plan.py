@@ -27,7 +27,7 @@ options:
   state:
     type: str
     description:
-    - Ensure that the notification plan with this C(label) exists or does not
+    - Ensure that the notification plan with this O(label) exists or does not
       exist.
     choices: ['present', 'absent']
     default: present

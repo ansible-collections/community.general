@@ -38,11 +38,11 @@ options:
     state:
         description:
             - Takes the host to the desired lifecycle state.
-            - If C(absent) the host will be deleted from the cluster.
-            - If C(present) the host will be created in the cluster (includes C(enabled), C(disabled) and C(offline) states).
-            - If C(enabled) the host is fully operational.
-            - C(disabled), e.g. to perform maintenance operations.
-            - C(offline), host is totally offline.
+            - If V(absent) the host will be deleted from the cluster.
+            - If V(present) the host will be created in the cluster (includes V(enabled), V(disabled) and V(offline) states).
+            - If V(enabled) the host is fully operational.
+            - V(disabled), e.g. to perform maintenance operations.
+            - V(offline), host is totally offline.
         choices:
             - absent
             - present

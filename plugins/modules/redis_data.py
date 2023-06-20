@@ -121,12 +121,12 @@ EXAMPLES = '''
 RETURN = '''
 old_value:
   description: Value of key before setting.
-  returned: on_success if state is C(present) and key exists in database.
+  returned: on_success if O(state=present) and key exists in database.
   type: str
   sample: 'old_value_of_key'
 value:
   description: Value key was set to.
-  returned: on success if state is C(present).
+  returned: on success if O(state=present).
   type: str
   sample: 'new_value_of_key'
 msg:

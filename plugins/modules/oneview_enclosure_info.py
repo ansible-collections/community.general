@@ -34,7 +34,7 @@ options:
     options:
       description:
         - "List with options to gather additional information about an Enclosure and related resources.
-          Options allowed: C(script), C(environmentalConfiguration), and C(utilization). For the option C(utilization),
+          Options allowed: V(script), V(environmentalConfiguration), and V(utilization). For the option V(utilization),
           you can provide specific parameters."
       type: list
       elements: raw

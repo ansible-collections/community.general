@@ -144,16 +144,16 @@ EXAMPLES = r'''
 RETURN = r'''
 state:
     description:
-        The state of the input C(path).
+        The state of the input O(path).
     type: str
     returned: always
 dest_state:
     description:
       - The state of the O(dest) file.
-      - C(absent) when the file does not exist.
-      - C(archive) when the file is an archive.
-      - C(compress) when the file is compressed, but not an archive.
-      - C(incomplete) when the file is an archive, but some files under O(path) were not found.
+      - V(absent) when the file does not exist.
+      - V(archive) when the file is an archive.
+      - V(compress) when the file is compressed, but not an archive.
+      - V(incomplete) when the file is an archive, but some files under O(path) were not found.
     type: str
     returned: success
     version_added: 3.4.0

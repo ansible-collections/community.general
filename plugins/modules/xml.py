@@ -63,7 +63,7 @@ options:
   value:
     description:
     - Desired state of the selected attribute.
-    - Either a string, or to unset a value, the Python C(None) keyword (YAML Equivalent, V(null)).
+    - Either a string, or to unset a value, the Python V(None) keyword (YAML Equivalent, V(null)).
     - Elements default to no value (but present).
     - Attributes default to an empty string.
     type: raw

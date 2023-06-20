@@ -35,7 +35,7 @@ options:
     default: 10
   validate_certs:
     description:
-      - When set to C(NO), SSL certificates will not be validated.
+      - When set to V(false), SSL certificates will not be validated.
     type: bool
     default: true
 notes:

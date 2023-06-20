@@ -36,7 +36,7 @@ options:
         type: str
     state:
         description:
-            - whether to install (C(present), C(latest)), or remove (C(absent)) a package.
+            - whether to install (V(present), V(latest)), or remove (V(absent)) a package.
         required: true
         choices: [ 'present', 'latest', 'absent']
         type: str

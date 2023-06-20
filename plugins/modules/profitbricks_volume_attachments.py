@@ -58,7 +58,7 @@ options:
   state:
     description:
       - Indicate desired state of the resource
-      - "The available choices are: C(present), C(absent)."
+      - "The available choices are: V(present), V(absent)."
     type: str
     required: false
     default: 'present'

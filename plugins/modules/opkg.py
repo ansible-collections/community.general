@@ -46,7 +46,7 @@ options:
     force:
         description:
             - The C(opkg --force) parameter used.
-            - Passing C("") as value and not passing any value at all have both
+            - Passing V("") as value and not passing any value at all have both
               the same effect of B(not) using any C(--force-) parameter.
         choices:
             - ""

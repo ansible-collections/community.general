@@ -61,7 +61,7 @@ options:
       - >
         A list of GitHub events the hook is triggered for. Events are listed at
         U(https://developer.github.com/v3/activity/events/types/). Required
-        unless C(state) is C(absent)
+        unless O(state=absent)
     required: false
     type: list
     elements: str

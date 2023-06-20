@@ -21,7 +21,7 @@ options:
   clients:
     description:
       - A list of the pip executables that will be used to get the packages.
-        They can be supplied with the full path or just the executable name, for example C(pip3.7).
+        They can be supplied with the full path or just the executable name, for example V(pip3.7).
     default: ['pip']
     required: false
     type: list

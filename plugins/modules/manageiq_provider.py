@@ -138,7 +138,7 @@ options:
         description: The CA bundle string with custom certificates. defaults to None.
       path:
         type: str
-        description: Database name for oVirt metrics. Defaults to C(ovirt_engine_history).
+        description: Database name for oVirt metrics. Defaults to V(ovirt_engine_history).
 
   alerts:
     description: Alerts endpoint connection information.

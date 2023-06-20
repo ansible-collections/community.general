@@ -35,7 +35,7 @@ options:
     required: true
     description:
       - List of commands to execute on iDRAC.
-      - C(GetManagerAttributes) returns the list of dicts containing iDRAC,
+      - V(GetManagerAttributes) returns the list of dicts containing iDRAC,
         LifecycleController and System attributes.
     type: list
     elements: str

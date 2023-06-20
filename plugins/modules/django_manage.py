@@ -62,7 +62,7 @@ options:
     description:
       - A directory to add to the Python path. Typically used to include the settings module if it is located
         external to the application directory.
-      - This would be equivalent to adding O(pythonpath)'s value to the C(PYTHONPATH) environment variable.
+      - This would be equivalent to adding O(pythonpath)'s value to the E(PYTHONPATH) environment variable.
     type: path
     required: false
     aliases: [python_path]

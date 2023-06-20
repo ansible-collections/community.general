@@ -30,7 +30,7 @@ options:
   port:
     description:
     - Port number to be used for REST connection.
-    - The default value depends on parameter C(use_ssl).
+    - The default value depends on parameter O(use_ssl).
     type: int
   username:
     description:
@@ -43,13 +43,13 @@ options:
     type: str
   use_ssl:
     description:
-    - If C(false), an HTTP connection will be used instead of the default HTTPS connection.
+    - If V(false), an HTTP connection will be used instead of the default HTTPS connection.
     type: bool
     default: true
   validate_certs:
     description:
-    - If C(false), SSL certificates will not be validated.
-    - This should only set to C(false) when used on personally controlled sites using self-signed certificates.
+    - If V(false), SSL certificates will not be validated.
+    - This should only set to V(false) when used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
 author:

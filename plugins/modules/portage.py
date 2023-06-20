@@ -33,7 +33,7 @@ attributes:
 options:
   package:
     description:
-      - Package atom or set, e.g. C(sys-apps/foo) or C(>foo-2.13) or C(@world)
+      - Package atom or set, for example V(sys-apps/foo) or V(>foo-2.13) or V(@world)
     aliases: [name]
     type: list
     elements: str
@@ -124,8 +124,8 @@ options:
   sync:
     description:
       - Sync package repositories first
-      - If C(yes), perform "emerge --sync"
-      - If C(web), perform "emerge-webrsync"
+      - If V(yes), perform "emerge --sync"
+      - If V(web), perform "emerge-webrsync"
     choices: [ "web", "yes", "no" ]
     type: str
 

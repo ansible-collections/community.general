@@ -87,14 +87,14 @@ options:
 
   validate_certs:
     description:
-      - If C(false), SSL certificates will not be validated. This should only be used
+      - If V(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
     default: true
 
   monitor:
     description:
-      - If C(true), add or change the monitor.  This is applicable only for A records.
+      - If V(true), add or change the monitor.  This is applicable only for A records.
     type: bool
     default: false
 
@@ -133,7 +133,7 @@ options:
   contactList:
     description:
       - Name or id of the contact list that the monitor will notify.
-      - The default C('') means the Account Owner.
+      - The default V('') means the Account Owner.
     type: str
 
   httpFqdn:
@@ -153,7 +153,7 @@ options:
 
   failover:
     description:
-      - If C(true), add or change the failover.  This is applicable only for A records.
+      - If V(true), add or change the failover.  This is applicable only for A records.
     type: bool
     default: false
 

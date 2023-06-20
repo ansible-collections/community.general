@@ -36,7 +36,7 @@ options:
     description:
     - Name of the VM to gather facts from.
     - VMs running on XenServer do not necessarily have unique names. The module will fail if multiple VMs with same name are found.
-    - In case of multiple VMs with same name, use C(uuid) to uniquely specify VM to manage.
+    - In case of multiple VMs with same name, use O(uuid) to uniquely specify VM to manage.
     - This parameter is case sensitive.
     type: str
     aliases: [ name_label ]

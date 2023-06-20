@@ -80,7 +80,7 @@ options:
     type: str
   update_dns:
     description:
-    - If set C("True") with state as C("absent"), then removes DNS records of the host managed by FreeIPA DNS.
+    - If set V(true) with O(state=absent), then removes DNS records of the host managed by FreeIPA DNS.
     - This option has no effect for states other than "absent".
     type: bool
   random_password:

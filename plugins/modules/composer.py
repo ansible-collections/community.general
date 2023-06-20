@@ -107,7 +107,7 @@ options:
     composer_executable:
         type: path
         description:
-            - Path to composer executable on the remote host, if composer is not in C(PATH) or a custom composer is needed.
+            - Path to composer executable on the remote host, if composer is not in E(PATH) or a custom composer is needed.
         version_added: 3.2.0
 requirements:
     - php

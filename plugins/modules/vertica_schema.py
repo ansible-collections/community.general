@@ -50,7 +50,7 @@ options:
     type: str
   state:
     description:
-      - Whether to create C(present), or drop C(absent) a schema.
+      - Whether to create V(present), or drop V(absent) a schema.
     default: present
     choices: ['present', 'absent']
     type: str

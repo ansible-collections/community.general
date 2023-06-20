@@ -58,7 +58,7 @@ options:
     default: jfs2
   permissions:
     description:
-      - Set file system permissions. C(rw) (read-write) or C(ro) (read-only).
+      - Set file system permissions. V(rw) (read-write) or V(ro) (read-only).
     type: str
     choices: [ ro, rw ]
     default: rw
@@ -77,13 +77,13 @@ options:
     type: str
   rm_mount_point:
     description:
-      - Removes the mount point directory when used with state C(absent).
+      - Removes the mount point directory when used with state V(absent).
     type: bool
     default: false
   size:
     description:
       - Specifies the file system size.
-      - For already C(present) it will be resized.
+      - For already V(present) it will be resized.
       - 512-byte blocks, Megabytes or Gigabytes. If the value has M specified
         it will be in Megabytes. If the value has G specified it will be in
         Gigabytes.
@@ -96,10 +96,10 @@ options:
   state:
     description:
       - Controls the file system state.
-      - C(present) check if file system exists, creates or resize.
-      - C(absent) removes existing file system if already C(unmounted).
-      - C(mounted) checks if the file system is mounted or mount the file system.
-      - C(unmounted) check if the file system is unmounted or unmount the file system.
+      - V(present) check if file system exists, creates or resize.
+      - V(absent) removes existing file system if already V(unmounted).
+      - V(mounted) checks if the file system is mounted or mount the file system.
+      - V(unmounted) check if the file system is unmounted or unmount the file system.
     type: str
     choices: [ absent, mounted, present, unmounted ]
     default: present
@@ -108,7 +108,7 @@ options:
       - Specifies an existing volume group (VG).
     type: str
 notes:
-  - For more C(attributes), please check "crfs" AIX manual.
+  - For more O(attributes), please check "crfs" AIX manual.
 '''
 
 EXAMPLES = r'''

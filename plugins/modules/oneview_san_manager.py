@@ -28,9 +28,9 @@ options:
     state:
         description:
             - Indicates the desired state for the Uplink Set resource.
-                - C(present) ensures data properties are compliant with OneView.
-                - C(absent) removes the resource from OneView, if it exists.
-                - C(connection_information_set) updates the connection information for the SAN Manager. This operation is non-idempotent.
+                - V(present) ensures data properties are compliant with OneView.
+                - V(absent) removes the resource from OneView, if it exists.
+                - V(connection_information_set) updates the connection information for the SAN Manager. This operation is non-idempotent.
         type: str
         default: present
         choices: [present, absent, connection_information_set]

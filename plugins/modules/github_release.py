@@ -25,7 +25,7 @@ attributes:
 options:
     token:
         description:
-            - GitHub Personal Access Token for authenticating. Mutually exclusive with C(password).
+            - GitHub Personal Access Token for authenticating. Mutually exclusive with O(password).
         type: str
     user:
         description:
@@ -34,7 +34,7 @@ options:
         required: true
     password:
         description:
-            - The GitHub account password for the user. Mutually exclusive with C(token).
+            - The GitHub account password for the user. Mutually exclusive with O(token).
         type: str
     repo:
         description:
@@ -49,7 +49,7 @@ options:
         choices: [ 'latest_release', 'create_release' ]
     tag:
         description:
-            - Tag name when creating a release. Required when using action is set to C(create_release).
+            - Tag name when creating a release. Required when using O(action=create_release).
         type: str
     target:
         description:

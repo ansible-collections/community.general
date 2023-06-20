@@ -47,7 +47,7 @@ options:
     type: str
     description:
       - version of database (MySQL supports 5.1 and 5.6, MariaDB supports 10, Percona supports 5.6)
-      - "The available choices are: C(5.1), C(5.6) and  C(10)."
+      - "The available choices are: V(5.1), V(5.6) and  V(10)."
     default: '5.6'
     aliases: ['version']
   state:

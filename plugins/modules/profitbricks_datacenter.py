@@ -63,7 +63,7 @@ options:
   state:
     description:
       - Create or terminate datacenters.
-      - "The available choices are: C(present), C(absent)."
+      - "The available choices are: V(present), V(absent)."
     type: str
     required: false
     default: 'present'

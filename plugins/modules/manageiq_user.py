@@ -60,7 +60,7 @@ options:
     default: always
     choices: ['always', 'on_create']
     description:
-      - C(always) will update passwords unconditionally.  C(on_create) will only set the password for a newly created user.
+      - V(always) will update passwords unconditionally.  V(on_create) will only set the password for a newly created user.
 '''
 
 EXAMPLES = '''

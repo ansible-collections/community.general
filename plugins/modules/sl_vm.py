@@ -158,7 +158,7 @@ options:
   state:
     description:
       - Create, or cancel a virtual instance.
-      - Specify C(present) for create, C(absent) to cancel.
+      - Specify V(present) for create, V(absent) to cancel.
     choices: [ absent, present ]
     default: present
     type: str

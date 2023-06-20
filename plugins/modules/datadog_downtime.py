@@ -38,7 +38,7 @@ options:
     api_host:
         description:
           - The URL to the Datadog API.
-          - This value can also be set with the C(DATADOG_HOST) environment variable.
+          - This value can also be set with the E(DATADOG_HOST) environment variable.
         required: false
         default: https://api.datadoghq.com
         type: str
@@ -57,7 +57,7 @@ options:
     id:
         description:
           - The identifier of the downtime.
-          - If empty, a new downtime gets created, otherwise it is either updated or deleted depending of the C(state).
+          - If empty, a new downtime gets created, otherwise it is either updated or deleted depending of the O(state).
           - To keep your playbook idempotent, you should save the identifier in a file and read it in a lookup.
         type: int
     monitor_tags:
@@ -99,7 +99,7 @@ options:
           - For example, to have a recurring event on the first day of each month,
             select a type of rrule and set the C(FREQ) to C(MONTHLY) and C(BYMONTHDAY) to C(1).
           - Most common rrule options from the iCalendar Spec are supported.
-          - Attributes specifying the duration in C(RRULE) are not supported (e.g. C(DTSTART), C(DTEND), C(DURATION)).
+          - Attributes specifying the duration in C(RRULE) are not supported (for example C(DTSTART), C(DTEND), C(DURATION)).
         type: str
 """
 

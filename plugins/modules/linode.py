@@ -31,7 +31,7 @@ options:
   api_key:
     description:
      - Linode API key.
-     - C(LINODE_API_KEY) env variable can be used instead.
+     - E(LINODE_API_KEY) environment variable can be used instead.
     type: str
     required: true
   name:
@@ -124,7 +124,7 @@ options:
   private_ip:
     description:
     - Add private IPv4 address when Linode is created.
-    - Default is C(false).
+    - Default is V(false).
     type: bool
   ssh_pub_key:
     description:
@@ -149,7 +149,7 @@ options:
     type: int
   wait:
     description:
-     - wait for the instance to be in state C(running) before returning
+     - wait for the instance to be in state V(running) before returning
     type: bool
     default: true
   wait_timeout:

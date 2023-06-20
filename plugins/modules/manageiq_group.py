@@ -52,7 +52,7 @@ options:
     type: str
     description:
     - The the group role name
-    - The C(role_id) has precedence over the C(role) when supplied.
+    - The O(role_id) has precedence over the O(role) when supplied.
     required: false
     default: null
   tenant_id:
@@ -65,7 +65,7 @@ options:
     type: str
     description:
     - The tenant for the group identified by the tenant name.
-    - The C(tenant_id) has precedence over the C(tenant) when supplied.
+    - The O(tenant_id) has precedence over the O(tenant) when supplied.
     - Tenant names are case sensitive.
     required: false
     default: null
@@ -78,7 +78,7 @@ options:
     type: str
     description:
     - In merge mode existing categories are kept or updated, new categories are added.
-    - In replace mode all categories will be replaced with the supplied C(managed_filters).
+    - In replace mode all categories will be replaced with the supplied O(managed_filters).
     choices: [ merge, replace ]
     default: replace
   belongsto_filters:
@@ -90,8 +90,8 @@ options:
   belongsto_filters_merge_mode:
     type: str
     description:
-    - In merge mode existing settings are merged with the supplied C(belongsto_filters).
-    - In replace mode current values are replaced with the supplied C(belongsto_filters).
+    - In merge mode existing settings are merged with the supplied O(belongsto_filters).
+    - In replace mode current values are replaced with the supplied O(belongsto_filters).
     choices: [ merge, replace ]
     default: replace
 '''

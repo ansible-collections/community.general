@@ -31,7 +31,7 @@ options:
   state:
     type: str
     description:
-      - The desired state of the gem. C(latest) ensures that the latest version is installed.
+      - The desired state of the gem. V(latest) ensures that the latest version is installed.
     required: false
     choices: [present, absent, latest]
     default: present
@@ -80,7 +80,7 @@ options:
     default: true
     description:
     - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
-    - The default changed from C(false) to C(true) in community.general 6.0.0.
+    - The default changed from V(false) to V(true) in community.general 6.0.0.
     version_added: 3.3.0
   env_shebang:
     description:

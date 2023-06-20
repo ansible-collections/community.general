@@ -45,27 +45,27 @@ options:
         type: str
     port:
         description:
-            - Use this TCP port when connecting to C(server).
+            - Use this TCP port when connecting to O(server).
         default: 53
         type: int
     key_name:
         description:
-            - Use TSIG key name to authenticate against DNS C(server)
+            - Use TSIG key name to authenticate against DNS O(server)
         type: str
     key_secret:
         description:
-            - Use TSIG key secret, associated with C(key_name), to authenticate against C(server)
+            - Use TSIG key secret, associated with O(key_name), to authenticate against O(server)
         type: str
     key_algorithm:
         description:
-            - Specify key algorithm used by C(key_secret).
+            - Specify key algorithm used by O(key_secret).
         choices: ['HMAC-MD5.SIG-ALG.REG.INT', 'hmac-md5', 'hmac-sha1', 'hmac-sha224', 'hmac-sha256', 'hmac-sha384',
                   'hmac-sha512']
         default: 'hmac-md5'
         type: str
     zone:
         description:
-            - DNS record will be modified on this C(zone).
+            - DNS record will be modified on this O(zone).
             - When omitted DNS will be queried to attempt finding the correct zone.
             - Starting with Ansible 2.7 this parameter is optional.
         type: str

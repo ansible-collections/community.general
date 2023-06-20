@@ -82,7 +82,7 @@ options:
         description: ["An arbitrary string to use for aggregation."]
     validate_certs:
         description:
-            - If C(false), SSL certificates will not be validated. This should only be used
+            - If V(false), SSL certificates will not be validated. This should only be used
               on personally controlled sites using self-signed certificates.
         type: bool
         default: true

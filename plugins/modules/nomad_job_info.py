@@ -29,8 +29,6 @@ options:
         - Name of job for Get info.
         - If not specified, lists all jobs.
       type: str
-notes:
-  - C(check_mode) is supported.
 seealso:
   - name: Nomad jobs documentation
     description: Complete documentation for Nomad API jobs.

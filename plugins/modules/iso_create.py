@@ -35,7 +35,7 @@ options:
    src_files:
      description:
      - This is a list of absolute paths of source files or folders which will be contained in the new generated ISO file.
-     - Will fail if specified file or folder in C(src_files) does not exist on local machine.
+     - Will fail if specified file or folder in O(src_files) does not exist on local machine.
      - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
        underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
        names are limited to 255 characters.'
@@ -51,9 +51,9 @@ options:
    interchange_level:
      description:
      - The ISO9660 interchange level to use, it dictates the rules on the names of files.
-     - Levels and valid values C(1), C(2), C(3), C(4) are supported.
-     - The default value is level C(1), which is the most conservative, level C(3) is recommended.
-     - ISO9660 file names at interchange level C(1) cannot have more than 8 characters or 3 characters in the extension.
+     - Levels and valid values V(1), V(2), V(3), V(4) are supported.
+     - The default value is level V(1), which is the most conservative, level V(3) is recommended.
+     - ISO9660 file names at interchange level V(1) cannot have more than 8 characters or 3 characters in the extension.
      type: int
      default: 1
      choices: [1, 2, 3, 4]
@@ -64,23 +64,23 @@ options:
    rock_ridge:
      description:
      - Whether to make this ISO have the Rock Ridge extensions or not.
-     - Valid values are C(1.09), C(1.10) or C(1.12), means adding the specified Rock Ridge version to the ISO.
-     - If unsure, set C(1.09) to ensure maximum compatibility.
+     - Valid values are V(1.09), V(1.10) or V(1.12), means adding the specified Rock Ridge version to the ISO.
+     - If unsure, set V(1.09) to ensure maximum compatibility.
      - If not specified, then not add Rock Ridge extension to the ISO.
      type: str
      choices: ['1.09', '1.10', '1.12']
    joliet:
      description:
-     - Support levels and valid values are C(1), C(2), or C(3).
-     - Level C(3) is by far the most common.
+     - Support levels and valid values are V(1), V(2), or V(3).
+     - Level V(3) is by far the most common.
      - If not specified, then no Joliet support is added.
      type: int
      choices: [1, 2, 3]
    udf:
      description:
      - Whether to add UDF support to this ISO.
-     - If set to C(True), then version 2.60 of the UDF spec is used.
-     - If not specified or set to C(False), then no UDF support is added.
+     - If set to V(true), then version 2.60 of the UDF spec is used.
+     - If not specified or set to V(false), then no UDF support is added.
      type: bool
      default: false
 '''

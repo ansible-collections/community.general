@@ -50,13 +50,13 @@ options:
     type: int
     description:
     - The id of the parent tenant. If not supplied the root tenant is used.
-    - The C(parent_id) takes president over C(parent) when supplied
+    - The O(parent_id) takes president over O(parent) when supplied
     required: false
     default: null
   parent:
     type: str
     description:
-    - The name of the parent tenant. If not supplied and no C(parent_id) is supplied the root tenant is used.
+    - The name of the parent tenant. If not supplied and no O(parent_id) is supplied the root tenant is used.
     required: false
     default: null
   quotas:

@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 module: shutdown
 short_description: Shut down a machine
 notes:
-  - C(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths)
+  - E(PATH) is ignored on the remote node when searching for the C(shutdown) command. Use O(search_paths)
     to specify locations to search if the default paths do not work.
   - The O(msg) and O(delay) options are not supported when a shutdown command is not found in O(search_paths), instead
     the module will attempt to shutdown the system by calling C(systemctl shutdown).
@@ -47,7 +47,7 @@ options:
   search_paths:
     description:
       - Paths to search on the remote machine for the C(shutdown) command.
-      - I(Only) these paths will be searched for the C(shutdown) command. C(PATH) is ignored in the remote node when searching for the C(shutdown) command.
+      - I(Only) these paths will be searched for the C(shutdown) command. E(PATH) is ignored in the remote node when searching for the C(shutdown) command.
     type: list
     elements: path
     default: ['/sbin', '/usr/sbin', '/usr/local/sbin']

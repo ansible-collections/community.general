@@ -77,7 +77,7 @@ options:
   deregister:
     description:
       - If a deregistration event should be created upon Sensu client process stop.
-      - Default is C(false).
+      - Default is V(false).
     type: bool
   deregistration:
     type: dict
