@@ -73,8 +73,8 @@ options:
     name:
         description:
             - Specifies the ECS name. Value requirements consists of 1 to 64
-              characters, including letters, digits, underscores C(_), hyphens
-              (-), periods (.).
+              characters, including letters, digits, underscores (V(_)), hyphens
+              (V(-)), periods (V(.)).
         type: str
         required: true
     nics:
@@ -306,8 +306,8 @@ RETURN = '''
     name:
         description:
             - Specifies the ECS name. Value requirements "Consists of 1 to 64
-              characters, including letters, digits, underscores C(_), hyphens
-              (-), periods (.)".
+              characters, including letters, digits, underscores (V(_)), hyphens
+              (V(-)), periods (V(.)).".
         type: str
         returned: success
     nics:

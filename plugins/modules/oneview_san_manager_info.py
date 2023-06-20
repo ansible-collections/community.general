@@ -34,10 +34,10 @@ options:
       description:
         - List of params to delimit, filter and sort the list of resources.
         - "params allowed:
-           - C(start): The first item to return, using 0-based indexing.
-           - C(count): The number of resources to return.
-           - C(query): A general query string to narrow the list of resources returned.
-           - C(sort): The sort order of the returned data set."
+           - V(start): The first item to return, using 0-based indexing.
+           - V(count): The number of resources to return.
+           - V(query): A general query string to narrow the list of resources returned.
+           - V(sort): The sort order of the returned data set."
       type: dict
 extends_documentation_fragment:
   - community.general.oneview

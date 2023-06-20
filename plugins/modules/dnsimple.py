@@ -26,7 +26,7 @@ attributes:
 options:
   account_email:
     description:
-      - Account email. If omitted, the environment variables C(DNSIMPLE_EMAIL) and C(DNSIMPLE_API_TOKEN) will be looked for.
+      - Account email. If omitted, the environment variables E(DNSIMPLE_EMAIL) and E(DNSIMPLE_API_TOKEN) will be looked for.
       - "If those aren't found, a C(.dnsimple) file will be looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started)."
       - "C(.dnsimple) config files are only supported in dnsimple-python<2.0.0"
     type: str

@@ -17,7 +17,7 @@ description:
     - Send a message to a Cisco Webex Teams Room or Individual with options to control the formatting.
 author: Drew Rusell (@drew-russell)
 notes:
-  - The C(recipient_id) type must be valid for the supplied C(recipient_id).
+  - The O(recipient_type) must be valid for the supplied O(recipient_id).
   - Full API documentation can be found at U(https://developer.webex.com/docs/api/basics).
 
 extends_documentation_fragment:
@@ -40,7 +40,7 @@ options:
 
   recipient_id:
     description:
-      - The unique identifier associated with the supplied C(recipient_type).
+      - The unique identifier associated with the supplied O(recipient_type).
     required: true
     type: str
 

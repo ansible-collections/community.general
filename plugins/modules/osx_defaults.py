@@ -38,7 +38,7 @@ options:
   host:
     description:
       - The host on which the preference should apply.
-      - The special value C(currentHost) corresponds to the C(-currentHost) switch of the defaults commandline tool.
+      - The special value V(currentHost) corresponds to the C(-currentHost) switch of the defaults commandline tool.
     type: str
   key:
     description:
@@ -63,7 +63,7 @@ options:
   state:
     description:
       - The state of the user defaults.
-      - If set to V(list) will query the given parameter specified by C(key). Returns 'null' is nothing found or mis-spelled.
+      - If set to V(list) will query the given parameter specified by O(key). Returns V(null) is nothing found or mis-spelled.
       - V(list) added in Ansible 2.8.
     type: str
     choices: [ absent, list, present ]

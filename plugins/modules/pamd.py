@@ -37,7 +37,7 @@ options:
   type:
     description:
       - The type of the PAM rule being modified.
-      - The C(type), C(control) and C(module_path) all must match a rule to be modified.
+      - The O(type), O(control), and O(module_path) options all must match a rule to be modified.
     type: str
     required: true
     choices: [ account, -account, auth, -auth, password, -password, session, -session ]
@@ -46,13 +46,13 @@ options:
       - The control of the PAM rule being modified.
       - This may be a complicated control with brackets. If this is the case, be
         sure to put "[bracketed controls]" in quotes.
-      - The C(type), C(control) and C(module_path) all must match a rule to be modified.
+      - The O(type), O(control), and O(module_path) options all must match a rule to be modified.
     type: str
     required: true
   module_path:
     description:
       - The module path of the PAM rule being modified.
-      - The C(type), C(control) and C(module_path) all must match a rule to be modified.
+      - The O(type), O(control), and O(module_path) options all must match a rule to be modified.
     type: str
     required: true
   new_type:
@@ -70,9 +70,9 @@ options:
     type: str
   module_arguments:
     description:
-    - When state is C(updated), the module_arguments will replace existing module_arguments.
-    - When state is C(args_absent) args matching those listed in module_arguments will be removed.
-    - When state is C(args_present) any args listed in module_arguments are added if
+    - When O(state=updated), the O(module_arguments) will replace existing module_arguments.
+    - When O(state=args_absent) args matching those listed in O(module_arguments) will be removed.
+    - When O(state=args_present) any args listed in O(module_arguments) are added if
       missing from the existing rule.
     - Furthermore, if the module argument takes a value denoted by C(=),
       the value will be changed to that specified in module_arguments.
@@ -80,15 +80,15 @@ options:
     elements: str
   state:
     description:
-    - The default of C(updated) will modify an existing rule if type,
+    - The default of V(updated) will modify an existing rule if type,
       control and module_path all match an existing rule.
-    - With C(before), the new rule will be inserted before a rule matching type,
+    - With V(before), the new rule will be inserted before a rule matching type,
       control and module_path.
-    - Similarly, with C(after), the new rule will be inserted after an existing rulematching type,
+    - Similarly, with V(after), the new rule will be inserted after an existing rulematching type,
       control and module_path.
-    - With either C(before) or C(after) new_type, new_control, and new_module_path must all be specified.
-    - If state is C(args_absent) or C(args_present), new_type, new_control, and new_module_path will be ignored.
-    - State C(absent) will remove the rule.  The 'absent' state was added in Ansible 2.4.
+    - With either V(before) or V(after) O(new_type), O(new_control), and O(new_module_path) must all be specified.
+    - If state is V(args_absent) or V(args_present), O(new_type), O(new_control), and O(new_module_path) will be ignored.
+    - State V(absent) will remove the rule.  The V(absent) state was added in Ansible 2.4.
     type: str
     choices: [ absent, before, after, args_absent, args_present, updated ]
     default: updated
