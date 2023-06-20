@@ -306,7 +306,7 @@ def main():
                 module.exit_json(changed=False, name=name, data=data)
 
             # Template attribute is not allowed in modification
-            del data['attrs']['templates']
+            del data['templates']
 
             ret = icinga.modify(name, data)
 
