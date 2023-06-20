@@ -23,8 +23,8 @@ options:
     description: >
       A list of version-likes or module names to check for installation.
       Supported operators: <, >, <=, >=, or ==. The bare module name like
-      C(ansible), the module with a specific version like C(boto3==1.6.1), or a
-      partial version like C(requests>2) are all valid specifications.
+      V(ansible), the module with a specific version like V(boto3==1.6.1), or a
+      partial version like V(requests>2) are all valid specifications.
     default: []
 author:
   - Will Thames (@willthames)

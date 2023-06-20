@@ -130,7 +130,7 @@ options:
   state:
     description:
       - create or terminate instances
-      - 'The choices available are: C(running), C(stopped), C(absent), C(present).'
+      - 'The choices available are: V(running), V(stopped), V(absent), V(present).'
     type: str
     default: 'present'
   disk_type:

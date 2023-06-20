@@ -53,15 +53,15 @@ options:
   policy:
     description:
     - Sets the interphysical volume allocation policy.
-    - C(maximum) allocates logical partitions across the maximum number of physical volumes.
-    - C(minimum) allocates logical partitions across the minimum number of physical volumes.
+    - V(maximum) allocates logical partitions across the maximum number of physical volumes.
+    - V(minimum) allocates logical partitions across the minimum number of physical volumes.
     type: str
     choices: [ maximum, minimum ]
     default: maximum
   state:
     description:
-    - Control if the logical volume exists. If C(present) and the
-      volume does not already exist then the C(size) option is required.
+    - Control if the logical volume exists. If V(present) and the
+      volume does not already exist then the O(size) option is required.
     type: str
     choices: [ absent, present ]
     default: present
@@ -72,7 +72,7 @@ options:
     default: ''
   pvs:
     description:
-    - A list of physical volumes e.g. C(hdisk1,hdisk2).
+    - A list of physical volumes, for example V(hdisk1,hdisk2).
     type: list
     elements: str
     default: []

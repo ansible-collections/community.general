@@ -48,7 +48,7 @@ options:
   state:
     description:
       - Attribute that specifies if the build is to be created, deleted or stopped.
-      - The C(stopped) state has been added in community.general 3.3.0.
+      - The V(stopped) state has been added in community.general 3.3.0.
     default: present
     choices: ['present', 'absent', 'stopped']
     type: str

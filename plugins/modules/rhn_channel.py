@@ -60,8 +60,8 @@ options:
         type: str
     validate_certs:
         description:
-            - If C(False), SSL certificates will not be validated.
-            - This should only set to C(False) when used on self controlled sites
+            - If V(false), SSL certificates will not be validated.
+            - This should only set to V(false) when used on self controlled sites
               using self-signed certificates, and you are absolutely sure that nobody
               can modify traffic between the module and the site.
         type: bool

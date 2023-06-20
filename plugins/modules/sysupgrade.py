@@ -43,7 +43,7 @@ options:
     fetch_only:
         description:
         - Fetch and verify files and create /bsd.upgrade but do not reboot.
-        - Set to C(false) if you want sysupgrade to reboot. This will cause Ansible to error, as it expects the module to exit gracefully. See the examples.
+        - Set to V(false) if you want sysupgrade to reboot. This will cause Ansible to error, as it expects the module to exit gracefully. See the examples.
         default: true
         type: bool
     installurl:

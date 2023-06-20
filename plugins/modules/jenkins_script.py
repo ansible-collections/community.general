@@ -42,8 +42,8 @@ options:
     default: http://localhost:8080
   validate_certs:
     description:
-      - If set to C(false), the SSL certificates will not be validated.
-        This should only set to C(false) used on personally controlled sites
+      - If set to V(false), the SSL certificates will not be validated.
+        This should only set to V(false) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
     type: bool
     default: true

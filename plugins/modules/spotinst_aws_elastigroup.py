@@ -46,13 +46,13 @@ options:
     description:
       - A Personal API Access Token issued by Spotinst.
       - >-
-        When not specified, the module will try to obtain it, in that order, from: environment variable C(SPOTINST_TOKEN), or from the credentials path.
+        When not specified, the module will try to obtain it, in that order, from: environment variable E(SPOTINST_TOKEN), or from the credentials path.
     type: str
 
   availability_vs_cost:
     description:
       - The strategy orientation.
-      - "The choices available are: C(availabilityOriented), C(costOriented), C(balanced)."
+      - "The choices available are: V(availabilityOriented), V(costOriented), V(balanced)."
     required: true
     type: str
 
@@ -127,7 +127,7 @@ options:
 
   elastic_ips:
     description:
-      - List of ElasticIps Allocation Ids (Example C(eipalloc-9d4e16f8)) to associate to the group instances
+      - List of ElasticIps Allocation Ids (example V(eipalloc-9d4e16f8)) to associate to the group instances
     type: list
     elements: str
 
@@ -139,7 +139,7 @@ options:
   health_check_grace_period:
     description:
       - The amount of time, in seconds, after the instance has launched to start and check its health.
-      - If not specified, it defaults to C(300).
+      - If not specified, it defaults to V(300).
     type: int
 
   health_check_unhealthy_duration_before_replacement:
@@ -150,7 +150,7 @@ options:
   health_check_type:
     description:
       - The service to use for the health check.
-      - "The choices available are: C(ELB), C(HCS), C(TARGET_GROUP), C(MLB), C(EC2)."
+      - "The choices available are: V(ELB), V(HCS), V(TARGET_GROUP), V(MLB), V(EC2)."
     type: str
 
   iam_role_name:
@@ -283,7 +283,7 @@ options:
   product:
     description:
       - Operation system type.
-      - "Available choices are: C(Linux/UNIX), C(SUSE Linux), C(Windows), C(Linux/UNIX (Amazon VPC)), C(SUSE Linux (Amazon VPC))."
+      - "Available choices are: V(Linux/UNIX), V(SUSE Linux), V(Windows), V(Linux/UNIX (Amazon VPC)), V(SUSE Linux (Amazon VPC))."
     required: true
     type: str
 
@@ -404,7 +404,7 @@ options:
   tenancy:
     description:
       - Dedicated vs shared tenancy.
-      - "The available choices are: C(default), C(dedicated)."
+      - "The available choices are: V(default), V(dedicated)."
     type: str
 
   terminate_at_end_of_billing_hour:
@@ -415,7 +415,7 @@ options:
   unit:
     description:
       - The capacity unit to launch instances by.
-      - "The available choices are: C(instance), C(weight)."
+      - "The available choices are: V(instance), V(weight)."
     type: str
 
   up_scaling_policies:

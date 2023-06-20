@@ -30,7 +30,7 @@ options:
   state:
     type: str
     description:
-      - The desired state of the Gem bundle. C(latest) updates gems to the most recent, acceptable version
+      - The desired state of the Gem bundle. V(latest) updates gems to the most recent, acceptable version
     choices: [present, latest]
     default: present
   chdir:
@@ -44,19 +44,19 @@ options:
     elements: str
     description:
       - A list of Gemfile groups to exclude during operations. This only
-        applies when state is C(present). Bundler considers this
+        applies when O(state=present). Bundler considers this
         a 'remembered' property for the Gemfile and will automatically exclude
-        groups in future operations even if C(exclude_groups) is not set
+        groups in future operations even if O(exclude_groups) is not set
   clean:
     description:
-      - Only applies if state is C(present). If set removes any gems on the
+      - Only applies if O(state=present). If set removes any gems on the
         target host that are not in the gemfile
     type: bool
     default: false
   gemfile:
     type: path
     description:
-      - Only applies if state is C(present). The path to the gemfile to use to install gems.
+      - Only applies if O(state=present). The path to the gemfile to use to install gems.
       - If not specified it will default to the Gemfile in current directory
   local:
     description:
@@ -65,31 +65,31 @@ options:
     default: false
   deployment_mode:
     description:
-      - Only applies if state is C(present). If set it will install gems in
+      - Only applies if O(state=present). If set it will install gems in
         ./vendor/bundle instead of the default location. Requires a Gemfile.lock
         file to have been created prior
     type: bool
     default: false
   user_install:
     description:
-      - Only applies if state is C(present). Installs gems in the local user's cache or for all users
+      - Only applies if O(state=present). Installs gems in the local user's cache or for all users
     type: bool
     default: true
   gem_path:
     type: path
     description:
-      - Only applies if state is C(present). Specifies the directory to
-        install the gems into. If C(chdir) is set then this path is relative to
-        C(chdir)
+      - Only applies if O(state=present). Specifies the directory to
+        install the gems into. If O(chdir) is set then this path is relative to
+        O(chdir)
       - If not specified the default RubyGems gem paths will be used.
   binstub_directory:
     type: path
     description:
-      - Only applies if state is C(present). Specifies the directory to
+      - Only applies if O(state=present). Specifies the directory to
         install any gem bins files to. When executed the bin files will run
         within the context of the Gemfile and fail if any required gem
-        dependencies are not installed. If C(chdir) is set then this path is
-        relative to C(chdir)
+        dependencies are not installed. If O(chdir) is set then this path is
+        relative to O(chdir)
   extra_args:
     type: str
     description:

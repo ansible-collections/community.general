@@ -42,14 +42,14 @@ options:
         type: str
     state:
         description:
-            - Whether to set this project as C(enabled), C(disabled) or C(absent).
+            - Whether to set this project as V(enabled), V(disabled), or V(absent).
         default: enabled
         type: str
         choices: [absent, enabled, disabled]
     chroot:
         description:
             - The name of the chroot that you want to enable/disable/remove in the project,
-              for example C(epel-7-x86_64). Default chroot is determined by the operating system,
+              for example V(epel-7-x86_64). Default chroot is determined by the operating system,
               version of the operating system, and architecture on which the module is run.
         type: str
 """
