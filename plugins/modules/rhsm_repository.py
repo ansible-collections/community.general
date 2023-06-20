@@ -226,6 +226,9 @@ def repository_modify(module, state, name, purge=False):
                 diff_after.join("Repository '{repoid}' is disabled for this system\n".format(repoid=repoid))
                 results.append("Repository '{repoid}' is disabled for this system".format(repoid=repoid))
                 rhsm_arguments.extend(['--disable', repoid])
+            for updated_repo in updated_repo_list:
+                if updated_repo['id'] in difference:
+                    updated_repo['enabled'] = False
 
     diff = {'before': diff_before,
             'after': diff_after,
