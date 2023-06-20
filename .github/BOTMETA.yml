@@ -687,6 +687,8 @@ files:
     maintainers: $team_keycloak
   $modules/keycloak_authentication.py:
     maintainers: elfelip Gaetan2907
+  $modules/keycloak_authentication_required_actions.py:
+    maintainers: Skrekulko
   $modules/keycloak_authz_authorization_scope.py:
     maintainers: mattock
   $modules/keycloak_client_rolemapping.py:
