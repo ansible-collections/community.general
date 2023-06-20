@@ -6,6 +6,127 @@ Community General Release Notes
 
 This changelog describes changes after version 6.0.0.
 
+v7.1.0
+======
+
+Release Summary
+---------------
+
+Regular bugfix and feature release.
+
+From this version on, community.general is using the new `Ansible semantic markup
+<https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_documenting.html#semantic-markup-within-module-documentation>`__
+in its documentation. If you look at documentation with the ansible-doc CLI tool
+from ansible-core before 2.15, please note that it does not render the markup
+correctly. You should be still able to read it in most cases, but you need
+ansible-core 2.15 or later to see it as it is intended. Alternatively you can
+look at `the devel docsite <https://docs.ansible.com/ansible/devel/collections/community/general/>__`
+for the rendered HTML version of the documentation of the latest release.
+
+
+Minor Changes
+-------------
+
+- The collection will start using semantic markup (https://github.com/ansible-collections/community.general/pull/6539).
+- VarDict module utils - add method ``VarDict.as_dict()`` to convert to a plain ``dict`` object (https://github.com/ansible-collections/community.general/pull/6602).
+- cobbler inventory plugin - add ``inventory_hostname`` option to allow using the system name for the inventory hostname (https://github.com/ansible-collections/community.general/pull/6502).
+- cobbler inventory plugin - add ``want_ip_addresses`` option to collect all interface DNS name to IP address mapping (https://github.com/ansible-collections/community.general/pull/6711).
+- cobbler inventory plugin - add primary IP addess to ``cobbler_ipv4_address`` and IPv6 address to ``cobbler_ipv6_address`` host variable (https://github.com/ansible-collections/community.general/pull/6711).
+- cobbler inventory plugin - add warning for systems with empty profiles (https://github.com/ansible-collections/community.general/pull/6502).
+- copr - respawn module to use the system python interpreter when the ``dnf`` python module is not available in ``ansible_python_interpreter`` (https://github.com/ansible-collections/community.general/pull/6522).
+- datadog_monitor - adds ``notification_preset_name``, ``renotify_occurrences`` and ``renotify_statuses`` parameters (https://github.com/ansible-collections/community.general/issues/6521,https://github.com/ansible-collections/community.general/issues/5823).
+- filesystem - add ``uuid`` parameter for UUID change feature (https://github.com/ansible-collections/community.general/pull/6680).
+- keycloak_client_rolemapping - adds support for subgroups with additional parameter ``parents`` (https://github.com/ansible-collections/community.general/pull/6687).
+- keycloak_role - add composite roles support for realm and client roles (https://github.com/ansible-collections/community.general/pull/6469).
+- ldap_* - add new arguments ``client_cert`` and ``client_key`` to the LDAP modules in order to allow certificate authentication (https://github.com/ansible-collections/community.general/pull/6668).
+- ldap_search - add a new ``page_size`` option to enable paged searches (https://github.com/ansible-collections/community.general/pull/6648).
+- lvg - add ``active`` and ``inactive`` values to the ``state`` option for active state management feature (https://github.com/ansible-collections/community.general/pull/6682).
+- lvg - add ``reset_vg_uuid``, ``reset_pv_uuid`` options for UUID reset feature (https://github.com/ansible-collections/community.general/pull/6682).
+- mas - disable sign-in check for macOS 12+ as ``mas account`` is non-functional (https://github.com/ansible-collections/community.general/pull/6520).
+- onepassword lookup plugin - add service account support (https://github.com/ansible-collections/community.general/issues/6635, https://github.com/ansible-collections/community.general/pull/6660).
+- onepassword_raw lookup plugin - add service account support (https://github.com/ansible-collections/community.general/issues/6635, https://github.com/ansible-collections/community.general/pull/6660).
+- opentelemetry callback plugin - add span attributes in the span event (https://github.com/ansible-collections/community.general/pull/6531).
+- opkg - remove default value ``""`` for parameter ``force`` as it causes the same behaviour of not having that parameter (https://github.com/ansible-collections/community.general/pull/6513).
+- proxmox - support ``timezone`` parameter at container creation (https://github.com/ansible-collections/community.general/pull/6510).
+- proxmox inventory plugin - add composite variables support for Proxmox nodes (https://github.com/ansible-collections/community.general/issues/6640).
+- proxmox_kvm - added support for ``tpmstate0`` parameter to configure TPM (Trusted Platform Module) disk. TPM is required for Windows 11 installations (https://github.com/ansible-collections/community.general/pull/6533).
+- proxmox_kvm - re-use ``timeout`` module param to forcefully shutdown a virtual machine when ``state`` is ``stopped`` (https://github.com/ansible-collections/community.general/issues/6257).
+- proxmox_snap - add ``retention`` parameter to delete old snapshots (https://github.com/ansible-collections/community.general/pull/6576).
+- redfish_command - add ``MultipartHTTPPushUpdate`` command (https://github.com/ansible-collections/community.general/issues/6471, https://github.com/ansible-collections/community.general/pull/6612).
+- redhat_subscription - the internal ``RegistrationBase`` class was folded
+  into the other internal ``Rhsm`` class, as the separation had no purpose
+  anymore
+  (https://github.com/ansible-collections/community.general/pull/6658).
+- rhsm_release - improve/harden the way ``subscription-manager`` is run;
+  no behaviour change is expected
+  (https://github.com/ansible-collections/community.general/pull/6669).
+- snap - module is now aware of channel when deciding whether to install or refresh the snap (https://github.com/ansible-collections/community.general/pull/6435, https://github.com/ansible-collections/community.general/issues/1606).
+- sorcery - minor refactor (https://github.com/ansible-collections/community.general/pull/6525).
+- tss lookup plugin - allow to fetch secret IDs which are in a folder based on folder ID. Previously, we could not fetch secrets based on folder ID but now use ``fetch_secret_ids_from_folder`` option to indicate to fetch secret IDs based on folder ID (https://github.com/ansible-collections/community.general/issues/6223).
+
+Deprecated Features
+-------------------
+
+- CmdRunner module utils - deprecate ``cmd_runner_fmt.as_default_type()`` formatter (https://github.com/ansible-collections/community.general/pull/6601).
+- MH VarsMixin module utils - deprecates ``VarsMixin`` and supporting classes in favor of plain ``vardict`` module util (https://github.com/ansible-collections/community.general/pull/6649).
+- cpanm - value ``compatibility`` is deprecated as default for parameter ``mode`` (https://github.com/ansible-collections/community.general/pull/6512).
+- redhat module utils - the ``module_utils.redhat`` module is deprecated, as
+  effectively unused: the ``Rhsm``, ``RhsmPool``, and ``RhsmPools`` classes
+  will be removed in community.general 9.0.0; the ``RegistrationBase`` class
+  will be removed in community.general 10.0.0 together with the
+  ``rhn_register`` module, as it is the only user of this class; this means
+  that the whole ``module_utils.redhat`` module will be dropped in
+  community.general 10.0.0, so importing it without even using anything of it
+  will fail
+  (https://github.com/ansible-collections/community.general/pull/6663).
+- redhat_subscription - the ``autosubscribe`` alias for the ``auto_attach`` option has been
+  deprecated for many years, although only in the documentation. Officially mark this alias
+  as deprecated, and it will be removed in community.general 9.0.0
+  (https://github.com/ansible-collections/community.general/pull/6646).
+- redhat_subscription - the ``pool`` option is deprecated in favour of the
+  more precise and flexible ``pool_ids`` option
+  (https://github.com/ansible-collections/community.general/pull/6650).
+- rhsm_repository - ``state=present`` has not been working as expected for many years,
+  and it seems it was not noticed so far; also, "presence" is not really a valid concept
+  for subscription repositories, which can only be enabled or disabled. Hence, mark the
+  ``present`` and ``absent`` values of the ``state`` option as deprecated, slating them
+  for removal in community.general 10.0.0
+  (https://github.com/ansible-collections/community.general/pull/6673).
+
+Bugfixes
+--------
+
+- MH DependencyMixin module utils - deprecation notice was popping up for modules not using dependencies (https://github.com/ansible-collections/community.general/pull/6644, https://github.com/ansible-collections/community.general/issues/6639).
+- csv module utils - detects and remove unicode BOM markers from incoming CSV content (https://github.com/ansible-collections/community.general/pull/6662).
+- gitlab_group - the module passed parameters to the API call even when not set. The module is now filtering out ``None`` values to remediate this (https://github.com/ansible-collections/community.general/pull/6712).
+- icinga2_host - fix a key error when updating an existing host (https://github.com/ansible-collections/community.general/pull/6748).
+- ini_file - add the ``follow`` paramter to follow the symlinks instead of replacing them (https://github.com/ansible-collections/community.general/pull/6546).
+- ini_file - fix a bug where the inactive options were not used when possible (https://github.com/ansible-collections/community.general/pull/6575).
+- keycloak module utils - fix ``is_struct_included`` handling of lists of lists/dictionaries (https://github.com/ansible-collections/community.general/pull/6688).
+- keycloak module utils - the function ``get_user_by_username`` now return the user representation or ``None`` as stated in the documentation (https://github.com/ansible-collections/community.general/pull/6758).
+- proxmox_kvm - allow creation of VM with existing name but new vmid (https://github.com/ansible-collections/community.general/issues/6155, https://github.com/ansible-collections/community.general/pull/6709).
+- rhsm_repository - when using the ``purge`` option, the ``repositories``
+  dictionary element in the returned JSON is now properly updated according
+  to the pruning operation
+  (https://github.com/ansible-collections/community.general/pull/6676).
+- tss lookup plugin - fix multiple issues when using ``fetch_attachments=true`` (https://github.com/ansible-collections/community.general/pull/6720).
+
+Known Issues
+------------
+
+- Ansible markup will show up in raw form on ansible-doc text output for ansible-core before 2.15. If you have trouble deciphering the documentation markup, please upgrade to ansible-core 2.15 (or newer), or read the HTML documentation on https://docs.ansible.com/ansible/devel/collections/community/general/ (https://github.com/ansible-collections/community.general/pull/6539).
+
+New Modules
+-----------
+
+- gitlab_instance_variable - Creates, updates, or deletes GitLab instance variables
+- gitlab_merge_request - Create, update, or delete GitLab merge requests
+- keycloak_authentication_required_actions - Allows administration of Keycloak authentication required actions
+- keycloak_user - Create and configure a user in Keycloak
+- lvg_rename - Renames LVM volume groups
+- proxmox_pool - Pool management for Proxmox VE cluster
+- proxmox_pool_member - Add or delete members from Proxmox VE cluster pools
+
 v7.0.1
 ======
 

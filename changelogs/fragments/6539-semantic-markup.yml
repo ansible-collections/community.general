@@ -1,7 +1,0 @@
----
-minor_changes:
-  - "The collection will start using semantic markup (https://github.com/ansible-collections/community.general/pull/6539)."
-known_issues:
-  - "Ansible markup will show up in raw form on ansible-doc text output for ansible-core before 2.15. If you have trouble deciphering the
-     documentation markup, please upgrade to ansible-core 2.15 (or newer), or read the HTML documentation on
-     https://docs.ansible.com/ansible/devel/collections/community/general/ (https://github.com/ansible-collections/community.general/pull/6539)."

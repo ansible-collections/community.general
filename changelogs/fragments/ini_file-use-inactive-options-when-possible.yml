@@ -1,3 +1,0 @@
----
-bugfixes:
-  - ini_file - fix a bug where the inactive options were not used when possible (https://github.com/ansible-collections/community.general/pull/6575).

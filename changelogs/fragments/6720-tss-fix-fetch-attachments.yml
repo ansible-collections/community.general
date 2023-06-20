@@ -1,2 +1,0 @@
-bugfixes:
-  - "tss lookup plugin - fix multiple issues when using ``fetch_attachments=true`` (https://github.com/ansible-collections/community.general/pull/6720)."

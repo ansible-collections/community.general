@@ -1,2 +1,0 @@
-minor_changes:
-  - filesystem - add ``uuid`` parameter for UUID change feature (https://github.com/ansible-collections/community.general/pull/6680).

@@ -1,3 +1,0 @@
----
-bugfixes:
-  - "ini_file - add the ``follow`` paramter to follow the symlinks instead of replacing them (https://github.com/ansible-collections/community.general/pull/6546)."

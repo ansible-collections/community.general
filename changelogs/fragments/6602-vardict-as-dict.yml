@@ -1,2 +1,0 @@
-minor_changes:
-  - VarDict module utils - add method ``VarDict.as_dict()`` to convert to a plain ``dict`` object (https://github.com/ansible-collections/community.general/pull/6602).
