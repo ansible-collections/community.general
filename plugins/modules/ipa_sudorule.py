@@ -56,14 +56,14 @@ options:
     - List of hosts assigned to the rule.
     - If an empty list is passed all hosts will be removed from the rule.
     - If option is omitted hosts will not be checked or changed.
-    - Option C(hostcategory) must be omitted to assign hosts.
+    - Option O(hostcategory) must be omitted to assign hosts.
     type: list
     elements: str
   hostcategory:
     description:
     - Host category the rule applies to.
-    - If 'all' is passed one must omit C(host) and C(hostgroup).
-    - Option C(host) and C(hostgroup) must be omitted to assign 'all'.
+    - If V(all) is passed one must omit O(host) and O(hostgroup).
+    - Option O(host) and O(hostgroup) must be omitted to assign V(all).
     choices: ['all']
     type: str
   hostgroup:
@@ -71,7 +71,7 @@ options:
     - List of host groups assigned to the rule.
     - If an empty list is passed all host groups will be removed from the rule.
     - If option is omitted host groups will not be checked or changed.
-    - Option C(hostcategory) must be omitted to assign host groups.
+    - Option O(hostcategory) must be omitted to assign host groups.
     type: list
     elements: str
   runasextusers:

@@ -24,19 +24,19 @@ attributes:
       - In certain situations it may report a task as changed that will not be reported
         as changed when C(check_mode) is disabled.
       - For example, this might occur when the zpool C(altroot) option is set or when
-        a size is written using human-readable notation, such as C(1M) or C(1024K),
-        instead of as an unqualified byte count, such as C(1048576).
+        a size is written using human-readable notation, such as V(1M) or V(1024K),
+        instead of as an unqualified byte count, such as V(1048576).
   diff_mode:
     support: full
 options:
   name:
     description:
-      - File system, snapshot or volume name e.g. C(rpool/myfs).
+      - File system, snapshot or volume name, for example V(rpool/myfs).
     required: true
     type: str
   state:
     description:
-      - Whether to create (C(present)), or remove (C(absent)) a
+      - Whether to create (V(present)), or remove (V(absent)) a
         file system, snapshot or volume. All parents/children
         will be created/destroyed as needed to reach the desired state.
     choices: [ absent, present ]

@@ -44,9 +44,9 @@ options:
         required: true
         choices: [ present, absent, deleted, imported, updated, vacuumed ]
         description:
-          - State the object operated on should be in. C(imported) is an alias for
-            for C(present) and C(deleted) for C(absent). When set to C(vacuumed)
-            and C(uuid) to C(*), it will remove all unused images.
+          - State the object operated on should be in. V(imported) is an alias for
+            for V(present) and V(deleted) for V(absent). When set to V(vacuumed)
+            and O(uuid=*), it will remove all unused images.
         type: str
 
     type:
@@ -60,7 +60,7 @@ options:
     uuid:
         required: false
         description:
-          - Image UUID. Can either be a full UUID or C(*) for all images.
+          - Image UUID. Can either be a full UUID or V(*) for all images.
         type: str
 
 requirements:

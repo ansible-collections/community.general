@@ -35,8 +35,8 @@ options:
     state:
       description:
       - State of the overlay package.
-      - C(present) simply ensures that a desired package is installed.
-      - C(absent) removes the specified package.
+      - V(present) simply ensures that a desired package is installed.
+      - V(absent) removes the specified package.
       choices: [ 'absent', 'present' ]
       default: 'present'
       type: str

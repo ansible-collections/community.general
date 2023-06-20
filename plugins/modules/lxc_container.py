@@ -92,7 +92,7 @@ options:
         type: str
     lxc_path:
         description:
-          - Place container under C(PATH).
+          - Place container under E(PATH).
         type: path
     container_log:
         description:

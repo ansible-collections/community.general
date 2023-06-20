@@ -45,14 +45,14 @@ options:
       Float values must begin with a digit.
     - When resizing, apart from specifying an absolute size you may, according to
       lvextend(8)|lvreduce(8) C(--size), specify the amount to extend the logical volume with
-      the prefix C(+) or the amount to reduce the logical volume by with prefix C(-).
-    - Resizing using C(+) or C(-) was not supported prior to community.general 3.0.0.
-    - Please note that when using C(+) or C(-), the module is B(not idempotent).
+      the prefix V(+) or the amount to reduce the logical volume by with prefix V(-).
+    - Resizing using V(+) or V(-) was not supported prior to community.general 3.0.0.
+    - Please note that when using V(+) or V(-), the module is B(not idempotent).
   state:
     type: str
     description:
-    - Control if the logical volume exists. If C(present) and the
-      volume does not already exist then the C(size) option is required.
+    - Control if the logical volume exists. If V(present) and the
+      volume does not already exist then the O(size) option is required.
     choices: [ absent, present ]
     default: present
   active:
