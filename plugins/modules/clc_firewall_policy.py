@@ -49,7 +49,7 @@ options:
     description:
       - The list of ports associated with the policy.
         TCP and UDP can take in single ports or port ranges.
-      - "Example: C(['any', 'icmp', 'TCP/123', 'UDP/123', 'TCP/123-456', 'UDP/123-456'])."
+      - "Example: V(['any', 'icmp', 'TCP/123', 'UDP/123', 'TCP/123-456', 'UDP/123-456'])."
     type: list
     elements: str
   firewall_policy_id:

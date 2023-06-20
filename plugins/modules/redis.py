@@ -26,9 +26,9 @@ options:
     command:
         description:
             - The selected redis command
-            - C(config) ensures a configuration setting on an instance.
-            - C(flush) flushes all the instance or a specified db.
-            - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
+            - V(config) ensures a configuration setting on an instance.
+            - V(flush) flushes all the instance or a specified db.
+            - V(replica) sets a redis instance in replica or master mode. (V(slave) is an alias for V(replica).)
         choices: [ config, flush, replica, slave ]
         type: str
     tls:
@@ -51,7 +51,7 @@ options:
     replica_mode:
         description:
             - The mode of the redis instance [replica command]
-            - C(slave) is an alias for C(replica).
+            - V(slave) is an alias for V(replica).
         default: replica
         choices: [ master, replica, slave ]
         type: str

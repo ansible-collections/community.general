@@ -114,18 +114,18 @@ options:
     default: utf-8
   subtype:
     description:
-    - The minor mime type, can be either C(plain) or C(html).
-    - The major type is always C(text).
+    - The minor mime type, can be either V(plain) or V(html).
+    - The major type is always V(text).
     type: str
     choices: [ html, plain ]
     default: plain
   secure:
     description:
-    - If C(always), the connection will only send email if the connection is Encrypted.
+    - If V(always), the connection will only send email if the connection is Encrypted.
       If the server doesn't accept the encrypted connection it will fail.
-    - If C(try), the connection will attempt to setup a secure SSL/TLS session, before trying to send.
-    - If C(never), the connection will not attempt to setup a secure SSL/TLS session, before sending
-    - If C(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending.
+    - If V(try), the connection will attempt to setup a secure SSL/TLS session, before trying to send.
+    - If V(never), the connection will not attempt to setup a secure SSL/TLS session, before sending
+    - If V(starttls), the connection will try to upgrade to a secure SSL/TLS connection, before sending.
       If it is unable to do so it will fail.
     type: str
     choices: [ always, never, starttls, try ]

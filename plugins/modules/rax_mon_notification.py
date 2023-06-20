@@ -26,7 +26,7 @@ options:
   state:
     type: str
     description:
-    - Ensure that the notification with this C(label) exists or does not exist.
+    - Ensure that the notification with this O(label) exists or does not exist.
     choices: ['present', 'absent']
     default: present
   label:

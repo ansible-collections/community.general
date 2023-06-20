@@ -95,12 +95,12 @@ options:
     default: opened
   assignee_ids:
     description:
-      - Comma separated list of assignees usernames omitting C(@) character.
+      - Comma separated list of assignees usernames omitting V(@) character.
       - Set to empty string to unassign all assignees.
     type: str
   reviewer_ids:
     description:
-      - Comma separated list of reviewers usernames omitting C(@) character.
+      - Comma separated list of reviewers usernames omitting V(@) character.
       - Set to empty string to unassign all reviewers.
     type: str
 '''

@@ -75,7 +75,7 @@ options:
                 description:
                     - Specifies the bandwidth name. The value is a string of 1
                       to 64 characters that can contain letters, digits,
-                      underscores C(_), hyphens (-), and periods (.).
+                      underscores (V(_)), hyphens (V(-)), and periods (V(.)).
                 type: str
                 required: true
             size:
@@ -187,7 +187,7 @@ RETURN = '''
                 description:
                     - Specifies the bandwidth name. The value is a string of 1
                       to 64 characters that can contain letters, digits,
-                      underscores C(_), hyphens (-), and periods (.).
+                      underscores (V(_)), hyphens (V(-)), and periods (V(.)).
                 type: str
                 returned: success
             size:
