@@ -1,0 +1,69 @@
+---
+# Copyright (c) 2023 Aritra Sen <aretrosen@proton.me>
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Remove any node modules"
+  file:
+    path: "{{ remote_dir }}/node_modules"
+    state: absent
+
+- vars:
+    # sample: node-v8.2.0-linux-x64.tar.xz
+    node_path: "{{ remote_dir }}/{{ nodejs_path }}/bin"
+    package: "ncp"
+  block:
+    - shell: pnpm --version
+      environment:
+        PATH: "{{ node_path }}:{{ ansible_env.PATH }}"
+      register: pnpm_version
+
+    - debug:
+        var: pnpm_version.stdout
+
+    - name: "Install simple package with no_bin_links disabled"
+      pnpm:
+        path: "{{ remote_dir }}"
+        executable: "{{ node_path }}/pnpm"
+        state: present
+        name: "{{ package }}"
+        no_bin_links: false
+      environment:
+        PATH: "{{ node_path }}:{{ ansible_env.PATH }}"
+      register: pnpm_install_no_bin_links_disabled
+
+    - name: "Make sure .bin folder has been created"
+      stat:
+        path: "{{ remote_dir }}/node_modules/.bin"
+      register: pnpm_dotbin_folder_disabled
+
+    - name: "Remove any node modules"
+      file:
+        path: "{{ remote_dir }}/node_modules"
+        state: absent
+
+    - name: "Install simple package with no_bin_links enabled"
+      pnpm:
+        path: "{{ remote_dir }}"
+        executable: "{{ node_path }}/pnpm"
+        state: present
+        name: "{{ package }}"
+        no_bin_links: true
+      environment:
+        PATH: "{{ node_path }}:{{ ansible_env.PATH }}"
+      register: pnpm_install_no_bin_links_enabled
+
+    - name: "Make sure .bin folder has not been created"
+      stat:
+        path: "{{ remote_dir }}/node_modules/.bin"
+      register: pnpm_dotbin_folder_enabled
+
+    - assert:
+        that:
+          - pnpm_install_no_bin_links_disabled is success
+          - pnpm_install_no_bin_links_disabled is changed
+          - pnpm_install_no_bin_links_enabled is success
+          - pnpm_install_no_bin_links_enabled is changed
+          - pnpm_dotbin_folder_disabled.stat.exists
+          - not pnpm_dotbin_folder_enabled.stat.exists

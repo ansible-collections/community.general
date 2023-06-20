@@ -398,6 +398,9 @@ def main():
     if state == "absent" and name is None:
         module.fail_json(msg="Package name is required for uninstalling")
 
+    if state == "absent" and alias is not None:
+        name = alias
+
     if state == "latest":
         version = "latest"
 

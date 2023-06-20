@@ -1,0 +1,12 @@
+---
+# Copyright (c) 2023 Aritra Sen <aretrosen@proton.me>
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Download pnpm"
+  unarchive:
+    src: "https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/pnpm/{{ nodejs_path }}.tar.gz"
+    dest: "{{ remote_tmp_dir }}"
+    remote_src: true
+    creates: "{{ remote_tmp_dir }}/{{ nodejs_path }}.tar.gz"
