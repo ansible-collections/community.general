@@ -1,0 +1,43 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2023, Sergei Antipov <greendayonfire at gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Proxmox VE virtual machines templates management
+  tags: ["template"]
+  block:
+    - name: Download ISO file
+      ansible.builtin.get_url:
+        url: https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9.2-x86_64-boot.iso
+        dest: /tmp/rocky-9.2.iso
+        mode: 0644
+        checksum: sha256:11e42da96a7b336de04e60d05e54a22999c4d7f3e92c19ebf31f9c71298f5b42
+
+    - name: Upload ISO as template to Proxmox VE cluster
+      proxmox_template:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        src: /tmp/rocky-9.2.iso
+        content_type: iso
+        force: true
+      register: result
+
+    - assert:
+        that:
+          - result is changed
+          - result is success
+
+  always:
+    - name: Delete ISO file from host
+      ansible.builtin.file:
+        path: /tmp/rocky-9.2.iso
+        state: absent

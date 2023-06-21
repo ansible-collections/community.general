@@ -65,7 +65,7 @@ options:
     choices: ['present', 'absent']
     default: present
 notes:
-  - Requires C(proxmoxer) and C(requests) modules on host. This modules can be installed with M(ansible.builtin.pip).
+  - Requires C(proxmoxer), C(requests) and C(requests_toolbelt) modules on host. Those modules can be installed with M(ansible.builtin.pip).
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
@@ -123,12 +123,25 @@ EXAMPLES = '''
 
 import os
 import time
+import traceback
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 
+REQUESTS_TOOLBELT_ERR = None
+try:
+    import requests_toolbelt # noqa: F401, pylint: disable=unused-import
+    HAS_REQUESTS_TOOLBELT = True
+except ImportError:
+    HAS_REQUESTS_TOOLBELT = False
+    REQUESTS_TOOLBELT_ERR = traceback.format_exc()
 
 class ProxmoxTemplateAnsible(ProxmoxAnsible):
+    def __init__(self, module):
+        super(ProxmoxTemplateAnsible, self).__init__(module)
+        if not HAS_REQUESTS_TOOLBELT:
+            self.module.fail_json(msg=missing_required_lib('requests_toolbelt'), exception=REQUESTS_TOOLBELT_ERR)
+
     def get_template(self, node, storage, content_type, template):
         return [True for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get()
                 if tmpl['volid'] == '%s:%s/%s' % (storage, content_type, template)]
