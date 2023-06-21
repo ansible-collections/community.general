@@ -130,11 +130,12 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 REQUESTS_TOOLBELT_ERR = None
 try:
-    import requests_toolbelt # noqa: F401, pylint: disable=unused-import
+    import requests_toolbelt  # noqa: F401, pylint: disable=unused-import
     HAS_REQUESTS_TOOLBELT = True
 except ImportError:
     HAS_REQUESTS_TOOLBELT = False
     REQUESTS_TOOLBELT_ERR = traceback.format_exc()
+
 
 class ProxmoxTemplateAnsible(ProxmoxAnsible):
     def __init__(self, module):
