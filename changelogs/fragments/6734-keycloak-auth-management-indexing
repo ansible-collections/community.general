@@ -1,0 +1,2 @@
+bugfixes:
+  - Fix Keycloak authentication flow (step or sub-flow) indexing during update, if not specified by the user (https://github.com/ansible-collections/community.general/pull/6734).
