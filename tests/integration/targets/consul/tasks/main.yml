@@ -10,8 +10,8 @@
 
 - name: Install Consul and test
   vars:
-    consul_version: 1.5.0
-    consul_uri: https://s3.amazonaws.com/ansible-ci-files/test/integration/targets/consul/consul_{{ consul_version }}_{{ ansible_system | lower }}_{{ consul_arch }}.zip
+    consul_version: 1.13.2
+    consul_uri: https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_{{ ansible_system | lower }}_{{ consul_arch }}.zip
     consul_cmd: '{{ remote_tmp_dir }}/consul'
   block:
   - name: Install requests<2.20 (CentOS/RHEL 6)
@@ -76,8 +76,15 @@
         dest: '{{ remote_tmp_dir }}/consul_config.hcl'
     - name: Start Consul (dev mode enabled)
       shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
+    - name: Bootstrap ACL
+      command: '{{ consul_cmd }} acl bootstrap --format=json'
+      register: consul_bootstrap_result_string
+    - set_fact:
+        consul_management_token: '{{ consul_bootstrap_json_result["SecretID"] }}'
+      vars:
+        consul_bootstrap_json_result: '{{ consul_bootstrap_result_string.stdout | from_json }}'
     - name: Create some data
-      command: '{{ consul_cmd }} kv put data/value{{ item }} foo{{ item }}'
+      command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'
       loop:
       - 1
       - 2
