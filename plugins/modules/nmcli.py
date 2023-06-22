@@ -2183,7 +2183,10 @@ class Nmcli(object):
             if key and len(pair) > 1:
                 raw_value = pair[1].lstrip()
                 if raw_value == '--':
-                    conn_info[key] = None
+                    if key_type == list:
+                        conn_info[key] = []
+                    else:
+                        conn_info[key] = None
                 elif key == 'bond.options':
                     # Aliases such as 'miimon', 'downdelay' are equivalent to the +bond.options 'option=value' syntax.
                     opts = raw_value.split(',')
@@ -2270,7 +2273,7 @@ class Nmcli(object):
             # We can't just do `if not value` because then if there's a value
             # of 0 specified as an integer it'll be interpreted as empty when
             # it actually isn't.
-            if value != 0 and not value:
+            if value not in (0, []) and not value:
                 continue
 
             if key in conn_info:
