@@ -39,6 +39,10 @@ DOCUMENTATION = '''
                 - toggle checking that the ssl certificates are valid, you normally only want to turn this off with self-signed certs.
             default: true
             type: boolean
+    seealso:
+    - module: community.general.etcd3
+    - plugin: community.general.etcd3
+      plugin_type: lookup
 '''
 
 EXAMPLES = '''
