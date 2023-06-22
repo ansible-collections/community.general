@@ -41,7 +41,7 @@
     path: "{{ remote_tmp_dir }}/builder"
     owner: yaybuilder
     state: directory
-    mode: '755'
+    mode: '0755'
 
 - name: clone yay git repo
   become: true
