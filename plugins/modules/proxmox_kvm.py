@@ -1099,6 +1099,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             return False
         return True
 
+    def restart_vm(self, vm):
+        vmid = vm['vmid']
+        proxmox_node = self.proxmox_api.nodes(vm['node'])
+        taskid = proxmox_node.qemu(vmid).status.reboot.post()
+        if not self.wait_for_task(vm['node'], taskid):
+            self.module.fail_json(msg='Reached timeout while waiting for rebooting VM. Last line in task before timeout: %s' %
+                                      proxmox_node.tasks(taskid).log.get()[:1])
+            return False
+        return True
+
     def migrate_vm(self, vm, target_node):
         vmid = vm['vmid']
         proxmox_node = self.proxmox_api.nodes(vm['node'])
@@ -1464,7 +1474,7 @@ def main():
             if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
 
-            if proxmox.stop_vm(vm, force=module.params['force']) and proxmox.start_vm(vm):
+            if proxmox.restart_vm(vm):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is restarted" % vmid, **status)
         except Exception as e:
             module.fail_json(vmid=vmid, msg="restarting of VM %s failed with exception: %s" % (vmid, e), **status)
