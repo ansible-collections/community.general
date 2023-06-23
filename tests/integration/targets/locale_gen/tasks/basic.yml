@@ -3,97 +3,100 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Is the locale we're going to test against installed?
+- name: Is the locale we're going to test against installed? {{ locale_basic.localegen }}
   command: locale -a
   register: initial_state
   ignore_errors: true
 
-- name: Make sure the locale is not installed
+- name: Make sure the locale is not installed {{ locale_basic.localegen }}
   locale_gen:
-    name: "{{ locale_basic }}"
+    name: "{{ locale_basic.localegen }}"
     state: absent
 
-- name: Is the locale present?
+- name: Is the locale present? {{ locale_basic.localegen }}
   command: locale -a
   register: cleaned
   ignore_errors: true
 
-- name: Make sure the locale is not present
+- name: Make sure the locale is not present {{ locale_basic.localegen }}
   assert:
     that:
-      - locale_basic not in cleaned.stdout
+      - locale_basic.skip_removal or locale_basic.locale not in cleaned.stdout
 
-- name: Install the locale
+- name: Install the locale {{ locale_basic.localegen }}
   locale_gen:
-    name: "{{ locale_basic }}"
+    name: "{{ locale_basic.localegen }}"
     state: present
   register: output_present
 
-- name: Is the locale present?
+- name: Is the locale present? {{ locale_basic.localegen }}
   command: locale -a
   register: post_check_output_present
   ignore_errors: true
 
-- name: Make sure the locale is present and we say we installed it
+- name: Make sure the locale is present and we say we installed it {{ locale_basic.localegen }}
   assert:
     that:
-      - locale_basic in post_check_output_present.stdout
-      - output_present is changed
+      - locale_basic.locale in post_check_output_present.stdout
+      - locale_basic.skip_removal or output_present is changed
 
-- name: Install the locale a second time
+- name: Install the locale a second time {{ locale_basic.localegen }}
   locale_gen:
-    name: "{{ locale_basic }}"
+    name: "{{ locale_basic.localegen }}"
     state: present
   register: output_present_idempotent
 
-- name: Is the locale present?
+- name: Is the locale present? {{ locale_basic.localegen }}
   command: locale -a
   register: post_check_output_present_idempotent
   ignore_errors: true
 
-- name: Make sure the locale is present and we reported no change
+- name: Make sure the locale is present and we reported no change {{ locale_basic.localegen }}
   assert:
     that:
-      - locale_basic in post_check_output_present_idempotent.stdout
+      - locale_basic.locale in post_check_output_present_idempotent.stdout
       - output_present_idempotent is not changed
 
-- name: Remove the locale
-  locale_gen:
-    name: "{{ locale_basic }}"
-    state: absent
-  register: output_absent
+- name: Removals
+  when: locale_basic.skip_removal is false
+  block:
+    - name: Remove the locale {{ locale_basic.localegen }}
+      locale_gen:
+        name: "{{ locale_basic.localegen }}"
+        state: absent
+      register: output_absent
 
-- name: Is the locale present?
-  command: locale -a
-  register: post_check_output_absent
-  ignore_errors: true
+    - name: Is the locale present? {{ locale_basic.localegen }}
+      command: locale -a
+      register: post_check_output_absent
+      ignore_errors: true
 
-- name: Make sure the locale is absent and we reported a change
-  assert:
-    that:
-      - locale_basic not in post_check_output_absent.stdout
-      - output_absent is changed
+    - name: Make sure the locale is absent and we reported a change {{ locale_basic.localegen }}
+      assert:
+        that:
+          - locale_basic.locale not in post_check_output_absent.stdout
+          - output_absent is changed
 
-- name: Remove the locale a second time
-  locale_gen:
-    name: "{{ locale_basic }}"
-    state: absent
-  register: output_absent_idempotent
+    - name: Remove the locale a second time {{ locale_basic.localegen }}
+      locale_gen:
+        name: "{{ locale_basic.localegen }}"
+        state: absent
+      register: output_absent_idempotent
 
-- name: Is the locale present?
-  command: locale -a
-  register: post_check_output_absent_idempotent
-  ignore_errors: true
+    - name: Is the locale present? {{ locale_basic.localegen }}
+      command: locale -a
+      register: post_check_output_absent_idempotent
+      ignore_errors: true
 
-- name: Make sure the locale is absent and we reported no change
-  assert:
-    that:
-      - locale_basic not in post_check_output_absent_idempotent.stdout
-      - output_absent_idempotent is not changed
+    - name: Make sure the locale is absent and we reported no change {{ locale_basic.localegen }}
+      assert:
+        that:
+          - locale_basic.locale not in post_check_output_absent_idempotent.stdout
+          - output_absent_idempotent is not changed
 
 # Cleanup
-- name: Reinstall the locale we tested against if it was initially installed
+- name: Reinstall the locale we tested against if it was initially installed {{ locale_basic.localegen }}
   locale_gen:
-    name: "{{ locale_basic }}"
+    name: "{{ locale_basic.localegen }}"
     state: present
-  when: locale_basic in initial_state.stdout
+  when: locale_basic.locale in initial_state.stdout

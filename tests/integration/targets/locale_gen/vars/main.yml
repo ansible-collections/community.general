@@ -3,4 +3,12 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-locale_basic: pt_BR
+# locale_basic: pt_BR
+
+locale_list_basic:
+  - localegen: pt_BR
+    locale: pt_BR
+    skip_removal: false
+  - localegen: C.UTF-8
+    locale: C.utf8
+    skip_removal: true

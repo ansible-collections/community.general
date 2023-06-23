@@ -8,5 +8,11 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- include_tasks: 'basic.yml'
-  when: ansible_distribution in ('Ubuntu', 'Debian')
+- name: Bail out if not supported
+  ansible.builtin.meta: end_play
+  when: ansible_distribution not in ('Ubuntu', 'Debian', 'Gentoo')
+
+- include_tasks: basic.yml
+  loop: "{{ locale_list_basic }}"
+  loop_control:
+    loop_var: locale_basic
