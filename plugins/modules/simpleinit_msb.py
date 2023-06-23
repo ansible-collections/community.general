@@ -224,8 +224,8 @@ class SimpleinitMSB(object):
         return (rc_state, stdout, stderr)
 
 
-def main():
-    module = AnsibleModule(
+def build_module():
+    return AnsibleModule(
         argument_spec=dict(
             name=dict(required=True, aliases=['service']),
             state=dict(choices=['running', 'started', 'stopped', 'restarted', 'reloaded']),
@@ -234,6 +234,10 @@ def main():
         supports_check_mode=True,
         required_one_of=[['state', 'enabled']],
     )
+
+
+def main():
+    module = build_module()
 
     service = SimpleinitMSB(module)
 
