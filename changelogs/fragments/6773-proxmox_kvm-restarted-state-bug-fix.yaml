@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_kvm - ``restarted`` state did not actually restart a vm in some vm configurations. The state now uses the Promox reboot endpoint instead of calling the ``stop_vm`` and ``start_vm`` functions.
