@@ -1,2 +1,2 @@
 bugfixes:
-  - proxmox_disk - fix unable to create cdrom due to size always being appended (https://github.com/ansible-collections/community.general/pull/6770).
+  - proxmox_disk - fix unable to create ``cdrom`` media due to ``size`` always being appended (https://github.com/ansible-collections/community.general/pull/6770).
