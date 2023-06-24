@@ -106,8 +106,10 @@ class TestSimpleinitMSB(ModuleTestCase):
 
         execute_command.return_value = (0, _TELINIT_LIST, "")
 
-        with self.assertRaises(AnsibleFailJson):
+        with self.assertRaises(AnsibleFailJson) as context:
             simpleinit_msb.service_exists()
+
+        self.assertEqual("telinit could not find the requested service: ntp", context.exception.args[0]["msg"])
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_exists')
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
