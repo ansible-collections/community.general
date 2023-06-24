@@ -12,3 +12,6 @@ locale_list_basic:
   - localegen: C.UTF-8
     locale: C.utf8
     skip_removal: true
+  - localegen: eo
+    locale: eo
+    skip_removal: false

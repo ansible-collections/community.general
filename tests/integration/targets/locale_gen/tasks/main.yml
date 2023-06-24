@@ -10,7 +10,7 @@
 
 - name: Bail out if not supported
   ansible.builtin.meta: end_play
-  when: ansible_distribution not in ('Ubuntu', 'Debian', 'Gentoo')
+  when: ansible_distribution not in ('Ubuntu', 'Debian')
 
 - include_tasks: basic.yml
   loop: "{{ locale_list_basic }}"

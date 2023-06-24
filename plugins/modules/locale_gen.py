@@ -74,11 +74,10 @@ def is_available(name, ubuntuMode):
     checking either :
     * if the locale is present in /etc/locales.gen
     * or if the locale is present in /usr/share/i18n/SUPPORTED"""
+    __regexp = r'^#?\s*(?P<locale>\S+[\._\S]*) (?P<charset>\S+)\s*$'
     if ubuntuMode:
-        __regexp = r'^(?P<locale>\S+[\._]\S+) (?P<charset>\S+)\s*$'
         __locales_available = '/usr/share/i18n/SUPPORTED'
     else:
-        __regexp = r'^#?\s*(?P<locale>\S+[\._]\S+) (?P<charset>\S+)\s*$'
         __locales_available = '/etc/locale.gen'
 
     re_compiled = re.compile(__regexp)
