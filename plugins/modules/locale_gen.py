@@ -87,7 +87,8 @@ def is_available(name, ubuntuMode):
         if result and result.group('locale') == name:
             return True
     fd.close()
-    return False
+    # locale may be installed but not listed in the file, for example C.UTF-8 in some systems
+    return is_present(name)
 
 
 def is_present(name):
