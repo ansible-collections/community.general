@@ -177,14 +177,15 @@ class SimpleinitMSB(object):
         return self.running
 
     def service_enable(self):
-        self.changed = True
-        action = None
-
-        self.service_exists()
+        # Check if the service is already enabled/disabled
+        if not self.enable ^ self.service_enabled():
+            return
 
         action = "boot" + ("enable" if self.enable else "disable")
 
         (rc, out, err) = self.execute_command("%s %s %s" % (self.telinit_cmd, action, self.name))
+
+        self.changed = True
 
         for line in err.splitlines():
             if self.enable and line.find('already enabled') != -1:
@@ -198,6 +199,22 @@ class SimpleinitMSB(object):
             return
 
         return (rc, out, err)
+
+    def service_enabled(self):
+        self.service_exists()
+
+        (rc, out, err) = self.execute_command("%s %sd" % (self.telinit_cmd, self.enable))
+
+        service_enabled = False if self.enable else True
+
+        rex = re.compile(r'^%s$' % self.name)
+
+        for line in out.splitlines():
+            if rex.match(line):
+                service_enabled = True if self.enable else False
+                break
+
+        return service_enabled
 
     def service_exists(self):
         (rc, out, err) = self.execute_command("%s list" % self.telinit_cmd)
@@ -252,8 +269,6 @@ def main():
 
     # Enable/disable service startup at boot if requested
     if service.module.params['enabled'] is not None:
-        # FIXME: ideally this should detect if we need to toggle the enablement state, though
-        # it's unlikely the changed handler would need to fire in this case so it's a minor thing.
         service.service_enable()
         result['enabled'] = service.enable
 

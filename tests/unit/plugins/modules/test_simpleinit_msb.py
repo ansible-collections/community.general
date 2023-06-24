@@ -35,13 +35,42 @@ S        single
 S        smgl-default-crypt-fs
 S        smgl-metalog
 S        smgl-sysctl
+S        sysstat
 """
 
-_TELINIT_ENABLED = """
+_TELINIT_LIST_ENABLED = """
+smgl-suspend-single
+crond
+fuse
+network
+nscd
+smgl-default-remote-fs
+smgl-misc
+sshd
+coldplug
+devices
+udevd
+hostname.sh
+hwclock.sh
+keymap.sh
+modutils
+mountall.sh
+mountroot.sh
+single
+smgl-default-crypt-fs
+smgl-metalog
+smgl-sysctl
+"""
+
+_TELINIT_LIST_DISABLED = """
+sysstat
+"""
+
+_TELINIT_ALREADY_ENABLED = """
 Service smgl-suspend-single already enabled.
 """
 
-_TELINIT_DISABLED = """
+_TELINIT_ALREADY_DISABLED = """
 Service smgl-suspend-single already disabled.
 """
 
@@ -114,27 +143,39 @@ class TestSimpleinitMSB(ModuleTestCase):
         })
 
         service_exists.return_value = True
-        execute_command.return_value = (0, "", _TELINIT_ENABLED)
+        execute_command.return_value = (0, _TELINIT_LIST_ENABLED, "")
 
-        simpleinit_msb.service_enable()
+        self.assertTrue(simpleinit_msb.service_enabled())
 
-        self.assertFalse(simpleinit_msb.changed)
+        # Race condition check
+        with patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_enabled', return_value=False):
+            execute_command.return_value = (0, "", _TELINIT_ALREADY_ENABLED)
+
+            simpleinit_msb.service_enable()
+
+            self.assertFalse(simpleinit_msb.changed)
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_exists')
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
     def test_check_service_disabled(self, execute_command, service_exists):
         simpleinit_msb = self.init_module({
-            'name': 'nscd',
+            'name': 'sysstat',
             'state': 'stopped',
             'enabled': 'false',
         })
 
         service_exists.return_value = True
-        execute_command.return_value = (0, "", _TELINIT_DISABLED)
+        execute_command.return_value = (0, _TELINIT_LIST_DISABLED, "")
 
-        simpleinit_msb.service_enable()
+        self.assertFalse(simpleinit_msb.service_enabled())
 
-        self.assertFalse(simpleinit_msb.changed)
+        # Race condition check
+        with patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_enabled', return_value=True):
+            execute_command.return_value = (0, "", _TELINIT_ALREADY_DISABLED)
+
+            simpleinit_msb.service_enable()
+
+            self.assertFalse(simpleinit_msb.changed)
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_control')
     def test_check_service_running(self, service_control):
