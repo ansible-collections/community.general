@@ -15,10 +15,9 @@
 
 - name: Remove packages for yay-become
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - base-devel
+      - yay
+      - git
+      - nmap
     state: absent
-  loop:
-    - base-devel
-    - yay
-    - git
-    - nmap

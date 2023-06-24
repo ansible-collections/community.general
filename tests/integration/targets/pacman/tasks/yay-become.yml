@@ -23,12 +23,11 @@
 
 - name: Install base packages
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - base-devel
+      - git
+      - go
     state: present
-  with_items:
-    - base-devel
-    - git
-    - go
   notify: Remove packages for yay-become
 
 - name: Hack permssions for the remote_tmp_dir
