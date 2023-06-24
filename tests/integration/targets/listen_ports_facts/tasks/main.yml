@@ -13,7 +13,7 @@
   ansible.builtin.package:
     name:
       - net-tools
-      - netcat
+      - netcat-openbsd
     state: latest
   when: ansible_os_family == "Debian"
 
