@@ -62,6 +62,22 @@ class TestSimpleinitMSB(ModuleTestCase):
     def tearDown(self):
         super(TestSimpleinitMSB, self).tearDown()
 
+    @patch('os.path.exists', return_value=True)
+    @patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', return_value="/sbin/telinit")
+    def test_get_service_tools(self, *args, **kwargs):
+        set_module_args({
+            'name': 'smgl-suspend-single',
+            'state': 'running',
+        })
+
+        module = build_module()
+
+        simpleinit_msb = SimpleinitMSB(module)
+
+        simpleinit_msb.get_service_tools()
+
+        self.assertEqual(simpleinit_msb.telinit_cmd, "/sbin/telinit")
+
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
     def test_service_exists(self, execute_command):
         set_module_args({
