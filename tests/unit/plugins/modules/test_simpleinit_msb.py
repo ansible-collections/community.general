@@ -62,17 +62,18 @@ class TestSimpleinitMSB(ModuleTestCase):
     def tearDown(self):
         super(TestSimpleinitMSB, self).tearDown()
 
+    def init_module(self, args):
+        set_module_args(args)
+
+        return SimpleinitMSB(build_module())
+
     @patch('os.path.exists', return_value=True)
     @patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', return_value="/sbin/telinit")
     def test_get_service_tools(self, *args, **kwargs):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'smgl-suspend-single',
             'state': 'running',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         simpleinit_msb.get_service_tools()
 
@@ -80,14 +81,10 @@ class TestSimpleinitMSB(ModuleTestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
     def test_service_exists(self, execute_command):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'smgl-suspend-single',
             'state': 'running',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         execute_command.return_value = (0, _TELINIT_LIST, "")
 
@@ -95,14 +92,10 @@ class TestSimpleinitMSB(ModuleTestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
     def test_service_exists_not(self, execute_command):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'ntp',
             'state': 'running',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         execute_command.return_value = (0, _TELINIT_LIST, "")
 
@@ -114,15 +107,11 @@ class TestSimpleinitMSB(ModuleTestCase):
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_exists')
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
     def test_check_service_enabled(self, execute_command, service_exists):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'nscd',
             'state': 'running',
             'enabled': 'true',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         service_exists.return_value = True
         execute_command.return_value = (0, "", _TELINIT_ENABLED)
@@ -134,15 +123,11 @@ class TestSimpleinitMSB(ModuleTestCase):
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_exists')
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
     def test_check_service_disabled(self, execute_command, service_exists):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'nscd',
             'state': 'stopped',
             'enabled': 'false',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         service_exists.return_value = True
         execute_command.return_value = (0, "", _TELINIT_DISABLED)
@@ -153,14 +138,10 @@ class TestSimpleinitMSB(ModuleTestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_control')
     def test_check_service_running(self, service_control):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'sshd',
             'state': 'running',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         service_control.return_value = (0, _TELINIT_STATUS_RUNNING, "")
 
@@ -168,14 +149,10 @@ class TestSimpleinitMSB(ModuleTestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_control')
     def test_check_service_running_not(self, service_control):
-        set_module_args({
+        simpleinit_msb = self.init_module({
             'name': 'smgl-metalog',
             'state': 'running',
         })
-
-        module = build_module()
-
-        simpleinit_msb = SimpleinitMSB(module)
 
         service_control.return_value = (0, _TELINIT_STATUS_RUNNING_NOT, "")
 
