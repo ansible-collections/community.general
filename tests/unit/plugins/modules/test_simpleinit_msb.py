@@ -37,11 +37,11 @@ S        smgl-metalog
 S        smgl-sysctl
 """
 
-_TELINIT_ENABLE = """
+_TELINIT_ENABLED = """
 Service smgl-suspend-single already enabled.
 """
 
-_TELINIT_DISABLE = """
+_TELINIT_DISABLED = """
 Service smgl-suspend-single already disabled.
 """
 
@@ -92,6 +92,46 @@ class TestSimpleinitMSB(ModuleTestCase):
 
         with self.assertRaises(AnsibleFailJson):
             simpleinit_msb.service_exists()
+
+    @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_exists')
+    @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
+    def test_check_service_enabled(self, execute_command, service_exists):
+        set_module_args({
+            'name': 'nscd',
+            'state': 'running',
+            'enabled': 'true',
+        })
+
+        module = build_module()
+
+        simpleinit_msb = SimpleinitMSB(module)
+
+        service_exists.return_value = True
+        execute_command.return_value = (0, "", _TELINIT_ENABLED)
+
+        simpleinit_msb.service_enable()
+
+        self.assertFalse(simpleinit_msb.changed)
+
+    @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_exists')
+    @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.execute_command')
+    def test_check_service_disabled(self, execute_command, service_exists):
+        set_module_args({
+            'name': 'nscd',
+            'state': 'stopped',
+            'enabled': 'false',
+        })
+
+        module = build_module()
+
+        simpleinit_msb = SimpleinitMSB(module)
+
+        service_exists.return_value = True
+        execute_command.return_value = (0, "", _TELINIT_DISABLED)
+
+        simpleinit_msb.service_enable()
+
+        self.assertFalse(simpleinit_msb.changed)
 
     @patch('ansible_collections.community.general.plugins.modules.simpleinit_msb.SimpleinitMSB.service_control')
     def test_check_service_running(self, service_control):
