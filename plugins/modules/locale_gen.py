@@ -35,6 +35,8 @@ options:
             - Whether the locale shall be present.
         choices: [ absent, present ]
         default: present
+notes:
+    - This module does not support RHEL-based systems.
 '''
 
 EXAMPLES = '''
