@@ -14,6 +14,7 @@ __metaclass__ = type
 
 import copy
 import fnmatch
+import itertools
 import json
 
 from ansible.module_utils import basic
@@ -143,6 +144,10 @@ Enabled:   %s
         return self.repos
 
 
+def flatten(iter_of_iters):
+    return list(itertools.chain.from_iterable(iter_of_iters))
+
+
 # List with test repositories, directly from the Candlepin test data.
 REPOS_LIST = [
     {
@@ -239,9 +244,11 @@ REPOS = Repos(REPOS_LIST)
 # The mock string for the output of `subscription-manager repos --list`.
 REPOS_LIST_OUTPUT = REPOS.to_subman_list_output()
 
-# MUST match what's in run_subscription_manager() in the module.
+# MUST match what's in the Rhsm class in the module.
 SUBMAN_KWARGS = {
     'environ_update': dict(LANG='C', LC_ALL='C', LC_MESSAGES='C'),
+    'expand_user_and_vars': False,
+    'use_unsafe_shell': False,
 }
 
 
@@ -255,15 +262,21 @@ TEST_CASES = [
             'id': 'test_enable_single',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable awesomeos-1000000000000023'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'awesomeos-1000000000000023',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -281,7 +294,11 @@ TEST_CASES = [
             'id': 'test_enable_already_enabled',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
@@ -299,16 +316,23 @@ TEST_CASES = [
             'id': 'test_enable_multiple',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable awesomeos-1000000000000023'
-                        ' --enable content-label-no-gpg-32060'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'awesomeos-1000000000000023',
+                        '--enable',
+                        'content-label-no-gpg-32060',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -326,16 +350,23 @@ TEST_CASES = [
             'id': 'test_enable_multiple_mixed',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable awesomeos-1000000000000023'
-                        ' --enable fake-content-38072'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'awesomeos-1000000000000023',
+                        '--enable',
+                        'fake-content-38072',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -354,15 +385,21 @@ TEST_CASES = [
             'id': 'test_purge_everything_but_one_disabled',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable never-enabled-content-801'
-                    ) + ''.join([' --disable ' + i for i in REPOS.ids_enabled() if i != 'never-enabled-content-801']),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'never-enabled-content-801',
+                    ] + flatten([['--disable', i] for i in REPOS.ids_enabled() if i != 'never-enabled-content-801']),
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -381,18 +418,27 @@ TEST_CASES = [
             'id': 'test_purge_everything_but_one_enabled',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable awesomeos-99000'
-                        ' --disable content-label-27060'
-                        ' --disable awesomeos-x86_64-99000'
-                        ' --disable fake-content-38072'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'awesomeos-99000',
+                        '--disable',
+                        'content-label-27060',
+                        '--disable',
+                        'awesomeos-x86_64-99000',
+                        '--disable',
+                        'fake-content-38072',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -411,28 +457,47 @@ TEST_CASES = [
             'id': 'test_enable_everything_purge_everything_but_one_enabled',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS.copy().enable('*').to_subman_list_output(), '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable content-label-27060'
-                        ' --disable never-enabled-content-801'
-                        ' --disable never-enabled-content-100000000000060'
-                        ' --disable awesomeos-x86_64-1000000000000023'
-                        ' --disable awesomeos-ppc64-100000000000011'
-                        ' --disable awesomeos-99000'
-                        ' --disable content-label-no-gpg-32060'
-                        ' --disable awesomeos-1000000000000023'
-                        ' --disable awesomeos-x86-100000000000020'
-                        ' --disable awesomeos-x86_64-99000'
-                        ' --disable awesomeos-s390x-99000'
-                        ' --disable awesomeos-modifier-37080'
-                        ' --disable awesomeos-i686-99000'
-                        ' --disable fake-content-38072'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'content-label-27060',
+                        '--disable',
+                        'never-enabled-content-801',
+                        '--disable',
+                        'never-enabled-content-100000000000060',
+                        '--disable',
+                        'awesomeos-x86_64-1000000000000023',
+                        '--disable',
+                        'awesomeos-ppc64-100000000000011',
+                        '--disable',
+                        'awesomeos-99000',
+                        '--disable',
+                        'content-label-no-gpg-32060',
+                        '--disable',
+                        'awesomeos-1000000000000023',
+                        '--disable',
+                        'awesomeos-x86-100000000000020',
+                        '--disable',
+                        'awesomeos-x86_64-99000',
+                        '--disable',
+                        'awesomeos-s390x-99000',
+                        '--disable',
+                        'awesomeos-modifier-37080',
+                        '--disable',
+                        'awesomeos-i686-99000',
+                        '--disable',
+                        'fake-content-38072',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -450,23 +515,37 @@ TEST_CASES = [
             'id': 'test_enable_all_awesomeos_star',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable awesomeos-x86_64-1000000000000023'
-                        ' --enable awesomeos-ppc64-100000000000011'
-                        ' --enable awesomeos-99000'
-                        ' --enable awesomeos-1000000000000023'
-                        ' --enable awesomeos-x86-100000000000020'
-                        ' --enable awesomeos-x86_64-99000'
-                        ' --enable awesomeos-s390x-99000'
-                        ' --enable awesomeos-modifier-37080'
-                        ' --enable awesomeos-i686-99000'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'awesomeos-x86_64-1000000000000023',
+                        '--enable',
+                        'awesomeos-ppc64-100000000000011',
+                        '--enable',
+                        'awesomeos-99000',
+                        '--enable',
+                        'awesomeos-1000000000000023',
+                        '--enable',
+                        'awesomeos-x86-100000000000020',
+                        '--enable',
+                        'awesomeos-x86_64-99000',
+                        '--enable',
+                        'awesomeos-s390x-99000',
+                        '--enable',
+                        'awesomeos-modifier-37080',
+                        '--enable',
+                        'awesomeos-i686-99000',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -485,18 +564,27 @@ TEST_CASES = [
             'id': 'test_purge_everything_but_awesomeos_list',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --enable awesomeos-99000'
-                        ' --enable awesomeos-x86_64-99000'
-                        ' --disable content-label-27060'
-                        ' --disable fake-content-38072'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--enable',
+                        'awesomeos-99000',
+                        '--enable',
+                        'awesomeos-x86_64-99000',
+                        '--disable',
+                        'content-label-27060',
+                        '--disable',
+                        'fake-content-38072',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -514,7 +602,11 @@ TEST_CASES = [
             'id': 'test_enable_nonexisting',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
@@ -533,15 +625,21 @@ TEST_CASES = [
             'id': 'test_disable_single',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --disable awesomeos-99000'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--disable',
+                        'awesomeos-99000',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -560,15 +658,21 @@ TEST_CASES = [
             'id': 'test_disable_single_using_absent',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --disable awesomeos-99000'
-                    ),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--disable',
+                        'awesomeos-99000',
+                    ],
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -587,7 +691,11 @@ TEST_CASES = [
             'id': 'test_disable_already_disabled',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
@@ -607,15 +715,19 @@ TEST_CASES = [
             'id': 'test_disable_already_disabled_and_purge',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                        ' --disable never-enabled-content-801'
-                    ) + ''.join([' --disable ' + i for i in REPOS.ids_enabled()]),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                    ] + flatten([['--disable', i] for i in REPOS.ids_enabled()]),
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -635,14 +747,19 @@ TEST_CASES = [
             'id': 'test_disable_single_and_purge',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
                 (
-                    (
-                        '/testbin/subscription-manager repos'
-                    ) + ''.join([' --disable ' + i for i in REPOS.ids_enabled()]),
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                    ] + flatten([['--disable', i] for i in REPOS.ids_enabled()]),
                     SUBMAN_KWARGS,
                     (0, '', '')
                 ),
@@ -661,7 +778,11 @@ TEST_CASES = [
             'id': 'test_disable_nonexisting',
             'run_command.calls': [
                 (
-                    '/testbin/subscription-manager repos --list',
+                    [
+                        '/testbin/subscription-manager',
+                        'repos',
+                        '--list',
+                    ],
                     SUBMAN_KWARGS,
                     (0, REPOS_LIST_OUTPUT, '')
                 ),
