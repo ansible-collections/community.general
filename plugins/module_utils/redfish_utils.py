@@ -1163,6 +1163,12 @@ class RedfishUtils(object):
                 if property in data:
                     user[property] = data[property]
 
+            # Filter out empty account slots
+            # An empty account slot can be detected if the username is an empty
+            # string and if the account is disabled
+            if user.get('UserName', '') == '' and not user.get('Enabled', False):
+                continue
+
             users_results.append(user)
         result["entries"] = users_results
         return result
