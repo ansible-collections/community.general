@@ -173,8 +173,8 @@ stages:
           targets:
             - name: Alpine 3.17
               test: alpine/3.17
-            # - name: Fedora 37
-            #   test: fedora/37
+            # - name: Fedora 38
+            #   test: fedora/38
             - name: Ubuntu 22.04
               test: ubuntu/22.04
           groups:
@@ -265,8 +265,8 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: Fedora 37
-              test: fedora37
+            - name: Fedora 38
+              test: fedora38
             - name: openSUSE 15
               test: opensuse15
             - name: Ubuntu 20.04
@@ -287,6 +287,8 @@ stages:
         parameters:
           testFormat: 2.15/linux/{0}
           targets:
+            - name: Fedora 37
+              test: fedora37
             - name: CentOS 7
               test: centos7
           groups:
