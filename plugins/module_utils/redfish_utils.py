@@ -912,7 +912,7 @@ class RedfishUtils(object):
                             else:
                                 sc_id = sc[0].get('Id', '1')
                                 controller_name = 'Controller %s' % sc_id
-                    if 'Controllers' in data:
+                    elif 'Controllers' in data:
                         response = self.get_request(self.root_uri + data['Controllers'][u'@odata.id'])
                         if response['ret'] is False:
                             return response
