@@ -505,7 +505,9 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
                 timeout_str = "Reached timeout while importing VM disk. Last line in task before timeout: %s"
                 ok_str = "Disk %s imported into VM %s"
             else:
-                config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
+                config_str = self.module.params["storage"]
+                if self.module.params.get("media") != "cdrom":
+                    config_str += ":%s" % (self.module.params["size"])
                 ok_str = "Disk %s created in VM %s"
                 timeout_str = "Reached timeout while creating VM disk. Last line in task before timeout: %s"
 
