@@ -495,6 +495,7 @@ def main():
                                           flowAlias=dict(type='str'),
                                           authenticationConfig=dict(type='dict'),
                                           index=dict(type='int'),
+                                          description=dict(type='str')
                                       )),
         state=dict(choices=["absent", "present", "exact"], default='present'),
         force=dict(type='bool', default=False),

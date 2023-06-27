@@ -1945,6 +1945,7 @@ class KeycloakAPI(object):
             newSubFlow["alias"] = subflowName
             newSubFlow["provider"] = "registration-page-form"
             newSubFlow["type"] = "basic-flow"
+            newSubFlow["description"] = ""
             open_url(
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
                     url=self.baseurl,
