@@ -43,6 +43,7 @@ options:
     providerId:
         description:
             - C(providerId) for the new flow when not copied from an existing flow.
+        choices: [ "basic-flow", "client-flow" ]
         type: str
     copyFrom:
         description:
@@ -331,7 +332,7 @@ def main():
     meta_args = dict(
         realm=dict(type='str', required=True),
         alias=dict(type='str', required=True),
-        providerId=dict(type='str'),
+        providerId=dict(type='str', choices=["basic-flow", "client-flow"]),
         description=dict(type='str'),
         copyFrom=dict(type='str'),
         authenticationExecutions=dict(type='list', elements='dict',
