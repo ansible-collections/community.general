@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_authentication - added provider ID choices, since Keycloak supports only those two specific ones (https://github.com/ansible-collections/community.general/pull/6763).
