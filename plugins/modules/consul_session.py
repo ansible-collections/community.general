@@ -17,7 +17,6 @@ description:
    to implement distributed locks. In depth documentation for working with
    sessions can be found at http://www.consul.io/docs/internals/sessions.html
 requirements:
-  - python-consul
   - requests
 author:
   - Steve Gargan (@sgargan)
