@@ -126,7 +126,6 @@ import os
 import time
 import traceback
 
-import proxmoxer
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
@@ -166,7 +165,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
 
     def upload_template(self, node, storage, content_type, realpath, timeout):
         stats = os.stat(realpath)
-        if (LooseVersion(proxmoxer.__version__) >= LooseVersion('1.2.0') and
+        if (LooseVersion(self.proxmoxer_version) >= LooseVersion('1.2.0') and
                 stats.st_size > 268435456 and not HAS_REQUESTS_TOOLBELT):
             self.module.fail_json(msg="'requests_toolbelt' module is required to upload files larger than 256MB",
                                   exception=missing_required_lib('requests_toolbelt'))
