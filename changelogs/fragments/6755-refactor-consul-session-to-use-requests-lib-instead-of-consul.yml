@@ -1,2 +1,2 @@
 minor_changes:
-  - consul_session module - drops requirement for the ``python-consul`` library to communicate with the Consul API, instead relying on the existing ``requests`` library requirement  (https://github.com/ansible-collections/community.general/pull/6755).
+  - consul_session - drops requirement for the ``python-consul`` library to communicate with the Consul API, instead relying on the existing ``requests`` library requirement (https://github.com/ansible-collections/community.general/pull/6755).
