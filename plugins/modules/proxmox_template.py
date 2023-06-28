@@ -65,7 +65,8 @@ options:
     choices: ['present', 'absent']
     default: present
 notes:
-  - Requires C(proxmoxer), C(requests) and C(requests_toolbelt) modules on host. Those modules can be installed with M(ansible.builtin.pip).
+  - Requires C(proxmoxer) and C(requests)modules on host. Those modules can be installed with M(ansible.builtin.pip).
+  - C(proxmoxer) >= 1.2.0 requires C(requests_toolbelt) to upload files larger than 256 MB.
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
@@ -130,6 +131,7 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 REQUESTS_TOOLBELT_ERR = None
 try:
+    # requests_toolbelt is used internally by proxmoxer module
     import requests_toolbelt  # noqa: F401, pylint: disable=unused-import
     HAS_REQUESTS_TOOLBELT = True
 except ImportError:
