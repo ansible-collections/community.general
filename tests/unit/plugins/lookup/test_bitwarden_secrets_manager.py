@@ -55,7 +55,7 @@ class TestLookupModule(unittest.TestCase):
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager._bitwarden_secrets_manager', new=MockBitwardenSecretsManager())
     def test_bitwarden_secrets_manager(self):
         # Getting a secret by its id should return the full secret info
-        self.assertEqual([MOCK_SECRETS[0]], self.lookup.run(['ababc4a8-c242-4e54-bceb-77d17cdf2e07'], bws_access_token='123'))
+        self.assertEqual([MOCK_SECRETS[0]], self.lookup.run(['ababc4a8-c242-4e54-bceb-77d17cdf2e07'], bws_access_token='123')[0])
 
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager._bitwarden_secrets_manager', new=MockBitwardenSecretsManager())
     def test_bitwarden_secrets_manager_no_match(self):

@@ -72,7 +72,7 @@ RETURN = """
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleLookupError
-from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
@@ -91,10 +91,10 @@ class BitwardenSecretsManager(object):
 
     def _run(self, args, stdin=None, expected_rc=0):
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-        out, err = p.communicate(to_bytes(stdin))
+        out, err = p.communicate(stdin)
         rc = p.wait()
         if rc != expected_rc:
-            raise BitwardenSecretsManagerException(err)
+            raise BitwardenSecretsManagerException(to_text(err))
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
     def get_secret(self, secret_id, bws_access_token):
@@ -120,5 +120,6 @@ class LookupModule(LookupBase):
         bws_access_token = self.get_option('bws_access_token')
 
         return [_bitwarden_secrets_manager.get_secret(term, bws_access_token) for term in terms]
+
 
 _bitwarden_secrets_manager = BitwardenSecretsManager()
