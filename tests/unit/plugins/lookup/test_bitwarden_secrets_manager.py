@@ -62,4 +62,3 @@ class TestLookupModule(unittest.TestCase):
         # Getting a nonexistant secret id throws exception
         with self.assertRaises(AnsibleLookupError):
             self.lookup.run(['nonexistant_id'], bws_access_token='123')
-
