@@ -118,6 +118,7 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
         bws_access_token = self.get_option('bws_access_token')
-        _bitwarden_secrets_manager = BitwardenSecretsManager()
 
         return [_bitwarden_secrets_manager.get_secret(term, bws_access_token) for term in terms]
+
+_bitwarden_secrets_manager = BitwardenSecretsManager()
