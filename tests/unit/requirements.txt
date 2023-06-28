@@ -44,3 +44,7 @@ elastic-apm ; python_version >= '3.6'
 
 # requirements for scaleway modules
 passlib[argon2]
+
+# requirement for the proxmox modules
+proxmoxer < 2.0.0 ; python_version <= '3.6'
+proxmoxer ; python_version > '3.6'
