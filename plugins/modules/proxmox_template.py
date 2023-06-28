@@ -65,7 +65,7 @@ options:
     choices: ['present', 'absent']
     default: present
 notes:
-  - Requires C(proxmoxer) and C(requests)modules on host. Those modules can be installed with M(ansible.builtin.pip).
+  - Requires C(proxmoxer) and C(requests) modules on host. Those modules can be installed with M(ansible.builtin.pip).
   - C(proxmoxer) >= 1.2.0 requires C(requests_toolbelt) to upload files larger than 256 MB.
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
