@@ -126,8 +126,10 @@ import os
 import time
 import traceback
 
+import proxmoxer
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 REQUESTS_TOOLBELT_ERR = None
 try:
@@ -140,11 +142,6 @@ except ImportError:
 
 
 class ProxmoxTemplateAnsible(ProxmoxAnsible):
-    def __init__(self, module):
-        super(ProxmoxTemplateAnsible, self).__init__(module)
-        if not HAS_REQUESTS_TOOLBELT:
-            self.module.fail_json(msg=missing_required_lib('requests_toolbelt'), exception=REQUESTS_TOOLBELT_ERR)
-
     def get_template(self, node, storage, content_type, template):
         return [True for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get()
                 if tmpl['volid'] == '%s:%s/%s' % (storage, content_type, template)]
@@ -165,8 +162,14 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         return False
 
     def upload_template(self, node, storage, content_type, realpath, timeout):
-        taskid = self.proxmox_api.nodes(node).storage(storage).upload.post(content=content_type, filename=open(realpath, 'rb'))
-        return self.task_status(node, taskid, timeout)
+        stats = os.stat(realpath)
+        if (LooseVersion(proxmoxer.__version__) >= LooseVersion('1.2.0') and
+                  stats.st_size > 268435456 and not HAS_REQUESTS_TOOLBELT):
+              self.module.fail_json(msg="'requests_toolbelt' module is required to upload files larger than 256MB", exception=missing_required_lib('requests_toolbelt'))
+
+        with open(realpath, 'rb') as filename:
+          taskid = self.proxmox_api.nodes(node).storage(storage).upload.post(content=content_type, filename=filename)
+          return self.task_status(node, taskid, timeout)
 
     def download_template(self, node, storage, template, timeout):
         taskid = self.proxmox_api.nodes(node).aplinfo.post(storage=storage, template=template)
