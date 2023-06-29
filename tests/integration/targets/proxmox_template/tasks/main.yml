@@ -8,25 +8,59 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Proxmox VE virtual machines templates management
-  tags: ["template"]
+  tags: ['template']
+  vars:
+    filename: /tmp/dummy.iso
   block:
-    - name: Download ISO file
-      ansible.builtin.get_url:
-        url: https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9.2-x86_64-boot.iso
-        dest: /tmp/rocky-9.2.iso
-        mode: 0644
-        checksum: sha256:11e42da96a7b336de04e60d05e54a22999c4d7f3e92c19ebf31f9c71298f5b42
+    - name: Create dummy ISO file
+      ansible.builtin.command:
+        cmd: 'truncate -s 300M {{ filename }}'
 
-    - name: Upload ISO as template to Proxmox VE cluster
+    - name: Delete requests_toolbelt module if it is installed
+      ansible.builtin.pip:
+        name: requests_toolbelt
+        state: absent
+
+    - name: Install latest proxmoxer
+      ansible.builtin.pip:
+        name: proxmoxer
+        state: latest
+
+    - name: Upload ISO as template to Proxmox VE cluster should fail
       proxmox_template:
-        api_host: "{{ api_host }}"
-        api_user: "{{ user }}@{{ domain }}"
-        api_password: "{{ api_password | default(omit) }}"
-        api_token_id: "{{ api_token_id | default(omit) }}"
-        api_token_secret: "{{ api_token_secret | default(omit) }}"
-        validate_certs: "{{ validate_certs }}"
-        node: "{{ node }}"
-        src: /tmp/rocky-9.2.iso
+        api_host: '{{ api_host }}'
+        api_user: '{{ user }}@{{ domain }}'
+        api_password: '{{ api_password | default(omit) }}'
+        api_token_id: '{{ api_token_id | default(omit) }}'
+        api_token_secret: '{{ api_token_secret | default(omit) }}'
+        validate_certs: '{{ validate_certs }}'
+        node: '{{ node }}'
+        src: '{{ filename }}'
+        content_type: iso
+        force: true
+      register: result
+      ignore_errors: true
+
+    - assert:
+        that:
+          - result is failed
+          - result.msg is match('\'requests_toolbelt\' module is required to upload files larger than 256MB')
+
+    - name: Install old (1.1.2) version of proxmoxer
+      ansible.builtin.pip:
+        name: proxmoxer==1.1.1
+        state: present
+
+    - name: Upload ISO as template to Proxmox VE cluster should be successful
+      proxmox_template:
+        api_host: '{{ api_host }}'
+        api_user: '{{ user }}@{{ domain }}'
+        api_password: '{{ api_password | default(omit) }}'
+        api_token_id: '{{ api_token_id | default(omit) }}'
+        api_token_secret: '{{ api_token_secret | default(omit) }}'
+        validate_certs: '{{ validate_certs }}'
+        node: '{{ node }}'
+        src: '{{ filename }}'
         content_type: iso
         force: true
       register: result
@@ -35,9 +69,68 @@
         that:
           - result is changed
           - result is success
+          - result.msg is match('template with volid=local:iso/dummy.iso uploaded')
+
+    - name: Install latest proxmoxer
+      ansible.builtin.pip:
+        name: proxmoxer
+        state: latest
+
+    - name: Make smaller dummy file
+      ansible.builtin.command:
+        cmd: 'truncate -s 128M {{ filename }}'
+
+    - name: Upload ISO as template to Proxmox VE cluster should be successful
+      proxmox_template:
+        api_host: '{{ api_host }}'
+        api_user: '{{ user }}@{{ domain }}'
+        api_password: '{{ api_password | default(omit) }}'
+        api_token_id: '{{ api_token_id | default(omit) }}'
+        api_token_secret: '{{ api_token_secret | default(omit) }}'
+        validate_certs: '{{ validate_certs }}'
+        node: '{{ node }}'
+        src: '{{ filename }}'
+        content_type: iso
+        force: true
+      register: result
+
+    - assert:
+        that:
+          - result is changed
+          - result is success
+          - result.msg is match('template with volid=local:iso/dummy.iso uploaded')
+
+    - name: Install requests_toolbelt
+      ansible.builtin.pip:
+        name: requests_toolbelt
+        state: present
+
+    - name: Make big dummy file
+      ansible.builtin.command:
+        cmd: 'truncate -s 300M {{ filename }}'
+
+    - name: Upload ISO as template to Proxmox VE cluster should be successful
+      proxmox_template:
+        api_host: '{{ api_host }}'
+        api_user: '{{ user }}@{{ domain }}'
+        api_password: '{{ api_password | default(omit) }}'
+        api_token_id: '{{ api_token_id | default(omit) }}'
+        api_token_secret: '{{ api_token_secret | default(omit) }}'
+        validate_certs: '{{ validate_certs }}'
+        node: '{{ node }}'
+        src: '{{ filename }}'
+        content_type: iso
+        force: true
+      register: result
+
+    - assert:
+        that:
+          - result is changed
+          - result is success
+          - result.msg is match('template with volid=local:iso/dummy.iso uploaded')
 
   always:
     - name: Delete ISO file from host
       ansible.builtin.file:
-        path: /tmp/rocky-9.2.iso
+        path: '{{ filename }}'
         state: absent
