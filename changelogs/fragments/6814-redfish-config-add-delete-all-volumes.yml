@@ -1,3 +1,2 @@
----
 minor_changes:
   - redfish_config - add ``DeleteAllVolumes`` command to allow deletion of all volumes on servers (https://github.com/ansible-collections/community.general/pull/6814).
