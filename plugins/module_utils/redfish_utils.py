@@ -3454,14 +3454,14 @@ class RedfishUtils(object):
         self.volume_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
         if not self.volume_uris:
             return {
-                    'ret': True, 'changed': False,
-                    'msg': "VolumeCollection's Members array is either empty or missing"}
+                'ret': True, 'changed': False,
+                'msg': "VolumeCollection's Members array is either empty or missing"}
 
         # Delete each volume
         for volume in self.volume_uris:
             response = self.delete_request(self.root_uri + volume)
             if response['ret'] is False:
                 return response
-        
+
         return {'ret': True, 'changed': True,
                 'msg': "All Volumes Deleted"}
