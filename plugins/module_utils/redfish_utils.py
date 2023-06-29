@@ -3394,3 +3394,74 @@ class RedfishUtils(object):
             fan_percent_min_config = hpe.get('FanPercentMinimum')
         result["fan_percent_min"] = fan_percent_min_config
         return result
+
+    def delete_all_volumes(self):
+        # Find the Storage resource from the requested ComputerSystem resource
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        storage_uri = data.get('Storage', {}).get('@odata.id')
+        if storage_uri is None:
+            return {'ret': False, 'msg': 'Storage resource not found'}
+
+        # Get Storage Collection
+        response = self.get_request(self.root_uri + storage_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # Collect Storage Controllers
+        self.storage_controlllers_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
+        if not self.storage_controlllers_uris:
+            return {
+                'ret': False,
+                'msg': "StorageCollection's Members array is either empty or missing"}
+
+        # Check if storage controller supports volume creation
+        response = self.get_request(self.root_uri + self.storage_controlllers_uris[0])
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        if data.get('Volumes'):
+            response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+            if response['ret'] is False:
+                return response
+            data = response['data']
+
+            if data.get('@Redfish.CollectionCapabilities') and data['@Redfish.CollectionCapabilities'].get('Capabilities') \
+                and data['@Redfish.CollectionCapabilities']['Capabilities'][0].get('UseCase') \
+                    and data['@Redfish.CollectionCapabilities']['Capabilities'][0]['UseCase'] == "VolumeCreation":
+                self.storage_controller = self.storage_controlllers_uris[0]
+            else:
+                return {
+                    'ret': False,
+                    'msg': "Storage Controller does not support Volume creation"}
+
+        # Get Volume Collection
+        response = self.get_request(self.root_uri + self.storage_controller)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # Collect Volumes
+        self.volume_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
+        if not self.volume_uris:
+            return {
+                    'ret': True, 'changed': False,
+                    'msg': "VolumeCollection's Members array is either empty or missing"}
+
+        # Delete each volume
+        for volume in self.volume_uris:
+            response = self.delete_request(self.root_uri + volume)
+            if response['ret'] is False:
+                return response
+        
+        return {'ret': True, 'changed': True,
+                'msg': "All Volumes Deleted"}

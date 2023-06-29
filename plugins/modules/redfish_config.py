@@ -272,6 +272,14 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Delete All Volumes
+    community.general.redfish_config:
+      category: Systems
+      command: DeleteAllVolumes
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -290,7 +298,7 @@ from ansible.module_utils.common.text.converters import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
-                "SetDefaultBootOrder", "EnableSecureBoot"],
+                "SetDefaultBootOrder", "EnableSecureBoot", "DeleteAllVolumes"],
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
     "Sessions": ["SetSessionService"],
 }
@@ -405,6 +413,8 @@ def main():
                 result = rf_utils.set_default_boot_order()
             elif command == "EnableSecureBoot":
                 result = rf_utils.enable_secure_boot()
+            elif command == "DeleteAllVolumes":
+                result = rf_utils.delete_all_volumes()
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
