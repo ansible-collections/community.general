@@ -25,6 +25,7 @@ options:
         P(ansible.builtin.dict2items#filter) filter.
       - If the value is a string, it is evaluated as Jinja2 expressions which can access the previously chosen
         elements with C(item.<index_name>). The result must be a list or a dictionary.
+      - test 
     type: list
     elements: dict
     required: true
