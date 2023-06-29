@@ -3544,3 +3544,85 @@ class RedfishUtils(object):
 
         return {'ret': True, 'changed': True,
                 'msg': "The following volumes were deleted: %s" % str(volume_ids)}
+
+    def create_volume(self, volume_details, storage_subsystem_id):
+        # Find the Storage resource from the requested ComputerSystem resource
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        storage_uri = data.get('Storage', {}).get('@odata.id')
+        if storage_uri is None:
+            return {'ret': False, 'msg': 'Storage resource not found'}
+
+        # Get Storage Collection
+        response = self.get_request(self.root_uri + storage_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # Collect Storage Subsystems
+        self.storage_subsystems_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
+        if not self.storage_subsystems_uris:
+            return {
+                'ret': False,
+                'msg': "StorageCollection's Members array is either empty or missing"}
+
+        # Matching Storage Subsystem ID with user input
+        self.storage_subsystem_uri = ""
+        for storage_subsystem_uri in self.storage_subsystems_uris:
+            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+                self.storage_subsystem_uri = storage_subsystem_uri
+
+        if not self.storage_subsystem_uri:
+            return {
+                'ret': False,
+                'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
+
+        # Validate input parameters
+        required_parameters = ['RAIDType', 'Drives']
+        allowed_parameters = ['CapacityBytes', 'DisplayName', 'InitializeMethod', 'MediaSpanCount',
+                              'Name', 'ReadCachePolicy', 'StripSizeBytes', 'VolumeUsage', 'WriteCachePolicy']
+
+        for parameter in required_parameters:
+            if not volume_details.get(parameter):
+                return {
+                    'ret': False,
+                    'msg': "%s are required parameter to create a volume" % str(required_parameters)}
+
+        # Navigate to the volume uri of the correct storage subsystem
+        response = self.get_request(self.root_uri + self.storage_subsystem_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # Deleting any volumes of RAIDType None present on the Storage Subsystem
+        response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+        if response['ret'] is False:
+            return response
+        volume_data = response['data']
+
+        if "Members" in volume_data:
+            for member in volume_data["Members"]:
+                response = self.get_request(self.root_uri + member['@odata.id'])
+                if response['ret'] is False:
+                    return response
+                member_data = response['data']
+
+                if member_data["RAIDType"] == "None":
+                    response = self.delete_request(self.root_uri + member['@odata.id'])
+                    if response['ret'] is False:
+                        return response
+
+        # Construct payload and issue POST command to create volume
+        volume_details["Links"] = {}
+        volume_details["Links"]["Drives"] = []
+        for drive in volume_details["Drives"]:
+            volume_details["Links"]["Drives"].append({"@odata.id": drive})
+        del volume_details["Drives"]
+        payload = volume_details
+        response = self.post_request(self.root_uri + data['Volumes']['@odata.id'], payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True,
+                'msg': "Volume Created"}
