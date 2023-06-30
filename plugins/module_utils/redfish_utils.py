@@ -767,7 +767,7 @@ class RedfishUtils(object):
         properties = ['BlockSizeBytes', 'CapableSpeedGbs', 'CapacityBytes',
                       'EncryptionAbility', 'EncryptionStatus',
                       'FailurePredicted', 'HotspareType', 'Id', 'Identifiers',
-                      'Manufacturer', 'MediaType', 'Model', 'Name',
+                      'Links', 'Manufacturer', 'MediaType', 'Model', 'Name',
                       'PartNumber', 'PhysicalLocation', 'Protocol', 'Revision',
                       'RotationSpeedRPM', 'SerialNumber', 'Status']
 
