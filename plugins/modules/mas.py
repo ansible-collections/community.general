@@ -36,7 +36,7 @@ options:
     state:
         description:
             - Desired state of the app installation.
-            - The C(absent) value requires root permissions, also see the examples.
+            - The V(absent) value requires root permissions, also see the examples.
         type: str
         choices:
             - absent

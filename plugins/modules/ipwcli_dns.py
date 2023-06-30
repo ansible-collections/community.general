@@ -54,7 +54,7 @@ options:
     address:
         description:
             - The IP address for the A or AAAA record.
-            - Required for I(type=A) or I(type=AAAA).
+            - Required for O(type=A) or O(type=AAAA).
         type: str
     ttl:
         description:
@@ -80,38 +80,38 @@ options:
     port:
         description:
             - Sets the port of the SRV record.
-            - Required for I(type=SRV).
+            - Required for O(type=SRV).
         type: int
     target:
         description:
             - Sets the target of the SRV record.
-            - Required for I(type=SRV).
+            - Required for O(type=SRV).
         type: str
     order:
         description:
             - Sets the order of the NAPTR record.
-            - Required for I(type=NAPTR).
+            - Required for O(type=NAPTR).
         type: int
     preference:
         description:
             - Sets the preference of the NAPTR record.
-            - Required for I(type=NAPTR).
+            - Required for O(type=NAPTR).
         type: int
     flags:
         description:
             - Sets one of the possible flags of NAPTR record.
-            - Required for I(type=NAPTR).
+            - Required for O(type=NAPTR).
         type: str
         choices: ['S', 'A', 'U', 'P']
     service:
         description:
             - Sets the service of the NAPTR record.
-            - Required for I(type=NAPTR).
+            - Required for O(type=NAPTR).
         type: str
     replacement:
         description:
             - Sets the replacement of the NAPTR record.
-            - Required for I(type=NAPTR).
+            - Required for O(type=NAPTR).
         type: str
     username:
         description:

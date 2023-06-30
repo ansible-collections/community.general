@@ -48,7 +48,7 @@ DOCUMENTATION = r'''
                 running this module using the following command
                 C(lxc config set core.trust_password <some random password>)
                 See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
-            - If I(trust_password) is set, this module send a request for authentication before sending any requests.
+            - If O(trust_password) is set, this module send a request for authentication before sending any requests.
             type: str
         state:
             description: Filter the instance according to the current status.
@@ -62,7 +62,7 @@ DOCUMENTATION = r'''
             version_added: 6.2.0
         type_filter:
             description:
-            - Filter the instances by type C(virtual-machine), C(container) or C(both).
+            - Filter the instances by type V(virtual-machine), V(container) or V(both).
             - The first version of the inventory only supported containers.
             type: str
             default: container
@@ -72,8 +72,8 @@ DOCUMENTATION = r'''
             description:
             - If an instance has multiple network interfaces, select which one is the prefered as pattern.
             - Combined with the first number that can be found e.g. 'eth' + 0.
-            - The option has been renamed from I(prefered_container_network_interface) to I(prefered_instance_network_interface) in community.general 3.8.0.
-              The old name still works as an alias.
+            - The option has been renamed from O(prefered_container_network_interface) to O(prefered_instance_network_interface)
+              in community.general 3.8.0. The old name still works as an alias.
             type: str
             default: eth
             aliases:
@@ -81,7 +81,7 @@ DOCUMENTATION = r'''
         prefered_instance_network_family:
             description:
             - If an instance has multiple network interfaces, which one is the prefered by family.
-            - Specify C(inet) for IPv4 and C(inet6) for IPv6.
+            - Specify V(inet) for IPv4 and V(inet6) for IPv6.
             type: str
             default: inet
             choices: [ 'inet', 'inet6' ]

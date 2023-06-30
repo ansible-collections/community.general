@@ -248,3 +248,236 @@
     that:
       - result is not changed
       - result.end_state == {}
+
+- name: Create realm role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert realm role is created with composites
+  assert:
+    that:
+      - result is changed
+      - result.end_state.composites | length == 3
+
+- name: Change realm role with composites no change
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert realm role with composites have not changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state.composites | length == 3
+
+- name: Remove composite from realm role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites_with_absent }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert composite was removed from realm role with composites
+  assert:
+    that:
+      - result is changed
+      - result.end_state.composites | length == 2
+
+- name: Delete realm role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ keycloak_role_name }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert realm role deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Delete absent realm role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ keycloak_role_name }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert not changed and realm role absent
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Create client role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert client role is created with composites
+  assert:
+    that:
+      - result is changed
+      - result.end_state.composites | length == 3
+
+- name: Change client role with composites no change
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert client role with composites have not changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state.composites | length == 3
+
+- name: Remove composite from client role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ keycloak_role_name }}"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+    description: "{{ keycloak_role_description }}"
+    composite: "{{ keycloak_role_composite }}"
+    composites: "{{ keycloak_role_composites_with_absent }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert composite was removed from client role with composites
+  assert:
+    that:
+      - result is changed
+      - result.end_state.composites | length == 2
+
+- name: Delete client role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ keycloak_role_name }}"
+    client_id: "{{ client_id }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert client role deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Delete absent client role with composites
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ keycloak_role_name }}"
+    client_id: "{{ client_id }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert not changed and client role absent
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}

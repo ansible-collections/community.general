@@ -36,7 +36,7 @@ options:
   name:
     description:
     - The name of the package.
-    - When using I(state=latest), this can be C('*'), which updates all installed packages managed by pkgutil.
+    - When using O(state=latest), this can be V('*'), which updates all installed packages managed by pkgutil.
     type: list
     required: true
     elements: str
@@ -49,19 +49,19 @@ options:
     type: str
   state:
     description:
-    - Whether to install (C(present)/C(installed)), or remove (C(absent)/C(removed)) packages.
-    - The upgrade (C(latest)) operation will update/install the packages to the latest version available.
+    - Whether to install (V(present)/V(installed)), or remove (V(absent)/V(removed)) packages.
+    - The upgrade (V(latest)) operation will update/install the packages to the latest version available.
     type: str
     required: true
     choices: [ absent, installed, latest, present, removed ]
   update_catalog:
     description:
-    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to C(true).
+    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to V(true).
     type: bool
     default: false
   force:
     description:
-    - To allow the update process to downgrade packages to match what is present in the repository, set this to C(true).
+    - To allow the update process to downgrade packages to match what is present in the repository, set this to V(true).
     - This is useful for rolling back to stable from testing, or similar operations.
     type: bool
     default: false

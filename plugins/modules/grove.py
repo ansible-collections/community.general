@@ -39,7 +39,7 @@ options:
     type: str
     description:
       - Message content.
-      - The alias I(message) is deprecated and will be removed in community.general 4.0.0.
+      - The alias O(ignore:message) has been removed in community.general 4.0.0.
     required: true
   url:
     type: str
@@ -53,7 +53,7 @@ options:
     required: false
   validate_certs:
     description:
-      - If C(false), SSL certificates will not be validated. This should only be used
+      - If V(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     default: true
     type: bool

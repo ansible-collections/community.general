@@ -40,16 +40,16 @@ options:
   value:
     description:
       - The value to set this variable to.
-      - Required if I(state=present).
+      - Required if O(state=present).
     type: str
   insertafter:
     description:
       - If specified, the variable will be inserted after the variable specified.
-      - Used with I(state=present).
+      - Used with O(state=present).
     type: str
   insertbefore:
     description:
-      - Used with I(state=present). If specified, the variable will be inserted
+      - Used with O(state=present). If specified, the variable will be inserted
         just before the variable specified.
     type: str
   state:
@@ -61,18 +61,19 @@ options:
   user:
     description:
       - The specific user whose crontab should be modified.
-      - This parameter defaults to C(root) when unset.
+      - This parameter defaults to V(root) when unset.
     type: str
   cron_file:
     description:
       - If specified, uses this file instead of an individual user's crontab.
-      - Without a leading C(/), this is assumed to be in I(/etc/cron.d).
-      - With a leading C(/), this is taken as absolute.
+      - Without a leading V(/), this is assumed to be in C(/etc/cron.d).
+      - With a leading V(/), this is taken as absolute.
     type: str
   backup:
     description:
       - If set, create a backup of the crontab before it is modified.
         The location of the backup is returned in the C(backup) variable by this module.
+      # TODO: C() above should be RV(), but return values have not been documented!
     type: bool
     default: false
 requirements:

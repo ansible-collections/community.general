@@ -23,7 +23,7 @@ options:
   clear_meta:
     description:
       - Optionally clear existing metadata when applying metadata to existing objects.
-        Selecting this option is only appropriate when setting I(type=meta).
+        Selecting this option is only appropriate when setting O(type=meta).
     type: bool
     default: false
   container:
@@ -36,7 +36,7 @@ options:
     description:
       - The destination of a C(get) operation; i.e. a local directory, C(/home/user/myfolder).
         Used to specify the destination of an operation on a remote object; i.e. a file name,
-        C(file1), or a comma-separated list of remote objects, C(file1,file2,file17).
+        V(file1), or a comma-separated list of remote objects, V(file1,file2,file17).
   expires:
     type: int
     description:
@@ -50,8 +50,8 @@ options:
     type: str
     description:
       - >
-        The method of operation to be performed: C(put) to upload files, C(get) to download files or
-        C(delete) to remove remote objects in Cloud Files.
+        The method of operation to be performed: V(put) to upload files, V(get) to download files or
+        V(delete) to remove remote objects in Cloud Files.
     choices:
       - get
       - put
@@ -61,8 +61,8 @@ options:
     type: str
     description:
       - Source from which to upload files.  Used to specify a remote object as a source for
-        an operation, i.e. a file name, C(file1), or a comma-separated list of remote objects,
-        C(file1,file2,file17). Parameters I(src) and I(dest) are mutually exclusive on remote-only object operations
+        an operation, i.e. a file name, V(file1), or a comma-separated list of remote objects,
+        V(file1,file2,file17). Parameters O(src) and O(dest) are mutually exclusive on remote-only object operations
   structure:
     description:
       - Used to specify whether to maintain nested directory structure when downloading objects

@@ -43,7 +43,7 @@ options:
             - client
             - server
         description:
-            - Type of the user I(user_name).
+            - Type of the user O(user_name).
 """
 
 EXAMPLES = """

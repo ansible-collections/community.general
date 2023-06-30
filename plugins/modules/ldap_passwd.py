@@ -20,10 +20,10 @@ description:
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a cn=peercred,cn=external,cn=auth ACL
+    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL
     rule allowing root to modify the server configuration. If you need to use
-    a simple bind to access your server, pass the credentials in I(bind_dn)
-    and I(bind_pw).
+    a simple bind to access your server, pass the credentials in O(bind_dn)
+    and O(bind_pw).
 author:
   - Keller Fuchs (@KellerFuchs)
 requirements:
@@ -36,7 +36,7 @@ attributes:
 options:
   passwd:
     description:
-      - The (plaintext) password to be set for I(dn).
+      - The (plaintext) password to be set for O(dn).
     type: str
 extends_documentation_fragment:
   - community.general.ldap.documentation
@@ -72,7 +72,7 @@ modlist:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
+from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
 
 LDAP_IMP_ERR = None
 try:
@@ -133,6 +133,7 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(passwd=dict(no_log=True)),
         supports_check_mode=True,
+        required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:

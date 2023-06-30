@@ -53,7 +53,7 @@ options:
             - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression: 'an_answer')."
             - You can provide a list containing items with or without answer.
             - A prompt list can be shorter or longer than the packages list but will issue a warning.
-            - If you want to specify that a package will not need prompts in the middle of a list,  C(null).
+            - If you want to specify that a package will not need prompts in the middle of a list,  V(null).
         type: list
         elements: raw
         version_added: 0.2.0

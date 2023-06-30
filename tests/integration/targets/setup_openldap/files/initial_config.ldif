@@ -18,5 +18,24 @@ homeDirectory: /home/ldaptest
 cn: LDAP Test
 gecos: LDAP Test
 displayName: LDAP Test
+userPassword: test1pass!
 mail: ldap.test@example.com
+sn: Test
+
+dn: uid=second,ou=users,dc=example,dc=com
+uid: second
+uidNumber: 1112
+gidNUmber: 102
+objectClass: top
+objectClass: posixAccount
+objectClass: shadowAccount
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+loginShell: /bin/sh
+homeDirectory: /home/second
+cn: Second Test
+gecos: Second Test
+displayName: Second Test
+mail: second.test@example.com
 sn: Test

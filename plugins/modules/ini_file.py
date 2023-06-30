@@ -34,35 +34,35 @@ options:
   path:
     description:
       - Path to the INI-style file; this file is created if required.
-      - Before Ansible 2.3 this option was only usable as I(dest).
+      - Before Ansible 2.3 this option was only usable as O(dest).
     type: path
     required: true
     aliases: [ dest ]
   section:
     description:
-      - Section name in INI file. This is added if I(state=present) automatically when
+      - Section name in INI file. This is added if O(state=present) automatically when
         a single value is being set.
-      - If left empty, being omitted, or being set to C(null), the I(option) will be placed before the first I(section).
-      - Using C(null) is also required if the config format does not support sections.
+      - If left empty, being omitted, or being set to V(null), the O(option) will be placed before the first O(section).
+      - Using V(null) is also required if the config format does not support sections.
     type: str
   option:
     description:
-      - If set (required for changing a I(value)), this is the name of the option.
-      - May be omitted if adding/removing a whole I(section).
+      - If set (required for changing a O(value)), this is the name of the option.
+      - May be omitted if adding/removing a whole O(section).
     type: str
   value:
     description:
-      - The string value to be associated with an I(option).
-      - May be omitted when removing an I(option).
-      - Mutually exclusive with I(values).
-      - I(value=v) is equivalent to I(values=[v]).
+      - The string value to be associated with an O(option).
+      - May be omitted when removing an O(option).
+      - Mutually exclusive with O(values).
+      - O(value=v) is equivalent to O(values=[v]).
     type: str
   values:
     description:
-      - The string value to be associated with an I(option).
-      - May be omitted when removing an I(option).
-      - Mutually exclusive with I(value).
-      - I(value=v) is equivalent to I(values=[v]).
+      - The string value to be associated with an O(option).
+      - May be omitted when removing an O(option).
+      - Mutually exclusive with O(value).
+      - O(value=v) is equivalent to O(values=[v]).
     type: list
     elements: str
     version_added: 3.6.0
@@ -74,22 +74,22 @@ options:
     default: false
   state:
     description:
-      - If set to C(absent) and I(exclusive) set to C(true) all matching I(option) lines are removed.
-      - If set to C(absent) and I(exclusive) set to C(false) the specified I(option=value) lines are removed,
-        but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(false) the specified I(option=values) lines are added,
-        but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(true) all given I(option=values) lines will be
-        added and the other I(option)s with the same name are removed.
+      - If set to V(absent) and O(exclusive) set to V(true) all matching O(option) lines are removed.
+      - If set to V(absent) and O(exclusive) set to V(false) the specified O(option=value) lines are removed,
+        but the other O(option)s with the same name are not touched.
+      - If set to V(present) and O(exclusive) set to V(false) the specified O(option=values) lines are added,
+        but the other O(option)s with the same name are not touched.
+      - If set to V(present) and O(exclusive) set to V(true) all given O(option=values) lines will be
+        added and the other O(option)s with the same name are removed.
     type: str
     choices: [ absent, present ]
     default: present
   exclusive:
     description:
-      - If set to C(true) (default), all matching I(option) lines are removed when I(state=absent),
-        or replaced when I(state=present).
-      - If set to C(false), only the specified I(value(s)) are added when I(state=present),
-        or removed when I(state=absent), and existing ones are not modified.
+      - If set to V(true) (default), all matching O(option) lines are removed when O(state=absent),
+        or replaced when O(state=present).
+      - If set to V(false), only the specified O(value)/O(values) are added when O(state=present),
+        or removed when O(state=absent), and existing ones are not modified.
     type: bool
     default: true
     version_added: 3.6.0
@@ -100,7 +100,7 @@ options:
     default: false
   create:
     description:
-      - If set to C(false), the module will fail if the file does not already exist.
+      - If set to V(false), the module will fail if the file does not already exist.
       - By default it will create the file if it is missing.
     type: bool
     default: true
@@ -112,13 +112,13 @@ options:
   follow:
     description:
     - This flag indicates that filesystem links, if they exist, should be followed.
-    - I(follow=true) can modify I(src) when combined with parameters such as I(mode).
+    - O(follow=true) can modify O(path) when combined with parameters such as O(mode).
     type: bool
     default: false
     version_added: 7.1.0
 notes:
-   - While it is possible to add an I(option) without specifying a I(value), this makes no sense.
-   - As of Ansible 2.3, the I(dest) option has been changed to I(path) as default, but I(dest) still works as well.
+   - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
+   - As of Ansible 2.3, the O(dest) option has been changed to O(path) as default, but O(dest) still works as well.
    - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
 author:
     - Jan-Piet Mens (@jpmens)
@@ -328,14 +328,14 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_active_opt(option, line):
+                if not changed_lines[index] and match_opt(option, line):
                     newline = assignment_format % (option, values.pop(0))
                     (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
                     if len(values) == 0:
                         break
         # remove all remaining option occurrences from the rest of the section
         for index in range(len(section_lines) - 1, 0, -1):
-            if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+            if not changed_lines[index] and match_opt(option, section_lines[index]):
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True

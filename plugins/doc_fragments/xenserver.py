@@ -15,27 +15,27 @@ options:
   hostname:
     description:
     - The hostname or IP address of the XenServer host or XenServer pool master.
-    - If the value is not specified in the task, the value of environment variable C(XENSERVER_HOST) will be used instead.
+    - If the value is not specified in the task, the value of environment variable E(XENSERVER_HOST) will be used instead.
     type: str
     default: localhost
     aliases: [ host, pool ]
   username:
     description:
     - The username to use for connecting to XenServer.
-    - If the value is not specified in the task, the value of environment variable C(XENSERVER_USER) will be used instead.
+    - If the value is not specified in the task, the value of environment variable E(XENSERVER_USER) will be used instead.
     type: str
     default: root
     aliases: [ admin, user ]
   password:
     description:
     - The password to use for connecting to XenServer.
-    - If the value is not specified in the task, the value of environment variable C(XENSERVER_PASSWORD) will be used instead.
+    - If the value is not specified in the task, the value of environment variable E(XENSERVER_PASSWORD) will be used instead.
     type: str
     aliases: [ pass, pwd ]
   validate_certs:
     description:
-    - Allows connection when SSL certificates are not valid. Set to C(false) when certificates are not trusted.
-    - If the value is not specified in the task, the value of environment variable C(XENSERVER_VALIDATE_CERTS) will be used instead.
+    - Allows connection when SSL certificates are not valid. Set to V(false) when certificates are not trusted.
+    - If the value is not specified in the task, the value of environment variable E(XENSERVER_VALIDATE_CERTS) will be used instead.
     type: bool
     default: true
 '''

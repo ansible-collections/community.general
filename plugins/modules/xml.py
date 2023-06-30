@@ -29,18 +29,18 @@ options:
     description:
     - Path to the file to operate on.
     - This file must exist ahead of time.
-    - This parameter is required, unless I(xmlstring) is given.
+    - This parameter is required, unless O(xmlstring) is given.
     type: path
     aliases: [ dest, file ]
   xmlstring:
     description:
     - A string containing XML on which to operate.
-    - This parameter is required, unless I(path) is given.
+    - This parameter is required, unless O(path) is given.
     type: str
   xpath:
     description:
     - A valid XPath expression describing the item(s) you want to manipulate.
-    - Operates on the document root, C(/), by default.
+    - Operates on the document root, V(/), by default.
     type: str
   namespaces:
     description:
@@ -57,43 +57,43 @@ options:
     aliases: [ ensure ]
   attribute:
     description:
-    - The attribute to select when using parameter I(value).
-    - This is a string, not prepended with C(@).
+    - The attribute to select when using parameter O(value).
+    - This is a string, not prepended with V(@).
     type: raw
   value:
     description:
     - Desired state of the selected attribute.
-    - Either a string, or to unset a value, the Python C(None) keyword (YAML Equivalent, C(null)).
+    - Either a string, or to unset a value, the Python V(None) keyword (YAML Equivalent, V(null)).
     - Elements default to no value (but present).
     - Attributes default to an empty string.
     type: raw
   add_children:
     description:
-    - Add additional child-element(s) to a selected element for a given I(xpath).
+    - Add additional child-element(s) to a selected element for a given O(xpath).
     - Child elements must be given in a list and each item may be either a string
-      (eg. C(children=ansible) to add an empty C(<ansible/>) child element),
+      (for example C(children=ansible) to add an empty C(<ansible/>) child element),
       or a hash where the key is an element name and the value is the element value.
-    - This parameter requires I(xpath) to be set.
+    - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
   set_children:
     description:
-    - Set the child-element(s) of a selected element for a given I(xpath).
+    - Set the child-element(s) of a selected element for a given O(xpath).
     - Removes any existing children.
-    - Child elements must be specified as in I(add_children).
-    - This parameter requires I(xpath) to be set.
+    - Child elements must be specified as in O(add_children).
+    - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
   count:
     description:
-    - Search for a given I(xpath) and provide the count of any matches.
-    - This parameter requires I(xpath) to be set.
+    - Search for a given O(xpath) and provide the count of any matches.
+    - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   print_match:
     description:
-    - Search for a given I(xpath) and print out any matches.
-    - This parameter requires I(xpath) to be set.
+    - Search for a given O(xpath) and print out any matches.
+    - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   pretty_print:
@@ -103,13 +103,13 @@ options:
     default: false
   content:
     description:
-    - Search for a given I(xpath) and get content.
-    - This parameter requires I(xpath) to be set.
+    - Search for a given O(xpath) and get content.
+    - This parameter requires O(xpath) to be set.
     type: str
     choices: [ attribute, text ]
   input_type:
     description:
-    - Type of input for I(add_children) and I(set_children).
+    - Type of input for O(add_children) and O(set_children).
     type: str
     choices: [ xml, yaml ]
     default: yaml
@@ -127,20 +127,20 @@ options:
     default: false
   insertbefore:
     description:
-      - Add additional child-element(s) before the first selected element for a given I(xpath).
+      - Add additional child-element(s) before the first selected element for a given O(xpath).
       - Child elements must be given in a list and each item may be either a string
-        (eg. C(children=ansible) to add an empty C(<ansible/>) child element),
+        (for example C(children=ansible) to add an empty C(<ansible/>) child element),
         or a hash where the key is an element name and the value is the element value.
-      - This parameter requires I(xpath) to be set.
+      - This parameter requires O(xpath) to be set.
     type: bool
     default: false
   insertafter:
     description:
-      - Add additional child-element(s) after the last selected element for a given I(xpath).
+      - Add additional child-element(s) after the last selected element for a given O(xpath).
       - Child elements must be given in a list and each item may be either a string
-        (eg. C(children=ansible) to add an empty C(<ansible/>) child element),
+        (for example C(children=ansible) to add an empty C(<ansible/>) child element),
         or a hash where the key is an element name and the value is the element value.
-      - This parameter requires I(xpath) to be set.
+      - This parameter requires O(xpath) to be set.
     type: bool
     default: false
 requirements:
@@ -149,7 +149,7 @@ notes:
 - Use the C(--check) and C(--diff) options when testing your expressions.
 - The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
 - This module does not handle complicated xpath expressions, so limit xpath selectors to simple expressions.
-- Beware that in case your XML elements are namespaced, you need to use the I(namespaces) parameter, see the examples.
+- Beware that in case your XML elements are namespaced, you need to use the O(namespaces) parameter, see the examples.
 - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is defined for them.
 seealso:
 - name: Xml module development community wiki
@@ -338,7 +338,7 @@ actions:
 backup_file:
     description: The name of the backup file that was created
     type: str
-    returned: when I(backup=true)
+    returned: when O(backup=true)
     sample: /path/to/file.xml.1942.2017-08-24@14:16:01~
 count:
     description: The count of xpath matches.

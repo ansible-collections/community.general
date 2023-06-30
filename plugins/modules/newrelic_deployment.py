@@ -32,14 +32,14 @@ options:
   app_name:
     type: str
     description:
-      - The value of app_name in the newrelic.yml file used by the application.
-      - One of I(app_name) or I(application_id) is required.
+      - The value of C(app_name) in the C(newrelic.yml) file used by the application.
+      - One of O(app_name) or O(application_id) is required.
     required: false
   application_id:
     type: str
     description:
       - The application ID found in the metadata of the application in APM.
-      - One of I(app_name) or I(application_id) is required.
+      - One of O(app_name) or O(application_id) is required.
     required: false
   changelog:
     type: str
@@ -63,7 +63,7 @@ options:
     required: false
   validate_certs:
     description:
-      - If C(false), SSL certificates will not be validated. This should only be used
+      - If V(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     required: false
     default: true

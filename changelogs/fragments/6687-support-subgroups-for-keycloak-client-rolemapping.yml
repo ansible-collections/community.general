@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_client_rolemapping - adds support for subgroups with additional parameter ``parents`` (https://github.com/ansible-collections/community.general/pull/6687).

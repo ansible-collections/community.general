@@ -90,6 +90,9 @@ URL_AUTHENTICATION_EXECUTION_CONFIG = "{url}/admin/realms/{realm}/authentication
 URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/raise-priority"
 URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/lower-priority"
 URL_AUTHENTICATION_CONFIG = "{url}/admin/realms/{realm}/authentication/config/{id}"
+URL_AUTHENTICATION_REGISTER_REQUIRED_ACTION = "{url}/admin/realms/{realm}/authentication/register-required-action"
+URL_AUTHENTICATION_REQUIRED_ACTIONS = "{url}/admin/realms/{realm}/authentication/required-actions"
+URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS = "{url}/admin/realms/{realm}/authentication/required-actions/{alias}"
 
 URL_IDENTITY_PROVIDERS = "{url}/admin/realms/{realm}/identity-provider/instances"
 URL_IDENTITY_PROVIDER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}"
@@ -216,24 +219,30 @@ def is_struct_included(struct1, struct2, exclude=None):
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
     if isinstance(struct1, list) and isinstance(struct2, list):
+        if not struct1 and not struct2:
+            return True
         for item1 in struct1:
             if isinstance(item1, (list, dict)):
                 for item2 in struct2:
-                    if not is_struct_included(item1, item2, exclude):
-                        return False
+                    if is_struct_included(item1, item2, exclude):
+                        break
+                else:
+                    return False
             else:
                 if item1 not in struct2:
                     return False
         return True
     elif isinstance(struct1, dict) and isinstance(struct2, dict):
+        if not struct1 and not struct2:
+            return True
         try:
             for key in struct1:
                 if not (exclude and key in exclude):
                     if not is_struct_included(struct1[key], struct2[key], exclude):
                         return False
-            return True
         except KeyError:
             return False
+        return True
     elif isinstance(struct1, bool) and isinstance(struct2, bool):
         return struct1 == struct2
     else:
@@ -1674,6 +1683,9 @@ class KeycloakAPI(object):
         """
         roles_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
@@ -1688,11 +1700,123 @@ class KeycloakAPI(object):
         """
         role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
         try:
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            composites = None
+            if "composites" in rolerep:
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep["composites"]
+            role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                                     data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            if composites is not None:
+                self.update_role_composites(rolerep=rolerep, composites=composites, realm=realm)
+            return role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
+
+    def get_role_composites(self, rolerep, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            return json.loads(to_native(open_url(
+                composite_url,
+                method='GET',
+                http_agent=self.http_agent,
+                headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg='Could not get role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def create_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            # create new composites
+            return open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(composites), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def delete_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        composite_url = ''
+        try:
+            if clientid is not None:
+                client = self.get_client_by_clientid(client_id=clientid, realm=realm)
+                cid = client['id']
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+            else:
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+            # Get existing composites
+            # create new composites
+            return open_url(composite_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(composites), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create role %s composites in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def update_role_composites(self, rolerep, composites, clientid=None, realm='master'):
+        # Get existing composites
+        existing_composites = self.get_role_composites(rolerep=rolerep, clientid=clientid, realm=realm)
+        composites_to_be_created = []
+        composites_to_be_deleted = []
+        for composite in composites:
+            composite_found = False
+            existing_composite_client = None
+            for existing_composite in existing_composites:
+                if existing_composite["clientRole"]:
+                    existing_composite_client = self.get_client_by_id(existing_composite["containerId"], realm=realm)
+                    if ("client_id" in composite
+                            and composite['client_id'] is not None
+                            and existing_composite_client["clientId"] == composite["client_id"]
+                            and composite["name"] == existing_composite["name"]):
+                        composite_found = True
+                        break
+                else:
+                    if (("client_id" not in composite or composite['client_id'] is None)
+                            and composite["name"] == existing_composite["name"]):
+                        composite_found = True
+                        break
+            if (not composite_found and ('state' not in composite or composite['state'] == 'present')):
+                if "client_id" in composite and composite['client_id'] is not None:
+                    client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                    for client_role in client_roles:
+                        if client_role['name'] == composite['name']:
+                            composites_to_be_created.append(client_role)
+                            break
+                else:
+                    realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                    composites_to_be_created.append(realm_role)
+            elif composite_found and 'state' in composite and composite['state'] == 'absent':
+                if "client_id" in composite and composite['client_id'] is not None:
+                    client_roles = self.get_client_roles(clientid=composite['client_id'], realm=realm)
+                    for client_role in client_roles:
+                        if client_role['name'] == composite['name']:
+                            composites_to_be_deleted.append(client_role)
+                            break
+                else:
+                    realm_role = self.get_realm_role(name=composite["name"], realm=realm)
+                    composites_to_be_deleted.append(realm_role)
+
+        if len(composites_to_be_created) > 0:
+            # create new composites
+            self.create_role_composites(rolerep=rolerep, composites=composites_to_be_created, clientid=clientid, realm=realm)
+        if len(composites_to_be_deleted) > 0:
+            # delete new composites
+            self.delete_role_composites(rolerep=rolerep, composites=composites_to_be_deleted, clientid=clientid, realm=realm)
 
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
@@ -1772,11 +1896,29 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
+            if "composites" in rolerep:
+                keycloak_compatible_composites = self.convert_role_composites(rolerep["composites"])
+                rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
+
+    def convert_role_composites(self, composites):
+        keycloak_compatible_composites = {
+            'client': {},
+            'realm': []
+        }
+        for composite in composites:
+            if 'state' not in composite or composite['state'] == 'present':
+                if "client_id" in composite and composite["client_id"] is not None:
+                    if composite["client_id"] not in keycloak_compatible_composites["client"]:
+                        keycloak_compatible_composites["client"][composite["client_id"]] = []
+                    keycloak_compatible_composites["client"][composite["client_id"]].append(composite["name"])
+                else:
+                    keycloak_compatible_composites["realm"].append(composite["name"])
+        return keycloak_compatible_composites
 
     def update_client_role(self, rolerep, clientid, realm="master"):
         """ Update an existing client role.
@@ -1792,8 +1934,15 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
-            return open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            composites = None
+            if "composites" in rolerep:
+                composites = copy.deepcopy(rolerep["composites"])
+                del rolerep['composites']
+            update_role_response = open_url(role_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+            if composites is not None:
+                self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
+            return update_role_response
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
@@ -2099,6 +2248,116 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
+
+    def get_required_actions(self, realm='master'):
+        """
+        Get required actions.
+        :param realm: Realm name (not id).
+        :return:      List of representations of the required actions.
+        """
+
+        try:
+            required_actions = json.load(
+                open_url(
+                    URL_AUTHENTICATION_REQUIRED_ACTIONS.format(
+                        url=self.baseurl,
+                        realm=realm
+                    ),
+                    method='GET',
+                    http_agent=self.http_agent, headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs
+                )
+            )
+
+            return required_actions
+        except Exception:
+            return None
+
+    def register_required_action(self, rep, realm='master'):
+        """
+        Register required action.
+        :param rep:   JSON containing 'providerId', and 'name' attributes.
+        :param realm: Realm name (not id).
+        :return:      Representation of the required action.
+        """
+
+        data = {
+            'name': rep['name'],
+            'providerId': rep['providerId']
+        }
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_REGISTER_REQUIRED_ACTION.format(
+                    url=self.baseurl,
+                    realm=realm
+                ),
+                method='POST',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(data),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to register required action %s in realm %s: %s'
+                % (rep["name"], realm, str(e))
+            )
+
+    def update_required_action(self, alias, rep, realm='master'):
+        """
+        Update required action.
+        :param alias: Alias of required action.
+        :param rep:   JSON describing new state of required action.
+        :param realm: Realm name (not id).
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
+                    url=self.baseurl,
+                    alias=quote(alias),
+                    realm=realm
+                ),
+                method='PUT',
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(rep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to update required action %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
+
+    def delete_required_action(self, alias, realm='master'):
+        """
+        Delete required action.
+        :param alias: Alias of required action.
+        :param realm: Realm name (not id).
+        :return:      HTTPResponse object on success.
+        """
+
+        try:
+            return open_url(
+                URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
+                    url=self.baseurl,
+                    alias=quote(alias),
+                    realm=realm
+                ),
+                method='DELETE',
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg='Unable to delete required action %s in realm %s: %s'
+                % (alias, realm, str(e))
+            )
 
     def get_identity_providers(self, realm='master'):
         """ Fetch representations for identity providers in a realm

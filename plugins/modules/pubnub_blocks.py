@@ -40,15 +40,15 @@ options:
   email:
     description:
       - Email from account for which new session should be started.
-      - "Not required if C(cache) contains result of previous module call (in
+      - "Not required if O(cache) contains result of previous module call (in
         same play)."
     required: false
     type: str
     default: ''
   password:
     description:
-      - Password which match to account to which specified C(email) belong.
-      - "Not required if C(cache) contains result of previous module call (in
+      - Password which match to account to which specified O(email) belong.
+      - "Not required if O(cache) contains result of previous module call (in
         same play)."
     required: false
     type: str
@@ -63,7 +63,7 @@ options:
     default: {}
   account:
     description:
-      - "Name of PubNub account for from which C(application) will be used to
+      - "Name of PubNub account for from which O(application) will be used to
         manage blocks."
       - "User's account will be used if value not set or empty."
     type: str
@@ -71,7 +71,7 @@ options:
   application:
     description:
       - "Name of target PubNub application for which blocks configuration on
-        specific C(keyset) will be done."
+        specific O(keyset) will be done."
     type: str
     required: true
   keyset:
@@ -102,7 +102,7 @@ options:
   event_handlers:
     description:
       - "List of event handlers which should be updated for specified block
-        C(name)."
+        O(name)."
       - "Each entry for new event handler should contain: C(name), C(src),
         C(channels), C(event). C(name) used as event handler name which can be
         used later to make changes to it."
@@ -110,7 +110,7 @@ options:
       - "C(channels) is name of channel from which event handler is waiting
         for events."
       - "C(event) is type of event which is able to trigger event handler:
-        I(js-before-publish), I(js-after-publish), I(js-after-presence)."
+        C(js-before-publish), C(js-after-publish), C(js-after-presence)."
       - "Each entry for existing handlers should contain C(name) (so target
         handler can be identified). Rest parameters (C(src), C(channels) and
         C(event)) can be added if changes required for them."
@@ -127,7 +127,7 @@ options:
     description:
       - "List of fields which should be changed by block itself (doesn't
         affect any event handlers)."
-      - "Possible options for change is: C(name)."
+      - "Possible options for change is: O(name)."
     required: false
     default: {}
     type: dict
@@ -136,7 +136,7 @@ options:
       - "This key allow to try skip certificates check when performing REST API
         calls. Sometimes host may have issues with certificates on it and this
         will cause problems to call PubNub REST API."
-      - If check should be ignored C(False) should be passed to this parameter.
+      - If check should be ignored V(false) should be passed to this parameter.
     required: false
     default: true
     type: bool

@@ -19,14 +19,14 @@ description:
     - Add or remove a website on a Webfaction host.  Further documentation at https://github.com/quentinsf/ansible-webfaction.
 author: Quentin Stafford-Fraser (@quentinsf)
 notes:
-    - Sadly, you I(do) need to know your webfaction hostname for the C(host) parameter.  But at least, unlike the API, you don't need to know the IP
+    - Sadly, you I(do) need to know your webfaction hostname for the C(host) parameter.  But at least, unlike the API, you do not need to know the IP
       address. You can use a DNS name.
     - If a site of the same name exists in the account but on a different host, the operation will exit.
     - >
       You can run playbooks that use this on a local machine, or on a Webfaction host, or elsewhere, since the scripts use the remote webfaction API.
-      The location is not important. However, running them on multiple hosts I(simultaneously) is best avoided. If you don't specify I(localhost) as
-      your host, you may want to add C(serial: 1) to the plays.
-    - See `the webfaction API <https://docs.webfaction.com/xmlrpc-api/>`_ for more info.
+      The location is not important. However, running them on multiple hosts I(simultaneously) is best avoided. If you do not specify C(localhost) as
+      your host, you may want to add C(serial=1) to the plays.
+    - See L(the webfaction API, https://docs.webfaction.com/xmlrpc-api/) for more info.
 
 extends_documentation_fragment:
     - community.general.attributes

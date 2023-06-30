@@ -16,7 +16,6 @@ short_description: Manages Datadog monitors
 description:
   - Manages monitors within Datadog.
   - Options as described on https://docs.datadoghq.com/api/.
-  - The type C(event-v2) was added in community.general 4.8.0.
 author: Sebastian Kornehl (@skornehl)
 requirements: [datadog]
 extends_documentation_fragment:
@@ -34,8 +33,8 @@ options:
         type: str
     api_host:
         description:
-          - The URL to the Datadog API. Default value is C(https://api.datadoghq.com).
-          - This value can also be set with the C(DATADOG_HOST) environment variable.
+          - The URL to the Datadog API. Default value is V(https://api.datadoghq.com).
+          - This value can also be set with the E(DATADOG_HOST) environment variable.
         required: false
         type: str
         version_added: '0.2.0'
@@ -59,8 +58,9 @@ options:
     type:
         description:
           - The type of the monitor.
-          - The types C(query alert), C(trace-analytics alert) and C(rum alert) were added in community.general 2.1.0.
-          - The type C(composite) was added in community.general 3.4.0.
+          - The types V(query alert), V(trace-analytics alert) and V(rum alert) were added in community.general 2.1.0.
+          - The type V(composite) was added in community.general 3.4.0.
+          - The type V(event-v2 alert) was added in community.general 4.8.0.
         choices:
             - metric alert
             - service check
@@ -117,7 +117,7 @@ options:
     escalation_message:
         description:
           - A message to include with a re-notification. Supports the '@username' notification we allow elsewhere.
-          - Not applicable if I(renotify_interval=None).
+          - Not applicable if O(renotify_interval=none).
         type: str
     notify_audit:
         description:
@@ -130,7 +130,7 @@ options:
           - A dictionary of thresholds by status.
           - Only available for service checks and metric alerts.
           - Because each of them can have multiple thresholds, we do not define them directly in the query.
-          - "If not specified, it defaults to: C({'ok': 1, 'critical': 1, 'warning': 1})."
+          - "If not specified, it defaults to: V({'ok': 1, 'critical': 1, 'warning': 1})."
     locked:
         description:
           - Whether changes to this monitor should be restricted to the creator or admins.

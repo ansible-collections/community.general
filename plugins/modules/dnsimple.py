@@ -26,13 +26,13 @@ attributes:
 options:
   account_email:
     description:
-      - Account email. If omitted, the environment variables C(DNSIMPLE_EMAIL) and C(DNSIMPLE_API_TOKEN) will be looked for.
+      - Account email. If omitted, the environment variables E(DNSIMPLE_EMAIL) and E(DNSIMPLE_API_TOKEN) will be looked for.
       - "If those aren't found, a C(.dnsimple) file will be looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started)."
       - "C(.dnsimple) config files are only supported in dnsimple-python<2.0.0"
     type: str
   account_api_token:
     description:
-      - Account API token. See I(account_email) for more information.
+      - Account API token. See O(account_email) for more information.
     type: str
   domain:
     description:
@@ -77,7 +77,7 @@ options:
   solo:
     description:
       - Whether the record should be the only one for that record type and record name.
-      - Only use with C(state) is set to C(present) on a record.
+      - Only use with O(state) is set to V(present) on a record.
     type: 'bool'
     default: false
   sandbox:

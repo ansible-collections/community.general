@@ -25,10 +25,10 @@ notes:
     bind over a UNIX domain socket. This works well with the default Ubuntu
     install for example, which includes a cn=peercred,cn=external,cn=auth ACL
     rule allowing root to modify the server configuration. If you need to use
-    a simple bind to access your server, pass the credentials in I(bind_dn)
-    and I(bind_pw).
-  - For I(state=present) and I(state=absent), all value comparisons are
-    performed on the server for maximum accuracy. For I(state=exact), values
+    a simple bind to access your server, pass the credentials in O(bind_dn)
+    and O(bind_pw).
+  - For O(state=present) and O(state=absent), all value comparisons are
+    performed on the server for maximum accuracy. For O(state=exact), values
     have to be compared in Python, which obviously ignores LDAP matching
     rules. This should work out in most cases, but it is theoretically
     possible to see spurious changes when target and actual values are
@@ -52,11 +52,11 @@ options:
     choices: [present, absent, exact]
     default: present
     description:
-      - The state of the attribute values. If C(present), all given attribute
-        values will be added if they're missing. If C(absent), all given
-        attribute values will be removed if present. If C(exact), the set of
+      - The state of the attribute values. If V(present), all given attribute
+        values will be added if they're missing. If V(absent), all given
+        attribute values will be removed if present. If V(exact), the set of
         attribute values will be forced to exactly those provided and no others.
-        If I(state=exact) and the attribute I(value) is empty, all values for
+        If O(state=exact) and the attribute value is empty, all values for
         this attribute will be removed.
   attributes:
     required: true
@@ -69,16 +69,16 @@ options:
         readability for long string values by using YAML block modifiers as seen in the
         examples for this module.
       - Note that when using values that YAML/ansible-core interprets as other types,
-        like C(yes), C(no) (booleans), or C(2.10) (float), make sure to quote them if
+        like V(yes), V(no) (booleans), or V(2.10) (float), make sure to quote them if
         these are meant to be strings. Otherwise the wrong values may be sent to LDAP.
   ordered:
     required: false
     type: bool
     default: false
     description:
-      - If C(true), prepend list values with X-ORDERED index numbers in all
+      - If V(true), prepend list values with X-ORDERED index numbers in all
         attributes specified in the current task. This is useful mostly with
-        I(olcAccess) attribute to easily manage LDAP Access Control Lists.
+        C(olcAccess) attribute to easily manage LDAP Access Control Lists.
 extends_documentation_fragment:
   - community.general.ldap.documentation
   - community.general.attributes
@@ -182,7 +182,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes, to_text
-from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
+from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
 
 import re
 
@@ -300,6 +300,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'exact', 'present']),
         ),
         supports_check_mode=True,
+        required_together=ldap_required_together(),
     )
 
     if not HAS_LDAP:

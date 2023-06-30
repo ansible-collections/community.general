@@ -32,10 +32,10 @@ DOCUMENTATION = '''
             default: false
         endpoints:
             description:
-            - Counterpart of C(ETCDCTL_ENDPOINTS) environment variable.
-              Specify the etcd3 connection with and URL form eg. C(https://hostname:2379)  or C(<host>:<port>) form.
-            - The C(host) part is overwritten by I(host) option, if defined.
-            - The C(port) part is overwritten by I(port) option, if defined.
+            - Counterpart of E(ETCDCTL_ENDPOINTS) environment variable.
+              Specify the etcd3 connection with and URL form, for example V(https://hostname:2379), or V(<host>:<port>) form.
+            - The V(host) part is overwritten by O(host) option, if defined.
+            - The V(port) part is overwritten by O(port) option, if defined.
             env:
             - name: ETCDCTL_ENDPOINTS
             default: '127.0.0.1:2379'
@@ -43,12 +43,12 @@ DOCUMENTATION = '''
         host:
             description:
             - etcd3 listening client host.
-            - Takes precedence over I(endpoints).
+            - Takes precedence over O(endpoints).
             type: str
         port:
             description:
             - etcd3 listening client port.
-            - Takes precedence over I(endpoints).
+            - Takes precedence over O(endpoints).
             type: int
         ca_cert:
             description:
@@ -89,13 +89,13 @@ DOCUMENTATION = '''
             type: str
 
     notes:
-    - I(host) and I(port) options take precedence over (endpoints) option.
-    - The recommended way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
-      environment variable and keep I(endpoints), I(host), and I(port) unused.
+    - O(host) and O(port) options take precedence over (endpoints) option.
+    - The recommended way to connect to etcd3 server is using E(ETCDCTL_ENDPOINT)
+      environment variable and keep O(endpoints), O(host), and O(port) unused.
     seealso:
     - module: community.general.etcd3
-    - ref: ansible_collections.community.general.etcd_lookup
-      description: The etcd v2 lookup.
+    - plugin: community.general.etcd
+      plugin_type: lookup
 
     requirements:
     - "etcd3 >= 0.10"

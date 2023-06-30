@@ -66,6 +66,19 @@ class _Variable(object):
         if verbosity is not None:
             self.verbosity = verbosity
 
+    def as_dict(self, meta_only=False):
+        d = {
+            "diff": self.diff,
+            "change": self.change,
+            "output": self.output,
+            "fact": self.fact,
+            "verbosity": self.verbosity,
+        }
+        if not meta_only:
+            d["initial_value"] = copy.deepcopy(self.initial_value)
+            d["value"] = self.value
+        return d
+
     def set_value(self, value):
         if not self.init:
             self.initial_value = copy.deepcopy(value)
@@ -93,7 +106,7 @@ class _Variable(object):
 
 
 class VarDict(object):
-    reserved_names = ('__vars__', 'var', 'set_meta', 'set', 'output', 'diff', 'facts', 'has_changed')
+    reserved_names = ('__vars__', '_var', 'var', 'set_meta', 'get_meta', 'set', 'output', 'diff', 'facts', 'has_changed', 'as_dict')
 
     def __init__(self):
         self.__vars__ = dict()
@@ -119,6 +132,9 @@ class VarDict(object):
     def _var(self, name):
         return self.__vars__[name]
 
+    def var(self, name):
+        return self._var(name).as_dict()
+
     def set_meta(self, name, **kwargs):
         """Set the metadata for the variable
 
@@ -132,6 +148,9 @@ class VarDict(object):
             verbosity (int, optional): level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
         """
         self._var(name).set_meta(**kwargs)
+
+    def get_meta(self, name):
+        return self._var(name).as_dict(meta_only=True)
 
     def set(self, name, value, **kwargs):
         """Set the value and optionally metadata for a variable. The variable is not required to exist prior to calling `set`.
@@ -172,7 +191,7 @@ class VarDict(object):
 
     @property
     def has_changed(self):
-        return any(True for var in self.__vars__.values() if var.has_changed)
+        return any(var.has_changed for var in self.__vars__.values())
 
     def as_dict(self):
         return dict((name, var.value) for name, var in self.__vars__.items())

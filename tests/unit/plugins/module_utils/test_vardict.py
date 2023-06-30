@@ -131,3 +131,4 @@ def test_vardict_dict():
     vd.set("zz", 789)
 
     assert vd.as_dict() == {"xx": 123, "yy": 456, "zz": 789}
+    assert vd.get_meta("xx") == {"output": True, "change": False, "diff": False, "fact": False, "verbosity": 0}

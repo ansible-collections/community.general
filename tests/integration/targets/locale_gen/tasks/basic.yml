@@ -1,0 +1,102 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Is the locale we're going to test against installed? {{ locale_basic.localegen }}
+  command: locale -a
+  register: initial_state
+  ignore_errors: true
+
+- name: Make sure the locale is not installed {{ locale_basic.localegen }}
+  locale_gen:
+    name: "{{ locale_basic.localegen }}"
+    state: absent
+
+- name: Is the locale present? {{ locale_basic.localegen }}
+  command: locale -a
+  register: cleaned
+  ignore_errors: true
+
+- name: Make sure the locale is not present {{ locale_basic.localegen }}
+  assert:
+    that:
+      - locale_basic.skip_removal or locale_basic.locales | intersect(cleaned.stdout_lines) == []
+
+- name: Install the locale {{ locale_basic.localegen }}
+  locale_gen:
+    name: "{{ locale_basic.localegen }}"
+    state: present
+  register: output_present
+
+- name: Is the locale present? {{ locale_basic.localegen }}
+  command: locale -a
+  register: post_check_output_present
+  ignore_errors: true
+
+- name: Make sure the locale is present and we say we installed it {{ locale_basic.localegen }}
+  assert:
+    that:
+      - locale_basic.locales | intersect(post_check_output_present.stdout_lines) != []
+      - locale_basic.skip_removal or output_present is changed
+
+- name: Install the locale a second time {{ locale_basic.localegen }}
+  locale_gen:
+    name: "{{ locale_basic.localegen }}"
+    state: present
+  register: output_present_idempotent
+
+- name: Is the locale present? {{ locale_basic.localegen }}
+  command: locale -a
+  register: post_check_output_present_idempotent
+  ignore_errors: true
+
+- name: Make sure the locale is present and we reported no change {{ locale_basic.localegen }}
+  assert:
+    that:
+      - locale_basic.locales | intersect(post_check_output_present_idempotent.stdout_lines) != []
+      - output_present_idempotent is not changed
+
+- name: Removals
+  when: locale_basic.skip_removal is false
+  block:
+    - name: Remove the locale {{ locale_basic.localegen }}
+      locale_gen:
+        name: "{{ locale_basic.localegen }}"
+        state: absent
+      register: output_absent
+
+    - name: Is the locale present? {{ locale_basic.localegen }}
+      command: locale -a
+      register: post_check_output_absent
+      ignore_errors: true
+
+    - name: Make sure the locale is absent and we reported a change {{ locale_basic.localegen }}
+      assert:
+        that:
+          - locale_basic.locales | intersect(post_check_output_absent.stdout_lines) == []
+          - output_absent is changed
+
+    - name: Remove the locale a second time {{ locale_basic.localegen }}
+      locale_gen:
+        name: "{{ locale_basic.localegen }}"
+        state: absent
+      register: output_absent_idempotent
+
+    - name: Is the locale present? {{ locale_basic.localegen }}
+      command: locale -a
+      register: post_check_output_absent_idempotent
+      ignore_errors: true
+
+    - name: Make sure the locale is absent and we reported no change {{ locale_basic.localegen }}
+      assert:
+        that:
+          - locale_basic.locales | intersect(post_check_output_absent_idempotent.stdout_lines) == []
+          - output_absent_idempotent is not changed
+
+# Cleanup
+- name: Reinstall the locale we tested against if it was initially installed {{ locale_basic.localegen }}
+  locale_gen:
+    name: "{{ locale_basic.localegen }}"
+    state: present
+  when: locale_basic.locales | intersect(initial_state.stdout_lines) != []

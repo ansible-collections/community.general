@@ -135,7 +135,7 @@ options:
                 required: true
             temporary:
                 description:
-                    - If C(true), the users are required to reset their credentials at next login.
+                    - If V(true), the users are required to reset their credentials at next login.
                 type: bool
                 default: false
     required_actions:
@@ -207,7 +207,7 @@ options:
         type: str
     force:
         description:
-            - If C(true), allows to remove user and recreate it.
+            - If V(true), allows to remove user and recreate it.
         type: bool
         default: false
 extends_documentation_fragment:
@@ -345,7 +345,7 @@ end_state:
   returned: on success
   type: dict
 changed:
-  description: Return C(true) if the operation changed the user on the keycloak server, C(false) otherwise.
+  description: Return V(true) if the operation changed the user on the keycloak server, V(false) otherwise.
   returned: always
   type: bool
 '''

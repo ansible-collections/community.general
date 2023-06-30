@@ -46,27 +46,28 @@ options:
         type: str
         required: true
     login_port:
-        description: Port of the MSSQL server. Requires I(login_host) be defined as well.
+        description: Port of the MSSQL server. Requires O(login_host) be defined as well.
         default: 1433
         type: int
     script:
         description:
           - The SQL script to be executed.
-          - Script can contain multiple SQL statements. Multiple Batches can be separated by C(GO) command.
+          - Script can contain multiple SQL statements. Multiple Batches can be separated by V(GO) command.
           - Each batch must return at least one result set.
         required: true
         type: str
     output:
         description:
-          - With C(default) each row will be returned as a list of values. See C(query_results).
-          - Output format C(dict) will return dictionary with the column names as keys. See C(query_results_dict).
-          - C(dict) requires named columns to be returned by each query otherwise an error is thrown.
+          - With V(default) each row will be returned as a list of values. See RV(query_results).
+          - Output format V(dict) will return dictionary with the column names as keys. See RV(query_results_dict).
+          - V(dict) requires named columns to be returned by each query otherwise an error is thrown.
         choices: [ "dict", "default" ]
         default: 'default'
         type: str
     params:
         description: |
-            Parameters passed to the script as SQL parameters. ('SELECT %(name)s"' with C(example: '{"name": "John Doe"}).)'
+            Parameters passed to the script as SQL parameters.
+            (Query V('SELECT %(name\)s"') with V(example: '{"name": "John Doe"}).)'
         type: dict
 notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
@@ -148,17 +149,17 @@ EXAMPLES = r'''
 
 RETURN = r'''
 query_results:
-    description: List of batches (queries separated by C(GO) keyword).
+    description: List of batches (queries separated by V(GO) keyword).
     type: list
     elements: list
-    returned: success and I(output=default)
+    returned: success and O(output=default)
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:
             description:
               - List of result sets of each query.
               - If a query returns no results, the results of this and all the following queries will not be included in the output.
-              - Use the C(GO) keyword in I(script) to separate queries.
+              - Use the V(GO) keyword in O(script) to separate queries.
             type: list
             elements: list
             contains:
@@ -175,10 +176,10 @@ query_results:
                             example: ["Batch 0 - Select 0"]
                             returned: success, if output is default
 query_results_dict:
-    description: List of batches (queries separated by C(GO) keyword).
+    description: List of batches (queries separated by V(GO) keyword).
     type: list
     elements: list
-    returned: success and I(output=dict)
+    returned: success and O(output=dict)
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:

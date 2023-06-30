@@ -16,7 +16,7 @@ description:
   - Sets or unsets the release version used by RHSM repositories.
 notes:
   - This module will fail on an unregistered system.
-    Use the C(redhat_subscription) module to register a system
+    Use the M(community.general.redhat_subscription) module to register a system
     prior to setting the RHSM release.
   - It is possible to interact with C(subscription-manager) only as root,
     so root permissions are required to successfully run this module.
@@ -33,7 +33,7 @@ options:
   release:
     description:
       - RHSM release version to use.
-      - To unset either pass C(null) for this option, or omit this option.
+      - To unset either pass V(null) for this option, or omit this option.
     type: str
 author:
   - Sean Myers (@seandst)
@@ -77,9 +77,9 @@ def _sm_release(module, *args):
     # pass args to s-m release, e.g. _sm_release(module, '--set', '0.1') becomes
     # "subscription-manager release --set 0.1"
     sm_bin = module.get_bin_path('subscription-manager', required=True)
-    cmd = '{0} release {1}'.format(sm_bin, " ".join(args))
+    cmd = [sm_bin, 'release'] + list(args)
     # delegate nonzero rc handling to run_command
-    return module.run_command(cmd, check_rc=True)
+    return module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
 
 
 def get_release(module):

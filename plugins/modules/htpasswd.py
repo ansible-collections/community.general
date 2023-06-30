@@ -46,12 +46,12 @@ options:
     description:
       - Encryption scheme to be used.  As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
-        C(portable_apache22) and C(host_apache24); or C(md5_crypt) and C(sha256_crypt),
+        V(portable_apache22) and V(host_apache24); or V(md5_crypt) and V(sha256_crypt),
         which are Linux passwd hashes.  Only some schemes in addition to
         the four choices below will be compatible with Apache or Nginx, and
         supported schemes depend on passlib version and its dependencies.
       - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
-      - 'Some of the available choices might be: C(apr_md5_crypt), C(des_crypt), C(ldap_sha1), C(plaintext).'
+      - 'Some of the available choices might be: V(apr_md5_crypt), V(des_crypt), V(ldap_sha1), V(plaintext).'
   state:
     type: str
     required: false
@@ -64,13 +64,13 @@ options:
     type: bool
     default: true
     description:
-      - Used with I(state=present). If specified, the file will be created
-        if it does not already exist. If set to C(false), will fail if the
+      - Used with O(state=present). If specified, the file will be created
+        if it does not already exist. If set to V(false), will fail if the
         file does not exist
 notes:
-  - "This module depends on the I(passlib) Python library, which needs to be installed on all target systems."
-  - "On Debian, Ubuntu, or Fedora: install I(python-passlib)."
-  - "On RHEL or CentOS: Enable EPEL, then install I(python-passlib)."
+  - "This module depends on the C(passlib) Python library, which needs to be installed on all target systems."
+  - "On Debian, Ubuntu, or Fedora: install C(python-passlib)."
+  - "On RHEL or CentOS: Enable EPEL, then install C(python-passlib)."
 requirements: [ passlib>=1.6 ]
 author: "Ansible Core Team"
 extends_documentation_fragment:

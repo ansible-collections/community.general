@@ -11,7 +11,7 @@ class ModuleDocFragment(object):
     DOCUMENTATION = """
     options:
         name:
-            description: Use I(name) along with the other options to return only resources that match the given name
+            description: Use O(name) along with the other options to return only resources that match the given name
                          exactly.
             type: str
     """

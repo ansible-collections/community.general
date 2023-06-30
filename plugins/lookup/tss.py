@@ -13,10 +13,10 @@ short_description: Get secrets from Thycotic Secret Server
 version_added: 1.0.0
 description:
     - Uses the Thycotic Secret Server Python SDK to get Secrets from Secret
-      Server using token authentication with I(username) and I(password) on
-      the REST API at I(base_url).
+      Server using token authentication with O(username) and O(password) on
+      the REST API at O(base_url).
     - When using self-signed certificates the environment variable
-      C(REQUESTS_CA_BUNDLE) can be set to a file containing the trusted certificates
+      E(REQUESTS_CA_BUNDLE) can be set to a file containing the trusted certificates
       (in C(.pem) format).
     - For example, C(export REQUESTS_CA_BUNDLE='/etc/ssl/certs/ca-bundle.trust.crt').
 requirements:
@@ -36,7 +36,7 @@ options:
     fetch_attachments:
         description:
             - Boolean flag which indicates whether attached files will get downloaded or not.
-            - The download will only happen if I(file_download_path) has been provided.
+            - The download will only happen if O(file_download_path) has been provided.
         required: false
         type: bool
         version_added: 7.0.0
@@ -46,7 +46,7 @@ options:
         type: path
         version_added: 7.0.0
     base_url:
-        description: The base URL of the server, e.g. C(https://localhost/SecretServer).
+        description: The base URL of the server, for example V(https://localhost/SecretServer).
         env:
             - name: TSS_BASE_URL
         ini:
@@ -63,7 +63,7 @@ options:
     password:
         description:
             - The password associated with the supplied username.
-            - Required when I(token) is not provided.
+            - Required when O(token) is not provided.
         env:
             - name: TSS_PASSWORD
         ini:
@@ -73,7 +73,7 @@ options:
         default: ""
         description:
           - The domain with which to request the OAuth2 Access Grant.
-          - Optional when I(token) is not provided.
+          - Optional when O(token) is not provided.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_DOMAIN
@@ -85,7 +85,7 @@ options:
     token:
         description:
           - Existing token for Thycotic authorizer.
-          - If provided, I(username) and I(password) are not needed.
+          - If provided, O(username) and O(password) are not needed.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_TOKEN
@@ -289,11 +289,15 @@ class TSSClient(object):
                 if file_download_path and os.path.isdir(file_download_path):
                     if i['isFile']:
                         try:
-                            with open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "w") as f:
-                                f.write(i['itemValue'].text)
-                            i['itemValue'] = "*** Not Valid For Display ***"
+                            file_content = i['itemValue'].content
+                            with open(os.path.join(file_download_path, str(obj['id']) + "_" + i['slug']), "wb") as f:
+                                f.write(file_content)
                         except ValueError:
                             raise AnsibleOptionsError("Failed to download {0}".format(str(i['slug'])))
+                        except AttributeError:
+                            display.warning("Could not read file content for {0}".format(str(i['slug'])))
+                        finally:
+                            i['itemValue'] = "*** Not Valid For Display ***"
                 else:
                     raise AnsibleOptionsError("File download path does not exist")
             return obj

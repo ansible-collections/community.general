@@ -53,7 +53,7 @@ variables:
 resources:
   containers:
     - container: default
-      image: quay.io/ansible/azure-pipelines-test-container:3.0.0
+      image: quay.io/ansible/azure-pipelines-test-container:4.0.1
 
 pool: Standard
 
@@ -173,10 +173,8 @@ stages:
           targets:
             - name: Alpine 3.17
               test: alpine/3.17
-            # - name: Fedora 37
-            #   test: fedora/37
-            # - name: Ubuntu 20.04
-            #   test: ubuntu/20.04
+            # - name: Fedora 38
+            #   test: fedora/38
             - name: Ubuntu 22.04
               test: ubuntu/22.04
           groups:
@@ -191,8 +189,10 @@ stages:
           targets:
             - name: macOS 13.2
               test: macos/13.2
-            - name: RHEL 9.1
-              test: rhel/9.1
+            - name: RHEL 9.2
+              test: rhel/9.2
+            - name: RHEL 8.8
+              test: rhel/8.8
             - name: FreeBSD 13.2
               test: freebsd/13.2
             - name: FreeBSD 12.4
@@ -209,6 +209,10 @@ stages:
         parameters:
           testFormat: 2.15/{0}
           targets:
+            - name: RHEL 9.1
+              test: rhel/9.1
+            - name: RHEL 8.7
+              test: rhel/8.7
             - name: RHEL 7.9
               test: rhel/7.9
             - name: FreeBSD 13.1
@@ -261,8 +265,8 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: Fedora 37
-              test: fedora37
+            - name: Fedora 38
+              test: fedora38
             - name: openSUSE 15
               test: opensuse15
             - name: Ubuntu 20.04
@@ -283,6 +287,8 @@ stages:
         parameters:
           testFormat: 2.15/linux/{0}
           targets:
+            - name: Fedora 37
+              test: fedora37
             - name: CentOS 7
               test: centos7
           groups:
@@ -333,6 +339,8 @@ stages:
           targets:
             - name: Debian Bullseye
               test: debian-bullseye/3.9
+            - name: Debian Bookworm
+              test: debian-bookworm/3.11
             - name: ArchLinux
               test: archlinux/3.11
             - name: CentOS Stream 8

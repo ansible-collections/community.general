@@ -45,7 +45,7 @@ options:
 
   region:
     description:
-      - Scaleway region to use (for example C(par1)).
+      - Scaleway region to use (for example V(par1)).
     type: str
     required: true
     choices:
@@ -110,8 +110,8 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: This is only present when I(state=present).
-    returned: when I(state=present)
+    description: This is only present when O(state=present).
+    returned: when O(state=present)
     type: dict
     sample: {
         "scaleway_security_group": {
