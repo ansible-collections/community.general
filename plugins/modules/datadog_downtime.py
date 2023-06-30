@@ -249,7 +249,7 @@ def build_downtime(module):
     if module.params["rrule"]:
         downtime.recurrence = DowntimeRecurrence(
             rrule=module.params["rrule"],
-            type="rrule"
+            type="rrule",
         )
     return downtime
 

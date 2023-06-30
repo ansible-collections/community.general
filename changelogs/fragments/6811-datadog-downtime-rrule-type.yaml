@@ -1,2 +1,2 @@
 bugfixes:
-  - datadog_downtime - presence of ``rrule`` param lead to the Datadog API returning Bad Request due to a missing recurrence type. (https://github.com/ansible-collections/community.general/pull/6811).
+  - datadog_downtime - presence of ``rrule`` param lead to the Datadog API returning Bad Request due to a missing recurrence type (https://github.com/ansible-collections/community.general/pull/6811).
