@@ -16,6 +16,8 @@ DOCUMENTATION = r"""
     version_added: '3.2.0'
     description:
       - Generates random string based upon the given constraints.
+      - Uses L(random.SystemRandom,https://docs.python.org/3/library/random.html#random.SystemRandom),
+        so should be strong enough for cryptographic purposes.
     options:
       length:
         description: The length of the string.
