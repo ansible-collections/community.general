@@ -48,6 +48,25 @@ DOCUMENTATION = '''
         default: chroot
 '''
 
+EXAMPLES = r"""
+# Static inventory file
+#
+# [chroots]
+# /path/to/debootstrap
+# /path/to/feboostrap
+# /path/to/lxc-image
+# /path/to/chroot
+
+# playbook
+---
+- hosts: chroots
+  connection: chroot
+  tasks:
+    - debug:
+        msg: "This is coming from Chroot environment"
+
+"""
+
 import os
 import os.path
 import subprocess
