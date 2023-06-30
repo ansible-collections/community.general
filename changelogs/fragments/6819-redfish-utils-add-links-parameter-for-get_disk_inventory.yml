@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_utils - support ``Links`` parameter for ``GetDiskInventory`` (https://github.com/ansible-collections/community.general/pull/6819).
