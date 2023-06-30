@@ -57,4 +57,3 @@ redis ; python_version >= '3.6'
 pycdlib < 1.13.0 ; python_version < '3'  # 1.13.0 does not work with Python 2, while not declaring that
 python-daemon <= 2.3.0 ; python_version < '3'
 bcrypt < 4.0.0  # TEMP: restrict to < 4.0.0 since installing 4.0.0 fails on RHEL 8
-proxmoxer < 2.0.0 ; python_version <= '3.6'
