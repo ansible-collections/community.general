@@ -93,9 +93,7 @@ class BitwardenSecretsManager(object):
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         out, err = p.communicate(stdin)
         rc = p.wait()
-        if rc != expected_rc:
-            raise BitwardenSecretsManagerException(to_text(err))
-        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
+        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict'), rc
 
     def get_secret(self, secret_id, bws_access_token):
         """Get and return the secret with the given secret_id.
@@ -109,7 +107,9 @@ class BitwardenSecretsManager(object):
             'get', 'secret', secret_id
         ]
 
-        out, err = self._run(params)
+        out, err, rc = self._run(params)
+        if rc != expected_rc:
+            raise BitwardenSecretsManagerException(to_text(err))
 
         return AnsibleJSONDecoder().raw_decode(out)[0]
 

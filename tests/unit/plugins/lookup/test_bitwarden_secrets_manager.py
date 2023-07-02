@@ -43,8 +43,21 @@ MOCK_SECRETS = [
 
 class MockBitwardenSecretsManager(BitwardenSecretsManager):
 
-    def get_secret(self, secret_id, bws_access_token):
-        return list(filter(lambda record: record["id"] == secret_id, MOCK_SECRETS))
+    def _run(self, args, stdin=None, expected_rc=0):
+        # secret_id is the last argument passed to the bws CLI
+        secret_id = args[-1]
+        rc = 0
+        err = ""
+        out = list(filter(lambda record: record["id"] == secret_id, MOCK_SECRETS))
+
+        if len(out) == 0:
+            err = "simulated bws CLI error: 404 no secret with such id"
+            rc = 1
+
+        # The real bws CLI will only ever return one secret for the "get secret <secret-id>" command
+        out = out[0]
+
+        return out, err, rc
 
 
 class TestLookupModule(unittest.TestCase):
