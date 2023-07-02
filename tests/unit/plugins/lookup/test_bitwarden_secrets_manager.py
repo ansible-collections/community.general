@@ -56,7 +56,7 @@ class MockBitwardenSecretsManager(BitwardenSecretsManager):
             err = "simulated bws CLI error: 404 no secret with such id"
         elif len(found_secrets) == 1:
             rc = 0
-            # The real bws CLI will only ever return one secret for the "get secret <secret-id>" command
+            # The real bws CLI will only ever return one secret / json object for the "get secret <secret-id>" command
             out = json.dumps(found_secrets[0])
         else:
             # This should never happen unless there's an error in the test MOCK_SECRETS.
@@ -74,7 +74,7 @@ class TestLookupModule(unittest.TestCase):
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager._bitwarden_secrets_manager', new=MockBitwardenSecretsManager())
     def test_bitwarden_secrets_manager(self):
         # Getting a secret by its id should return the full secret info
-        self.assertEqual([MOCK_SECRETS[0]], self.lookup.run(['ababc4a8-c242-4e54-bceb-77d17cdf2e07'], bws_access_token='123')[0])
+        self.assertEqual([MOCK_SECRETS[0]], self.lookup.run(['ababc4a8-c242-4e54-bceb-77d17cdf2e07'], bws_access_token='123'))
 
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager._bitwarden_secrets_manager', new=MockBitwardenSecretsManager())
     def test_bitwarden_secrets_manager_no_match(self):
