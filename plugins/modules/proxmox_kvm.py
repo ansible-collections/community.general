@@ -1513,7 +1513,7 @@ def main():
         vm = proxmox.get_vm(vmid)
         if not name:
             name = vm.get('name', '(unnamed)')
-        current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
+        current = vm.get('status')
         status['status'] = current
         if status:
             module.exit_json(changed=False, vmid=vmid, data=vm, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
