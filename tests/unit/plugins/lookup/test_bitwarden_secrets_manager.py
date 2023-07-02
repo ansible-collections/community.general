@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
+import json
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
@@ -46,16 +47,21 @@ class MockBitwardenSecretsManager(BitwardenSecretsManager):
     def _run(self, args, stdin=None):
         # secret_id is the last argument passed to the bws CLI
         secret_id = args[-1]
-        rc = 0
+        rc = 1
+        out = ""
         err = ""
-        out = list(filter(lambda record: record["id"] == secret_id, MOCK_SECRETS))
+        found_secrets = list(filter(lambda record: record["id"] == secret_id, MOCK_SECRETS))
 
-        if len(out) == 0:
+        if len(found_secrets) == 0:
             err = "simulated bws CLI error: 404 no secret with such id"
-            rc = 1
-
-        # The real bws CLI will only ever return one secret for the "get secret <secret-id>" command
-        out = out[0]
+        elif len(found_secrets) == 1:
+            rc = 0
+            # The real bws CLI will only ever return one secret for the "get secret <secret-id>" command
+            out = json.dumps(found_secrets[0])
+        else:
+            # This should never happen unless there's an error in the test MOCK_SECRETS.
+            # The real Bitwarden Secrets Manager assigns each secret a unique ID.
+            raise ValueError("More than 1 secret found with id: '{0}'. Impossible!".format(secret_id))
 
         return out, err, rc
 
