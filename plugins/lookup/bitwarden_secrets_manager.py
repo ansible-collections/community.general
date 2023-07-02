@@ -89,7 +89,7 @@ class BitwardenSecretsManager(object):
     def cli_path(self):
         return self._cli_path
 
-    def _run(self, args, stdin=None, expected_rc=0):
+    def _run(self, args, stdin=None):
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         out, err = p.communicate(stdin)
         rc = p.wait()
@@ -108,7 +108,7 @@ class BitwardenSecretsManager(object):
         ]
 
         out, err, rc = self._run(params)
-        if rc != expected_rc:
+        if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
 
         return AnsibleJSONDecoder().raw_decode(out)[0]
