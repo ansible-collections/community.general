@@ -207,25 +207,25 @@ class Snap(StateModuleHelper):
                 rc, out, err = ctx.run(state=state, name=actionable_names)
                 results_cmd.append(commands + actionable_names)
                 results_rc.append(rc)
-                results_out.append(out)
-                results_err.append(err)
+                results_out.append(out.strip())
+                results_err.append(err.strip())
                 results_run_info.append(ctx.run_info)
             else:
                 for name in actionable_names:
                     rc, out, err = ctx.run(state=state, name=name)
                     results_cmd.append(commands + [name])
                     results_rc.append(rc)
-                    results_out.append(out)
-                    results_err.append(err)
+                    results_out.append(out.strip())
+                    results_err.append(err.strip())
                     results_run_info.append(ctx.run_info)
 
-        return [
+        return (
             '; '.join([to_native(x) for x in results_cmd]),
             self._first_non_zero(results_rc),
             '\n'.join(results_out),
             '\n'.join(results_err),
             results_run_info,
-        ]
+        )
 
     def __quit_module__(self):
         if self.vars.channel is None:
@@ -324,8 +324,8 @@ class Snap(StateModuleHelper):
             self.vars.run_info = run_info
 
         if rc == 0:
-            match_install = [self.__install_re.match(line) for line in out.split('\n')]
-            match_install = [m.group('name') in actionable_snaps for m in match_install if m]
+            match_install2 = [self.__install_re.match(line) for line in out.split('\n')]
+            match_install = [m.group('name') in actionable_snaps for m in match_install2 if m]
             if len(match_install) == len(actionable_snaps):
                 return
 
