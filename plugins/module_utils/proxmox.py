@@ -18,6 +18,7 @@ import traceback
 PROXMOXER_IMP_ERR = None
 try:
     from proxmoxer import ProxmoxAPI
+    from proxmoxer import __version__ as proxmoxer_version
     HAS_PROXMOXER = True
 except ImportError:
     HAS_PROXMOXER = False
@@ -80,6 +81,7 @@ class ProxmoxAnsible(object):
 
         self.module = module
         self.proxmox_api = self._connect()
+        self.proxmoxer_version = proxmoxer_version
         # Test token validity
         try:
             self.proxmox_api.version.get()

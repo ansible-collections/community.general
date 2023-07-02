@@ -7,7 +7,15 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import json
+import sys
+
 import pytest
+
+proxmoxer = pytest.importorskip('proxmoxer')
+mandatory_py_version = pytest.mark.skipif(
+    sys.version_info < (2, 7),
+    reason='The proxmoxer dependency requires python2.7 or higher'
+)
 
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.plugins.modules import proxmox_snap
