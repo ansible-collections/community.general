@@ -1,3 +1,5 @@
 minor_changes:
-  - proxmox_kvm - ``current`` state now includes the full resource object under the `data` key. (https://github.com/ansible-collections/community.general/pull/6828).
-  - proxmox_kvm - Removed redundant API call when fetching ``current`` state. This call provided the VM power state. (https://github.com/ansible-collections/community.general/pull/6828).
+  - proxmox_kvm - ``current`` state now includes the full resource object under the ``data`` key (https://github.com/ansible-collections/community.general/pull/6828).
+
+  - proxmox_kvm - removed redundant API call when fetching ``current`` state. This call provided the VM power state (https://github.com/ansible-collections/community.general/pull/6828).
+
