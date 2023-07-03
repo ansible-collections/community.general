@@ -184,7 +184,7 @@ options:
         which makes sure these options have no defaults.
       - This affects the O(disk), O(cores), O(cpus), O(memory), O(onboot), O(swap), and O(cpuunits) options.
       - >
-        This parameter is now B(deprecated) and it will be removed in community.general 9.0.0.
+        This parameter is now B(deprecated) and it will be removed in community.general 10.0.0.
         By then, the module's behavior should be to not set default values, equivalent to V(no_defaults).
         If a consistent set of defaults is needed, the playbook or role should be responsible for setting it.
     type: str
