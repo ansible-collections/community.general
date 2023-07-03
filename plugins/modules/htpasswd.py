@@ -26,13 +26,13 @@ options:
     required: true
     aliases: [ dest, destfile ]
     description:
-      - Path to the file that contains the usernames and passwords
+      - Path to the file that contains the usernames and passwords.
   name:
     type: str
     required: true
     aliases: [ username ]
     description:
-      - User name to add or remove
+      - User name to add or remove.
   password:
     type: str
     required: false
@@ -58,15 +58,15 @@ options:
     choices: [ present, absent ]
     default: "present"
     description:
-      - Whether the user entry should be present or not
+      - Whether the user entry should be present or not.
   create:
     required: false
     type: bool
     default: true
     description:
-      - Used with O(state=present). If specified, the file will be created
-        if it does not already exist. If set to V(false), will fail if the
-        file does not exist
+      - Used with O(state=present). If V(true), the file will be created
+        if it does not exist. Conversely, if set to V(false) and the file
+        does not exist it will fail.
 notes:
   - "This module depends on the C(passlib) Python library, which needs to be installed on all target systems."
   - "On Debian, Ubuntu, or Fedora: install C(python-passlib)."
