@@ -44,10 +44,10 @@ options:
     required: false
     default: "apr_md5_crypt"
     description:
-      - Encryption scheme to be used.  As well as the four choices listed
+      - Encryption scheme to be used. As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
         V(portable_apache22) and V(host_apache24); or V(md5_crypt) and V(sha256_crypt),
-        which are Linux passwd hashes.  Only some schemes in addition to
+        which are Linux passwd hashes. Only some schemes in addition to
         the four choices below will be compatible with Apache or Nginx, and
         supported schemes depend on passlib version and its dependencies.
       - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
