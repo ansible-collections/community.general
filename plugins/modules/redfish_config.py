@@ -159,6 +159,13 @@ options:
     type: dict
     default: {}
     version_added: '7.2.0'
+  storage_subsystem_id:
+    required: false
+    description:
+      - Id of the Storage Subsystem on which the volume is to be created.
+    type: str
+    default: ''
+    version_added: '7.2.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
@@ -384,10 +391,15 @@ def main():
             hostinterface_config=dict(type='dict', default={}),
             hostinterface_id=dict(),
             sessions_config=dict(type='dict', default={}),
+<<<<<<< HEAD
             storage_subsystem_id=dict(type='str', default=''),
             volume_ids=dict(type='list', default=[], elements='str'),
             secure_boot_enable=dict(type='bool', default=True),
             volume_details=dict(type='dict', default={})
+=======
+            volume_details=dict(type='dict', default={}),
+            storage_subsystem_id=dict(type='str', default='')
+>>>>>>> 1bef8445 (Removing capabilities check and correcting controllers terminology to storage subsystem)
         ),
         required_together=[
             ('username', 'password'),
@@ -446,6 +458,7 @@ def main():
 
     # Volume creation options
     volume_details = module.params['volume_details']
+    storage_subsystem_id = module.params['storage_subsystem_id']
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -485,7 +498,7 @@ def main():
             elif command == "DeleteVolumes":
                 result = rf_utils.delete_volumes(storage_subsystem_id, volume_ids)
             elif command == "CreateVolume":
-                result = rf_utils.create_volume(volume_details)
+                result = rf_utils.create_volume(volume_details, storage_subsystem_id)
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
