@@ -105,6 +105,12 @@ class ProxmoxAnsible(object):
 
         try:
             return ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
+        except TypeError as e:
+            msg = str(e)
+            if 'token_name' in msg or 'token_value' in msg:
+                self.module.fail_json('Using "token_name" and "token_value" require proxmoxer>=1.1.0')
+            else:
+                self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
 
