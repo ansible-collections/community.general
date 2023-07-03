@@ -26,13 +26,13 @@ options:
     required: true
     aliases: [ dest, destfile ]
     description:
-      - Path to the file that contains the usernames and passwords
+      - Path to the file that contains the usernames and passwords.
   name:
     type: str
     required: true
     aliases: [ username ]
     description:
-      - User name to add or remove
+      - User name to add or remove.
   password:
     type: str
     required: false
@@ -44,10 +44,10 @@ options:
     required: false
     default: "apr_md5_crypt"
     description:
-      - Encryption scheme to be used.  As well as the four choices listed
+      - Encryption scheme to be used. As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
         V(portable_apache22) and V(host_apache24); or V(md5_crypt) and V(sha256_crypt),
-        which are Linux passwd hashes.  Only some schemes in addition to
+        which are Linux passwd hashes. Only some schemes in addition to
         the four choices below will be compatible with Apache or Nginx, and
         supported schemes depend on passlib version and its dependencies.
       - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
@@ -58,15 +58,15 @@ options:
     choices: [ present, absent ]
     default: "present"
     description:
-      - Whether the user entry should be present or not
+      - Whether the user entry should be present or not.
   create:
     required: false
     type: bool
     default: true
     description:
-      - Used with O(state=present). If specified, the file will be created
-        if it does not already exist. If set to V(false), will fail if the
-        file does not exist
+      - Used with O(state=present). If V(true), the file will be created
+        if it does not exist. Conversely, if set to V(false) and the file
+        does not exist it will fail.
 notes:
   - "This module depends on the C(passlib) Python library, which needs to be installed on all target systems."
   - "On Debian, Ubuntu, or Fedora: install C(python-passlib)."
