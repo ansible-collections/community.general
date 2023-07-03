@@ -39,12 +39,12 @@ options:
     description:
       - Password associated with user.
       - Must be specified if user does not exist yet.
-  crypt_scheme:
+  hash_scheme:
     type: str
     required: false
     default: "apr_md5_crypt"
     description:
-      - Encryption scheme to be used. As well as the four choices listed
+      - Hashing scheme to be used. As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
         V(portable_apache22) and V(host_apache24); or V(md5_crypt) and V(sha256_crypt),
         which are Linux passwd hashes. Only some schemes in addition to
@@ -52,6 +52,7 @@ options:
         supported schemes depend on passlib version and its dependencies.
       - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
       - 'Some of the available choices might be: V(apr_md5_crypt), V(des_crypt), V(ldap_sha1), V(plaintext).'
+    aliases: [crypt_scheme]
   state:
     type: str
     required: false
@@ -215,7 +216,7 @@ def main():
         path=dict(type='path', required=True, aliases=["dest", "destfile"]),
         name=dict(type='str', required=True, aliases=["username"]),
         password=dict(type='str', required=False, default=None, no_log=True),
-        crypt_scheme=dict(type='str', required=False, default="apr_md5_crypt"),
+        hash_scheme=dict(type='str', required=False, default="apr_md5_crypt", aliases=["crypt_scheme"]),
         state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
         create=dict(type='bool', default=True),
 
