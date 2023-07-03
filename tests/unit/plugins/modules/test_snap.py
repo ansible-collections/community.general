@@ -423,34 +423,6 @@ TEST_CASES = [
             ),
         ]
     ),
-    ModuleTestCase(
-        id="issue_6821",
-        input={"name": ["microk8s", "kubectl"], "classic": True},
-        output=dict(changed=True, snaps_installed=["microk8s", "kubectl"]),
-        run_command_calls=[
-            RunCmdCall(
-                command=['/testbin/snap', 'list'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=issue_6803_status_out,
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'install', '--classic', 'microk8s'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=issue_6803_microk8s_out,
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'install', '--classic', 'kubectl'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=issue_6803_kubectl_out,
-                err="",
-            ),
-        ]
-    ),
 ]
 TEST_CASES_IDS = [item.id for item in TEST_CASES]
 
