@@ -100,6 +100,8 @@ class ProxmoxAnsible(object):
         if api_password:
             auth_args['password'] = api_password
         else:
+            if self.version() < LooseVersion('1.1.0'):
+                self.module.fail_json('Using "token_name" and "token_value" require proxmoxer>=1.1.0')
             auth_args['token_name'] = api_token_id
             auth_args['token_value'] = api_token_secret
 
