@@ -1,0 +1,2 @@
+deprecated_features:
+  - proxmox - old feature flag ``proxmox_default_behavior`` will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/6836).
