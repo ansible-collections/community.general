@@ -282,6 +282,9 @@ class Snap(StateModuleHelper):
             else:
                 return Snap.INSTALLED
 
+        if channel:
+            channel = "latest/{0}".format(channel) if "/" not in channel else channel
+
         with self.runner("_list") as ctx:
             rc, out, err = ctx.run(check_rc=True)
         out = out.split('\n')[1:]

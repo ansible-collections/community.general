@@ -38,9 +38,13 @@
   assert:
     that:
       - install is changed
+      - install is not failed
       - install_check is changed
+      - install_check is not failed
       - install_again is not changed
+      - install_again is not failed
       - install_again_check is not changed
+      - install_again_check is not failed
 
 - name: Check package has been installed correctly (hello-world)
   command: hello-world
