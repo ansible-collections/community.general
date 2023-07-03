@@ -90,7 +90,6 @@ repositories:
   type: list
 '''
 
-import re
 import os
 from fnmatch import fnmatch
 from copy import deepcopy
@@ -129,15 +128,6 @@ class Rhsm(object):
         """
         rc, out, err = self.run_repos(['--list'])
 
-        skip_lines = [
-            '+----------------------------------------------------------+',
-            '    Available Repositories in /etc/yum.repos.d/redhat.repo'
-        ]
-        repo_id_re = re.compile(r'Repo ID:\s+(.*)')
-        repo_name_re = re.compile(r'Repo Name:\s+(.*)')
-        repo_url_re = re.compile(r'Repo URL:\s+(.*)')
-        repo_enabled_re = re.compile(r'Enabled:\s+(.*)')
-
         repo_id = ''
         repo_name = ''
         repo_url = ''
@@ -145,27 +135,27 @@ class Rhsm(object):
 
         repo_result = []
         for line in out.splitlines():
-            if line == '' or line in skip_lines:
+            # ignore lines that are:
+            # - empty
+            # - "+---------[...]" -- i.e. header
+            # - "    Available Repositories [...]" -- i.e. header
+            if line == '' or line[0] == '+' or line[0] == ' ':
                 continue
 
-            repo_id_match = repo_id_re.match(line)
-            if repo_id_match:
-                repo_id = repo_id_match.group(1)
+            if line.startswith('Repo ID: '):
+                repo_id = line[9:].lstrip()
                 continue
 
-            repo_name_match = repo_name_re.match(line)
-            if repo_name_match:
-                repo_name = repo_name_match.group(1)
+            if line.startswith('Repo Name: '):
+                repo_name = line[11:].lstrip()
                 continue
 
-            repo_url_match = repo_url_re.match(line)
-            if repo_url_match:
-                repo_url = repo_url_match.group(1)
+            if line.startswith('Repo URL: '):
+                repo_url = line[10:].lstrip()
                 continue
 
-            repo_enabled_match = repo_enabled_re.match(line)
-            if repo_enabled_match:
-                repo_enabled = repo_enabled_match.group(1)
+            if line.startswith('Enabled: '):
+                repo_enabled = line[9:].lstrip()
 
                 repo = {
                     "id": repo_id,
