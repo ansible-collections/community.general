@@ -26,6 +26,11 @@ options:
         description: The integer ID of the secret.
         required: true
         type: int
+    secret_path:
+        description: Indicate a full path of secret including folder and secret name when the secret ID is set to 0.
+        required: false
+        type: str
+        version_added: 7.2.0
     fetch_secret_ids_from_folder:
         description:
             - Boolean flag which indicates whether secret ids are in a folder is fetched by folder ID or not.
@@ -221,6 +226,29 @@ EXAMPLES = r"""
           the secret id's are {{
               secret
           }}
+
+# If secret ID is 0 and secret_path has value then secret is fetched by secret path
+- hosts: localhost
+  vars:
+      secret: >-
+        {{
+            lookup(
+                'community.general.tss',
+                0,
+                secret_path='\folderName\secretName'
+                base_url='https://secretserver.domain.com/SecretServer/',
+                username='user.name',
+                password='password'
+            )
+        }}
+  tasks:
+      - ansible.builtin.debug:
+          msg: >
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
 """
 
 import abc
@@ -231,32 +259,23 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from delinea.secrets.server import SecretServer, SecretServerError
+    from delinea.secrets.server import SecretServer, SecretServerError, PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
     HAS_TSS_SDK = True
     HAS_DELINEA_SS_SDK = True
+    HAS_TSS_AUTHORIZER = True
 except ImportError:
     try:
-        from thycotic.secrets.server import SecretServer, SecretServerError
+        from thycotic.secrets.server import SecretServer, SecretServerError, PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
         HAS_TSS_SDK = True
         HAS_DELINEA_SS_SDK = False
+        HAS_TSS_AUTHORIZER = True
     except ImportError:
         SecretServer = None
         SecretServerError = None
         HAS_TSS_SDK = False
         HAS_DELINEA_SS_SDK = False
-
-try:
-    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
-
-    HAS_TSS_AUTHORIZER = True
-except ImportError:
-    try:
-        from delinea.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
-
-        HAS_TSS_AUTHORIZER = True
-    except ImportError:
         PasswordGrantAuthorizer = None
         DomainPasswordGrantAuthorizer = None
         AccessTokenAuthorizer = None
@@ -278,13 +297,21 @@ class TSSClient(object):
         else:
             return TSSClientV0(**server_parameters)
 
-    def get_secret(self, term, fetch_file_attachments, file_download_path):
+    def get_secret(self, term, secret_path, fetch_file_attachments, file_download_path):
         display.debug("tss_lookup term: %s" % term)
         secret_id = self._term_to_secret_id(term)
-        display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
+        if secret_id == 0 and secret_path:
+            fetch_secret_by_path = True
+            display.vvv(u"Secret Server lookup of Secret with path %s" % secret_path)
+        else:
+            fetch_secret_by_path = False
+            display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
 
         if fetch_file_attachments:
-            obj = self._client.get_secret(secret_id, fetch_file_attachments)
+            if fetch_secret_by_path:
+                obj = self._client.get_secret_by_path(secret_path, fetch_file_attachments)
+            else:
+                obj = self._client.get_secret(secret_id, fetch_file_attachments)
             for i in obj['items']:
                 if file_download_path and os.path.isdir(file_download_path):
                     if i['isFile']:
@@ -302,7 +329,10 @@ class TSSClient(object):
                     raise AnsibleOptionsError("File download path does not exist")
             return obj
         else:
-            return self._client.get_secret_json(secret_id)
+            if fetch_secret_by_path:
+                return self._client.get_secret_by_path(secret_path, False)
+            else:
+                return self._client.get_secret_json(secret_id)
 
     def get_secret_ids_by_folderid(self, term):
         display.debug("tss_lookup term: %s" % term)
@@ -399,6 +429,6 @@ class LookupModule(LookupBase):
                 else:
                     raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
             else:
-                return [tss.get_secret(term, self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
+                return [tss.get_secret(term, self.get_option("secret_path"), self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
         except SecretServerError as error:
             raise AnsibleError("Secret Server lookup failure: %s" % error.message)
