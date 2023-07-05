@@ -285,7 +285,8 @@ def main():
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        required_if=[('state', 'absent', ['name'])],
+        supports_check_mode=True,
     )
 
     name = module.params['name']
@@ -304,8 +305,6 @@ def main():
 
     if not path and not glbl:
         module.fail_json(msg='path must be specified when not using global')
-    if state == 'absent' and not name:
-        module.fail_json(msg='uninstalling a package is only available for named packages')
 
     npm = Npm(module, name=name, path=path, version=version, glbl=glbl, production=production,
               executable=executable, registry=registry, ignore_scripts=ignore_scripts,
