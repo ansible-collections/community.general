@@ -1,0 +1,2 @@
+minor_changes:
+  - npm - minor improvement on parameter validation (https://github.com/ansible-collections/community.general/pull/6848).
