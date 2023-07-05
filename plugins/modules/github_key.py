@@ -83,7 +83,7 @@ EXAMPLES = '''
     token: '{{ github_access_token }}'
     pubkey: '{{ ssh_pub_key.stdout }}'
 
-# Alternatively, a single task can be used reading a key from a file
+# Alternatively, a single task can be used reading a key from a file on the controller
 - name: Authorize key with GitHub
   community.general.github_key:
     name: Access Key for Some Machine
