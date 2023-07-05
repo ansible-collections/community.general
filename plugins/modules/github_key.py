@@ -82,8 +82,14 @@ EXAMPLES = '''
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
     pubkey: '{{ ssh_pub_key.stdout }}'
-'''
 
+# Alternatively, a single task can be used reading a key from a file
+- name: Authorize key with GitHub
+  community.general.github_key:
+    name: Access Key for Some Machine
+    token: '{{ github_access_token }}'
+    pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
+'''
 
 import json
 import re
