@@ -70,6 +70,7 @@ options:
         description:
             - The executable location for C(opkg).
         type: path
+        version_added: 7.2.0
 requirements:
     - opkg
     - python
