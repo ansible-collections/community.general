@@ -1140,7 +1140,8 @@ class RedfishUtils(object):
         user_list = []
         users_results = []
         # Get these entries, but does not fail if not found
-        properties = ['Id', 'Name', 'UserName', 'RoleId', 'Locked', 'Enabled']
+        properties = ['Id', 'Name', 'UserName', 'RoleId', 'Locked', 'Enabled',
+                      'AccountTypes', 'OEMAccountTypes']
 
         response = self.get_request(self.root_uri + self.accounts_uri)
         if response['ret'] is False:
@@ -1191,6 +1192,10 @@ class RedfishUtils(object):
             payload['Password'] = user.get('account_password')
         if user.get('account_roleid'):
             payload['RoleId'] = user.get('account_roleid')
+        if user.get('account_accounttypes'):
+            payload['AccountTypes'] = user.get('account_accounttypes')
+        if user.get('account_oemaccounttypes'):
+            payload['OEMAccountTypes'] = user.get('account_oemaccounttypes')
         return self.patch_request(self.root_uri + uri, payload, check_pyld=True)
 
     def add_user(self, user):
@@ -1221,6 +1226,10 @@ class RedfishUtils(object):
             payload['Password'] = user.get('account_password')
         if user.get('account_roleid'):
             payload['RoleId'] = user.get('account_roleid')
+        if user.get('account_accounttypes'):
+            payload['AccountTypes'] = user.get('account_accounttypes')
+        if user.get('account_oemaccounttypes'):
+            payload['OEMAccountTypes'] = user.get('account_oemaccounttypes')
         if user.get('account_id'):
             payload['Id'] = user.get('account_id')
 

@@ -85,6 +85,22 @@ options:
     description:
       - Role of account to add/modify.
     type: str
+  account_types:
+    required: false
+    aliases: [ account_accounttypes ]
+    description:
+      - Array of account types to apply to a user account.
+    type: list
+    elements: str
+    version_added: '7.2.0'
+  oem_account_types:
+    required: false
+    aliases: [ account_oemaccounttypes ]
+    description:
+      - Array of OEM account types to apply to a user account.
+    type: list
+    elements: str
+    version_added: '7.2.0'
   bootdevice:
     required: false
     description:
@@ -379,6 +395,20 @@ EXAMPLES = '''
       new_username: "{{ new_username }}"
       new_password: "{{ new_password }}"
       roleid: "{{ roleid }}"
+
+  - name: Add user with specified account types
+    community.general.redfish_command:
+      category: Accounts
+      command: AddUser
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      new_username: "{{ new_username }}"
+      new_password: "{{ new_password }}"
+      roleid: "{{ roleid }}"
+      account_types:
+      - Redfish
+      - WebUI
 
   - name: Add user using new option aliases
     community.general.redfish_command:
@@ -747,6 +777,8 @@ def main():
             new_username=dict(aliases=["account_username"]),
             new_password=dict(aliases=["account_password"], no_log=True),
             roleid=dict(aliases=["account_roleid"]),
+            account_types=dict(aliases=["account_accounttypes"]),
+            oem_account_types=dict(aliases=["account_oemaccounttypes"]),
             update_username=dict(type='str', aliases=["account_updatename"]),
             account_properties=dict(type='dict', default={}),
             bootdevice=dict(),
@@ -810,8 +842,11 @@ def main():
             'account_username': module.params['new_username'],
             'account_password': module.params['new_password'],
             'account_roleid': module.params['roleid'],
+            'account_accounttypes': module.params['account_types'],
+            'account_oemaccounttypes': module.params['oem_account_types'],
             'account_updatename': module.params['update_username'],
-            'account_properties': module.params['account_properties']}
+            'account_properties': module.params['account_properties'],
+    }
 
     # timeout
     timeout = module.params['timeout']
