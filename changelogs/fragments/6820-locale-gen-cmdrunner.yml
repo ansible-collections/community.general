@@ -1,0 +1,2 @@
+minor_changes:
+  - locale_gen - module now using ``CmdRunner`` to execute external commands (https://github.com/ansible-collections/community.general/pull/6820).
