@@ -1,0 +1,2 @@
+ bugfixes:
+  - nmcli - fix support for empty list (in compare and scrape) (https://github.com/ansible-collections/community.general/pull/6769).
