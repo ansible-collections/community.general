@@ -1503,7 +1503,7 @@ def main():
             status['status'] = vm['status']
             if vm['status'] == 'running':
                 if module.params['force']:
-                    proxmox.stop_vm(vm, True)
+                    proxmox.stop_vm(vm, True, timeout=module.params['timeout'])
                 else:
                     module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion or use force=true." % vmid)
             taskid = proxmox_node.qemu.delete(vmid)
