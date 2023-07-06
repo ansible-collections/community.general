@@ -48,10 +48,11 @@ EXAMPLES = '''
 
 import os
 import re
-from subprocess import Popen, PIPE, call
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.locale_gen import locale_runner, locale_gen_runner
+
 
 LOCALE_NORMALIZATION = {
     ".utf8": ".UTF-8",
@@ -65,6 +66,8 @@ LOCALE_NORMALIZATION = {
     ".gb18030": ".GB18030",
     ".euctw": ".EUC-TW",
 }
+
+module = None
 
 
 # ===========================================
@@ -95,8 +98,9 @@ def is_available(name, ubuntuMode):
 
 def is_present(name):
     """Checks if the given locale is currently installed."""
-    output = Popen(["locale", "-a"], stdout=PIPE).communicate()[0]
-    output = to_native(output)
+    runner = locale_runner(module)
+    with runner() as ctx:
+        dummy, output, dummy = ctx.run()
     return any(fix_case(name) == fix_case(line) for line in output.splitlines())
 
 
@@ -134,6 +138,8 @@ def apply_change(targetState, name):
     targetState -- Desired state, either present or absent.
     name -- Name including encoding such as de_CH.UTF-8.
     """
+    runner = locale_gen_runner(module)
+
     if targetState == "present":
         # Create locale.
         set_locale(name, enabled=True)
@@ -141,9 +147,8 @@ def apply_change(targetState, name):
         # Delete locale.
         set_locale(name, enabled=False)
 
-    localeGenExitValue = call("locale-gen")
-    if localeGenExitValue != 0:
-        raise EnvironmentError(localeGenExitValue, "locale.gen failed to execute, it returned " + str(localeGenExitValue))
+    with runner() as ctx:
+        ctx.run()
 
 
 def apply_change_ubuntu(targetState, name):
@@ -153,10 +158,13 @@ def apply_change_ubuntu(targetState, name):
     targetState -- Desired state, either present or absent.
     name -- Name including encoding such as de_CH.UTF-8.
     """
+    runner = locale_gen_runner(module)
+
     if targetState == "present":
         # Create locale.
         # Ubuntu's patched locale-gen automatically adds the new locale to /var/lib/locales/supported.d/local
-        localeGenExitValue = call(["locale-gen", name])
+        with runner() as ctx:
+            ctx.run()
     else:
         # Delete locale involves discarding the locale from /var/lib/locales/supported.d/local and regenerating all locales.
         try:
@@ -174,13 +182,13 @@ def apply_change_ubuntu(targetState, name):
             f.close()
         # Purge locales and regenerate.
         # Please provide a patch if you know how to avoid regenerating the locales to keep!
-        localeGenExitValue = call(["locale-gen", "--purge"])
-
-    if localeGenExitValue != 0:
-        raise EnvironmentError(localeGenExitValue, "locale.gen failed to execute, it returned " + str(localeGenExitValue))
+        with runner("purge") as ctx:
+            ctx.run()
 
 
 def main():
+    global module
+
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
