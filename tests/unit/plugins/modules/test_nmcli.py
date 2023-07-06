@@ -262,6 +262,25 @@ ipv4.routes:                            { ip = 192.168.200.0/24, nh = 192.168.1.
 ipv4.route-metric:                      10
 """
 
+TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC_CLEAR = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'routes4': [],
+        'state': 'present',
+        '_ansible_check_mode': False,
+        '_ansible_diff': True,
+    },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'routes4_extended': [],
+        'state': 'present',
+        '_ansible_check_mode': False,
+        '_ansible_diff': True,
+    },
+]
+
 TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
     {
         'type': 'ethernet',
@@ -1672,6 +1691,17 @@ def mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modi
 
 
 @pytest.fixture
+def mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_clear(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
 def mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modify(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -2986,6 +3016,38 @@ def test_ethernet_connection_static_ipv4_address_static_route_with_metric_modify
 
     out, err = capfd.readouterr()
     results = json.loads(out)
+
+    assert results.get('changed') is True
+    assert not results.get('failed')
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC_CLEAR, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv4_address_static_route_with_metric_clear(
+        mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_clear, capfd):
+    """
+    Test : Modify ethernet connection with static IPv4 address and static route
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[1]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'modify'
+    assert add_args[0][3] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['ipv4.routes', '']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+
+    assert 'ipv4.routes' in results['diff']['before']
+    assert 'ipv4.routes' in results['diff']['after']
 
     assert results.get('changed') is True
     assert not results.get('failed')
