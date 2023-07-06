@@ -96,17 +96,22 @@ class ProxmoxAnsible(object):
         api_token_secret = self.module.params['api_token_secret']
         validate_certs = self.module.params['validate_certs']
 
-        auth_args = {'user': api_user}
+        args = {'user': api_user}
         if api_password:
-            auth_args['password'] = api_password
+            args['password'] = api_password
         else:
             if self.version() < LooseVersion('1.1.0'):
                 self.module.fail_json('Using "token_name" and "token_value" require proxmoxer>=1.1.0')
-            auth_args['token_name'] = api_token_id
-            auth_args['token_value'] = api_token_secret
+            args['token_name'] = api_token_id
+            args['token_value'] = api_token_secret
 
         try:
-            return ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
+            args['timeout'] = self.module.params['timeout']
+        except KeyError:
+            pass
+
+        try:
+            return ProxmoxAPI(api_host, verify_ssl=validate_certs, **args)
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
 
