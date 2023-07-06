@@ -777,8 +777,8 @@ def main():
             new_username=dict(aliases=["account_username"]),
             new_password=dict(aliases=["account_password"], no_log=True),
             roleid=dict(aliases=["account_roleid"]),
-            account_types=dict(aliases=["account_accounttypes"]),
-            oem_account_types=dict(aliases=["account_oemaccounttypes"]),
+            account_types=dict(type='list', elements='str', aliases=["account_accounttypes"]),
+            oem_account_types=dict(type='list', elements='str', aliases=["account_oemaccounttypes"]),
             update_username=dict(type='str', aliases=["account_updatename"]),
             account_properties=dict(type='dict', default={}),
             bootdevice=dict(),
@@ -838,14 +838,15 @@ def main():
              'token': module.params['auth_token']}
 
     # user to add/modify/delete
-    user = {'account_id': module.params['id'],
-            'account_username': module.params['new_username'],
-            'account_password': module.params['new_password'],
-            'account_roleid': module.params['roleid'],
-            'account_accounttypes': module.params['account_types'],
-            'account_oemaccounttypes': module.params['oem_account_types'],
-            'account_updatename': module.params['update_username'],
-            'account_properties': module.params['account_properties'],
+    user = {
+        'account_id': module.params['id'],
+        'account_username': module.params['new_username'],
+        'account_password': module.params['new_password'],
+        'account_roleid': module.params['roleid'],
+        'account_accounttypes': module.params['account_types'],
+        'account_oemaccounttypes': module.params['oem_account_types'],
+        'account_updatename': module.params['update_username'],
+        'account_properties': module.params['account_properties'],
     }
 
     # timeout
