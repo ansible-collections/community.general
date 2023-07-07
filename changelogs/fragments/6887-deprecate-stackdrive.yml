@@ -1,0 +1,2 @@
+deprecated_features:
+  - stackdriver - module relies entirely on no longer existent API endpoints, and it will be removed in community.general 10.0.0 (https://github.com/ansible-collections/community.general/pull/6887).
