@@ -429,6 +429,14 @@ class LookupModule(LookupBase):
                 else:
                     raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
             else:
-                return [tss.get_secret(term, self.get_option("secret_path"), self.get_option("fetch_attachments"), self.get_option("file_download_path")) for term in terms]
+                return [
+                    tss.get_secret(
+                        term,
+                        self.get_option("secret_path"),
+                        self.get_option("fetch_attachments"),
+                        self.get_option("file_download_path"),
+                    )
+                    for term in terms
+                ]
         except SecretServerError as error:
             raise AnsibleError("Secret Server lookup failure: %s" % error.message)
