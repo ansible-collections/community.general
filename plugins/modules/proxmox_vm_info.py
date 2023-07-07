@@ -127,11 +127,6 @@ proxmox_vms:
           "vmid": 101
         }
       ]
-msg:
-    description: Short message on failure.
-    returned: on failure
-    type: str
-    sample: "VM with vmid 106 doesn't exist on node pve"
 """
 
 from ansible.module_utils.basic import AnsibleModule

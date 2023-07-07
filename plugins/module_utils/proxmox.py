@@ -130,7 +130,7 @@ class ProxmoxAnsible(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to retrieve next free vmid: %s' % e)
 
-    def get_vmid(self, name, ignore_missing=False):
+    def get_vmid(self, name, ignore_missing=False, choose_first_if_multiple=False):
         try:
             vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
         except Exception as e:
