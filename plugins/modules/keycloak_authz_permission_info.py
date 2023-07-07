@@ -15,7 +15,7 @@ module: keycloak_authz_permission_info
 
 version_added: 7.2.0
 
-short_description: Query Keycloak client authorization permissions information.
+short_description: Query Keycloak client authorization permissions information
 
 description:
     - This module allows querying information about Keycloak client authorization permissions from the
@@ -29,14 +29,13 @@ description:
 
     - The names of module options are snake_cased versions of the camelCase options used by Keycloak.
       The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
-      https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/
+      U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
 
 attributes:
     check_mode:
         support: full
     diff_mode:
         support: none
-
 options:
     name:
         description:
@@ -58,6 +57,7 @@ options:
 extends_documentation_fragment:
     - community.general.keycloak
     - community.general.attributes
+    - community.general.attributes.info_module
 
 author:
     - Samuli Seppänen (@mattock)
@@ -65,7 +65,7 @@ author:
 
 EXAMPLES = '''
 - name: Query Keycloak authorization permission
-  keycloak_authz_permission_info:
+  community.general.keycloak_authz_permission_info:
     name: ScopePermission
     client_id: myclient
     realm: myrealm

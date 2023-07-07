@@ -15,7 +15,7 @@ module: keycloak_authz_permission
 
 version_added: 7.2.0
 
-short_description: Allows administration of Keycloak client authorization permissions via Keycloak API.
+short_description: Allows administration of Keycloak client authorization permissions via Keycloak API
 
 description:
     - This module allows the administration of Keycloak client authorization permissions via the Keycloak REST
@@ -36,7 +36,7 @@ description:
 
     - The names of module options are snake_cased versions of the camelCase options used by Keycloak.
       The Authorization Services paths and payloads have not officially been documented by the Keycloak project.
-      https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/
+      U(https://www.puppeteers.net/blog/keycloak-authorization-services-rest-api-paths-and-payload/)
 
 attributes:
     check_mode:
@@ -95,7 +95,7 @@ options:
     scopes:
         description:
             - Scope names to attach to this permission.
-            - Resource-based permissions can't have scopes attached to them.
+            - Resource-based permissions cannot have scopes attached to them.
         type: list
         elements: str
         default: []
@@ -129,7 +129,7 @@ author:
 
 EXAMPLES = '''
 - name: Manage scope-based Keycloak authorization permission
-  keycloak_authz_permission:
+  community.general.keycloak_authz_permission:
     name: ScopePermission
     state: present
     description: Scope permission
@@ -146,7 +146,7 @@ EXAMPLES = '''
     auth_realm: master
 
 - name: Manage resource-based Keycloak authorization permission
-  keycloak_authz_permission:
+  community.general.keycloak_authz_permission:
     name: ResourcePermission
     state: present
     description: Resource permission
