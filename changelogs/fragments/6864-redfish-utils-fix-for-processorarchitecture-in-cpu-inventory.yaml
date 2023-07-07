@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - adds ``ProcessorArchitecture`` to CPU inventory (https://github.com/ansible-collections/community.general/pull/6864).

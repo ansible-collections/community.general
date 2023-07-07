@@ -2287,7 +2287,7 @@ class RedfishUtils(object):
         key = "Processors"
         # Get these entries, but does not fail if not found
         properties = ['Id', 'Name', 'Manufacturer', 'Model', 'MaxSpeedMHz',
-                      'TotalCores', 'TotalThreads', 'Status']
+                      'ProcessorArchitecture', 'TotalCores', 'TotalThreads', 'Status']
 
         # Search for 'key' entry and extract URI from it
         response = self.get_request(self.root_uri + systems_uri)
