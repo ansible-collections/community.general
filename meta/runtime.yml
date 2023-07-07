@@ -150,6 +150,12 @@ plugin_routing:
         warning_text: You are using an internal name to access the community.general.airbrake_deployment
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
+    stackdriver:
+      deprecation:
+        removal_version: 10.0.0
+        warning_text: >
+          This module relies on HTTPS APIs that do not exist anymore, and any new development in the
+          direction of providing an alternative should happen in the context of the google.cloud collection.
     system.aix_devices:
       redirect: community.general.aix_devices
       deprecation:

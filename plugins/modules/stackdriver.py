@@ -10,6 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 
+deprecated:
+  removed_in: 10.0.0
+  why: the endpoints this module relies on do not exist any more and do not resolve to IPs in DNS.
+  alternative: no known alternative at this point
+
 module: stackdriver
 short_description: Send code deploy and annotation events to stackdriver
 description:
