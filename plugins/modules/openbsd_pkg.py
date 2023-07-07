@@ -169,7 +169,7 @@ def get_package_state(names, pkg_spec, module):
         rc, stdout, stderr = execute_command(command, module)
 
         if stderr:
-            match = re.search(r"^Can't find inst:%s$" % name, stderr)
+            match = re.search(r"^Can't find inst:%s$" % re.escape(name), stderr)
             if match:
                 pkg_spec[name]['installed_state'] = False
             else:
