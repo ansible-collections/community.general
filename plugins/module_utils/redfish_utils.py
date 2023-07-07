@@ -916,19 +916,19 @@ class RedfishUtils(object):
                         response = self.get_request(self.root_uri + data['Controllers'][u'@odata.id'])
                         if response['ret'] is False:
                             return response
-                        data = response['data']
+                        c_data = response['data']
 
-                        if data.get('Members') and data['Members']:
-                            response = self.get_request(self.root_uri + data['Members'][0][u'@odata.id'])
+                        if c_data.get('Members') and c_data['Members']:
+                            response = self.get_request(self.root_uri + c_data['Members'][0][u'@odata.id'])
                             if response['ret'] is False:
                                 return response
-                            data = response['data']
+                            member_data = response['data']
 
-                            if data:
-                                if 'Name' in data:
-                                    controller_name = data['Name']
+                            if member_data:
+                                if 'Name' in member_data:
+                                    controller_name = member_data['Name']
                                 else:
-                                    controller_id = data.get('Id', '1')
+                                    controller_id = member_data.get('Id', '1')
                                     controller_name = 'Controller %s' % controller_id
                     volume_results = []
                     volume_list = []
