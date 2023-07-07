@@ -1,0 +1,2 @@
+minor_changes:
+  - make - change ``target`` para meter to a list, allowing multiple targets to be used with ``make`` (https://github.com/ansible-collections/community.general/pull/6882, https://github.com/ansible-collections/community.general/issues/4919).
