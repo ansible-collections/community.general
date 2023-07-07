@@ -204,7 +204,7 @@ def main():
             node, vmid=vmid
         )
 
-    if vms:
+    if vms or vmid is None:
         result["proxmox_vms"] = vms
         module.exit_json(**result)
     else:
