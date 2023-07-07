@@ -27,7 +27,7 @@ options:
         required: true
         type: int
     secret_path:
-        description: Indicate a full path of secret including folder and secret name when the secret ID is set to 0.
+        description: Indicate a full path of secret including folder and secret name.
         required: false
         type: str
         version_added: 7.2.0
