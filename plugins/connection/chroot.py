@@ -60,10 +60,10 @@ EXAMPLES = r"""
 # playbook
 ---
 - hosts: chroots
-  connection: chroot
+  connection: community.general.chroot
   tasks:
     - debug:
-        msg: "This is coming from Chroot environment"
+        msg: "This is coming from chroot environment"
 
 """
 
