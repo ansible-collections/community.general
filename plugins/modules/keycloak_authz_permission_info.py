@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_authz_permission_info
 
-version_added: 7.0.0
+version_added: 7.2.0
 
 short_description: Query Keycloak client authorization permissions information.
 
