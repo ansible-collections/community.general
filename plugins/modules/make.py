@@ -52,9 +52,10 @@ options:
     type: dict
   target:
     description:
-      - The target to run.
+      - The targets to run.
       - Typically this would be something like V(install), V(test), or V(all).
-    type: str
+    type: list
+    elements: str
 '''
 
 EXAMPLES = r'''
@@ -154,7 +155,7 @@ def sanitize_output(output):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            target=dict(type='str'),
+            target=dict(type='list', elements='str'),
             params=dict(type='dict'),
             chdir=dict(type='path', required=True),
             file=dict(type='path'),
@@ -188,7 +189,7 @@ def main():
         base_command.extend(["-f", module.params['file']])
 
     # add make target
-    base_command.append(make_target)
+    base_command.extend(make_target)
 
     # add makefile parameters
     base_command.extend(make_parameters)
