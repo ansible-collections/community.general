@@ -39,12 +39,12 @@ options:
     description:
       - Password associated with user.
       - Must be specified if user does not exist yet.
-  crypt_scheme:
+  hash_scheme:
     type: str
     required: false
     default: "apr_md5_crypt"
     description:
-      - Encryption scheme to be used. As well as the four choices listed
+      - Hashing scheme to be used. As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
         V(portable_apache22) and V(host_apache24); or V(md5_crypt) and V(sha256_crypt),
         which are Linux passwd hashes. Only some schemes in addition to
@@ -52,6 +52,7 @@ options:
         supported schemes depend on passlib version and its dependencies.
       - See U(https://passlib.readthedocs.io/en/stable/lib/passlib.apache.html#passlib.apache.HtpasswdFile) parameter C(default_scheme).
       - 'Some of the available choices might be: V(apr_md5_crypt), V(des_crypt), V(ldap_sha1), V(plaintext).'
+    aliases: [crypt_scheme]
   state:
     type: str
     required: false
@@ -99,7 +100,7 @@ EXAMPLES = """
     path: /etc/mail/passwords
     name: alex
     password: oedu2eGh
-    crypt_scheme: md5_crypt
+    hash_scheme: md5_crypt
 """
 
 
@@ -131,14 +132,14 @@ def create_missing_directories(dest):
         os.makedirs(destpath)
 
 
-def present(dest, username, password, crypt_scheme, create, check_mode):
+def present(dest, username, password, hash_scheme, create, check_mode):
     """ Ensures user is present
 
     Returns (msg, changed) """
-    if crypt_scheme in apache_hashes:
+    if hash_scheme in apache_hashes:
         context = htpasswd_context
     else:
-        context = CryptContext(schemes=[crypt_scheme] + apache_hashes)
+        context = CryptContext(schemes=[hash_scheme] + apache_hashes)
     if not os.path.exists(dest):
         if not create:
             raise ValueError('Destination %s does not exist' % dest)
@@ -146,9 +147,9 @@ def present(dest, username, password, crypt_scheme, create, check_mode):
             return ("Create %s" % dest, True)
         create_missing_directories(dest)
         if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
-            ht = HtpasswdFile(dest, new=True, default_scheme=crypt_scheme, context=context)
+            ht = HtpasswdFile(dest, new=True, default_scheme=hash_scheme, context=context)
         else:
-            ht = HtpasswdFile(dest, autoload=False, default=crypt_scheme, context=context)
+            ht = HtpasswdFile(dest, autoload=False, default=hash_scheme, context=context)
         if getattr(ht, 'set_password', None):
             ht.set_password(username, password)
         else:
@@ -157,9 +158,9 @@ def present(dest, username, password, crypt_scheme, create, check_mode):
         return ("Created %s and added %s" % (dest, username), True)
     else:
         if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
-            ht = HtpasswdFile(dest, new=False, default_scheme=crypt_scheme, context=context)
+            ht = HtpasswdFile(dest, new=False, default_scheme=hash_scheme, context=context)
         else:
-            ht = HtpasswdFile(dest, default=crypt_scheme, context=context)
+            ht = HtpasswdFile(dest, default=hash_scheme, context=context)
 
         found = None
         if getattr(ht, 'check_password', None):
@@ -215,7 +216,7 @@ def main():
         path=dict(type='path', required=True, aliases=["dest", "destfile"]),
         name=dict(type='str', required=True, aliases=["username"]),
         password=dict(type='str', required=False, default=None, no_log=True),
-        crypt_scheme=dict(type='str', required=False, default="apr_md5_crypt"),
+        hash_scheme=dict(type='str', required=False, default="apr_md5_crypt", aliases=["crypt_scheme"]),
         state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
         create=dict(type='bool', default=True),
 
@@ -227,7 +228,7 @@ def main():
     path = module.params['path']
     username = module.params['name']
     password = module.params['password']
-    crypt_scheme = module.params['crypt_scheme']
+    hash_scheme = module.params['hash_scheme']
     state = module.params['state']
     create = module.params['create']
     check_mode = module.check_mode
@@ -267,7 +268,7 @@ def main():
 
     try:
         if state == 'present':
-            (msg, changed) = present(path, username, password, crypt_scheme, create, check_mode)
+            (msg, changed) = present(path, username, password, hash_scheme, create, check_mode)
         elif state == 'absent':
             if not os.path.exists(path):
                 module.exit_json(msg="%s not present" % username,
