@@ -6,6 +6,7 @@
 - name: list sessions
   consul_session:
     state: list
+    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -17,6 +18,7 @@
   consul_session:
     state: present
     name: testsession
+    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -31,6 +33,7 @@
 - name: list sessions after creation
   consul_session:
     state: list
+    token: "{{ consul_management_token }}"
   register: result
 
 - set_fact:
@@ -52,12 +55,13 @@
 - name: ensure session was created
   assert:
     that:
-      - test_session_found|default(False)
+      - test_session_found|default(false)
 
 - name: fetch info about a session
   consul_session:
     state: info
     id: '{{ session_id }}'
+    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -68,6 +72,7 @@
   consul_session:
     state: info
     name: test
+    token: "{{ consul_management_token }}"
   register: result
   ignore_errors: true
 
@@ -80,6 +85,7 @@
     state: info
     id: '{{ session_id }}'
     scheme: non_existent
+    token: "{{ consul_management_token }}"
   register: result
   ignore_errors: true
 
@@ -93,6 +99,7 @@
     id: '{{ session_id }}'
     port: 8501
     scheme: https
+    token: "{{ consul_management_token }}"
   register: result
   ignore_errors: true
 
@@ -108,6 +115,7 @@
     id: '{{ session_id }}'
     port: 8501
     scheme: https
+    token: "{{ consul_management_token }}"
     validate_certs: false
   register: result
 
@@ -122,6 +130,7 @@
     id: '{{ session_id }}'
     port: 8501
     scheme: https
+    token: "{{ consul_management_token }}"
   environment:
     REQUESTS_CA_BUNDLE: '{{ remote_dir }}/cert.pem'
   register: result
@@ -134,6 +143,7 @@
   consul_session:
     state: absent
     id: '{{ session_id }}'
+    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -143,6 +153,7 @@
 - name: list sessions after deletion
   consul_session:
     state: list
+    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -169,6 +180,7 @@
     state: present
     name: session-with-ttl
     ttl: 180  # sec
+    token: "{{ consul_management_token }}"
   register: result
 
 - assert:

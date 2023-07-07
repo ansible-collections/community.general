@@ -12,3 +12,8 @@ ports {
 }
 key_file = "{{ remote_dir }}/privatekey.pem"
 cert_file = "{{ remote_dir }}/cert.pem"
+acl {
+  enabled        = true
+  default_policy = "deny"
+  down_policy    = "extend-cache"
+}
