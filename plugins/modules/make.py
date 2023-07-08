@@ -52,10 +52,18 @@ options:
     type: dict
   target:
     description:
-      - The targets to run.
+      - The target to run.
       - Typically this would be something like V(install), V(test), or V(all).
+      - O(target) and O(targets) are mutually exclusive.
+    type: str
+  targets:
+    description:
+      - The list of targets to run.
+      - Typically this would be something like V(install), V(test), or V(all).
+      - O(target) and O(targets) are mutually exclusive.
     type: list
     elements: str
+    version_added: 7.2.0
 '''
 
 EXAMPLES = r'''
@@ -116,6 +124,12 @@ target:
     - The value of the module parameter O(target).
   type: str
   returned: success
+targets:
+  description:
+    - The value of the module parameter O(targets).
+  type: str
+  returned: success
+  version_added: 7.2.0
 '''
 
 from ansible.module_utils.six import iteritems
@@ -155,13 +169,15 @@ def sanitize_output(output):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            target=dict(type='list', elements='str'),
+            target=dict(type='str'),
+            targets=dict(type='list', elements='str'),
             params=dict(type='dict'),
             chdir=dict(type='path', required=True),
             file=dict(type='path'),
             make=dict(type='path'),
             jobs=dict(type='int'),
         ),
+        mutually_exclusive=[('target', 'targets')],
         supports_check_mode=True,
     )
 
@@ -173,7 +189,6 @@ def main():
         if not make_path:
             # Fall back to system make
             make_path = module.get_bin_path('make', required=True)
-    make_target = module.params['target']
     if module.params['params'] is not None:
         make_parameters = [k + '=' + str(v) for k, v in iteritems(module.params['params'])]
     else:
@@ -189,7 +204,10 @@ def main():
         base_command.extend(["-f", module.params['file']])
 
     # add make target
-    base_command.extend(make_target)
+    if module.params['target']:
+        base_command.append(module.params['target'])
+    elif module.params['targets']:
+        base_command.extend(module.params['targets'])
 
     # add makefile parameters
     base_command.extend(make_parameters)
@@ -207,8 +225,7 @@ def main():
             changed = False
         else:
             # The target isn't up to date, so we need to run it
-            rc, out, err = run_command(base_command, module,
-                                       check_rc=True)
+            rc, out, err = run_command(base_command, module, check_rc=True)
             changed = True
 
     # We don't report the return code, as if this module failed
@@ -222,6 +239,7 @@ def main():
         stdout=out,
         stderr=err,
         target=module.params['target'],
+        targets=module.params['targets'],
         params=module.params['params'],
         chdir=module.params['chdir'],
         file=module.params['file'],
