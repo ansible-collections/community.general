@@ -133,6 +133,9 @@ notes:
     it is much more efficient to pass the list directly to the I(name) option.
   - To use an AUR helper (I(executable) option), a few extra setup steps might be required beforehand.
     For example, a dedicated build user with permissions to install packages could be necessary.
+  - >
+    In the tests, while using C(yay) as the I(executable) option, the module failed to install AUR packages
+    with the error: C(error: target not found: <pkg>).
 """
 
 RETURN = """
@@ -263,6 +266,7 @@ EXAMPLES = """
     reason_for: all
 """
 
+import re
 import shlex
 from ansible.module_utils.basic import AnsibleModule
 from collections import defaultdict, namedtuple
@@ -418,7 +422,7 @@ class Pacman(object):
             for p in name_ver:
                 # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that.
                 # When installing from URLs, pacman can also output a 'nothing to do' message. strip that too.
-                if "loading packages" in p or "there is nothing to do" in p:
+                if "loading packages" in p or "there is nothing to do" in p or 'Avoid running' in p:
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
@@ -706,11 +710,12 @@ class Pacman(object):
         installed_pkgs = {}
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
+        query_re = re.compile(r'^\s*(?P<pkg>\S+)\s+(?P<ver>\S+)\s*$')
         for l in stdout.splitlines():
-            l = l.strip()
-            if not l:
+            query_match = query_re.match(l)
+            if not query_match:
                 continue
-            pkg, ver = l.split()
+            pkg, ver = query_match.groups()
             installed_pkgs[pkg] = ver
 
         installed_groups = defaultdict(set)
@@ -721,11 +726,12 @@ class Pacman(object):
         #     base-devel file
         #     base-devel findutils
         #     ...
+        query_groups_re = re.compile(r'^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
         for l in stdout.splitlines():
-            l = l.strip()
-            if not l:
+            query_groups_match = query_groups_re.match(l)
+            if not query_groups_match:
                 continue
-            group, pkgname = l.split()
+            group, pkgname = query_groups_match.groups()
             installed_groups[group].add(pkgname)
 
         available_pkgs = {}
@@ -747,11 +753,12 @@ class Pacman(object):
         #     vim-plugins vim-airline-themes
         #     vim-plugins vim-ale
         #     ...
+        sync_groups_re = re.compile(r'^\s*(?P<group>\S+)\s+(?P<pkg>\S+)\s*$')
         for l in stdout.splitlines():
-            l = l.strip()
-            if not l:
+            sync_groups_match = sync_groups_re.match(l)
+            if not sync_groups_match:
                 continue
-            group, pkg = l.split()
+            group, pkg = sync_groups_match.groups()
             available_groups[group].add(pkg)
 
         upgradable_pkgs = {}
@@ -759,9 +766,14 @@ class Pacman(object):
             [self.pacman_path, "--query", "--upgrades"], check_rc=False
         )
 
+        stdout = stdout.splitlines()
+        if stdout and "Avoid running" in stdout[0]:
+            stdout = stdout[1:]
+        stdout = "\n".join(stdout)
+
         # non-zero exit with nothing in stdout -> nothing to upgrade, all good
         # stderr can have warnings, so not checked here
-        if rc == 1 and stdout == "":
+        if rc == 1 and not stdout:
             pass  # nothing to upgrade
         elif rc == 0:
             # Format of lines:
@@ -771,7 +783,7 @@ class Pacman(object):
                 l = l.strip()
                 if not l:
                     continue
-                if "[ignored]" in l:
+                if "[ignored]" in l or "Avoid running" in l:
                     continue
                 s = l.split()
                 if len(s) != 4:
