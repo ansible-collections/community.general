@@ -106,22 +106,16 @@ EXAMPLES = """
 
 import os
 import tempfile
-import traceback
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils import deps
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-PASSLIB_IMP_ERR = None
-try:
+with deps.declare("passlib"):
     from passlib.apache import HtpasswdFile, htpasswd_context
     from passlib.context import CryptContext
-    import passlib
-except ImportError:
-    PASSLIB_IMP_ERR = traceback.format_exc()
-    passlib_installed = False
-else:
-    passlib_installed = True
+
 
 apache_hashes = ["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]
 
@@ -146,36 +140,20 @@ def present(dest, username, password, hash_scheme, create, check_mode):
         if check_mode:
             return ("Create %s" % dest, True)
         create_missing_directories(dest)
-        if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
-            ht = HtpasswdFile(dest, new=True, default_scheme=hash_scheme, context=context)
-        else:
-            ht = HtpasswdFile(dest, autoload=False, default=hash_scheme, context=context)
-        if getattr(ht, 'set_password', None):
-            ht.set_password(username, password)
-        else:
-            ht.update(username, password)
+        ht = HtpasswdFile(dest, new=True, default_scheme=crypt_scheme, context=context)
+        ht.set_password(username, password)
         ht.save()
         return ("Created %s and added %s" % (dest, username), True)
     else:
-        if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
-            ht = HtpasswdFile(dest, new=False, default_scheme=hash_scheme, context=context)
-        else:
-            ht = HtpasswdFile(dest, default=hash_scheme, context=context)
+        ht = HtpasswdFile(dest, new=False, default_scheme=crypt_scheme, context=context)
 
-        found = None
-        if getattr(ht, 'check_password', None):
-            found = ht.check_password(username, password)
-        else:
-            found = ht.verify(username, password)
+        found = ht.check_password(username, password)
 
         if found:
             return ("%s already present" % username, False)
         else:
             if not check_mode:
-                if getattr(ht, 'set_password', None):
-                    ht.set_password(username, password)
-                else:
-                    ht.update(username, password)
+                ht.set_password(username, password)
                 ht.save()
             return ("Add/update %s" % username, True)
 
@@ -184,10 +162,7 @@ def absent(dest, username, check_mode):
     """ Ensures user is absent
 
     Returns (msg, changed) """
-    if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
-        ht = HtpasswdFile(dest, new=False)
-    else:
-        ht = HtpasswdFile(dest)
+    ht = HtpasswdFile(dest, new=False)
 
     if username not in ht.users():
         return ("%s not present" % username, False)
@@ -233,20 +208,12 @@ def main():
     create = module.params['create']
     check_mode = module.check_mode
 
-    if not passlib_installed:
-        module.fail_json(msg=missing_required_lib("passlib"), exception=PASSLIB_IMP_ERR)
+    deps.validate(module)
 
     # Check file for blank lines in effort to avoid "need more than 1 value to unpack" error.
     try:
-        f = open(path, "r")
-    except IOError:
-        # No preexisting file to remove blank lines from
-        f = None
-    else:
-        try:
+        with open(path, "r") as f:
             lines = f.readlines()
-        finally:
-            f.close()
 
         # If the file gets edited, it returns true, so only edit the file if it has blank lines
         strip = False
@@ -260,11 +227,12 @@ def main():
             if check_mode:
                 temp = tempfile.NamedTemporaryFile()
                 path = temp.name
-            f = open(path, "w")
-            try:
-                [f.write(line) for line in lines if line.strip()]
-            finally:
-                f.close()
+            with open(path, "w") as f:
+                f.writelines(line for line in lines if line.strip())
+
+    except IOError:
+        # No preexisting file to remove blank lines from
+        f = None
 
     try:
         if state == 'present':
