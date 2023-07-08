@@ -140,12 +140,12 @@ def present(dest, username, password, hash_scheme, create, check_mode):
         if check_mode:
             return ("Create %s" % dest, True)
         create_missing_directories(dest)
-        ht = HtpasswdFile(dest, new=True, default_scheme=crypt_scheme, context=context)
+        ht = HtpasswdFile(dest, new=True, default_scheme=hash_scheme, context=context)
         ht.set_password(username, password)
         ht.save()
         return ("Created %s and added %s" % (dest, username), True)
     else:
-        ht = HtpasswdFile(dest, new=False, default_scheme=crypt_scheme, context=context)
+        ht = HtpasswdFile(dest, new=False, default_scheme=hash_scheme, context=context)
 
         found = ht.check_password(username, password)
 
