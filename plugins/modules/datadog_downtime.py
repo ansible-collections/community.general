@@ -248,7 +248,8 @@ def build_downtime(module):
         downtime.timezone = module.params["timezone"]
     if module.params["rrule"]:
         downtime.recurrence = DowntimeRecurrence(
-            rrule=module.params["rrule"]
+            rrule=module.params["rrule"],
+            type="rrule",
         )
     return downtime
 
