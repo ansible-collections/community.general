@@ -44,3 +44,36 @@
       - install_microk8s_chan is changed
       - install_microk8s_chan_again is not changed
       - remove_microk8s is changed
+
+- name: Install package (shellcheck)
+  community.general.snap:
+    name: shellcheck
+    state: present
+  register: install_shellcheck
+
+- name: Install package with channel (shellcheck)
+  community.general.snap:
+    name: shellcheck
+    channel: edge
+    state: present
+  register: install_shellcheck_chan
+
+- name: Install package with channel (shellcheck) again
+  community.general.snap:
+    name: shellcheck
+    channel: edge
+    state: present
+  register: install_shellcheck_chan_again
+
+- name: Remove package (shellcheck)
+  community.general.snap:
+    name: shellcheck
+    state: absent
+  register: remove_shellcheck
+
+- assert:
+    that:
+      - install_shellcheck is changed
+      - install_shellcheck_chan is changed
+      - install_shellcheck_chan_again is not changed
+      - remove_shellcheck is changed

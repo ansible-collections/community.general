@@ -55,6 +55,9 @@ options:
             - Define which release of a snap is installed and tracked for updates.
               This option can only be specified if there is a single snap in the task.
             - If not passed, the C(snap) command will default to V(stable).
+            - If the value passed does not contain the C(track), it will default to C(latest).
+              For example, if V(edge) is passed, the module will assume the channel to be V(latest/edge).
+            - See U(https://snapcraft.io/docs/channels) for more details about snap channels.
         type: str
         required: false
     options:
@@ -277,7 +280,7 @@ class Snap(StateModuleHelper):
             match = [c for n, c in installed if n == name]
             if not match:
                 return Snap.NOT_INSTALLED
-            if channel and channel != match[0]:
+            if channel and match[0] not in (channel, "latest/{0}".format(channel)):
                 return Snap.CHANNEL_MISMATCH
             else:
                 return Snap.INSTALLED
