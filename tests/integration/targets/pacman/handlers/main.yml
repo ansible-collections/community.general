@@ -1,0 +1,23 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Remove user yaybuilder
+  ansible.builtin.user:
+    name: yaybuilder
+    state: absent
+
+- name: Remove yay
+  ansible.builtin.package:
+    name: yay
+    state: absent
+
+- name: Remove packages for yay-become
+  ansible.builtin.package:
+    name:
+      - base-devel
+      - yay
+      - git
+      - nmap
+    state: absent
