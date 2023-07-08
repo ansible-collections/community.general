@@ -169,7 +169,11 @@ def get_package_state(names, pkg_spec, module):
         rc, stdout, stderr = execute_command(command, module)
 
         if stderr:
-            module.fail_json(msg="failed in get_package_state(): " + stderr)
+            match = re.search(r"^Can't find inst:%s$" % re.escape(name), stderr)
+            if match:
+                pkg_spec[name]['installed_state'] = False
+            else:
+                module.fail_json(msg="failed in get_package_state(): " + stderr)
 
         if stdout:
             # If the requested package name is just a stem, like "python", we may
