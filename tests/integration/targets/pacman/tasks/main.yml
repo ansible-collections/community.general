@@ -17,3 +17,4 @@
     - include_tasks: 'update_cache.yml'
     - include_tasks: 'locally_installed_package.yml'
     - include_tasks: 'reason.yml'
+    - include_tasks: 'yay-become.yml'
