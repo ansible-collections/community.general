@@ -210,6 +210,7 @@ def main():
 
     deps.validate(module)
 
+    # TODO double check if this hack below is still needed.
     # Check file for blank lines in effort to avoid "need more than 1 value to unpack" error.
     try:
         with open(path, "r") as f:
@@ -232,7 +233,7 @@ def main():
 
     except IOError:
         # No preexisting file to remove blank lines from
-        f = None
+        pass
 
     try:
         if state == 'present':
