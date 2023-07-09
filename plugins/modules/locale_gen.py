@@ -51,12 +51,8 @@ import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.mh.deco import check_mode_skip
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.locale_gen import locale_runner, locale_gen_runner
-
 
 
 class LocaleGen(StateModuleHelper):
