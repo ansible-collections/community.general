@@ -152,7 +152,7 @@ plugin_routing:
           in community.general 9.0.0.
     stackdriver:
       deprecation:
-        removal_version: 10.0.0
+        removal_version: 9.0.0
         warning_text: >
           This module relies on HTTPS APIs that do not exist anymore, and any new development in the
           direction of providing an alternative should happen in the context of the google.cloud collection.
