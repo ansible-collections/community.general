@@ -1,2 +1,0 @@
-minor_changes:
-  - nmcli - add support for ``ipv4.dns-options`` and ``ipv6.dns-options`` (https://github.com/ansible-collections/community.general/pull/4308).
