@@ -5,3 +5,4 @@
 
 dependencies:
   - setup_snap
+  - setup_remote_tmp_dir

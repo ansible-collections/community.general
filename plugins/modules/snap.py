@@ -17,7 +17,7 @@ DOCUMENTATION = '''
 module: snap
 short_description: Manages snaps
 description:
-    - "Manages snaps packages."
+    - Manages snaps packages.
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -28,7 +28,11 @@ attributes:
 options:
     name:
         description:
-            - Name of the snaps.
+            - Name of the snaps to be installed.
+            - Any named snap accepted by the C(snap) command is valid.
+            - >
+              Notice that snap files might require O(dangerous=true) to ignore the error
+              "cannot find signatures with metadata for snap".
         required: true
         type: list
         elements: str
@@ -45,7 +49,7 @@ options:
         description:
             - Confinement policy. The classic confinement allows a snap to have
               the same level of access to the system as "classic" packages,
-              like those managed by APT. This option corresponds to the --classic argument.
+              like those managed by APT. This option corresponds to the C(--classic) argument.
               This option can only be specified if there is a single snap in the task.
         type: bool
         required: false
@@ -69,6 +73,14 @@ options:
         type: list
         elements: str
         version_added: 4.4.0
+    dangerous:
+        description:
+            - Install the given snap file even if there are no pre-acknowledged signatures for it,
+              meaning it was not verified and could be dangerous.
+        type: bool
+        required: false
+        default: false
+        version_added: 7.2.0
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
@@ -179,6 +191,7 @@ class Snap(StateModuleHelper):
             'classic': dict(type='bool', default=False),
             'channel': dict(type='str'),
             'options': dict(type='list', elements='str'),
+            'dangerous': dict(type='bool', default=False),
         },
         supports_check_mode=True,
     )
@@ -193,7 +206,16 @@ class Snap(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = snap_runner(self.module)
-        self.vars.set("snap_status", self.snap_status(self.vars.name, self.vars.channel), output=False)
+        # if state=present there might be file names passed in 'name', in
+        # which case they must be converted to their actual snap names, which
+        # is done using the names_from_snaps() method calling 'snap info'.
+        if self.vars.state == "present":
+            self.vars.set("snapinfo_run_info", [], output=(self.verbosity >= 4))
+            self.vars.set("snap_names", self.names_from_snaps(self.vars.name))
+            status_var = "snap_names"
+        else:
+            status_var = "name"
+        self.vars.set("snap_status", self.snap_status(self.vars[status_var], self.vars.channel), output=False)
         self.vars.set("snap_status_map", dict(zip(self.vars.name, self.vars.snap_status)), output=False)
 
     def _run_multiple_commands(self, commands, actionable_names, bundle=True, refresh=False):
@@ -269,11 +291,44 @@ class Snap(StateModuleHelper):
 
         try:
             option_map = self.convert_json_to_map(out)
+            return option_map
         except Exception as e:
             self.do_raise(
                 msg="Parsing option map returned by 'snap get {0}' triggers exception '{1}', output:\n'{2}'".format(snap_name, str(e), out))
 
-        return option_map
+    def names_from_snaps(self, snaps):
+        def process_one(rc, out, err):
+            res = [line for line in out.split("\n") if line.startswith("name:")]
+            name = res[0].split()[1]
+            return [name]
+
+        def process_many(rc, out, err):
+            outputs = out.split("---")
+            res = []
+            for sout in outputs:
+                res.extend(process_one(rc, sout, ""))
+            return res
+
+        def process(rc, out, err):
+            if len(snaps) == 1:
+                check_error = err
+                process_ = process_one
+            else:
+                check_error = out
+                process_ = process_many
+
+            if "warning: no snap found" in check_error:
+                self.do_raise("Snaps not found: {0}.".format([x.split()[-1]
+                                                              for x in out.split('\n')
+                                                              if x.startswith("warning: no snap found")]))
+            return process_(rc, out, err)
+
+        with self.runner("info name", output_process=process) as ctx:
+            try:
+                names = ctx.run(name=snaps)
+            finally:
+                self.vars.snapinfo_run_info.append(ctx.run_info)
+        return names
 
     def snap_status(self, snap_name, channel):
         def _status_check(name, channel, installed):
@@ -287,14 +342,14 @@ class Snap(StateModuleHelper):
 
         with self.runner("_list") as ctx:
             rc, out, err = ctx.run(check_rc=True)
-        out = out.split('\n')[1:]
-        out = [self.__list_re.match(x) for x in out]
-        out = [(m.group('name'), m.group('channel')) for m in out if m]
+        list_out = out.split('\n')[1:]
+        list_out = [self.__list_re.match(x) for x in list_out]
+        list_out = [(m.group('name'), m.group('channel')) for m in list_out if m]
         if self.verbosity >= 4:
-            self.vars.status_out = out
+            self.vars.status_out = list_out
             self.vars.status_run_info = ctx.run_info
 
-        return [_status_check(n, channel, out) for n in snap_name]
+        return [_status_check(n, channel, list_out) for n in snap_name]
 
     def is_snap_enabled(self, snap_name):
         with self.runner("_list name") as ctx:
@@ -315,7 +370,7 @@ class Snap(StateModuleHelper):
         if self.check_mode:
             return
 
-        params = ['state', 'classic', 'channel']  # get base cmd parts
+        params = ['state', 'classic', 'channel', 'dangerous']  # get base cmd parts
         has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != 'stable'
         has_multiple_snaps = len(actionable_snaps) > 1
 

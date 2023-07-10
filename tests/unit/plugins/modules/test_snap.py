@@ -396,10 +396,45 @@ issue_6803_kubectl_out = (
 
 TEST_CASES = [
     ModuleTestCase(
+        id="simple case",
+        input={"name": ["hello-world"]},
+        output=dict(changed=True, snaps_installed=["hello-world"]),
+        run_command_calls=[
+            RunCmdCall(
+                command=['/testbin/snap', 'info', 'hello-world'],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out='name: hello-world\n',
+                err="",
+            ),
+            RunCmdCall(
+                command=['/testbin/snap', 'list'],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out=issue_6803_status_out,
+                err="",
+            ),
+            RunCmdCall(
+                command=['/testbin/snap', 'install', 'hello-world'],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out=issue_6803_microk8s_out,
+                err="",
+            ),
+        ]
+    ),
+    ModuleTestCase(
         id="issue_6803",
         input={"name": ["microk8s", "kubectl"], "classic": True},
         output=dict(changed=True, snaps_installed=["microk8s", "kubectl"]),
         run_command_calls=[
+            RunCmdCall(
+                command=['/testbin/snap', 'info', 'microk8s', 'kubectl'],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out='name: microk8s\n---\nname: kubectl\n',
+                err="",
+            ),
             RunCmdCall(
                 command=['/testbin/snap', 'list'],
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
