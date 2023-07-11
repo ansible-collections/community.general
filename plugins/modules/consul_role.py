@@ -157,7 +157,8 @@ operation:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.consul import get_consul_url, get_auth_headers, RequestError, handle_consul_response_error
+from ansible_collections.community.general.plugins.module_utils.consul import ( get_consul_url, get_auth_headers, \
+    RequestError, handle_consul_response_error)
 import traceback
 
 
