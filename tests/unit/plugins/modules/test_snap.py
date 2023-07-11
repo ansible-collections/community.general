@@ -411,14 +411,14 @@ TEST_CASES = [
                 command=['/testbin/snap', 'list'],
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
                 rc=0,
-                out=issue_6803_status_out,
+                out="",
                 err="",
             ),
             RunCmdCall(
                 command=['/testbin/snap', 'install', 'hello-world'],
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
                 rc=0,
-                out=issue_6803_microk8s_out,
+                out="hello-world (12345/stable) v12345 from Canonical** installed\n",
                 err="",
             ),
         ]
