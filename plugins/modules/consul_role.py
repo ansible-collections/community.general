@@ -157,6 +157,7 @@ operation:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import missing_required_lib
+from ansible_collections.community.general.plugins.module_utils.consul import get_consul_url, get_auth_headers, RequestError, handle_consul_response_error
 import traceback
 
 
@@ -204,26 +205,6 @@ _ARGUMENT_SPEC = {
     NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
 }
-
-
-def get_consul_url(configuration):
-    return '%s://%s:%s/v1' % (configuration.scheme, configuration.host, configuration.port)
-
-
-def get_auth_headers(configuration):
-    if configuration.token is None:
-        return {}
-    else:
-        return {'X-Consul-Token': configuration.token}
-
-
-class RequestError(Exception):
-    pass
-
-
-def handle_consul_response_error(response):
-    if 400 <= response.status_code < 600:
-        raise RequestError('%d %s' % (response.status_code, response.content))
 
 
 def update_role(role, configuration):
