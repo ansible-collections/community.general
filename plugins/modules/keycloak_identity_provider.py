@@ -591,8 +591,8 @@ def main():
         if state == 'present':
             # Process an update
 
-            # no changes
-            if normalize(desired_idp) == normalize(before_idp):
+            # Note: we will not compare the passwords of the 2 idps as to not leak info
+            if normalize(sanitize(desired_idp)) == normalize(sanitize(before_idp)):
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_idp)
                 result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
@@ -600,11 +600,12 @@ def main():
 
             # doing an update
             result['changed'] = True
-            if module._diff:
-                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(desired_idp))
 
             if module.check_mode:
+                if module._diff:
+                    result['diff'] = dict(before=normalize(sanitize(before_idp)), after=normalize(sanitize(desired_idp)))
                 module.exit_json(**result)
+
 
             # do the update
             desired_idp = desired_idp.copy()
