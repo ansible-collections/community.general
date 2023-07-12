@@ -992,6 +992,7 @@ files:
     keywords: kvm libvirt proxmox qemu
     labels: proxmox virt
     maintainers: $team_virt UnderGreen
+    ignore: tleguern
   $modules/proxmox.py:
     ignore: skvidal
     maintainers: UnderGreen
