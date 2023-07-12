@@ -43,6 +43,7 @@ options:
       - Description of the role.
     required: false
     type: str
+    default: ''
   policies:
     type: list
     elements: dict
@@ -50,6 +51,7 @@ options:
       - List of policies to attach to the role.
       - Each element must have a "name" or "id" (or both) to identify the policy. See consul_policy for more info.
     required: false
+    default: []
   service_identities:
     type: list
     elements: dict
@@ -58,6 +60,7 @@ options:
       - Each element must have a "name" and optionally a "datacenters" list of datacenters the policy is valid for.
       - An empty datacenters list allows all datacenters
     required: false
+    default: []
   node_identities:
     type: list
     elements: dict
@@ -65,6 +68,7 @@ options:
       - List of node identities to attach to the role.
       - Each element must have a "name" and optionally a "datacenter" the policy is valid for. An empty datacenter allows all datacenters
     required: false
+    default: []
   host:
     description:
       - host of the consul agent, defaults to localhost.
@@ -157,10 +161,9 @@ operation:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.consul import ( get_consul_url, get_auth_headers, \
-    RequestError, handle_consul_response_error)
+from ansible_collections.community.general.plugins.module_utils.consul import (
+    get_consul_url, get_auth_headers, RequestError, handle_consul_response_error)
 import traceback
-
 
 REQUESTS_IMP_ERR = None
 
@@ -171,7 +174,6 @@ try:
 except ImportError:
     HAS_REQUESTS = False
     REQUESTS_IMP_ERR = traceback.format_exc()
-
 
 TOKEN_PARAMETER_NAME = "token"
 HOST_PARAMETER_NAME = "host"
@@ -184,7 +186,6 @@ POLICIES_PARAMETER_NAME = "policies"
 SERVICE_IDENTITIES_PARAMETER_NAME = "service_identities"
 NODE_IDENTITIES_PARAMETER_NAME = "node_identities"
 STATE_PARAMETER_NAME = "state"
-
 
 PRESENT_STATE_VALUE = "present"
 ABSENT_STATE_VALUE = "absent"
@@ -309,7 +310,7 @@ def set_role(configuration):
         return create_role(configuration)
 
 
-class ConsulVersion():
+class ConsulVersion:
     def __init__(self, version_string):
         split = version_string.split('.')
         self.major = split[0]
