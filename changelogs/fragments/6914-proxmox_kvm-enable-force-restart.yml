@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_kvm - enabled force restart of VM, bringing the 'force' parameter functionality in line with what is described in the docs (https://github.com/ansible-collections/community.general/pull/6914).
