@@ -226,7 +226,7 @@ def find_exec_in_executions(searched_exec, executions, excluded_ids):
     return -1
 
 def compare_config_aliases(exec1, exec2):
-    return "authenticationConfig" not in exec1 or "authenticationConfig" not in exec2 or\
+    return exec1.get("authenticationConfig") is None or exec2.get("authenticationConfig") is None or\
             exec1["authenticationConfig"]["alias"] == exec2["authenticationConfig"]["alias"]    
 
 def get_identifier(execution):
