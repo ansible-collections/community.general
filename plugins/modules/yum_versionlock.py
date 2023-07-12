@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018, Florian Paul Azim Hoberg <florian.hoberg@credativ.de>
+# Copyright (c) 2018, Florian Paul Azim Hoberg (@gyptazy) <gyptazy@gyptazy.ch>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -25,7 +25,8 @@ attributes:
 options:
   name:
     description:
-      - Package name or a list of package names with optional wildcards.
+      - Package name or a list of package names with optional version or wildcards.
+      - Specifying versions is supported since community.general 7.2.0.
     type: list
     required: true
     elements: str
@@ -50,7 +51,14 @@ EXAMPLES = r'''
 - name: Prevent Apache / httpd from being updated
   community.general.yum_versionlock:
     state: present
-    name: httpd
+    name:
+    - httpd
+
+- name: Prevent Apache / httpd version 2.4.57-2 from being updated
+  community.general.yum_versionlock:
+    state: present
+    name:
+    - httpd-0:2.4.57-2.el9
 
 - name: Prevent multiple packages from being updated
   community.general.yum_versionlock:
@@ -111,22 +119,30 @@ class YumVersionLock:
     def ensure_state(self, packages, command):
         """ Ensure packages state """
         rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command] + packages)
+        # If no package can be found this will be written on stdout with rc 0
+        if 'No package found for' in out:
+            self.module.fail_json(msg=out)
         if rc == 0:
             return True
         self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
 
 
 def match(entry, name):
+    match = False
     m = NEVRA_RE_YUM.match(entry)
     if not m:
         m = NEVRA_RE_DNF.match(entry)
     if not m:
         return False
-    return fnmatch(m.group("name"), name)
+    if fnmatch(m.group("name"), name):
+        match = True
+    if entry.rstrip('.*') == name:
+        match = True
+    return match
 
 
 def main():
-    """ start main program to add/remove a package to yum versionlock"""
+    """ start main program to add/delete a package to yum versionlock """
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'absent']),
