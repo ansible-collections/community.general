@@ -249,6 +249,7 @@ options:
             - Type of client.
         type: str
         choices: ['openid-connect', 'saml']
+        default: openid-connect
 
     full_scope_allowed:
         description:
