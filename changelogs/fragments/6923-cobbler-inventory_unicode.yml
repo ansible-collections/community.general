@@ -1,0 +1,2 @@
+minor_changes:
+  - cobbler inventory plugin - apply ``str()`` method before passing user/password to xmlrpc client (https://github.com/ansible-collections/community.general/pull/6923).

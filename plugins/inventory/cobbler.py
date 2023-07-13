@@ -145,7 +145,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self.connection = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
             self.token = None
             if self.get_option('user') is not None:
-                self.token = self.connection.login(self.get_option('user'), self.get_option('password'))
+                self.token = self.connection.login(str(self.get_option('user')), str(self.get_option('password')))
         return self.connection
 
     def _init_cache(self):
