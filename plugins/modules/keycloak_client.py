@@ -813,7 +813,7 @@ def main():
         authorization_services_enabled=dict(type='bool', aliases=['authorizationServicesEnabled']),
         public_client=dict(type='bool', aliases=['publicClient']),
         frontchannel_logout=dict(type='bool', aliases=['frontchannelLogout']),
-        protocol=dict(type='str', choices=['openid-connect', 'saml']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml'], default='openid-connect'),
         attributes=dict(type='dict'),
         full_scope_allowed=dict(type='bool', aliases=['fullScopeAllowed']),
         node_re_registration_timeout=dict(type='int', aliases=['nodeReRegistrationTimeout']),
