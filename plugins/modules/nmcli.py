@@ -191,6 +191,12 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns4_options:
+        description:
+            - A list of DNS options.
+        elements: str
+        type: list
+        version_added: 7.2.0
     dns4_ignore_auto:
         description:
             - Ignore automatically configured IPv4 name servers.
@@ -290,6 +296,12 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns6_options:
+        description:
+            - A list of DNS options.
+        elements: str
+        type: list
+        version_added: 7.2.0
     dns6_ignore_auto:
         description:
             - Ignore automatically configured IPv6 name servers.
@@ -1537,6 +1549,7 @@ class Nmcli(object):
         self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
+        self.dns4_options = module.params['dns4_options']
         self.dns4_ignore_auto = module.params['dns4_ignore_auto']
         self.method4 = module.params['method4']
         self.may_fail4 = module.params['may_fail4']
@@ -1548,6 +1561,7 @@ class Nmcli(object):
         self.route_metric6 = module.params['route_metric6']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
+        self.dns6_options = module.params['dns6_options']
         self.dns6_ignore_auto = module.params['dns6_ignore_auto']
         self.method6 = module.params['method6']
         self.ip_privacy6 = module.params['ip_privacy6']
@@ -1654,6 +1668,7 @@ class Nmcli(object):
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
+                'ipv4.dns-options': self.dns4_options,
                 'ipv4.ignore-auto-dns': self.dns4_ignore_auto,
                 'ipv4.gateway': self.gw4,
                 'ipv4.ignore-auto-routes': self.gw4_ignore_auto,
@@ -1666,6 +1681,7 @@ class Nmcli(object):
                 'ipv6.addresses': self.enforce_ipv6_cidr_notation(self.ip6),
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
+                'ipv6.dns-options': self.dns6_options,
                 'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
                 'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
@@ -2042,10 +2058,12 @@ class Nmcli(object):
                          'ipv6.addresses',
                          'ipv4.dns',
                          'ipv4.dns-search',
+                         'ipv4.dns-options',
                          'ipv4.routes',
                          'ipv4.routing-rules',
                          'ipv6.dns',
                          'ipv6.dns-search',
+                         'ipv6.dns-options',
                          'ipv6.routes',
                          '802-11-wireless-security.group',
                          '802-11-wireless-security.leap-password-flags',
@@ -2404,6 +2422,7 @@ def main():
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
+            dns4_options=dict(type='list', elements='str'),
             dns4_ignore_auto=dict(type='bool', default=False),
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             may_fail4=dict(type='bool', default=True),
@@ -2413,6 +2432,7 @@ def main():
             gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
+            dns6_options=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
             routes6=dict(type='list', elements='str'),
             routes6_extended=dict(type='list',

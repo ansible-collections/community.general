@@ -472,6 +472,38 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_GENERIC_DNS4_OPTIONS = [
+    {
+        'type': 'generic',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'generic_non_existant',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'state': 'present',
+        'dns4_options': [],
+        'dns6_options': [],
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_GENERIC_DNS4_OPTIONS_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              generic_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.dns-options:                       --
+ipv4.may-fail:                          yes
+ipv6.dns-options:                       --
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
 TESTCASE_GENERIC_ZONE = [
     {
         'type': 'generic',
@@ -1534,6 +1566,13 @@ def mocked_generic_connection_dns_search_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_generic_connection_dns_options_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GENERIC_DNS4_OPTIONS_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_generic_connection_zone_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -2087,6 +2126,62 @@ def test_generic_connection_modify_dns_search(mocked_generic_connection_create, 
 def test_generic_connection_dns_search_unchanged(mocked_generic_connection_dns_search_unchanged, capfd):
     """
     Test : Generic connection with dns search unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_OPTIONS, indirect=['patch_ansible_module'])
+def test_generic_connection_create_dns_options(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection created with dns options
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'ipv4.dns-options' in args[0]
+    assert 'ipv6.dns-options' in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_OPTIONS, indirect=['patch_ansible_module'])
+def test_generic_connection_modify_dns_options(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection modified with dns options
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'ipv4.dns-options' in args[0]
+    assert 'ipv6.dns-options' in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_OPTIONS, indirect=['patch_ansible_module'])
+def test_generic_connection_dns_options_unchanged(mocked_generic_connection_dns_options_unchanged, capfd):
+    """
+    Test : Generic connection with dns options unchanged
     """
     with pytest.raises(SystemExit):
         nmcli.main()
@@ -4141,6 +4236,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
+            dns4_options=dict(type='list', elements='str'),
             dns4_ignore_auto=dict(type='bool', default=False),
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             may_fail4=dict(type='bool', default=True),
@@ -4150,6 +4246,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
+            dns6_options=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
             routes6=dict(type='list', elements='str'),
             routes6_extended=dict(type='list',
