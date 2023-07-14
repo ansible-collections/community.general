@@ -106,7 +106,7 @@ def del_passphrase(module):
     try:
         keyring.delete_password(module.params["service"], module.params["username"])
         return None
-    except keyring.errors.KeyringLocked as keyring_locked_err:  # pylint: disable=unused-variable
+    except keyring.errors.KeyringLocked:
         delete_argument = (
             'echo "%s" | gnome-keyring-daemon --unlock\nkeyring del %s %s\n'
             % (
@@ -140,7 +140,7 @@ def set_passphrase(module):
             module.params["user_password"],
         )
         return None
-    except keyring.errors.KeyringLocked as keyring_locked_err:  # pylint: disable=unused-variable
+    except keyring.errors.KeyringLocked:
         set_argument = (
             'echo "%s" | gnome-keyring-daemon --unlock\nkeyring set %s %s\n%s\n'
             % (
