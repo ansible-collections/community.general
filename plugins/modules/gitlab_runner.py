@@ -210,13 +210,6 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-try:
-    cmp  # pylint: disable=used-before-assignment
-except NameError:
-    def cmp(a, b):
-        return (a > b) - (a < b)
-
-
 class GitLabRunner(object):
     def __init__(self, module, gitlab_instance, group=None, project=None):
         self._module = module
@@ -302,7 +295,7 @@ class GitLabRunner(object):
                     list1.sort()
                     list2 = arguments[arg_key]
                     list2.sort()
-                    if cmp(list1, list2):
+                    if list1 != list2:
                         setattr(runner, arg_key, arguments[arg_key])
                         changed = True
                 else:

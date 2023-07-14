@@ -100,9 +100,9 @@ except ImportError:
 from ansible.module_utils.common import respawn
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils import distro  # pylint: disable=import-error
-from ansible.module_utils.basic import AnsibleModule  # pylint: disable=import-error
-from ansible.module_utils.urls import open_url  # pylint: disable=import-error
+from ansible.module_utils import distro
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import open_url
 
 
 def _respawn_dnf():
