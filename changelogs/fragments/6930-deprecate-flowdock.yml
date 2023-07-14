@@ -1,0 +1,2 @@
+deprecated_features:
+  - flowdock - module relies entirely on no longer responsive API endpoints, and it will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/6930).
