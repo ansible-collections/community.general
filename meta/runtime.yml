@@ -804,6 +804,10 @@ plugin_routing:
         warning_text: You are using an internal name to access the community.general.flatpak_remote
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
+    flowdock:
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
     notification.flowdock:
       redirect: community.general.flowdock
       deprecation:
