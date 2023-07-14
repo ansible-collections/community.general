@@ -22,8 +22,6 @@ description:
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
-requirements:
-  - ipaddress
 
 attributes:
   check_mode:
