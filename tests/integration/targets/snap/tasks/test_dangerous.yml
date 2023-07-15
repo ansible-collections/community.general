@@ -1,0 +1,51 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure package is not installed (cider)
+  community.general.snap:
+    name: cider
+    state: absent
+
+- name: Download cider snap
+  ansible.builtin.get_url:
+    url: https://github.com/ciderapp/cider-releases/releases/download/v1.6.0/cider_1.6.0_amd64.snap
+    dest: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
+    mode: "0644"
+
+# Test for https://github.com/ansible-collections/community.general/issues/5715
+- name: Install package from file (check)
+  community.general.snap:
+    name: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
+    dangerous: true
+    state: present
+  check_mode: true
+  register: install_dangerous_check
+
+- name: Install package from file
+  community.general.snap:
+    name: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
+    dangerous: true
+    state: present
+  register: install_dangerous
+
+- name: Install package from file
+  community.general.snap:
+    name: "{{ remote_tmp_dir }}/cider_1.6.0_amd64.snap"
+    dangerous: true
+    state: present
+  register: install_dangerous_idempot
+
+- name: Remove package
+  community.general.snap:
+    name: cider
+    state: absent
+  register: remove_dangerous
+
+- assert:
+    that:
+      - install_dangerous_check is changed
+      - install_dangerous is changed
+      - install_dangerous_idempot is not changed
+      - remove_dangerous is changed
