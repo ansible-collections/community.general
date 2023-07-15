@@ -22,8 +22,6 @@ description:
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
-requirements:
-  - ipaddress
 
 attributes:
   check_mode:
@@ -137,19 +135,8 @@ data:
     }
 '''
 
-import traceback
-
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway, payload_from_object
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
-try:
-    from ipaddress import ip_network  # noqa: F401, pylint: disable=unused-import
-except ImportError:
-    IPADDRESS_IMP_ERR = traceback.format_exc()
-    HAS_IPADDRESS = False
-else:
-    IPADDRESS_IMP_ERR = None
-    HAS_IPADDRESS = True
+from ansible.module_utils.basic import AnsibleModule
 
 
 def get_sgr_from_api(security_group_rules, security_group_rule):
@@ -272,8 +259,6 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
-    if not HAS_IPADDRESS:
-        module.fail_json(msg=missing_required_lib('ipaddress'), exception=IPADDRESS_IMP_ERR)
 
     core(module)
 

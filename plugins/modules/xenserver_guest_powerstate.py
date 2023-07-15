@@ -177,12 +177,6 @@ instance:
     }
 '''
 
-HAS_XENAPI = False
-try:
-    import XenAPI  # noqa: F401, pylint: disable=unused-import
-    HAS_XENAPI = True
-except ImportError:
-    pass
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.xenserver import (xenserver_common_argument_spec, XenServerObject, get_object_ref,
