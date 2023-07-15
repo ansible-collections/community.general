@@ -22,7 +22,7 @@ extends_documentation_fragment:
   - community.general.attributes
 attributes:
   check_mode:
-    support: none
+    support: full
   diff_mode:
     support: none
 options:
@@ -162,7 +162,7 @@ operation:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    get_consul_url, get_auth_headers, RequestError, handle_consul_response_error)
+    get_consul_url, get_auth_headers, handle_consul_response_error)
 import traceback
 
 REQUESTS_IMP_ERR = None
@@ -227,18 +227,33 @@ def update_role(role, configuration):
         update_role_data["NodeIdentities"] = [
             x.to_dict() for x in configuration.node_identities]
 
-    response = requests.put(url, headers=headers, json=update_role_data, verify=configuration.validate_certs)
-    handle_consul_response_error(response)
+    if configuration.check_mode:
+        get_url = '%s/acl/role/name/%s' % (get_consul_url(configuration),
+                                  role['Name'])
+        response = requests.get(get_url, headers=headers, verify=configuration.validate_certs)
+        handle_consul_response_error(response)
 
-    resulting_role = response.json()
-    changed = (
-        role['Description'] != resulting_role['Description'] or
-        role.get('Policies', None) != resulting_role.get('Policies', None) or
-        role.get('ServiceIdentities', None) != resulting_role.get('ServiceIdentities', None) or
-        role.get('NodeIdentities', None) != resulting_role.get('NodeIdentities', None)
-    )
+        current_role = response.json()
+        changed = (
+            role['Description'] != current_role['Description'] or
+            role.get('Policies', None) != current_role.get('Policies', None) or
+            role.get('ServiceIdentities', None) != current_role.get('ServiceIdentities', None) or
+            role.get('NodeIdentities', None) != current_role.get('NodeIdentities', None)
+        )
+        return Output(changed=changed, operation=UPDATE_OPERATION, role=role)
+    else:
+        response = requests.put(url, headers=headers, json=update_role_data, verify=configuration.validate_certs)
+        handle_consul_response_error(response)
 
-    return Output(changed=changed, operation=UPDATE_OPERATION, role=resulting_role)
+        resulting_role = response.json()
+        changed = (
+            role['Description'] != resulting_role['Description'] or
+            role.get('Policies', None) != resulting_role.get('Policies', None) or
+            role.get('ServiceIdentities', None) != resulting_role.get('ServiceIdentities', None) or
+            role.get('NodeIdentities', None) != resulting_role.get('NodeIdentities', None)
+        )
+
+        return Output(changed=changed, operation=UPDATE_OPERATION, role=resulting_role)
 
 
 def create_role(configuration):
@@ -255,12 +270,15 @@ def create_role(configuration):
     if configuration.version >= ConsulVersion("1.8.0"):
         create_role_data["NodeIdentities"] = [x.to_dict() for x in configuration.node_identities]
 
-    response = requests.put(url, headers=headers, json=create_role_data, verify=configuration.validate_certs)
-    handle_consul_response_error(response)
+    if not configuration.check_mode:
+        response = requests.put(url, headers=headers, json=create_role_data, verify=configuration.validate_certs)
+        handle_consul_response_error(response)
 
-    resulting_role = response.json()
+        resulting_role = response.json()
 
-    return Output(changed=True, operation=CREATE_OPERATION, role=resulting_role)
+        return Output(changed=True, operation=CREATE_OPERATION, role=resulting_role)
+    else:
+        return Output(changed=True, operation=CREATE_OPERATION)
 
 
 def remove_role(configuration):
@@ -270,10 +288,11 @@ def remove_role(configuration):
 
         role_id = roles[configuration.name]['ID']
 
-        url = '%s/acl/role/%s' % (get_consul_url(configuration), role_id)
-        headers = get_auth_headers(configuration)
-        response = requests.delete(url, headers=headers, verify=configuration.validate_certs)
-        handle_consul_response_error(response)
+        if not configuration.check_mode:
+            url = '%s/acl/role/%s' % (get_consul_url(configuration), role_id)
+            headers = get_auth_headers(configuration)
+            response = requests.delete(url, headers=headers, verify=configuration.validate_certs)
+            handle_consul_response_error(response)
 
         changed = True
     else:
@@ -305,8 +324,10 @@ def set_role(configuration):
 
     if configuration.name in roles:
         role = roles[configuration.name]
+        # figure out if we're changing something
         return update_role(role, configuration)
     else:
+        # if check_mode -> return true
         return create_role(configuration)
 
 
@@ -386,7 +407,7 @@ class Configuration:
     """
 
     def __init__(self, token=None, host=None, scheme=None, validate_certs=None, name=None, description=None, port=None,
-                 policies=None, service_identities=None, node_identities=None, state=None):
+                 policies=None, service_identities=None, node_identities=None, state=None, check_mode=None):
         self.token = token                                    # type: str
         self.host = host                                                            # type: str
         self.port = port                                                            # type: int
@@ -398,7 +419,7 @@ class Configuration:
         self.service_identities = [ServiceIdentity(s) for s in service_identities]  # type: list(ServiceIdentity)
         self.node_identities = [NodeIdentity(n) for n in node_identities]           # type: list(NodeIdentity)
         self.state = state                                                          # type: str
-
+        self.check_mode = check_mode                                                # type: bool
 
 class Output:
     """
@@ -415,7 +436,7 @@ def main():
     """
     Main method.
     """
-    module = AnsibleModule(_ARGUMENT_SPEC, supports_check_mode=False)
+    module = AnsibleModule(_ARGUMENT_SPEC, supports_check_mode=True)
 
     if not HAS_REQUESTS:
         module.fail_json(msg=missing_required_lib("requests"),
@@ -434,6 +455,7 @@ def main():
             service_identities=module.params.get(SERVICE_IDENTITIES_PARAMETER_NAME),
             node_identities=module.params.get(NODE_IDENTITIES_PARAMETER_NAME),
             state=module.params.get(STATE_PARAMETER_NAME),
+            check_mode=module.check_mode
 
         )
     except ValueError as err:
@@ -444,6 +466,8 @@ def main():
 
         version = get_consul_version(configuration)
         configuration.version = version
+        # if check mode
+        #
         if configuration.state == PRESENT_STATE_VALUE:
             output = set_role(configuration)
         else:
