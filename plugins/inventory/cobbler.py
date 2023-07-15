@@ -307,20 +307,22 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
             # Add host variables
             ip_address = None
+            ip_address_first = None
             ipv6_address = None
+            ipv6_address_first = None
             for iname, ivalue in interfaces.items():
                 # Set to first interface or management interface if defined or hostname matches dns_name
                 if ivalue['ip_address'] != "":
-                    if ip_address is None:
-                        ip_address = ivalue['ip_address']
-                    elif ivalue['management']:
+                    if ip_address_first is None:
+                        ip_address_first = ivalue['ip_address']
+                    if ivalue['management']:
                         ip_address = ivalue['ip_address']
                     elif ivalue['dns_name'] == hostname and ip_address is None:
                         ip_address = ivalue['ip_address']
                 if ivalue['ipv6_address'] != "":
-                    if ipv6_address is None:
-                        ipv6_address = ivalue['ipv6_address']
-                    elif ivalue['management']:
+                    if ipv6_address_first is None:
+                        ipv6_address_first = ivalue['ipv6_address']
+                    if ivalue['management']:
                         ipv6_address = ivalue['ipv6_address']
                     elif ivalue['dns_name'] == hostname and ipv6_address is None:
                         ipv6_address = ivalue['ipv6_address']
@@ -333,9 +335,13 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         if ivalue['ipv6_address'] != "":
                             ip_addresses[ivalue['dns_name']] = ivalue['ipv6_address']
 
-            # Add ip_address to host if defined
+            # Add ip_address to host if defined, use first if no management or matched dns_name
+            if ip_address is None and ip_address_first is not None:
+                ip_address = ip_address_first
             if ip_address is not None:
                 self.inventory.set_variable(hostname, 'cobbler_ipv4_address', ip_address)
+            if ipv6_address is None and ipv6_address_first is not None:
+                ipv6_address = ipv6_address_first
             if ipv6_address is not None:
                 self.inventory.set_variable(hostname, 'cobbler_ipv6_address', ipv6_address)
 
