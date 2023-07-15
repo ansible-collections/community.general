@@ -1,0 +1,2 @@
+bugfixes:
+  - cobbler inventory plugin - fix calculation of cobbler_ipv4/6_address (https://github.com/ansible-collections/community.general/pull/6925).
