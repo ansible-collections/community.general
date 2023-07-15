@@ -102,6 +102,7 @@ class BecomeModule(BecomeBase):
     prompt = 'Password: '
     fail = ('==== AUTHENTICATION FAILED ====',)
     success = ('==== AUTHENTICATION COMPLETE ====',)
+    require_tty = True  # see https://github.com/ansible-collections/community.general/issues/6932
 
     @staticmethod
     def remove_ansi_codes(line):
