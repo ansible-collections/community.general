@@ -1,0 +1,2 @@
+minor_changes:
+  - locale_gen - module has been refactored to use ``ModuleHelper`` and ``CmdRunner`` (https://github.com/ansible-collections/community.general/pull/6903).
