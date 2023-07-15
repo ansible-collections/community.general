@@ -1,0 +1,8 @@
+minor_changes:
+  - |
+    rhsm_repository - the interaction with ``subscription-manager`` was
+    refactored by grouping things together, removing unused bits, and hardening
+    the way it is run; also, the parsing of ``subscription-manager repos --list``
+    was improved and made slightly faster; no behaviour change is expected
+    (https://github.com/ansible-collections/community.general/pull/6783,
+    https://github.com/ansible-collections/community.general/pull/6837).
