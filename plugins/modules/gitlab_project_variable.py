@@ -181,20 +181,13 @@ project_variable:
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
 '''
 
-import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.api import basic_auth_argument_spec
 
-GITLAB_IMP_ERR = None
-try:
-    import gitlab  # noqa: F401, pylint: disable=unused-import
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables,
+    HAS_GITLAB_PACKAGE, GITLAB_IMP_ERR
 )
 
 
