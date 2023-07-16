@@ -48,8 +48,8 @@ options:
     state:
         description:
             - State of the authorization permission.
-            - On C(present), the authorization permission will be created (or updated if it exists already).
-            - On C(absent), the authorization permission will be removed if it exists.
+            - On V(present), the authorization permission will be created (or updated if it exists already).
+            - On V(absent), the authorization permission will be removed if it exists.
         choices: ['present', 'absent']
         default: 'present'
         type: str
@@ -66,8 +66,8 @@ options:
     permission_type:
         description:
             - The type of authorization permission.
-            - On C(scope) create a scope-based permission.
-            - On C(resource) create a resource-based permission.
+            - On V(scope) create a scope-based permission.
+            - On V(resource) create a resource-based permission.
         type: str
         required: true
         choices:
@@ -177,49 +177,49 @@ end_state:
         id:
             description: ID of the authorization permission.
             type: str
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample: 9da05cd2-b273-4354-bbd8-0c133918a454
         name:
             description: Name of the authorization permission.
             type: str
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample: ResourcePermission
         description:
             description: Description of the authorization permission.
             type: str
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample: Resource Permission
         type:
             description: Type of the authorization permission.
             type: str
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample: resource
         decisionStrategy:
             description: The decision strategy to use.
             type: str
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample: UNANIMOUS
         logic:
             description: The logic used for the permission (part of the payload, but has a fixed value).
             type: str
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample: POSITIVE
         resources:
             description: IDs of resources attached to this permission.
             type: list
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample:
                 - 49e052ff-100d-4b79-a9dd-52669ed3c11d
         scopes:
             description: IDs of scopes attached to this permission.
             type: list
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample:
                 - 9da05cd2-b273-4354-bbd8-0c133918a454
         policies:
             description: IDs of policies attached to this permission.
             type: list
-            returned: when I(state=present)
+            returned: when O(state=present)
             sample:
                 - 9da05cd2-b273-4354-bbd8-0c133918a454
 '''
