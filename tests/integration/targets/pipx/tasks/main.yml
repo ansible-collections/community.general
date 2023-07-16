@@ -224,50 +224,50 @@
       - "'tox' not in uninstall_tox_again.application"
 
 ##############################################################################
-- name: ensure application pytype is uninstalled
+- name: ensure application supervisor is uninstalled
   community.general.pipx:
-    name: pytype
+    name: supervisor
     state: absent
 
-- name: install application pytype
+- name: install application supervisor
   community.general.pipx:
-    name: pytype
-  register: install_pytype
+    name: supervisor
+  register: install_supervisor
 
 - name: inject packages
   community.general.pipx:
     state: inject
-    name: pytype
+    name: supervisor
     inject_packages:
       - licenses
-  register: inject_pkgs_pytype
+  register: inject_pkgs_supervisor
 
 - name: inject packages with apps
   community.general.pipx:
     state: inject
-    name: pytype
+    name: supervisor
     inject_packages:
       - black
     install_apps: true
-  register: inject_pkgs_apps_pytype
+  register: inject_pkgs_apps_supervisor
 
-- name: cleanup pytype
+- name: cleanup supervisor
   community.general.pipx:
     state: absent
-    name: pytype
-  register: uninstall_pytype
+    name: supervisor
+  register: uninstall_supervisor
 
 - name: check assertions inject_packages
   assert:
     that:
-      - install_pytype is changed
-      - inject_pkgs_pytype is changed
-      - '"pytype" in inject_pkgs_pytype.application'
-      - '"licenses" in inject_pkgs_pytype.application["pytype"]["injected"]'
-      - inject_pkgs_apps_pytype is changed
-      - '"pytype" in inject_pkgs_apps_pytype.application'
-      - '"black" in inject_pkgs_apps_pytype.application["pytype"]["injected"]'
-      - uninstall_pytype is changed
+      - install_supervisor is changed
+      - inject_pkgs_supervisor is changed
+      - '"supervisor" in inject_pkgs_supervisor.application'
+      - '"licenses" in inject_pkgs_supervisor.application["supervisor"]["injected"]'
+      - inject_pkgs_apps_supervisor is changed
+      - '"supervisor" in inject_pkgs_apps_supervisor.application'
+      - '"black" in inject_pkgs_apps_supervisor.application["supervisor"]["injected"]'
+      - uninstall_supervisor is changed
 
 ##############################################################################
 - name: install jupyter - not working smoothly in freebsd
