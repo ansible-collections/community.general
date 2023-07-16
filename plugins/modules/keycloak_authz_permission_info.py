@@ -84,37 +84,30 @@ queried_state:
         id:
             description: ID of the authorization permission.
             type: str
-            returned: when I(state=present)
             sample: 9da05cd2-b273-4354-bbd8-0c133918a454
         name:
             description: Name of the authorization permission.
             type: str
-            returned: when I(state=present)
             sample: ResourcePermission
         description:
             description: Description of the authorization permission.
             type: str
-            returned: when I(state=present)
             sample: Resource Permission
         type:
             description: Type of the authorization permission.
             type: str
-            returned: when I(state=present)
             sample: resource
         decisionStrategy:
             description: The decision strategy.
             type: str
-            returned: when I(state=present)
             sample: UNANIMOUS
         logic:
             description: The logic used for the permission (part of the payload, but has a fixed value).
             type: str
-            returned: when I(state=present)
             sample: POSITIVE
         config:
             description: Configuration of the permission (empty in all observed cases).
             type: dict
-            returned: when I(state=present)
             sample: {}
 '''
 
