@@ -87,6 +87,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six import iteritems
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
+from ansible.module_utils.six import text_type
 
 # xmlrpc
 try:
@@ -128,7 +129,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self.connection = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
             self.token = None
             if self.get_option('user') is not None:
-                self.token = self.connection.login(self.get_option('user'), self.get_option('password'))
+                self.token = self.connection.login(text_type(self.get_option('user')), text_type(self.get_option('password')))
         return self.connection
 
     def _init_cache(self):
