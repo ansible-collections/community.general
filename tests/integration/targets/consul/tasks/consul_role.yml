@@ -16,6 +16,19 @@
     token: "{{ consul_management_token }}"
   register: policy_result
 
+- name: Create another policy with rules
+  consul_policy:
+    name: bar-access-for-role
+    rules: |
+        key "bar" {
+            policy = "read"
+        }
+        key "private/bar" {
+            policy = "deny"
+        }
+    token: "{{ consul_management_token }}"
+  register: policy_result
+
 - name: Create a role with policy
   consul_role:
     name: foo-role-with-policy
@@ -28,6 +41,21 @@
     that:
       - result is changed
       - result['role']['Name'] == 'foo-role-with-policy'
+
+- name: Update the role with another policy
+  consul_role:
+    name: foo-role-with-policy
+    policies:
+      - name: "foo-access-for-role"
+      - name: "bar-access-for-role"
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+      - result['role']['Policies'][1]['Name'] == 'bar-access-for-role'
 
 - name: Create a role with service identity
   consul_role:
@@ -44,6 +72,23 @@
       - result is changed
       - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
       - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+
+- name: Update the role with service identity in check mode
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-service-identity
+    service_identities:
+      - name: web
+        datacenters:
+          - dc2
+  register: result
+  check_mode: yes
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
+      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc2"
 
 - name: Create a role with node identity
   consul_role:

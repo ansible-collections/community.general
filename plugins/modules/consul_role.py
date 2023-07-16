@@ -209,6 +209,17 @@ _ARGUMENT_SPEC = {
 }
 
 
+def compare_consul_api_role_policy_objects(first, second):
+    # compare two lists of dictionaries, ignoring the ID element if it exists
+    for x in first:
+        x.pop('ID', None)
+
+    for x in second:
+        x.pop('ID', None)
+
+    return first == second
+
+
 def update_role(role, configuration):
     url = '%s/acl/role/%s' % (get_consul_url(configuration),
                               role['Name'])
@@ -228,17 +239,11 @@ def update_role(role, configuration):
             x.to_dict() for x in configuration.node_identities]
 
     if configuration.check_mode:
-        get_url = '%s/acl/role/name/%s' % (get_consul_url(configuration),
-                                  role['Name'])
-        response = requests.get(get_url, headers=headers, verify=configuration.validate_certs)
-        handle_consul_response_error(response)
-
-        current_role = response.json()
         changed = (
-            role['Description'] != current_role['Description'] or
-            role.get('Policies', None) != current_role.get('Policies', None) or
-            role.get('ServiceIdentities', None) != current_role.get('ServiceIdentities', None) or
-            role.get('NodeIdentities', None) != current_role.get('NodeIdentities', None)
+                role['Description'] != update_role_data['Description'] or
+                not compare_consul_api_role_policy_objects(role.get('Policies', []), update_role_data.get('Policies', [])) or
+                role.get('ServiceIdentities', None) != update_role_data.get('ServiceIdentities', None) or
+                role.get('NodeIdentities', None) != update_role_data.get('NodeIdentities', None)
         )
         return Output(changed=changed, operation=UPDATE_OPERATION, role=role)
     else:
@@ -247,10 +252,10 @@ def update_role(role, configuration):
 
         resulting_role = response.json()
         changed = (
-            role['Description'] != resulting_role['Description'] or
-            role.get('Policies', None) != resulting_role.get('Policies', None) or
-            role.get('ServiceIdentities', None) != resulting_role.get('ServiceIdentities', None) or
-            role.get('NodeIdentities', None) != resulting_role.get('NodeIdentities', None)
+                role['Description'] != resulting_role['Description'] or
+                role.get('Policies', None) != resulting_role.get('Policies', None) or
+                role.get('ServiceIdentities', None) != resulting_role.get('ServiceIdentities', None) or
+                role.get('NodeIdentities', None) != resulting_role.get('NodeIdentities', None)
         )
 
         return Output(changed=changed, operation=UPDATE_OPERATION, role=resulting_role)
