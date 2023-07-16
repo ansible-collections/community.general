@@ -532,6 +532,7 @@ files:
     keywords: gitlab source_control
     maintainers: $team_gitlab
     notify: jlozadad
+    ignore: dj-wasabi
   $modules/gitlab_branch.py:
     maintainers: paytroff
   $modules/gitlab_merge_request.py:
