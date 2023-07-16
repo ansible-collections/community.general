@@ -1588,3 +1588,12 @@ releases:
     - 6401-rhsm_release-required.yml
     - 6404-ini_file-section.yml
     release_date: '2023-04-24'
+  5.8.9:
+    changes:
+      bugfixes:
+      - passwordstore lookup plugin - make compatible with ansible-core 2.16 (https://github.com/ansible-collections/community.general/pull/6447).
+      release_summary: Bugfix release.
+    fragments:
+    - 5.8.9.yml
+    - passwordstore-lock.yml
+    release_date: '2023-07-16'

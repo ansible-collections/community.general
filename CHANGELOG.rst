@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 4.0.0.
 
+v5.8.9
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- passwordstore lookup plugin - make compatible with ansible-core 2.16 (https://github.com/ansible-collections/community.general/pull/6447).
+
 v5.8.8
 ======
 
