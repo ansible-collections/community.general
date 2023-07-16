@@ -17,40 +17,40 @@ module: simpleinit_msb
 short_description: Manage services on Source Mage GNU/Linux
 version_added: 7.1.0
 description:
-    - Controls services on remote hosts using C(simpleinit-msb).
+  - Controls services on remote hosts using C(simpleinit-msb).
 author: "Vlad Glagolev (@vaygr)"
 extends_documentation_fragment:
-    - community.general.attributes
+  - community.general.attributes
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    name:
-        type: str
-        description:
-            - Name of the service.
-        required: true
-        aliases: ['service']
-    state:
-        type: str
-        required: false
-        choices: [ running, started, stopped, restarted, reloaded ]
-        description:
-          - V(started)/V(stopped) are idempotent actions that will not run
-            commands unless necessary.  V(restarted) will always bounce the
-            service.  V(reloaded) will always reload.
-          - At least one of O(state) and O(enabled) are required.
-          - Note that V(reloaded) will start the
-            service if it is not already started, even if your chosen init
-            system would not normally.
-    enabled:
-        type: bool
-        required: false
-        description:
-        - Whether the service should start on boot.
-        - At least one of O(state) and O(enabled) are required.
+  name:
+    type: str
+    description:
+      - Name of the service.
+    required: true
+    aliases: ['service']
+  state:
+    type: str
+    required: false
+    choices: [ running, started, stopped, restarted, reloaded ]
+    description:
+      - V(started)/V(stopped) are idempotent actions that will not run
+        commands unless necessary.  V(restarted) will always bounce the
+        service.  V(reloaded) will always reload.
+      - At least one of O(state) and O(enabled) are required.
+      - Note that V(reloaded) will start the
+        service if it is not already started, even if your chosen init
+        system would not normally.
+  enabled:
+    type: bool
+    required: false
+    description:
+      - Whether the service should start on boot.
+      - At least one of O(state) and O(enabled) are required.
 '''
 
 EXAMPLES = '''
