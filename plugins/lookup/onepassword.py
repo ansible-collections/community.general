@@ -74,18 +74,18 @@ EXAMPLES = """
 
 - name: Retrieve password for HAL when not signed in to 1Password
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword'
-                'HAL 9000'
-                subdomain='Discovery'
+    var: lookup('community.general.onepassword',
+                'HAL 9000',
+                subdomain='Discovery',
                 master_password=vault_master_password)
 
 - name: Retrieve password for HAL when never signed in to 1Password
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword'
-                'HAL 9000'
-                subdomain='Discovery'
-                master_password=vault_master_password
-                username='tweety@acme.com'
+    var: lookup('community.general.onepassword',
+                'HAL 9000',
+                subdomain='Discovery',
+                master_password=vault_master_password,
+                username='tweety@acme.com',
                 secret_key=vault_secret_key)
 """
 
