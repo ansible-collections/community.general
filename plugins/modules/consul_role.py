@@ -426,6 +426,7 @@ class Configuration:
         self.state = state                                                          # type: str
         self.check_mode = check_mode                                                # type: bool
 
+
 class Output:
     """
     Output of an action of this module.
