@@ -15,7 +15,7 @@ DOCUMENTATION = '''
 ---
 module: simpleinit_msb
 short_description: Manage services on Source Mage GNU/Linux
-version_added: 7.1.0
+version_added: 7.3.0
 description:
   - Controls services on remote hosts using C(simpleinit-msb).
 author: "Vlad Glagolev (@vaygr)"
