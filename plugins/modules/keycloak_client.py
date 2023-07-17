@@ -249,7 +249,6 @@ options:
             - Type of client.
         type: str
         choices: ['openid-connect', 'saml']
-        default: openid-connect
 
     full_scope_allowed:
         description:
@@ -722,6 +721,9 @@ from ansible.module_utils.basic import AnsibleModule
 import copy
 
 
+PROTOCOL_OPENID_CONNECT = 'openid-connect'
+PROTOCOL_SAML = 'saml'
+
 def normalise_cr(clientrep, remove_ids=False):
     """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
     the change detection is more effective.
@@ -780,7 +782,7 @@ def main():
         consentText=dict(type='str'),
         id=dict(type='str'),
         name=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml']),
+        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML]),
         protocolMapper=dict(type='str'),
         config=dict(type='dict'),
     )
@@ -814,7 +816,7 @@ def main():
         authorization_services_enabled=dict(type='bool', aliases=['authorizationServicesEnabled']),
         public_client=dict(type='bool', aliases=['publicClient']),
         frontchannel_logout=dict(type='bool', aliases=['frontchannelLogout']),
-        protocol=dict(type='str', choices=['openid-connect', 'saml'], default='openid-connect'),
+        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML]),
         attributes=dict(type='dict'),
         full_scope_allowed=dict(type='bool', aliases=['fullScopeAllowed']),
         node_re_registration_timeout=dict(type='int', aliases=['nodeReRegistrationTimeout']),
@@ -912,6 +914,8 @@ def main():
 
         if 'clientId' not in desired_client:
             module.fail_json(msg='client_id needs to be specified when creating a new client')
+        if 'protocol' not in desired_client:
+            desired_client['protocol'] = PROTOCOL_OPENID_CONNECT
 
         if module._diff:
             result['diff'] = dict(before='', after=sanitize_cr(desired_client))
