@@ -1,2 +1,0 @@
-bugfixes:
-  - pacman - module recognizes the output of ``yay`` running as ``root`` (https://github.com/ansible-collections/community.general/pull/6713).
