@@ -210,7 +210,7 @@ _ARGUMENT_SPEC = {
 
 
 def compare_consul_api_role_policy_objects(first, second):
-    # compare two lists of dictionaries, ignoring the ID element if it exists
+    # compare two lists of dictionaries, ignoring the ID element
     for x in first:
         x.pop('ID', None)
 
@@ -222,10 +222,11 @@ def compare_consul_api_role_policy_objects(first, second):
 
 def update_role(role, configuration):
     url = '%s/acl/role/%s' % (get_consul_url(configuration),
-                              role['Name'])
+                              role['ID'])
     headers = get_auth_headers(configuration)
 
     update_role_data = {
+        'Name': configuration.name,
         'Description': configuration.description,
         'Policies': [x.to_dict() for x in configuration.policies],
     }
@@ -242,10 +243,10 @@ def update_role(role, configuration):
         changed = (
             role['Description'] != update_role_data['Description'] or
             not compare_consul_api_role_policy_objects(role.get('Policies', []), update_role_data.get('Policies', [])) or
-            role.get('ServiceIdentities', None) != update_role_data.get('ServiceIdentities', None) or
-            role.get('NodeIdentities', None) != update_role_data.get('NodeIdentities', None)
+            role.get('ServiceIdentities', []) != update_role_data.get('ServiceIdentities', []) or
+            role.get('NodeIdentities', []) != update_role_data.get('NodeIdentities', [])
         )
-        return Output(changed=changed, operation=UPDATE_OPERATION, role=role)
+        return Output(changed=changed, operation=UPDATE_OPERATION, role=update_role_data)
     else:
         response = requests.put(url, headers=headers, json=update_role_data, verify=configuration.validate_certs)
         handle_consul_response_error(response)
@@ -472,8 +473,7 @@ def main():
 
         version = get_consul_version(configuration)
         configuration.version = version
-        # if check mode
-        #
+
         if configuration.state == PRESENT_STATE_VALUE:
             output = set_role(configuration)
         else:
