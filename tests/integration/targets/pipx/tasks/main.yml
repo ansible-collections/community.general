@@ -270,30 +270,30 @@
       - uninstall_supervisor is changed
 
 ##############################################################################
-- name: install jupyter - not working smoothly in freebsd
-  when: ansible_system != 'FreeBSD'
+- name: install notebook - not working smoothly in freebsd
+  # when: ansible_system != 'FreeBSD'
   block:
     - name: ensure application jupyter is uninstalled
       community.general.pipx:
-        name: jupyter
+        name: notebook
         state: absent
 
-    - name: install application jupyter
+    - name: install application notebook
       community.general.pipx:
-        name: jupyter
+        name: notebook
         install_deps: true
-      register: install_jupyter
+      register: install_notebook
 
-    - name: cleanup jupyter
+    - name: cleanup notebook
       community.general.pipx:
         state: absent
-        name: jupyter
+        name: notebook
 
     - name: check assertions
       assert:
         that:
-          - install_jupyter is changed
-          - '"ipython" in install_jupyter.stdout'
+          - install_notebook is changed
+          - '"ipython" in install_notebook.stdout'
 
 ##############################################################################
 - name: ensure /opt/pipx
