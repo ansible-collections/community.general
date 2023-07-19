@@ -121,3 +121,20 @@ cmd_echo_tests:
       - test_result.rc == None
       - test_result.out == None
       - test_result.err == None
+
+  - name: set aa and tt value
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
+      - test_result.err == ""

@@ -208,7 +208,7 @@ class CmdRunner(object):
 
         for mod_param_name, spec in iteritems(module.argument_spec):
             if mod_param_name not in self.arg_formats:
-                self.arg_formats[mod_param_name] = _Format.as_default_type(spec['type'], mod_param_name)
+                self.arg_formats[mod_param_name] = _Format.as_default_type(spec.get('type', 'str'), mod_param_name)
 
     def __call__(self, args_order=None, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
         if output_process is None:

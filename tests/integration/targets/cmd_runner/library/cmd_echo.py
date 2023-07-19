@@ -26,6 +26,7 @@ def main():
             arg_values=dict(type="dict", default={}),
             check_mode_skip=dict(type="bool", default=False),
             aa=dict(type="raw"),
+            tt=dict(),
         ),
         supports_check_mode=True,
     )
