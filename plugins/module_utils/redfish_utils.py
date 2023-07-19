@@ -819,7 +819,10 @@ class RedfishUtils(object):
                             for property in properties:
                                 if property in data:
                                     if data[property] is not None:
-                                        drive_result[property] = data[property]
+                                        if property == "Links" and "Volumes" in data["Links"].keys():
+                                            drive_result["Volumes"] = data["Links"]["Volumes"]
+                                        else:
+                                            drive_result[property] = data[property]
                             drive_results.append(drive_result)
                     drives = {'Controller': controller_name,
                               'Drives': drive_results}
