@@ -338,8 +338,8 @@ EXAMPLES = '''
       volume_details:
         Name: "MR Volume"
         RAIDType: "RAID0"
-          Drives:
-            - "/redfish/v1/Systems/1/Storage/DE00B000/Drives/1"
+        Drives:
+          - "/redfish/v1/Systems/1/Storage/DE00B000/Drives/1"
 '''
 
 RETURN = '''
