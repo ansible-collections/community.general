@@ -334,12 +334,12 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+      storage_subsystem_id: "DExxxxxx"
       volume_details:
         Name: "MR Volume"
         RAIDType: "RAID0"
-        Links:
           Drives:
-            - "@odata.id": "/redfish/v1/Systems/1/Storage/DE00B000/Drives/1"
+            - "/redfish/v1/Systems/1/Storage/DE00B000/Drives/1"
 '''
 
 RETURN = '''
