@@ -233,9 +233,9 @@ def main():
     elif type == "qemu":
         vms = proxmox.get_qemu_vms(vms_cluster_resources, vmid, node)
     else:
-        vms = proxmox.get_qemu_vms(vms_cluster_resources, vmid) + proxmox.get_lxc_vms(
-            vms_cluster_resources, vmid
-        )
+        vms = proxmox.get_qemu_vms(
+            vms_cluster_resources, vmid, node
+        ) + proxmox.get_lxc_vms(vms_cluster_resources, vmid, node)
 
     if vms or vmid is None:
         result["proxmox_vms"] = vms

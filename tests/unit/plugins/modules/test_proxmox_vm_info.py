@@ -450,6 +450,20 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert result["proxmox_vms"] == expected_output
         assert len(result["proxmox_vms"]) == 1
 
+    def test_get_all_vms_from_specific_node(self):
+        with pytest.raises(AnsibleExitJson) as exc_info:
+            expected_output = [
+                vm
+                for vm in EXPECTED_VMS_OUTPUT
+                if vm["node"] == NODE1
+            ]
+            set_module_args(get_module_args(node=NODE1))
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["proxmox_vms"] == expected_output
+        assert len(result["proxmox_vms"]) == 2
+
     def test_module_fail_when_vm_does_not_exist_on_node(self):
         with pytest.raises(AnsibleFailJson) as exc_info:
             vmid = 200
