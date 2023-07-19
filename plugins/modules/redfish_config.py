@@ -137,12 +137,13 @@ options:
     type: str
     default: ''
     version_added: '7.2.0'
-  volumes_ids:
+  volume_ids:
     required: false
     description:
       - List of IDs of volumes to be deleted.
     type: list
     default: []
+    elements: str
     version_added: '7.2.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
@@ -347,7 +348,7 @@ def main():
             hostinterface_id=dict(),
             sessions_config=dict(type='dict', default={}),
             storage_subsystem_id=dict(type='str', default=''),
-            volume_ids=dict(type='list', default=[])
+            volume_ids=dict(type='list', default=[], elements='str')
         ),
         required_together=[
             ('username', 'password'),
