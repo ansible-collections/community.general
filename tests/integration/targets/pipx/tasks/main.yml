@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Prepare Alpine Linux
+  become: true
   ansible.builtin.package:
     name:
       - build-base
@@ -271,23 +272,23 @@
 
 ##############################################################################
 - name: install notebook - not working smoothly in freebsd
-  when: ansible_system != 'FreeBSD'
+  when: ansible_system not in ('FreeBSD', 'Alpine')
   block:
     - name: ensure application jupyter is uninstalled
       community.general.pipx:
-        name: notebook
+        name: nox[tox_to_nox]
         state: absent
 
     - name: install application notebook
       community.general.pipx:
-        name: notebook
+        name: nox[tox_to_nox]
         install_deps: true
       register: install_notebook
 
     - name: cleanup notebook
       community.general.pipx:
         state: absent
-        name: notebook
+        name: nox[tox_to_nox]
 
     - name: check assertions
       assert:
