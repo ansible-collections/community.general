@@ -130,7 +130,20 @@ options:
     type: dict
     default: {}
     version_added: '5.7.0'
-
+  storage_subsystem_id:
+    required: false
+    description:
+      - Id of the Storage Subsystem on which the volume is to be created.
+    type: str
+    default: ''
+    version_added: '7.2.0'
+  volumes_ids:
+    required: false
+    description:
+      - List of IDs of volumes to be deleted.
+    type: list
+    default: []
+    version_added: '7.2.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
@@ -276,10 +289,12 @@ EXAMPLES = '''
   - name: Delete All Volumes
     community.general.redfish_config:
       category: Systems
-      command: DeleteAllVolumes
+      command: DeleteVolumes
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+      storage_subsystem_id: "DExxxxxx"
+      volume_ids: ["volume1", "volume2"]
 '''
 
 RETURN = '''
@@ -298,7 +313,7 @@ from ansible.module_utils.common.text.converters import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
-                "SetDefaultBootOrder", "EnableSecureBoot", "DeleteAllVolumes"],
+                "SetDefaultBootOrder", "EnableSecureBoot", "DeleteVolumes"],
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
     "Sessions": ["SetSessionService"],
 }
@@ -331,6 +346,8 @@ def main():
             hostinterface_config=dict(type='dict', default={}),
             hostinterface_id=dict(),
             sessions_config=dict(type='dict', default={}),
+            storage_subsystem_id=dict(type='str', default=''),
+            volume_ids=dict(type='list', default=[])
         ),
         required_together=[
             ('username', 'password'),
@@ -380,6 +397,10 @@ def main():
     # Sessions config options
     sessions_config = module.params['sessions_config']
 
+    # Volume deletion options
+    storage_subsystem_id = module.params['storage_subsystem_id']
+    volume_ids = module.params['volume_ids']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
@@ -413,8 +434,8 @@ def main():
                 result = rf_utils.set_default_boot_order()
             elif command == "EnableSecureBoot":
                 result = rf_utils.enable_secure_boot()
-            elif command == "DeleteAllVolumes":
-                result = rf_utils.delete_all_volumes()
+            elif command == "DeleteVolumes":
+                result = rf_utils.delete_volumes(storage_subsystem_id, volume_ids)
 
     elif category == "Manager":
         # execute only if we find a Manager service resource

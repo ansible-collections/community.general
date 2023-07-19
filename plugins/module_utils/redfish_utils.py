@@ -3395,7 +3395,7 @@ class RedfishUtils(object):
         result["fan_percent_min"] = fan_percent_min_config
         return result
 
-    def delete_all_volumes(self):
+    def delete_volumes(self, storage_subsystem_id, volume_ids):
         # Find the Storage resource from the requested ComputerSystem resource
         response = self.get_request(self.root_uri + self.systems_uri)
         if response['ret'] is False:
@@ -3411,36 +3411,26 @@ class RedfishUtils(object):
             return response
         data = response['data']
 
-        # Collect Storage Controllers
-        self.storage_controlllers_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
-        if not self.storage_controlllers_uris:
+        # Collect Storage Subsystems
+        self.storage_subsystems_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
+        if not self.storage_subsystems_uris:
             return {
                 'ret': False,
                 'msg': "StorageCollection's Members array is either empty or missing"}
 
-        # Check if storage controller supports volume creation
-        response = self.get_request(self.root_uri + self.storage_controlllers_uris[0])
-        if response['ret'] is False:
-            return response
-        data = response['data']
+        # Matching Storage Subsystem ID with user input
+        self.storage_subsystem_uri = ""
+        for storage_subsystem_uri in self.storage_subsystems_uris:
+            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+                self.storage_subsystem_uri = storage_subsystem_uri
 
-        if data.get('Volumes'):
-            response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
-            if response['ret'] is False:
-                return response
-            data = response['data']
-
-            if data.get('@Redfish.CollectionCapabilities') and data['@Redfish.CollectionCapabilities'].get('Capabilities') \
-                and data['@Redfish.CollectionCapabilities']['Capabilities'][0].get('UseCase') \
-                    and data['@Redfish.CollectionCapabilities']['Capabilities'][0]['UseCase'] == "VolumeCreation":
-                self.storage_controller = self.storage_controlllers_uris[0]
-            else:
-                return {
-                    'ret': False,
-                    'msg': "Storage Controller does not support Volume creation"}
+        if not self.storage_subsystem_uri:
+            return {
+                'ret': False,
+                'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
 
         # Get Volume Collection
-        response = self.get_request(self.root_uri + self.storage_controller)
+        response = self.get_request(self.root_uri + self.storage_subsystem_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -3459,9 +3449,10 @@ class RedfishUtils(object):
 
         # Delete each volume
         for volume in self.volume_uris:
-            response = self.delete_request(self.root_uri + volume)
-            if response['ret'] is False:
-                return response
+            if volume.split("/")[-1] in volume_ids:
+                response = self.delete_request(self.root_uri + volume)
+                if response['ret'] is False:
+                    return response
 
         return {'ret': True, 'changed': True,
-                'msg': "All Volumes Deleted"}
+                'msg': "The following volumes were deleted: %s" % str(volume_ids)}
