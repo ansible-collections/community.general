@@ -156,11 +156,11 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
     def get_vms_from_nodes(self, vms_unfiltered, type, vmid=None, node=None):
         vms = []
         for vm in vms_unfiltered:
-            if type != vm["type"]:
-                continue
-            if node and vm["node"] != node:
-                continue
-            if vmid and int(vm["vmid"]) != vmid:
+            if (
+                type != vm["type"]
+                or (node and vm["node"] != node)
+                or (vmid and int(vm["vmid"]) != vmid)
+            ):
                 continue
             vms.append(vm)
         nodes = frozenset([vm["node"] for vm in vms])
