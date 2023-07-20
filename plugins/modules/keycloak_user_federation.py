@@ -963,7 +963,7 @@ def main():
             # Process an update
 
             # no changes
-            if desired_comp == before_comp:
+            if sanitize(desired_comp) == sanitize(before_comp):
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
