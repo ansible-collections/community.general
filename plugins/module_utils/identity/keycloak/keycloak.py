@@ -934,15 +934,20 @@ class KeycloakAPI(object):
         :param realm: Realm in which the user resides; default 'master'
         """
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
-        users_url += '?username=%s&exact=true' % username
+        users_url_with_username = users_url + '?username=%s&exact=true' % username
         try:
             userrep = None
-            users = json.loads(to_native(open_url(users_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+            users = json.loads(to_native(open_url(users_url_with_username, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
                                                   validate_certs=self.validate_certs).read()))
             for user in users:
                 if user['username'] == username:
                     userrep = user
                     break
+            if userrep is not None:
+                user_credentials_url = users_url + f"/{userrep.get('id')}/credentials"
+                user_credentials = json.loads(to_native(open_url(user_credentials_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+                                                      validate_certs=self.validate_certs).read()))
+                userrep.update({"credentials": user_credentials})
             return userrep
 
         except ValueError as e:

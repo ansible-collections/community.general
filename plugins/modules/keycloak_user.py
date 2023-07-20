@@ -428,7 +428,7 @@ def main():
 
     # Filter and map the parameters names that apply to the user
     user_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'force', 'groups'] and
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'force', 'groups', 'credentials'] and
                    module.params.get(x) is not None]
 
     before_user = kc.get_user_by_username(username=username, realm=realm)
@@ -457,6 +457,20 @@ def main():
                 changeset[camel(param)] = copy.deepcopy(new_param_value)
             else:
                 changeset[camel(param)] = new_param_value
+
+    if before_user is not None and before_user.get('credentials') is not None:
+        changeset.update({'credentials':[]})
+        for new_credential in module.params.get('credentials'):
+            credential_with_same_label_exists = False
+            for old_credential in before_user.get('credentials'):
+                credential_with_same_label_exists = old_credential.get('userLabel') == new_credential.get('userLabel')
+                if credential_with_same_label_exists:
+                    break
+            if not credential_with_same_label_exists:
+                changeset['credentials'].append(new_credential)
+    else:
+        changeset.update({'credentials': module.params.get('credentials')})
+
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_user = copy.deepcopy(before_user)
     desired_user.update(changeset)
@@ -524,17 +538,22 @@ def main():
             # Compare users
             if not (is_struct_included(desired_user, before_user, excludes)):  # If the new user does not introduce a change to the existing user
                 # Update the user
+                if module.check_mode:
+                    if module._diff:
+                        result['diff'] = dict(before=before_user, after=desired_user)
+                    result['changed'] = True
+                    module.exit_json(**result)
                 after_user = kc.update_user(userrep=desired_user, realm=realm)
                 changed = True
-
         # set user groups
-        if kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
+        if not module.check_mode and kc.update_user_groups_membership(userrep=desired_user, groups=groups, realm=realm):
             changed = True
         # Get the user groups
         after_user["groups"] = kc.get_user_groups(user_id=desired_user["id"], realm=realm)
         result["end_state"] = after_user
         if module._diff:
-            result['diff'] = dict(before=before_user, after=after_user)
+            after_user_with_before_credentials = after_user | {"credentials": before_user.get("credentials")}
+            result['diff'] = dict(before=before_user, after=after_user_with_before_credentials)
         if changed:
             result["msg"] = 'User %s updated' % (desired_user['username'])
         else:
