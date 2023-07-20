@@ -11,11 +11,11 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: consul_role
 short_description: Manipulate Consul roles
-version_added: 7.2.0
+version_added: 7.3.0
 description:
  - Allows the addition, modification and deletion of roles in a consul
    cluster via the agent. For more details on using and configuring ACLs,
-   see https://www.consul.io/docs/guides/acl.html.
+   see U(https://www.consul.io/docs/guides/acl.html).
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
@@ -71,30 +71,30 @@ options:
     default: []
   host:
     description:
-      - host of the consul agent, defaults to localhost.
+      - Host of the consul agent, defaults to V(localhost).
     required: false
     default: localhost
     type: str
   port:
     type: int
     description:
-      - the port on which the consul agent is running.
+      - The port on which the consul agent is running.
     required: false
     default: 8500
   scheme:
     description:
-      - the protocol scheme on which the consul agent is running.
+      - The protocol scheme on which the consul agent is running.
     required: false
     default: http
     type: str
   token:
     description:
-      - a management token is required to manipulate the roles.
+      - A management token is required to manipulate the roles.
     type: str
   validate_certs:
     type: bool
     description:
-      - whether to verify the tls certificate of the consul agent
+      - Whether to verify the TLS certificate of the consul agent.
     required: false
     default: True
 requirements:
