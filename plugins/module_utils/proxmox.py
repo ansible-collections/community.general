@@ -18,6 +18,7 @@ import traceback
 PROXMOXER_IMP_ERR = None
 try:
     from proxmoxer import ProxmoxAPI
+    from proxmoxer import __version__ as proxmoxer_version
     HAS_PROXMOXER = True
 except ImportError:
     HAS_PROXMOXER = False
@@ -79,6 +80,7 @@ class ProxmoxAnsible(object):
             module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
 
         self.module = module
+        self.proxmoxer_version = proxmoxer_version
         self.proxmox_api = self._connect()
         # Test token validity
         try:
@@ -98,7 +100,7 @@ class ProxmoxAnsible(object):
         if api_password:
             auth_args['password'] = api_password
         else:
-            if self.version() < LooseVersion('1.1.0'):
+            if self.proxmoxer_version < LooseVersion('1.1.0'):
                 self.module.fail_json('Using "token_name" and "token_value" require proxmoxer>=1.1.0')
             auth_args['token_name'] = api_token_id
             auth_args['token_value'] = api_token_secret
