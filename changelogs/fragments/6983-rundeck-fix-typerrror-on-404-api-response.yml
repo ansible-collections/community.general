@@ -1,0 +1,2 @@
+bugfixes:
+  - rundeck - fix TypeError on 404 api response.
