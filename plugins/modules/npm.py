@@ -208,18 +208,16 @@ class Npm(object):
                 cwd = self.path
 
             params = dict(self.module.params)
+            params['exec_args'] = args
+            params['global_'] = self.glbl
             params['production'] = self.production and ('install' in args or 'update' in args or 'ci' in args)
+            params['name_version'] = self.name_version if add_package_name else None
 
             with self.runner(
                 "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links",
                 check_rc=check_rc, cwd=cwd
             ) as ctx:
-                rc, out, err = ctx.run(
-                    exec_args=args,
-                    global_=self.glbl,
-                    name_version=self.name_version,
-                    **params
-                )
+                rc, out, err = ctx.run(**params)
             return out
 
         return ''
