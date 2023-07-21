@@ -3,16 +3,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Prepare Alpine Linux
-  become: true
-  ansible.builtin.package:
-    name:
-      - build-base
-      - python3-dev
-  when: ansible_os_family == 'Alpine'
-
 - name: install pipx
-  ansible.builtin.pip:
+  pip:
     name: pipx
     extra_args: --user
 
@@ -225,76 +217,76 @@
       - "'tox' not in uninstall_tox_again.application"
 
 ##############################################################################
-- name: ensure application supervisor is uninstalled
+- name: ensure application ansible-lint is uninstalled
   community.general.pipx:
-    name: supervisor
+    name: ansible-lint
     state: absent
 
-- name: install application supervisor
+- name: install application ansible-lint
   community.general.pipx:
-    name: supervisor
-  register: install_supervisor
+    name: ansible-lint
+  register: install_ansible_lint
 
 - name: inject packages
   community.general.pipx:
     state: inject
-    name: supervisor
+    name: ansible-lint
     inject_packages:
       - licenses
-  register: inject_pkgs_supervisor
+  register: inject_pkgs_ansible_lint
 
 - name: inject packages with apps
   community.general.pipx:
     state: inject
-    name: supervisor
+    name: ansible-lint
     inject_packages:
       - black
     install_apps: true
-  register: inject_pkgs_apps_supervisor
+  register: inject_pkgs_apps_ansible_lint
 
-- name: cleanup supervisor
+- name: cleanup ansible-lint
   community.general.pipx:
     state: absent
-    name: supervisor
-  register: uninstall_supervisor
+    name: ansible-lint
+  register: uninstall_ansible_lint
 
 - name: check assertions inject_packages
   assert:
     that:
-      - install_supervisor is changed
-      - inject_pkgs_supervisor is changed
-      - '"supervisor" in inject_pkgs_supervisor.application'
-      - '"licenses" in inject_pkgs_supervisor.application["supervisor"]["injected"]'
-      - inject_pkgs_apps_supervisor is changed
-      - '"supervisor" in inject_pkgs_apps_supervisor.application'
-      - '"black" in inject_pkgs_apps_supervisor.application["supervisor"]["injected"]'
-      - uninstall_supervisor is changed
+      - install_ansible_lint is changed
+      - inject_pkgs_ansible_lint is changed
+      - '"ansible-lint" in inject_pkgs_ansible_lint.application'
+      - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
+      - inject_pkgs_apps_ansible_lint is changed
+      - '"ansible-lint" in inject_pkgs_apps_ansible_lint.application'
+      - '"black" in inject_pkgs_apps_ansible_lint.application["ansible-lint"]["injected"]'
+      - uninstall_ansible_lint is changed
 
 ##############################################################################
-- name: install notebook - not working smoothly in freebsd
+- name: install jupyter - not working smoothly in freebsd nor alpine
   when: ansible_system not in ('FreeBSD', 'Alpine')
   block:
     - name: ensure application jupyter is uninstalled
       community.general.pipx:
-        name: nox[tox_to_nox]
+        name: jupyter
         state: absent
 
-    - name: install application notebook
+    - name: install application jupyter
       community.general.pipx:
-        name: nox[tox_to_nox]
+        name: jupyter
         install_deps: true
-      register: install_notebook
+      register: install_jupyter
 
-    - name: cleanup notebook
+    - name: cleanup jupyter
       community.general.pipx:
         state: absent
-        name: nox[tox_to_nox]
+        name: jupyter
 
     - name: check assertions
       assert:
         that:
-          - install_notebook is changed
-          - '"ipython" in install_notebook.stdout'
+          - install_jupyter is changed
+          - '"ipython" in install_jupyter.stdout'
 
 ##############################################################################
 - name: ensure /opt/pipx
