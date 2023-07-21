@@ -49,7 +49,7 @@ options:
     elements: dict
     description:
       - List of policies to attach to the role.
-      - Each element must have a "name" or "id" (or both) to identify the policy. See consul_policy for more info.
+      - Each element must have a "name" or "id" (or both) to identify the policy. See M(community.general.consul_policy) for more info.
       - If the parameter is left blank, any policies assigned will be unassigned
     required: false
     default: []
