@@ -207,6 +207,9 @@ class Npm(object):
                     self.module.fail_json(msg="path %s is not a directory" % self.path)
                 cwd = self.path
 
+            params = dict(self.module.params)
+            params['production'] = self.production and ('install' in args or 'update' in args or 'ci' in args)
+
             with self.runner(
                 "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links",
                 check_rc=check_rc, cwd=cwd
@@ -214,11 +217,10 @@ class Npm(object):
                 rc, out, err = ctx.run(
                     exec_args=args,
                     global_=self.glbl,
-                    production=self.production and ('install' in args or 'update' in args or 'ci' in args),
                     name_version=self.name_version,
-                    **self.module.params
+                    **params
                 )
-                return out
+            return out
 
         return ''
 
