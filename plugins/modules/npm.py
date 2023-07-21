@@ -178,8 +178,6 @@ class Npm(object):
         else:
             self.name_version = self.name
 
-        # raise Exception(str(module.argument_spec))
-
         self.runner = CmdRunner(
             module,
             command=self.executable,
