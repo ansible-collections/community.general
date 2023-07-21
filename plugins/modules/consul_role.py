@@ -50,6 +50,7 @@ options:
     description:
       - List of policies to attach to the role.
       - Each element must have a "name" or "id" (or both) to identify the policy. See consul_policy for more info.
+      - If the parameter is left blank, any policies assigned will be unassigned
     required: false
     default: []
   service_identities:
@@ -57,8 +58,9 @@ options:
     elements: dict
     description:
       - List of service identities to attach to the role.
-      - Each element must have a "name" and optionally a "datacenters" list of datacenters the policy is valid for.
+      - Each element must have a "name" and optionally a "datacenters" list of datacenters the effective policy is valid within.
       - An empty datacenters list allows all datacenters
+      - If the parameter is left blank, any service identities assigned will be unassigned
     required: false
     default: []
   node_identities:
@@ -66,7 +68,9 @@ options:
     elements: dict
     description:
       - List of node identities to attach to the role.
-      - Each element must have a "name" and optionally a "datacenter" the policy is valid for. An empty datacenter allows all datacenters
+      - Each element must have a "name" and optionally a "datacenter" the effective policy is valid in.
+      - An empty datacenter allows all datacenters.
+      - If the parameter is left blank, any node identities assigned will be unassigned.
     required: false
     default: []
   host:
@@ -139,7 +143,7 @@ RETURN = """
 role:
     description: The role object
     returned: success
-    type: str
+    type: dict
     sample: |
         {
             "CreateIndex": 39,
@@ -194,6 +198,11 @@ REMOVE_OPERATION = "remove"
 UPDATE_OPERATION = "update"
 CREATE_OPERATION = "create"
 
+POLICY_RULE_SPEC = dict(
+    name=dict(type='str'),
+    id=dict(type='str'),
+)
+
 _ARGUMENT_SPEC = {
     TOKEN_PARAMETER_NAME: dict(no_log=True),
     PORT_PARAMETER_NAME: dict(default=8500, type='int'),
@@ -202,7 +211,7 @@ _ARGUMENT_SPEC = {
     VALIDATE_CERTS_PARAMETER_NAME: dict(type='bool', default=True),
     NAME_PARAMETER_NAME: dict(required=True),
     DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=''),
-    POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
+    POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', options=POLICY_RULE_SPEC, default=[]),
     SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
     NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
