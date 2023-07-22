@@ -194,6 +194,28 @@ EXAMPLES = '''
     url_username: admin
     url_password: p4ssw0rd
     url: http://localhost:8888
+#
+# Example of how to authenticate with serverless deployment
+#
+- name: Update plugins on ECS Fargate Jenkins instance
+  community.general.jenkins_plugin:
+    # plugin name and version
+    name: ws-cleanup
+    version: 0.45
+    # Jenkins home path mounted on ec2-helper VM (example)
+    jenkins_home: "/mnt/{{ jenkins_instance }}"
+    # default local EC2 user that owns the mount
+    owner: ubuntu
+    group: ubuntu
+    # Jenkins instance URL and admin credentials
+    url: "https://{{ jenkins_instance }}.com/"
+    url_username: admin
+    url_password: p4ssw0rd
+  # make module work from EC2 which has local access
+  # to EFS mount as well as Jenkins URL
+  delegate_to: ec2-helper
+  vars:
+    jenkins_instance: foobar
 
 #
 # Example of a Play which handles Jenkins restarts during the state changes
