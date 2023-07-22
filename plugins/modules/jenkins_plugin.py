@@ -194,6 +194,7 @@ EXAMPLES = '''
     url_username: admin
     url_password: p4ssw0rd
     url: http://localhost:8888
+
 #
 # Example of how to authenticate with serverless deployment
 #
