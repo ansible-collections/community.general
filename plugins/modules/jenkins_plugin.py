@@ -27,7 +27,7 @@ options:
   group:
     type: str
     description:
-      - Name of the Jenkins group on the OS.
+      - GID or name of the Jenkins group on the OS.
     default: jenkins
   jenkins_home:
     type: path
@@ -47,7 +47,7 @@ options:
   owner:
     type: str
     description:
-      - Name of the Jenkins user on the OS.
+      - UID or name of the Jenkins user on the OS.
     default: jenkins
   state:
     type: str
@@ -205,9 +205,9 @@ EXAMPLES = '''
     version: '0.45'
     # Jenkins home path mounted on ec2-helper VM (example)
     jenkins_home: "/mnt/{{ jenkins_instance }}"
-    # default local EC2 user that owns the mount
-    owner: ubuntu
-    group: ubuntu
+    # matching the UID/GID to one in official Jenkins image
+    owner: 1000
+    group: 1000
     # Jenkins instance URL and admin credentials
     url: "https://{{ jenkins_instance }}.com/"
     url_username: admin
