@@ -287,8 +287,9 @@ options:
     type: int
   name:
     description:
-      - Specifies the VM name. Only used on the configuration web interface.
+      - Specifies the VM name. Name could be non-unique across the cluster.
       - Required only for O(state=present).
+      - With O(state=present) if O(vmid) not provided and VM with name exists in the cluster then no changes will be made.
     type: str
   nameservers:
     description:
@@ -1289,10 +1290,14 @@ def main():
     # the cloned vm name or retrieve the next free VM id from ProxmoxAPI.
     if not vmid:
         if state == 'present' and not update and not clone and not delete and not revert and not migrate:
-            try:
-                vmid = proxmox.get_nextvmid()
-            except Exception:
-                module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
+            existing_vmid = proxmox.get_vmid(name, ignore_missing=True)
+            if existing_vmid:
+                vmid = existing_vmid
+            else:
+                try:
+                    vmid = proxmox.get_nextvmid()
+                except Exception:
+                    module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
         else:
             clone_target = clone or name
             vmid = proxmox.get_vmid(clone_target, ignore_missing=True)
