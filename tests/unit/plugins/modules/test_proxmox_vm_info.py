@@ -28,105 +28,274 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 )
 import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
 
-NODE = "pve"
-LXC_VMS = [
+NODE1 = "pve"
+NODE2 = "pve2"
+RAW_CLUSTER_OUTPUT = [
     {
-        "uptime": 47,
-        "maxswap": 536870912,
-        "diskread": 0,
-        "name": "test-lxc.home.arpa",
-        "status": "running",
-        "vmid": "102",
-        "type": "lxc",
-        "swap": 0,
-        "cpus": 2,
-        "mem": 29134848,
-        "maxdisk": 10737418240,
-        "diskwrite": 0,
-        "netin": 35729,
-        "netout": 446,
-        "pid": 1412780,
-        "maxmem": 536870912,
-        "disk": 307625984,
-        "cpu": 0,
-    },
-    {
-        "netin": 0,
-        "netout": 0,
-        "cpu": 0,
-        "maxmem": 536870912,
+        "cpu": 0.174069059487628,
         "disk": 0,
-        "name": "test1-lxc.home.arpa",
-        "diskread": 0,
-        "status": "stopped",
-        "vmid": "103",
-        "type": "lxc",
-        "swap": 0,
-        "uptime": 0,
-        "maxswap": 536870912,
+        "diskread": 6656,
         "diskwrite": 0,
-        "cpus": 2,
-        "mem": 0,
-        "maxdisk": 10737418240,
-    },
-]
-QEMU_VMS = [
-    {
-        "vmid": 101,
-        "diskread": 0,
-        "status": "stopped",
-        "name": "test1",
-        "uptime": 0,
-        "diskwrite": 0,
-        "cpus": 1,
-        "mem": 0,
-        "maxdisk": 0,
-        "netout": 0,
-        "netin": 0,
-        "cpu": 0,
-        "maxmem": 536870912,
-        "disk": 0,
-    },
-    {
-        "netout": 4113,
-        "netin": 22738,
-        "pid": 1947197,
-        "maxmem": 4294967296,
-        "disk": 0,
-        "cpu": 0.0795350949559682,
-        "uptime": 41,
-        "vmid": 100,
-        "status": "running",
-        "diskread": 0,
-        "name": "pxe.home.arpa",
-        "cpus": 1,
-        "mem": 35315629,
+        "id": "qemu/100",
+        "maxcpu": 1,
         "maxdisk": 34359738368,
+        "maxmem": 4294967296,
+        "mem": 35304543,
+        "name": "pxe.home.arpa",
+        "netin": 416956,
+        "netout": 17330,
+        "node": NODE1,
+        "status": "running",
+        "template": 0,
+        "type": "qemu",
+        "uptime": 669,
+        "vmid": 100,
+    },
+    {
+        "cpu": 0,
+        "disk": 0,
+        "diskread": 0,
         "diskwrite": 0,
+        "id": "qemu/101",
+        "maxcpu": 1,
+        "maxdisk": 0,
+        "maxmem": 536870912,
+        "mem": 0,
+        "name": "test1",
+        "netin": 0,
+        "netout": 0,
+        "node": NODE2,
+        "pool": "pool1",
+        "status": "stopped",
+        "template": 0,
+        "type": "qemu",
+        "uptime": 0,
+        "vmid": 101,
+    },
+    {
+        "cpu": 0,
+        "disk": 352190464,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "lxc/102",
+        "maxcpu": 2,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "mem": 28192768,
+        "name": "test-lxc.home.arpa",
+        "netin": 102757,
+        "netout": 446,
+        "node": NODE1,
+        "status": "running",
+        "template": 0,
+        "type": "lxc",
+        "uptime": 161,
+        "vmid": 102,
+    },
+    {
+        "cpu": 0,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "lxc/103",
+        "maxcpu": 2,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "mem": 0,
+        "name": "test1-lxc.home.arpa",
+        "netin": 0,
+        "netout": 0,
+        "node": NODE2,
+        "pool": "pool1",
+        "status": "stopped",
+        "template": 0,
+        "type": "lxc",
+        "uptime": 0,
+        "vmid": 103,
+    },
+]
+RAW_LXC_OUTPUT = [
+    {
+        "cpu": 0,
+        "cpus": 2,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "maxswap": 536870912,
+        "mem": 0,
+        "name": "test1-lxc.home.arpa",
+        "netin": 0,
+        "netout": 0,
+        "status": "stopped",
+        "swap": 0,
+        "type": "lxc",
+        "uptime": 0,
+        "vmid": "103",
+    },
+    {
+        "cpu": 0,
+        "cpus": 2,
+        "disk": 352190464,
+        "diskread": 0,
+        "diskwrite": 0,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "maxswap": 536870912,
+        "mem": 28192768,
+        "name": "test-lxc.home.arpa",
+        "netin": 102757,
+        "netout": 446,
+        "pid": 4076752,
+        "status": "running",
+        "swap": 0,
+        "type": "lxc",
+        "uptime": 161,
+        "vmid": "102",
+    },
+]
+RAW_QEMU_OUTPUT = [
+    {
+        "cpu": 0,
+        "cpus": 1,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "maxdisk": 0,
+        "maxmem": 536870912,
+        "mem": 0,
+        "name": "test1",
+        "netin": 0,
+        "netout": 0,
+        "status": "stopped",
+        "uptime": 0,
+        "vmid": 101,
+    },
+    {
+        "cpu": 0.174069059487628,
+        "cpus": 1,
+        "disk": 0,
+        "diskread": 6656,
+        "diskwrite": 0,
+        "maxdisk": 34359738368,
+        "maxmem": 4294967296,
+        "mem": 35304543,
+        "name": "pxe.home.arpa",
+        "netin": 416956,
+        "netout": 17330,
+        "pid": 4076688,
+        "status": "running",
+        "uptime": 669,
+        "vmid": 100,
+    },
+]
+EXPECTED_VMS_OUTPUT = [
+    {
+        "cpu": 0.174069059487628,
+        "cpus": 1,
+        "disk": 0,
+        "diskread": 6656,
+        "diskwrite": 0,
+        "id": "qemu/100",
+        "maxcpu": 1,
+        "maxdisk": 34359738368,
+        "maxmem": 4294967296,
+        "mem": 35304543,
+        "name": "pxe.home.arpa",
+        "netin": 416956,
+        "netout": 17330,
+        "node": NODE1,
+        "pid": 4076688,
+        "status": "running",
+        "template": False,
+        "type": "qemu",
+        "uptime": 669,
+        "vmid": 100,
+    },
+    {
+        "cpu": 0,
+        "cpus": 1,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "qemu/101",
+        "maxcpu": 1,
+        "maxdisk": 0,
+        "maxmem": 536870912,
+        "mem": 0,
+        "name": "test1",
+        "netin": 0,
+        "netout": 0,
+        "node": NODE2,
+        "pool": "pool1",
+        "status": "stopped",
+        "template": False,
+        "type": "qemu",
+        "uptime": 0,
+        "vmid": 101,
+    },
+    {
+        "cpu": 0,
+        "cpus": 2,
+        "disk": 352190464,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "lxc/102",
+        "maxcpu": 2,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "maxswap": 536870912,
+        "mem": 28192768,
+        "name": "test-lxc.home.arpa",
+        "netin": 102757,
+        "netout": 446,
+        "node": NODE1,
+        "pid": 4076752,
+        "status": "running",
+        "swap": 0,
+        "template": False,
+        "type": "lxc",
+        "uptime": 161,
+        "vmid": 102,
+    },
+    {
+        "cpu": 0,
+        "cpus": 2,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "lxc/103",
+        "maxcpu": 2,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "maxswap": 536870912,
+        "mem": 0,
+        "name": "test1-lxc.home.arpa",
+        "netin": 0,
+        "netout": 0,
+        "node": NODE2,
+        "pool": "pool1",
+        "status": "stopped",
+        "swap": 0,
+        "template": False,
+        "type": "lxc",
+        "uptime": 0,
+        "vmid": 103,
     },
 ]
 
 
-def get_module_args(type="all", vmid=None, name=None):
+def get_module_args(type="all", node=None, vmid=None, name=None):
     return {
         "api_host": "host",
         "api_user": "user",
         "api_password": "password",
-        "node": NODE,
+        "node": node,
         "type": type,
         "vmid": vmid,
         "name": name,
     }
-
-
-def normalized_expected_vms_output(vms):
-    result = [vm.copy() for vm in vms]
-    for vm in result:
-        if "type" not in vm:
-            # response for QEMU VMs doesn't contain type field, adding it
-            vm["type"] = "qemu"
-        vm["vmid"] = int(vm["vmid"])
-    return result
 
 
 class TestProxmoxVmInfoModule(ModuleTestCase):
@@ -138,12 +307,15 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
             "ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect",
         ).start()
         self.connect_mock.return_value.nodes.return_value.lxc.return_value.get.return_value = (
-            LXC_VMS
+            RAW_LXC_OUTPUT
         )
         self.connect_mock.return_value.nodes.return_value.qemu.return_value.get.return_value = (
-            QEMU_VMS
+            RAW_QEMU_OUTPUT
         )
-        self.connect_mock.return_value.nodes.get.return_value = [{"node": NODE}]
+        self.connect_mock.return_value.cluster.return_value.resources.return_value.get.return_value = (
+            RAW_CLUSTER_OUTPUT
+        )
+        self.connect_mock.return_value.nodes.get.return_value = [{"node": NODE1}]
 
     def tearDown(self):
         self.connect_mock.stop()
@@ -155,7 +327,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["msg"] == "missing required arguments: api_host, api_user, node"
+        assert result["msg"] == "missing required arguments: api_host, api_user"
 
     def test_get_lxc_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
@@ -164,36 +336,34 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
 
         result = exc_info.value.args[0]
         assert result["changed"] is False
-        assert result["proxmox_vms"] == LXC_VMS
+        assert result["proxmox_vms"] == [
+            vm for vm in EXPECTED_VMS_OUTPUT if vm["type"] == "lxc"
+        ]
 
     def test_get_qemu_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            expected_output = normalized_expected_vms_output(QEMU_VMS)
             set_module_args(get_module_args(type="qemu"))
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["proxmox_vms"] == expected_output
+        assert result["proxmox_vms"] == [
+            vm for vm in EXPECTED_VMS_OUTPUT if vm["type"] == "qemu"
+        ]
 
     def test_get_all_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            qemu_output = normalized_expected_vms_output(QEMU_VMS)
-            expected_output = qemu_output + LXC_VMS
-
             set_module_args(get_module_args())
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["proxmox_vms"] == expected_output
+        assert result["proxmox_vms"] == EXPECTED_VMS_OUTPUT
 
     def test_vmid_is_converted_to_int(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
-            expected_output = normalized_expected_vms_output(LXC_VMS)
             set_module_args(get_module_args(type="lxc"))
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["proxmox_vms"] == expected_output
         assert isinstance(result["proxmox_vms"][0]["vmid"], int)
 
     def test_get_specific_lxc_vm_information(self):
@@ -201,8 +371,8 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
             vmid = 102
             expected_output = [
                 vm
-                for vm in normalized_expected_vms_output(LXC_VMS)
-                if vm["vmid"] == vmid
+                for vm in EXPECTED_VMS_OUTPUT
+                if vm["vmid"] == vmid and vm["type"] == "lxc"
             ]
             set_module_args(get_module_args(type="lxc", vmid=vmid))
             self.module.main()
@@ -216,8 +386,8 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
             vmid = 100
             expected_output = [
                 vm
-                for vm in normalized_expected_vms_output(QEMU_VMS)
-                if vm["vmid"] == vmid
+                for vm in EXPECTED_VMS_OUTPUT
+                if vm["vmid"] == vmid and vm["type"] == "qemu"
             ]
             set_module_args(get_module_args(type="qemu", vmid=vmid))
             self.module.main()
@@ -229,11 +399,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
     def test_get_specific_vm_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
             vmid = 100
-            expected_output = [
-                vm
-                for vm in normalized_expected_vms_output(QEMU_VMS + LXC_VMS)
-                if vm["vmid"] == vmid
-            ]
+            expected_output = [vm for vm in EXPECTED_VMS_OUTPUT if vm["vmid"] == vmid]
             set_module_args(get_module_args(type="all", vmid=vmid))
             self.module.main()
 
@@ -248,11 +414,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         ]
 
         with pytest.raises(AnsibleExitJson) as exc_info:
-            expected_output = [
-                vm
-                for vm in normalized_expected_vms_output(QEMU_VMS + LXC_VMS)
-                if vm["name"] == name
-            ]
+            expected_output = [vm for vm in EXPECTED_VMS_OUTPUT if vm["name"] == name]
             set_module_args(get_module_args(type="all", name=name))
             self.module.main()
 
@@ -260,14 +422,65 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert result["proxmox_vms"] == expected_output
         assert len(result["proxmox_vms"]) == 1
 
+    def test_get_all_lxc_vms_from_specific_node(self):
+        with pytest.raises(AnsibleExitJson) as exc_info:
+            expected_output = [
+                vm
+                for vm in EXPECTED_VMS_OUTPUT
+                if vm["node"] == NODE1 and vm["type"] == "lxc"
+            ]
+            set_module_args(get_module_args(type="lxc", node=NODE1))
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["proxmox_vms"] == expected_output
+        assert len(result["proxmox_vms"]) == 1
+
+    def test_get_all_qemu_vms_from_specific_node(self):
+        with pytest.raises(AnsibleExitJson) as exc_info:
+            expected_output = [
+                vm
+                for vm in EXPECTED_VMS_OUTPUT
+                if vm["node"] == NODE1 and vm["type"] == "qemu"
+            ]
+            set_module_args(get_module_args(type="qemu", node=NODE1))
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["proxmox_vms"] == expected_output
+        assert len(result["proxmox_vms"]) == 1
+
+    def test_get_all_vms_from_specific_node(self):
+        with pytest.raises(AnsibleExitJson) as exc_info:
+            expected_output = [
+                vm
+                for vm in EXPECTED_VMS_OUTPUT
+                if vm["node"] == NODE1
+            ]
+            set_module_args(get_module_args(node=NODE1))
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["proxmox_vms"] == expected_output
+        assert len(result["proxmox_vms"]) == 2
+
     def test_module_fail_when_vm_does_not_exist_on_node(self):
+        with pytest.raises(AnsibleFailJson) as exc_info:
+            vmid = 200
+            set_module_args(get_module_args(type="all", vmid=vmid, node=NODE1))
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["msg"] == "VM with vmid 200 doesn't exist on node pve"
+
+    def test_module_fail_when_vm_does_not_exist_in_cluster(self):
         with pytest.raises(AnsibleFailJson) as exc_info:
             vmid = 200
             set_module_args(get_module_args(type="all", vmid=vmid))
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["msg"] == "VM with vmid 200 doesn't exist on node pve"
+        assert result["msg"] == "VM with vmid 200 doesn't exist in cluster"
 
     def test_module_fail_when_qemu_request_fails(self):
         self.connect_mock.return_value.nodes.return_value.qemu.return_value.get.side_effect = IOError(
@@ -291,10 +504,24 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         result = exc_info.value.args[0]
         assert "Failed to retrieve LXC VMs information:" in result["msg"]
 
+    def test_module_fail_when_cluster_resources_request_fails(self):
+        self.connect_mock.return_value.cluster.return_value.resources.return_value.get.side_effect = IOError(
+            "Some mocked connection error."
+        )
+        with pytest.raises(AnsibleFailJson) as exc_info:
+            set_module_args(get_module_args())
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert (
+            "Failed to retrieve VMs information from cluster resources:"
+            in result["msg"]
+        )
+
     def test_module_fail_when_node_does_not_exist(self):
         self.connect_mock.return_value.nodes.get.return_value = []
         with pytest.raises(AnsibleFailJson) as exc_info:
-            set_module_args(get_module_args(type="all"))
+            set_module_args(get_module_args(type="all", node=NODE1))
             self.module.main()
 
         result = exc_info.value.args[0]
