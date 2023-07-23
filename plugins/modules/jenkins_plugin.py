@@ -202,7 +202,7 @@ EXAMPLES = '''
   community.general.jenkins_plugin:
     # plugin name and version
     name: ws-cleanup
-    version: 0.45
+    version: '0.45'
     # Jenkins home path mounted on ec2-helper VM (example)
     jenkins_home: "/mnt/{{ jenkins_instance }}"
     # default local EC2 user that owns the mount
