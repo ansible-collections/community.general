@@ -1111,11 +1111,11 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             return False
         return True
 
-    def restart_vm(self, vm, **status):
+    def restart_vm(self, vm, force, **status):
         vmid = vm['vmid']
         try:
             proxmox_node = self.proxmox_api.nodes(vm['node'])
-            taskid = proxmox_node.qemu(vmid).status.reboot.post()
+            taskid = proxmox_node.qemu(vmid).status.reset.post() if force else proxmox_node.qemu(vmid).status.reboot.post()
             if not self.wait_for_task(vm['node'], taskid):
                 self.module.fail_json(msg='Reached timeout while waiting for rebooting VM. Last line in task before timeout: %s' %
                                           proxmox_node.tasks(taskid).log.get()[:1])
@@ -1493,7 +1493,7 @@ def main():
         if vm['status'] == 'stopped':
             module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
 
-        if proxmox.restart_vm(vm):
+        if proxmox.restart_vm(vm, force=module.params['force']):
             module.exit_json(changed=True, vmid=vmid, msg="VM %s is restarted" % vmid, **status)
 
     elif state == 'absent':
