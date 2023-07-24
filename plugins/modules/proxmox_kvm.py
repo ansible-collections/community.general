@@ -282,8 +282,8 @@ options:
   name:
     description:
       - Specifies the VM name. Name could be non-unique across the cluster.
-      - Required only for O(state=present).
-      - With O(state=present) if O(vmid) not provided and VM with name exists in the cluster then no changes will be made.
+      - Required only for I(state=present).
+      - With I(state=present) if I(vmid) not provided and VM with name exists in the cluster then no changes will be made.
     type: str
   nameservers:
     description:
