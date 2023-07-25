@@ -50,7 +50,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = r"""
 # Plugin requires root privileges for chroot, -E preserves your env (and location of ~/.ansible):
-# sudo -E ansible-playbook ... 
+# sudo -E ansible-playbook ...
 #
 # Static inventory file
 # [chroots]
