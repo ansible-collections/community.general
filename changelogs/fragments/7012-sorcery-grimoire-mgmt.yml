@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - "``community.general.sorcery`` - grimoire (repository) management support"
+bugfixes:
+  - "``community.general.sorcery`` - fix queue generation before the whole system rebuild"
