@@ -20,8 +20,6 @@ author: "Vlad Glagolev (@vaygr)"
 notes:
     - When all three components are selected, the update goes by the sequence --
       Sorcery -> Grimoire(s) -> Spell(s); you cannot override it.
-    - grimoire handling (i.e. add/remove, including SCM/rsync versions) is not
-      yet supported.
 requirements:
     - bash
 extends_documentation_fragment:
@@ -34,21 +32,30 @@ attributes:
 options:
     name:
         description:
-            - Name of the spell
-            - multiple names can be given, separated by commas
-            - special value '*' in conjunction with states V(latest) or
+            - Name of the spell or grimoire.
+            - Multiple names can be given, separated by commas.
+            - Special value V(*) in conjunction with states V(latest) or
               V(rebuild) will update or rebuild the whole system respectively
-        aliases: ["spell"]
+        aliases: ["spell", "grimoire"]
         type: list
         elements: str
 
+    repository:
+        description:
+            - Repository location.
+            - If specified, O(name) represents grimoire(s) instead of spell(s).
+            - Special value V(*) will pull grimoire from the official location.
+            - Only single item in O(name) in conjunction with V(*) can be used.
+            - O(state) V(absent) must be used with a special value V(*).
+        type: str
+
     state:
         description:
-            - Whether to cast, dispel or rebuild a package
-            - state V(cast) is an equivalent of V(present), not V(latest)
-            - state V(latest) always triggers O(update_cache=true)
-            - state V(rebuild) implies cast of all specified spells, not only
-              those existed before
+            - Whether to cast, dispel or rebuild a package.
+            - State V(cast) is an equivalent of V(present), not V(latest).
+            - State V(latest) always triggers O(update_cache=true).
+            - State V(rebuild) implies cast of all specified spells, not only
+              those existed before.
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
         default: "present"
         type: str
@@ -56,12 +63,12 @@ options:
     depends:
         description:
             - Comma-separated list of _optional_ dependencies to build a spell
-              (or make sure it is built) with; use +/- in front of dependency
-              to turn it on/off ('+' is optional though).
-            - this option is ignored if O(name) parameter is equal to V(*) or
+              (or make sure it is built) with; use V(+)/V(-) in front of dependency
+              to turn it on/off (V(+) is optional though).
+            - This option is ignored if O(name) parameter is equal to V(*) or
               contains more than one spell.
-            - providers must be supplied in the form recognized by Sorcery, for example
-              'openssl(SSL)'.
+            - Providers must be supplied in the form recognized by Sorcery,
+              for example 'V(openssl(SSL))'.
         type: str
 
     update:
@@ -147,6 +154,30 @@ EXAMPLES = '''
   community.general.sorcery:
     update_codex: true
     cache_valid_time: 86400
+
+- name: Make sure stable grimoire is present
+  community.general.sorcery:
+    name: stable
+    repository: '*'
+    state: present
+
+- name: Make sure binary and stable-rc grimoires are removed
+  community.general.sorcery:
+    grimoire: binary,stable-rc
+    repository: '*'
+    state: absent
+
+- name: Make sure games grimoire is pulled from rsync
+  community.general.sorcery:
+    grimoire: games
+    repository: "rsync://download.sourcemage.org::codex/games"
+    state: present
+
+- name: Make sure a specific branch of stable grimoire is pulled from git
+  community.general.sorcery:
+    grimoire: stable.git
+    repository: "git://download.sourcemage.org/smgl/grimoire.git:stable.git:stable-0.62"
+    state: present
 
 - name: Update only Sorcery itself
   community.general.sorcery:
@@ -448,6 +479,65 @@ def match_depends(module):
     return depends_ok
 
 
+def manage_grimoires(module):
+    """ Add or remove grimoires. """
+
+    params = module.params
+    grimoires = params['name']
+    url = params['repository']
+
+    codex = codex_list(module)
+
+    if url == '*':
+        if params['state'] in ('present', 'latest', 'absent'):
+            if params['state'] == 'absent':
+                action = "remove"
+                todo = set(grimoires) & set(codex)
+            else:
+                action = "add"
+                todo = set(grimoires) - set(codex)
+
+            if not todo:
+                module.exit_json(changed=False, msg="all grimoire(s) are already %sed" % action[:5])
+
+            if module.check_mode:
+                module.exit_json(changed=True, msg="would have %sed grimoire(s)" % action[:5])
+
+            cmd_scribe = "%s %s %s" % (SORCERY['scribe'], action, ' '.join(todo))
+
+            rc, stdout, stderr = module.run_command(cmd_scribe)
+
+            if rc != 0:
+                module.fail_json(msg="failed to %s one or more grimoire(s): %s" % (action, stdout))
+
+            module.exit_json(changed=True, msg="successfully %sed one or more grimoire(s)" % action[:5])
+        else:
+            module.fail_json(msg="unsupported operation on '*' repository value")
+    else:
+        if params['state'] in ('present', 'latest'):
+            if len(grimoires) > 1:
+                module.fail_json(msg="using multiple items with repository is invalid")
+
+            grimoire = grimoires[0]
+
+            if grimoire in codex:
+                module.exit_json(changed=False, msg="grimoire %s already exists" % grimoire)
+
+            if module.check_mode:
+                module.exit_json(changed=True, msg="would have added grimoire %s from %s" % (grimoire, url))
+
+            cmd_scribe = "%s add %s from %s" % (SORCERY['scribe'], grimoire, url)
+
+            rc, stdout, stderr = module.run_command(cmd_scribe)
+
+            if rc != 0:
+                module.fail_json(msg="failed to add grimoire %s from %s: %s" % (grimoire, url, stdout))
+
+            module.exit_json(changed=True, msg="successfully added grimoire %s from %s" % (grimoire, url))
+        else:
+            module.fail_json(msg="unsupported operation on repository value")
+
+
 def manage_spells(module):
     """ Cast or dispel spells.
 
@@ -473,7 +563,7 @@ def manage_spells(module):
             # see update_codex()
             module.run_command_environ_update.update(dict(SILENT='1'))
 
-            cmd_sorcery = "%s queue"
+            cmd_sorcery = "%s queue" % SORCERY['sorcery']
 
             rc, stdout, stderr = module.run_command(cmd_sorcery)
 
@@ -584,7 +674,7 @@ def manage_spells(module):
                 rc, stdout, stderr = module.run_command(cmd_cast)
 
                 if rc != 0:
-                    module.fail_json(msg="failed to cast spell(s): %s" + stdout)
+                    module.fail_json(msg="failed to cast spell(s): " + stdout)
 
                 module.exit_json(changed=True, msg="successfully cast spell(s)")
             elif params['state'] != 'absent':
@@ -599,7 +689,7 @@ def manage_spells(module):
                 rc, stdout, stderr = module.run_command(cmd_dispel)
 
                 if rc != 0:
-                    module.fail_json(msg="failed to dispel spell(s): %s" + stdout)
+                    module.fail_json(msg="failed to dispel spell(s): " + stdout)
 
                 module.exit_json(changed=True, msg="successfully dispelled spell(s)")
             else:
@@ -609,7 +699,8 @@ def manage_spells(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['spell'], type='list', elements='str'),
+            name=dict(default=None, aliases=['spell', 'grimoire'], type='list', elements='str'),
+            repository=dict(default=None, type='str'),
             state=dict(default='present', choices=['present', 'latest',
                                                    'absent', 'cast', 'dispelled', 'rebuild']),
             depends=dict(default=None),
@@ -641,10 +732,13 @@ def main():
     if params['update']:
         update_sorcery(module)
 
+    if params['name'] and params['repository']:
+        manage_grimoires(module)
+
     if params['update_cache'] or params['state'] == 'latest':
         update_codex(module)
 
-    if params['name']:
+    if params['name'] and not params['repository']:
         manage_spells(module)
 
 
