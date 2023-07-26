@@ -53,7 +53,6 @@ options:
         description:
             - Whether to cast, dispel or rebuild a package.
             - State V(cast) is an equivalent of V(present), not V(latest).
-            - State V(latest) always triggers O(update_cache=true).
             - State V(rebuild) implies cast of all specified spells, not only
               those existed before.
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
@@ -330,7 +329,7 @@ def update_codex(module):
                 changed = True
 
             module.exit_json(changed=changed, msg="would have updated Codex")
-    elif not fresh or params['name'] and params['state'] == 'latest':
+    elif not fresh:
         # SILENT is required as a workaround for query() in libgpg
         module.run_command_environ_update.update(dict(SILENT='1'))
 
@@ -735,7 +734,7 @@ def main():
     if params['name'] and params['repository']:
         manage_grimoires(module)
 
-    if params['update_cache'] or params['state'] == 'latest':
+    if params['update_cache']:
         update_codex(module)
 
     if params['name'] and not params['repository']:
