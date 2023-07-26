@@ -70,6 +70,8 @@ URL_USER_CLIENTS_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-map
 URL_USER_CLIENT_ROLE_MAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client_id}"
 URL_USER_GROUPS = "{url}/admin/realms/{realm}/users/{id}/groups"
 URL_USER_GROUP = "{url}/admin/realms/{realm}/users/{id}/groups/{group_id}"
+URL_USER_CREDENTIALS = "{url}/admin/realms/{realm}/users/{id}/credentials"
+URL_USER_CREDENTIAL = "{url}/admin/realms/{realm}/users/{id}/credentials/{credential_id}"
 
 URL_USERS = "{url}/admin/realms/{realm}/users"
 URL_CLIENT_SERVICE_ACCOUNT_USER = "{url}/admin/realms/{realm}/clients/{id}/service-account-user"
@@ -2564,6 +2566,27 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not delete user %s in realm %s: %s'
                                       % (user_id, realm, str(e)))
+    def remove_user_credential(self, user_id, credential_id, realm="master"):
+        """
+                Remove a credential for a user.
+                :param user_id: User ID
+                :param credential_id: Credential ID to remove.
+                :param realm: Realm
+                :return: HTTP response
+                """
+        try:
+            user_credential_url = URL_USER_CREDENTIAL.format(
+                url=self.baseurl,
+                realm=realm,
+                id=user_id,
+                credential_id=credential_id)
+            return open_url(
+                user_credential_url,
+                method='DELETE',
+                headers=self.restheaders)
+        except Exception as e:
+            self.module.fail_json(msg='Could not remove credential %s from user %s in realm %s: %s'
+                                      % (credential_id, user_id, realm, str(e)))
 
     def get_user_groups(self, user_id, realm='master'):
         """
