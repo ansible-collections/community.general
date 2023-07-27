@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: sorcery
 short_description: Package manager for Source Mage GNU/Linux
@@ -20,6 +20,7 @@ author: "Vlad Glagolev (@vaygr)"
 notes:
     - When all three components are selected, the update goes by the sequence --
       Sorcery -> Grimoire(s) -> Spell(s); you cannot override it.
+    - Grimoire handling is supported since community.general 7.3.0.
 requirements:
     - bash
 extends_documentation_fragment:
@@ -36,6 +37,7 @@ options:
             - Multiple names can be given, separated by commas.
             - Special value V(*) in conjunction with states V(latest) or
               V(rebuild) will update or rebuild the whole system respectively
+            - The alias O(grimoire) was added in community.general 7.3.0.
         aliases: ["spell", "grimoire"]
         type: list
         elements: str
@@ -46,8 +48,9 @@ options:
             - If specified, O(name) represents grimoire(s) instead of spell(s).
             - Special value V(*) will pull grimoire from the official location.
             - Only single item in O(name) in conjunction with V(*) can be used.
-            - O(state) V(absent) must be used with a special value V(*).
+            - O(state=absent) must be used with a special value V(*).
         type: str
+        version_added: 7.3.0
 
     state:
         description:
@@ -67,7 +70,7 @@ options:
             - This option is ignored if O(name) parameter is equal to V(*) or
               contains more than one spell.
             - Providers must be supplied in the form recognized by Sorcery,
-              for example 'V(openssl(SSL))'.
+              for example 'V(openssl(SSL\))'.
         type: str
 
     update:

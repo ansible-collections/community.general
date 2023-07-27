@@ -1,5 +1,5 @@
 ---
 minor_changes:
-  - "``community.general.sorcery`` - grimoire (repository) management support"
+  - "sorcery - add grimoire (repository) management support (https://github.com/ansible-collections/community.general/pull/7012)."
 bugfixes:
-  - "``community.general.sorcery`` - fix queue generation before the whole system rebuild"
+  - "sorcery - fix queue generation before the whole system rebuild (https://github.com/ansible-collections/community.general/pull/7012)."
