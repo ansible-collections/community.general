@@ -342,7 +342,7 @@ def main():
         ipadefaultemaildomain=dict(type='str', aliases=['emaildomain']),
         ipadefaultprimarygroup=dict(type='str', aliases=['primarygroup']),
         ipagroupobjectclasses=dict(type='list', elements='str',
-                                   aliases=['ipagroupobjectclasses']),
+                                   aliases=['groupobjectclasses']),
         ipagroupsearchfields=dict(type='list', elements='str',
                                   aliases=['groupsearchfields']),
         ipahomesrootdir=dict(type='str', aliases=['homesrootdir']),
