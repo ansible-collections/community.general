@@ -1524,8 +1524,8 @@ class RedfishUtils(object):
                 software = {}
                 # Get these standard properties if present
                 for key in ['Name', 'Id', 'Status', 'Version', 'Updateable',
-                           'SoftwareId', 'LowestSupportedVersion', 'Manufacturer',
-                           'ReleaseDate']:
+                            'SoftwareId', 'LowestSupportedVersion', 'Manufacturer',
+                            'ReleaseDate']:
                     if key in data:
                         software[key] = data.get(key)
                 result['entries'].append(software)
