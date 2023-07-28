@@ -45,7 +45,7 @@ options:
     aliases: ["groupobjectclasses"]
     type: list
     elements: str
-    version_added: '7.2.0'
+    version_added: '7.3.0'
   ipagroupsearchfields:
     description: A list of fields to search in when searching for groups.
     aliases: ["groupsearchfields"]
@@ -102,7 +102,7 @@ options:
     aliases: ["userobjectclasses"]
     type: list
     elements: str
-    version_added: '7.2.0'
+    version_added: '7.3.0'
   ipausersearchfields:
     description: A list of fields to search in when searching for users.
     aliases: ["usersearchfields"]

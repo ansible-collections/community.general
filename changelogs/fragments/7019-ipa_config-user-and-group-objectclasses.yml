@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa_config - add module parameters to manage freeipa user and group objectclasses
