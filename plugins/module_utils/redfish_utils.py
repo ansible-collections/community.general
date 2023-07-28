@@ -820,7 +820,8 @@ class RedfishUtils(object):
                                 if property in data:
                                     if data[property] is not None:
                                         if property == "Links" and "Volumes" in data["Links"].keys():
-                                            drive_result["Volumes"] = data["Links"]["Volumes"]
+                                            volumes = [v["@odata.id"] for v in data["Links"]["Volumes"]]
+                                            drive_result["Volumes"] = volumes
                                         else:
                                             drive_result[property] = data[property]
                             drive_results.append(drive_result)
