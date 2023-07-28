@@ -41,6 +41,7 @@
   ansible.builtin.service:
     name: docker
     state: started
+  notify: Stop docker service
 
 - name: Cheat on the docker socket permissions
   become: true
@@ -53,3 +54,4 @@
     name:
       - requests
     state: present
+  notify: Remove python requests
