@@ -122,7 +122,7 @@ class EjabberdUser(object):
         """ This method will run the any command specified and return the
         returns using the Ansible common module
         """
-        cmd = [self.module.get_bin_path('ejabberdctl'), cmd] + options
+        cmd = [self.module.get_bin_path('ejabberdctl', required=True), cmd] + options
         self.log('command: %s' % " ".join(cmd))
         return self.module.run_command(cmd)
 
