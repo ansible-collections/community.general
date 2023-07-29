@@ -681,7 +681,7 @@ files:
   $modules/jira.py:
     ignore: DWSR tarka
     labels: jira
-    maintainers: Slezhuk tarka pertoft
+    maintainers: Slezhuk pertoft
   $modules/kdeconfig.py:
     maintainers: smeso
   $modules/kernel_blacklist.py:
