@@ -679,7 +679,7 @@ files:
   $modules/jenkins_script.py:
     maintainers: hogarthj
   $modules/jira.py:
-    ignore: DWSR
+    ignore: DWSR tarka
     labels: jira
     maintainers: Slezhuk tarka pertoft
   $modules/kdeconfig.py:
