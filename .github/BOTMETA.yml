@@ -679,9 +679,9 @@ files:
   $modules/jenkins_script.py:
     maintainers: hogarthj
   $modules/jira.py:
-    ignore: DWSR
+    ignore: DWSR tarka
     labels: jira
-    maintainers: Slezhuk tarka pertoft
+    maintainers: Slezhuk pertoft
   $modules/kdeconfig.py:
     maintainers: smeso
   $modules/kernel_blacklist.py:
