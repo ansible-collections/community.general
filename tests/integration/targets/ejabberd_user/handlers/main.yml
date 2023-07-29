@@ -1,0 +1,5 @@
+---
+- name: Remove ejabberd
+  ansible.builtin.package:
+    name: ejabberd
+    state: absent

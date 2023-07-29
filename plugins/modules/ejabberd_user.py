@@ -110,7 +110,7 @@ class EjabberdUser(object):
         host specified.  If the user exists True is returned, otherwise False
         is returned
         """
-        return self.run_command('check_account', [self.user, self.host])
+        return not bool(self.run_command('check_account', [self.user, self.host])[0])
 
     def log(self, entry):
         """ This method will log information to the local syslog facility """
@@ -180,6 +180,8 @@ def main():
             if module.check_mode:
                 module.exit_json(changed=True)
             (rc, out, err) = obj.update()
+            if (rc, out, err) == (0, "", ""):
+                rc = None
         if rc is not None and rc != 0:
             module.fail_json(msg=err, rc=rc)
 
