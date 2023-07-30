@@ -16,7 +16,7 @@
 - name: Remove ejabberd
   ansible.builtin.package:
     name: ejabberd
-    state: ansent
+    state: absent
 
 - name: Create user without ejabberdctl installed
   community.general.ejabberd_user:
