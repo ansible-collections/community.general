@@ -4,4 +4,5 @@
 
 skip/freebsd
 skip/alpine
+needs/target/setup_epel
 destructive
