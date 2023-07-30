@@ -102,7 +102,7 @@ class EjabberdUser(object):
         changed.   It will return True if the user does not match the supplied
         credentials and False if it does not
         """
-        return self.run_command('check_password', [self.user, self.host, self.pwd])
+        return bool(self.run_command('check_password', [self.user, self.host, self.pwd])[0])
 
     @property
     def exists(self):
@@ -180,8 +180,6 @@ def main():
             if module.check_mode:
                 module.exit_json(changed=True)
             (rc, out, err) = obj.update()
-            if (rc, out, err) == (0, "", ""):
-                rc = None
         if rc is not None and rc != 0:
             module.fail_json(msg=err, rc=rc)
 

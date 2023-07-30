@@ -64,6 +64,14 @@
     state: present
   register: user_alice_idempot
 
+- name: Create user alice (change password)
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    password: different_pa$$w0rd
+    state: present
+  register: user_alice_chgpw
+
 - name: Remove user alice (check)
   community.general.ejabberd_user:
     host: localhost
@@ -94,6 +102,7 @@
       - user_alice_check is changed
       - user_alice is changed
       - user_alice_idempot is not changed
+      - user_alice_chgpw is changed
       - remove_alice_check is changed
       - remove_alice is changed
       - remove_alice_idempot is not changed
