@@ -1,2 +1,2 @@
 minor_changes:
-  - ipa_config - add module parameters to manage freeipa user and group objectclasses
+  - ipa_config - add module parameters to manage FreeIPA user and group objectclasses (https://github.com/ansible-collections/community.general/pull/7019).
