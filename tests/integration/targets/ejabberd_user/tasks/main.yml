@@ -10,7 +10,7 @@
 
 - name: Bail out if not supported
   ansible.builtin.meta: end_play
-  when: ansible_distribution in ('Alpine', 'openSUSE Leap')
+  when: ansible_distribution in ('Alpine', 'openSUSE Leap', 'CentOS')
 
 - name: Install EPEL repository (RHEL only)
   include_role:
