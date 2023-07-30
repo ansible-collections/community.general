@@ -18,7 +18,7 @@
     name: setup_epel
   when:
     - ansible_distribution in ['RedHat', 'CentOS', 'Fedora']
-    # - ansible_distribution_major_version is version('9', '<')
+    - ansible_distribution_major_version is version('9', '<')
 
 - name: Create user without ejabberdctl installed
   community.general.ejabberd_user:
