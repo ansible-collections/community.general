@@ -3,7 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 azp/posix/3
+skip/osx
+skip/macos
 skip/freebsd
 skip/alpine
+skip/rhel
 needs/target/setup_epel
 destructive
