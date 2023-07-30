@@ -64,6 +64,7 @@ options:
   boot:
     description:
       - Specify the boot order -> boot on floppy V(a), hard disk V(c), CD-ROM V(d), or network V(n).
+      - For newer versions of Proxmox VE, use a boot order like V(order=scsi0;net0;hostpci0).
       - You can combine to set order.
       - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(cnd).
     type: str
