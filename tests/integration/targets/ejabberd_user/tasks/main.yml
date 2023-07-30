@@ -11,13 +11,12 @@
 - name: Bail out if not supported
   ansible.builtin.meta: end_play
   when: ansible_distribution in ('Alpine', 'openSUSE Leap')
-  # when: ansible_distribution not in ('Ubuntu', 'Debian')
 
 - name: Install EPEL repository (RHEL only)
   include_role:
     name: setup_epel
   when:
-    - ansible_distribution in ['RedHat', 'CentOS', 'Fedora']
+    - ansible_distribution in ['RedHat', 'CentOS']
     - ansible_distribution_major_version is version('9', '<')
 
 - name: Create user without ejabberdctl installed
