@@ -8,5 +8,4 @@ skip/macos
 skip/freebsd
 skip/alpine
 skip/rhel
-needs/target/setup_epel
 destructive

@@ -12,13 +12,6 @@
   ansible.builtin.meta: end_play
   when: ansible_distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora')
 
-- name: Install EPEL repository (RHEL only)
-  include_role:
-    name: setup_epel
-  when:
-    - ansible_distribution in ['RedHat', 'CentOS']
-    - ansible_distribution_major_version is version('9', '<')
-
 - name: Create user without ejabberdctl installed
   community.general.ejabberd_user:
     host: localhost
