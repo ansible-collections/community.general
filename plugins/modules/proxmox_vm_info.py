@@ -34,10 +34,12 @@ options:
   vmid:
     description:
       - Restrict results to a specific virtual machine by using its ID.
+      - If VM with vmid doesn't exist in a cluster then resulted list will be empty.
     type: int
   name:
     description:
       - Restrict results to a specific virtual machine by using its name.
+      - If VM with name doesn't exist in a cluster then resulted list will be empty.
       - If multiple virtual machines have the same name then vmid must be used instead.
     type: str
 extends_documentation_fragment:
