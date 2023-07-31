@@ -464,23 +464,14 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert result["proxmox_vms"] == expected_output
         assert len(result["proxmox_vms"]) == 2
 
-    def test_module_fail_when_vm_does_not_exist_on_node(self):
-        with pytest.raises(AnsibleFailJson) as exc_info:
-            vmid = 200
-            set_module_args(get_module_args(type="all", vmid=vmid, node=NODE1))
-            self.module.main()
-
-        result = exc_info.value.args[0]
-        assert result["msg"] == "VM with vmid 200 doesn't exist on node pve"
-
-    def test_module_fail_when_vm_does_not_exist_in_cluster(self):
-        with pytest.raises(AnsibleFailJson) as exc_info:
+    def test_module_returns_empty_list_when_vm_does_not_exist(self):
+        with pytest.raises(AnsibleExitJson) as exc_info:
             vmid = 200
             set_module_args(get_module_args(type="all", vmid=vmid))
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["msg"] == "VM with vmid 200 doesn't exist in cluster"
+        assert result["proxmox_vms"] == []
 
     def test_module_fail_when_qemu_request_fails(self):
         self.connect_mock.return_value.nodes.return_value.qemu.return_value.get.side_effect = IOError(

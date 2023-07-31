@@ -223,10 +223,12 @@ def main():
         module.fail_json(msg="Node %s doesn't exist in PVE cluster" % node)
 
     if not vmid and name:
-        vmid = int(proxmox.get_vmid(name, ignore_missing=False))
+        vmid = proxmox.get_vmid(name, ignore_missing=True)
+        if vmid is not None:
+            vmid = int(vmid)
 
     vms_cluster_resources = proxmox.get_vms_from_cluster_resources()
-    vms = None
+    vms = []
 
     if type == "lxc":
         vms = proxmox.get_lxc_vms(vms_cluster_resources, vmid, node)
@@ -237,15 +239,8 @@ def main():
             vms_cluster_resources, vmid, node
         ) + proxmox.get_lxc_vms(vms_cluster_resources, vmid, node)
 
-    if vms or vmid is None:
-        result["proxmox_vms"] = vms
-        module.exit_json(**result)
-    else:
-        if node is None:
-            result["msg"] = "VM with vmid %s doesn't exist in cluster" % (vmid)
-        else:
-            result["msg"] = "VM with vmid %s doesn't exist on node %s" % (vmid, node)
-        module.fail_json(**result)
+    result["proxmox_vms"] = vms
+    module.exit_json(**result)
 
 
 if __name__ == "__main__":
