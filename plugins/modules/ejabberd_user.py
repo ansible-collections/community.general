@@ -150,7 +150,7 @@ def main():
             username=dict(required=True, type='str'),
             password=dict(type='str', no_log=True),
             state=dict(default='present', choices=['present', 'absent']),
-            logging=dict(default=False, type='bool')  # deprecate in favour of c.g.syslogger?
+            logging=dict(default=False, type='bool', removed_in_version='9.0.0', removed_from_collection='community.general'),
         ),
         required_if=[
             ('state', 'present', ['password']),
