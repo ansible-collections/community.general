@@ -72,7 +72,9 @@ def api_request(module, endpoint, data=None, method="GET"):
     if info["status"] == 403:
         module.fail_json(msg="Token authorization failed",
                          execution_info=json.loads(info["body"]))
-    if info["status"] == 409:
+    elif info["status"] == 404:
+        return None, info
+    elif info["status"] == 409:
         module.fail_json(msg="Job executions limit reached",
                          execution_info=json.loads(info["body"]))
     elif info["status"] >= 500:
