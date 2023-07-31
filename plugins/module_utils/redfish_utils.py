@@ -1499,29 +1499,37 @@ class RedfishUtils(object):
 
     def _software_inventory(self, uri):
         result = {}
-        response = self.get_request(self.root_uri + uri)
-        if response['ret'] is False:
-            return response
-        result['ret'] = True
-        data = response['data']
-
         result['entries'] = []
-        for member in data[u'Members']:
-            uri = self.root_uri + member[u'@odata.id']
-            # Get details for each software or firmware member
-            response = self.get_request(uri)
+
+        while uri:
+            response = self.get_request(self.root_uri + uri)
             if response['ret'] is False:
                 return response
             result['ret'] = True
+
             data = response['data']
-            software = {}
-            # Get these standard properties if present
-            for key in ['Name', 'Id', 'Status', 'Version', 'Updateable',
-                        'SoftwareId', 'LowestSupportedVersion', 'Manufacturer',
-                        'ReleaseDate']:
-                if key in data:
-                    software[key] = data.get(key)
-            result['entries'].append(software)
+            if data.get('Members@odata.nextLink'):
+                uri = data.get('Members@odata.nextLink')
+            else:
+                uri = None
+
+            for member in data[u'Members']:
+                fw_uri = self.root_uri + member[u'@odata.id']
+                # Get details for each software or firmware member
+                response = self.get_request(fw_uri)
+                if response['ret'] is False:
+                    return response
+                result['ret'] = True
+                data = response['data']
+                software = {}
+                # Get these standard properties if present
+                for key in ['Name', 'Id', 'Status', 'Version', 'Updateable',
+                            'SoftwareId', 'LowestSupportedVersion', 'Manufacturer',
+                            'ReleaseDate']:
+                    if key in data:
+                        software[key] = data.get(key)
+                result['entries'].append(software)
+
         return result
 
     def get_firmware_inventory(self):
