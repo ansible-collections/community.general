@@ -87,7 +87,7 @@ options:
   ipauserauthtype:
     description: The authentication type to use by default.
     aliases: ["userauthtype"]
-    choices: ["password", "radius", "otp", "pkinit", "hardened", "disabled"]
+    choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "disabled"]
     type: list
     elements: str
     version_added: '2.5.0'
@@ -337,7 +337,7 @@ def main():
         ipauserauthtype=dict(type='list', elements='str',
                              aliases=['userauthtype'],
                              choices=["password", "radius", "otp", "pkinit",
-                                      "hardened", "disabled"]),
+                                      "hardened", "idp", "disabled"]),
         ipausersearchfields=dict(type='list', elements='str',
                                  aliases=['usersearchfields']),
     )
