@@ -41,13 +41,13 @@ options:
     description:
     - The size of the logical volume, according to lvcreate(8) --size, by
       default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
-      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE];
+      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE|ORIGIN];
       Float values must begin with a digit.
     - When resizing, apart from specifying an absolute size you may, according to
       lvextend(8)|lvreduce(8) C(--size), specify the amount to extend the logical volume with
       the prefix V(+) or the amount to reduce the logical volume by with prefix V(-).
     - Resizing using V(+) or V(-) was not supported prior to community.general 3.0.0.
-    - Please note that when using V(+) or V(-), the module is B(not idempotent).
+    - Please note that when using V(+), V(-), or percentage of sizes, the module is B(not idempotent).
   state:
     type: str
     description:
@@ -73,7 +73,7 @@ options:
   snapshot:
     type: str
     description:
-    - The name of the snapshot volume
+    - The name of a snapshot volume to be configured. When creating a snapshot volume, the O(lv) parameter specifies the origin volume.
   pvs:
     type: str
     description:
@@ -368,10 +368,10 @@ def main():
             if size_percent > 100:
                 module.fail_json(msg="Size percentage cannot be larger than 100%")
             size_whole = size_parts[1]
-            if size_whole == 'ORIGIN':
-                module.fail_json(msg="Snapshot Volumes are not supported")
-            elif size_whole not in ['VG', 'PVS', 'FREE']:
-                module.fail_json(msg="Specify extents as a percentage of VG|PVS|FREE")
+            if size_whole == 'ORIGIN' and snapshot is None:
+                module.fail_json(msg="Percentage of ORIGIN supported only for snapshot volumes")
+            elif size_whole not in ['VG', 'PVS', 'FREE', 'ORIGIN']:
+                module.fail_json(msg="Specify extents as a percentage of VG|PVS|FREE|ORIGIN")
             size_opt = 'l'
             size_unit = ''
 

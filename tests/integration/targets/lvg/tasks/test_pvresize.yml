@@ -12,10 +12,10 @@
   shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
-- name: Assert the testvg size is 8388608B
+- name: Assert the testvg size is 33554432B
   assert:
    that:
-    - "'8388608B' == cmd_result.stdout"
+    - "'33554432B' == cmd_result.stdout"
 
 - name: Increases size in file
   command: "dd if=/dev/zero bs=8MiB count=1 of={{ remote_tmp_dir }}/img1 conv=notrunc oflag=append"
@@ -38,10 +38,10 @@
   shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
-- name: Assert the testvg size is still 8388608B
+- name: Assert the testvg size is still 33554432B
   assert:
    that:
-    - "'8388608B' == cmd_result.stdout"
+    - "'33554432B' == cmd_result.stdout"
 
 - name: "Reruns lvg with pvresize:yes and check_mode:yes"
   lvg:
@@ -60,10 +60,10 @@
   shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
  
-- name: Assert the testvg size is still 8388608B
+- name: Assert the testvg size is still 33554432B
   assert:
    that:
-    - "'8388608B' == cmd_result.stdout"
+    - "'33554432B' == cmd_result.stdout"
 
 - name: "Reruns lvg with pvresize:yes"
   lvg:
@@ -75,7 +75,7 @@
   shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
-- name: Assert the testvg size is now 16777216B
+- name: Assert the testvg size is now 41943040B
   assert:
    that:
-    - "'16777216B' == cmd_result.stdout"
+    - "'41943040B' == cmd_result.stdout"

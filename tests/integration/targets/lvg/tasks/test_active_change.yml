@@ -17,6 +17,16 @@
     lv: "{{ item }}"
     size: 2m
 
+- name: Create snapshot volumes of origin logical volumes
+  loop:
+    - lv1
+    - lv2
+  lvol:
+    vg: testvg
+    lv: "{{ item }}"
+    snapshot: "{{ item }}_snap"
+    size: 50%ORIGIN
+
 - name: Collect all lv active status in testvg
   shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: initial_lv_status_result
