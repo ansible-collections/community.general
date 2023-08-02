@@ -47,7 +47,7 @@ options:
       lvextend(8)|lvreduce(8) C(--size), specify the amount to extend the logical volume with
       the prefix V(+) or the amount to reduce the logical volume by with prefix V(-).
     - Resizing using V(+) or V(-) was not supported prior to community.general 3.0.0.
-    - Please note that when using V(+), V(-), or percentage of sizes, the module is B(not idempotent).
+    - Please note that when using V(+), V(-), or percentage of FREE, the module is B(not idempotent).
   state:
     type: str
     description:
