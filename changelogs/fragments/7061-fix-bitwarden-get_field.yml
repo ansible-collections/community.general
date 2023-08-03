@@ -1,0 +1,2 @@
+bugfixes:
+  - bitwarden lookup makes assumptions about the structure of a bitwarden JSON object which may have been broken by an update in the bitwarden API. Remove assumptions, and allow queries for general fields such as 'notes'.
