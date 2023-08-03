@@ -156,6 +156,7 @@ class Bitwarden(object):
             raise AnsibleError("field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
         return field_matches
 
+
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
