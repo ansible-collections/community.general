@@ -132,21 +132,29 @@ class Bitwarden(object):
         If field is None, return the whole record for each match.
         """
         matches = self._get_matches(search_value, search_field, collection_id)
-
-        if field in ['autofillOnPageLoad', 'password', 'passwordRevisionDate', 'totp', 'uris', 'username']:
-            return [match['login'][field] for match in matches]
-        elif not field:
+        if not field:
             return matches
-        else:
-            custom_field_matches = []
-            for match in matches:
+        field_matches = []
+        for match in matches:
+            # if there are no custom fields, then `match` has no key 'fields'
+            if 'fields' in match.keys():
+                custom_field_found = False
                 for custom_field in match['fields']:
-                    if custom_field['name'] == field:
-                        custom_field_matches.append(custom_field['value'])
-            if matches and not custom_field_matches:
-                raise AnsibleError("Custom field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
-            return custom_field_matches
-
+                    if field == custom_field['name']:
+                        field_matches.append(custom_field['value'])
+                        custom_field_found = True
+                        break
+                if custom_field_found:
+                    continue
+            if 'login' in match.keys() and field in match['login'].keys():
+                field_matches.append(match['login'][field])
+                continue
+            if field in match.keys():
+                field_matches.append(match[field])
+                continue
+        if matches and not field_matches:
+            raise AnsibleError("field {field} does not exist in {search_value}".format(field=field, search_value=search_value))
+        return field_matches
 
 class LookupModule(LookupBase):
 
