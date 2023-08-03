@@ -10,7 +10,6 @@
       - shellcheck
     state: absent
 
-# Test for https://github.com/ansible-collections/community.general/issues/5715
 - name: Install package with 3 dashes in description (check)
   community.general.snap:
     name:
