@@ -303,7 +303,10 @@ class Snap(StateModuleHelper):
             return [name]
 
         def process_many(rc, out, err):
-            outputs = out.split("---")
+            # This needs to be "\n---" instead of just "---" because otherwise
+            # if a snap uses "---" in its description then that will incorrectly
+            # be interpreted as a separator between snaps in the output.
+            outputs = out.split("\n---")
             res = []
             for sout in outputs:
                 res.extend(process_one(rc, sout, ""))
