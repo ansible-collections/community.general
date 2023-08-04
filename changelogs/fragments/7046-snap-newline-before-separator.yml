@@ -1,0 +1,2 @@
+bugfixes:
+  - snap - fix crash when multiple snaps are specified and one has ``---`` in its description (https://github.com/ansible-collections/community.general/pull/7046).
