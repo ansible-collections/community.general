@@ -247,7 +247,7 @@ options:
     protocol:
         description:
             - Type of client.
-            - At creation only, default value will be 'openid-connect' if 'protocol' is omitted
+            - At creation only, default value will be V(openid-connect) if O(protocol) is omitted.
         type: str
         choices: ['openid-connect', 'saml']
 
