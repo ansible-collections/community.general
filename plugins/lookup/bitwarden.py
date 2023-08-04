@@ -146,7 +146,7 @@ class Bitwarden(object):
                         break
                 if custom_field_found:
                     continue
-            if 'login' in match.keys() and field in match['login'].keys():
+            if 'login' in match and field in match['login']:
                 field_matches.append(match['login'][field])
                 continue
             if field in match.keys():
