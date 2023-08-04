@@ -137,7 +137,7 @@ class Bitwarden(object):
         field_matches = []
         for match in matches:
             # if there are no custom fields, then `match` has no key 'fields'
-            if 'fields' in match.keys():
+            if 'fields' in match:
                 custom_field_found = False
                 for custom_field in match['fields']:
                     if field == custom_field['name']:
