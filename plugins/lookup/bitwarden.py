@@ -149,7 +149,7 @@ class Bitwarden(object):
             if 'login' in match and field in match['login']:
                 field_matches.append(match['login'][field])
                 continue
-            if field in match.keys():
+            if field in match:
                 field_matches.append(match[field])
                 continue
         if matches and not field_matches:
