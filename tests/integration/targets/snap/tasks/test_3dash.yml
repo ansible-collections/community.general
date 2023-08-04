@@ -1,0 +1,31 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure packages are not installed (3 dashes)
+  community.general.snap:
+    name:
+      - bw
+      - shellcheck
+    state: absent
+
+- name: Install package with 3 dashes in description (check)
+  community.general.snap:
+    name:
+      - bw
+      - shellcheck
+    state: present
+  check_mode: true
+  register: install_3dash_check
+
+- name: Remove packages (3 dashes)
+  community.general.snap:
+    name:
+      - bw
+      - shellcheck
+    state: absent
+
+- assert:
+    that:
+      - install_3dash_check is changed

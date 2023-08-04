@@ -17,3 +17,5 @@
       ansible.builtin.include_tasks: test_channel.yml
     - name: Include test_dangerous
       ansible.builtin.include_tasks: test_dangerous.yml
+    - name: Include test_3dash
+      ansible.builtin.include_tasks: test_3dash.yml
