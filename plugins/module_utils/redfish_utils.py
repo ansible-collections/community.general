@@ -3411,3 +3411,65 @@ class RedfishUtils(object):
             fan_percent_min_config = hpe.get('FanPercentMinimum')
         result["fan_percent_min"] = fan_percent_min_config
         return result
+
+    def delete_volumes(self, storage_subsystem_id, volume_ids):
+        # Find the Storage resource from the requested ComputerSystem resource
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        storage_uri = data.get('Storage', {}).get('@odata.id')
+        if storage_uri is None:
+            return {'ret': False, 'msg': 'Storage resource not found'}
+
+        # Get Storage Collection
+        response = self.get_request(self.root_uri + storage_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # Collect Storage Subsystems
+        self.storage_subsystems_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
+        if not self.storage_subsystems_uris:
+            return {
+                'ret': False,
+                'msg': "StorageCollection's Members array is either empty or missing"}
+
+        # Matching Storage Subsystem ID with user input
+        self.storage_subsystem_uri = ""
+        for storage_subsystem_uri in self.storage_subsystems_uris:
+            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+                self.storage_subsystem_uri = storage_subsystem_uri
+
+        if not self.storage_subsystem_uri:
+            return {
+                'ret': False,
+                'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
+
+        # Get Volume Collection
+        response = self.get_request(self.root_uri + self.storage_subsystem_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # Collect Volumes
+        self.volume_uris = [i['@odata.id'] for i in response['data'].get('Members', [])]
+        if not self.volume_uris:
+            return {
+                'ret': True, 'changed': False,
+                'msg': "VolumeCollection's Members array is either empty or missing"}
+
+        # Delete each volume
+        for volume in self.volume_uris:
+            if volume.split("/")[-1] in volume_ids:
+                response = self.delete_request(self.root_uri + volume)
+                if response['ret'] is False:
+                    return response
+
+        return {'ret': True, 'changed': True,
+                'msg': "The following volumes were deleted: %s" % str(volume_ids)}
