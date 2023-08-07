@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak module util - fix missing http_agent, timeout, and validate_certs open_url() parameters
