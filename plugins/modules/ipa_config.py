@@ -91,9 +91,11 @@ options:
     elements: str
     version_added: '3.7.0'
   ipauserauthtype:
-    description: The authentication type to use by default.
+    description:
+      - The authentication type to use by default.
+      - The choice V(idp) has been added in community.general 7.3.0.
     aliases: ["userauthtype"]
-    choices: ["password", "radius", "otp", "pkinit", "hardened", "disabled"]
+    choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "disabled"]
     type: list
     elements: str
     version_added: '2.5.0'
@@ -358,7 +360,7 @@ def main():
         ipauserauthtype=dict(type='list', elements='str',
                              aliases=['userauthtype'],
                              choices=["password", "radius", "otp", "pkinit",
-                                      "hardened", "disabled"]),
+                                      "hardened", "idp", "disabled"]),
         ipausersearchfields=dict(type='list', elements='str',
                                  aliases=['usersearchfields']),
         ipauserobjectclasses=dict(type='list', elements='str',
