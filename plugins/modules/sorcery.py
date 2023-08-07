@@ -330,22 +330,22 @@ def update_codex(module):
             changed = True
 
         return (changed, "would have updated Codex")
-    elif not fresh:
-        # SILENT is required as a workaround for query() in libgpg
-        module.run_command_environ_update.update(dict(SILENT='1'))
+    else:
+        if not fresh:
+            # SILENT is required as a workaround for query() in libgpg
+            module.run_command_environ_update.update(dict(SILENT='1'))
 
-        cmd_scribe = "%s update" % SORCERY['scribe']
+            cmd_scribe = "%s update" % SORCERY['scribe']
 
-        rc, stdout, stderr = module.run_command(cmd_scribe)
+            rc, stdout, stderr = module.run_command(cmd_scribe)
 
-        if rc != 0:
-            module.fail_json(msg="unable to update Codex: " + stdout)
+            if rc != 0:
+                module.fail_json(msg="unable to update Codex: " + stdout)
 
-        if codex != codex_list(module):
-            changed = True
+            if codex != codex_list(module):
+                changed = True
 
-        if not params['name']:
-            return (changed, "successfully updated Codex")
+        return (changed, "successfully updated Codex")
 
 
 def match_depends(module):
