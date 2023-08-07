@@ -747,7 +747,7 @@ def main():
     if params['name'] and not params['repository']:
         changed['spells'] = manage_spells(module)
 
-    if list(filter(lambda x: changed.get(x)[0], changed)):
+    if any(x[0] for x in changed.values()):
         state_msg = "state changed"
         state_changed = True
     else:
