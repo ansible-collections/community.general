@@ -161,7 +161,7 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                 type != vm["type"]
                 or (node and vm["node"] != node)
                 or (vmid and int(vm["vmid"]) != vmid)
-                or (name and vm["name"] != name)
+                or (name is not None and vm["name"] != name)
             ):
                 continue
             vms.append(vm)

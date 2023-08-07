@@ -134,6 +134,27 @@ RAW_CLUSTER_OUTPUT = [
         "uptime": 0,
         "vmid": 104,
     },
+    {
+        "cpu": 0,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "lxc/105",
+        "maxcpu": 2,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "mem": 0,
+        "name": "",
+        "netin": 0,
+        "netout": 0,
+        "node": NODE2,
+        "pool": "pool1",
+        "status": "stopped",
+        "template": 0,
+        "type": "lxc",
+        "uptime": 0,
+        "vmid": 105,
+    },
 ]
 RAW_LXC_OUTPUT = [
     {
@@ -193,6 +214,25 @@ RAW_LXC_OUTPUT = [
         "type": "lxc",
         "uptime": 0,
         "vmid": "104",
+    },
+    {
+        "cpu": 0,
+        "cpus": 2,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "maxswap": 536870912,
+        "mem": 0,
+        "name": "",
+        "netin": 0,
+        "netout": 0,
+        "status": "stopped",
+        "swap": 0,
+        "type": "lxc",
+        "uptime": 0,
+        "vmid": "105",
     },
 ]
 RAW_QEMU_OUTPUT = [
@@ -346,6 +386,30 @@ EXPECTED_VMS_OUTPUT = [
         "type": "lxc",
         "uptime": 0,
         "vmid": 104,
+    },
+    {
+        "cpu": 0,
+        "cpus": 2,
+        "disk": 0,
+        "diskread": 0,
+        "diskwrite": 0,
+        "id": "lxc/105",
+        "maxcpu": 2,
+        "maxdisk": 10737418240,
+        "maxmem": 536870912,
+        "maxswap": 536870912,
+        "mem": 0,
+        "name": "",
+        "netin": 0,
+        "netout": 0,
+        "node": NODE2,
+        "pool": "pool1",
+        "status": "stopped",
+        "swap": 0,
+        "template": False,
+        "type": "lxc",
+        "uptime": 0,
+        "vmid": 105,
     },
 ]
 
@@ -501,6 +565,21 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         result = exc_info.value.args[0]
         assert result["proxmox_vms"] == expected_output
         assert len(result["proxmox_vms"]) == 2
+
+    def test_get_multiple_vms_with_the_same_name(self):
+        name = ""
+        self.connect_mock.return_value.cluster.resources.get.return_value = [
+            {"name": name, "vmid": "105"},
+        ]
+
+        with pytest.raises(AnsibleExitJson) as exc_info:
+            expected_output = [vm for vm in EXPECTED_VMS_OUTPUT if vm["name"] == name]
+            set_module_args(get_module_args(type="all", name=name))
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["proxmox_vms"] == expected_output
+        assert len(result["proxmox_vms"]) == 1
 
     def test_get_all_lxc_vms_from_specific_node(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
