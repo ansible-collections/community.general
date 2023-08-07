@@ -213,6 +213,8 @@ SORCERY = {
 SORCERY_LOG_DIR = "/var/log/sorcery"
 SORCERY_STATE_DIR = "/var/state/sorcery"
 
+NA = "N/A"
+
 
 def get_sorcery_ver(module):
     """ Get Sorcery version. """
@@ -291,8 +293,7 @@ def update_sorcery(module):
     changed = False
 
     if module.check_mode:
-        if not module.params['name'] and not module.params['update_cache']:
-            module.exit_json(changed=True, msg="would have updated Sorcery")
+        return (True, "would have updated Sorcery")
     else:
         sorcery_ver = get_sorcery_ver(module)
 
@@ -306,9 +307,7 @@ def update_sorcery(module):
         if sorcery_ver != get_sorcery_ver(module):
             changed = True
 
-        if not module.params['name'] and not module.params['update_cache']:
-            module.exit_json(changed=changed,
-                             msg="successfully updated Sorcery")
+        return (changed, "successfully updated Sorcery")
 
 
 def update_codex(module):
@@ -327,11 +326,10 @@ def update_codex(module):
     fresh = codex_fresh(codex, module)
 
     if module.check_mode:
-        if not params['name']:
-            if not fresh:
-                changed = True
+        if not fresh:
+            changed = True
 
-            module.exit_json(changed=changed, msg="would have updated Codex")
+        return (changed, "would have updated Codex")
     elif not fresh:
         # SILENT is required as a workaround for query() in libgpg
         module.run_command_environ_update.update(dict(SILENT='1'))
@@ -347,8 +345,7 @@ def update_codex(module):
             changed = True
 
         if not params['name']:
-            module.exit_json(changed=changed,
-                             msg="successfully updated Codex")
+            return (changed, "successfully updated Codex")
 
 
 def match_depends(module):
@@ -500,10 +497,10 @@ def manage_grimoires(module):
                 todo = set(grimoires) - set(codex)
 
             if not todo:
-                module.exit_json(changed=False, msg="all grimoire(s) are already %sed" % action[:5])
+                return (False, "all grimoire(s) are already %sed" % action[:5])
 
             if module.check_mode:
-                module.exit_json(changed=True, msg="would have %sed grimoire(s)" % action[:5])
+                return (True, "would have %sed grimoire(s)" % action[:5])
 
             cmd_scribe = "%s %s %s" % (SORCERY['scribe'], action, ' '.join(todo))
 
@@ -512,7 +509,7 @@ def manage_grimoires(module):
             if rc != 0:
                 module.fail_json(msg="failed to %s one or more grimoire(s): %s" % (action, stdout))
 
-            module.exit_json(changed=True, msg="successfully %sed one or more grimoire(s)" % action[:5])
+            return (True, "successfully %sed one or more grimoire(s)" % action[:5])
         else:
             module.fail_json(msg="unsupported operation on '*' repository value")
     else:
@@ -523,10 +520,10 @@ def manage_grimoires(module):
             grimoire = grimoires[0]
 
             if grimoire in codex:
-                module.exit_json(changed=False, msg="grimoire %s already exists" % grimoire)
+                return (False, "grimoire %s already exists" % grimoire)
 
             if module.check_mode:
-                module.exit_json(changed=True, msg="would have added grimoire %s from %s" % (grimoire, url))
+                return (True, "would have added grimoire %s from %s" % (grimoire, url))
 
             cmd_scribe = "%s add %s from %s" % (SORCERY['scribe'], grimoire, url)
 
@@ -535,7 +532,7 @@ def manage_grimoires(module):
             if rc != 0:
                 module.fail_json(msg="failed to add grimoire %s from %s: %s" % (grimoire, url, stdout))
 
-            module.exit_json(changed=True, msg="successfully added grimoire %s from %s" % (grimoire, url))
+            return (True, "successfully added grimoire %s from %s" % (grimoire, url))
         else:
             module.fail_json(msg="unsupported operation on repository value")
 
@@ -584,7 +581,7 @@ def manage_spells(module):
                     except IOError:
                         module.fail_json(msg="failed to restore the update queue")
 
-                    module.exit_json(changed=True, msg="would have updated the system")
+                    return (True, "would have updated the system")
 
                 cmd_cast = "%s --queue" % SORCERY['cast']
 
@@ -593,12 +590,12 @@ def manage_spells(module):
                 if rc != 0:
                     module.fail_json(msg="failed to update the system")
 
-                module.exit_json(changed=True, msg="successfully updated the system")
+                return (True, "successfully updated the system")
             else:
-                module.exit_json(changed=False, msg="the system is already up to date")
+                return (False, "the system is already up to date")
         elif params['state'] == 'rebuild':
             if module.check_mode:
-                module.exit_json(changed=True, msg="would have rebuilt the system")
+                return (True, "would have rebuilt the system")
 
             cmd_sorcery = "%s rebuild" % SORCERY['sorcery']
 
@@ -607,7 +604,7 @@ def manage_spells(module):
             if rc != 0:
                 module.fail_json(msg="failed to rebuild the system: " + stdout)
 
-            module.exit_json(changed=True, msg="successfully rebuilt the system")
+            return (True, "successfully rebuilt the system")
         else:
             module.fail_json(msg="unsupported operation on '*' name value")
     else:
@@ -669,7 +666,7 @@ def manage_spells(module):
 
             if cast_queue:
                 if module.check_mode:
-                    module.exit_json(changed=True, msg="would have cast spell(s)")
+                    return (True, "would have cast spell(s)")
 
                 cmd_cast = "%s -c %s" % (SORCERY['cast'], ' '.join(cast_queue))
 
@@ -678,13 +675,13 @@ def manage_spells(module):
                 if rc != 0:
                     module.fail_json(msg="failed to cast spell(s): " + stdout)
 
-                module.exit_json(changed=True, msg="successfully cast spell(s)")
+                return (True, "successfully cast spell(s)")
             elif params['state'] != 'absent':
-                module.exit_json(changed=False, msg="spell(s) are already cast")
+                return (False, "spell(s) are already cast")
 
             if dispel_queue:
                 if module.check_mode:
-                    module.exit_json(changed=True, msg="would have dispelled spell(s)")
+                    return (True, "would have dispelled spell(s)")
 
                 cmd_dispel = "%s %s" % (SORCERY['dispel'], ' '.join(dispel_queue))
 
@@ -693,9 +690,9 @@ def manage_spells(module):
                 if rc != 0:
                     module.fail_json(msg="failed to dispel spell(s): " + stdout)
 
-                module.exit_json(changed=True, msg="successfully dispelled spell(s)")
+                return (True, "successfully dispelled spell(s)")
             else:
-                module.exit_json(changed=False, msg="spell(s) are already dispelled")
+                return (False, "spell(s) are already dispelled")
 
 
 def main():
@@ -731,17 +728,33 @@ def main():
     elif params['state'] in ('absent', 'dispelled'):
         params['state'] = 'absent'
 
+    changed = {
+        'sorcery': (False, NA),
+        'grimoires': (False, NA),
+        'codex': (False, NA),
+        'spells': (False, NA)
+    }
+
     if params['update']:
-        update_sorcery(module)
+        changed['sorcery'] = update_sorcery(module)
 
     if params['name'] and params['repository']:
-        manage_grimoires(module)
+        changed['grimoires'] = manage_grimoires(module)
 
     if params['update_cache']:
-        update_codex(module)
+        changed['codex'] = update_codex(module)
 
     if params['name'] and not params['repository']:
-        manage_spells(module)
+        changed['spells'] = manage_spells(module)
+
+    if list(filter(lambda x: changed.get(x)[0], changed)):
+        state_msg = "state changed"
+        state_changed = True
+    else:
+        state_msg = "no change in state"
+        state_changed = False
+
+    module.exit_json(changed=state_changed, msg=state_msg + ": " + '; '.join(x[1] for x in changed.values()))
 
 
 if __name__ == '__main__':
