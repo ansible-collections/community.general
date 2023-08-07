@@ -102,7 +102,7 @@ class EjabberdUser(object):
         changed.   It will return True if the user does not match the supplied
         credentials and False if it does not
         """
-        return self.run_command('check_password', [self.user, self.host, self.pwd])
+        return bool(self.run_command('check_password', [self.user, self.host, self.pwd])[0])
 
     @property
     def exists(self):
@@ -110,7 +110,7 @@ class EjabberdUser(object):
         host specified.  If the user exists True is returned, otherwise False
         is returned
         """
-        return self.run_command('check_account', [self.user, self.host])
+        return not bool(self.run_command('check_account', [self.user, self.host])[0])
 
     def log(self, entry):
         """ This method will log information to the local syslog facility """

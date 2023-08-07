@@ -1,0 +1,2 @@
+bugfixes:
+  - ejabberd_user - module was failing to detect whether user was already created and/or password was changed (https://github.com/ansible-collections/community.general/pull/7033).
