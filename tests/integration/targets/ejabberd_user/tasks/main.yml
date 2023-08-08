@@ -1,0 +1,106 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Bail out if not supported
+  ansible.builtin.meta: end_play
+  when: ansible_distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora')
+
+
+- name: Remove ejabberd
+  ansible.builtin.package:
+    name: ejabberd
+    state: absent
+
+- name: Create user without ejabberdctl installed
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    password: pa$$w0rd
+    state: present
+  register: user_no_ejabberdctl
+  ignore_errors: true
+
+- name: Install ejabberd
+  ansible.builtin.package:
+    name: ejabberd
+    state: present
+  notify: Remove ejabberd
+
+- ansible.builtin.service:
+    name: ejabberd
+    state: started
+
+- name: Create user alice (check)
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    password: pa$$w0rd
+    state: present
+  check_mode: true
+  register: user_alice_check
+
+- name: Create user alice
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    password: pa$$w0rd
+    state: present
+  register: user_alice
+
+- name: Create user alice (idempotency)
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    password: pa$$w0rd
+    state: present
+  register: user_alice_idempot
+
+- name: Create user alice (change password)
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    password: different_pa$$w0rd
+    state: present
+  register: user_alice_chgpw
+
+- name: Remove user alice (check)
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    state: absent
+  register: remove_alice_check
+  check_mode: true
+
+- name: Remove user alice
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    state: absent
+  register: remove_alice
+
+- name: Remove user alice (idempotency)
+  community.general.ejabberd_user:
+    host: localhost
+    username: alice
+    state: absent
+  register: remove_alice_idempot
+
+- name: Assertions
+  ansible.builtin.assert:
+    that:
+      - user_no_ejabberdctl is failed
+      - "'Failed to find required executable' in user_no_ejabberdctl.msg"
+      - user_alice_check is changed
+      - user_alice is changed
+      - user_alice_idempot is not changed
+      - user_alice_chgpw is changed
+      - remove_alice_check is changed
+      - remove_alice is changed
+      - remove_alice_idempot is not changed
