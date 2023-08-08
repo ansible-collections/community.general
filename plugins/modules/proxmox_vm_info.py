@@ -39,7 +39,7 @@ options:
   name:
     description:
       - Restrict results to a specific virtual machine(s) by using their name.
-      - If VM(s) with the specified name does not exist in a cluster then resulting list will be empty.
+      - If VM(s) with the specified name do not exist in a cluster then the resulting list will be empty.
     type: str
 extends_documentation_fragment:
     - community.general.proxmox.documentation
