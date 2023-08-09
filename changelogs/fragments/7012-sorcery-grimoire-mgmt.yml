@@ -1,0 +1,7 @@
+---
+minor_changes:
+  - "sorcery - add grimoire (repository) management support (https://github.com/ansible-collections/community.general/pull/7012)."
+bugfixes:
+  - "sorcery - fix queue generation before the whole system rebuild (https://github.com/ansible-collections/community.general/pull/7012)."
+  - "sorcery - latest state no longer triggers update_cache (https://github.com/ansible-collections/community.general/pull/7012)."
+  - "sorcery - fix interruption of the multi-stage process (https://github.com/ansible-collections/community.general/pull/7012)."
