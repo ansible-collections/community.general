@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_vm_info - non-existing provided by name/vmid VM would return empty results instead of failing (https://github.com/ansible-collections/community.general/pull/7049).

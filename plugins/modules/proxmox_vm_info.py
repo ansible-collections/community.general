@@ -34,11 +34,12 @@ options:
   vmid:
     description:
       - Restrict results to a specific virtual machine by using its ID.
+      - If VM with the specified vmid does not exist in a cluster then resulting list will be empty.
     type: int
   name:
     description:
-      - Restrict results to a specific virtual machine by using its name.
-      - If multiple virtual machines have the same name then vmid must be used instead.
+      - Restrict results to a specific virtual machine(s) by using their name.
+      - If VM(s) with the specified name do not exist in a cluster then the resulting list will be empty.
     type: str
 extends_documentation_fragment:
     - community.general.proxmox.documentation
@@ -153,13 +154,14 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                 msg="Failed to retrieve VMs information from cluster resources: %s" % e
             )
 
-    def get_vms_from_nodes(self, vms_unfiltered, type, vmid=None, node=None):
+    def get_vms_from_nodes(self, vms_unfiltered, type, vmid=None, name=None, node=None):
         vms = []
         for vm in vms_unfiltered:
             if (
                 type != vm["type"]
                 or (node and vm["node"] != node)
                 or (vmid and int(vm["vmid"]) != vmid)
+                or (name is not None and vm["name"] != name)
             ):
                 continue
             vms.append(vm)
@@ -179,15 +181,15 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
 
         return vms
 
-    def get_qemu_vms(self, vms_unfiltered, vmid=None, node=None):
+    def get_qemu_vms(self, vms_unfiltered, vmid=None, name=None, node=None):
         try:
-            return self.get_vms_from_nodes(vms_unfiltered, "qemu", vmid, node)
+            return self.get_vms_from_nodes(vms_unfiltered, "qemu", vmid, name, node)
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve QEMU VMs information: %s" % e)
 
-    def get_lxc_vms(self, vms_unfiltered, vmid=None, node=None):
+    def get_lxc_vms(self, vms_unfiltered, vmid=None, name=None, node=None):
         try:
-            return self.get_vms_from_nodes(vms_unfiltered, "lxc", vmid, node)
+            return self.get_vms_from_nodes(vms_unfiltered, "lxc", vmid, name, node)
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve LXC VMs information: %s" % e)
 
@@ -222,30 +224,23 @@ def main():
     if node and proxmox.get_node(node) is None:
         module.fail_json(msg="Node %s doesn't exist in PVE cluster" % node)
 
-    if not vmid and name:
-        vmid = int(proxmox.get_vmid(name, ignore_missing=False))
-
     vms_cluster_resources = proxmox.get_vms_from_cluster_resources()
-    vms = None
+    vms = []
 
     if type == "lxc":
-        vms = proxmox.get_lxc_vms(vms_cluster_resources, vmid, node)
+        vms = proxmox.get_lxc_vms(vms_cluster_resources, vmid, name, node)
     elif type == "qemu":
-        vms = proxmox.get_qemu_vms(vms_cluster_resources, vmid, node)
+        vms = proxmox.get_qemu_vms(vms_cluster_resources, vmid, name, node)
     else:
         vms = proxmox.get_qemu_vms(
-            vms_cluster_resources, vmid, node
-        ) + proxmox.get_lxc_vms(vms_cluster_resources, vmid, node)
+            vms_cluster_resources,
+            vmid,
+            name,
+            node,
+        ) + proxmox.get_lxc_vms(vms_cluster_resources, vmid, name, node)
 
-    if vms or vmid is None:
-        result["proxmox_vms"] = vms
-        module.exit_json(**result)
-    else:
-        if node is None:
-            result["msg"] = "VM with vmid %s doesn't exist in cluster" % (vmid)
-        else:
-            result["msg"] = "VM with vmid %s doesn't exist on node %s" % (vmid, node)
-        module.fail_json(**result)
+    result["proxmox_vms"] = vms
+    module.exit_json(**result)
 
 
 if __name__ == "__main__":
