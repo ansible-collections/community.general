@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2015-2016, Vlad Glagolev <scm@vaygr.net>
+# Copyright (c) 2015-2023, Vlad Glagolev <scm@vaygr.net>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: sorcery
 short_description: Package manager for Source Mage GNU/Linux
@@ -20,8 +20,7 @@ author: "Vlad Glagolev (@vaygr)"
 notes:
     - When all three components are selected, the update goes by the sequence --
       Sorcery -> Grimoire(s) -> Spell(s); you cannot override it.
-    - grimoire handling (i.e. add/remove, including SCM/rsync versions) is not
-      yet supported.
+    - Grimoire handling is supported since community.general 7.3.0.
 requirements:
     - bash
 extends_documentation_fragment:
@@ -34,21 +33,31 @@ attributes:
 options:
     name:
         description:
-            - Name of the spell
-            - multiple names can be given, separated by commas
-            - special value '*' in conjunction with states V(latest) or
+            - Name of the spell or grimoire.
+            - Multiple names can be given, separated by commas.
+            - Special value V(*) in conjunction with states V(latest) or
               V(rebuild) will update or rebuild the whole system respectively
-        aliases: ["spell"]
+            - The alias O(grimoire) was added in community.general 7.3.0.
+        aliases: ["spell", "grimoire"]
         type: list
         elements: str
 
+    repository:
+        description:
+            - Repository location.
+            - If specified, O(name) represents grimoire(s) instead of spell(s).
+            - Special value V(*) will pull grimoire from the official location.
+            - Only single item in O(name) in conjunction with V(*) can be used.
+            - O(state=absent) must be used with a special value V(*).
+        type: str
+        version_added: 7.3.0
+
     state:
         description:
-            - Whether to cast, dispel or rebuild a package
-            - state V(cast) is an equivalent of V(present), not V(latest)
-            - state V(latest) always triggers O(update_cache=true)
-            - state V(rebuild) implies cast of all specified spells, not only
-              those existed before
+            - Whether to cast, dispel or rebuild a package.
+            - State V(cast) is an equivalent of V(present), not V(latest).
+            - State V(rebuild) implies cast of all specified spells, not only
+              those existed before.
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
         default: "present"
         type: str
@@ -56,12 +65,12 @@ options:
     depends:
         description:
             - Comma-separated list of _optional_ dependencies to build a spell
-              (or make sure it is built) with; use +/- in front of dependency
-              to turn it on/off ('+' is optional though).
-            - this option is ignored if O(name) parameter is equal to V(*) or
+              (or make sure it is built) with; use V(+)/V(-) in front of dependency
+              to turn it on/off (V(+) is optional though).
+            - This option is ignored if O(name) parameter is equal to V(*) or
               contains more than one spell.
-            - providers must be supplied in the form recognized by Sorcery, for example
-              'openssl(SSL)'.
+            - Providers must be supplied in the form recognized by Sorcery,
+              for example 'V(openssl(SSL\))'.
         type: str
 
     update:
@@ -148,6 +157,30 @@ EXAMPLES = '''
     update_codex: true
     cache_valid_time: 86400
 
+- name: Make sure stable grimoire is present
+  community.general.sorcery:
+    name: stable
+    repository: '*'
+    state: present
+
+- name: Make sure binary and stable-rc grimoires are removed
+  community.general.sorcery:
+    grimoire: binary,stable-rc
+    repository: '*'
+    state: absent
+
+- name: Make sure games grimoire is pulled from rsync
+  community.general.sorcery:
+    grimoire: games
+    repository: "rsync://download.sourcemage.org::codex/games"
+    state: present
+
+- name: Make sure a specific branch of stable grimoire is pulled from git
+  community.general.sorcery:
+    grimoire: stable.git
+    repository: "git://download.sourcemage.org/smgl/grimoire.git:stable.git:stable-0.62"
+    state: present
+
 - name: Update only Sorcery itself
   community.general.sorcery:
     update: true
@@ -179,6 +212,8 @@ SORCERY = {
 
 SORCERY_LOG_DIR = "/var/log/sorcery"
 SORCERY_STATE_DIR = "/var/state/sorcery"
+
+NA = "N/A"
 
 
 def get_sorcery_ver(module):
@@ -258,8 +293,7 @@ def update_sorcery(module):
     changed = False
 
     if module.check_mode:
-        if not module.params['name'] and not module.params['update_cache']:
-            module.exit_json(changed=True, msg="would have updated Sorcery")
+        return (True, "would have updated Sorcery")
     else:
         sorcery_ver = get_sorcery_ver(module)
 
@@ -273,9 +307,7 @@ def update_sorcery(module):
         if sorcery_ver != get_sorcery_ver(module):
             changed = True
 
-        if not module.params['name'] and not module.params['update_cache']:
-            module.exit_json(changed=changed,
-                             msg="successfully updated Sorcery")
+        return (changed, "successfully updated Sorcery")
 
 
 def update_codex(module):
@@ -294,28 +326,26 @@ def update_codex(module):
     fresh = codex_fresh(codex, module)
 
     if module.check_mode:
-        if not params['name']:
-            if not fresh:
-                changed = True
-
-            module.exit_json(changed=changed, msg="would have updated Codex")
-    elif not fresh or params['name'] and params['state'] == 'latest':
-        # SILENT is required as a workaround for query() in libgpg
-        module.run_command_environ_update.update(dict(SILENT='1'))
-
-        cmd_scribe = "%s update" % SORCERY['scribe']
-
-        rc, stdout, stderr = module.run_command(cmd_scribe)
-
-        if rc != 0:
-            module.fail_json(msg="unable to update Codex: " + stdout)
-
-        if codex != codex_list(module):
+        if not fresh:
             changed = True
 
-        if not params['name']:
-            module.exit_json(changed=changed,
-                             msg="successfully updated Codex")
+        return (changed, "would have updated Codex")
+    else:
+        if not fresh:
+            # SILENT is required as a workaround for query() in libgpg
+            module.run_command_environ_update.update(dict(SILENT='1'))
+
+            cmd_scribe = "%s update" % SORCERY['scribe']
+
+            rc, stdout, stderr = module.run_command(cmd_scribe)
+
+            if rc != 0:
+                module.fail_json(msg="unable to update Codex: " + stdout)
+
+            if codex != codex_list(module):
+                changed = True
+
+        return (changed, "successfully updated Codex")
 
 
 def match_depends(module):
@@ -448,6 +478,65 @@ def match_depends(module):
     return depends_ok
 
 
+def manage_grimoires(module):
+    """ Add or remove grimoires. """
+
+    params = module.params
+    grimoires = params['name']
+    url = params['repository']
+
+    codex = codex_list(module)
+
+    if url == '*':
+        if params['state'] in ('present', 'latest', 'absent'):
+            if params['state'] == 'absent':
+                action = "remove"
+                todo = set(grimoires) & set(codex)
+            else:
+                action = "add"
+                todo = set(grimoires) - set(codex)
+
+            if not todo:
+                return (False, "all grimoire(s) are already %sed" % action[:5])
+
+            if module.check_mode:
+                return (True, "would have %sed grimoire(s)" % action[:5])
+
+            cmd_scribe = "%s %s %s" % (SORCERY['scribe'], action, ' '.join(todo))
+
+            rc, stdout, stderr = module.run_command(cmd_scribe)
+
+            if rc != 0:
+                module.fail_json(msg="failed to %s one or more grimoire(s): %s" % (action, stdout))
+
+            return (True, "successfully %sed one or more grimoire(s)" % action[:5])
+        else:
+            module.fail_json(msg="unsupported operation on '*' repository value")
+    else:
+        if params['state'] in ('present', 'latest'):
+            if len(grimoires) > 1:
+                module.fail_json(msg="using multiple items with repository is invalid")
+
+            grimoire = grimoires[0]
+
+            if grimoire in codex:
+                return (False, "grimoire %s already exists" % grimoire)
+
+            if module.check_mode:
+                return (True, "would have added grimoire %s from %s" % (grimoire, url))
+
+            cmd_scribe = "%s add %s from %s" % (SORCERY['scribe'], grimoire, url)
+
+            rc, stdout, stderr = module.run_command(cmd_scribe)
+
+            if rc != 0:
+                module.fail_json(msg="failed to add grimoire %s from %s: %s" % (grimoire, url, stdout))
+
+            return (True, "successfully added grimoire %s from %s" % (grimoire, url))
+        else:
+            module.fail_json(msg="unsupported operation on repository value")
+
+
 def manage_spells(module):
     """ Cast or dispel spells.
 
@@ -473,7 +562,7 @@ def manage_spells(module):
             # see update_codex()
             module.run_command_environ_update.update(dict(SILENT='1'))
 
-            cmd_sorcery = "%s queue"
+            cmd_sorcery = "%s queue" % SORCERY['sorcery']
 
             rc, stdout, stderr = module.run_command(cmd_sorcery)
 
@@ -492,7 +581,7 @@ def manage_spells(module):
                     except IOError:
                         module.fail_json(msg="failed to restore the update queue")
 
-                    module.exit_json(changed=True, msg="would have updated the system")
+                    return (True, "would have updated the system")
 
                 cmd_cast = "%s --queue" % SORCERY['cast']
 
@@ -501,12 +590,12 @@ def manage_spells(module):
                 if rc != 0:
                     module.fail_json(msg="failed to update the system")
 
-                module.exit_json(changed=True, msg="successfully updated the system")
+                return (True, "successfully updated the system")
             else:
-                module.exit_json(changed=False, msg="the system is already up to date")
+                return (False, "the system is already up to date")
         elif params['state'] == 'rebuild':
             if module.check_mode:
-                module.exit_json(changed=True, msg="would have rebuilt the system")
+                return (True, "would have rebuilt the system")
 
             cmd_sorcery = "%s rebuild" % SORCERY['sorcery']
 
@@ -515,7 +604,7 @@ def manage_spells(module):
             if rc != 0:
                 module.fail_json(msg="failed to rebuild the system: " + stdout)
 
-            module.exit_json(changed=True, msg="successfully rebuilt the system")
+            return (True, "successfully rebuilt the system")
         else:
             module.fail_json(msg="unsupported operation on '*' name value")
     else:
@@ -577,39 +666,40 @@ def manage_spells(module):
 
             if cast_queue:
                 if module.check_mode:
-                    module.exit_json(changed=True, msg="would have cast spell(s)")
+                    return (True, "would have cast spell(s)")
 
                 cmd_cast = "%s -c %s" % (SORCERY['cast'], ' '.join(cast_queue))
 
                 rc, stdout, stderr = module.run_command(cmd_cast)
 
                 if rc != 0:
-                    module.fail_json(msg="failed to cast spell(s): %s" + stdout)
+                    module.fail_json(msg="failed to cast spell(s): " + stdout)
 
-                module.exit_json(changed=True, msg="successfully cast spell(s)")
+                return (True, "successfully cast spell(s)")
             elif params['state'] != 'absent':
-                module.exit_json(changed=False, msg="spell(s) are already cast")
+                return (False, "spell(s) are already cast")
 
             if dispel_queue:
                 if module.check_mode:
-                    module.exit_json(changed=True, msg="would have dispelled spell(s)")
+                    return (True, "would have dispelled spell(s)")
 
                 cmd_dispel = "%s %s" % (SORCERY['dispel'], ' '.join(dispel_queue))
 
                 rc, stdout, stderr = module.run_command(cmd_dispel)
 
                 if rc != 0:
-                    module.fail_json(msg="failed to dispel spell(s): %s" + stdout)
+                    module.fail_json(msg="failed to dispel spell(s): " + stdout)
 
-                module.exit_json(changed=True, msg="successfully dispelled spell(s)")
+                return (True, "successfully dispelled spell(s)")
             else:
-                module.exit_json(changed=False, msg="spell(s) are already dispelled")
+                return (False, "spell(s) are already dispelled")
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['spell'], type='list', elements='str'),
+            name=dict(default=None, aliases=['spell', 'grimoire'], type='list', elements='str'),
+            repository=dict(default=None, type='str'),
             state=dict(default='present', choices=['present', 'latest',
                                                    'absent', 'cast', 'dispelled', 'rebuild']),
             depends=dict(default=None),
@@ -638,14 +728,33 @@ def main():
     elif params['state'] in ('absent', 'dispelled'):
         params['state'] = 'absent'
 
+    changed = {
+        'sorcery': (False, NA),
+        'grimoires': (False, NA),
+        'codex': (False, NA),
+        'spells': (False, NA)
+    }
+
     if params['update']:
-        update_sorcery(module)
+        changed['sorcery'] = update_sorcery(module)
 
-    if params['update_cache'] or params['state'] == 'latest':
-        update_codex(module)
+    if params['name'] and params['repository']:
+        changed['grimoires'] = manage_grimoires(module)
 
-    if params['name']:
-        manage_spells(module)
+    if params['update_cache']:
+        changed['codex'] = update_codex(module)
+
+    if params['name'] and not params['repository']:
+        changed['spells'] = manage_spells(module)
+
+    if any(x[0] for x in changed.values()):
+        state_msg = "state changed"
+        state_changed = True
+    else:
+        state_msg = "no change in state"
+        state_changed = False
+
+    module.exit_json(changed=state_changed, msg=state_msg + ": " + '; '.join(x[1] for x in changed.values()))
 
 
 if __name__ == '__main__':
