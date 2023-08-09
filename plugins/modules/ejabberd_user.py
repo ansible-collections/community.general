@@ -134,8 +134,11 @@ class EjabberdUser(object):
         """ This method will run the any command specified and return the
         returns using the Ansible common module
         """
+        def _proc(*a):
+            return a
+
         if process is None:
-            process = lambda rc, out, err: (rc, out, err)
+            process = _proc
 
         with self.runner("cmd " + options, output_process=process) as ctx:
             res = ctx.run(cmd=cmd, host=self.host, user=self.user, pwd=self.pwd)
