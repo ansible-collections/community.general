@@ -717,7 +717,8 @@ class RedfishUtils(object):
         properties = ['CacheSummary', 'FirmwareVersion', 'Identifiers',
                       'Location', 'Manufacturer', 'Model', 'Name', 'Id',
                       'PartNumber', 'SerialNumber', 'SpeedGbps', 'Status']
-        key = "StorageControllers"
+        key = "Controllers"
+        deprecated_key = "StorageControllers"
 
         # Find Storage service
         response = self.get_request(self.root_uri + systems_uri)
@@ -745,7 +746,30 @@ class RedfishUtils(object):
                 data = response['data']
 
                 if key in data:
-                    controller_list = data[key]
+                    controller_uri = data[key][u'@odata.id']
+
+                    response = self.get_request(self.root_uri + controller_uri)
+                    if response['ret'] is False:
+                        return response
+                    result['ret'] = True
+                    data = response['data']
+
+                    if data[u'Members']:
+                        for controller_member in data[u'Members']:
+                            controller_member_uri = controller_member[u'@odata.id']
+                            response = self.get_request(self.root_uri + controller_member_uri)
+                            if response['ret'] is False:
+                                return response
+                            result['ret'] = True
+                            data = response['data']
+
+                            controller_result = {}
+                            for property in properties:
+                                if property in data:
+                                    controller_result[property] = data[property]
+                            controller_results.append(controller_result)
+                elif deprecated_key in data:
+                    controller_list = data[deprecated_key]
                     for controller in controller_list:
                         controller_result = {}
                         for property in properties:
