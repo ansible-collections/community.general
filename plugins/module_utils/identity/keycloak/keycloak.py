@@ -777,7 +777,8 @@ class KeycloakAPI(object):
         users_url += '?username=%s&exact=true' % username
         try:
             userrep = None
-            users = json.loads(to_native(open_url(users_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+            users = json.loads(to_native(open_url(users_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                  timeout=self.connection_timeout,
                                                   validate_certs=self.validate_certs).read()))
             for user in users:
                 if user['username'] == username:
@@ -803,7 +804,8 @@ class KeycloakAPI(object):
 
         service_account_user_url = URL_CLIENT_SERVICE_ACCOUNT_USER.format(url=self.baseurl, realm=realm, id=cid)
         try:
-            return json.loads(to_native(open_url(service_account_user_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(service_account_user_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain the service-account-user for realm %s and client_id %s: %s'
@@ -1347,7 +1349,8 @@ class KeycloakAPI(object):
         clientsecret_url = URL_CLIENTSECRET.format(url=self.baseurl, realm=realm, id=id)
 
         try:
-            return json.loads(to_native(open_url(clientsecret_url, method='POST', headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(clientsecret_url, method='POST', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -1370,7 +1373,8 @@ class KeycloakAPI(object):
         clientsecret_url = URL_CLIENTSECRET.format(url=self.baseurl, realm=realm, id=id)
 
         try:
-            return json.loads(to_native(open_url(clientsecret_url, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(clientsecret_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -2678,7 +2682,9 @@ class KeycloakAPI(object):
                 open_url(
                     user_url,
                     method='GET',
-                    headers=self.restheaders))
+                    http_agent=self.http_agent, headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs))
             return userrep
         except Exception as e:
             self.module.fail_json(msg='Could not get user %s in realm %s: %s'
@@ -2700,8 +2706,10 @@ class KeycloakAPI(object):
                 realm=realm)
             open_url(users_url,
                      method='POST',
-                     headers=self.restheaders,
-                     data=json.dumps(userrep))
+                     http_agent=self.http_agent, headers=self.restheaders,
+                     data=json.dumps(userrep),
+                     timeout=self.connection_timeout,
+                     validate_certs=self.validate_certs)
             created_user = self.get_user_by_username(
                 username=userrep['username'],
                 realm=realm)
@@ -2744,8 +2752,10 @@ class KeycloakAPI(object):
             open_url(
                 user_url,
                 method='PUT',
-                headers=self.restheaders,
-                data=json.dumps(userrep))
+                http_agent=self.http_agent, headers=self.restheaders,
+                data=json.dumps(userrep),
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
             updated_user = self.get_user_by_id(
                 user_id=userrep['id'],
                 realm=realm)
@@ -2769,7 +2779,9 @@ class KeycloakAPI(object):
             return open_url(
                 user_url,
                 method='DELETE',
-                headers=self.restheaders)
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not delete user %s in realm %s: %s'
                                       % (user_id, realm, str(e)))
@@ -2791,7 +2803,9 @@ class KeycloakAPI(object):
                 open_url(
                     user_groups_url,
                     method='GET',
-                    headers=self.restheaders))
+                    http_agent=self.http_agent, headers=self.restheaders,
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs))
             for user_group in user_groups:
                 groups.append(user_group["name"])
             return groups
@@ -2816,7 +2830,9 @@ class KeycloakAPI(object):
             return open_url(
                 user_group_url,
                 method='PUT',
-                headers=self.restheaders)
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not add user %s in group %s in realm %s: %s'
                                       % (user_id, group_id, realm, str(e)))
@@ -2838,7 +2854,9 @@ class KeycloakAPI(object):
             return open_url(
                 user_group_url,
                 method='DELETE',
-                headers=self.restheaders)
+                http_agent=self.http_agent, headers=self.restheaders,
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not remove user %s from group %s in realm %s: %s'
                                       % (user_id, group_id, realm, str(e)))
