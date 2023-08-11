@@ -342,7 +342,9 @@ def update_codex(module):
             module.run_command_environ_update.update(dict(SILENT='1'))
 
             cmd_scribe = "%s update" % SORCERY['scribe']
-            cmd_scribe += ' %s' % ' '.join(codex.keys()) if params['repository'] else ''
+
+            if params['repository']:
+                cmd_scribe += ' %s' % ' '.join(codex.keys())
 
             rc, stdout, stderr = module.run_command(cmd_scribe)
 
