@@ -255,7 +255,7 @@ def codex_fresh(codex, module):
     return True
 
 
-def codex_list(module):
+def codex_list(module, skip_new=False):
     """ List valid grimoire collection. """
 
     params = module.params
@@ -278,12 +278,9 @@ def codex_list(module):
         if match:
             codex[match.group('grim')] = match.group('ver')
 
-    # return only specified grimoires
-    if params['repository']:
-        if module.check_mode:
-            codex = dict((x, NA) for x in params['name'])
-        else:
-            codex = dict((x, codex[x]) for x in params['name'])
+    # return only specified grimoires unless requested to skip new
+    if params['repository'] and not skip_new:
+        codex = dict((x, codex.get(x, NA)) for x in params['name'])
 
     if not codex:
         module.fail_json(msg="no grimoires to operate on; add at least one")
@@ -495,7 +492,7 @@ def manage_grimoires(module):
     grimoires = params['name']
     url = params['repository']
 
-    codex = codex_list(module)
+    codex = codex_list(module, True)
 
     if url == '*':
         if params['state'] in ('present', 'latest', 'absent'):
