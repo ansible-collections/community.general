@@ -258,6 +258,8 @@ def codex_fresh(codex, module):
 def codex_list(module):
     """ List valid grimoire collection. """
 
+    params = module.params
+
     codex = {}
 
     cmd_scribe = "%s index" % SORCERY['scribe']
@@ -275,6 +277,13 @@ def codex_list(module):
 
         if match:
             codex[match.group('grim')] = match.group('ver')
+
+    # return only specified grimoires
+    if params['repository']:
+        if module.check_mode:
+            codex = {x: NA for x in params['name']}
+        else:
+            codex = {x: codex[x] for x in params['name']}
 
     if not codex:
         module.fail_json(msg="no grimoires to operate on; add at least one")
@@ -336,6 +345,7 @@ def update_codex(module):
             module.run_command_environ_update.update(dict(SILENT='1'))
 
             cmd_scribe = "%s update" % SORCERY['scribe']
+            cmd_scribe += ' %s' % ' '.join(codex.keys()) if params['repository'] else ''
 
             rc, stdout, stderr = module.run_command(cmd_scribe)
 
