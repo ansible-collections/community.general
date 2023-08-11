@@ -652,7 +652,8 @@ class RedfishUtils(object):
         properties = ['CacheSummary', 'FirmwareVersion', 'Identifiers',
                       'Location', 'Manufacturer', 'Model', 'Name', 'Id',
                       'PartNumber', 'SerialNumber', 'SpeedGbps', 'Status']
-        key = "StorageControllers"
+        key = "Controllers"
+        deprecated_key = "StorageControllers"
 
         # Find Storage service
         response = self.get_request(self.root_uri + systems_uri)
@@ -680,7 +681,30 @@ class RedfishUtils(object):
                 data = response['data']
 
                 if key in data:
-                    controller_list = data[key]
+                    controllers_uri = data[key][u'@odata.id']
+
+                    response = self.get_request(self.root_uri + controllers_uri)
+                    if response['ret'] is False:
+                        return response
+                    result['ret'] = True
+                    data = response['data']
+
+                    if data[u'Members']:
+                        for controller_member in data[u'Members']:
+                            controller_member_uri = controller_member[u'@odata.id']
+                            response = self.get_request(self.root_uri + controller_member_uri)
+                            if response['ret'] is False:
+                                return response
+                            result['ret'] = True
+                            data = response['data']
+
+                            controller_result = {}
+                            for property in properties:
+                                if property in data:
+                                    controller_result[property] = data[property]
+                            controller_results.append(controller_result)
+                elif deprecated_key in data:
+                    controller_list = data[deprecated_key]
                     for controller in controller_list:
                         controller_result = {}
                         for property in properties:
@@ -735,7 +759,25 @@ class RedfishUtils(object):
                         return response
                     data = response['data']
                     controller_name = 'Controller 1'
-                    if 'StorageControllers' in data:
+                    if 'Controllers' in data:
+                        controllers_uri = data['Controllers'][u'@odata.id']
+
+                        response = self.get_request(self.root_uri + controllers_uri)
+                        if response['ret'] is False:
+                            return response
+                        result['ret'] = True
+                        cdata = response['data']
+
+                        if cdata[u'Members']:
+                            controller_member_uri = cdata[u'Members'][0][u'@odata.id']
+
+                            response = self.get_request(self.root_uri + controller_member_uri)
+                            if response['ret'] is False:
+                                return response
+                            result['ret'] = True
+                            cdata = response['data']
+                            controller_name = cdata['Name']
+                    elif 'StorageControllers' in data:
                         sc = data['StorageControllers']
                         if sc:
                             if 'Name' in sc[0]:
@@ -839,15 +881,7 @@ class RedfishUtils(object):
                         return response
                     data = response['data']
                     controller_name = 'Controller %s' % str(idx)
-                    if 'StorageControllers' in data:
-                        sc = data['StorageControllers']
-                        if sc:
-                            if 'Name' in sc[0]:
-                                controller_name = sc[0]['Name']
-                            else:
-                                sc_id = sc[0].get('Id', '1')
-                                controller_name = 'Controller %s' % sc_id
-                    elif 'Controllers' in data:
+                    if 'Controllers' in data:
                         response = self.get_request(self.root_uri + data['Controllers'][u'@odata.id'])
                         if response['ret'] is False:
                             return response
@@ -865,6 +899,14 @@ class RedfishUtils(object):
                                 else:
                                     controller_id = member_data.get('Id', '1')
                                     controller_name = 'Controller %s' % controller_id
+                    elif 'StorageControllers' in data:
+                        sc = data['StorageControllers']
+                        if sc:
+                            if 'Name' in sc[0]:
+                                controller_name = sc[0]['Name']
+                            else:
+                                sc_id = sc[0].get('Id', '1')
+                                controller_name = 'Controller %s' % sc_id
                     volume_results = []
                     volume_list = []
                     if 'Volumes' in data:
