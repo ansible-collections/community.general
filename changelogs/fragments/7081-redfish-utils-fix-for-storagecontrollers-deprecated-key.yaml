@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_utils - use ``Controllers`` key in redfish data to obtain Storage controllers properties (https://github.com/ansible-collections/community.general/pull/7081).
