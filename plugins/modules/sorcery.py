@@ -281,9 +281,9 @@ def codex_list(module):
     # return only specified grimoires
     if params['repository']:
         if module.check_mode:
-            codex = {x: NA for x in params['name']}
+            codex = dict((x, NA) for x in params['name'])
         else:
-            codex = {x: codex[x] for x in params['name']}
+            codex = dict((x, codex[x]) for x in params['name'])
 
     if not codex:
         module.fail_json(msg="no grimoires to operate on; add at least one")
