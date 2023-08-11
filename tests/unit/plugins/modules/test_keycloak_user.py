@@ -41,7 +41,7 @@ def patch_keycloak_api(get_user_by_username=None,
                 with patch.object(obj, 'get_user_groups', side_effect=get_user_groups) as mock_get_user_groups:
                     with patch.object(obj, 'delete_user', side_effect=delete_user) as mock_delete_user:
                         with patch.object(obj, 'update_user', side_effect=update_user) as mock_update_user:
-                            yield mock_get_user_by_username, mock_create_user, mock_update_user_groups_membership,\
+                            yield mock_get_user_by_username, mock_create_user, mock_update_user_groups_membership, \
                                 mock_get_user_groups, mock_delete_user, mock_update_user
 
 

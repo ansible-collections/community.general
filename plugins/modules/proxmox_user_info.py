@@ -193,14 +193,14 @@ class ProxmoxUser:
                 self.user[k] = v
             elif k in ['groups', 'tokens'] and (v == '' or v is None):
                 self.user[k] = []
-            elif k == 'groups' and type(v) == str:
+            elif k == 'groups' and isinstance(v, str):
                 self.user['groups'] = v.split(',')
-            elif k == 'tokens' and type(v) == list:
+            elif k == 'tokens' and isinstance(v, list):
                 for token in v:
                     if 'privsep' in token:
                         token['privsep'] = proxmox_to_ansible_bool(token['privsep'])
                 self.user['tokens'] = v
-            elif k == 'tokens' and type(v) == dict:
+            elif k == 'tokens' and isinstance(v, dict):
                 self.user['tokens'] = list()
                 for tokenid, tokenvalues in v.items():
                     t = tokenvalues
