@@ -57,6 +57,8 @@ DOCUMENTATION = '''
         vars:
           - name: ansible_chroot_disable_root_check
         default: false
+        type: bool
+        version_added: 7.3.0
 '''
 
 EXAMPLES = r"""
