@@ -1,2 +1,2 @@
 minor_changes:
-  - "chroot - add ``disable_root_check`` option (https://github.com/ansible-collections/community.general/pull/7099)."
+  - "chroot connection plugin - add ``disable_root_check`` option (https://github.com/ansible-collections/community.general/pull/7099)."
