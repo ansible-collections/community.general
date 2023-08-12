@@ -49,8 +49,10 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = r"""
-# Static inventory file
+# Plugin requires root privileges for chroot, -E preserves your env (and location of ~/.ansible):
+# sudo -E ansible-playbook ...
 #
+# Static inventory file
 # [chroots]
 # /path/to/debootstrap
 # /path/to/feboostrap
