@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Create files to use as a disk devices"
-  command: "dd if=/dev/zero of={{ remote_tmp_dir }}/img{{ item }} bs=1M count=10"
+  command: "dd if=/dev/zero of={{ remote_tmp_dir }}/img{{ item }} bs=1M count=36"
   with_sequence: 'count=4'
 
 - name: "Show next free loop device"
