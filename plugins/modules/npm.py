@@ -150,6 +150,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
 class Npm(object):
@@ -172,33 +173,29 @@ class Npm(object):
         else:
             self.executable = [module.get_bin_path('npm', True)]
 
-        if kwargs['version'] and self.state != 'absent':
-            self.name_version = self.name + '@' + str(self.version)
+        if kwargs['version'] and kwargs['state'] != 'absent':
+            self.name_version = self.name + '@' + str(kwargs['version'])
         else:
             self.name_version = self.name
 
+        self.runner = CmdRunner(
+            module,
+            command=self.executable,
+            arg_formats=dict(
+                exec_args=cmd_runner_fmt.as_list(),
+                global_=cmd_runner_fmt.as_bool('--global'),
+                production=cmd_runner_fmt.as_bool('--production'),
+                ignore_scripts=cmd_runner_fmt.as_bool('--ignore-scripts'),
+                unsafe_perm=cmd_runner_fmt.as_bool('--unsafe-perm'),
+                name_version=cmd_runner_fmt.as_list(),
+                registry=cmd_runner_fmt.as_opt_val('--registry'),
+                no_optional=cmd_runner_fmt.as_bool('--no-optional'),
+                no_bin_links=cmd_runner_fmt.as_bool('--no-bin-links'),
+            )
+        )
+
     def _exec(self, args, run_in_check_mode=False, check_rc=True, add_package_name=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
-            cmd = self.executable + args
-
-            if self.glbl:
-                cmd.append('--global')
-            if self.production and ('install' in cmd or 'update' in cmd or 'ci' in cmd):
-                cmd.append('--production')
-            if self.ignore_scripts:
-                cmd.append('--ignore-scripts')
-            if self.unsafe_perm:
-                cmd.append('--unsafe-perm')
-            if self.name_version and add_package_name:
-                cmd.append(self.name_version)
-            if self.registry:
-                cmd.append('--registry')
-                cmd.append(self.registry)
-            if self.no_optional:
-                cmd.append('--no-optional')
-            if self.no_bin_links:
-                cmd.append('--no-bin-links')
-
             # If path is specified, cd into that path and run the command.
             cwd = None
             if self.path:
@@ -208,8 +205,19 @@ class Npm(object):
                     self.module.fail_json(msg="path %s is not a directory" % self.path)
                 cwd = self.path
 
-            rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
+            params = dict(self.module.params)
+            params['exec_args'] = args
+            params['global_'] = self.glbl
+            params['production'] = self.production and ('install' in args or 'update' in args or 'ci' in args)
+            params['name_version'] = self.name_version if add_package_name else None
+
+            with self.runner(
+                "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links",
+                check_rc=check_rc, cwd=cwd
+            ) as ctx:
+                rc, out, err = ctx.run(**params)
             return out
+
         return ''
 
     def list(self):
@@ -269,12 +277,12 @@ class Npm(object):
 
 def main():
     arg_spec = dict(
-        name=dict(default=None, type='str'),
-        path=dict(default=None, type='path'),
-        version=dict(default=None, type='str'),
+        name=dict(type='str'),
+        path=dict(type='path'),
+        version=dict(type='str'),
         production=dict(default=False, type='bool'),
-        executable=dict(default=None, type='path'),
-        registry=dict(default=None, type='str'),
+        executable=dict(type='path'),
+        registry=dict(type='str'),
         state=dict(default='present', choices=['present', 'absent', 'latest']),
         ignore_scripts=dict(default=False, type='bool'),
         unsafe_perm=dict(default=False, type='bool'),
@@ -293,25 +301,27 @@ def main():
     path = module.params['path']
     version = module.params['version']
     glbl = module.params['global']
-    production = module.params['production']
-    executable = module.params['executable']
-    registry = module.params['registry']
     state = module.params['state']
-    ignore_scripts = module.params['ignore_scripts']
-    unsafe_perm = module.params['unsafe_perm']
-    ci = module.params['ci']
-    no_optional = module.params['no_optional']
-    no_bin_links = module.params['no_bin_links']
 
     if not path and not glbl:
         module.fail_json(msg='path must be specified when not using global')
 
-    npm = Npm(module, name=name, path=path, version=version, glbl=glbl, production=production,
-              executable=executable, registry=registry, ignore_scripts=ignore_scripts,
-              unsafe_perm=unsafe_perm, state=state, no_optional=no_optional, no_bin_links=no_bin_links)
+    npm = Npm(module,
+              name=name,
+              path=path,
+              version=version,
+              glbl=glbl,
+              production=module.params['production'],
+              executable=module.params['executable'],
+              registry=module.params['registry'],
+              ignore_scripts=module.params['ignore_scripts'],
+              unsafe_perm=module.params['unsafe_perm'],
+              state=state,
+              no_optional=module.params['no_optional'],
+              no_bin_links=module.params['no_bin_links'])
 
     changed = False
-    if ci:
+    if module.params['ci']:
         npm.ci_install()
         changed = True
     elif state == 'present':
