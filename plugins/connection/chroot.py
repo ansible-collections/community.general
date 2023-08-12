@@ -46,6 +46,17 @@ DOCUMENTATION = '''
         vars:
           - name: ansible_chroot_exe
         default: chroot
+      disable_root_check:
+        description:
+            - Do not check that the user is not root.
+        ini:
+          - section: chroot_connection
+            key: disable_root_check
+        env:
+          - name: ANSIBLE_CHROOT_DISABLE_ROOT_CHECK
+        vars:
+          - name: ansible_chroot_disable_root_check
+        default: false
 '''
 
 EXAMPLES = r"""
@@ -100,11 +111,7 @@ class Connection(ConnectionBase):
 
         self.chroot = self._play_context.remote_addr
 
-        if os.geteuid() != 0:
-            raise AnsibleError("chroot connection requires running as root")
-
-        # we're running as root on the local system so do some
-        # trivial checks for ensuring 'host' is actually a chroot'able dir
+        # do some trivial checks for ensuring 'host' is actually a chroot'able dir
         if not os.path.isdir(self.chroot):
             raise AnsibleError("%s is not a directory" % self.chroot)
 
@@ -118,6 +125,11 @@ class Connection(ConnectionBase):
 
     def _connect(self):
         """ connect to the chroot """
+        if not self.get_option('disable_root_check') and os.geteuid() != 0:
+            raise AnsibleError(
+                "chroot connection requires running as root. "
+                "You can override this check with the `disable_root_check` option.")
+
         if os.path.isabs(self.get_option('chroot_exe')):
             self.chroot_cmd = self.get_option('chroot_exe')
         else:
