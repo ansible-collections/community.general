@@ -1,2 +1,2 @@
 minor_changes:
-  - Use shutdown -p ... with FreeBSD to half and power off machien with community.general.shutdown
+  - shutdown - use ``shutdown -p ...`` with FreeBSD to halt and power off machine (https://github.com/ansible-collections/community.general/pull/7102).
