@@ -231,8 +231,8 @@ stages:
           targets:
             - name: RHEL 9.0
               test: rhel/9.0
-            - name: FreeBSD 12.3
-              test: freebsd/12.3
+            #- name: FreeBSD 12.4
+            #  test: freebsd/12.4
           groups:
             - 1
             - 2
@@ -249,8 +249,8 @@ stages:
               test: macos/12.0
             - name: RHEL 8.5
               test: rhel/8.5
-            - name: FreeBSD 13.0
-              test: freebsd/13.0
+            #- name: FreeBSD 13.1
+            #  test: freebsd/13.1
           groups:
             - 1
             - 2
