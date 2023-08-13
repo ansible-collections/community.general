@@ -1,2 +1,0 @@
-bugfixes:
-  - rundeck - fix ``TypeError`` on 404 API response (https://github.com/ansible-collections/community.general/pull/6983).
