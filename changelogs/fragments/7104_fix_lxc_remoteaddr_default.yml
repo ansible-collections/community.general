@@ -1,0 +1,2 @@
+bugfixes:
+  - "lxc connection plugin - now handles ``remote_addr`` defaulting to ``inventory_hostname`` correctly (https://github.com/ansible-collections/community.general/pull/7104)."
