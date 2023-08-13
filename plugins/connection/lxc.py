@@ -19,6 +19,7 @@ DOCUMENTATION = '''
             - Container identifier
         default: inventory_hostname
         vars:
+            - name: inventory_hostname
             - name: ansible_host
             - name: ansible_lxc_host
       executable:
