@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_utils module utils - add support for ``PowerCycle`` reset type for ``redfish_command`` responses feature (https://github.com/ansible-collections/community.general/issues/7083).
