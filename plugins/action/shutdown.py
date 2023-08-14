@@ -45,7 +45,7 @@ class ActionModule(ActionBase):
     SHUTDOWN_COMMAND_ARGS = {
         'alpine': '',
         'void': '-h +{delay_min} "{message}"',
-        'freebsd': '-h +{delay_sec}s "{message}"',
+        'freebsd': '-p +{delay_sec}s "{message}"',
         'linux': DEFAULT_SHUTDOWN_COMMAND_ARGS,
         'macosx': '-h +{delay_min} "{message}"',
         'openbsd': '-h +{delay_min} "{message}"',

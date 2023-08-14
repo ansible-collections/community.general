@@ -1,0 +1,2 @@
+minor_changes:
+  - shutdown - use ``shutdown -p ...`` with FreeBSD to halt and power off machine (https://github.com/ansible-collections/community.general/pull/7102).
