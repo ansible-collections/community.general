@@ -1074,7 +1074,12 @@ class RedfishUtils(object):
         # command should be PowerOn, PowerForceOff, etc.
         if not command.startswith('Power'):
             return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
-        reset_type = command[5:]
+
+        # Commands (except PowerCycle) will be stripped of the 'Power' prefix
+        if command == 'PowerCycle':
+            reset_type = command
+        else:
+            reset_type = command[5:]
 
         # map Reboot to a ResetType that does a reboot
         if reset_type == 'Reboot':
