@@ -77,8 +77,8 @@
 - name: Verify shutdown delay is present in seconds in FreeBSD
   assert:
     that:
-      - '"-h +100s" in shutdown_result["shutdown_command"]'
-      - '"-h +0s" in shutdown_result_minus["shutdown_command"]'
+      - '"-p +100s" in shutdown_result["shutdown_command"]'
+      - '"-p +0s" in shutdown_result_minus["shutdown_command"]'
   when: ansible_system == 'FreeBSD'
 
 - name: Verify shutdown delay is present in seconds in Solaris, SunOS
