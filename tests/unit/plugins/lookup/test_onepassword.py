@@ -90,7 +90,7 @@ def test_assert_logged_in_v2_connect(mocker, monkeypatch):
     op_cli = OnePassCLIv2()
     result = op_cli.assert_logged_in()
     assert not op_cli._run.called
-    assert result == True
+    assert result
 
 
 def test_full_signin_v2(mocker):
