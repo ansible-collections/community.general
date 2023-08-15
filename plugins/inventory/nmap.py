@@ -85,6 +85,11 @@ DOCUMENTATION = '''
             type: boolean
             default: false
             version_added: 6.1.0
+        use_arp_ping:
+            description: Whether to always (V(true)) the quick arp ping or (V(false)) a slower but more reliable method.
+            type: boolean
+            default: true
+            version_added: 7.4.0
     notes:
         - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
         - 'TODO: add OS fingerprinting'
@@ -196,40 +201,43 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # setup command
             cmd = [self._nmap]
 
-            if self._options['sudo']:
+            if self.get_option['sudo']:
                 cmd.insert(0, 'sudo')
 
-            if self._options['port']:
+            if self.get_option['port']:
                 cmd.append('-p')
-                cmd.append(self._options['port'])
+                cmd.append(self.get_option['port'])
 
-            if not self._options['ports']:
+            if not self.get_option['ports']:
                 cmd.append('-sP')
 
-            if self._options['ipv4'] and not self._options['ipv6']:
+            if self.get_option['ipv4'] and not self.get_option['ipv6']:
                 cmd.append('-4')
-            elif self._options['ipv6'] and not self._options['ipv4']:
+            elif self.get_option['ipv6'] and not self.get_option['ipv4']:
                 cmd.append('-6')
-            elif not self._options['ipv6'] and not self._options['ipv4']:
+            elif not self.get_option['ipv6'] and not self.get_option['ipv4']:
                 raise AnsibleParserError('One of ipv4 or ipv6 must be enabled for this plugin')
 
-            if self._options['exclude']:
+            if self.get_option['exclude']:
                 cmd.append('--exclude')
-                cmd.append(','.join(self._options['exclude']))
+                cmd.append(','.join(self.get_option['exclude']))
 
-            if self._options['dns_resolve']:
+            if self.get_option['dns_resolve']:
                 cmd.append('-n')
 
-            if self._options['udp_scan']:
+            if self.get_option['udp_scan']:
                 cmd.append('-sU')
 
-            if self._options['icmp_timestamp']:
+            if self.get_option['icmp_timestamp']:
                 cmd.append('-PP')
 
-            if self._options['open']:
+            if self.get_option['open']:
                 cmd.append('--open')
 
-            cmd.append(self._options['address'])
+            if not self.get_option['use_arp_ping']:
+                cmd.append('-disable-arp-ping')
+
+            cmd.append(self.get_option['address'])
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
