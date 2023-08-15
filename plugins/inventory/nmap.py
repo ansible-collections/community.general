@@ -86,7 +86,7 @@ DOCUMENTATION = '''
             default: false
             version_added: 6.1.0
         use_arp_ping:
-            description: Whether to always (V(true)) the quick arp ping or (V(false)) a slower but more reliable method.
+            description: Whether to always (V(true)) use the quick ARP ping or (V(false)) a slower but more reliable method.
             type: boolean
             default: true
             version_added: 7.4.0
