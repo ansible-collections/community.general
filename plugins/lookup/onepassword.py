@@ -510,6 +510,11 @@ class OnePassCLIv2(OnePassCLIBase):
         return ""
 
     def assert_logged_in(self):
+        connect_host = os.environ.get("OP_CONNECT_HOST", False)
+        connect_token = os.environ.get("OP_CONNECT_TOKEN", False)
+        if connect_host and connect_token:
+            return True
+
         if self.service_account_token:
             args = ["whoami"]
             environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}

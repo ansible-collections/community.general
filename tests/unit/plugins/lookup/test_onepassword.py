@@ -82,6 +82,17 @@ def test_assert_logged_in_v2(mocker, args, out, expected_call_args, expected_cal
     assert result == expected
 
 
+def test_assert_logged_in_v2_connect(mocker, monkeypatch):
+    mocker.patch.object(OnePassCLIv2, "_run", return_value=[1, "", ""])
+    monkeypatch.setenv("OP_CONNECT_HOST", "http://localhost:8080")
+    monkeypatch.setenv("OP_CONNECT_TOKEN", "foobar")
+
+    op_cli = OnePassCLIv2()
+    result = op_cli.assert_logged_in()
+    assert not op_cli._run.called
+    assert result == True
+
+
 def test_full_signin_v2(mocker):
     mocker.patch.object(OnePassCLIv2, "_run", return_value=[0, "", ""])
 
