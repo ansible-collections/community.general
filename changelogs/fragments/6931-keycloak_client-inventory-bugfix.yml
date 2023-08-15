@@ -1,2 +1,0 @@
-bugfixes:
-  - keycloak_client inventory plugin - fix missing client secret (https://github.com/ansible-collections/community.general/pull/6931).

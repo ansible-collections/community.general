@@ -1295,3 +1295,83 @@ releases:
     - 6983-rundeck-fix-typerrror-on-404-api-response.yml
     - 7.2.1.yml
     release_date: '2023-07-31'
+  7.3.0:
+    changes:
+      bugfixes:
+      - bitwarden lookup plugin - the plugin made assumptions about the structure
+        of a Bitwarden JSON object which may have been broken by an update in the
+        Bitwarden API. Remove assumptions, and allow queries for general fields such
+        as ``notes`` (https://github.com/ansible-collections/community.general/pull/7061).
+      - ejabberd_user - module was failing to detect whether user was already created
+        and/or password was changed (https://github.com/ansible-collections/community.general/pull/7033).
+      - keycloak module util - fix missing ``http_agent``, ``timeout``, and ``validate_certs``
+        ``open_url()`` parameters (https://github.com/ansible-collections/community.general/pull/7067).
+      - keycloak_client inventory plugin - fix missing client secret (https://github.com/ansible-collections/community.general/pull/6931).
+      - lvol - add support for percentage of origin size specification when creating
+        snapshot volumes (https://github.com/ansible-collections/community.general/issues/1630,
+        https://github.com/ansible-collections/community.general/pull/7053).
+      - lxc connection plugin - now handles ``remote_addr`` defaulting to ``inventory_hostname``
+        correctly (https://github.com/ansible-collections/community.general/pull/7104).
+      - oci_utils module utils - avoid direct type comparisons (https://github.com/ansible-collections/community.general/pull/7085).
+      - proxmox_user_info - avoid direct type comparisons (https://github.com/ansible-collections/community.general/pull/7085).
+      - snap - fix crash when multiple snaps are specified and one has ``---`` in
+        its description (https://github.com/ansible-collections/community.general/pull/7046).
+      - sorcery - fix interruption of the multi-stage process (https://github.com/ansible-collections/community.general/pull/7012).
+      - sorcery - fix queue generation before the whole system rebuild (https://github.com/ansible-collections/community.general/pull/7012).
+      - sorcery - latest state no longer triggers update_cache (https://github.com/ansible-collections/community.general/pull/7012).
+      deprecated_features:
+      - ejabberd_user - deprecate the parameter ``logging`` in favour of producing
+        more detailed information in the module output (https://github.com/ansible-collections/community.general/pull/7043).
+      minor_changes:
+      - chroot connection plugin - add ``disable_root_check`` option (https://github.com/ansible-collections/community.general/pull/7099).
+      - ejabberd_user - module now using ``CmdRunner`` to execute external command
+        (https://github.com/ansible-collections/community.general/pull/7075).
+      - ipa_config - add module parameters to manage FreeIPA user and group objectclasses
+        (https://github.com/ansible-collections/community.general/pull/7019).
+      - ipa_config - adds ``idp`` choice to ``ipauserauthtype`` parameter's choices
+        (https://github.com/ansible-collections/community.general/pull/7051).
+      - npm - module now using ``CmdRunner`` to execute external commands (https://github.com/ansible-collections/community.general/pull/6989).
+      - proxmox_kvm - enabled force restart of VM, bringing the ``force`` parameter
+        functionality in line with what is described in the docs (https://github.com/ansible-collections/community.general/pull/6914).
+      - proxmox_vm_info - ``node`` parameter is no longer required. Information can
+        be obtained for the whole cluster (https://github.com/ansible-collections/community.general/pull/6976).
+      - proxmox_vm_info - non-existing provided by name/vmid VM would return empty
+        results instead of failing (https://github.com/ansible-collections/community.general/pull/7049).
+      - redfish_config - add ``DeleteAllVolumes`` command to allow deletion of all
+        volumes on servers (https://github.com/ansible-collections/community.general/pull/6814).
+      - redfish_utils - use ``Controllers`` key in redfish data to obtain Storage
+        controllers properties (https://github.com/ansible-collections/community.general/pull/7081).
+      - redfish_utils module utils - add support for ``PowerCycle`` reset type for
+        ``redfish_command`` responses feature (https://github.com/ansible-collections/community.general/issues/7083).
+      - redfish_utils module utils - add support for following ``@odata.nextLink``
+        pagination in ``software_inventory`` responses feature (https://github.com/ansible-collections/community.general/pull/7020).
+      - shutdown - use ``shutdown -p ...`` with FreeBSD to halt and power off machine
+        (https://github.com/ansible-collections/community.general/pull/7102).
+      - sorcery - add grimoire (repository) management support (https://github.com/ansible-collections/community.general/pull/7012).
+      release_summary: Feature and bugfix release.
+    fragments:
+    - 6814-redfish-config-add-delete-all-volumes.yml
+    - 6914-proxmox_kvm-enable-force-restart.yml
+    - 6931-keycloak_client-inventory-bugfix.yml
+    - 6976-proxmox-vm-info-not-require-node.yml
+    - 6989-npm-cmdrunner.yml
+    - 7.3.0.yml
+    - 7012-sorcery-grimoire-mgmt.yml
+    - 7019-ipa_config-user-and-group-objectclasses.yml
+    - 7020-redfish-utils-pagination.yml
+    - 7033-ejabberd-user-bugs.yml
+    - 7043-ejabberd-user-deprecate-logging.yml
+    - 7046-snap-newline-before-separator.yml
+    - 7049-proxmox-vm-info-empty-results.yml
+    - 7051-ipa-config-new-choice-idp-to-ipauserauthtype.yml
+    - 7061-fix-bitwarden-get_field.yml
+    - 7067-keycloak-api-paramerter-fix.yml
+    - 7075-ejabberd-user-cmdrunner.yml
+    - 7081-redfish-utils-fix-for-storagecontrollers-deprecated-key.yaml
+    - 7085-sanity.yml
+    - 7099-chroot-disable-root-check-option.yml
+    - 7102-freebsd-shutdown-p.yml
+    - 7104_fix_lxc_remoteaddr_default.yml
+    - 7113-redfish-utils-power-cycle.yml
+    - lvol-pct-of-origin.yml
+    release_date: '2023-08-15'

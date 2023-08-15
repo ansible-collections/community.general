@@ -1,3 +1,0 @@
-bugfixes:
-  - "oci_utils module utils - avoid direct type comparisons (https://github.com/ansible-collections/community.general/pull/7085)."
-  - "proxmox_user_info - avoid direct type comparisons (https://github.com/ansible-collections/community.general/pull/7085)."
