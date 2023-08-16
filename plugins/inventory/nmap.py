@@ -235,7 +235,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 cmd.append('--open')
 
             if not self.get_option['use_arp_ping']:
-                cmd.append('-disable-arp-ping')
+                cmd.append('--disable-arp-ping')
 
             cmd.append(self.get_option['address'])
             try:
