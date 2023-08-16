@@ -248,6 +248,7 @@ class Pnpm(object):
             out, err = self._exec(cmd, True, False)
             if err is not None and err != "":
                 raise Exception(out)
+
             data = json.loads(out)
         except Exception as e:
             self.module.fail_json(
@@ -269,12 +270,17 @@ class Pnpm(object):
                 continue
 
             for dep, prop in data[typedep].items():
-                if self.alias is None or self.alias == dep:
-                    name = prop["from"] if self.alias is not None else dep
-                    if self.name == name:
-                        if self.version is None or self.version == prop["version"]:
-                            return False
-                        break
+                if self.alias is not None and self.alias != dep:
+                    continue
+
+                name = prop["from"] if self.alias is not None else dep
+                if self.name != name:
+                    continue
+
+                if self.version is None or self.version == prop["version"]:
+                    return False
+
+                break
 
         return True
 
@@ -298,6 +304,7 @@ class Pnpm(object):
         cmd = ["outdated", "--format", "json"]
         try:
             out, err = self._exec(cmd, True, False)
+
             # BUG: It will not show correct error sometimes, like when it has
             # plain text output intermingled with a {}
             if err is not None and err != "":
