@@ -36,7 +36,7 @@ options:
       - All packages in package.json are installed if not provided.
     type: str
     required: false
-   alias:
+  alias:
     description:
       - Alias of the node.js library.
     type: str
