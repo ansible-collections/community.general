@@ -3,15 +3,11 @@
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
-# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or
+# https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
-from ansible.module_utils.six.moves.urllib.parse import urlencode
-from copy import deepcopy
-import json
 
 DOCUMENTATION = '''
 ---
@@ -20,7 +16,7 @@ module: keycloak_realm_key
 short_description: Allows administration of Keycloak realm keys via Keycloak API
 
 description:
-    - This module allows the administration of Keycloak realm via the Keycloak REST API. It
+    - This module allows the administration of Keycloak realm keys via the Keycloak REST API. It
       requires access to the REST API via OpenID Connect; the user connecting and the realm being
       used must have the requisite access rights. In a default Keycloak installation, admin-cli
       and an admin user would work, as would a separate realm definition with the scope tailored
@@ -36,12 +32,18 @@ description:
       This can be considered either a bug or a feature, as the alternative would be to always
       update the realm key whether it has changed or not.
 
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: full
+
 options:
     state:
         description:
             - State of the keycloak realm key.
-            - On C(present), the realm key will be created (or updated if it exists already).
-            - On C(absent), the realm key will be removed if it exists.
+            - On V(present), the realm key will be created (or updated if it exists already).
+            - On V(absent), the realm key will be removed if it exists.
         choices: ['present', 'absent']
         default: 'present'
         type: str
@@ -49,19 +51,21 @@ options:
         description:
             - Name of the realm key to create.
         type: str
+        required: true
     parent_id:
         description:
             - The parent_id of the realm key. In practice the ID (name) of the realm.
         type: str
+        required: true
     provider_id:
         description:
-            - The name of the "provider ID" for the key..
+            - The name of the "provider ID" for the key.
         choices: ['rsa']
         default: 'rsa'
         type: str
     config:
         description:
-            - Dict specifying the key and its properties
+            - Dict specifying the key and its properties.
         type: dict
         suboptions:
             active:
@@ -78,52 +82,65 @@ options:
                 type: bool
             priority:
                 description:
-                    - The priority of the key
+                    - The priority of the key.
                 default: 100
                 type: int
             algorithm:
                 description:
-                    - Key algorithm
-                default: 'RSA256'
-                choices: ['RSA256']
+                    - Key algorithm.
+                default: RS256
+                choices: ['RS256']
+                type: str
             private_key:
                 description:
-                    - The private key as an ASCII string. Contents of the key Must match algorithm
-                      and provider_id
-                    - Linefeeds should be converted into literal \n
+                    - The private key as an ASCII string. Contents of the key must match algorithm
+                      and provider_id.
+                    - Linefeeds should be converted into literal linefeed (backslash + n).
+                required: true
+                type: str
 
 extends_documentation_fragment:
     - community.general.keycloak
+    - community.general.attributes
 
-    author:
-            - Samuli Seppänen (@mattock)
+author:
+    - Samuli Seppänen (@mattock)
 '''
 
 EXAMPLES = '''
 - name: Manage Keycloak realm key
-    keycloak_realm_key:
-      name: custom
-      state: present
-      parent_id: master
-      provider_id: "rsa"
-      auth_keycloak_url: "http://localhost:8080/auth"
-      auth_username: keycloak
-      auth_password: keycloak
-      auth_realm: master
-      config:
-        private_key: "{{ private_key }}"
-        enabled: true
-        active: true
-        priority: 120
-        algorithm: "RS256"
+  community.general.keycloak_realm_key:
+    name: custom
+    state: present
+    parent_id: master
+    provider_id: rsa
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_username: keycloak
+    auth_password: keycloak
+    auth_realm: master
+    config:
+      private_key: "{{ private_key }}"
+      enabled: true
+      active: true
+      priority: 120
+      algorithm: RS256
 '''
 
 RETURN = '''
+msg:
+    description: Message as to what action was taken.
+    returned: always
+    type: str
 '''
+
+import json
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from copy import deepcopy
+
 
 def main():
     """
@@ -138,7 +155,8 @@ def main():
         name=dict(type='str', required=True),
         parent_id=dict(type='str', required=True),
         provider_id=dict(type='str', default='rsa', choices=['rsa']),
-        config=dict(type='dict',
+        config=dict(
+            type='dict',
             options=dict(
                 active=dict(type='bool', default=True),
                 enabled=dict(type='bool', default=True),
@@ -172,11 +190,11 @@ def main():
 
     # Filter and map the parameters names that apply to the role
     component_params = [x for x in module.params
-                    if x not in params_to_ignore and
-                    module.params.get(x) is not None]
+                        if x not in params_to_ignore and
+                        module.params.get(x) is not None]
 
     # We only support one component provider type in this module
-    provider_type='org.keycloak.keys.KeyProvider'
+    provider_type = 'org.keycloak.keys.KeyProvider'
 
     # Build a proposed changeset from parameters given to this module FIXME:
     # rename to "payload" or something as that reflects the variable's
@@ -209,9 +227,9 @@ def main():
 
                 changeset['config'][camel(config_param)].append(value)
         else:
-          # No need for camelcase in here as these are one word parameters
-          new_param_value = module.params.get(component_param)
-          changeset[camel(component_param)] = new_param_value
+            # No need for camelcase in here as these are one word parameters
+            new_param_value = module.params.get(component_param)
+            changeset[camel(component_param)] = new_param_value
 
     # As provider_type is not a module parameter we have to add it to the
     # changeset explicitly.
@@ -246,7 +264,7 @@ def main():
     key_id = None
 
     # Track individual parameter changes
-    changes=""
+    changes = ""
 
     # This tells Ansible whether the key was changed (added, removed, modified)
     result['changed'] = False
@@ -297,7 +315,7 @@ def main():
         result['msg'] = "Realm key %s created" % (name)
     elif not key_id and state == 'absent':
         result['changed'] = False
-        result['end_state'] = { state: state, name: name, parent_id: parent_id, enabled: enabled }
+        result['end_state'] = {state: state, name: name, parent_id: parent_id, enabled: enabled}
         result['msg'] = "Realm key %s not present" % (name)
 
     module.exit_json(**result)
