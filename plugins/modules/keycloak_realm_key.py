@@ -299,24 +299,39 @@ def main():
     # the key).
     if key_id and state == 'present':
         if result['changed']:
-            kc.update_component(changeset, parent_id)
-            result['msg'] = "Realm key %s changed: %s" % (name, changes.strip(", "))
+            if module.check_mode:
+                result['msg'] = "Realm key %s would be changed: %s" % (name, changes.strip(", "))
+            else:
+                kc.update_component(changeset, parent_id)
+                result['msg'] = "Realm key %s changed: %s" % (name, changes.strip(", "))
         else:
             result['msg'] = "Realm key %s was in sync" % (name)
+
         result['end_state'] = changeset_copy
     elif key_id and state == 'absent':
-        kc.delete_component(key_id, parent_id)
-        result['changed'] = True
-        result['msg'] = "Realm key %s deleted" % (name)
+        if module.check_mode:
+            result['changed'] = True
+            result['msg'] = "Realm key %s would be deleted" % (name)
+        else:
+            kc.delete_component(key_id, parent_id)
+            result['changed'] = True
+            result['msg'] = "Realm key %s deleted" % (name)
+
+        result['end_state'] = {}
     elif not key_id and state == 'present':
-        kc.create_component(changeset, parent_id)
-        result['changed'] = True
+        if module.check_mode:
+            result['changed'] = True
+            result['msg'] = "Realm key %s would be created" % (name)
+        else:
+            kc.create_component(changeset, parent_id)
+            result['changed'] = True
+            result['msg'] = "Realm key %s created" % (name)
+
         result['end_state'] = changeset_copy
-        result['msg'] = "Realm key %s created" % (name)
     elif not key_id and state == 'absent':
         result['changed'] = False
-        result['end_state'] = {state: state, name: name, parent_id: parent_id, enabled: enabled}
         result['msg'] = "Realm key %s not present" % (name)
+        result['end_state'] = {}
 
     module.exit_json(**result)
 
