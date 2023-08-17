@@ -196,9 +196,7 @@ def main():
     # We only support one component provider type in this module
     provider_type = 'org.keycloak.keys.KeyProvider'
 
-    # Build a proposed changeset from parameters given to this module FIXME:
-    # rename to "payload" or something as that reflects the variable's
-    # purpose better.
+    # Build a proposed changeset from parameters given to this module
     changeset = {}
     changeset['config'] = {}
 
