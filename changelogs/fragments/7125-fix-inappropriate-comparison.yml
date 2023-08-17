@@ -1,0 +1,2 @@
+bugfixes:
+  - apt_repository - fix inappropriate logical comparison expressions and makes them simpler. The previous checks had logical short circuits (https://github.com/ansible-collections/community.general/pull/7125).
