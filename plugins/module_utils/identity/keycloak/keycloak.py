@@ -119,6 +119,7 @@ URL_AUTHZ_RESOURCES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/reso
 URL_AUTHZ_CUSTOM_POLICY = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy/{policy_type}"
 URL_AUTHZ_CUSTOM_POLICIES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy"
 
+
 def keycloak_argument_spec():
     """
     Returns argument_spec of options common to keycloak_*-modules
