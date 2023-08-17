@@ -102,9 +102,9 @@ options:
     type: str
     required: false
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: ["present", "absent", "latest"]
 requirements:
-    - Pnpm executable present in C($PATH).
+  - Pnpm executable present in C($PATH).
 """
 
 EXAMPLES = """
