@@ -326,11 +326,13 @@ class Snap(StateModuleHelper):
                                                               if x.startswith("warning: no snap found")]))
             return process_(rc, out, err)
 
-        with self.runner("info name", output_process=process) as ctx:
-            try:
-                names = ctx.run(name=snaps)
-            finally:
-                self.vars.snapinfo_run_info.append(ctx.run_info)
+        names = []
+        if snaps:
+            with self.runner("info name", output_process=process) as ctx:
+                try:
+                    names = ctx.run(name=snaps)
+                finally:
+                    self.vars.snapinfo_run_info.append(ctx.run_info)
         return names
 
     def snap_status(self, snap_name, channel):
