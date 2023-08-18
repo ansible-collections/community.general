@@ -165,7 +165,7 @@ options:
       - Id of the Storage Subsystem on which the volume is to be created.
     type: str
     default: ''
-    version_added: '7.2.0'
+    version_added: '7.4.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
