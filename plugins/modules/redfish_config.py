@@ -158,7 +158,7 @@ options:
       - Setting dict of volume to be created.
     type: dict
     default: {}
-    version_added: '7.2.0'
+    version_added: '7.4.0'
   storage_subsystem_id:
     required: false
     description:
