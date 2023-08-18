@@ -133,6 +133,46 @@ msg:
     description: Message as to what action was taken.
     returned: always
     type: str
+
+end_state:
+    description: Representation of the keycloak_realm_key after module execution.
+    returned: on success
+    type: complex
+    contains:
+        id:
+            description: ID of the realm key.
+            type: str
+            returned: when O(state=present)
+            sample: 5b7ec13f-99da-46ad-8326-ab4c73cf4ce4
+        name:
+            description: Name of the realm key.
+            type: str
+            returned: when O(state=present)
+            sample: mykey
+        parentId:
+            description: ID of the realm this key belongs to.
+            type: str
+            returned: when O(state=present)
+            sample: myrealm
+        providerId:
+            description: The ID of the key provider.
+            type: str
+            returned: when O(state=present)
+            sample: rsa
+        providerType:
+            description: The type of provider.
+            type: str
+            returned: when O(state=present)
+        config:
+            description: Realm key configuration.
+            type: dict
+            returned: when O(state=present)
+            sample: {
+              "active": ["true"],
+              "algorithm": ["RS256"],
+              "enabled": ["true"],
+              "priority": ["140"]
+            }
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
