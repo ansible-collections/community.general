@@ -242,7 +242,12 @@ def main():
 
     # Initialize the result object. Only "changed" seems to have special
     # meaning for Ansible.
-    result = dict(changed=False, msg='', end_state={})
+    result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
+
+    # This will include the current state of the realm key if it is already
+    # present. This is only used for diff-mode.
+    before_realm_key = {}
+    before_realm_key['config'] = {}
 
     # Obtain access token, initialize API
     try:
@@ -345,12 +350,15 @@ def main():
 
             # Compare top-level parameters
             for param, value in changeset.items():
+                before_realm_key[param] = key[param]
+
                 if changeset_copy[param] != key[param] and param != 'config':
                     changes += "%s: %s -> %s, " % (param, key[param], changeset_copy[param])
                     result['changed'] = True
 
             # Compare parameters under the "config" key
             for p, v in changeset_copy['config'].items():
+                before_realm_key['config'][p] = key['config'][p]
                 if changeset_copy['config'][p] != key['config'][p]:
                     changes += "config.%s: %s -> %s, " % (p, key['config'][p], changeset_copy['config'][p])
                     result['changed'] = True
@@ -365,6 +373,11 @@ def main():
     # the key).
     if key_id and state == 'present':
         if result['changed']:
+            if module._diff:
+                del before_realm_key['config']['privateKey']
+                del before_realm_key['config']['certificate']
+                result['diff'] = dict(before=before_realm_key, after=changeset_copy)
+
             if module.check_mode:
                 result['msg'] = "Realm key %s would be changed: %s" % (name, changes.strip(", "))
             else:
@@ -375,6 +388,11 @@ def main():
 
         result['end_state'] = changeset_copy
     elif key_id and state == 'absent':
+        if module._diff:
+            del before_realm_key['config']['privateKey']
+            del before_realm_key['config']['certificate']
+            result['diff'] = dict(before=before_realm_key, after={})
+
         if module.check_mode:
             result['changed'] = True
             result['msg'] = "Realm key %s would be deleted" % (name)
@@ -385,6 +403,9 @@ def main():
 
         result['end_state'] = {}
     elif not key_id and state == 'present':
+        if module._diff:
+            result['diff'] = dict(before={}, after=changeset_copy)
+
         if module.check_mode:
             result['changed'] = True
             result['msg'] = "Realm key %s would be created" % (name)
