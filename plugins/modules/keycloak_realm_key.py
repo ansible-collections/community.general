@@ -106,6 +106,7 @@ options:
                       key must match algorithm and provider_id.
                     - Linefeeds should be converted into literal linefeed (backslash + n).
                 required: false
+                default: ''
                 type: str
 
 extends_documentation_fragment:
