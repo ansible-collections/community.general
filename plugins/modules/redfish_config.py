@@ -149,7 +149,7 @@ options:
     required: false
     description:
       - Setting parameter to enable or disable SecureBoot .
-    type: boot
+    type: bool
     default: True
     version_added: '7.4.0'
 author:
