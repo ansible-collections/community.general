@@ -250,12 +250,12 @@
       - result.end_state == {}
       - result.msg == "Realm key testkey not present"
 
-#- name: Remove Keycloak test realm
-#  community.general.keycloak_realm:
-#    auth_keycloak_url: "{{ url }}"
-#    auth_realm: "{{ admin_realm }}"
-#    auth_username: "{{ admin_user }}"
-#    auth_password: "{{ admin_password }}"
-#    realm: "{{ realm }}"
-#    id: "{{ realm }}"
-#    state: absent
+- name: Remove Keycloak test realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: absent
