@@ -3413,7 +3413,7 @@ class RedfishUtils(object):
             "msg": "BIOS verification completed"
         }
 
-    def enable_secure_boot(self):
+    def set_secure_boot(self, secure_boot_enable):
         # This function enable Secure Boot on an OOB controller
 
         response = self.get_request(self.root_uri + self.systems_uri)
@@ -3428,7 +3428,7 @@ class RedfishUtils(object):
             return response
 
         body = {}
-        body["SecureBootEnable"] = True
+        body["SecureBootEnable"] = secure_boot_enable
 
         return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)
 
