@@ -145,7 +145,7 @@ options:
     description:
      - Indicate desired state of the instance
     type: str
-    choices: ['present', 'started', 'absent', 'stopped', 'restarted']
+    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'template']
     default: present
   pubkey:
     description:
@@ -419,6 +419,23 @@ EXAMPLES = r'''
     api_host: node1
     state: restarted
 
+- name: Convert container to template
+  community.general.proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: template
+
+- name: Convert container to template(stop container if running)
+  community.general.proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: template
+    force: true
+
 - name: Remove container
   community.general.proxmox:
     vmid: 100
@@ -581,6 +598,13 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
+    def convert_to_template(self, vm, vmid, timeout, force):
+        if getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running' and force:
+            self.stop_instance(vm, vmid, timeout, force)
+        # not sure why, but templating a container doesn't return a taskid
+        getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).template.post()
+        return True
+
     def umount_instance(self, vm, vmid, timeout):
         taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.umount.post()
         while timeout:
@@ -621,7 +645,7 @@ def main():
         timeout=dict(type='int', default=30),
         force=dict(type='bool', default=False),
         purge=dict(type='bool', default=False),
-        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
+        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'template']),
         pubkey=dict(type='str'),
         unprivileged=dict(type='bool', default=True),
         description=dict(type='str'),
@@ -789,7 +813,16 @@ def main():
             if proxmox.stop_instance(vm, vmid, timeout, force=module.params['force']):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid)
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(msg="stopping of VM %s failed with exception: %s" % (vmid, e))
+    
+    elif state == 'template':
+        try:
+            vm = proxmox.get_vm(vmid)
+
+            if proxmox.convert_to_template(vm, vmid, timeout, force=module.params['force']):
+                module.exit_json(changed=True, msg="VM %s is converted to template" % vmid)
+        except Exception as e:
+            module.fail_json(msg="conversion of VM %s to template failed with exception: %s" % (vmid, e))
 
     elif state == 'restarted':
         try:
