@@ -791,7 +791,7 @@ class RedfishUtils(object):
         properties = ['BlockSizeBytes', 'CapableSpeedGbs', 'CapacityBytes',
                       'EncryptionAbility', 'EncryptionStatus',
                       'FailurePredicted', 'HotspareType', 'Id', 'Identifiers',
-                      'Manufacturer', 'MediaType', 'Model', 'Name',
+                      'Links', 'Manufacturer', 'MediaType', 'Model', 'Name',
                       'PartNumber', 'PhysicalLocation', 'Protocol', 'Revision',
                       'RotationSpeedRPM', 'SerialNumber', 'Status']
 
@@ -861,7 +861,12 @@ class RedfishUtils(object):
                             for property in properties:
                                 if property in data:
                                     if data[property] is not None:
-                                        drive_result[property] = data[property]
+                                        if property == "Links":
+                                            if "Volumes" in data["Links"].keys():
+                                                volumes = [v["@odata.id"] for v in data["Links"]["Volumes"]]
+                                                drive_result["Volumes"] = volumes
+                                        else:
+                                            drive_result[property] = data[property]
                             drive_results.append(drive_result)
                     drives = {'Controller': controller_name,
                               'Drives': drive_results}
