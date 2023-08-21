@@ -3344,7 +3344,7 @@ class RedfishUtils(object):
         result = {}
         inventory = {}
         # Get these entries, but does not fail if not found
-        properties = ['FirmwareVersion', 'ManagerType', 'Manufacturer', 'Model',
+        properties = ['Id', 'FirmwareVersion', 'ManagerType', 'Manufacturer', 'Model',
                       'PartNumber', 'PowerState', 'SerialNumber', 'Status', 'UUID']
 
         response = self.get_request(self.root_uri + manager_uri)
