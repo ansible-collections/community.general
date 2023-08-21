@@ -16,7 +16,7 @@ DOCUMENTATION = """
 ---
 module: pnpm
 short_description: Manage node.js packages with pnpm
-version_added: 7.1.0
+version_added: 7.4.0
 description:
   - Manage node.js packages with the L(pnpm package manager, https://pnpm.io/).
 author:
@@ -60,7 +60,7 @@ options:
   executable:
     description:
       - The executable location for pnpm.
-      - The default location it searches for is C($PATH), fails if not set.
+      - The default location it searches for is E(PATH), fails if not set.
     type: path
     required: false
   ignore_scripts:
@@ -85,7 +85,7 @@ options:
   dev:
     description:
       - Install dependencies in development mode.
-      - Pnpm will ignore any regular dependencies in package.json.
+      - Pnpm will ignore any regular dependencies in C(package.json).
     required: false
     default: false
     type: bool
@@ -104,7 +104,7 @@ options:
     default: present
     choices: ["present", "absent", "latest"]
 requirements:
-  - Pnpm executable present in C($PATH).
+  - Pnpm executable present in E(PATH).
 """
 
 EXAMPLES = """
