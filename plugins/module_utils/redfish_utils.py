@@ -3630,3 +3630,119 @@ class RedfishUtils(object):
 
         return {'ret': True, 'changed': True,
                 'msg': "Volume Created"}
+
+    def get_bios_registry(self):
+        # Get /redfish/v1
+        response = self.get_request(self.root_uri + self.service_root)
+        if not response["ret"]:
+            # error_msg(module, "GET", base_uri, redfish_data.status, redfish_data.text)
+            return response
+
+        server_details = response["data"]
+
+        # Get Registries URI
+        if "Registries" not in server_details:
+            msg = "Getting Registries URI failed, Key 'Registries' not found in /redfish/v1/ response: %s"
+            # module.fail_json(msg=msg % str(server_details))
+            return {
+                "ret": False,
+                "msg": msg % str(server_details)
+            }
+
+        reg_uri = server_details["Registries"]["@odata.id"]
+        reg_resp = self.get_request(self.root_uri + reg_uri)
+        if not reg_resp["ret"]:
+            # error_msg(module, "GET", reg_uri, reg_resp.status, reg_resp.text)
+            return reg_resp
+
+        reg_data = reg_resp["data"]
+
+        # Get BIOS attribute registry URI
+        lst = []
+        response = self.check_attribute_registry_uri(reg_data, reg_uri)
+        if not response["ret"]:
+            return response
+
+        resp_data, resp_uri = response["resp_data"], response["resp_uri"]
+        # Get the location URI
+        response = self.check_location_uri(resp_data, resp_uri)
+        if not response["ret"]:
+            return response
+
+        rsp_data, rsp_uri = response["rsp_data"], response["rsp_uri"]
+
+        if "RegistryEntries" not in rsp_data:
+            return {
+                "msg": "'RegistryEntries' not present in %s response, %s" % (rsp_uri, str(rsp_data)),
+                "ret": False
+            }
+
+        return {
+            "bios_registry": rsp_data,
+            "bios_registry_uri": rsp_uri,
+            "ret": True
+        }
+
+    def check_attribute_registry_uri(self, reg_data, reg_uri):
+        # Get BiosAttributeRegistry<BIOS version> response
+        resp_data = ""
+        for mem in reg_data['Members']:
+            if "attribute" in mem['@odata.id'].lower():
+                resp = self.get_request(self.root_uri + mem["@odata.id"])
+                if not resp["ret"]:
+                    return resp
+                resp_data = resp["data"]
+                if 'Location' not in resp_data:
+                    msg = "Key 'Location' not found in BIOS attribute registry, URI: %s response: %s"
+                    return {
+                        "ret": False,
+                        "msg": msg % (mem['@odata.id'], str(resp_data))
+                    }
+                break
+        if not resp_data:
+            msg = "'BiosAttributeRegistry<BIOS_version>' URI not found in %s response, %s"
+            return {
+                "ret": False,
+                "msg": msg % (reg_uri, str(reg_data))
+            }
+
+        return {
+            "ret": True,
+            "resp_data": resp_data,
+            "resp_uri": mem['@odata.id']
+        }
+
+    def check_location_uri(self, resp_data, resp_uri):
+        # Get the location URI response
+        # return {"msg": self.creds, "ret": False}
+        rsp_uri = ""
+        for loc in resp_data['Location']:
+            if loc['Language'] == "en":
+                if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
+                    rsp_uri = loc['Uri']['extref']
+                    headers = {"Accept": "application/json"}
+                else:
+                    rsp_uri = loc['Uri']
+                    headers = {"Accept": "application/json", "Accept-Encoding": "gzip"}
+        if not rsp_uri:
+            msg = "Language 'en' not found in BIOS Atrribute Registries location, URI: %s, response: %s"
+            return {
+                "ret": False,
+                "msg": msg % (resp_uri, str(resp_data))
+            }
+
+        headers['X-Auth-Token'] = self.creds["token"]
+        res = requests.get(self.root_uri + rsp_uri, headers=headers, verify=False)
+        if res.status_code != 200:
+            return {
+                "ret": False,
+                "msg": "Failed get on %s" % str(rsp_uri)
+            }
+
+        rsp_data = json.loads(res.text)
+
+        return {
+            "ret": True,
+            "rsp_data": rsp_data,
+            "rsp_uri": rsp_uri
+        }
