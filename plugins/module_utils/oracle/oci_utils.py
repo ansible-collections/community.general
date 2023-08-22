@@ -561,7 +561,7 @@ def are_lists_equal(s, t):
     if s is None and t is None:
         return True
 
-    if (s is None and len(t) >= 0) or (t is None and len(s) >= 0) or (len(s) != len(t)):
+    if s is None or t is None or (len(s) != len(t)):
         return False
 
     if len(s) == 0:
@@ -1026,10 +1026,7 @@ def check_if_user_value_matches_resources_attr(
             return
 
         if (
-            resources_value_for_attr is None
-            and len(user_provided_value_for_attr) >= 0
-            or user_provided_value_for_attr is None
-            and len(resources_value_for_attr) >= 0
+            resources_value_for_attr is None or user_provided_value_for_attr is None
         ):
             res[0] = False
             return
