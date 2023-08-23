@@ -73,7 +73,7 @@ options:
             active:
                 description:
                     - Whether they key is active or inactive. Not to be confused with the state
-                      of the Ansible resource managed by the "state" parameter.
+                      of the Ansible resource managed by the O(state) parameter.
                 default: true
                 type: bool
             enabled:
