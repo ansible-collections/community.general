@@ -95,7 +95,7 @@ options:
                 type: str
             private_key:
                 description:
-                    - The private key as an ASCII string. Contents of the key must match algorithm
+                    - The private key as an ASCII string. Contents of the key must match O(config.algorithm)
                       and O(provider_id).
                     - Linefeeds should be converted into literal linefeed (backslash + n).
                 required: true
