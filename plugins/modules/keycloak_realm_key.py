@@ -103,7 +103,7 @@ options:
             certificate:
                 description:
                     - A certificate signed with the private key as an ASCII string. Contents of the
-                      key must match algorithm and provider_id.
+                      key must match O(config.algorithm) and O(provider_id).
                     - Linefeeds should be converted into literal linefeed (backslash + n).
                 required: false
                 default: ''
