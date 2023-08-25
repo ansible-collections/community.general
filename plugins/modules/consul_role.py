@@ -56,11 +56,13 @@ options:
       name:
         description:
           - The name of the policy to attach to this role; see M(community.general.consul_policy) for more info.
-          - Either C(name) or C(id) must be specified. Both can be specified.
+          - Either this or C(id) must be specified.
+        type: str
       id:
         description:
           - The id of the policy to attach to this role; see M(community.general.consul_policy) for more info.
-          - Either C(name) or C(id) must be specified. Both can be specified.
+          - Either this or C(name) must be specified.
+        type: str
   service_identities:
     type: list
     elements: dict
