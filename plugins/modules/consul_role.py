@@ -48,11 +48,19 @@ options:
     type: list
     elements: dict
     description:
-      - List of policies to attach to the role.
-      - Each element must have a "name" or "id" (or both) to identify the policy. See M(community.general.consul_policy) for more info.
+      - List of policies to attach to the role. Each policy is a dict.
       - If the parameter is left blank, any policies assigned will be unassigned
     required: false
     default: []
+    suboptions:
+      name:
+        description:
+          - The name of the policy to attach to this role; see M(community.general.consul_policy) for more info.
+          - Either C(name) or C(id) must be specified. Both can be specified.
+      id:
+        description:
+          - The id of the policy to attach to this role; see M(community.general.consul_policy) for more info.
+          - Either C(name) or C(id) must be specified. Both can be specified.
   service_identities:
     type: list
     elements: dict
