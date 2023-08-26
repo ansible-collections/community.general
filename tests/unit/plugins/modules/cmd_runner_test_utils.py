@@ -66,8 +66,11 @@ class _Context(object):
 
     def _make_mock_run_cmd(self):
         call_results = [(x.rc, x.out, x.err) for x in self.run_cmd_calls]
-        error_call_results = (123, "OUT: testcase has not enough run_command calls", "ERR: testcase has not enough run_command calls")
-        mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command', side_effect=chain(call_results, repeat(error_call_results)))
+        error_call_results = (123,
+                              "OUT: testcase has not enough run_command calls",
+                              "ERR: testcase has not enough run_command calls")
+        mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command',
+                                             side_effect=chain(call_results, repeat(error_call_results)))
         return mock_run_command
 
     def __enter__(self):
