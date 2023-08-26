@@ -50,8 +50,8 @@ options:
     description:
       - List of policies to attach to the role. Each policy is a dict.
       - If the parameter is left blank, any policies assigned will be unassigned
+      - Any empty array will clear any policies previously set
     required: false
-    default: []
     suboptions:
       name:
         description:
@@ -221,9 +221,9 @@ _ARGUMENT_SPEC = {
     VALIDATE_CERTS_PARAMETER_NAME: dict(type='bool', default=True),
     NAME_PARAMETER_NAME: dict(required=True),
     DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=''),
-    POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', options=POLICY_RULE_SPEC, default=[]),
-    SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
-    NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
+    POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', options=POLICY_RULE_SPEC, default=None),
+    SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=None),
+    NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=None),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
 }
 
@@ -247,26 +247,77 @@ def update_role(role, configuration):
     update_role_data = {
         'Name': configuration.name,
         'Description': configuration.description,
-        'Policies': [x.to_dict() for x in configuration.policies],
     }
 
-    if configuration.version >= ConsulVersion("1.5.0"):
+    # check if the user omitted policies, service identities, or node identities
+    policy_specified = True
+    if len(configuration.policies) == 1 and configuration.policies[0] is None:
+        policy_specified = False
+
+    service_id_specified = True
+    if len(configuration.service_identities) == 1 and configuration.service_identities[0] is None:
+        service_id_specified = False
+
+    node_id_specified = True
+    if len(configuration.node_identities) == 1 and configuration.node_identities[0] is None:
+        node_id_specified = False
+
+    # if not policy_specified:
+    #     configuration.policies.pop()  # TODO check: do we to do need this?
+
+    if policy_specified:
+        update_role_data["Policies"] = [x.to_dict() for x in configuration.policies]
+
+    if configuration.version >= ConsulVersion("1.5.0") and service_id_specified:
         update_role_data["ServiceIdentities"] = [
             x.to_dict() for x in configuration.service_identities]
 
-    if configuration.version >= ConsulVersion("1.8.0"):
+    if configuration.version >= ConsulVersion("1.8.0") and node_id_specified:
         update_role_data["NodeIdentities"] = [
             x.to_dict() for x in configuration.node_identities]
 
     if configuration.check_mode:
+        policies_changed = False
+        if policy_specified:
+            policies_changed = not (
+                compare_consul_api_role_policy_objects(role.get('Policies', []), update_role_data.get('Policies', [])))
+        else:
+            if role.get('Policies') is not None:
+                update_role_data["Policies"] = role.get('Policies')
+
+        service_ids_changed = False
+        if service_id_specified:
+            service_ids_changed = role.get('ServiceIdentities') != update_role_data.get('ServiceIdentities')
+        else:
+            if role.get('ServiceIdentities') is not None:
+                update_role_data["ServiceIdentities"] = role.get('ServiceIdentities')
+
+        node_ids_changed = False
+        if node_id_specified:
+            node_ids_changed = role.get('NodeIdentities') != update_role_data.get('NodeIdentities')
+        else:
+            if role.get('NodeIdentities'):
+                update_role_data["NodeIdentities"] = role.get('NodeIdentities')
+
         changed = (
             role['Description'] != update_role_data['Description'] or
-            not compare_consul_api_role_policy_objects(role.get('Policies', []), update_role_data.get('Policies', [])) or
-            role.get('ServiceIdentities', []) != update_role_data.get('ServiceIdentities', []) or
-            role.get('NodeIdentities', []) != update_role_data.get('NodeIdentities', [])
+            policies_changed or
+            service_ids_changed or
+            node_ids_changed
         )
         return Output(changed=changed, operation=UPDATE_OPERATION, role=update_role_data)
     else:
+        # if policies, service_id or node_id are not specified; we need to get the existing value and apply it
+
+        if not policy_specified and role.get('Policies') is not None:
+            update_role_data["Policies"] = role.get('Policies')
+
+        if not service_id_specified and role.get('ServiceIdentities') is not None:
+            update_role_data["ServiceIdentities"] = role.get('ServiceIdentities')
+
+        if not node_id_specified and role.get('NodeIdentities') is not None:
+            update_role_data["NodeIdentities"] = role.get('NodeIdentities')
+
         response = requests.put(url, headers=headers, json=update_role_data, verify=configuration.validate_certs)
         handle_consul_response_error(response)
 
@@ -284,6 +335,30 @@ def update_role(role, configuration):
 def create_role(configuration):
     url = '%s/acl/role' % get_consul_url(configuration)
     headers = get_auth_headers(configuration)
+
+    # check if the user omitted policies, service identities, or node identities
+    policy_specified = True
+    if len(configuration.policies) == 1 and configuration.policies[0] is None:
+        policy_specified = False
+
+    service_id_specified = True
+    if len(configuration.service_identities) == 1 and configuration.service_identities[0] is None:
+        service_id_specified = False
+
+    node_id_specified = True
+    if len(configuration.node_identities) == 1 and configuration.node_identities[0] is None:
+        node_id_specified = False
+
+    # get rid of None item so we can set an emtpy list for policies, service identities and node identities
+    if not policy_specified:
+        configuration.policies.pop()
+
+    if not service_id_specified:
+        configuration.service_identities.pop()
+
+    if not node_id_specified:
+        configuration.node_identities.pop()
+
     create_role_data = {
         'Name': configuration.name,
         'Description': configuration.description,
@@ -349,10 +424,8 @@ def set_role(configuration):
 
     if configuration.name in roles:
         role = roles[configuration.name]
-        # figure out if we're changing something
         return update_role(role, configuration)
     else:
-        # if check_mode -> return true
         return create_role(configuration)
 
 
@@ -433,18 +506,27 @@ class Configuration:
 
     def __init__(self, token=None, host=None, scheme=None, validate_certs=None, name=None, description=None, port=None,
                  policies=None, service_identities=None, node_identities=None, state=None, check_mode=None):
-        self.token = token                                    # type: str
-        self.host = host                                                            # type: str
-        self.port = port                                                            # type: int
-        self.scheme = scheme                                                        # type: str
-        self.validate_certs = validate_certs                                        # type: bool
-        self.name = name                                                            # type: str
-        self.description = description                                              # type: str
-        self.policies = [PolicyLink(p) for p in policies]                           # type: list(PolicyLink)
-        self.service_identities = [ServiceIdentity(s) for s in service_identities]  # type: list(ServiceIdentity)
-        self.node_identities = [NodeIdentity(n) for n in node_identities]           # type: list(NodeIdentity)
-        self.state = state                                                          # type: str
-        self.check_mode = check_mode                                                # type: bool
+        self.token = token                                                              # type: str
+        self.host = host                                                                # type: str
+        self.port = port                                                                # type: int
+        self.scheme = scheme                                                            # type: str
+        self.validate_certs = validate_certs                                            # type: bool
+        self.name = name                                                                # type: str
+        self.description = description                                                  # type: str
+        if policies is not None:
+            self.policies = [PolicyLink(p) for p in policies]                           # type: list(PolicyLink)
+        else:
+            self.policies = [None]
+        if service_identities is not None:
+            self.service_identities = [ServiceIdentity(s) for s in service_identities]  # type: list(ServiceIdentity)
+        else:
+            self.service_identities = [None]
+        if node_identities is not None:
+            self.node_identities = [NodeIdentity(n) for n in node_identities]           # type: list(NodeIdentity)
+        else:
+            self.node_identities = [None]
+        self.state = state                                                              # type: str
+        self.check_mode = check_mode                                                    # type: bool
 
 
 class Output:

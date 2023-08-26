@@ -90,6 +90,69 @@
       - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
       - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc2"
 
+- name: Update the role with service identity to add a policy, leaving the service id unchanged, in check mode
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-service-identity
+    policies:
+      - name: "foo-access-for-role"
+  register: result
+  check_mode: yes
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
+      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+
+- name: Update the role with service identity to remove the policies
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-service-identity
+    policies: []
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
+      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+      - result['role']['Policies'] is not defined
+      - result['role']['NodeIdentities'][0]['NodeName'] == "node-1"
+      - result['role']['NodeIdentities'][0]['Datacenter'] == "dc2"
+
+- name: Update the role with service identity to remove the node identities, in check mode
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-service-identity
+    node_identities: []
+  register: result
+  check_mode: yes
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
+      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+      - result['role']['Policies'] is not defined
+      - result['role']['NodeIdentities'] == [] # in check mode the cleared field is returned as an emtpy array
+
+- name: Update the role with service identity to remove the service identities
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-service-identity
+    service_identies: []
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['ServiceIdentities'] is not defined # in normal mode the dictionary is removed from the result
+      - result['role']['Policies'] is not defined
+      - result['role']['NodeIdentities'][0]['NodeName'] == "node-1"
+      - result['role']['NodeIdentities'][0]['Datacenter'] == "dc2"
+
 - name: Create a role with node identity
   consul_role:
     token: "{{ consul_management_token }}"
@@ -98,11 +161,13 @@
       - name: node-1
         datacenter: dc2
   register: result
+
 - assert:
     that:
       - result is changed
       - result['role']['NodeIdentities'][0]['NodeName'] == "node-1"
       - result['role']['NodeIdentities'][0]['Datacenter'] == "dc2"
+
 - name: Remove the last role
   consul_role:
     token: "{{ consul_management_token }}"
