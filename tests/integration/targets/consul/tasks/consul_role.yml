@@ -142,7 +142,7 @@
   consul_role:
     token: "{{ consul_management_token }}"
     name: role-with-service-identity
-    service_identies: []
+    service_identities: []
   register: result
 
 - assert:
