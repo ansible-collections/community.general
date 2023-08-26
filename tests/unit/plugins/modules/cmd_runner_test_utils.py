@@ -8,6 +8,7 @@ __metaclass__ = type
 
 import os
 from collections import namedtuple
+from itertools import chain, repeat
 
 import pytest
 import yaml
@@ -36,9 +37,8 @@ class CmdRunnerTestHelper(object):
 
         results = []
         for tc in test_cases:
-            if tc.get("run_command_calls"):
-                run_commands = [RunCmdCall(**r) for r in tc["run_command_calls"]]
-                tc["run_command_calls"] = run_commands
+            tc["run_command_calls"] = [RunCmdCall(**r) for r in tc["run_command_calls"]] if tc.get("run_command_calls") else []
+
             results.append(ModuleTestCase(**tc))
 
         return results
@@ -66,18 +66,21 @@ class _Context(object):
 
     def _make_mock_run_cmd(self):
         call_results = [(x.rc, x.out, x.err) for x in self.run_cmd_calls]
-        mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command', side_effect=call_results)
+        error_call_results = (123, "OUT: testcase has not enough run_command calls", "ERR: testcase has not enough run_command calls")
+        mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command', side_effect=chain(call_results, repeat(error_call_results)))
         return mock_run_command
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        return True
+        return False
 
     def check_results(self, results):
         print("testcase =\n%s" % str(self.testcase))
         print("results =\n%s" % results)
+        if 'exception' in results:
+            print("exception = \n%s" % results["exception"])
 
         for test_result in self.testcase.output:
             assert results[test_result] == self.testcase.output[test_result], \
