@@ -1,0 +1,2 @@
+bugfixes:
+- pritunl module utils - fix incorrect url parameter for orgnization add method. (https://github.com/ansible-collections/community.general/pull/7161).
