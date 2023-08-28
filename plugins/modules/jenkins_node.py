@@ -29,7 +29,7 @@ options:
   name:
     description:
       - Name of the Jenkins node to manage.
-    required: true
+    required: yes
     type: str
   url:
     description:
@@ -53,7 +53,15 @@ options:
       - Specifies whether the Jenkins node should be V(present) (created), V(absent)
         (deleted), enabled (online) or disabled (offline).
     default: present
-    choices: ['enabled', 'disabled', 'present', 'absent']
+    type: str
+    choices:
+      - enabled
+      - disabled
+      - present
+      - absent
+  description:
+    description:
+      - When specified, sets the Jenkins node description.
     type: str
   num_executors:
     description:
@@ -66,19 +74,37 @@ options:
   labels:
     description:
       - When specified, sets the Jenkins node labels.
-    type: list[str]
+    type: list
+    elements: str
   mode:
     description:
       - When specified, sets the Jenkins node usage policy.
       - V(normal) means use node as much as possible.
       - V(exclusive) means only build jobs with label expressions that match tnode.
-    choices: ['normal', 'exclusive']
+    type: str
+    choices:
+      - normal
+      - exclusive
   launcher:
     description:
       - When specified, sets the Jenkins node launch method.
       - Launcher V(type) must be specified.
       - V(args) are specified according to the launcher V(type) (see examples).
     type: dict
+    suboptions:
+      type:
+        description:
+          - Specifies the launch method.
+        type: str
+        choices:
+          - ssh
+          - jnlp
+        required: yes
+      args:
+        description:
+          - Specifies the launch method arguments.
+        type: dict
+        default: {}
   defer_wipeout:
     description:
       - When specified, enables or disables the Jenkins node improved workspace cleanup
@@ -92,9 +118,25 @@ options:
   tools:
     description:
       - When specified, sets the Jenkins node tool locations.
-      - Each tool location is specified as tool V(type) (class), instance V(name) and
-        V(home) directory (see examples).
-    type: dict
+    type: list
+    elements: dict
+    suboptions:
+      type:
+        description:
+          - Jenkins tool class name e.g. "hudson.plugins.git.GitTool$DescriptorImpl" for
+            Git.
+        type: str
+        required: yes
+      name:
+         description:
+           - Jenkins tool instance name.
+         type: str
+         required: yes
+      home:
+        description:
+          - Jenkins tool home directory.
+        type: path
+        required: yes
   offline_message:
     description:
       - Specifies the offline reason message to be set when setting a Jenkins node state
@@ -132,7 +174,7 @@ EXAMPLES = '''
 - name: Set a Jenkins node to launch using SSH and specify a credential
   community.general.jenkins_node:
     name: my-agent
-    launch:
+    launcher:
       type: ssh
       args:
         host: my-agent.test
@@ -144,7 +186,7 @@ EXAMPLES = '''
     time
   community.general.jenkins_node:
     name: my-agent
-    launch:
+    launcher:
       type: ssh
       args:
         host_key_verify:
@@ -155,7 +197,7 @@ EXAMPLES = '''
 - name: Specify the host key expected when connecting to a node by SSH for the first time
   community.general.jenkins_node:
     name: my-agent
-    launch:
+    launcher:
       type: ssh
       args:
         host_key_verify:
@@ -167,7 +209,7 @@ EXAMPLES = '''
 - name: Disable host key verification when connecting to a node by SSH
   community.general.jenkins_node:
     name: my-agent
-    launch:
+    launcher:
       type: ssh
       args:
         host_key_verify:
@@ -176,7 +218,7 @@ EXAMPLES = '''
 - name: Use known hosts file for host key verification when connecting to a node by SSH
   community.general.jenkins_node:
     name: my-agent
-    launch:
+    launcher:
       type: ssh
       args:
         host_key_verify:
@@ -185,14 +227,14 @@ EXAMPLES = '''
 - name: Set Jenkins node to launch by connecting it to the controller
   community.general.jenkins_node:
     name: my-agent
-    launch:
+    launcher:
       type: jnlp
       args:
-        data_dir: remoting,
-        work_dir: custom,
-        disable_work_dir: yes,
-        assert_work_dir: no,
-        use_web_socket: no,
+        data_dir: remoting
+        work_dir: custom
+        disable_work_dir: yes
+        assert_work_dir: no
+        use_web_socket: no
 
 - name: Disable deferred wipeout on a Jenkins node
   community.general.jenkins_node:
@@ -285,9 +327,7 @@ def bool_to_text(value):
     }[value]
 
 
-class LauncherElement:
-    TAG = 'launcher'
-
+class XMLWrapper:
     def __init__(self, root):
         self.root = root
 
@@ -297,10 +337,27 @@ class LauncherElement:
             return None
         return self.root.get('class')
 
+    @class_.setter
+    def class_(self, value):
+        if self.root is None:
+            raise ValueError('no root element')
+        self.root.set('class', value)
+
+
+class LauncherXMLWrapper(XMLWrapper):
+    TAG = 'launcher'
+    CLASS = None
+
+    def ensure_class(self):
+        if not isinstance(self.CLASS, str):
+            raise TypeError('class is not str: got {0}'.format(type(self.CLASS)))
+        self.class_ = self.CLASS
+
 
 class Launcher:
-    CLASS = None
-    VALIDATOR = ArgumentSpecValidator(dict())
+    XMLWrapper = LauncherXMLWrapper
+
+    validator = ArgumentSpecValidator(dict())
 
     @abstractmethod
     def init_elem(self):
@@ -311,7 +368,9 @@ class Launcher:
         pass
 
 
-class JNLPLauncherElement(LauncherElement):
+class JNLPLauncherXMLWrapper(LauncherXMLWrapper):
+    CLASS = 'hudson.slaves.JNLPLauncher'
+
     @property
     def work_dir_settings(self):
         return self.root.find('workDirSettings')
@@ -351,9 +410,9 @@ class JNLPLauncherElement(LauncherElement):
 
 
 class JNLPLauncher(Launcher):
-    CLASS = 'hudson.slaves.JNLPLauncher'
+    XMLWrapper = JNLPLauncherXMLWrapper
 
-    VALIDATOR = ArgumentSpecValidator(dict(
+    validator = ArgumentSpecValidator(dict(
         data_dir=dict(type='path'),
         work_dir=dict(type='path'),
         disable_work_dir=dict(type='bool'),
@@ -368,7 +427,6 @@ class JNLPLauncher(Launcher):
         disable_work_dir=None,
         assert_work_dir=None,
         use_web_socket=None,
-        **_kwargs,
     ):
         self.data_dir = data_dir
         self.work_dir = work_dir
@@ -377,22 +435,22 @@ class JNLPLauncher(Launcher):
         self.use_web_socket = use_web_socket
 
     XML_TEMPLATE = """
-    <launcher class="hudson.slaves.JNLPLauncher">
-        <workDirSettings>
-            <disabled>false</disabled>
-            <internalDir>remoting</internalDir>
-            <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
-        </workDirSettings>
-        <webSocket>false</webSocket>
-    </launcher>
-        """.strip()
+<launcher class="hudson.slaves.JNLPLauncher">
+    <workDirSettings>
+        <disabled>false</disabled>
+        <internalDir>remoting</internalDir>
+        <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
+    </workDirSettings>
+    <webSocket>false</webSocket>
+</launcher>
+    """
 
     def init_elem(self):
         return ElementTree.fromstring(self.XML_TEMPLATE)
 
     def update_elem(self, root):
         updated = False
-        wrapper = JNLPLauncherElement(root)
+        wrapper = JNLPLauncherXMLWrapper(root)
 
         if self.data_dir is not None:
             if wrapper.internal_dir.text != self.data_dir:
@@ -425,35 +483,24 @@ class JNLPLauncher(Launcher):
         return updated
 
 
-class SSHHostKeyVerifyElement:
-    def __init__(self, root):
-        self.root = root
-
-    @property
-    def class_(self):
-        if self.root is None:
-            return None
-        return self.root.get('class')
-
-    @class_.setter
-    def class_(self, value):
-        self.root.set('class', value)
+class SSHHostKeyVerifyXMLWrapper(XMLWrapper):
+    TAG = 'sshHostKeyVerificationStrategy'
 
 
 class SSHHostKeyVerify:
-    TAG = 'sshHostKeyVerificationStrategy'
     CLASS = None
-    VALIDATOR = ArgumentSpecValidator(dict())
+
+    validator = ArgumentSpecValidator(dict())
 
     def init(self):
-        root = ElementTree.Element(self.TAG)
-        SSHHostKeyVerifyElement(root).class_ = self.CLASS
+        root = ElementTree.Element(SSHHostKeyVerifyXMLWrapper.TAG)
+        SSHHostKeyVerifyXMLWrapper(root).class_ = self.CLASS
         return root
 
     def update(self, root):
-        class_ = SSHHostKeyVerifyElement(root).class_
+        class_ = SSHHostKeyVerifyXMLWrapper(root).class_
         if class_ != self.CLASS:
-            raise ValueError('unexpected class {}: expected {}'.format(class_, self.CLASS))
+            raise ValueError('unexpected class {0}: expected {1}'.format(class_, self.CLASS))
 
 
 class KnownHostsSSHHostKeyVerify(SSHHostKeyVerify):
@@ -464,7 +511,7 @@ class NoneSSHHostKeyVerify(SSHHostKeyVerify):
     CLASS = 'hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy'
 
 
-class ApproveSSHHostKeyVerifyElement(SSHHostKeyVerifyElement):
+class ApproveSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
     @property
     def allow_initial(self):
         return self.root.find('requireInitialManualTrust')
@@ -473,15 +520,15 @@ class ApproveSSHHostKeyVerifyElement(SSHHostKeyVerifyElement):
 class ApproveSSHHostKeyVerify(SSHHostKeyVerify):
     CLASS = 'hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy'
 
-    VALIDATOR = ArgumentSpecValidator(dict(
+    validator = ArgumentSpecValidator(dict(
         allow_initial=dict(type='bool')
     ))
 
     XML_TEMPLATE = """
-    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
-        <requireInitialManualTrust>false</requireInitialManualTrust>
-    </sshHostKeyVerificationStrategy>
-        """
+<sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+    <requireInitialManualTrust>false</requireInitialManualTrust>
+</sshHostKeyVerificationStrategy>
+    """
 
     def __init__(self, allow_initial=None):
         self.allow_initial = allow_initial
@@ -490,10 +537,10 @@ class ApproveSSHHostKeyVerify(SSHHostKeyVerify):
         return ElementTree.fromstring(self.XML_TEMPLATE)
 
     def update(self, root):
-        super().update(root)
+        super(ApproveSSHHostKeyVerify, self).update(root)
 
         updated = False
-        wrapper = ApproveSSHHostKeyVerifyElement(root)
+        wrapper = ApproveSSHHostKeyVerifyXMLWrapper(root)
 
         if self.allow_initial is not None:
             if wrapper.allow_initial.text != bool_to_text(self.allow_initial):
@@ -503,7 +550,7 @@ class ApproveSSHHostKeyVerify(SSHHostKeyVerify):
         return updated
 
 
-class ContentSSHHostKeyVerifyElement(SSHHostKeyVerifyElement):
+class ContentSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
     @property
     def container(self):
         return self.root.find('key')
@@ -520,7 +567,7 @@ class ContentSSHHostKeyVerifyElement(SSHHostKeyVerifyElement):
 class ContentSSHHostKeyVerify(SSHHostKeyVerify):
     CLASS = 'hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy'
 
-    VALIDATOR = ArgumentSpecValidator(dict(
+    validator = ArgumentSpecValidator(dict(
         algorithm=dict(type='str', required=True),
         key=dict(type='str', required=True),
     ))
@@ -542,10 +589,10 @@ class ContentSSHHostKeyVerify(SSHHostKeyVerify):
         return ElementTree.fromstring(self.XML_TEMPLATE)
 
     def update(self, root):
-        super().update(root)
+        super(ContentSSHHostKeyVerify, self).update(root)
 
         updated = False
-        wrapper = ContentSSHHostKeyVerifyElement(root)
+        wrapper = ContentSSHHostKeyVerifyXMLWrapper(root)
 
         if wrapper.algorithm.text != self.algorithm:
             wrapper.algorithm.text = self.algorithm
@@ -566,7 +613,9 @@ SSH_HOST_KEY_VERIFY = {
 }
 
 
-class SSHLauncherElement(LauncherElement):
+class SSHLauncherXMLWrapper(LauncherXMLWrapper):
+    CLASS = 'hudson.plugins.sshslaves.SSHLauncher'
+
     @property
     def host(self):
         return self.root.find('host')
@@ -597,7 +646,7 @@ class SSHLauncherElement(LauncherElement):
 
     @property
     def host_key_verify(self):
-        return self.root.find(SSHHostKeyVerify.TAG)
+        return self.root.find(SSHHostKeyVerifyXMLWrapper.TAG)
 
     @host_key_verify.setter
     def host_key_verify(self, elem):
@@ -607,9 +656,9 @@ class SSHLauncherElement(LauncherElement):
 
 
 class SSHLauncher(Launcher):
-    CLASS = 'hudson.plugins.sshslaves.SSHLauncher'
+    XMLWrapper = SSHLauncherXMLWrapper
 
-    VALIDATOR = ArgumentSpecValidator(dict(
+    validator = ArgumentSpecValidator(dict(
         host=dict(type='str'),
         port=dict(type='int'),
         credentials_id=dict(type='str'),
@@ -627,11 +676,16 @@ class SSHLauncher(Launcher):
         if spec is None:
             return None
 
-        type = SSH_HOST_KEY_VERIFY[spec['type']]
-        args = type.VALIDATOR.validate(spec['args']).validated_parameters
+        type_ = SSH_HOST_KEY_VERIFY[spec['type']]
+        if not issubclass(type, SSHHostKeyVerify):
+            raise TypeError('verify helper is not SSHHostKeyVerify: got {0}'.format(type_))
 
-        obj = type(**args)  # type: ignore
-        assert isinstance(obj, SSHHostKeyVerify)
+        args = type_.validator.validate(spec['args']).validated_parameters
+
+        obj = type_(**args)  # type: ignore
+        if not isinstance(obj, SSHHostKeyVerify):
+            raise TypeError
+
         return obj
 
     def __init__(
@@ -639,8 +693,7 @@ class SSHLauncher(Launcher):
         host=None,
         port=None,
         credentials_id=None,
-        host_key_verify=None,
-        **_kwargs,
+        host_key_verify=None
     ):
         self.host = host
         self.port = port
@@ -661,14 +714,14 @@ class SSHLauncher(Launcher):
     def init_elem(self):
         root = ElementTree.fromstring(self.XML_TEMPLATE)
 
-        wrapper = SSHLauncherElement(root)
+        wrapper = self.XMLWrapper(root)
         wrapper.host_key_verify = self.host_key_verify.init()
 
         return root
 
     def update_elem(self, root):
         updated = False
-        wrapper = SSHLauncherElement(root)
+        wrapper = self.XMLWrapper(root)
 
         if self.host is not None:
             if wrapper.host is None:
@@ -692,7 +745,7 @@ class SSHLauncher(Launcher):
                 updated = True
 
         if self.host_key_verify is not None:
-            if SSHHostKeyVerifyElement(wrapper.host_key_verify).class_ != self.host_key_verify.CLASS:
+            if SSHHostKeyVerifyXMLWrapper(wrapper.host_key_verify).class_ != self.host_key_verify.CLASS:
                 wrapper.host_key_verify = self.host_key_verify.init()
                 updated = True
             if self.host_key_verify.update(wrapper.host_key_verify):
@@ -707,11 +760,8 @@ LAUNCHER = {
 }
 
 
-class TreeMapElement:
+class TreeMapXMLWrapper(XMLWrapper):
     TAG = 'tree-map'
-
-    def __init__(self, root):
-        self.root = root
 
     @property
     def comparator(self):
@@ -743,7 +793,7 @@ class TreeMap:
 
     @classmethod
     def from_elem(cls, root):
-        wrapper = TreeMapElement(root)
+        wrapper = TreeMapXMLWrapper(root)
 
         items = []
         strings = iter(wrapper.strings)
@@ -762,11 +812,11 @@ class TreeMap:
     </default>
     <int>0</int>
 </tree-map>
-    """.strip()
+    """
 
     def to_elem(self):
         root = ElementTree.fromstring(self.XML_TEMPLATE)
-        wrapper = TreeMapElement(root)
+        wrapper = TreeMapXMLWrapper(root)
 
         wrapper.comparator.set('class', self.comparator)
         wrapper.int.text = str(len(self.items))
@@ -781,7 +831,7 @@ class TreeMap:
         return root
 
 
-class EnvironmentVariablesElement:
+class EnvironmentVariablesXMLWrapper:
     TAG = 'hudson.slaves.EnvironmentVariablesNodeProperty'
 
     def __init__(self, root):
@@ -795,11 +845,11 @@ class EnvironmentVariablesElement:
     def tree_map(self):
         if self.envvars is None:
             return None
-        return self.envvars.find(TreeMapElement.TAG)
+        return self.envvars.find(TreeMapXMLWrapper.TAG)
 
     @tree_map.setter
     def tree_map(self, elem):
-        prev = self.envvars.find(TreeMapElement.TAG)
+        prev = self.envvars.find(TreeMapXMLWrapper.TAG)
         if prev is not None:
             self.envvars.remove(prev)
         self.envvars.append(elem)
@@ -808,7 +858,7 @@ class EnvironmentVariablesElement:
 class EnvironmentVariables:
     @classmethod
     def from_elem(cls, root):
-        wrapper = EnvironmentVariablesElement(root)
+        wrapper = EnvironmentVariablesXMLWrapper(root)
         items = TreeMap.from_elem(wrapper.tree_map).items
         return dict(items)
 
@@ -819,20 +869,22 @@ class EnvironmentVariables:
         <!--tree-map goes here-->
     </envVars>
 </hudson.slaves.EnvironmentVariablesNodeProperty>
-    """.strip()
+    """
 
     @classmethod
     def to_elem(cls, items):
         root = ElementTree.fromstring(cls.XML_TEMPLATE)
-        wrapper = EnvironmentVariablesElement(root)
+
+        wrapper = EnvironmentVariablesXMLWrapper(root)
         wrapper.tree_map = TreeMap(
             list(items.items()),
             'java.lang.String$CaseInsensitiveComparator'
         ).to_elem()
+
         return root
 
 
-class ToolLocationElement:
+class ToolLocationsItemXMLWrapper:
     TAG = 'hudson.tools.ToolLocationNodeProperty_-ToolLocation'
 
     def __init__(self, root):
@@ -851,7 +903,7 @@ class ToolLocationElement:
         return self.root.find('home')
 
 
-class ToolLocation:
+class ToolLocationsItem:
     def __init__(self, type, name, home):
         self.type = type
         self.name = name
@@ -859,7 +911,7 @@ class ToolLocation:
 
     @classmethod
     def from_dict(cls, item):
-        return ToolLocation(
+        return ToolLocationsItem(
             item['type'],
             item['name'],
             item['home'],
@@ -889,10 +941,10 @@ class ToolLocation:
             raise KeyError('home')
         home = elem.text
 
-        return ToolLocation(type, name, home)
+        return ToolLocationsItem(type, name, home)
 
     def to_elem(self):
-        root = ElementTree.Element(ToolLocationElement.TAG)
+        root = ElementTree.Element(ToolLocationsItemXMLWrapper.TAG)
 
         elem = ElementTree.SubElement(root, 'type')
         elem.text = self.type
@@ -906,7 +958,7 @@ class ToolLocation:
         return root
 
 
-class ToolLocationsElement:
+class ToolLocationsXMLWrapper:
     TAG = 'hudson.tools.ToolLocationNodeProperty'
 
     def __init__(self, root):
@@ -918,7 +970,7 @@ class ToolLocationsElement:
 
     @property
     def items(self):
-        return self.container.findall(ToolLocationElement.TAG)
+        return self.container.findall(ToolLocationsItemXMLWrapper.TAG)
 
     @items.setter
     def items(self, items):
@@ -931,10 +983,10 @@ class ToolLocationsElement:
 class ToolLocations:
     @classmethod
     def from_elem(cls, root):
-        wrapper = ToolLocationsElement(root)
+        wrapper = ToolLocationsXMLWrapper(root)
 
         return [
-            ToolLocation.from_elem(elem).to_dict() for elem in wrapper.items
+            ToolLocationsItem.from_elem(elem).to_dict() for elem in wrapper.items
         ]
 
     XML_TEMPLATE = """
@@ -948,14 +1000,45 @@ class ToolLocations:
     @classmethod
     def to_elem(cls, items):
         root = ElementTree.fromstring(cls.XML_TEMPLATE)
-        wrapper = ToolLocationsElement(root)
+
+        wrapper = ToolLocationsXMLWrapper(root)
         wrapper.items = (
-            ToolLocation.from_dict(item).to_elem() for item in items
+            ToolLocationsItem.from_dict(item).to_elem() for item in items
         )
+
         return root
 
 
 class JenkinsNode:
+    @staticmethod
+    def init_launcher(spec):
+        if spec is None:
+            return None
+
+        type_ = LAUNCHER[spec['type']]
+        if not issubclass(type_, Launcher):
+            raise TypeError('launcher helper is not Launcher: got {0}'.format(type_))
+
+        args = type_.validator.validate(spec['args']).validated_parameters
+
+        launcher = type_(**args)  # type: ignore
+        if not isinstance(type_, Launcher):
+            raise TypeError
+
+        return launcher
+
+    def get_jenkins_connection(self):
+        try:
+            if self.user and self.password:
+                return jenkins.Jenkins(self.url, self.user, self.password)
+            elif self.user and self.token:
+                return jenkins.Jenkins(self.url, self.user, self.token)
+            elif self.user and not (self.password or self.token):
+                return jenkins.Jenkins(self.url, self.user)
+            else:
+                return jenkins.Jenkins(self.url)
+        except Exception as e:
+            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
 
     def __init__(self, module):
         self.module = module
@@ -966,7 +1049,6 @@ class JenkinsNode:
         self.token = module.params.get('token')
         self.user = module.params.get('user')
         self.url = module.params.get('url')
-        self.launcher = module.params.get('launcher')
         self.num_executors = module.params.get('num_executors')
         self.description = module.params.get('description')
         self.labels = module.params.get('labels')
@@ -976,6 +1058,7 @@ class JenkinsNode:
         self.defer_wipeout = module.params.get('defer_wipeout')
         self.tools = module.params.get('tools')
         self.offline_message = module.params.get('offline_message')
+        self.launcher = self.init_launcher(module.params.get('launcher'))
         self.server = self.get_jenkins_connection()
 
         self.result = {
@@ -991,19 +1074,6 @@ class JenkinsNode:
             'configured': False,
         }
 
-    def get_jenkins_connection(self):
-        try:
-            if self.user and self.password:
-                return jenkins.Jenkins(self.url, self.user, self.password)
-            elif self.user and self.token:
-                return jenkins.Jenkins(self.url, self.user, self.token)
-            elif self.user and not (self.password or self.token):
-                return jenkins.Jenkins(self.url, self.user)
-            else:
-                return jenkins.Jenkins(self.url)
-        except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
-
     def configure_node(self):
         self.server.assert_node_exists(self.name)
 
@@ -1012,19 +1082,14 @@ class JenkinsNode:
         root = ElementTree.fromstring(data)
 
         if self.launcher is not None:
-            type = LAUNCHER[self.launcher['type']]
-            assert issubclass(type, Launcher)
-            args = type.VALIDATOR.validate(self.launcher['args']).validated_parameters
-            factory = type(**args)  # type: ignore
-
-            elem = root.find(LauncherElement.TAG)
-            if LauncherElement(elem).class_ != factory.CLASS:
+            elem = root.find(LauncherXMLWrapper.TAG)
+            if LauncherXMLWrapper(elem).class_ != self.launcher.XMLWrapper.CLASS:
                 if elem is not None:
                     root.remove(elem)
-                elem = factory.init_elem()
+                elem = self.launcher.init_elem()
                 root.append(elem)
                 configured = True
-            if factory.update_elem(elem):
+            if self.launcher.update_elem(elem):
                 configured = True
 
         if self.description is not None:
@@ -1086,14 +1151,14 @@ class JenkinsNode:
             props_elem = ElementTree.SubElement(root, 'nodeProperties')
 
         if self.environment is not None:
-            msg = 'environment variable "{}" {} modified by str: result will always be "changed"'
+            msg = 'environment variable "{0}" {1} modified by str: result will always be "changed"'
             for name, value in self.environment.items():
                 if str(name) != name:
                     self.module.warn(msg.format(name, 'name'))
                 if str(value) != value:
                     self.module.warn(msg.format(name, 'value'))
 
-            elem = props_elem.find(EnvironmentVariablesElement.TAG)
+            elem = props_elem.find(EnvironmentVariablesXMLWrapper.TAG)
             environment = None if elem is None else EnvironmentVariables.from_elem(elem)
 
             if environment != self.environment:
@@ -1104,7 +1169,7 @@ class JenkinsNode:
                 configured = True
 
         if self.tools is not None:
-            elem = props_elem.find(ToolLocationsElement.TAG)
+            elem = props_elem.find(ToolLocationsXMLWrapper.TAG)
             tools = None if elem is None else ToolLocations.from_elem(elem)
 
             if tools != self.tools:
@@ -1181,17 +1246,20 @@ def test_dependencies(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, str='str'),
+            name=dict(type='str', required=True),
             url=dict(default='http://localhost:8080'),
             user=dict(),
             password=dict(no_log=True),
             token=dict(no_log=True),
-            state=dict(choices=['enabled', 'disabled', 'present', 'absent'], default='present'),
+            state=dict(
+                choices=['enabled', 'disabled', 'present', 'absent'],
+                default='present',
+            ),
             description=dict(type='str'),
             num_executors=dict(type='int'),
             remote_fs=dict(type='path'),
             labels=dict(type='list', elements='str'),
-            mode=dict(choices=['normal', 'exclusive'], default='normal'),
+            mode=dict(choices=['normal', 'exclusive']),
             launcher=dict(
                 type='dict',
                 options=dict(
