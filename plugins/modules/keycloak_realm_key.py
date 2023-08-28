@@ -85,8 +85,8 @@ options:
             priority:
                 description:
                     - The priority of the key.
-                default: 100
                 type: int
+                required: true
             algorithm:
                 description:
                     - Key algorithm.
@@ -103,8 +103,9 @@ options:
                 description:
                     - A certificate signed with the private key as an ASCII string. Contents of the
                       key must match O(config.algorithm) and O(provider_id).
-                required: false
-                default: ''
+                    - If you want Keycloak to automatically generate a certificate using your private key
+                      then set this to an empty string.
+                required: true
                 type: str
 
 extends_documentation_fragment:
@@ -223,10 +224,10 @@ def main():
             options=dict(
                 active=dict(type='bool', default=True),
                 enabled=dict(type='bool', default=True),
-                priority=dict(type='int', default=100),
+                priority=dict(type='int', required=True),
                 algorithm=dict(type='str', default='RS256', choices=['RS256']),
                 private_key=dict(type='str', required=True, no_log=True),
-                certificate=dict(type='str', default='', no_log=True)
+                certificate=dict(type='str', required=True, no_log=True)
             )
         )
     )

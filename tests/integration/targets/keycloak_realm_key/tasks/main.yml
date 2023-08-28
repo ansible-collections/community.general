@@ -33,6 +33,7 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 150
@@ -65,6 +66,7 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 150
@@ -97,6 +99,7 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 150
@@ -128,6 +131,7 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 140
@@ -160,6 +164,7 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 140
@@ -192,6 +197,7 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 140
@@ -223,6 +229,8 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
+      priority: 140
   diff: true
   register: result
 
@@ -244,6 +252,8 @@
     parent_id: "{{ realm }}"
     config:
       private_key: "{{ realm_private_key }}"
+      certificate: ""
+      priority: 140
   register: result
 
 - name: Assert that nothing has changed
