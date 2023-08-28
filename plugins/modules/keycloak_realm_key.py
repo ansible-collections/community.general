@@ -36,9 +36,9 @@ description:
 
 attributes:
     check_mode:
-        support: full
+        support: partial
     diff_mode:
-        support: full
+        support: partial
 
 options:
     state:
