@@ -97,14 +97,12 @@ options:
                 description:
                     - The private key as an ASCII string. Contents of the key must match O(config.algorithm)
                       and O(provider_id).
-                    - Linefeeds should be converted into literal linefeed (backslash + n).
                 required: true
                 type: str
             certificate:
                 description:
                     - A certificate signed with the private key as an ASCII string. Contents of the
                       key must match O(config.algorithm) and O(provider_id).
-                    - Linefeeds should be converted into literal linefeed (backslash + n).
                 required: false
                 default: ''
                 type: str
