@@ -1,0 +1,185 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+- id: test_missing_input
+  input: {}
+  output:
+    failed: true
+    msg: "missing required arguments: channel, property"
+- id: test_property_set_property
+  input:
+    channel: xfwm4
+    property: /general/inactive_opacity
+    state: present
+    value_type: int
+    value: 90
+  output:
+    changed: true
+    previous_value: '100'
+    type: int
+    value: '90'
+  run_command_calls:
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "100\n"
+      err: ""
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity, --create, --type, int, --set, '90']
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
+- id: test_property_set_property_same_value
+  input:
+    channel: xfwm4
+    property: /general/inactive_opacity
+    state: present
+    value_type: int
+    value: 90
+  output:
+    changed: false
+    previous_value: '90'
+    type: int
+    value: '90'
+  run_command_calls:
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "90\n"
+      err: ""
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity, --create, --type, int, --set, '90']
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
+- id: test_property_set_property_bool_false
+  input:
+    channel: xfce4-session
+    property: /general/SaveOnExit
+    state: present
+    value_type: bool
+    value: False
+  output:
+    changed: true
+    previous_value: 'true'
+    type: bool
+    value: 'False'
+  run_command_calls:
+    - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "true\n"
+      err: ""
+    - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit, --create, --type, bool, --set, 'false']
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "false\n"
+      err: ""
+- id: test_property_set_array
+  input:
+    channel: xfwm4
+    property: /general/workspace_names
+    state: present
+    value_type: string
+    value: [A, B, C]
+  output:
+    changed: true
+    previous_value: [Main, Work, Tmp]
+    type: [string, string, string]
+    value: [A, B, C]
+  run_command_calls:
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "Value is an array with 3 items:\n\nMain\nWork\nTmp\n"
+      err: ""
+    - command:
+        - /testbin/xfconf-query
+        - --channel
+        - xfwm4
+        - --property
+        - /general/workspace_names
+        - --create
+        - --force-array
+        - --type
+        - string
+        - --set
+        - A
+        - --type
+        - string
+        - --set
+        - B
+        - --type
+        - string
+        - --set
+        - C
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
+- id: test_property_set_array_to_same_value
+  input:
+    channel: xfwm4
+    property: /general/workspace_names
+    state: present
+    value_type: string
+    value: [A, B, C]
+  output:
+    changed: false
+    previous_value: [A, B, C]
+    type: [string, string, string]
+    value: [A, B, C]
+  run_command_calls:
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "Value is an array with 3 items:\n\nA\nB\nC\n"
+      err: ""
+    - command:
+        - /testbin/xfconf-query
+        - --channel
+        - xfwm4
+        - --property
+        - /general/workspace_names
+        - --create
+        - --force-array
+        - --type
+        - string
+        - --set
+        - A
+        - --type
+        - string
+        - --set
+        - B
+        - --type
+        - string
+        - --set
+        - C
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
+- id: test_property_reset_value
+  input:
+    channel: xfwm4
+    property: /general/workspace_names
+    state: absent
+  output:
+    changed: true
+    previous_value: [A, B, C]
+    type: null
+    value: null
+  run_command_calls:
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: "Value is an array with 3 items:\n\nA\nB\nC\n"
+      err: ""
+    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names, --reset]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
