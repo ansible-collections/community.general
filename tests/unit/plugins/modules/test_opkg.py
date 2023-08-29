@@ -24,7 +24,7 @@ with open("tests/unit/plugins/modules/test_opkg.yaml", "r") as TEST_CASES:
                          helper.testcases_params, ids=helper.testcases_ids,
                          indirect=['patch_ansible_module'])
 @pytest.mark.usefixtures('patch_ansible_module')
-def test_opkg(mocker, capfd, patch_bin, testcase):
+def test_module(mocker, capfd, patch_bin, testcase):
     """
     Run unit tests for test cases listed in TEST_CASES
     """
