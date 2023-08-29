@@ -59,7 +59,7 @@ options:
             - Enforce the state of the private key and certificate. This is not automatically the
               case as this module is unable to determine the current state of the private key and
               thus can't trigger an update based on an actual divergence. That said, a private key
-              update may happen even without force: true as a side-effect of other changes.
+              update may happen even if force is false as a side-effect of other changes.
         default: false
         type: bool
     parent_id:
