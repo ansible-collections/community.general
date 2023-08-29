@@ -135,6 +135,7 @@ def vars_to_variables(vars, module):
                     "value": str(value),
                     "masked": False,
                     "protected": False,
+                    "raw": False,
                     "variable_type": "env_var",
                 }
             )
@@ -145,6 +146,7 @@ def vars_to_variables(vars, module):
                 "value": value.get('value'),
                 "masked": value.get('masked'),
                 "protected": value.get('protected'),
+                "raw": value.get('raw'),
                 "variable_type": value.get('variable_type'),
             }
 
