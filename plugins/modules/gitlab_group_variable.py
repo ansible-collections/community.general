@@ -53,13 +53,14 @@ options:
     type: bool
   vars:
     description:
-      - When the list element is a simple key-value pair, set masked and protected to false.
-      - When the list element is a dict with the keys C(value), C(masked) and C(protected), the user can
-        have full control about whether a value should be masked, protected or both.
+      - When the list element is a simple key-value pair, masked, raw and protected will be set to false.
+      - When the list element is a dict with the keys C(value), C(masked), C(raw) and C(protected), the user can
+        have full control about whether a value should be masked, raw, protected or both.
       - Support for group variables requires GitLab >= 9.5.
       - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
+      - Support for raw values requires GitLab >= 15.7.
       - A C(value) must be a string or a number.
       - Field C(variable_type) must be a string with either V(env_var), which is the default, or V(file).
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
@@ -95,6 +96,13 @@ options:
           - Wether variable value is protected or not.
         type: bool
         default: false
+      raw:
+        description:
+          - Wether variable value is raw or not.
+          - Support for raw values requires GitLab >= 15.7.
+        type: bool
+        default: false
+        version_added: '7.4.0'
       variable_type:
         description:
           - Wether a variable is an environment variable (V(env_var)) or a file (V(file)).
@@ -125,6 +133,38 @@ EXAMPLES = r'''
         protected: true
         variable_type: env_var
         environment_scope: production
+
+- name: Set or update some CI/CD variables with raw value
+  community.general.gitlab_group_variable:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    group: scodeman/testgroup/
+    purge: false
+    vars:
+      ACCESS_KEY_ID: abc123
+      SECRET_ACCESS_KEY:
+        value: 3214cbad
+        masked: true
+        protected: true
+        raw: true
+        variable_type: env_var
+        environment_scope: '*'
+
+- name: Set or update some CI/CD variables with expandable value
+  community.general.gitlab_group_variable:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    group: scodeman/testgroup/
+    purge: false
+    vars:
+      ACCESS_KEY_ID: abc123
+      SECRET_ACCESS_KEY:
+        value: '$MY_OTHER_VARIABLE'
+        masked: true
+        protected: true
+        raw: false
+        variable_type: env_var
+        environment_scope: '*'
 
 - name: Delete one variable
   community.general.gitlab_group_variable:
@@ -199,6 +239,7 @@ class GitlabGroupVariables(object):
             "value": var_obj.get('value'),
             "masked": var_obj.get('masked'),
             "protected": var_obj.get('protected'),
+            "raw": var_obj.get('raw'),
             "variable_type": var_obj.get('variable_type'),
         }
         if var_obj.get('environment_scope') is not None:
@@ -267,6 +308,8 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         item['value'] = str(item.get('value'))
         if item.get('protected') is None:
             item['protected'] = False
+        if item.get('raw') is None:
+            item['raw'] = False
         if item.get('masked') is None:
             item['masked'] = False
         if item.get('environment_scope') is None:
@@ -343,6 +386,7 @@ def main():
             value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
+            raw=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
