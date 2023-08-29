@@ -67,7 +67,7 @@ author:
 
 EXAMPLES = '''
 - name: Set default client scopes on realm level
-  community.general.keycloak_clientsecret_info:
+  community.general.keycloak_clientscope_type:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -79,7 +79,7 @@ EXAMPLES = '''
 
 
 - name: Set default and optional client scopes on client level with token auth
-  community.general.keycloak_clientsecret_info:
+  community.general.keycloak_clientscope_type:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     token: TOKEN
