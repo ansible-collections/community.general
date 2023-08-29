@@ -54,6 +54,14 @@ options:
             - Name of the realm key to create.
         type: str
         required: true
+    force:
+        description:
+            - Enforce the state of the private key and certificate. This is not automatically the
+              case as this module is unable to determine the current state of the private key and
+              thus can't trigger an update based on an actual divergence. That said, a private key
+              update may happen even without force: true as a side-effect of other changes.
+        default: false
+        type: bool
     parent_id:
         description:
             - The parent_id of the realm key. In practice the ID (name) of the realm.
@@ -217,6 +225,7 @@ def main():
     meta_args = dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
         name=dict(type='str', required=True),
+        force=dict(type='bool', default=False),
         parent_id=dict(type='str', required=True),
         provider_id=dict(type='str', default='rsa', choices=['rsa']),
         config=dict(
@@ -256,7 +265,7 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state"]
+    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state", "force"]
 
     # Filter and map the parameters names that apply to the role
     component_params = [x for x in module.params
@@ -320,6 +329,7 @@ def main():
 
     # Make it easier to refer to current module parameters
     name = module.params.get('name')
+    force = module.params.get('force')
     state = module.params.get('state')
     enabled = module.params.get('enabled')
     provider_id = module.params.get('provider_id')
@@ -382,6 +392,10 @@ def main():
             else:
                 kc.update_component(changeset, parent_id)
                 result['msg'] = "Realm key %s changed: %s" % (name, changes.strip(", "))
+        elif not result['changed'] and force:
+            kc.update_component(changeset, parent_id)
+            result['changed'] = True
+            result['msg'] = "Realm key %s was forcibly updated" % (name)
         else:
             result['msg'] = "Realm key %s was in sync" % (name)
 

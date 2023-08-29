@@ -218,6 +218,39 @@
       - result.end_state.config.priority == ["140"]
       - result.msg == "Realm key testkey was in sync"
 
+- name: Force update custom realm key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    force: true
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key_2 }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 140
+  register: result
+
+- name: Assert that forced update ran correctly
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["140"]
+      - result.msg == "Realm key testkey was forcibly updated"
+
 - name: Remove custom realm key
   community.general.keycloak_realm_key:
     auth_keycloak_url: "{{ url }}"
