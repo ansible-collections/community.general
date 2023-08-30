@@ -52,6 +52,12 @@ DOCUMENTATION = '''
           - Only works with 1Password CLI version 2 or later.
         type: str
         version_added: 7.1.0
+      connect_host:
+        description: The host for 1Password Connect. Must be used in combination with C(connect_token).
+        type: str
+      connect_token:
+        description: The token for 1Password Connect. Must be used in combination with C(connect_host).
+        type: str
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
@@ -139,6 +145,8 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         master_password=None,
         service_account_token=None,
         account_id=None,
+        connect_host=None,
+        connect_token=None,
     ):
         self.subdomain = subdomain
         self.domain = domain
@@ -147,6 +155,8 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         self.secret_key = secret_key
         self.service_account_token = service_account_token
         self.account_id = account_id
+        self.connect_host = connect_host
+        self.connect_token = connect_token
 
         self._path = None
         self._version = None
@@ -325,6 +335,10 @@ class OnePassCLIv1(OnePassCLIBase):
         return not bool(rc)
 
     def full_signin(self):
+        if self.connect_host or self.connect_token:
+            raise AnsibleLookupError(
+                "1Password Connect is not available with 1Password CLI version 1. Please use version 2 or later.")
+
         if self.service_account_token:
             raise AnsibleLookupError(
                 "1Password CLI version 1 does not support Service Accounts. Please use version 2 or later.")
@@ -512,7 +526,7 @@ class OnePassCLIv2(OnePassCLIBase):
     def assert_logged_in(self):
         connect_host = os.environ.get("OP_CONNECT_HOST", False)
         connect_token = os.environ.get("OP_CONNECT_TOKEN", False)
-        if connect_host and connect_token:
+        if (connect_host and connect_token) or (self.connect_host and self.connect_token):
             return True
 
         if self.service_account_token:
@@ -574,6 +588,15 @@ class OnePassCLIv2(OnePassCLIBase):
         if vault is not None:
             args += ["--vault={0}".format(vault)]
 
+        if self.connect_host and self.connect_token:
+            if vault is None:
+                raise AnsibleLookupError("'vault' is required with 1Password Connect")
+            environment_update = {
+                "OP_CONNECT_HOST": self.connect_host,
+                "OP_CONNECT_TOKEN": self.connect_token,
+            }
+            return self._run(args, environment_update=environment_update)
+
         if self.service_account_token:
             if vault is None:
                 raise AnsibleLookupError("'vault' is required with 'service_account_token'")
@@ -597,7 +620,7 @@ class OnePassCLIv2(OnePassCLIBase):
 
 class OnePass(object):
     def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
-                 service_account_token=None, account_id=None):
+                 service_account_token=None, account_id=None, connect_host=None, connect_token=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -605,6 +628,8 @@ class OnePass(object):
         self.master_password = master_password
         self.service_account_token = service_account_token
         self.account_id = account_id
+        self.connect_host = connect_host
+        self.connect_token = connect_token
 
         self.logged_in = False
         self.token = None
@@ -617,7 +642,8 @@ class OnePass(object):
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
                 try:
-                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token, self.account_id)
+                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token,
+                               self.account_id, self.connect_host, self.connect_token)
                 except TypeError as e:
                     raise AnsibleLookupError(e)
 
@@ -682,8 +708,10 @@ class LookupModule(LookupBase):
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
         account_id = self.get_option("account_id")
+        connect_host = self.get_option("connect_host")
+        connect_token = self.get_option("connect_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, connect_host, connect_token)
         op.assert_logged_in()
 
         values = []

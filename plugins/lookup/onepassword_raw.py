@@ -49,6 +49,12 @@ DOCUMENTATION = '''
           - Only works with 1Password CLI version 2 or later.
         type: string
         version_added: 7.1.0
+      connect_host:
+        description: The host for 1Password Connect. Must be used in combination with C(connect_token).
+        type: str
+      connect_token:
+        description: The token for 1Password Connect. Must be used in combination with C(connect_host).
+        type: str
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
@@ -102,8 +108,10 @@ class LookupModule(LookupBase):
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
         account_id = self.get_option("account_id")
+        connect_host = self.get_option("connect_host")
+        connect_token = self.get_option("connect_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, connect_host, connect_token)
         op.assert_logged_in()
 
         values = []
