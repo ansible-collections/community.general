@@ -37,6 +37,14 @@ description:
 attributes:
     check_mode:
         support: partial
+        details:
+          - Current value of the private key cannot be fetched from Keycloak.
+            Therefore comparing its desired state to the current state is not
+            possible.
+          - If certificate is not explicitly provided it will be dynamically
+            created by Keycloak. Therefore comparing the current state of the
+            certificate to the desired state (which may be empty) is not
+            possible.
     diff_mode:
         support: partial
 
