@@ -1,0 +1,2 @@
+minor_changes:
+  - make module - allows params to be used without value
