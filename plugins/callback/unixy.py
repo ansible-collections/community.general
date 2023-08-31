@@ -91,7 +91,7 @@ class CallbackModule(CallbackModule_default):
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._get_task_display_name(task)
         if self.task_display_name is not None:
-            if context.CLIARGS['check'] and self.get_option('check_mode_markers'):
+            if task.check_mode and self.get_option('check_mode_markers'):
                 self._display.display("%s (check mode)..." % self.task_display_name)
             else:
                 self._display.display("%s..." % self.task_display_name)
@@ -99,17 +99,23 @@ class CallbackModule(CallbackModule_default):
     def v2_playbook_on_handler_task_start(self, task):
         self._get_task_display_name(task)
         if self.task_display_name is not None:
-            if context.CLIARGS['check'] and self.get_option('check_mode_markers'):
+            if task.check_mode and self.get_option('check_mode_markers'):
                 self._display.display("%s (via handler in check mode)... " % self.task_display_name)
             else:
                 self._display.display("%s (via handler)... " % self.task_display_name)
 
     def v2_playbook_on_play_start(self, play):
         name = play.get_name().strip()
-        if name and play.hosts:
-            msg = u"\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
+        if task.check_mode and self.get_option('check_mode_markers'):
+            if name and play.hosts:
+                msg = u"\n- %s (in check mode) on hosts: %s -" % (name, ",".join(play.hosts))
+            else:
+                msg = u"- check mode -"
         else:
-            msg = u"---"
+            if name and play.hosts:
+                msg = u"\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
+            else:
+                msg = u"---"
 
         self._display.display(msg)
 

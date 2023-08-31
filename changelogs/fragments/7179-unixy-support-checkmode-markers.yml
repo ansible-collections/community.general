@@ -1,2 +1,2 @@
 minor_changes:
-  - unixy callback plugin - add support for check_mode_markers
+  - unixy callback plugin - add support for ``check_mode_markers`` option (https://github.com/ansible-collections/community.general/pull/7179).
