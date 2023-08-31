@@ -190,7 +190,7 @@ def main():
             # Fall back to system make
             make_path = module.get_bin_path('make', required=True)
     if module.params['params'] is not None:
-        make_parameters = [k + (('=' + str(v)) if v != None else '') for k, v in iteritems(module.params['params'])]
+        make_parameters = [k + (('=' + str(v)) if v is not None else '') for k, v in iteritems(module.params['params'])]
     else:
         make_parameters = []
 
