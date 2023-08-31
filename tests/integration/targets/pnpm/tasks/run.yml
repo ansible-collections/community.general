@@ -4,44 +4,47 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: "Download Nodejs"
-  unarchive:
-    src: "https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/pnpm/{{ nodejs_path }}.tar.gz"
+- name: Download nodejs
+  ansible.builtin.unarchive:
+    src: "https://nodejs.org/dist/v{{ nodejs_version }}/{{ nodejs_path }}.tar.gz"
     dest: "{{ remote_tmp_dir }}"
     remote_src: true
     creates: "{{ remote_tmp_dir }}/{{ nodejs_path }}.tar.gz"
 
-- name: "Download Pnpm"
-  unarchive:
-    src: "https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/pnpm/pnpm-v{{pnpm_version}}.tar.gz"
-    dest: "{{ remote_tmp_dir }}"
-    remote_src: true
-    creates: "{{ remote_tmp_dir }}/pnpm-v{{pnpm_version}}_pkg.tar.gz"
+- name: Create pnpm install directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/pnpm"
+    state: directory
+    mode: "755"
+
+- name: Download pnpm
+  ansible.builtin.get_url:
+    url: "https://github.com/pnpm/pnpm/releases/download/v{{ pnpm_version }}/{{ pnpm_path }}"
+    dest: "{{ ansible_env.HOME }}/.local/share/pnpm/pnpm"
+    mode: "755"
 
 - name: Remove any previous Nodejs modules
-  file:
-    path: "{{remote_tmp_dir}}/node_modules"
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/node_modules"
     state: absent
 
-- vars:
+- name: CI tests to run
+  vars:
     node_bin_path: "{{ remote_tmp_dir }}/{{ nodejs_path }}/bin"
-    pnpm_bin_path: "{{ remote_tmp_dir }}/pnpm-v{{ pnpm_version }}/bin"
+    pnpm_bin_path: "{{ ansible_env.HOME }}/.local/share/pnpm"
     package: "tailwindcss"
   environment:
-    PATH: "{{ node_bin_path }}:{{ansible_env.PATH}}"
+    PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
 
   block:
-    - shell: "{{ pnpm_bin_path }}/pnpm --version"
-      environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
-      register: pnpm_version
-
-    - name: "Create dummy package.json"
-      template:
+    - name: Create dummy package.json
+      ansible.builtin.template:
         src: package.j2
         dest: "{{ remote_tmp_dir }}/package.json"
+        mode: "644"
 
-    - name: "Install all packages."
+    - name: Install reading-time package via package.json
       pnpm:
         path: "{{ remote_tmp_dir }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
@@ -49,22 +52,22 @@
       environment:
         PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
 
-    - name: "Install the same package from package.json again."
+    - name: Install the same package from package.json again
       pnpm:
         path: "{{ remote_tmp_dir }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
-        name: "{{ package }}"
+        name: "reading-time"
         state: present
       environment:
         PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_install
 
-    - name: "Assert that result is not changed"
-      assert:
+    - name: Assert that result is not changed
+      ansible.builtin.assert:
         that:
           - not (pnpm_install is changed)
 
-    - name: "Install all packages in check mode."
+    - name: Install all packages in check mode
       pnpm:
         path: "{{ remote_tmp_dir }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
@@ -74,17 +77,17 @@
       check_mode: true
       register: pnpm_install_check
 
-    - name: "Verify test pnpm global installation in check mode"
-      assert:
+    - name: Verify test pnpm global installation in check mode
+      ansible.builtin.assert:
         that:
           - pnpm_install_check.err is defined
           - pnpm_install_check.out is defined
           - pnpm_install_check.err is none
           - pnpm_install_check.out is none
 
-    - name: "Install package without dependency"
+    - name: Install package without dependency
       pnpm:
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
         state: present
         name: "{{ package }}"
@@ -92,15 +95,15 @@
         PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_install
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_install is success
           - pnpm_install is changed
 
-    - name: "Reinstall package without dependency"
+    - name: Reinstall package without dependency
       pnpm:
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
         state: present
         name: "{{ package }}"
@@ -108,187 +111,191 @@
         PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_reinstall
 
-    - name: "Assert that there is no change"
-      assert:
+    - name: Assert that there is no change
+      ansible.builtin.assert:
         that:
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
 
-    - name: "Manually delete package"
-      file:
-        path: "{{ remote_dir }}/node_modules/{{ package }}"
+    - name: Manually delete package
+      ansible.builtin.file:
+        path: "{{ remote_tmp_dir }}/node_modules/{{ package }}"
         state: absent
 
-    - name: "Reinstall package"
+    - name: Reinstall package
       pnpm:
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
-        state: present
+        state: latest
         name: "{{ package }}"
       environment:
         PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_fix_install
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_fix_install is success
           - pnpm_fix_install is changed
 
-    - name: "Install package with version, without executable path"
+    - name: Install package with version, without executable path
       pnpm:
         name: "{{ package }}"
         version: 0.1.3
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         state: present
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_install
 
-    - name: "Assert that package with version is installed"
-      assert:
+    - name: Assert that package with version is installed
+      ansible.builtin.assert:
         that:
           - pnpm_install is success
           - pnpm_install is changed
 
-    - name: "Reinstall package with version, without explicit executable path"
+    - name: Reinstall package with version, without explicit executable path
       pnpm:
         name: "{{ package }}"
         version: 0.1.3
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         state: present
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_reinstall
 
-    - name: "Assert that there is no change"
-      assert:
+    - name: Assert that there is no change
+      ansible.builtin.assert:
         that:
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
 
-    - name: "Update package, without executable path"
+    - name: Update package, without executable path
       pnpm:
         name: "{{ package }}"
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         state: latest
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_update
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_update is success
           - pnpm_update is changed
 
-    - name: "Remove package, without executable path"
+    - name: Remove package, without executable path
       pnpm:
         name: "{{ package }}"
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         state: absent
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_absent
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_absent is success
           - pnpm_absent is changed
 
-    - name: "Install package with version and alias, without executable path"
+    - name: Install package with version and alias, without executable path
       pnpm:
         name: "{{ package }}"
         alias: tailwind-1
         version: 0.1.3
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         state: present
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_install
 
-    - name: "Assert that package with version and alias is installed"
-      assert:
+    - name: Assert that package with version and alias is installed
+      ansible.builtin.assert:
         that:
           - pnpm_install is success
           - pnpm_install is changed
 
-    - name: "Reinstall package with version and alias, without explicit executable path"
+    - name: Reinstall package with version and alias, without explicit executable path
       pnpm:
         name: "{{ package }}"
         alias: tailwind-1
         version: 0.1.3
-        path: "{{ remote_dir }}"
+        path: "{{ remote_tmp_dir }}"
         state: present
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_reinstall
 
-    - name: "Assert that there is no change"
-      assert:
+    - name: Assert that there is no change
+      ansible.builtin.assert:
         that:
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
 
-    - name: "Remove package with alias, without executable path"
+    - name: Remove package with alias, without executable path
       pnpm:
-        name: "tailwind-1"
-        path: "{{ remote_dir }}"
+        name: tailwindcss
+        alias: tailwind-1
+        path: "{{ remote_tmp_dir }}"
         state: absent
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
       register: pnpm_absent
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_absent is success
           - pnpm_absent is changed
 
-    - name: "Install package without dependency globally"
+    - name: Install package without dependency globally
       pnpm:
         name: "{{ package }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
         state: present
         global: true
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_install
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_install is success
           - pnpm_install is changed
 
-    - name: "Reinstall package globally, without explicit executable path"
+    - name: Reinstall package globally, without explicit executable path
       pnpm:
         name: "{{ package }}"
         state: present
         global: true
       environment:
         PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_reinstall
 
-    - name: "Assert that there is no change"
-      assert:
+    - name: Assert that there is no change
+      ansible.builtin.assert:
         that:
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
 
-    - name: "Remove package without dependency globally"
+    - name: Remove package without dependency globally
       pnpm:
         name: "{{ package }}"
         executable: "{{ pnpm_bin_path }}/pnpm"
         global: true
         state: absent
       environment:
-        PATH: "{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PNPM_HOME: "{{ pnpm_bin_path }}"
       register: pnpm_absent
 
-    - name: "Assert that result is changed and successful"
-      assert:
+    - name: Assert that result is changed and successful
+      ansible.builtin.assert:
         that:
           - pnpm_absent is success
           - pnpm_absent is changed

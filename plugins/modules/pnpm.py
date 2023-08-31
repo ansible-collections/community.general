@@ -311,12 +311,20 @@ class Pnpm(object):
                 raise Exception(out)
 
             # HACK: To fix the above bug, the following hack is implemented
-            data = out.splitlines()
+            data_lines = out.splitlines(True)
 
-            for i in range(len(data)):
-                if len(data[i]) > 0 and data[i][0] == "{":
-                    out = "".join(data[i:])
+            out = None
+            for line in data_lines:
+                if len(line) > 0 and line[0] == "{":
+                    out = line
+                    continue
+
+                if len(line) > 0 and line[0] == "}":
+                    out += line
                     break
+
+                if out is not None:
+                    out += line
 
             data = json.loads(out)
         except Exception as e:
@@ -404,9 +412,6 @@ def main():
 
     if state == "absent" and name is None:
         module.fail_json(msg="Package name is required for uninstalling")
-
-    if state == "absent" and alias is not None:
-        name = alias
 
     if state == "latest":
         version = "latest"

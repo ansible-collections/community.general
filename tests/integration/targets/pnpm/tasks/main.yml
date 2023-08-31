@@ -1,4 +1,3 @@
----
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
@@ -13,12 +12,15 @@
 # -------------------------------------------------------------
 # Setup steps
 
-- include_tasks: run.yml
+- name: Run tests on OSes
+  include_tasks: run.yml
   vars:
+    ansible_system_os: "{{ ansible_system | lower }}"
     nodejs_version: "{{ item.node_version }}"
-    nodejs_path: "node-v{{ nodejs_version }}-{{ ansible_system|lower }}-x{{ ansible_userspace_bits }}"
+    nodejs_path: "node-v{{ nodejs_version }}-{{ ansible_system_os }}-x{{ ansible_userspace_bits }}"
     pnpm_version: "{{ item.pnpm_version }}"
+    pnpm_path: "pnpm-{{ 'macos' if ansible_system_os == 'darwin' else ansible_system_os }}-x{{ ansible_userspace_bits }}"
   with_items:
-    - { node_version: 16.14.0, pnpm_version: 7.0.0 } # Honestly, no idea! Very scarce documentation for this
+    - { node_version: 20.5.0, pnpm_version: 8.7.0 }
   when:
-    - not (ansible_os_family == 'Alpine')
+    - not(ansible_distribution == 'Alpine') and not(ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7')
