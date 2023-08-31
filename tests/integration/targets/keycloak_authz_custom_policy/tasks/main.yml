@@ -26,6 +26,29 @@
     service_accounts_enabled: true
     authorization_services_enabled: true
 
+- name: Create first custom policy (check_mode)
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: FirstCustomPolicy
+    state: present
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  check_mode: true
+  register: result
+
+- name: Assert that first custom policy was not created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "FirstCustomPolicy"
+      - result.end_state.type == "script-policy-1.js"
+      - result.msg == 'Would create custom policy'
+
 - name: Create first custom policy
   community.general.keycloak_authz_custom_policy:
     auth_keycloak_url: "{{ url }}"
@@ -47,6 +70,28 @@
       - result.end_state.name == "FirstCustomPolicy"
       - result.end_state.type == "script-policy-1.js"
       - result.msg == 'Custom policy created'
+
+- name: Attemp to update first custom policy (not possible)
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: FirstCustomPolicy
+    state: present
+    policy_type: script-policy-2.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  register: result
+
+- name: Assert that first custom policy was not modified
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "FirstCustomPolicy"
+      - result.end_state.type == "script-policy-2.js"
+      - result.msg == 'Custom policy already exists'
 
 # Ensure that we can create multiple instances of the custom policy 
 - name: Create second instance of the custom policy
@@ -70,6 +115,27 @@
       - result.end_state.name == "SecondCustomPolicy"
       - result.end_state.type == "script-policy-1.js"
       - result.msg == 'Custom policy created'
+
+- name: Remove second instance of the custom policy (check_mode)
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: SecondCustomPolicy
+    state: absent
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  check_mode: true
+  register: result
+
+- name: Assert that second custom policy was not removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == 'Would remove custom policy'
 
 - name: Remove second instance of the custom policy
   community.general.keycloak_authz_custom_policy:
