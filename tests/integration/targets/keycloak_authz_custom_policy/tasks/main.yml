@@ -47,7 +47,7 @@
       - result.end_state != {}
       - result.end_state.name == "FirstCustomPolicy"
       - result.end_state.type == "script-policy-1.js"
-      - result.msg == 'Would create custom policy'
+      - result.msg == 'Would create custom policy FirstCustomPolicy'
 
 - name: Create first custom policy
   community.general.keycloak_authz_custom_policy:
@@ -69,7 +69,7 @@
       - result.end_state != {}
       - result.end_state.name == "FirstCustomPolicy"
       - result.end_state.type == "script-policy-1.js"
-      - result.msg == 'Custom policy created'
+      - result.msg == 'Custom policy FirstCustomPolicy created'
 
 - name: Attemp to update first custom policy (not possible)
   community.general.keycloak_authz_custom_policy:
@@ -91,7 +91,7 @@
       - result.end_state != {}
       - result.end_state.name == "FirstCustomPolicy"
       - result.end_state.type == "script-policy-2.js"
-      - result.msg == 'Custom policy already exists'
+      - result.msg == 'Custom policy FirstCustomPolicy already exists'
 
 # Ensure that we can create multiple instances of the custom policy 
 - name: Create second instance of the custom policy
@@ -114,7 +114,7 @@
       - result.end_state != {}
       - result.end_state.name == "SecondCustomPolicy"
       - result.end_state.type == "script-policy-1.js"
-      - result.msg == 'Custom policy created'
+      - result.msg == 'Custom policy SecondCustomPolicy created'
 
 - name: Remove second instance of the custom policy (check_mode)
   community.general.keycloak_authz_custom_policy:
@@ -135,7 +135,7 @@
     that:
       - result is changed
       - result.end_state == {}
-      - result.msg == 'Would remove custom policy'
+      - result.msg == 'Would remove custom policy SecondCustomPolicy'
 
 - name: Remove second instance of the custom policy
   community.general.keycloak_authz_custom_policy:
@@ -155,7 +155,7 @@
     that:
       - result is changed
       - result.end_state == {}
-      - result.msg == 'Custom policy removed'
+      - result.msg == 'Custom policy SecondCustomPolicy removed'
 
 - name: Remove keycloak client
   community.general.keycloak_client:
