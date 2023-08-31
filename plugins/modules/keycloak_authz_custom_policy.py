@@ -180,15 +180,23 @@ def main():
         result['changed'] = False
         result['end_state'] = desired_authz_custom_policy
     elif not before_authz_custom_policy and state == 'present':
-        kc.create_authz_custom_policy(
-            payload=desired_authz_custom_policy, policy_type=policy_type, client_id=cid, realm=realm)
-        result['msg'] = 'Custom policy created'
+        if module.check_mode:
+            result['msg'] = 'Would create custom policy'
+        else:
+            kc.create_authz_custom_policy(
+                payload=desired_authz_custom_policy, policy_type=policy_type, client_id=cid, realm=realm)
+            result['msg'] = 'Custom policy created'
+
         result['changed'] = True
         result['end_state'] = desired_authz_custom_policy
     elif before_authz_custom_policy and state == 'absent':
-        kc.remove_authz_custom_policy(
-            policy_id=before_authz_custom_policy['id'], client_id=cid, realm=realm)
-        result['msg'] = 'Custom policy removed'
+        if module.check_mode:
+            result['msg'] = 'Would remove custom policy'
+        else:
+            kc.remove_authz_custom_policy(
+                policy_id=before_authz_custom_policy['id'], client_id=cid, realm=realm)
+            result['msg'] = 'Custom policy removed'
+
         result['changed'] = True
         result['end_state'] = {}
     elif not before_authz_custom_policy and state == 'absent':
