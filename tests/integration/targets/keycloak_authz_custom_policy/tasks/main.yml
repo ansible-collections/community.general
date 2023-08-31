@@ -71,7 +71,7 @@
       - result.end_state.type == "script-policy-1.js"
       - result.msg == 'Custom policy FirstCustomPolicy created'
 
-- name: Attemp to update first custom policy (not possible)
+- name: Attempt to update first custom policy (not possible)
   community.general.keycloak_authz_custom_policy:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
