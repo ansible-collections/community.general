@@ -19,8 +19,8 @@ RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"]
 
 class CmdRunnerTestHelper(object):
     def __init__(self, test_cases):
-        # self.command = command
         self._test_cases = test_cases
+        if isinstance(test_cases, list)
         self.testcases = self._make_test_cases()
 
     @property
