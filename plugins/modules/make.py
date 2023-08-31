@@ -90,6 +90,16 @@ EXAMPLES = r'''
     chdir: /home/ubuntu/cool-project
     target: all
     file: /some-project/Makefile
+
+- name: build arm64 kernel on FreeBSD, with 16 parallel jobs
+  community.general.make:
+    chdir: /usr/src
+    jobs: 16
+    target: buildkernel
+    params:
+      -DWITH_FDT:
+      TARGET_ARCH: aarch64
+      TARGET: arm64
 '''
 
 RETURN = r'''
