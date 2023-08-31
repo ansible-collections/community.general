@@ -42,6 +42,12 @@ DOCUMENTATION = '''
         description: Fallback to cached results if connection to cobbler fails.
         type: boolean
         default: false
+      exclude_mgmt_classes:
+        description: Management classes to exclude from inventory.
+        type: list
+        default: []
+        elements: str
+        version_added: 7.4.0
       exclude_profiles:
         description:
           - Profiles to exclude from inventory.
@@ -49,6 +55,12 @@ DOCUMENTATION = '''
         type: list
         default: []
         elements: str
+      include_mgmt_classes:
+        description: Management classes to include from inventory.
+        type: list
+        default: []
+        elements: str
+        version_added: 7.4.0
       include_profiles:
         description:
           - Profiles to include from inventory.
@@ -216,6 +228,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
 
+        self.exclude_mgmt_classes = self.get_option('exclude_mgmt_classes')
+        self.include_mgmt_classes = self.get_option('include_mgmt_classes')
         self.exclude_profiles = self.get_option('exclude_profiles')
         self.include_profiles = self.get_option('include_profiles')
         self.group_by = self.get_option('group_by')
@@ -265,9 +279,16 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 hostname = host['hostname']  # None
             interfaces = host['interfaces']
 
-            if self._exclude_profile(host['profile']):
-                self.display.vvvv('Excluding host %s in profile %s\n' % (host['name'], host['profile']))
-                continue
+            if set(host['mgmt_classes']) & set(self.include_mgmt_classes):
+                self.display.vvvv('Including host %s in mgmt_classes %s\n' % (host['name'], host['mgmt_classes']))
+            else:
+                if self._exclude_profile(host['profile']):
+                    self.display.vvvv('Excluding host %s in profile %s\n' % (host['name'], host['profile']))
+                    continue
+
+                if set(host['mgmt_classes']) & set(self.exclude_mgmt_classes):
+                    self.display.vvvv('Excluding host %s in mgmt_classes %s\n' % (host['name'], host['mgmt_classes']))
+                    continue
 
             # hostname is often empty for non-static IP hosts
             if hostname == '':
