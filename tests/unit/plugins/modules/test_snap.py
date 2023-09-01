@@ -7,15 +7,13 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import json
-
-from collections import namedtuple
-from ansible_collections.community.general.plugins.modules import snap
-
 import pytest
 
+from .cmd_runner_test_utils import CmdRunnerTestHelper, ModuleTestCase, RunCmdCall
+from ansible_collections.community.general.plugins.modules import snap as module
 
-ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_command_calls"])
-RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"])
+
+TESTED_MODULE = module.__name__
 
 
 @pytest.fixture
@@ -457,50 +455,27 @@ TEST_CASES = [
         ]
     ),
 ]
-TEST_CASES_IDS = [item.id for item in TEST_CASES]
 
 
-@pytest.mark.parametrize("patch_ansible_module, testcase",
-                         [[x.input, x] for x in TEST_CASES],
-                         ids=TEST_CASES_IDS,
-                         indirect=["patch_ansible_module"])
-@pytest.mark.usefixtures("patch_ansible_module")
-def test_snap(mocker, capfd, patch_get_bin_path, testcase):
+helper = CmdRunnerTestHelper(test_cases=TEST_CASES)
+patch_bin = helper.cmd_fixture
+
+
+@pytest.mark.parametrize('patch_ansible_module, testcase',
+                         helper.testcases_params, ids=helper.testcases_ids,
+                         indirect=['patch_ansible_module'])
+@pytest.mark.usefixtures('patch_ansible_module')
+def test_module(mocker, capfd, patch_bin, testcase):
     """
-    Run unit tests for test cases listen in TEST_CASES
+    Run unit tests for test cases listed in TEST_CASES
     """
 
-    run_cmd_calls = testcase.run_command_calls
+    with helper(testcase, mocker) as ctx:
+        # Try to run test case
+        with pytest.raises(SystemExit):
+            module.main()
 
-    # Mock function used for running commands first
-    call_results = [(x.rc, x.out, x.err) for x in run_cmd_calls]
-    mock_run_command = mocker.patch(
-        "ansible.module_utils.basic.AnsibleModule.run_command",
-        side_effect=call_results)
+        out, err = capfd.readouterr()
+        results = json.loads(out)
 
-    # Try to run test case
-    with pytest.raises(SystemExit):
-        snap.main()
-
-    out, err = capfd.readouterr()
-    results = json.loads(out)
-    print("testcase =\n%s" % str(testcase))
-    print("results =\n%s" % results)
-
-    assert mock_run_command.call_count == len(run_cmd_calls)
-    if mock_run_command.call_count:
-        call_args_list = [(item[0][0], item[1]) for item in mock_run_command.call_args_list]
-        expected_call_args_list = [(item.command, item.environ) for item in run_cmd_calls]
-        print("call args list =\n%s" % call_args_list)
-        print("expected args list =\n%s" % expected_call_args_list)
-        try:
-            assert call_args_list == expected_call_args_list
-        except AssertionError:
-            for test_call_run, expected_call_run in zip(call_args_list, expected_call_args_list):
-                assert test_call_run == expected_call_run
-
-    assert results.get("changed", False) == testcase.output["changed"]
-    if "failed" in testcase:
-        assert results.get("failed", False) == testcase.output["failed"]
-    if "msg" in testcase:
-        assert results.get("msg", "") == testcase.output["msg"]
+        ctx.check_results(results)
