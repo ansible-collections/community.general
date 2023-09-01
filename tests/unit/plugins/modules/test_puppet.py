@@ -19,8 +19,6 @@ from ansible_collections.community.general.plugins.modules import puppet
 
 import pytest
 
-TESTED_MODULE = puppet.__name__
-
 
 ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_command_calls"])
 RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"])
