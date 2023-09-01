@@ -106,7 +106,7 @@ class CallbackModule(CallbackModule_default):
 
     def v2_playbook_on_play_start(self, play):
         name = play.get_name().strip()
-        if task.check_mode and self.get_option('check_mode_markers'):
+        if play.check_mode and self.get_option('check_mode_markers'):
             if name and play.hosts:
                 msg = u"\n- %s (in check mode) on hosts: %s -" % (name, ",".join(play.hosts))
             else:
