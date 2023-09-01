@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import json
 import pytest
 
 from .cmd_runner_test_utils import CmdRunnerTestHelper, ModuleTestCase, RunCmdCall
@@ -444,7 +443,7 @@ TEST_CASES = [
 ]
 
 
-helper = CmdRunnerTestHelper(test_cases=TEST_CASES)
+helper = CmdRunnerTestHelper(module.main, test_cases=TEST_CASES)
 patch_bin = helper.cmd_fixture
 
 
@@ -457,12 +456,5 @@ def test_module(mocker, capfd, patch_bin, testcase):
     Run unit tests for test cases listed in TEST_CASES
     """
 
-    with helper(testcase, mocker) as ctx:
-        # Try to run test case
-        with pytest.raises(SystemExit):
-            module.main()
-
-        out, err = capfd.readouterr()
-        results = json.loads(out)
-
-        ctx.check_results(results)
+    with helper(testcase, mocker, capfd) as ctx:
+        ctx.run_testcase()
