@@ -18,8 +18,6 @@ from ansible_collections.community.general.plugins.modules import cpanm
 
 import pytest
 
-TESTED_MODULE = cpanm.__name__
-
 
 @pytest.fixture
 def patch_cpanm(mocker):

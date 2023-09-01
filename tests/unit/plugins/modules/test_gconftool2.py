@@ -12,8 +12,6 @@ from ansible_collections.community.general.plugins.modules import gconftool2
 
 import pytest
 
-TESTED_MODULE = gconftool2.__name__
-
 
 @pytest.fixture
 def patch_gconftool2(mocker):
