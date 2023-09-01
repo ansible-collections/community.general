@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import os
 from collections import namedtuple
 from itertools import chain, repeat
 
@@ -19,16 +18,20 @@ RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"]
 
 
 class CmdRunnerTestHelper(object):
-    def __init__(self, command, test_cases):
-        self.command = command
+    def __init__(self, test_cases):
         self._test_cases = test_cases
-        self.testcases = self._make_test_cases()
+        if isinstance(test_cases, (list, tuple)):
+            self.testcases = test_cases
+        else:
+            self.testcases = self._make_test_cases()
 
     @property
     def cmd_fixture(self):
         @pytest.fixture
         def patch_bin(mocker):
-            mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', return_value=os.path.join('/testbin', self.command))
+            def mockie(self, path, *args, **kwargs):
+                return "/testbin/{0}".format(path)
+            mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', mockie)
 
         return patch_bin
 
