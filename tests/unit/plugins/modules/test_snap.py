@@ -13,19 +13,6 @@ from .cmd_runner_test_utils import CmdRunnerTestHelper, ModuleTestCase, RunCmdCa
 from ansible_collections.community.general.plugins.modules import snap as module
 
 
-TESTED_MODULE = module.__name__
-
-
-@pytest.fixture
-def patch_get_bin_path(mocker):
-    """
-    Function used for mocking AnsibleModule.get_bin_path
-    """
-    def mockie(self, path, *args, **kwargs):
-        return "/testbin/{0}".format(path)
-    mocker.patch("ansible.module_utils.basic.AnsibleModule.get_bin_path", mockie)
-
-
 issue_6803_status_out = """Name    Version      Rev    Tracking         Publisher    Notes
 core20  20220826     1623   latest/stable    canonical**  base
 lxd     5.6-794016a  23680  latest/stable/…  canonical**  -
