@@ -15,7 +15,7 @@ from .cmd_runner_test_utils import CmdRunnerTestHelper
 
 TESTED_MODULE = module.__name__
 with open("tests/unit/plugins/modules/test_xfconf_info.yaml", "r") as TEST_CASES:
-    helper = CmdRunnerTestHelper(command="xfconf-query", test_cases=TEST_CASES)
+    helper = CmdRunnerTestHelper(test_cases=TEST_CASES)
     patch_bin = helper.cmd_fixture
 
 
