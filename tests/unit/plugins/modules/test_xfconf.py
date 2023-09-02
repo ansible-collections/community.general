@@ -12,16 +12,15 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import json
-from ansible_collections.community.general.plugins.modules import xfconf as module
 
 import pytest
 
+from ansible_collections.community.general.plugins.modules import xfconf as module
 from .cmd_runner_test_utils import CmdRunnerTestHelper
 
 
 with open("tests/unit/plugins/modules/test_xfconf.yaml", "r") as TEST_CASES:
-    helper = CmdRunnerTestHelper(test_cases=TEST_CASES)
+    helper = CmdRunnerTestHelper(module.main, test_cases=TEST_CASES)
     patch_bin = helper.cmd_fixture
 
 
@@ -34,12 +33,5 @@ def test_module(mocker, capfd, patch_bin, testcase):
     Run unit tests for test cases listed in TEST_CASES
     """
 
-    with helper(testcase, mocker) as ctx:
-        # Try to run test case
-        with pytest.raises(SystemExit):
-            module.main()
-
-        out, err = capfd.readouterr()
-        results = json.loads(out)
-
-        ctx.check_results(results)
+    with helper(testcase, mocker, capfd) as testcase_context:
+        testcase_context.run()

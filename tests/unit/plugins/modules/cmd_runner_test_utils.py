@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import json
 from collections import namedtuple
 from itertools import chain, repeat
 
@@ -18,7 +19,8 @@ RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"]
 
 
 class CmdRunnerTestHelper(object):
-    def __init__(self, test_cases):
+    def __init__(self, module_main, test_cases):
+        self.module_main = module_main
         self._test_cases = test_cases
         if isinstance(test_cases, (list, tuple)):
             self.testcases = test_cases
@@ -54,15 +56,16 @@ class CmdRunnerTestHelper(object):
     def testcases_ids(self):
         return [item.id for item in self.testcases]
 
-    def __call__(self, testcase, mocker):
-        return _Context(self, testcase, mocker)
+    def __call__(self, *args, **kwargs):
+        return _Context(self, *args, **kwargs)
 
 
 class _Context(object):
-    def __init__(self, helper, testcase, mocker):
+    def __init__(self, helper, testcase, mocker, capfd):
         self.helper = helper
         self.testcase = testcase
         self.mocker = mocker
+        self.capfd = capfd
 
         self.run_cmd_calls = self.testcase.run_command_calls
         self.mock_run_cmd = self._make_mock_run_cmd()
@@ -81,6 +84,15 @@ class _Context(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         return False
+
+    def run(self):
+        with pytest.raises(SystemExit):
+            self.helper.module_main()
+
+        out, err = self.capfd.readouterr()
+        results = json.loads(out)
+
+        self.check_results(results)
 
     def check_results(self, results):
         print("testcase =\n%s" % str(self.testcase))
