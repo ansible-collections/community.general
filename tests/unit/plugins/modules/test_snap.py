@@ -381,6 +381,7 @@ TEST_CASES = [
         id="simple case",
         input={"name": ["hello-world"]},
         output=dict(changed=True, snaps_installed=["hello-world"]),
+        flags={},
         run_command_calls=[
             RunCmdCall(
                 command=['/testbin/snap', 'info', 'hello-world'],
@@ -409,6 +410,7 @@ TEST_CASES = [
         id="issue_6803",
         input={"name": ["microk8s", "kubectl"], "classic": True},
         output=dict(changed=True, snaps_installed=["microk8s", "kubectl"]),
+        flags={},
         run_command_calls=[
             RunCmdCall(
                 command=['/testbin/snap', 'info', 'microk8s', 'kubectl'],
