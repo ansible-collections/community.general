@@ -33,5 +33,5 @@ def test_module(mocker, capfd, patch_bin, testcase):
     Run unit tests for test cases listed in TEST_CASES
     """
 
-    with helper(testcase, mocker, capfd) as ctx:
-        ctx.run_testcase()
+    with helper(testcase, mocker, capfd) as testcase_context:
+        testcase_context.run()

@@ -85,7 +85,7 @@ class _Context(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         return False
 
-    def run_testcase(self):
+    def run(self):
         with pytest.raises(SystemExit):
             self.helper.module_main()
 
