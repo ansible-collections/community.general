@@ -14,7 +14,7 @@ import pytest
 import yaml
 
 
-ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_command_calls"])
+ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_command_calls", "flags"])
 RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"])
 
 
@@ -42,8 +42,13 @@ class CmdRunnerTestHelper(object):
 
         results = []
         for tc in test_cases:
-            tc["run_command_calls"] = [RunCmdCall(**r) for r in tc["run_command_calls"]] if tc.get("run_command_calls") else []
-
+            for tc_param in ["input", "output", "flags"]:
+                if not tc.get(tc_param):
+                    tc[tc_param] = {}
+            if tc.get("run_command_calls"):
+                tc["run_command_calls"] = [RunCmdCall(**r) for r in tc["run_command_calls"]]
+            else:
+                tc["run_command_calls"] = []
             results.append(ModuleTestCase(**tc))
 
         return results
@@ -85,7 +90,7 @@ class _Context(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         return False
 
-    def run(self):
+    def _run(self):
         with pytest.raises(SystemExit):
             self.helper.module_main()
 
@@ -93,6 +98,23 @@ class _Context(object):
         results = json.loads(out)
 
         self.check_results(results)
+
+    def test_flags(self, flag=None):
+        flags = self.testcase.flags
+        if flag:
+            flags = flags.get(flag)
+        return flags
+
+    def run(self):
+        func = self._run
+
+        test_flags = self.test_flags()
+        if test_flags.get("skip"):
+            func = pytest.mark.skip(func, reason=test_flags["skip"])
+        if test_flags.get("xfail"):
+            func = pytest.mark.xfail(func, reason=test_flags["xfail"])
+
+        func()
 
     def check_results(self, results):
         print("testcase =\n%s" % str(self.testcase))
