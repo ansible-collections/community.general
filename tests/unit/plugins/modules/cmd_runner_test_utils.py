@@ -110,9 +110,9 @@ class _Context(object):
 
         test_flags = self.test_flags()
         if test_flags.get("skip"):
-            func = pytest.mark.skip(func, reason=test_flags["skip"])
+            pytest.skip(reason=test_flags["skip"])
         if test_flags.get("xfail"):
-            func = pytest.mark.xfail(func, reason=test_flags["xfail"])
+            pytest.xfail(reason=test_flags["xfail"])
 
         func()
 
