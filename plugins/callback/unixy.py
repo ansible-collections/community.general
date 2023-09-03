@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2017, Allyson Bowles <@akatch>
+# Copyright (c) 2023, Al Bowles <@akatch>
 # Copyright (c) 2012-2014, Michael DeHaan <michael.dehaan@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: unixy
     type: stdout
-    author: Allyson Bowles (@akatch)
+    author: Al Bowles (@akatch)
     short_description: condensed Ansible output
     description:
       - Consolidated Ansible output in the style of LINUX/UNIX startup logs.
@@ -40,7 +40,6 @@ class CallbackModule(CallbackModule_default):
     - Only display task names if the task runs on at least one host
     - Add option to display all hostnames on a single line in the appropriate result color (failures may have a separate line)
     - Consolidate stats display
-    - Display whether run is in --check mode
     - Don't show play name if no hosts found
     '''
 
@@ -92,19 +91,31 @@ class CallbackModule(CallbackModule_default):
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._get_task_display_name(task)
         if self.task_display_name is not None:
-            self._display.display("%s..." % self.task_display_name)
+            if task.check_mode and self.get_option('check_mode_markers'):
+                self._display.display("%s (check mode)..." % self.task_display_name)
+            else:
+                self._display.display("%s..." % self.task_display_name)
 
     def v2_playbook_on_handler_task_start(self, task):
         self._get_task_display_name(task)
         if self.task_display_name is not None:
-            self._display.display("%s (via handler)... " % self.task_display_name)
+            if task.check_mode and self.get_option('check_mode_markers'):
+                self._display.display("%s (via handler in check mode)... " % self.task_display_name)
+            else:
+                self._display.display("%s (via handler)... " % self.task_display_name)
 
     def v2_playbook_on_play_start(self, play):
         name = play.get_name().strip()
-        if name and play.hosts:
-            msg = u"\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
+        if play.check_mode and self.get_option('check_mode_markers'):
+            if name and play.hosts:
+                msg = u"\n- %s (in check mode) on hosts: %s -" % (name, ",".join(play.hosts))
+            else:
+                msg = u"- check mode -"
         else:
-            msg = u"---"
+            if name and play.hosts:
+                msg = u"\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
+            else:
+                msg = u"---"
 
         self._display.display(msg)
 
@@ -227,8 +238,10 @@ class CallbackModule(CallbackModule_default):
         self._display.display("  Ran out of hosts!", color=C.COLOR_ERROR)
 
     def v2_playbook_on_start(self, playbook):
-        # TODO display whether this run is happening in check mode
-        self._display.display("Executing playbook %s" % basename(playbook._file_name))
+        if context.CLIARGS['check'] and self.get_option('check_mode_markers'):
+            self._display.display("Executing playbook %s in check mode" % basename(playbook._file_name))
+        else:
+            self._display.display("Executing playbook %s" % basename(playbook._file_name))
 
         # show CLI arguments
         if self._display.verbosity > 3:
