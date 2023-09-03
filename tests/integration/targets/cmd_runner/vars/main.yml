@@ -249,4 +249,4 @@ cmd_echo_tests:
     expect_error: true
     assertions:
       - >
-        "No such file or directory:" in test_result.msg
+        "No such file or directory" in test_result.msg
