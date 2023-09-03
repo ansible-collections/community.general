@@ -157,8 +157,8 @@ cmd_echo_tests:
       - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
       - test_result.err == ""
 
-  - name: use cmd /usr/bin/echo
-    cmd: /usr/bin/echo
+  - name: use cmd /bin/echo
+    cmd: /bin/echo
     arg_formats:
       aa:
         func: as_opt_eq_val
