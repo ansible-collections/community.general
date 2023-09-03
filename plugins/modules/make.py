@@ -98,9 +98,11 @@ EXAMPLES = r'''
     jobs: 16
     target: buildkernel
     params:
+      # This adds -DWITH_FDT to the command line:
       -DWITH_FDT:
-      TARGET_ARCH: aarch64
+      # The following adds TARGET=arm64 TARGET_ARCH=aarch64 to the command line:
       TARGET: arm64
+      TARGET_ARCH: aarch64
 '''
 
 RETURN = r'''
