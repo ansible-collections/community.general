@@ -21,6 +21,7 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def main():
     module = AnsibleModule(
         argument_spec=dict(
+            cmd=dict(type="str", default="echo"),
             arg_formats=dict(type="dict", default={}),
             arg_order=dict(type="raw", required=True),
             arg_values=dict(type="dict", default={}),
@@ -41,7 +42,7 @@ def main():
 
         arg_formats[arg] = func(*args)
 
-    runner = CmdRunner(module, ['echo', '--'], arg_formats=arg_formats)
+    runner = CmdRunner(module, [module.params["cmd"], '--'], arg_formats=arg_formats)
 
     with runner.context(p['arg_order'], check_mode_skip=p['check_mode_skip']) as ctx:
         result = ctx.run(**p['arg_values'])

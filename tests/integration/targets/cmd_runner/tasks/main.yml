@@ -6,3 +6,7 @@
   ansible.builtin.include_tasks:
     file: test_cmd_echo.yml
   loop: "{{ cmd_echo_tests }}"
+- name: parameterized test cmd
+  ansible.builtin.include_tasks:
+    file: test_cmd.yml
+  loop: "{{ cmd_tests }}"

@@ -5,6 +5,7 @@
 
 - name: test cmd_echo [{{ item.name }}]
   cmd_echo:
+    cmd: "{{ item.cmd|default(omit) }}"
     arg_formats: "{{ item.arg_formats|default(omit) }}"
     arg_order: "{{ item.arg_order }}"
     arg_values: "{{ item.arg_values|default(omit) }}"

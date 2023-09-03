@@ -204,11 +204,16 @@ class CmdRunner(object):
             environ_update = {}
         self.environ_update = environ_update
 
-        self.command[0] = module.get_bin_path(self.command[0], opt_dirs=path_prefix, required=True)
+        _cmd = self.command[0]
+        self.command[0] = _cmd if '/' in _cmd else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
 
         for mod_param_name, spec in iteritems(module.argument_spec):
             if mod_param_name not in self.arg_formats:
                 self.arg_formats[mod_param_name] = _Format.as_default_type(spec.get('type', 'str'), mod_param_name)
+
+    @property
+    def binary(self):
+        return self.command[0]
 
     def __call__(self, args_order=None, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
         if output_process is None:
