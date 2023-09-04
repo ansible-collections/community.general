@@ -23,4 +23,4 @@
   with_items:
     - { node_version: 16.20.0, pnpm_version: 8.7.0 }
   when:
-    - not(ansible_distribution == 'Alpine')
+    - not(ansible_distribution == 'Alpine') and not(ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
