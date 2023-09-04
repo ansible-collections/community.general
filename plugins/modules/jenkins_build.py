@@ -20,6 +20,7 @@ requirements:
 author:
   - Brett Milford (@brettmilford)
   - Tong He (@unnecessary-username)
+  - Juan Casanova (@juanmcasanova)
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -65,6 +66,11 @@ options:
     description:
        - User to authenticate with the Jenkins server.
     type: str
+  detach:
+    description:
+      - Enable detached mode to not wait for the build end.
+    default: False
+    type: bool
 '''
 
 EXAMPLES = '''
@@ -152,6 +158,7 @@ class JenkinsBuild:
         self.user = module.params.get('user')
         self.jenkins_url = module.params.get('url')
         self.build_number = module.params.get('build_number')
+        self.detach = module.params.get('detach')
         self.server = self.get_jenkins_connection()
 
         self.result = {
@@ -235,6 +242,13 @@ class JenkinsBuild:
         build_status = self.get_build_status()
 
         if build_status['result'] is None:
+            # If detached mode is active mark as success, we wouldn't be able to get here if it didn't exist
+            if self.detach:
+                result['changed'] = True
+                result['build_info'] = build_status
+
+                return result
+
             sleep(10)
             self.get_result()
         else:
@@ -273,6 +287,7 @@ def main():
             token=dict(no_log=True),
             url=dict(default="http://localhost:8080"),
             user=dict(),
+            detach=dict(type='bool', default=False),
         ),
         mutually_exclusive=[['password', 'token']],
         required_if=[['state', 'absent', ['build_number'], True], ['state', 'stopped', ['build_number'], True]],
