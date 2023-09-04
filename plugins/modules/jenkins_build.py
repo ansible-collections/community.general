@@ -71,6 +71,12 @@ options:
       - Enable detached mode to not wait for the build end.
     default: False
     type: bool
+  time_between_checks:
+    description:
+      - Time in seconds to wait between requests to the Jenkins server.
+      - This times must be higher than the configured quiet time for the job.
+    default: 10
+    type: int
 '''
 
 EXAMPLES = '''
@@ -159,6 +165,7 @@ class JenkinsBuild:
         self.jenkins_url = module.params.get('url')
         self.build_number = module.params.get('build_number')
         self.detach = module.params.get('detach')
+        self.time_between_checks = module.params.get('time_between_checks')
         self.server = self.get_jenkins_connection()
 
         self.result = {
@@ -249,7 +256,7 @@ class JenkinsBuild:
 
                 return result
 
-            sleep(10)
+            sleep(self.time_between_checks)
             self.get_result()
         else:
             if self.state == "stopped" and build_status['result'] == "ABORTED":
@@ -288,6 +295,7 @@ def main():
             url=dict(default="http://localhost:8080"),
             user=dict(),
             detach=dict(type='bool', default=False),
+            time_between_checks=dict(type='int', default=10)
         ),
         mutually_exclusive=[['password', 'token']],
         required_if=[['state', 'absent', ['build_number'], True], ['state', 'stopped', ['build_number'], True]],
@@ -303,7 +311,7 @@ def main():
     else:
         jenkins_build.absent_build()
 
-    sleep(10)
+    sleep(jenkins_build.time_between_checks)
     result = jenkins_build.get_result()
     module.exit_json(**result)
 
