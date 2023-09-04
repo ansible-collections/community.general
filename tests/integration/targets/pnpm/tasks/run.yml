@@ -11,18 +11,28 @@
     remote_src: true
     creates: "{{ remote_tmp_dir }}/{{ nodejs_path }}.tar.gz"
 
-- name: Create pnpm install directory
-  become: true
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.local/share/pnpm"
+- name: Create a temporary directory for pnpm binary
+  ansible.builtin.tempfile:
     state: directory
-    mode: "755"
+  register: tmp_dir
 
-- name: Download pnpm
+- name: Download pnpm binary to the temporary directory
   ansible.builtin.get_url:
     url: "https://github.com/pnpm/pnpm/releases/download/v{{ pnpm_version }}/{{ pnpm_path }}"
-    dest: "{{ ansible_env.HOME }}/.local/share/pnpm/pnpm"
+    dest: "{{ tmp_dir.path }}/pnpm"
     mode: "755"
+
+- name: Setting up pnpm via command
+  ansible.builtin.command: "{{ tmp_dir.path }}/pnpm setup --force"
+  environment:
+    PNPM_HOME: "{{ ansible_env.HOME }}/.local/share/pnpm"
+    SHELL: /bin/sh
+    ENV: "{{ ansible_env.HOME }}/.shrc"
+
+- name: Remove the temporary directory
+  ansible.builtin.file:
+    path: "{{ tmp_dir.path }}"
+    state: absent
 
 - name: Remove any previous Nodejs modules
   ansible.builtin.file:

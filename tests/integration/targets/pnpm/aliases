@@ -6,4 +6,3 @@ azp/posix/2
 destructive
 skip/macos
 skip/freebsd
-skip/rhel7.9

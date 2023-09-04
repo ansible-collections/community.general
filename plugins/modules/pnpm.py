@@ -78,7 +78,7 @@ options:
   production:
     description:
       - Install dependencies in production mode.
-      - Pnpm will ignore any dependencies under devDependencies in package.json.
+      - Pnpm will ignore any dependencies under C(devDependencies) in package.json.
     required: false
     type: bool
     default: false
@@ -98,7 +98,7 @@ options:
   state:
     description:
       - Installation state of the named node.js library.
-      - If absent is selected, a name option must be provided.
+      - If V(absent) is selected, a name option must be provided.
     type: str
     required: false
     default: present

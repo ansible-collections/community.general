@@ -19,8 +19,8 @@
     nodejs_version: "{{ item.node_version }}"
     nodejs_path: "node-v{{ nodejs_version }}-{{ ansible_system_os }}-x{{ ansible_userspace_bits }}"
     pnpm_version: "{{ item.pnpm_version }}"
-    pnpm_path: "pnpm-{{ 'macos' if ansible_system_os == 'darwin' else ansible_system_os }}-x{{ ansible_userspace_bits }}"
+    pnpm_path: "pnpm-{{ 'macos' if ansible_system_os == 'darwin' else 'linuxstatic' }}-x{{ ansible_userspace_bits }}"
   with_items:
-    - { node_version: 20.5.0, pnpm_version: 8.7.0 }
+    - { node_version: 16.20.0, pnpm_version: 8.7.0 }
   when:
-    - not(ansible_distribution == 'Alpine') and not(ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7')
+    - not(ansible_distribution == 'Alpine')
