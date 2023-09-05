@@ -498,7 +498,7 @@ def main():
                 elif command == "GetVirtualMedia":
                     result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
                 elif command == "GetBiosRegistries":
-                    result["bios_registries"] = rf_utils.get_bios_registry()
+                    result["bios_registries"] = rf_utils.get_bios_registries()
 
         elif category == "Chassis":
             # execute only if we find Chassis resource

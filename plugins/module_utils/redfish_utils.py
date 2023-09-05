@@ -3631,41 +3631,42 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "Volume Created"}
 
-    def get_bios_registry(self):
+    def get_bios_registries(self):
         # Get /redfish/v1
-        response = self.get_request(self.root_uri + self.service_root)
+        response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
-            # error_msg(module, "GET", base_uri, redfish_data.status, redfish_data.text)
             return response
 
         server_details = response["data"]
 
         # Get Registries URI
-        if "Registries" not in server_details:
-            msg = "Getting Registries URI failed, Key 'Registries' not found in /redfish/v1/ response: %s"
-            # module.fail_json(msg=msg % str(server_details))
+        if "Bios" not in server_details:
+            msg = "Getting BIOS URI failed, Key 'Bios' not found in /redfish/v1/Systems/1/ response: %s"
             return {
                 "ret": False,
                 "msg": msg % str(server_details)
             }
 
-        reg_uri = server_details["Registries"]["@odata.id"]
-        reg_resp = self.get_request(self.root_uri + reg_uri)
+        bios_uri = server_details["Bios"]["@odata.id"]
+        bios_resp = self.get_request(self.root_uri + bios_uri)
+        if not bios_resp["ret"]:
+            return bios_resp
+
+        bios_data = bios_resp["data"]
+        attribute_registry = bios_data["AttributeRegistry"]
+
+        reg_uri = self.root_uri + self.service_root + "Registries/" + attribute_registry
+        reg_resp = self.get_request(reg_uri)
         if not reg_resp["ret"]:
-            # error_msg(module, "GET", reg_uri, reg_resp.status, reg_resp.text)
             return reg_resp
 
         reg_data = reg_resp["data"]
 
         # Get BIOS attribute registry URI
         lst = []
-        response = self.check_attribute_registry_uri(reg_data, reg_uri)
-        if not response["ret"]:
-            return response
 
-        resp_data, resp_uri = response["resp_data"], response["resp_uri"]
         # Get the location URI
-        response = self.check_location_uri(resp_data, resp_uri)
+        response = self.check_location_uri(reg_data, reg_uri)
         if not response["ret"]:
             return response
 
@@ -3681,35 +3682,6 @@ class RedfishUtils(object):
             "bios_registry": rsp_data,
             "bios_registry_uri": rsp_uri,
             "ret": True
-        }
-
-    def check_attribute_registry_uri(self, reg_data, reg_uri):
-        # Get BiosAttributeRegistry<BIOS version> response
-        resp_data = ""
-        for mem in reg_data['Members']:
-            if "attribute" in mem['@odata.id'].lower():
-                resp = self.get_request(self.root_uri + mem["@odata.id"])
-                if not resp["ret"]:
-                    return resp
-                resp_data = resp["data"]
-                if 'Location' not in resp_data:
-                    msg = "Key 'Location' not found in BIOS attribute registry, URI: %s response: %s"
-                    return {
-                        "ret": False,
-                        "msg": msg % (mem['@odata.id'], str(resp_data))
-                    }
-                break
-        if not resp_data:
-            msg = "'BiosAttributeRegistry<BIOS_version>' URI not found in %s response, %s"
-            return {
-                "ret": False,
-                "msg": msg % (reg_uri, str(reg_data))
-            }
-
-        return {
-            "ret": True,
-            "resp_data": resp_data,
-            "resp_uri": mem['@odata.id']
         }
 
     def check_location_uri(self, resp_data, resp_uri):
