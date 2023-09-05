@@ -78,8 +78,8 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Manage Keycloak file:delete authorization scope
-  keycloak_authz_authorization_scope:
+- name: Manage Keycloak custom authorization policy
+  community.general.keycloak_authz_custom_policy:
     name: OnlyOwner
     state: present
     policy_type: script-policy.js
