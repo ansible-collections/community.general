@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - jenkins_build - add new "detach" option, which allows the module to exit successfully as long as the build is created (default functionality is still waiting for the build to end before exiting).
+  - jenkins_build - add new "time_between_checks" option, which allows to configure the wait time between requests to the Jenkins server.
