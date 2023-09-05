@@ -34,17 +34,13 @@ description:
       This can be considered either a bug or a feature, as the alternative would be to always
       update the realm key whether it has changed or not.
 
+    - If certificate is not explicitly provided it will be dynamically created by Keycloak.
+      Therefore comparing the current state of the certificate to the desired state (which may be
+      empty) is not possible.
+
 attributes:
     check_mode:
-        support: partial
-        details:
-          - Current value of the private key cannot be fetched from Keycloak.
-            Therefore comparing its desired state to the current state is not
-            possible.
-          - If certificate is not explicitly provided it will be dynamically
-            created by Keycloak. Therefore comparing the current state of the
-            certificate to the desired state (which may be empty) is not
-            possible.
+        support: full
     diff_mode:
         support: partial
 
@@ -126,6 +122,16 @@ options:
                       then set this to an empty string.
                 required: true
                 type: str
+notes:
+    - Current value of the private key cannot be fetched from Keycloak.
+      Therefore comparing its desired state to the current state is not
+      possible.
+    - If certificate is not explicitly provided it will be dynamically created
+      by Keycloak. Therefore comparing the current state of the certificate to
+      the desired state (which may be empty) is not possible.
+    - Due to the private key and certificate options the module is B(not fully
+      idempotent). You can use O(force=true) to force the module to always
+      update if you know that the private key might have changed.
 
 extends_documentation_fragment:
     - community.general.keycloak
