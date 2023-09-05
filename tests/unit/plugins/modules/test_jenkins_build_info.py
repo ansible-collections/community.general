@@ -159,7 +159,6 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         self.assertFalse(return_json.exception.args[0]['changed'])
         self.assertEquals("SUCCESS", return_json.exception.args[0]['build_info']['result'])
 
-
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_jenkins_connection')
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_build_status')
