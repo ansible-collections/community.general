@@ -415,6 +415,14 @@ options:
   smbios:
     description:
       - Specifies SMBIOS type 1 fields.
+      - Comma separated, base64 encoded (optional) SMBIOS properties
+      - [base64=<1|0>] [,family=<Base64 encoded string>] 
+      - [,manufacturer=<Base64 encoded string>] 
+      - [,product=<Base64 encoded string>] 
+      - [,serial=<Base64 encoded string>] 
+      - [,sku=<Base64 encoded string>]
+      - [,uuid=<UUID>]
+      - [,version=<Base64 encoded string>]
     type: str
   snapname:
     description:
