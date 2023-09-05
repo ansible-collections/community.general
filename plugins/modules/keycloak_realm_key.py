@@ -129,9 +129,9 @@ notes:
     - If certificate is not explicitly provided it will be dynamically created
       by Keycloak. Therefore comparing the current state of the certificate to
       the desired state (which may be empty) is not possible.
-    - Due to the private key and certificate options the module is B(not fully
-      idempotent). You can use O(force=true) to force the module to always
-      update if you know that the private key might have changed.
+    - Due to the private key and certificate options the module is
+      B(not fully idempotent). You can use O(force=true) to force the module
+      to always update if you know that the private key might have changed.
 
 extends_documentation_fragment:
     - community.general.keycloak
