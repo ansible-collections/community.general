@@ -11,7 +11,6 @@ from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.modules import jenkins_build_info
 
-import jenkins
 import json
 
 
@@ -42,6 +41,29 @@ def fail_json(*args, **kwargs):
     """function to patch over fail_json; package return data into an exception"""
     kwargs['failed'] = True
     raise AnsibleFailJson(kwargs)
+
+
+class jenkins:
+    class JenkinsException(Exception):
+        pass
+
+
+class JenkinsBuildMock():
+    def __init__(self, name, build_number=None):
+        self.name = name
+        self.build_number = build_number
+
+    def get_build_status(self):
+        try:
+            instance = JenkinsMock()
+            response = JenkinsMock.get_build_info(instance, self.name, self.build_number)
+            return response
+        except jenkins.JenkinsException:
+            response = {}
+            response["result"] = "ABSENT"
+            return response
+        except Exception as e:
+            fail_json(msg='Unable to fetch build information, {0}'.format(e))
 
 
 class JenkinsMock():
@@ -105,9 +127,11 @@ class TestJenkinsBuildInfo(unittest.TestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_jenkins_connection')
-    def test_module_get_build_info_if_build_does_not_exist(self, jenkins_connection, test_deps):
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_build_status')
+    def test_module_get_build_info_if_build_does_not_exist(self, build_status, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
+        build_status.return_value = JenkinsBuildMock("job-absent", 30).get_build_status()
 
         with self.assertRaises(AnsibleExitJson) as return_json:
             set_module_args({
@@ -156,9 +180,11 @@ class TestJenkinsBuildInfo(unittest.TestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_jenkins_connection')
-    def test_module_get_build_info_if_job_does_not_exist(self, jenkins_connection, test_deps):
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_build_status')
+    def test_module_get_build_info_if_job_does_not_exist(self, build_status, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
+        build_status.return_value = JenkinsBuildMock("job-absent").get_build_status()
 
         with self.assertRaises(AnsibleExitJson) as return_json:
             set_module_args({
