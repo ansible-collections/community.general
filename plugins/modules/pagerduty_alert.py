@@ -64,7 +64,7 @@ options:
         description:
             - The API version we want to use to run the module.
             - V1 is more limited with option we can provide to trigger incident.
-            - V2 has more variables for example, O(severity), O(source), O(custom_detail),etc.
+            - V2 has more variables for example, O(severity), O(source), O(custom_details),etc.
         default: 'v1'
         choices:
             - 'v1'
