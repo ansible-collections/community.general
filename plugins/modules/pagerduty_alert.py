@@ -35,7 +35,7 @@ options:
         type: str
         description:
             - The pagerduty API key (readonly access), generated on the pagerduty site.
-            - Required if O(api_version=v1)
+            - Required if O(api_version=v1).
     integration_key:
         type: str
         description:
@@ -45,11 +45,11 @@ options:
         type: str
         description:
             - ID of PagerDuty service when incidents will be triggered, acknowledged or resolved.
-            - Required O(api_version=v1)
+            - Required if O(api_version=v1).
     service_key:
         type: str
         description:
-            - The GUID of one of your 'Generic API' services. Obsolete. Please use I(integration_key).
+            - The GUID of one of your 'Generic API' services. Obsolete. Please use O(integration_key).
     state:
         type: str
         description:
@@ -134,14 +134,14 @@ options:
         type: str
         description:
         - The unique location of the affected system, preferably a hostname or FQDN.
-        - Required in case of O(state=trigger) and O(api_version=v2)
+        - Required in case of O(state=trigger) and O(api_version=v2).
         required: false
         version_added: 7.4.0
     severity:
         type: str
         description:
             - The perceived severity of the status the event is describing with respect to the affected system.
-            - Required in case of O(state=trigger) and O(api_version=v2)
+            - Required in case of O(state=trigger) and O(api_version=v2).
         default: 'critical'
         choices:
             - 'critical'
