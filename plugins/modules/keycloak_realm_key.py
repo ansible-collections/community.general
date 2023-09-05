@@ -113,6 +113,9 @@ options:
                 description:
                     - The private key as an ASCII string. Contents of the key must match O(config.algorithm)
                       and O(provider_id).
+                    - Please note that the module cannot detect whether the private key specified differs from the
+                      current state's private key. Use O(force=true) to force the module to update the private key
+                      if you expect it to be updated.
                 required: true
                 type: str
             certificate:
