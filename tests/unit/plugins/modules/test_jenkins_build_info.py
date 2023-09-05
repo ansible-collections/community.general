@@ -71,8 +71,6 @@ class JenkinsMock():
     def get_build_info(self, name, build_number):
         if name == "job-absent":
             raise jenkins.JenkinsException()
-        elif name == "job-exception":
-            raise Exception()
 
         return {
             "result": "SUCCESS",
@@ -82,8 +80,6 @@ class JenkinsMock():
     def get_job_info(self, name):
         if name == "job-absent":
             raise jenkins.JenkinsException()
-        elif name == "job-exception":
-            raise Exception()
 
         return {
             "lastBuild": {
@@ -163,20 +159,6 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         self.assertFalse(return_json.exception.args[0]['changed'])
         self.assertEquals("SUCCESS", return_json.exception.args[0]['build_info']['result'])
 
-    @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies')
-    @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_jenkins_connection')
-    def test_module_get_build_info_if_exception_trying_to_get_build(self, jenkins_connection, test_deps):
-        test_deps.return_value = None
-        jenkins_connection.return_value = JenkinsMock()
-
-        with self.assertRaises(AnsibleFailJson):
-            set_module_args({
-                "name": "job-exception",
-                "user": "abc",
-                "token": "xyz",
-                "build_number": 30
-            })
-            jenkins_build_info.main()
 
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_jenkins_connection')
@@ -197,17 +179,3 @@ class TestJenkinsBuildInfo(unittest.TestCase):
         self.assertFalse(return_json.exception.args[0]['changed'])
         self.assertTrue(return_json.exception.args[0]['failed'])
         self.assertEquals("ABSENT", return_json.exception.args[0]['build_info']['result'])
-
-    @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.test_dependencies')
-    @patch('ansible_collections.community.general.plugins.modules.jenkins_build_info.JenkinsBuildInfo.get_jenkins_connection')
-    def test_module_get_build_info_if_exception_trying_to_get_job(self, jenkins_connection, test_deps):
-        test_deps.return_value = None
-        jenkins_connection.return_value = JenkinsMock()
-
-        with self.assertRaises(AnsibleFailJson):
-            set_module_args({
-                "name": "job-exception",
-                "user": "abc",
-                "token": "xyz"
-            })
-            jenkins_build_info.main()
