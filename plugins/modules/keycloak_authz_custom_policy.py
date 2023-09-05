@@ -50,24 +50,24 @@ options:
         description:
             - Name of the custom policy to create.
         type: str
-        required: True
+        required: true
     policy_type:
         description:
             - The type of the policy. This must match the name of the custom policy deployed to the server.
             - Multiple policies pointing to the same policy type can be created, but their names have to differ.
         type: str
-        required: True
+        required: true
     client_id:
         description:
             - The V(clientId) of the Keycloak client that should have the custom policy attached to it.
             - This is usually a human-readable name of the Keycloak client.
         type: str
-        required: True
+        required: true
     realm:
         description:
             - The name of the Keycloak realm the Keycloak client is in.
         type: str
-        required: True
+        required: true
 
 extends_documentation_fragment:
     - community.general.keycloak
