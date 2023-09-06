@@ -154,7 +154,7 @@ def _get_ctl_binary(module):
         if ctl_binary is not None:
             return ctl_binary
 
-    module.fail_json(msg="Neither of apache2ctl nor apachctl found. At least one apache control binary is necessary.")
+    module.fail_json(msg="Neither of apache2ctl nor apachectl found. At least one apache control binary is necessary.")
 
 
 def _module_is_enabled(module):
