@@ -49,7 +49,7 @@ options:
   params:
     description:
       - Any extra parameters to pass to make.
-      - If the value is empty, only the key will be used. For example, V(FOO:) will produce V(FOO), not V(FOO=).
+      - If the value is empty, only the key will be used. For example, C(FOO:) will produce C(FOO), not C(FOO=).
     type: dict
   target:
     description:
