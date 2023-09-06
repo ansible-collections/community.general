@@ -1,0 +1,2 @@
+minor_changes:
+  - make - allows ``params`` to be used without value (https://github.com/ansible-collections/community.general/pull/7180).
