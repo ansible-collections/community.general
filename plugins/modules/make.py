@@ -49,6 +49,7 @@ options:
   params:
     description:
       - Any extra parameters to pass to make.
+      - If the value is empty, only the key will be used. For example, V(FOO:) will produce V(FOO), not V(FOO=).
     type: dict
   target:
     description:
@@ -90,6 +91,18 @@ EXAMPLES = r'''
     chdir: /home/ubuntu/cool-project
     target: all
     file: /some-project/Makefile
+
+- name: build arm64 kernel on FreeBSD, with 16 parallel jobs
+  community.general.make:
+    chdir: /usr/src
+    jobs: 16
+    target: buildkernel
+    params:
+      # This adds -DWITH_FDT to the command line:
+      -DWITH_FDT:
+      # The following adds TARGET=arm64 TARGET_ARCH=aarch64 to the command line:
+      TARGET: arm64
+      TARGET_ARCH: aarch64
 '''
 
 RETURN = r'''
@@ -190,7 +203,7 @@ def main():
             # Fall back to system make
             make_path = module.get_bin_path('make', required=True)
     if module.params['params'] is not None:
-        make_parameters = [k + '=' + str(v) for k, v in iteritems(module.params['params'])]
+        make_parameters = [k + (('=' + str(v)) if v is not None else '') for k, v in iteritems(module.params['params'])]
     else:
         make_parameters = []
 
