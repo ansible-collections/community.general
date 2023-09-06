@@ -3703,8 +3703,12 @@ class RedfishUtils(object):
                 "msg": msg % (resp_uri, str(resp_data))
             }
 
-        headers['X-Auth-Token'] = self.creds["token"]
-        res = requests.get(self.root_uri + rsp_uri, headers=headers, verify=False)
+        if not self.creds["token"]:
+            auth = HTTPBasicAuth(self.creds["user"], self.creds["pswd"])
+            res = requests.get(self.root_uri + rsp_uri, headers=headers, auth=auth, verify=False)
+        else:
+            headers['X-Auth-Token'] = self.creds["token"]
+            res = requests.get(self.root_uri + rsp_uri, headers=headers, verify=False)
         if res.status_code != 200:
             return {
                 "ret": False,
