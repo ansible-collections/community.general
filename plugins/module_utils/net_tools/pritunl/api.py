@@ -79,7 +79,7 @@ def _post_pritunl_organization(
         api_secret=api_secret,
         base_url=base_url,
         method="POST",
-        path="/organization/%s",
+        path="/organization",
         headers={"Content-Type": "application/json"},
         data=json.dumps(organization_data),
         validate_certs=validate_certs,
