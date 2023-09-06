@@ -220,7 +220,7 @@ def post_pritunl_organization(
         api_secret=api_secret,
         base_url=base_url,
         organization_data={"name": organization_name},
-        validate_certs=True,
+        validate_certs=validate_certs,
     )
 
     if response.getcode() != 200:
@@ -248,7 +248,7 @@ def post_pritunl_user(
             base_url=base_url,
             organization_id=organization_id,
             user_data=user_data,
-            validate_certs=True,
+            validate_certs=validate_certs,
         )
 
         if response.getcode() != 200:
@@ -267,7 +267,7 @@ def post_pritunl_user(
             organization_id=organization_id,
             user_data=user_data,
             user_id=user_id,
-            validate_certs=True,
+            validate_certs=validate_certs,
         )
 
         if response.getcode() != 200:
@@ -287,7 +287,7 @@ def delete_pritunl_organization(
         api_secret=api_secret,
         base_url=base_url,
         organization_id=organization_id,
-        validate_certs=True,
+        validate_certs=validate_certs,
     )
 
     if response.getcode() != 200:
@@ -307,7 +307,7 @@ def delete_pritunl_user(
         base_url=base_url,
         organization_id=organization_id,
         user_id=user_id,
-        validate_certs=True,
+        validate_certs=validate_certs,
     )
 
     if response.getcode() != 200:
