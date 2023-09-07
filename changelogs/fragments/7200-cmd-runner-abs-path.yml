@@ -1,0 +1,2 @@
+bugfixes:
+  - CmdRunner module utils - does not attempt to resolve path if executable is an absolute path (https://github.com/ansible-collections/community.general/pull/7200).
