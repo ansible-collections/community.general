@@ -346,19 +346,19 @@ class GitLabUser(object):
 
     '''
     @param user User object
-    @param sshkey_name Name of the ssh key
+    @param sshkey_key Public key of the ssh key
     '''
-    def ssh_key_exists(self, user, sshkey_name):
-        keyList = map(lambda k: k.title, user.keys.list(all=True))
+    def ssh_key_exists(self, user, sshkey_key):
+        keySet = set(ssh_key_value(k.key) for k in user.keys.list(all=True))
 
-        return sshkey_name in keyList
+        return ssh_key_value(sshkey_key) in keySet
 
     '''
     @param user User object
     @param sshkey Dict containing sshkey infos {"name": "", "file": "", "expires_at": ""}
     '''
     def add_ssh_key_to_user(self, user, sshkey):
-        if not self.ssh_key_exists(user, sshkey['name']):
+        if not self.ssh_key_exists(user, sshkey['file']):
             if self._module.check_mode:
                 return True
 
@@ -572,6 +572,17 @@ def sanitize_arguments(arguments):
         if value is None:
             del arguments[key]
     return arguments
+
+
+def ssh_key_value(public_key):
+    '''
+    strip comment from public key
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAA.... this is the comment to be stripped"
+    =>
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAA...."
+    @param public_key The public key value of an ssh key
+    '''
+    return ' '.join(public_key.split()[0:2])
 
 
 def main():
