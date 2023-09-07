@@ -196,7 +196,7 @@ def main():
             user=dict(),
         ),
         mutually_exclusive=[['password', 'token']],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
 
     test_dependencies(module)

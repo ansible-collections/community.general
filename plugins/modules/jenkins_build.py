@@ -295,7 +295,7 @@ def main():
             url=dict(default="http://localhost:8080"),
             user=dict(),
             detach=dict(type='bool', default=False),
-            time_between_checks=dict(type='int', default=10)
+            time_between_checks=dict(type='int', default=10),
         ),
         mutually_exclusive=[['password', 'token']],
         required_if=[['state', 'absent', ['build_number'], True], ['state', 'stopped', ['build_number'], True]],
