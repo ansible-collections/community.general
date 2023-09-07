@@ -71,12 +71,14 @@ options:
       - Enable detached mode to not wait for the build end.
     default: false
     type: bool
+    version_added: 7.4.0
   time_between_checks:
     description:
       - Time in seconds to wait between requests to the Jenkins server.
       - This times must be higher than the configured quiet time for the job.
     default: 10
     type: int
+    version_added: 7.4.0
 '''
 
 EXAMPLES = '''
