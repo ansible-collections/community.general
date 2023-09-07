@@ -413,16 +413,16 @@ options:
       - Only root is allowed to use this option.
     type: bool
   smbios:
-    description: |
-      Specifies SMBIOS type 1 fields.
-      Comma separated, Base64 encoded (optional) SMBIOS properties:
-      V([base64=<1|0>] [,family=<Base64 encoded string>])
-      V([,manufacturer=<Base64 encoded string>])
-      V([,product=<Base64 encoded string>])
-      V([,serial=<Base64 encoded string>])
-      V([,sku=<Base64 encoded string>])
-      V([,uuid=<UUID>])
-      V([,version=<Base64 encoded string>])
+    description:
+      - Specifies SMBIOS type 1 fields.
+      - "Comma separated, Base64 encoded (optional) SMBIOS properties:"
+      - V([base64=<1|0>] [,family=<Base64 encoded string>])
+      - V([,manufacturer=<Base64 encoded string>])
+      - V([,product=<Base64 encoded string>])
+      - V([,serial=<Base64 encoded string>])
+      - V([,sku=<Base64 encoded string>])
+      - V([,uuid=<UUID>])
+      - V([,version=<Base64 encoded string>])
     type: str
   snapname:
     description:
