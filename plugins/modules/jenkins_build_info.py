@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: jenkins_build_info
 short_description: Get information about Jenkins builds
+version_added: 7.4.0
 description:
     - Get information about Jenkins builds with Jenkins REST API.
 requirements:
