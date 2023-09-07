@@ -69,7 +69,7 @@ options:
   detach:
     description:
       - Enable detached mode to not wait for the build end.
-    default: False
+    default: false
     type: bool
   time_between_checks:
     description:
