@@ -62,13 +62,13 @@ EXAMPLES = '''
     url: http://localhost:8080
 
 - name: Get information about a jenkins build anonymously
-  community.general.jenkins_build:
+  community.general.jenkins_build_info:
     name: "stop-check"
     build_number: 3
     url: http://localhost:8080
 
 - name: Get information about a jenkins build using token authentication
-  community.general.jenkins_build:
+  community.general.jenkins_build_info:
     name: "delete-experiment"
     build_number: 30
     user: Jenkins
