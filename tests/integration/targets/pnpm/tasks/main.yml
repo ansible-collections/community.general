@@ -1,0 +1,26 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for the pnpm module
+# Copyright (c) 2023 Aritra Sen <aretrosen@proton.me>
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# -------------------------------------------------------------
+# Setup steps
+
+- name: Run tests on OSes
+  include_tasks: run.yml
+  vars:
+    ansible_system_os: "{{ ansible_system | lower }}"
+    nodejs_version: "{{ item.node_version }}"
+    nodejs_path: "node-v{{ nodejs_version }}-{{ ansible_system_os }}-x{{ ansible_userspace_bits }}"
+    pnpm_version: "{{ item.pnpm_version }}"
+    pnpm_path: "pnpm-{{ 'macos' if ansible_system_os == 'darwin' else 'linuxstatic' }}-x{{ ansible_userspace_bits }}"
+  with_items:
+    - { node_version: 16.20.0, pnpm_version: 8.7.0 }
+  when:
+    - not(ansible_distribution == 'Alpine') and not(ansible_distribution == 'CentOS' and ansible_distribution_major_version == '6')
