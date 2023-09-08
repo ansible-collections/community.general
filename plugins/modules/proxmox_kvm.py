@@ -524,7 +524,7 @@ options:
   virtio:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. O(virtio='{"key":"value", "key":"value"}').
-      - Keys allowed are - C(virto[n]) where 0 ≤ n ≤ 15.
+      - Keys allowed are - C(virtio[n]) where 0 ≤ n ≤ 15.
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
