@@ -206,7 +206,7 @@ class CmdRunner(object):
         self.environ_update = environ_update
 
         _cmd = self.command[0]
-        self.command[0] = _cmd if os.path.isabs(_cmd) else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
+        self.command[0] = _cmd if (os.path.isabs(_cmd) or '/' in _cmd) else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
 
         for mod_param_name, spec in iteritems(module.argument_spec):
             if mod_param_name not in self.arg_formats:
