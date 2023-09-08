@@ -408,6 +408,14 @@ options:
   smbios:
     description:
       - Specifies SMBIOS type 1 fields.
+      - "Comma separated, Base64 encoded (optional) SMBIOS properties:"
+      - C([base64=<1|0>] [,family=<Base64 encoded string>])
+      - C([,manufacturer=<Base64 encoded string>])
+      - C([,product=<Base64 encoded string>])
+      - C([,serial=<Base64 encoded string>])
+      - C([,sku=<Base64 encoded string>])
+      - C([,uuid=<UUID>])
+      - C([,version=<Base64 encoded string>])
     type: str
   snapname:
     description:
