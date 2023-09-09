@@ -70,9 +70,8 @@ options:
       - List of service identities to attach to the role.
       - Each element must have a "name" and optionally a "datacenters" list of datacenters the effective policy is valid within.
       - An empty datacenters list allows all datacenters
-      - If the parameter is left blank, any service identities assigned will be unassigned
+      - If the parameter is an empty array ([]), any node identities assigned will be unassigned.
     required: false
-    default: []
   node_identities:
     type: list
     elements: dict
@@ -80,9 +79,8 @@ options:
       - List of node identities to attach to the role.
       - Each element must have a "name" and optionally a "datacenter" the effective policy is valid in.
       - An empty datacenter allows all datacenters.
-      - If the parameter is left blank, any node identities assigned will be unassigned.
+      - If the parameter is an empty array ([]), any node identities assigned will be unassigned.
     required: false
-    default: []
   host:
     description:
       - Host of the consul agent, defaults to V(localhost).
