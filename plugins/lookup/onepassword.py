@@ -52,6 +52,8 @@ DOCUMENTATION = '''
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
       major_version:
         description: The op CLI major version. If absent will attempt to auto-detect the version.
+        type: str
+        version_added: 7.4.0
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
         performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the
@@ -581,7 +583,7 @@ class OnePass(object):
 
         if not major_version:
             version = OnePassCLIBase.get_current_version()
-            major_version = version.split(".")[0]
+            major_version = version.split(".", 1)[0]
 
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == major_version:
