@@ -51,6 +51,9 @@ DOCUMENTATION = '''
         description: The op CLI major version. If absent will attempt to auto-detect the version.
         type: str
         version_added: 7.4.0
+        choices:
+          - "1"
+	  - "2"
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
         performed an initial sign in (meaning C(~/.op/config exists)), then only the O(master_password) is required.
