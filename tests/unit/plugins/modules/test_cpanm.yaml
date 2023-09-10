@@ -1,0 +1,220 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+- id: install_dancer_compatibility
+  input:
+    name: Dancer
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/perl, -le, 'use Dancer;']
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 2
+      out: ""
+      err: "error, not installed"
+    - command: [/testbin/cpanm, Dancer]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_dancer_already_installed_compatibility
+  input:
+    name: Dancer
+  output:
+    changed: false
+  run_command_calls:
+    - command: [/testbin/perl, -le, 'use Dancer;']
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_dancer
+  input:
+    name: Dancer
+    mode: new
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, Dancer]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_distribution_file_compatibility
+  input:
+    name: MIYAGAWA/Plack-0.99_05.tar.gz
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_distribution_file
+  input:
+    name: MIYAGAWA/Plack-0.99_05.tar.gz
+    mode: new
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_into_locallib
+  input:
+    name: Dancer
+    mode: new
+    locallib: /srv/webapps/my_app/extlib
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, --local-lib, /srv/webapps/my_app/extlib, Dancer]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_from_local_directory
+  input:
+    from_path: /srv/webapps/my_app/src/
+    mode: new
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, /srv/webapps/my_app/src/]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_into_locallib_no_unit_testing
+  input:
+    name: Dancer
+    notest: true
+    mode: new
+    locallib: /srv/webapps/my_app/extlib
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, --notest, --local-lib, /srv/webapps/my_app/extlib, Dancer]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_from_mirror
+  input:
+    name: Dancer
+    mode: new
+    mirror: "http://cpan.cpantesters.org/"
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, --mirror, "http://cpan.cpantesters.org/", Dancer]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_into_system_lib
+  input:
+    name: Dancer
+    mode: new
+    system_lib: true
+  output:
+    failed: true
+  run_command_calls: []
+- id: install_minversion_implicit
+  input:
+    name: Dancer
+    mode: new
+    version: "1.0"
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, Dancer~1.0]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_minversion_explicit
+  input:
+    name: Dancer
+    mode: new
+    version: "~1.5"
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, Dancer~1.5]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_specific_version
+  input:
+    name: Dancer
+    mode: new
+    version: "@1.7"
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, Dancer@1.7]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_specific_version_from_file_error
+  input:
+    name: MIYAGAWA/Plack-0.99_05.tar.gz
+    mode: new
+    version: "@1.7"
+  output:
+    failed: true
+    msg: parameter 'version' must not be used when installing from a file
+  run_command_calls: []
+- id: install_specific_version_from_directory_error
+  input:
+    from_path: ~/
+    mode: new
+    version: "@1.7"
+  output:
+    failed: true
+    msg: parameter 'version' must not be used when installing from a directory
+  run_command_calls: []
+- id: install_specific_version_from_git_url_explicit
+  input:
+    name: "git://github.com/plack/Plack.git"
+    mode: new
+    version: "@1.7"
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, "git://github.com/plack/Plack.git@1.7"]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_specific_version_from_git_url_implicit
+  input:
+    name: "git://github.com/plack/Plack.git"
+    mode: new
+    version: "2.5"
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/cpanm, "git://github.com/plack/Plack.git@2.5"]
+      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+- id: install_version_operator_from_git_url_error
+  input:
+    name: "git://github.com/plack/Plack.git"
+    mode: new
+    version: "~2.5"
+  output:
+    failed: true
+    msg: operator '~' not allowed in version parameter when installing from git repository
+  run_command_calls: []

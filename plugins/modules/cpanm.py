@@ -183,8 +183,9 @@ class CPANMinus(ModuleHelper):
             if v.name and v.from_path:
                 self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
 
-        self.command = self.get_bin_path(v.executable if v.executable else self.command)
-        self.vars.set("binary", self.command)
+        self.command = v.executable if v.executable else self.command
+        self.runner = CmdRunner(self.module, self.command, self.command_args_formats, check_rc=True)
+        self.vars.binary = self.runner.binary
 
     def _is_package_installed(self, name, locallib, version):
         def process(rc, out, err):
@@ -220,8 +221,6 @@ class CPANMinus(ModuleHelper):
                 self.do_raise(msg=err, cmd=self.vars.cmd_args)
             return 'is up to date' not in err and 'is up to date' not in out
 
-        runner = CmdRunner(self.module, self.command, self.command_args_formats, check_rc=True)
-
         v = self.vars
         pkg_param = 'from_path' if v.from_path else 'name'
 
@@ -235,7 +234,7 @@ class CPANMinus(ModuleHelper):
                 return
             pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
 
-        with runner(['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'pkg_spec'], output_process=process) as ctx:
+        with self.runner(['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'pkg_spec'], output_process=process) as ctx:
             self.changed = ctx.run(pkg_spec=pkg_spec)
 
 
