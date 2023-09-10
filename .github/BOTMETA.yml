@@ -669,7 +669,9 @@ files:
     labels: jboss
     maintainers: $team_jboss jhoekx
   $modules/jenkins_build.py:
-    maintainers: brettmilford unnecessary-username
+    maintainers: brettmilford unnecessary-username juanmcasanova
+  $modules/jenkins_build_info.py:
+    maintainers: juanmcasanova
   $modules/jenkins_job.py:
     maintainers: sermilrod
   $modules/jenkins_job_info.py:
