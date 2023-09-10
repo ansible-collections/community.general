@@ -6,3 +6,4 @@
   ansible.builtin.include_tasks:
     file: test_cmd_echo.yml
   loop: "{{ cmd_echo_tests }}"
+  when: item.condition | default(true) | bool

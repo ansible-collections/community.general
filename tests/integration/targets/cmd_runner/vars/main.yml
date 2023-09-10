@@ -138,3 +138,125 @@ cmd_echo_tests:
       - test_result.rc == 0
       - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
       - test_result.err == ""
+
+  - name: use cmd echo
+    cmd: echo
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
+      - test_result.err == ""
+
+  - name: use cmd /bin/echo
+    cmd: /bin/echo
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
+      - test_result.err == ""
+
+  # this will not be in the regular set of paths get_bin_path() searches
+  - name: use cmd {{ remote_tmp_dir }}/echo
+    condition: >
+      {{
+        ansible_distribution != "MacOSX" and
+        not (ansible_distribution == "CentOS" and ansible_distribution_major_version is version('7.0', '<'))
+      }}
+    copy_to: "{{ remote_tmp_dir }}"
+    cmd: "{{ remote_tmp_dir }}/echo"
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
+      - test_result.err == ""
+
+  - name: use cmd echo with path_prefix {{ remote_tmp_dir }}
+    cmd: echo
+    condition: >
+      {{
+        ansible_distribution != "MacOSX" and
+        not (ansible_distribution == "CentOS" and ansible_distribution_major_version is version('7.0', '<'))
+      }}
+    copy_to: "{{ remote_tmp_dir }}"
+    path_prefix: "{{ remote_tmp_dir }}"
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --tt-arg potatoes\n"
+      - test_result.err == ""
+
+  - name: use cmd never-existed
+    cmd: never-existed
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    expect_error: true
+    assertions:
+      - >
+        "Failed to find required executable" in test_result.msg
+
+  - name: use cmd /usr/bin/never-existed
+    cmd: /usr/bin/never-existed
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      tt:
+        func: as_opt_val
+        args: [--tt-arg]
+    arg_order: 'aa tt'
+    arg_values:
+      tt: potatoes
+    aa: 11
+    expect_error: true
+    assertions:
+      - >
+        "No such file or directory" in test_result.msg
