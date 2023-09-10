@@ -1,0 +1,2 @@
+minor_changes:
+  - pagerduty - adds in option to use v2 API for creating pagerduty incidents (https://github.com/ansible-collections/community.general/issues/6151)

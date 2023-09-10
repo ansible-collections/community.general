@@ -7,6 +7,10 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import pagerduty_alert
+import json
+import pytest
+from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 class PagerDutyAlertsTest(unittest.TestCase):
@@ -44,3 +48,106 @@ class PagerDutyAlertsTest(unittest.TestCase):
 class Response(object):
     def read(self):
         return '{"incidents":[{"id": "incident_id", "status": "triggered"}]}'
+
+
+class TestPagerDutyAlertModule(ModuleTestCase):
+    def setUp(self):
+        super(TestPagerDutyAlertModule, self).setUp()
+        self.module = pagerduty_alert
+
+    def tearDown(self):
+        super(TestPagerDutyAlertModule, self).tearDown()
+
+    @pytest.fixture
+    def fetch_url_mock(self, mocker):
+        return mocker.patch('ansible.module_utils.monitoring.pagerduty_change.fetch_url')
+
+    def test_module_fail_when_required_args_missing(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({})
+            self.module.main()
+
+    def test_ensure_alert_created_with_minimal_data(self):
+        set_module_args({
+            'state': 'triggered',
+            'api_version': 'v2',
+            'integration_key': 'test',
+            'source': 'My Ansible Script',
+            'desc': 'Description for alert'
+        })
+
+        with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
+            fetch_url_mock.return_value = (Response(), {"status": 202})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+
+            assert fetch_url_mock.call_count == 1
+            url = fetch_url_mock.call_args[0][1]
+            json_data = fetch_url_mock.call_args[1]['data']
+            data = json.loads(json_data)
+
+            assert url == 'https://events.pagerduty.com/v2/enqueue'
+            assert data['routing_key'] == 'test'
+            assert data['event_action'] == 'trigger'
+            assert data['payload']['summary'] == 'Description for alert'
+            assert data['payload']['source'] == 'My Ansible Script'
+            assert data['payload']['severity'] == 'critical'
+            assert data['payload']['timestamp'] is not None
+
+    def test_ensure_alert_created_with_full_data(self):
+        set_module_args({
+            'api_version': 'v2',
+            'component': 'mysql',
+            'custom_details': {'environment': 'production', 'notes': 'this is a test note'},
+            'desc': 'Description for alert',
+            'incident_class': 'ping failure',
+            'integration_key': 'test',
+            'link_url': 'https://pagerduty.com',
+            'link_text': 'PagerDuty',
+            'state': 'triggered',
+            'source': 'My Ansible Script',
+        })
+
+        with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
+            fetch_url_mock.return_value = (Response(), {"status": 202})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+
+            assert fetch_url_mock.call_count == 1
+            url = fetch_url_mock.call_args[0][1]
+            json_data = fetch_url_mock.call_args[1]['data']
+            data = json.loads(json_data)
+
+            assert url == 'https://events.pagerduty.com/v2/enqueue'
+            assert data['routing_key'] == 'test'
+            assert data['payload']['summary'] == 'Description for alert'
+            assert data['payload']['source'] == 'My Ansible Script'
+            assert data['payload']['class'] == 'ping failure'
+            assert data['payload']['component'] == 'mysql'
+            assert data['payload']['custom_details']['environment'] == 'production'
+            assert data['payload']['custom_details']['notes'] == 'this is a test note'
+            assert data['links'][0]['href'] == 'https://pagerduty.com'
+            assert data['links'][0]['text'] == 'PagerDuty'
+
+    def test_ensure_alert_acknowledged(self):
+        set_module_args({
+            'state': 'acknowledged',
+            'api_version': 'v2',
+            'integration_key': 'test',
+            'incident_key': 'incident_test_id',
+        })
+
+        with patch.object(pagerduty_alert, 'fetch_url') as fetch_url_mock:
+            fetch_url_mock.return_value = (Response(), {"status": 202})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+
+            assert fetch_url_mock.call_count == 1
+            url = fetch_url_mock.call_args[0][1]
+            json_data = fetch_url_mock.call_args[1]['data']
+            data = json.loads(json_data)
+
+            assert url == 'https://events.pagerduty.com/v2/enqueue'
+            assert data['routing_key'] == 'test'
+            assert data['event_action'] == 'acknowledge'
+            assert data['dedup_key'] == 'incident_test_id'

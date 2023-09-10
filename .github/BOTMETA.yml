@@ -937,7 +937,7 @@ files:
     labels: pagerduty
     maintainers: suprememoocow thaumos
   $modules/pagerduty_alert.py:
-    maintainers: ApsOps
+    maintainers: ApsOps xshen1
   $modules/pagerduty_change.py:
     maintainers: adamvaughan
   $modules/pagerduty_user.py:
