@@ -47,6 +47,8 @@ DOCUMENTATION = '''
         version_added: 7.1.0
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
+      major_version:
+        description: The op CLI major version. If absent will attempt to auto-detect the version.
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
         performed an initial sign in (meaning C(~/.op/config exists)), then only the O(master_password) is required.
@@ -96,8 +98,9 @@ class LookupModule(LookupBase):
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
+        major_version = self.get_option("major_version")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, major_version)
         op.assert_logged_in()
 
         values = []

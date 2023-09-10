@@ -50,6 +50,8 @@ DOCUMENTATION = '''
         version_added: 7.1.0
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
+      major_version:
+        description: The op CLI major version. If absent will attempt to auto-detect the version.
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
         performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the
@@ -559,13 +561,14 @@ class OnePassCLIv2(OnePassCLIBase):
 
 class OnePass(object):
     def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
-                 service_account_token=None):
+                 service_account_token=None, major_version=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
         self.secret_key = secret_key
         self.master_password = master_password
         self.service_account_token = service_account_token
+        self.major_version = major_version
 
         self.logged_in = False
         self.token = None
@@ -574,9 +577,14 @@ class OnePass(object):
         self._cli = self._get_cli_class()
 
     def _get_cli_class(self):
-        version = OnePassCLIBase.get_current_version()
+        major_version = self.major_version
+
+        if not major_version:
+            version = OnePassCLIBase.get_current_version()
+            major_version = version.split(".")[0]
+
         for cls in OnePassCLIBase.__subclasses__():
-            if cls.supports_version == version.split(".")[0]:
+            if cls.supports_version == major_version:
                 try:
                     return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
                 except TypeError as e:
@@ -642,8 +650,9 @@ class LookupModule(LookupBase):
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
+        major_version = self.get_option("major_version")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, major_version)
         op.assert_logged_in()
 
         values = []
