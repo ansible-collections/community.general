@@ -1530,3 +1530,30 @@ releases:
     - 7081-redfish-utils-fix-for-storagecontrollers-deprecated-key.yaml
     - 7085-sanity.yml
     release_date: '2023-08-13'
+  6.6.5:
+    changes:
+      bugfixes:
+      - CmdRunner module utils - does not attempt to resolve path if executable is
+        a relative or absolute path (https://github.com/ansible-collections/community.general/pull/7200).
+      - lxc connection plugin - now handles ``remote_addr`` defaulting to ``inventory_hostname``
+        correctly (https://github.com/ansible-collections/community.general/pull/7104).
+      - nsupdate - fix a possible ``list index out of range`` exception (https://github.com/ansible-collections/community.general/issues/836).
+      - oci_utils module util - fix inappropriate logical comparison expressions and
+        makes them simpler. The previous checks had logical short circuits (https://github.com/ansible-collections/community.general/pull/7125).
+      - pritunl module utils - fix incorrect URL parameter for orgnization add method
+        (https://github.com/ansible-collections/community.general/pull/7161).
+      minor_changes:
+      - make - allows ``params`` to be used without value (https://github.com/ansible-collections/community.general/pull/7180).
+      - pritunl module utils - ensure ``validate_certs`` parameter is honoured in
+        all methods (https://github.com/ansible-collections/community.general/pull/7156).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 6.6.5.yml
+    - 7104_fix_lxc_remoteaddr_default.yml
+    - 7125-fix-inappropriate-comparison.yml
+    - 7156-ensure-validate-certs-parameter-is-honoured.yml
+    - 7161-fix-incorrect-post-parameter.yml
+    - 7180-make_params_without_value.yml
+    - 7200-cmd-runner-abs-path.yml
+    - 7219-fix-nsupdate-cname.yaml
+    release_date: '2023-09-11'
