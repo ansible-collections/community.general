@@ -189,8 +189,10 @@ class LookupModule(LookupBase):
         available_chars_set = ""
 
         if ignore_similar_chars:
-            for c in [number_chars, lower_chars, upper_chars, special_chars]:
-                c = "".join([sc for sc in c if sc not in similar_chars])
+            number_chars = "".join([sc for sc in number_chars if sc not in similar_chars])
+            lower_chars = "".join([sc for sc in lower_chars if sc not in similar_chars])
+            upper_chars = "".join([sc for sc in upper_chars if sc not in similar_chars])
+            special_chars = "".join([sc for sc in special_chars if sc not in similar_chars])
 
         if override_all:
             # Override all the values
