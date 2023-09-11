@@ -75,6 +75,11 @@ class JenkinsMock():
     def get_build_info(self, name, build_number):
         if name == "host-delete":
             raise jenkins.JenkinsException("job {0} number {1} does not exist".format(name, build_number))
+        elif name == "create-detached":
+            return {
+                "building": True,
+                "result": None
+            }
         return {
             "building": True,
             "result": "SUCCESS"
@@ -222,3 +227,38 @@ class TestJenkinsBuild(unittest.TestCase):
                 "token": "xyz"
             })
             jenkins_build.main()
+
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_build_status')
+    def test_module_create_build_without_detach(self, build_status, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMock()
+        build_status.return_value = JenkinsBuildMock().get_build_status()
+
+        with self.assertRaises(AnsibleExitJson) as return_json:
+            set_module_args({
+                "name": "create-detached",
+                "user": "abc",
+                "token": "xyz"
+            })
+            jenkins_build.main()
+
+        self.assertFalse(return_json.exception.args[0]['changed'])
+
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    def test_module_create_build_detached(self, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMock()
+
+        with self.assertRaises(AnsibleExitJson) as return_json:
+            set_module_args({
+                "name": "create-detached",
+                "user": "abc",
+                "token": "xyz",
+                "detach": True
+            })
+            jenkins_build.main()
+
+        self.assertTrue(return_json.exception.args[0]['changed'])
