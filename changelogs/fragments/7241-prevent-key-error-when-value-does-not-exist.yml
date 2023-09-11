@@ -1,0 +1,2 @@
+bugfixes:
+    - onepassword - fix KeyError exception when trying to access value of a field that is not filled out in OnePassword item (https://github.com/ansible-collections/community.general/pull/7241).
