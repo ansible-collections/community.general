@@ -1,2 +1,0 @@
-minor_changes:
-- pritunl module utils - ensure ``validate_certs`` parameter is honoured in all methods (https://github.com/ansible-collections/community.general/pull/7156).
