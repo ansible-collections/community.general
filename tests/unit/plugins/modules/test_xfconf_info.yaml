@@ -13,7 +13,7 @@
     is_array: false
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: "100\n"
       err: ""
@@ -24,7 +24,7 @@
   output: {}
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/i_dont_exist]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 1
       out: ""
       err: 'Property "/general/i_dont_exist" does not exist on channel "xfwm4".\n'
@@ -44,7 +44,7 @@
     value_array: [Main, Work, Tmp]
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "Value is an array with 3 items:\n\nMain\nWork\nTmp\n"
       err: ""
@@ -54,7 +54,7 @@
     channels: [a, b, c]
   run_command_calls:
     - command: [/testbin/xfconf-query, --list]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "Channels:\n  a\n  b\n  c\n"
       err: ""
@@ -71,7 +71,7 @@
       - /general/zoom_desktop
   run_command_calls:
     - command: [/testbin/xfconf-query, --list, --channel, xfwm4]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: |
         /general/wrap_cycle

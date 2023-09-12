@@ -11,12 +11,12 @@
     changed: true
   run_command_calls:
     - command: [/testbin/perl, -le, 'use Dancer;']
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: &env-def-false {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
       rc: 2
       out: ""
       err: "error, not installed"
     - command: [/testbin/cpanm, Dancer]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: &env-def-true {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: ""
       err: ""
@@ -27,7 +27,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/perl, -le, 'use Dancer;']
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def-false
       rc: 0
       out: ""
       err: ""
@@ -39,7 +39,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, Dancer]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -50,7 +50,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -62,7 +62,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, MIYAGAWA/Plack-0.99_05.tar.gz]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -75,7 +75,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, --local-lib, /srv/webapps/my_app/extlib, Dancer]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -87,7 +87,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, /srv/webapps/my_app/src/]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -101,7 +101,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, --notest, --local-lib, /srv/webapps/my_app/extlib, Dancer]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -114,7 +114,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, --mirror, "http://cpan.cpantesters.org/", Dancer]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -135,7 +135,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, Dancer~1.0]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -148,7 +148,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, Dancer~1.5]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -161,7 +161,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, Dancer@1.7]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -192,7 +192,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, "git://github.com/plack/Plack.git@1.7"]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""
@@ -205,7 +205,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/cpanm, "git://github.com/plack/Plack.git@2.5"]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def-true
       rc: 0
       out: ""
       err: ""

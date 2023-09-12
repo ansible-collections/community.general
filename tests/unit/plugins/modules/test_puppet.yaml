@@ -10,7 +10,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
       rc: 0
       out: "blah, anything"
       err: ""
@@ -29,7 +29,7 @@
         - --verbose
         - --color
         - "0"
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -40,7 +40,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "blah, anything"
       err: ""
@@ -60,7 +60,7 @@
         - --color
         - "0"
         - --certname=potatobox
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -71,7 +71,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "blah, anything"
       err: ""
@@ -92,7 +92,7 @@
         - "0"
         - --tags
         - a,b,c
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -103,7 +103,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "blah, anything"
       err: ""
@@ -124,7 +124,7 @@
         - "0"
         - --skip_tags
         - d,e,f
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -135,7 +135,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "blah, anything"
       err: ""
@@ -155,7 +155,7 @@
         - --color
         - "0"
         - --no-noop
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -166,7 +166,7 @@
     changed: false
   run_command_calls:
     - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "blah, anything"
       err: ""
@@ -186,7 +186,7 @@
         - --color
         - "0"
         - --noop
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
