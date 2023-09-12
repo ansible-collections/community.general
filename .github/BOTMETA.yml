@@ -249,8 +249,10 @@ files:
     labels: onepassword
     maintainers: samdoran
   $lookups/onepassword.py:
+    ignore: scottsb
     maintainers: azenk scottsb
   $lookups/onepassword_raw.py:
+    ignore: scottsb
     maintainers: azenk scottsb
   $lookups/passwordstore.py: {}
   $lookups/random_pet.py:
