@@ -15,13 +15,12 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules import xfconf as module
-from .cmd_runner_test_utils import CmdRunnerTestHelper
+from ansible_collections.community.general.plugins.modules import xfconf
+from .helper import CmdRunnerTestHelper
 
 
-with open("tests/unit/plugins/modules/test_xfconf.yaml", "r") as TEST_CASES:
-    helper = CmdRunnerTestHelper(module.main, test_cases=TEST_CASES)
-    patch_bin = helper.cmd_fixture
+helper = CmdRunnerTestHelper.from_file(xfconf.main, "tests/unit/plugins/modules/test_xfconf.yaml")
+patch_bin = helper.cmd_fixture
 
 
 @pytest.mark.parametrize('patch_ansible_module, testcase',

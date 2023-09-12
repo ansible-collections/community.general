@@ -19,6 +19,17 @@ RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"]
 
 
 class CmdRunnerTestHelper(object):
+    @staticmethod
+    def from_list(module_main, list_):
+        helper = CmdRunnerTestHelper(module_main, test_cases=list_)
+        return helper
+
+    @staticmethod
+    def from_file(module_main, filename):
+        with open(filename, "r") as TEST_CASES:
+            helper = CmdRunnerTestHelper(module_main, test_cases=TEST_CASES)
+            return helper
+
     def __init__(self, module_main, test_cases):
         self.module_main = module_main
         self._test_cases = test_cases

@@ -10,12 +10,11 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.modules import gconftool2_info
-from .cmd_runner_test_utils import CmdRunnerTestHelper
+from .helper import CmdRunnerTestHelper
 
 
-with open("tests/unit/plugins/modules/test_gconftool2_info.yaml", "r") as TEST_CASES:
-    helper = CmdRunnerTestHelper(gconftool2_info.main, test_cases=TEST_CASES)
-    patch_bin = helper.cmd_fixture
+helper = CmdRunnerTestHelper.from_file(gconftool2_info.main, "tests/unit/plugins/modules/test_gconftool2_info.yaml")
+patch_bin = helper.cmd_fixture
 
 
 @pytest.mark.parametrize('patch_ansible_module, testcase',
