@@ -11,7 +11,7 @@
   output: {}
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: "100\n"
       err: ""
@@ -22,7 +22,7 @@
   output: {}
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: "No value set for `/desktop/gnome/background/picture_filename'\n"
@@ -37,17 +37,17 @@
     changed: true
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "100\n"
       err: ""
     - command: [/testbin/gconftool-2, --type, int, --set, /desktop/gnome/background/picture_filename, "200"]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "200\n"
       err: ""
@@ -62,17 +62,17 @@
     changed: false
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "200\n"
       err: ""
     - command: [/testbin/gconftool-2, --type, int, --set, /desktop/gnome/background/picture_filename, "200"]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "200\n"
       err: ""
@@ -87,17 +87,17 @@
     changed: false
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /apps/gnome_settings_daemon/screensaver/start_screensaver]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "false\n"
       err: ""
     - command: [/testbin/gconftool-2, --type, bool, --set, /apps/gnome_settings_daemon/screensaver/start_screensaver, "False"]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
     - command: [/testbin/gconftool-2, --get, /apps/gnome_settings_daemon/screensaver/start_screensaver]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "false\n"
       err: ""
@@ -110,12 +110,12 @@
     changed: true
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "200\n"
       err: ""
     - command: [/testbin/gconftool-2, --unset, /desktop/gnome/background/picture_filename]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -128,12 +128,12 @@
     changed: false
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /apps/gnome_settings_daemon/screensaver/start_screensaver]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
     - command: [/testbin/gconftool-2, --unset, /apps/gnome_settings_daemon/screensaver/start_screensaver]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
