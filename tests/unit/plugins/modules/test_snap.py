@@ -8,8 +8,8 @@ __metaclass__ = type
 
 import pytest
 
-from .cmd_runner_test_utils import CmdRunnerTestHelper, ModuleTestCase, RunCmdCall
-from ansible_collections.community.general.plugins.modules import snap as module
+from .helper import CmdRunnerTestHelper, ModuleTestCase, RunCmdCall
+from ansible_collections.community.general.plugins.modules import snap
 
 
 issue_6803_status_out = """Name    Version      Rev    Tracking         Publisher    Notes
@@ -444,8 +444,7 @@ TEST_CASES = [
     ),
 ]
 
-
-helper = CmdRunnerTestHelper(module.main, test_cases=TEST_CASES)
+helper = CmdRunnerTestHelper.from_list(snap.main, TEST_CASES)
 patch_bin = helper.cmd_fixture
 
 
