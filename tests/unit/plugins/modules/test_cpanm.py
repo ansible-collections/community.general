@@ -16,12 +16,11 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.modules import cpanm
-from .cmd_runner_test_utils import CmdRunnerTestHelper
+from .helper import CmdRunnerTestHelper
 
 
-with open("tests/unit/plugins/modules/test_cpanm.yaml", "r") as TEST_CASES:
-    helper = CmdRunnerTestHelper(cpanm.main, test_cases=TEST_CASES)
-    patch_bin = helper.cmd_fixture
+helper = CmdRunnerTestHelper.from_file(cpanm.main, "tests/unit/plugins/modules/test_cpanm.yaml")
+patch_bin = helper.cmd_fixture
 
 
 @pytest.mark.parametrize('patch_ansible_module, testcase',

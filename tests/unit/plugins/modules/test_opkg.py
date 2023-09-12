@@ -9,13 +9,12 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules import opkg as module
-from .cmd_runner_test_utils import CmdRunnerTestHelper
+from ansible_collections.community.general.plugins.modules import opkg
+from .helper import CmdRunnerTestHelper
 
 
-with open("tests/unit/plugins/modules/test_opkg.yaml", "r") as TEST_CASES:
-    helper = CmdRunnerTestHelper(module.main, test_cases=TEST_CASES)
-    patch_bin = helper.cmd_fixture
+helper = CmdRunnerTestHelper.from_file(opkg.main, "tests/unit/plugins/modules/test_opkg.yaml")
+patch_bin = helper.cmd_fixture
 
 
 @pytest.mark.parametrize('patch_ansible_module, testcase',
