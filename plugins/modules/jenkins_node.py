@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: jenkins_node
 short_description: Manage Jenkins nodes
+version_added: 7.4.0
 description:
     - Manage Jenkins nodes with Jenkins REST API.
 requirements:
@@ -29,7 +30,7 @@ options:
   name:
     description:
       - Name of the Jenkins node to manage.
-    required: yes
+    required: true
     type: str
   url:
     description:
@@ -51,7 +52,7 @@ options:
   state:
     description:
       - Specifies whether the Jenkins node should be V(present) (created), V(absent)
-        (deleted), enabled (online) or disabled (offline).
+        (deleted), V(enabled) (online) or V(disabled) (offline).
     default: present
     type: str
     choices:
@@ -80,31 +81,93 @@ options:
     description:
       - When specified, sets the Jenkins node usage policy.
       - V(normal) means use node as much as possible.
-      - V(exclusive) means only build jobs with label expressions that match tnode.
+      - V(exclusive) means only build jobs with label expressions that match the node.
     type: str
     choices:
       - normal
       - exclusive
-  launcher:
+  launch_ssh:
     description:
-      - When specified, sets the Jenkins node launch method.
-      - Launcher V(type) must be specified.
-      - V(args) are specified according to the launcher V(type) (see examples).
+      - When specified, sets the Jenkins node to launch by SSH.
     type: dict
     suboptions:
-      type:
+      host:
         description:
-          - Specifies the launch method.
+          - When specified, sets the SSH host name.
         type: str
-        choices:
-          - ssh
-          - jnlp
-        required: yes
-      args:
+      port:
         description:
-          - Specifies the launch method arguments.
+          - When specified, sets the SSH port number.
+        type: int
+      credentials_id:
+        description:
+          - When specified, sets the Jenkins credential used for SSH authentication by
+            its ID.
+        type: str
+      host_key_verify_none:
+        description:
+          - When set, sets the SSH host key non-verifying strategy.
+        type: bool
+        choices:
+          - True
+      host_key_verify_known_hosts:
+        description:
+          - When set, sets the SSH host key known hosts file verification strategy.
+        type: bool 
+        choices:
+          - True
+      host_key_verify_provided:
+        description:
+          - When specified, sets the SSH host key manually provided verification strategy.
         type: dict
-        default: {}
+        suboptions:
+          algorithm:
+            description:
+              - Key type e.g. V(ssh-rsa).
+            type: str
+            required: true
+          key:
+            description:
+              - Key value.
+            type: str
+            required: true
+      host_key_verify_trusted:
+        description:
+          - When specified, sets the SSH host key manually trusted verification strategy.
+        type: dict
+        suboptions:
+          allow_initial:
+            description:
+              - When specified, enables or disables the requiring manual verification of
+                the first connected host for this node.
+            type: bool
+  launch_jnlp:
+    description:
+      - When specified, sets the Jenkins node to launch by JNLP.
+    type: dict
+    suboptions:
+      data_dir:
+        description:
+          - When specified, sets the work directory.
+        type: path
+      work_dir:
+        description:
+          - When specified, sets the internal data directory.
+        type: path
+      disable_work_dir:
+        description:
+          - When specified, disables or enables the work directory.
+        type: bool
+      assert_work_dir:
+        description:
+          - When specified, enables or disables failing at startup if the target work
+            directory is missing.
+        type: bool
+      use_web_socket:
+        description:
+          - When specified, enables or disables using a WebSocket to connect to the
+            Jenkins master.
+        type: bool
   defer_wipeout:
     description:
       - When specified, enables or disables the Jenkins node improved workspace cleanup
@@ -126,17 +189,17 @@ options:
           - Jenkins tool class name e.g. "hudson.plugins.git.GitTool$DescriptorImpl" for
             Git.
         type: str
-        required: yes
+        required: true
       name:
          description:
            - Jenkins tool instance name.
          type: str
-         required: yes
+         required: true
       home:
         description:
           - Jenkins tool home directory.
         type: path
-        required: yes
+        required: true
   offline_message:
     description:
       - Specifies the offline reason message to be set when setting a Jenkins node state
@@ -232,7 +295,7 @@ EXAMPLES = '''
       args:
         data_dir: remoting
         work_dir: custom
-        disable_work_dir: yes
+        disable_work_dir: true
         assert_work_dir: no
         use_web_socket: no
 
@@ -412,14 +475,6 @@ class JNLPLauncherXMLWrapper(LauncherXMLWrapper):
 class JNLPLauncher(Launcher):
     XMLWrapper = JNLPLauncherXMLWrapper
 
-    validator = ArgumentSpecValidator(dict(
-        data_dir=dict(type='path'),
-        work_dir=dict(type='path'),
-        disable_work_dir=dict(type='bool'),
-        assert_work_dir=dict(type='bool'),
-        use_web_socket=dict(type='bool'),
-    ))
-
     def __init__(
         self,
         data_dir=None,
@@ -511,18 +566,14 @@ class NoneSSHHostKeyVerify(SSHHostKeyVerify):
     CLASS = 'hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy'
 
 
-class ApproveSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
+class TrustedSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
     @property
     def allow_initial(self):
         return self.root.find('requireInitialManualTrust')
 
 
-class ApproveSSHHostKeyVerify(SSHHostKeyVerify):
+class TrustedSSHHostKeyVerify(SSHHostKeyVerify):
     CLASS = 'hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy'
-
-    validator = ArgumentSpecValidator(dict(
-        allow_initial=dict(type='bool')
-    ))
 
     XML_TEMPLATE = """
 <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
@@ -537,10 +588,10 @@ class ApproveSSHHostKeyVerify(SSHHostKeyVerify):
         return ElementTree.fromstring(self.XML_TEMPLATE)
 
     def update(self, root):
-        super(ApproveSSHHostKeyVerify, self).update(root)
+        super(TrustedSSHHostKeyVerify, self).update(root)
 
         updated = False
-        wrapper = ApproveSSHHostKeyVerifyXMLWrapper(root)
+        wrapper = TrustedSSHHostKeyVerifyXMLWrapper(root)
 
         if self.allow_initial is not None:
             if wrapper.allow_initial.text != bool_to_text(self.allow_initial):
@@ -550,7 +601,7 @@ class ApproveSSHHostKeyVerify(SSHHostKeyVerify):
         return updated
 
 
-class ContentSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
+class ProvidedSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
     @property
     def container(self):
         return self.root.find('key')
@@ -564,13 +615,8 @@ class ContentSSHHostKeyVerifyXMLWrapper(SSHHostKeyVerifyXMLWrapper):
         return self.container.find('key')
 
 
-class ContentSSHHostKeyVerify(SSHHostKeyVerify):
+class ProvidedSSHHostKeyVerify(SSHHostKeyVerify):
     CLASS = 'hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy'
-
-    validator = ArgumentSpecValidator(dict(
-        algorithm=dict(type='str', required=True),
-        key=dict(type='str', required=True),
-    ))
 
     XML_TEMPLATE = """
 <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
@@ -589,10 +635,10 @@ class ContentSSHHostKeyVerify(SSHHostKeyVerify):
         return ElementTree.fromstring(self.XML_TEMPLATE)
 
     def update(self, root):
-        super(ContentSSHHostKeyVerify, self).update(root)
+        super(ProvidedSSHHostKeyVerify, self).update(root)
 
         updated = False
-        wrapper = ContentSSHHostKeyVerifyXMLWrapper(root)
+        wrapper = ProvidedSSHHostKeyVerifyXMLWrapper(root)
 
         if wrapper.algorithm.text != self.algorithm:
             wrapper.algorithm.text = self.algorithm
@@ -603,14 +649,6 @@ class ContentSSHHostKeyVerify(SSHHostKeyVerify):
             updated = True
 
         return updated
-
-
-SSH_HOST_KEY_VERIFY = {
-    'none': NoneSSHHostKeyVerify,
-    'known_hosts': KnownHostsSSHHostKeyVerify,
-    'content': ContentSSHHostKeyVerify,
-    'approve': ApproveSSHHostKeyVerify,
-}
 
 
 class SSHLauncherXMLWrapper(LauncherXMLWrapper):
@@ -658,47 +696,17 @@ class SSHLauncherXMLWrapper(LauncherXMLWrapper):
 class SSHLauncher(Launcher):
     XMLWrapper = SSHLauncherXMLWrapper
 
-    validator = ArgumentSpecValidator(dict(
-        host=dict(type='str'),
-        port=dict(type='int'),
-        credentials_id=dict(type='str'),
-        host_key_verify=dict(
-            type='dict',
-            options=dict(
-                type=dict(choices=['none', 'known_hosts', 'content', 'approve']),
-                args=dict(type='dict', default={}),
-            ),
-        ),
-    ))
-
-    @staticmethod
-    def init_host_key_verify(spec):
-        if spec is None:
-            return None
-
-        type_ = SSH_HOST_KEY_VERIFY[spec['type']]
-        if not issubclass(type, SSHHostKeyVerify):
-            raise TypeError('verify helper is not SSHHostKeyVerify: got {0}'.format(type_))
-
-        args = type_.validator.validate(spec['args']).validated_parameters
-
-        obj = type_(**args)  # type: ignore
-        if not isinstance(obj, SSHHostKeyVerify):
-            raise TypeError
-
-        return obj
-
     def __init__(
         self,
         host=None,
         port=None,
         credentials_id=None,
-        host_key_verify=None
+        host_key_verify=None,
     ):
         self.host = host
         self.port = port
         self.credentials_id = credentials_id
-        self.host_key_verify = self.init_host_key_verify(host_key_verify)
+        self.host_key_verify = host_key_verify
 
     XML_TEMPLATE = """
 <launcher class="hudson.plugins.sshslaves.SSHLauncher">
@@ -752,12 +760,6 @@ class SSHLauncher(Launcher):
                 updated = True
 
         return updated
-
-
-LAUNCHER = {
-    'ssh': SSHLauncher,
-    'jnlp': JNLPLauncher,
-}
 
 
 class TreeMapXMLWrapper(XMLWrapper):
@@ -1010,24 +1012,7 @@ class ToolLocations:
 
 
 class JenkinsNode:
-    @staticmethod
-    def init_launcher(spec):
-        if spec is None:
-            return None
-
-        type_ = LAUNCHER[spec['type']]
-        if not issubclass(type_, Launcher):
-            raise TypeError('launcher helper is not Launcher: got {0}'.format(type_))
-
-        args = type_.validator.validate(spec['args']).validated_parameters
-
-        launcher = type_(**args)  # type: ignore
-        if not isinstance(type_, Launcher):
-            raise TypeError
-
-        return launcher
-
-    def get_jenkins_connection(self):
+    def get_server(self):
         try:
             if self.user and self.password:
                 return jenkins.Jenkins(self.url, self.user, self.password)
@@ -1039,6 +1024,31 @@ class JenkinsNode:
                 return jenkins.Jenkins(self.url)
         except Exception as e:
             self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+
+    @staticmethod
+    def get_ssh_launcher(args):
+        if args.get('host_key_verify_none'):
+            host_key_verify = NoneSSHHostKeyVerify()
+        elif args.get('host_key_verify_known_hosts'):
+            host_key_verify = KnownHostsSSHHostKeyVerify()
+        elif args.get('host_key_verify_provided'):
+            host_key_verify = ProvidedSSHHostKeyVerify(
+                args['host_key_verify_provided']['algorithm'],
+                args['host_key_verify_provided']['key'],
+            )
+        elif args.get('host_key_verify_trusted'):
+            host_key_verify = TrustedSSHHostKeyVerify(
+                allow_initial=args['host_key_verify_trusted'].get('allow_initial')
+            )
+        else:
+            host_key_verify = None
+
+        return SSHLauncher(
+            host=args.get('host'),
+            port=args.get('port'),
+            credentials_id=args.get('credentials_id'),
+            host_key_verify=host_key_verify,
+        )
 
     def __init__(self, module):
         self.module = module
@@ -1058,8 +1068,22 @@ class JenkinsNode:
         self.defer_wipeout = module.params.get('defer_wipeout')
         self.tools = module.params.get('tools')
         self.offline_message = module.params.get('offline_message')
-        self.launcher = self.init_launcher(module.params.get('launcher'))
-        self.server = self.get_jenkins_connection()
+
+        if module.params.get('launch_ssh') is not None:
+            self.launcher = self.get_ssh_launcher(module.params['launch_ssh'])
+        elif module.params.get('launch_jnlp') is not None:
+            args = module.params['launch_jnlp']
+            self.launcher = JNLPLauncher(
+                data_dir=args.get('data_dir'),
+                work_dir=args.get('work_dir'),
+                disable_work_dir=args.get('disable_work_dir'),
+                assert_work_dir=args.get('assert_work_dir'),
+                use_web_socket=args.get('use_web_socket'),
+            )
+        else:
+            self.launcher = None
+
+        self.server = self.get_server()
 
         self.result = {
             'changed': False,
@@ -1135,20 +1159,21 @@ class JenkinsNode:
                 elem.text = self.mode.upper()
                 configured = True
 
-        if self.defer_wipeout is not None:
-            tag = 'hudson.plugins.ws__cleanup.DisableDeferredWipeoutNodeProperty'
-            elem = root.find(tag)
-            if self.defer_wipeout:
-                if elem is not None:
-                    root.remove(elem)
-                    configured = True
-            else:
-                if elem is None:
-                    ElementTree.SubElement(root, tag)
-
         props_elem = root.find('nodeProperties')
         if props_elem is None:
             props_elem = ElementTree.SubElement(root, 'nodeProperties')
+
+        if self.defer_wipeout is not None:
+            tag = 'hudson.plugins.ws__cleanup.DisableDeferredWipeoutNodeProperty'
+            elem = props_elem.find(tag)
+            if self.defer_wipeout:
+                if elem is not None:
+                    props_elem.remove(elem)
+                    configured = True
+            else:
+                if elem is None:
+                    ElementTree.SubElement(props_elem, tag)
+                    configured = True
 
         if self.environment is not None:
             msg = 'environment variable "{0}" {1} modified by str: result will always be "changed"'
@@ -1181,7 +1206,8 @@ class JenkinsNode:
 
         if configured:
             data = ElementTree.tostring(root, encoding='unicode')
-            self.server.reconfig_node(self.name, data)
+            if not self.module.check_mode:
+                self.server.reconfig_node(self.name, data)
 
         self.result['configured'] = configured
         if configured:
@@ -1190,20 +1216,29 @@ class JenkinsNode:
     def present_node(self):
         present = self.server.node_exists(self.name)
         created = False
+
         if not present:
-            self.server.create_node(self.name)
+            if not self.module.check_mode:
+                self.server.create_node(self.name)
+                present = True
             created = True
-        self.configure_node()
+
+        if present:
+            self.configure_node()
 
         self.result['created'] = created
         if created:
             self.result['changed'] = True
 
+        return present
+
     def absent_node(self):
         present = self.server.node_exists(self.name)
         deleted = False
+
         if present:
-            self.server.delete_node(self.name)
+            if not self.module.check_mode:
+                self.server.delete_node(self.name)
             deleted = True
 
         self.result['deleted'] = deleted
@@ -1211,24 +1246,33 @@ class JenkinsNode:
             self.result['changed'] = True
 
     def enabled_node(self):
-        self.present_node()
+        present = self.present_node()
         enabled = False
-        info = self.server.get_node_info(self.name)
-        if info['offline']:
-            self.server.enable_node(self.name)
-            enabled = True
+
+        if present:
+            info = self.server.get_node_info(self.name)
+            if info['offline']:
+                if not self.module.check_mode:
+                    self.server.enable_node(self.name)
+                enabled = True
 
         self.result['enabled'] = enabled
         if enabled:
             self.result['changed'] = True
 
     def disabled_node(self):
-        self.present_node()
+        present = self.present_node()
         disabled = False
-        info = self.server.get_node_info(self.name)
-        if not info['offline']:
-            self.server.disable_node(self.name, self.offline_message)
-            disabled = True
+
+        if present:
+            info = self.server.get_node_info(self.name)
+            if (
+                not info['offline']
+                or info['offlineCauseReason'] != self.offline_message
+            ):
+                if not self.module.check_mode:
+                    self.server.disable_node(self.name, self.offline_message)
+                disabled = True
 
         self.result['disabled'] = disabled
         if disabled:
@@ -1245,6 +1289,7 @@ def test_dependencies(module):
 
 def main():
     module = AnsibleModule(
+        supports_check_mode=True,
         argument_spec=dict(
             name=dict(type='str', required=True),
             url=dict(default='http://localhost:8080'),
@@ -1260,21 +1305,45 @@ def main():
             remote_fs=dict(type='path'),
             labels=dict(type='list', elements='str'),
             mode=dict(choices=['normal', 'exclusive']),
-            launcher=dict(
+            launch_ssh=dict(
                 type='dict',
                 options=dict(
-                    type=dict(choices=['ssh', 'jnlp'], required=True),
-                    args=dict(type='dict', default={})
+                    host=dict(type='str'),
+                    port=dict(type='int'),
+                    credentials_id=dict(type='str'),
+                    host_key_verify_none=dict(type='bool', choices=[True]),
+                    host_key_verify_known_hosts=dict(type='bool', choices=[True]),
+                    host_key_verify_provided=dict(
+                        type='dict',
+                        options=dict(
+                            algorithm=dict(type='str', required=True),
+                            key=dict(type='str', required=True),
+                        ),
+                    ),
+                    host_key_verify_trusted=dict(
+                        type='dict',
+                        options=dict(
+                            allow_initial=dict(type='bool'),
+                        ),
+                    ),
+                ),
+                mutually_exclusive=[
+                    'host_key_verify_none',
+                    'host_key_verify_known_hosts',
+                    'host_key_verify_provided',
+                    'host_key_verify_trusted',
+                ]
+            ),
+            launch_jnlp=dict(
+                type='dict',
+                options=dict(
+                    data_dir=dict(type='path'),
+                    work_dir=dict(type='path'),
+                    disable_work_dir=dict(type='bool'),
+                    assert_work_dir=dict(type='bool'),
+                    use_web_socket=dict(type='bool'),
                 ),
             ),
-            # TODO: Not implemented yet
-            # retention=dict(
-            #     type='dict',
-            #     options=dict(
-            #         type=dict(choices=['always', ...]),
-            #         args=dict(type='dict', default={})
-            #     ),
-            # ),
             defer_wipeout=dict(type='bool'),
             environment=dict(type='dict'),
             tools=dict(
@@ -1288,7 +1357,10 @@ def main():
             ),
             offline_message=dict(type='str', default=''),
         ),
-        mutually_exclusive=[['password', 'token']],
+        mutually_exclusive=[
+            ['password', 'token'],
+            ['launch_ssh', 'launch_jnlp'],
+        ],
     )
 
     test_dependencies(module)
