@@ -7,24 +7,10 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-import pytest
-
 from ansible_collections.community.general.plugins.modules import opkg
-from .helper import CmdRunnerTestHelper
+from .helper import Helper
 
 
-helper = CmdRunnerTestHelper.from_file(opkg.main, "tests/unit/plugins/modules/test_opkg.yaml")
+helper = Helper.from_file(opkg.main, "tests/unit/plugins/modules/test_opkg.yaml")
 patch_bin = helper.cmd_fixture
-
-
-@pytest.mark.parametrize('patch_ansible_module, testcase',
-                         helper.testcases_params, ids=helper.testcases_ids,
-                         indirect=['patch_ansible_module'])
-@pytest.mark.usefixtures('patch_ansible_module')
-def test_module(mocker, capfd, patch_bin, testcase):
-    """
-    Run unit tests for test cases listed in TEST_CASES
-    """
-
-    with helper(testcase, mocker, capfd) as testcase_context:
-        testcase_context.run()
+test_module = helper.test_module
