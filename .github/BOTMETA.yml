@@ -250,10 +250,10 @@ files:
     maintainers: samdoran
   $lookups/onepassword.py:
     ignore: scottsb
-    maintainers: azenk scottsb
+    maintainers: azenk
   $lookups/onepassword_raw.py:
     ignore: scottsb
-    maintainers: azenk scottsb
+    maintainers: azenk
   $lookups/passwordstore.py: {}
   $lookups/random_pet.py:
     maintainers: Akasurde
