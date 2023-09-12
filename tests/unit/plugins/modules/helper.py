@@ -18,16 +18,16 @@ ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_com
 RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"])
 
 
-class CmdRunnerTestHelper(object):
+class Helper(object):
     @staticmethod
     def from_list(module_main, list_):
-        helper = CmdRunnerTestHelper(module_main, test_cases=list_)
+        helper = Helper(module_main, test_cases=list_)
         return helper
 
     @staticmethod
     def from_file(module_main, filename):
         with open(filename, "r") as TEST_CASES:
-            helper = CmdRunnerTestHelper(module_main, test_cases=TEST_CASES)
+            helper = Helper(module_main, test_cases=TEST_CASES)
             return helper
 
     def __init__(self, module_main, test_cases):
@@ -74,6 +74,24 @@ class CmdRunnerTestHelper(object):
 
     def __call__(self, *args, **kwargs):
         return _Context(self, *args, **kwargs)
+
+    @property
+    def test_module(self):
+        helper = self
+
+        @pytest.mark.parametrize('patch_ansible_module, testcase',
+                                 helper.testcases_params, ids=helper.testcases_ids,
+                                 indirect=['patch_ansible_module'])
+        @pytest.mark.usefixtures('patch_ansible_module')
+        def _test_module(mocker, capfd, patch_bin, testcase):
+            """
+            Run unit tests for test cases listed in TEST_CASES
+            """
+
+            with helper(testcase, mocker, capfd) as testcase_context:
+                testcase_context.run()
+
+        return _test_module
 
 
 class _Context(object):
