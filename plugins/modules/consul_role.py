@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: consul_role
 short_description: Manipulate Consul roles
-version_added: 7.3.0
+version_added: 7.5.0
 description:
  - Allows the addition, modification and deletion of roles in a consul
    cluster via the agent. For more details on using and configuring ACLs,
