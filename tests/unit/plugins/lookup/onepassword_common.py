@@ -81,5 +81,47 @@ MOCK_ENTRIES = {
             "expected": ["first value"],
             "output": load_file("v2_out_03.json")
         },
+        {
+            # Request data from an omitted value (label lookup, no section)
+            "vault_name": "Test Vault",
+            "queries": ["Omitted values"],
+            "kwargs": {
+                "field": "label-without-value",
+            },
+            "expected": [""],
+            "output": load_file("v2_out_04.json")
+        },
+        {
+            # Request data from an omitted value (id lookup, no section)
+            "vault_name": "Test Vault",
+            "queries": ["Omitted values"],
+            "kwargs": {
+                "field": "67890q7mspf4x6zrlw3qejn7m",
+            },
+            "expected": [""],
+            "output": load_file("v2_out_04.json")
+        },
+        {
+            # Request data from an omitted value (label lookup, with section)
+            "vault_name": "Test Vault",
+            "queries": ["Omitted values"],
+            "kwargs": {
+                "field": "section-label-without-value",
+                "section": "section-without-values"
+            },
+            "expected": [""],
+            "output": load_file("v2_out_04.json")
+        },
+        {
+            # Request data from an omitted value (id lookup, with section)
+            "vault_name": "Test Vault",
+            "queries": ["Omitted values"],
+            "kwargs": {
+                "field": "123345q7mspf4x6zrlw3qejn7m",
+                "section": "section-without-values",
+            },
+            "expected": [""],
+            "output": load_file("v2_out_04.json")
+        },
     ],
 }
