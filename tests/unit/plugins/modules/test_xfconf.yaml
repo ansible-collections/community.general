@@ -23,12 +23,12 @@
     value: '90'
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
       rc: 0
       out: "100\n"
       err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity, --create, --type, int, --set, '90']
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -46,12 +46,12 @@
     value: '90'
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "90\n"
       err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity, --create, --type, int, --set, '90']
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -69,12 +69,12 @@
     value: 'False'
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "true\n"
       err: ""
     - command: [/testbin/xfconf-query, --channel, xfce4-session, --property, /general/SaveOnExit, --create, --type, bool, --set, 'false']
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "false\n"
       err: ""
@@ -92,7 +92,7 @@
     value: [A, B, C]
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "Value is an array with 3 items:\n\nMain\nWork\nTmp\n"
       err: ""
@@ -116,7 +116,7 @@
         - string
         - --set
         - C
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -134,7 +134,7 @@
     value: [A, B, C]
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "Value is an array with 3 items:\n\nA\nB\nC\n"
       err: ""
@@ -158,7 +158,7 @@
         - string
         - --set
         - C
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -174,12 +174,12 @@
     value: null
   run_command_calls:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: "Value is an array with 3 items:\n\nA\nB\nC\n"
       err: ""
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names, --reset]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
