@@ -58,7 +58,7 @@ options:
   sn:
     description:
     - Surname.
-    - If user doesn't exist and O(state=present), the usage of V(sn) is required.
+    - If user does not exist and O(state=present), the usage of O(sn) is required.
     type: str
   sshpubkey:
     description:
