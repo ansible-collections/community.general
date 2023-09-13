@@ -451,10 +451,10 @@ class OnePassCLIv2(OnePassCLIBase):
                 # If the field name doesn't exist in the section, match on the value of "label"
                 # then "id" and return "value"
                 if field.get("label") == field_name:
-                    return field["value"]
+                    return field.get("value", "")
 
                 if field.get("id") == field_name:
-                    return field["value"]
+                    return field.get("value", "")
 
             # Look at the section data and get an indentifier. The value of 'id' is either a unique ID
             # or a human-readable string. If a 'label' field exists, prefer that since
@@ -464,10 +464,10 @@ class OnePassCLIv2(OnePassCLIBase):
             if section_title == current_section_title:
                 # In the correct section. Check "label" then "id" for the desired field_name
                 if field.get("label") == field_name:
-                    return field["value"]
+                    return field.get("value", "")
 
                 if field.get("id") == field_name:
-                    return field["value"]
+                    return field.get("value", "")
 
         return ""
 
