@@ -32,7 +32,7 @@ options:
   givenname:
     description:
     - First name.
-    - If user doesn't exist and O(state=present), the usage of V(givenname) is required.
+    - If user does not exist and O(state=present), the usage of O(givenname) is required.
     type: str
   krbpasswordexpiration:
     description:
