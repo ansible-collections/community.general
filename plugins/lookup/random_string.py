@@ -85,6 +85,7 @@ DOCUMENTATION = r"""
         - Ignore similar characters, such as l and 1, or O and 0.
         default: false
         type: bool
+        version_added: 7.5.0
       similar_chars:
         description:
         - Overide a list of characters not to be use in the string.
