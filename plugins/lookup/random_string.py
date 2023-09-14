@@ -82,7 +82,8 @@ DOCUMENTATION = r"""
         type: str
       ignore_similar_chars:
         description:
-        - Ignore similar characters, such as l and 1, or O and 0.
+        - Ignore similar characters, such as V(l) and V(1), or V(O) and V(0).
+        - These characters can be configured in O(similar_chars).
         default: false
         type: bool
         version_added: 7.5.0
