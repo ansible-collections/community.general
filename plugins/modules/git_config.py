@@ -197,11 +197,6 @@ def main():
     # Set the locale to C to ensure consistent messages.
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
-    if params['name']:
-        name = params['name']
-    else:
-        name = None
-
     if params['scope']:
         scope = params['scope']
     elif params['list_all']:
@@ -209,77 +204,84 @@ def main():
     else:
         scope = 'system'
 
-    if params['state'] == 'absent':
-        unset = 'unset'
-        params['value'] = None
-    else:
-        unset = None
+    name = params.get('name', None)
+    unset = params['state'] == 'absent'
+    new_value = params.get('value', None)
 
-    if params['value']:
-        new_value = params['value']
-    else:
+    if unset:
         new_value = None
 
-    args = [git_path, "config", "--includes"]
-    if params['list_all']:
-        args.append('-l')
-    if scope == 'file':
-        args.append('-f')
-        args.append(params['file'])
-    elif scope:
-        args.append("--" + scope)
-    if name:
-        args.append(name)
-
     if scope == 'local':
-        dir = params['repo']
+        cwd = params['repo']
     elif params['list_all'] and params['repo']:
         # Include local settings from a specific repo when listing all available settings
-        dir = params['repo']
+        cwd = params['repo']
     else:
         # Run from root directory to avoid accidentally picking up any local config settings
-        dir = "/"
+        cwd = "/"
 
-    (rc, out, err) = module.run_command(args, cwd=dir, expand_user_and_vars=False)
+    base_args = [git_path, "config", "--includes"]
+
+    if scope == 'file':
+        base_args.append('-f')
+        base_args.append(params['file'])
+    elif scope:
+        base_args.append(f"--{scope}")
+
+    list_args = base_args.copy()
+
+    if params['list_all']:
+        list_args.append('-l')
+
+    if name:
+        list_args.append(name)
+
+    (rc, out, err) = module.run_command(list_args, cwd=cwd, expand_user_and_vars=False)
+
     if params['list_all'] and scope and rc == 128 and 'unable to read config file' in err:
         # This just means nothing has been set at the given scope
         module.exit_json(changed=False, msg='', config_values={})
     elif rc >= 2:
         # If the return code is 1, it just means the option hasn't been set yet, which is fine.
-        module.fail_json(rc=rc, msg=err, cmd=' '.join(args))
+        module.fail_json(rc=rc, msg=err, cmd=' '.join(list_args))
+
+    old_value = out.rstrip()
 
     if params['list_all']:
-        values = out.rstrip().splitlines()
+        values = old_value.splitlines()
         config_values = {}
         for value in values:
             k, v = value.split('=', 1)
             config_values[k] = v
         module.exit_json(changed=False, msg='', config_values=config_values)
     elif not new_value and not unset:
-        module.exit_json(changed=False, msg='', config_value=out.rstrip())
+        module.exit_json(changed=False, msg='', config_value=old_value)
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
+    elif old_value == new_value:
+        module.exit_json(changed=False, msg="")
+
+    # Until this point, the git config was just read and in case no change is needed, the module is already exited.
+
+    set_args = base_args.copy()
+    if unset:
+        set_args.append("--unset")
+        set_args.append(name)
     else:
-        old_value = out.rstrip()
-        if old_value == new_value:
-            module.exit_json(changed=False, msg="")
+        set_args.append(name)
+        set_args.append(new_value)
 
     if not module.check_mode:
-        if unset:
-            args.insert(len(args) - 1, "--" + unset)
-            cmd = args
-        else:
-            cmd = args + [new_value]
-        (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False, expand_user_and_vars=False)
+        (rc, out, err) = module.run_command(set_args, cwd=cwd, ignore_invalid_cwd=False, expand_user_and_vars=False)
         if err:
-            module.fail_json(rc=rc, msg=err, cmd=cmd)
+            module.fail_json(rc=rc, msg=err, cmd=set_args)
 
     module.exit_json(
         msg='setting changed',
         diff=dict(
-            before_header=' '.join(args),
+            before_header=' '.join(set_args),
             before=old_value + "\n",
-            after_header=' '.join(args),
+            after_header=' '.join(set_args),
             after=(new_value or '') + "\n"
         ),
         changed=True
