@@ -90,6 +90,7 @@ DOCUMENTATION = r"""
         - Overide a list of characters not to be use in the string.
         default: "il1LoO0"
         type: str
+        version_added: 7.5.0
       base64:
         description:
         - Returns base64 encoded string.
