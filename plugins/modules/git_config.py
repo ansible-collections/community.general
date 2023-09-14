@@ -75,6 +75,16 @@ options:
       - When specifying the name of a single setting, supply a value to
         set that setting to the given value.
     type: str
+  add_mode:
+    description:
+      - Specify if a value should replace the existing value(s) or if the new
+        value should be added alongside other values with the same name.
+      - This option is only relevant when adding/replacing values. If O(state=absent) or
+        values are just read out, this option is not considered.
+    choices: [ "add", "replace-all" ]
+    type: str
+    default: "replace-all"
+    version_added: 8.1.0
 '''
 
 EXAMPLES = '''
@@ -117,6 +127,15 @@ EXAMPLES = '''
   community.general.git_config:
     name: color.ui
     value: auto
+
+- name: Add several options for the same name
+  community.general.git_config:
+    name: push.pushoption
+    value: "{{ item }}"
+    add_mode: add
+  loop:
+    - merge_request.create
+    - merge_request.draft
 
 - name: Make etckeeper not complaining when it is invoked by cron
   community.general.git_config:
@@ -178,6 +197,7 @@ def main():
             name=dict(type='str'),
             repo=dict(type='path'),
             file=dict(type='path'),
+            add_mode=dict(required=False, type='str', default='replace-all', choices=['add', 'replace-all']),
             scope=dict(required=False, type='str', choices=['file', 'local', 'global', 'system']),
             state=dict(required=False, type='str', default='present', choices=['present', 'absent']),
             value=dict(required=False),
@@ -197,28 +217,13 @@ def main():
     # Set the locale to C to ensure consistent messages.
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
-    if params['scope']:
-        scope = params['scope']
-    elif params['list_all']:
-        scope = None
-    else:
-        scope = 'system'
-
-    name = params.get('name', None)
+    name = params['name'] or ''
     unset = params['state'] == 'absent'
-    new_value = params.get('value', None)
+    new_value = params['value'] or ''
+    add_mode = params['add_mode']
 
-    if unset:
-        new_value = None
-
-    if scope == 'local':
-        cwd = params['repo']
-    elif params['list_all'] and params['repo']:
-        # Include local settings from a specific repo when listing all available settings
-        cwd = params['repo']
-    else:
-        # Run from root directory to avoid accidentally picking up any local config settings
-        cwd = "/"
+    scope = determine_scope(params)
+    cwd = determine_cwd(scope, params)
 
     base_args = [git_path, "config", "--includes"]
 
@@ -226,14 +231,15 @@ def main():
         base_args.append('-f')
         base_args.append(params['file'])
     elif scope:
-        base_args.append(f"--{scope}")
+        base_args.append("--" + scope)
 
-    list_args = base_args.copy()
+    list_args = list(base_args)
 
     if params['list_all']:
         list_args.append('-l')
 
     if name:
+        list_args.append("--get-all")
         list_args.append(name)
 
     (rc, out, err) = module.run_command(list_args, cwd=cwd, expand_user_and_vars=False)
@@ -245,29 +251,29 @@ def main():
         # If the return code is 1, it just means the option hasn't been set yet, which is fine.
         module.fail_json(rc=rc, msg=err, cmd=' '.join(list_args))
 
-    old_value = out.rstrip()
+    old_values = out.rstrip().splitlines()
 
     if params['list_all']:
-        values = old_value.splitlines()
         config_values = {}
-        for value in values:
+        for value in old_values:
             k, v = value.split('=', 1)
             config_values[k] = v
         module.exit_json(changed=False, msg='', config_values=config_values)
     elif not new_value and not unset:
-        module.exit_json(changed=False, msg='', config_value=old_value)
+        module.exit_json(changed=False, msg='', config_value=old_values[0] if old_values else '')
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
-    elif old_value == new_value:
+    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add"):
         module.exit_json(changed=False, msg="")
 
-    # Until this point, the git config was just read and in case no change is needed, the module is already exited.
+    # Until this point, the git config was just read and in case no change is needed, the module has already exited.
 
-    set_args = base_args.copy()
+    set_args = list(base_args)
     if unset:
-        set_args.append("--unset")
+        set_args.append("--unset-all")
         set_args.append(name)
     else:
+        set_args.append("--" + add_mode)
         set_args.append(name)
         set_args.append(new_value)
 
@@ -276,16 +282,52 @@ def main():
         if err:
             module.fail_json(rc=rc, msg=err, cmd=set_args)
 
+    if unset:
+        after_values = []
+    elif add_mode == "add":
+        after_values = old_values + [new_value]
+    else:
+        after_values = [new_value]
+
     module.exit_json(
         msg='setting changed',
         diff=dict(
             before_header=' '.join(set_args),
-            before=old_value + "\n",
+            before=build_diff_value(old_values),
             after_header=' '.join(set_args),
-            after=(new_value or '') + "\n"
+            after=build_diff_value(after_values),
         ),
         changed=True
     )
+
+
+def determine_scope(params):
+    if params['scope']:
+        return params['scope']
+    elif params['list_all']:
+        return ""
+    else:
+        return 'system'
+
+
+def build_diff_value(value):
+    if not value:
+        return "\n"
+    elif len(value) == 1:
+        return value[0] + "\n"
+    else:
+        return value
+
+
+def determine_cwd(scope, params):
+    if scope == 'local':
+        return params['repo']
+    elif params['list_all'] and params['repo']:
+        # Include local settings from a specific repo when listing all available settings
+        return params['repo']
+    else:
+        # Run from root directory to avoid accidentally picking up any local config settings
+        return "/"
 
 
 if __name__ == '__main__':

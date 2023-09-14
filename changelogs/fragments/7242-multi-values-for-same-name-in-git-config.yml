@@ -1,0 +1,4 @@
+minor_changes:
+    - "git_config - allow multiple git configs for the same name with the new ``add_mode`` option (https://github.com/ansible-collections/community.general/pull/7260)."
+    - "git_config - the ``after`` and ``before`` fields in the ``diff`` of the return value can be a list instead of a string in case more configs with the same key are affected (https://github.com/ansible-collections/community.general/pull/7260)."
+    - "git_config - when a value is unset, all configs with the same key are unset (https://github.com/ansible-collections/community.general/pull/7260)."
