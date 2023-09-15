@@ -708,7 +708,8 @@ def main():
                 module.fail_json(vmid=vmid, taskid=taskid, msg="ostemplate '%s' not exists on node %s and storage %s"
                                  % (module.params['ostemplate'], node, template_store))
         except Exception as e:
-            module.fail_json(vmid=vmid, taskid=taskid, msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(vmid=vmid, taskid=taskid,
+                             msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
             proxmox.create_instance(vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
@@ -751,7 +752,8 @@ def main():
             if not proxmox.get_vm(clone, ignore_missing=True):
                 module.exit_json(changed=False, vmid=vmid, taskid=taskid, msg="Container to be cloned does not exist")
         except Exception as e:
-            module.fail_json(vmid=vmid, taskid=taskid, msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(vmid=vmid, taskid=taskid,
+                             msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
             proxmox.create_instance(vmid, node, disk, storage, cpus, memory, swap, timeout, clone)
