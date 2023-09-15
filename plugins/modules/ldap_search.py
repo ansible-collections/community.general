@@ -120,7 +120,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.six import string_types, text_type
+from ansible.module_utils.six import binary_type, string_types, text_type
 from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs, ldap_required_together
 
 LDAP_IMP_ERR = None
@@ -159,7 +159,7 @@ def main():
 
 
 def _normalize_string(val, convert_to_base64):
-    if isinstance(val, string_types):
+    if isinstance(val, (string_types, binary_type)):
         if isinstance(val, text_type):
             val = to_bytes(val, encoding='utf-8')
         if convert_to_base64:
