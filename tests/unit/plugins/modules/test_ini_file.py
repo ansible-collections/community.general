@@ -23,7 +23,7 @@ def do_test(option, ignore_spaces, newline, before, expected_after,
     assert changed_lines[0] == 1
     assert msg == expected_msg
 
-    
+
 def test_ignore_spaces_comment():
     oldline = ';foobar=baz'
     newline = 'foobar = baz'

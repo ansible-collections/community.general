@@ -497,7 +497,9 @@ def main():
     elif values is None:
         values = []
 
-    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, ignore_spaces, create, allow_no_value, follow)
+    (changed, backup_file, diff, msg) = do_ini(
+        module, path, section, option, values, state, exclusive, backup,
+        no_extra_spaces, ignore_spaces, create, allow_no_value, follow)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
