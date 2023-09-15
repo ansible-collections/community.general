@@ -546,7 +546,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(vmid=vmid, taskid=taskid, node=node, msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
+                self.module.fail_json(vmid=vmid, taskid=taskid, msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
                                       proxmox_node.tasks(taskid).log.get()[:1])
 
             time.sleep(1)
