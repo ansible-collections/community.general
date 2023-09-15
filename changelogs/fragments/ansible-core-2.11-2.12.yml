@@ -2,3 +2,11 @@ removed_features:
   - "The collection no longer supports ansible-core 2.11 and ansible-core 2.12.
      Parts of the collection might still work on these ansible-core versions, but others might not
      (https://github.com/ansible-collections/community.general/pull/7269)."
+breaking_changes:
+  - "selective callback plugin - remove compatibility code for Ansible 2.9 and ansible-core 2.10
+     (https://github.com/ansible-collections/community.general/pull/7269)."
+  - "collection_version lookup plugin - remove compatibility code for ansible-base 2.10 and ansible-core 2.11
+     (https://github.com/ansible-collections/community.general/pull/7269)."
+  - "version module util - remove fallback for ansible-core 2.11. All modules and plugins that do
+     version collections no longer work with ansible-core 2.11
+     (https://github.com/ansible-collections/community.general/pull/7269)."
