@@ -1,0 +1,6 @@
+deprecated_features:
+  - "The next major release, community.general 8.0.0, will drop support for ansible-core 2.11 and 2.12, which have been End of Life for some time
+    now. This means that this collection no longer supports Python 2.6 on the target. Individual content might still work with unsupported
+    ansible-core versions, but that can change at any time. Also please note that from now on, for every new major community.general release,
+    we will drop support for all ansible-core versions that have been End of Life for more than a few weeks on the date of the major release
+    (https://github.com/ansible-community/community-topics/discussions/271, https://github.com/ansible-collections/community.general/pull/7259)."
