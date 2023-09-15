@@ -1,0 +1,4 @@
+removed_features:
+  - "The collection no longer supports ansible-core 2.11 and ansible-core 2.12.
+     Parts of the collection might still work on these ansible-core versions, but others might not
+     (https://github.com/ansible-collections/community.general/pull/7269)."
