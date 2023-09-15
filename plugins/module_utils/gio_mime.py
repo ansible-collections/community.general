@@ -23,7 +23,7 @@ def gio_mime_runner(module, **kwargs):
 
 def gio_mime_get(runner, mime_type):
     def process(rc, out, err):
-        if out.startswith("No default applications for"):
+        if err.startswith("No default applications for"):
             return None
         out = out.splitlines()[0]
         return out.split()[-1]

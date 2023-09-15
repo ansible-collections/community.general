@@ -90,7 +90,7 @@ class _RunCmdContext(_BaseContext):
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
 
-        assert self.mock_run_cmd.call_count == len(self.run_cmd_calls)
+        assert self.mock_run_cmd.call_count == len(self.run_cmd_calls), "{0} != {1}".format(self.mock_run_cmd.call_count, len(self.run_cmd_calls))
         if self.mock_run_cmd.call_count:
             assert call_args_list == expected_call_args_list
 

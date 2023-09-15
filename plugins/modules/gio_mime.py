@@ -91,10 +91,13 @@ class GioMime(ModuleHelper):
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
-        with self.runner.context(args_order=["mime_type", "handler"], check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
-            rc, out, err = ctx.run()
-            self.vars.out = out
-            self.vars.err = err
+        if self.vars.has_changed("handler"):
+            with self.runner.context(args_order=["mime_type", "handler"], check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
+                rc, out, err = ctx.run()
+                self.vars.out = out
+                self.vars.err = err
+                if self.verbosity >= 4:
+                    self.vars.run_info = ctx.run_info
 
 
 def main():
