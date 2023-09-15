@@ -733,7 +733,7 @@ def main():
                                     timezone=module.params['timezone'],
                                     tags=module.params['tags'])
 
-            module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
+            module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']), vmid)
         except Exception as e:
             module.fail_json(msg="Creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
 
