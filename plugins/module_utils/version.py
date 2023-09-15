@@ -10,6 +10,4 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible.module_utils.six import raise_from
-
 from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
