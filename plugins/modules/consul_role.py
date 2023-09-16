@@ -69,9 +69,25 @@ options:
     description:
       - List of service identities to attach to the role.
       - Each element must have a "name" and optionally a "datacenters" list of datacenters the effective policy is valid within.
-      - An empty datacenters list allows all datacenters
+      - An empty datacenters list allows all datacenters.
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
+    suboptions:
+      name:
+        description:
+          - The name of the node.
+          - Must not be longer than 256 characters, must start and end with a lowercase alphanumeric character.
+          - May only contain lowercase alphanumeric characters as well as - and _.
+        type: str
+        required: true
+      id:
+        datacenters:
+          - The datacenters the policies will be effective. 
+          - This will result in effective policy only being valid in this datacenter.
+          - If an empty array (V([])) is specified, the policies will valid in all datacenters.
+          - including those which do not yet exist but may in the future.
+        type: list
+        required: true
   node_identities:
     type: list
     elements: dict
@@ -81,6 +97,20 @@ options:
       - An empty datacenter allows all datacenters.
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
+    suboptions:
+      name:
+        description:
+          - The name of the node.
+          - Must not be longer than 256 characters, must start and end with a lowercase alphanumeric character.
+          - May only contain lowercase alphanumeric characters as well as - and _.
+        type: str
+        required: true
+      id:
+        datacenter:
+          - The nodes datacenter. 
+          - This will result in effective policy only being valid in this datacenter.
+        type: str
+        required: true 
   host:
     description:
       - Host of the consul agent, defaults to V(localhost).
@@ -214,6 +244,16 @@ POLICY_RULE_SPEC = dict(
     id=dict(type='str'),
 )
 
+NODE_ID_RULE_SPEC = dict(
+    name=dict(type='str'),
+    datacenter=dict(type='str'),
+)
+
+SERVICE_ID_RULE_SPEC = dict(
+    name=dict(type='str'),
+    datacenter=dict(type='list', elements='str'),
+)
+
 _ARGUMENT_SPEC = {
     TOKEN_PARAMETER_NAME: dict(no_log=True),
     PORT_PARAMETER_NAME: dict(default=8500, type='int'),
@@ -223,8 +263,10 @@ _ARGUMENT_SPEC = {
     NAME_PARAMETER_NAME: dict(required=True),
     DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=''),
     POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', options=POLICY_RULE_SPEC, default=None),
-    SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=None),
-    NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=None),
+    SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=SERVICE_ID_RULE_SPEC,
+                                            required_together=[['name', 'datacenters']], default=None),
+    NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=NODE_ID_RULE_SPEC,
+                                            required_together=[['name', 'datacenter']], default=None),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
 }
 
