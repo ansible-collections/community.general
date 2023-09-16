@@ -57,13 +57,13 @@ RETURN = '''
     returned: success
     type: str
     sample: google-chrome.desktop
-  out:
+  stdout:
     description:
     - The output of the C(gio) command.
     returned: success
     type: str
     sample: Set google-chrome.desktop as the default for x-scheme-handler/https
-  err:
+  stderr:
     description:
     - The error output of the C(gio) command.
     returned: failure
@@ -94,8 +94,8 @@ class GioMime(ModuleHelper):
         if self.vars.has_changed("handler"):
             with self.runner.context(args_order=["mime_type", "handler"], check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
-                self.vars.out = out
-                self.vars.err = err
+                self.vars.stdout = out
+                self.vars.stderr = err
                 if self.verbosity >= 4:
                     self.vars.run_info = ctx.run_info
 
