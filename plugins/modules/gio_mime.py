@@ -12,7 +12,7 @@ module: gio_mime
 author:
   - "Alexei Znamensky (@russoz)"
 short_description: Set default handler for MIME type, for applications using Gnome GIO
-version_added: 7.4.0
+version_added: 7.5.0
 description:
   - This module allows configuring the default handler for a specific MIME type, to be used by applications built with th Gnome GIO API.
 extends_documentation_fragment:
