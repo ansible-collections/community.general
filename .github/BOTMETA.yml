@@ -330,6 +330,9 @@ files:
   $module_utils/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
+  $module_utils/snap.py:
+    labels: snap
+    maintainers: russoz
   $module_utils/ssh.py:
     maintainers: russoz
   $module_utils/storage/hpe3par/hpe3par.py:
@@ -1214,7 +1217,7 @@ files:
     maintainers: $team_solaris
   $modules/snap.py:
     labels: snap
-    maintainers: angristan vcarceler
+    maintainers: angristan vcarceler russoz
   $modules/snap_alias.py:
     labels: snap
     maintainers: russoz
