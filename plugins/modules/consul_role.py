@@ -60,7 +60,7 @@ options:
         type: str
       id:
         description:
-          - The id of the policy to attach to this role; see M(community.general.consul_policy) for more info.
+          - The ID of the policy to attach to this role; see M(community.general.consul_policy) for more info.
           - Either this or O(policies[].name) must be specified.
         type: str
   service_identities:
@@ -70,7 +70,7 @@ options:
       - List of service identities to attach to the role.
       - Each element must have a "name" and optionally a "datacenters" list of datacenters the effective policy is valid within.
       - An empty datacenters list allows all datacenters
-      - If the parameter is an empty array ([]), any node identities assigned will be unassigned.
+      - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
   node_identities:
     type: list
@@ -79,7 +79,7 @@ options:
       - List of node identities to attach to the role.
       - Each element must have a "name" and optionally a "datacenter" the effective policy is valid in.
       - An empty datacenter allows all datacenters.
-      - If the parameter is an empty array ([]), any node identities assigned will be unassigned.
+      - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
   host:
     description:
@@ -108,7 +108,7 @@ options:
     description:
       - Whether to verify the TLS certificate of the consul agent.
     required: false
-    default: True
+    default: true
 requirements:
   - requests
 '''
@@ -122,6 +122,7 @@ EXAMPLES = """
     policies:
       - id: 783beef3-783f-f41f-7422-7087dc272765
       - name: "policy-1"
+
 - name: Create a role with service identity
   community.general.consul_role:
     host: consul1.example.com
@@ -131,6 +132,7 @@ EXAMPLES = """
       - name: web
         datacenters:
           - dc1
+
 - name: Create a role with node identity
   community.general.consul_role:
     host: consul1.example.com
@@ -139,6 +141,7 @@ EXAMPLES = """
     node_identities:
       - name: node-1
         datacenter: dc2
+
 - name: Remove a role
   community.general.consul_role:
     host: consul1.example.com
@@ -149,10 +152,10 @@ EXAMPLES = """
 
 RETURN = """
 role:
-    description: The role object
+    description: The role object.
     returned: success
     type: dict
-    sample: |
+    sample:
         {
             "CreateIndex": 39,
             "Description": "",
@@ -165,7 +168,7 @@ role:
             ]
         }
 operation:
-    description: the operation performed on the role
+    description: The operation performed on the role.
     returned: changed
     type: str
     sample: update
