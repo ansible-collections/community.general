@@ -41,3 +41,6 @@
 
     - name: include tasks to test symlink handling
       include_tasks: tests/04-symlink.yml
+
+    - name: include tasks to test ignore_spaces
+      include_tasks: tests/05-ignore_spaces.yml
