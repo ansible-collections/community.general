@@ -101,9 +101,10 @@ options:
     default: false
   ignore_spaces:
     description:
-      - Don't change a line if doing so would only add or remove spaces before or after the '=' symbol.
+      - Do not change a line if doing so would only add or remove spaces before or after the V(=) symbol.
     type: bool
     default: false
+    version_added: 7.5.0
   create:
     description:
       - If set to V(false), the module will fail if the file does not already exist.
