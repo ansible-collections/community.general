@@ -82,7 +82,7 @@ options:
         required: true
       id:
         datacenters:
-          - The datacenters the policies will be effective. 
+          - The datacenters the policies will be effective.
           - This will result in effective policy only being valid in this datacenter.
           - If an empty array (V([])) is specified, the policies will valid in all datacenters.
           - including those which do not yet exist but may in the future.
@@ -107,10 +107,10 @@ options:
         required: true
       id:
         datacenter:
-          - The nodes datacenter. 
+          - The nodes datacenter.
           - This will result in effective policy only being valid in this datacenter.
         type: str
-        required: true 
+        required: true
   host:
     description:
       - Host of the consul agent, defaults to V(localhost).
@@ -266,7 +266,7 @@ _ARGUMENT_SPEC = {
     SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=SERVICE_ID_RULE_SPEC,
                                             required_together=[['name', 'datacenters']], default=None),
     NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=NODE_ID_RULE_SPEC,
-                                            required_together=[['name', 'datacenter']], default=None),
+                                         required_together=[['name', 'datacenter']], default=None),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
 }
 
