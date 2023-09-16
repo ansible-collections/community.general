@@ -80,8 +80,8 @@ options:
           - May only contain lowercase alphanumeric characters as well as - and _.
         type: str
         required: true
-      id:
-        datacenters:
+      datacenters:
+        description:
           - The datacenters the policies will be effective.
           - This will result in effective policy only being valid in this datacenter.
           - If an empty array (V([])) is specified, the policies will valid in all datacenters.
@@ -105,8 +105,8 @@ options:
           - May only contain lowercase alphanumeric characters as well as - and _.
         type: str
         required: true
-      id:
-        datacenter:
+      datacenter:
+        description:
           - The nodes datacenter.
           - This will result in effective policy only being valid in this datacenter.
         type: str
@@ -245,13 +245,13 @@ POLICY_RULE_SPEC = dict(
 )
 
 NODE_ID_RULE_SPEC = dict(
-    name=dict(type='str'),
-    datacenter=dict(type='str'),
+    name=dict(type='str', required=True),
+    datacenter=dict(type='str', required=True),
 )
 
 SERVICE_ID_RULE_SPEC = dict(
-    name=dict(type='str'),
-    datacenter=dict(type='list', elements='str'),
+    name=dict(type='str', required=True),
+    datacenter=dict(type='list', elements='str', required=True),
 )
 
 _ARGUMENT_SPEC = {
