@@ -546,7 +546,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(vmid=vmid, taskid=taskid, msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
+                self.module.fail_json(vmid=vmid, node=node, msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
                                       proxmox_node.tasks(taskid).log.get()[:1])
 
             time.sleep(1)
@@ -708,8 +708,7 @@ def main():
                 module.fail_json(vmid=vmid, msg="ostemplate '%s' not exists on node %s and storage %s"
                                  % (module.params['ostemplate'], node, template_store))
         except Exception as e:
-            module.fail_json(vmid=vmid,
-                             msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(vmid=vmid, msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
             proxmox.create_instance(vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
@@ -752,8 +751,7 @@ def main():
             if not proxmox.get_vm(clone, ignore_missing=True):
                 module.exit_json(changed=False, vmid=vmid, msg="Container to be cloned does not exist")
         except Exception as e:
-            module.fail_json(vmid=vmid,
-                             msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(vmid=vmid, msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
             proxmox.create_instance(vmid, node, disk, storage, cpus, memory, swap, timeout, clone)
@@ -782,8 +780,8 @@ def main():
                     if proxmox.umount_instance(vm, vmid, timeout):
                         module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid)
                 else:
-                    module.exit_json(changed=False, vmid=vmid, msg=("VM %s is already shutdown, but mounted. "
-                                                         "You can use force option to umount it.") % vmid)
+                    module.exit_json(changed=False, vmid=vmid,
+                                     msg=("VM %s is already shutdown, but mounted. You can use force option to umount it.") % vmid)
 
             if getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already shutdown" % vmid)
