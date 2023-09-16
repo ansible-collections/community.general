@@ -49,8 +49,8 @@ options:
     elements: dict
     description:
       - List of policies to attach to the role. Each policy is a dict.
-      - If the parameter is left blank, any policies assigned will be unassigned
-      - Any empty array will clear any policies previously set
+      - If the parameter is left blank, any policies assigned will be unassigned.
+      - Any empty array (V([])) will clear any policies previously set.
     required: false
     suboptions:
       name:
@@ -87,6 +87,7 @@ options:
           - If an empty array (V([])) is specified, the policies will valid in all datacenters.
           - including those which do not yet exist but may in the future.
         type: list
+        elements: str
         required: true
   node_identities:
     type: list
@@ -251,7 +252,7 @@ NODE_ID_RULE_SPEC = dict(
 
 SERVICE_ID_RULE_SPEC = dict(
     name=dict(type='str', required=True),
-    datacenter=dict(type='list', elements='str', required=True),
+    datacenters=dict(type='list', elements='str', required=True),
 )
 
 _ARGUMENT_SPEC = {
