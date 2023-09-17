@@ -42,7 +42,34 @@
       - result is changed
       - result['role']['Name'] == 'foo-role-with-policy'
 
-- name: Update the role with another policy
+- name: Update policy description, in check mode
+  consul_role:
+    name: foo-role-with-policy
+    description: "Testing updating description"
+    token: "{{ consul_management_token }}"
+  check_mode: yes
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['Description'] == "Testing updating description"
+      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+
+- name: Update policy to add the description
+  consul_role:
+    name: foo-role-with-policy
+    description: "Role for testing policies"
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['Description'] == "Role for testing policies"
+      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+
+- name: Update the role with another policy, also testing leaving description blank
   consul_role:
     name: foo-role-with-policy
     policies:
@@ -56,6 +83,7 @@
       - result is changed
       - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
       - result['role']['Policies'][1]['Name'] == 'bar-access-for-role'
+      - result['role']['Description'] == "Role for testing policies"
 
 - name: Create a role with service identity
   consul_role:
