@@ -32,7 +32,7 @@ options:
   givenname:
     description:
     - First name.
-    - If user does not exist and O(state=present), the usage of O(givenname) is required.
+    - If user does not exist and I(state=present), the usage of I(givenname) is required.
     type: str
   krbpasswordexpiration:
     description:
@@ -58,7 +58,7 @@ options:
   sn:
     description:
     - Surname.
-    - If user does not exist and O(state=present), the usage of O(sn) is required.
+    - If user does not exist and I(state=present), the usage of I(sn) is required.
     type: str
   sshpubkey:
     description:
