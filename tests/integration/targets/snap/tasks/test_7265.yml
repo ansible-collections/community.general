@@ -1,0 +1,19 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install packages (7265)
+  ansible.builtin.apt:
+    name:
+      - snapd
+      - fuse
+      - udev
+    state: present
+    update_cache: true
+
+- name: Install Microk8s (7265)
+  community.general.snap:
+    name: microk8s
+    classic: true
+    channel: 1.26/stable

@@ -21,3 +21,5 @@
       ansible.builtin.include_tasks: test_3dash.yml
     - name: Include test_empty_list
       ansible.builtin.include_tasks: test_empty_list.yml
+    - name: Include test_7265
+      ansible.builtin.include_tasks: test_7265.yml
