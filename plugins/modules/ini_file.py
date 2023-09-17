@@ -4,6 +4,7 @@
 # Copyright (c) 2012, Jan-Piet Mens <jpmens () gmail.com>
 # Copyright (c) 2015, Ales Nosek <anosek.nosek () gmail.com>
 # Copyright (c) 2017, Ansible Project
+# Copyright (c) 2023, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -98,6 +99,12 @@ options:
       - Do not insert spaces before and after '=' symbol.
     type: bool
     default: false
+  ignore_spaces:
+    description:
+      - Do not change a line if doing so would only add or remove spaces before or after the V(=) symbol.
+    type: bool
+    default: false
+    version_added: 7.5.0
   create:
     description:
       - If set to V(false), the module will fail if the file does not already exist.
@@ -178,7 +185,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match('[#;]?( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match('([#;]?)( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
 def match_active_opt(option, line):
@@ -186,19 +193,27 @@ def match_active_opt(option, line):
     return re.match('( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
-def update_section_line(changed, section_lines, index, changed_lines, newline, msg):
-    option_changed = section_lines[index] != newline
+def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
+    option_changed = None
+    if ignore_spaces:
+        old_match = match_opt(option, section_lines[index])
+        if not old_match.group(1):
+            new_match = match_opt(option, newline)
+            option_changed = old_match.group(7) != new_match.group(7)
+    if option_changed is None:
+        option_changed = section_lines[index] != newline
+    if option_changed:
+        section_lines[index] = newline
     changed = changed or option_changed
     if option_changed:
         msg = 'option changed'
-    section_lines[index] = newline
     changed_lines[index] = 1
     return (changed, msg)
 
 
 def do_ini(module, filename, section=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
-           create=True, allow_no_value=False, follow=False):
+           ignore_spaces=False, create=True, allow_no_value=False, follow=False):
 
     if section is not None:
         section = to_text(section)
@@ -306,8 +321,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
         for index, line in enumerate(section_lines):
             if match_opt(option, line):
                 match = match_opt(option, line)
-                if values and match.group(6) in values:
-                    matched_value = match.group(6)
+                if values and match.group(7) in values:
+                    matched_value = match.group(7)
                     if not matched_value and allow_no_value:
                         # replace existing option with no value line(s)
                         newline = u'%s\n' % option
@@ -315,12 +330,12 @@ def do_ini(module, filename, section=None, option=None, values=None,
                     else:
                         # replace existing option=value line(s)
                         newline = assignment_format % (option, matched_value)
-                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     values.remove(matched_value)
                 elif not values and allow_no_value:
                     # replace existing option with no value line(s)
                     newline = u'%s\n' % option
-                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     option_no_value_present = True
                     break
 
@@ -330,7 +345,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
             for index, line in enumerate(section_lines):
                 if not changed_lines[index] and match_opt(option, line):
                     newline = assignment_format % (option, values.pop(0))
-                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     if len(values) == 0:
                         break
         # remove all remaining option occurrences from the rest of the section
@@ -449,6 +464,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present']),
             exclusive=dict(type='bool', default=True),
             no_extra_spaces=dict(type='bool', default=False),
+            ignore_spaces=dict(type='bool', default=False),
             allow_no_value=dict(type='bool', default=False),
             create=dict(type='bool', default=True),
             follow=dict(type='bool', default=False)
@@ -469,6 +485,7 @@ def main():
     exclusive = module.params['exclusive']
     backup = module.params['backup']
     no_extra_spaces = module.params['no_extra_spaces']
+    ignore_spaces = module.params['ignore_spaces']
     allow_no_value = module.params['allow_no_value']
     create = module.params['create']
     follow = module.params['follow']
@@ -481,7 +498,9 @@ def main():
     elif values is None:
         values = []
 
-    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value, follow)
+    (changed, backup_file, diff, msg) = do_ini(
+        module, path, section, option, values, state, exclusive, backup,
+        no_extra_spaces, ignore_spaces, create, allow_no_value, follow)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
