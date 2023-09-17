@@ -49,7 +49,7 @@ options:
     elements: dict
     description:
       - List of policies to attach to the role. Each policy is a dict.
-      - If the parameter is left blank, any policies currently assigned will not be changed. 
+      - If the parameter is left blank, any policies currently assigned will not be changed.
       - Any empty array (V([])) will clear any policies previously set.
     required: false
     suboptions:
@@ -68,7 +68,7 @@ options:
     elements: dict
     description:
       - List of service identities to attach to the role.
-      - If not specified, any service identities currently assigned will not be changed. 
+      - If not specified, any service identities currently assigned will not be changed.
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
     suboptions:
@@ -93,7 +93,7 @@ options:
     elements: dict
     description:
       - List of node identities to attach to the role.
-      - If not specified, any node identities currently assigned will not be changed. 
+      - If not specified, any node identities currently assigned will not be changed.
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
     suboptions:
@@ -321,6 +321,7 @@ def update_role(role, configuration):
             x.to_dict() for x in configuration.node_identities]
 
     if configuration.check_mode:
+        description_changed = False
         if description_specified:
             description_changed = role.get('Description') != update_role_data["Description"]
         else:
