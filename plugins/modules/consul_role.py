@@ -41,15 +41,15 @@ options:
   description:
     description:
       - Description of the role.
+      - If not specified, the assigned description will not be changed.
     required: false
     type: str
-    default: ''
   policies:
     type: list
     elements: dict
     description:
       - List of policies to attach to the role. Each policy is a dict.
-      - If the parameter is left blank, any policies assigned will be unassigned.
+      - If the parameter is left blank, any policies currently assigned will not be changed. 
       - Any empty array (V([])) will clear any policies previously set.
     required: false
     suboptions:
@@ -68,8 +68,7 @@ options:
     elements: dict
     description:
       - List of service identities to attach to the role.
-      - Each element must have a "name" and optionally a "datacenters" list of datacenters the effective policy is valid within.
-      - An empty datacenters list allows all datacenters.
+      - If not specified, any service identities currently assigned will not be changed. 
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
     suboptions:
@@ -94,8 +93,7 @@ options:
     elements: dict
     description:
       - List of node identities to attach to the role.
-      - Each element must have a "name" and optionally a "datacenter" the effective policy is valid in.
-      - An empty datacenter allows all datacenters.
+      - If not specified, any node identities currently assigned will not be changed. 
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
     required: false
     suboptions:
@@ -262,7 +260,7 @@ _ARGUMENT_SPEC = {
     SCHEME_PARAMETER_NAME: dict(default='http'),
     VALIDATE_CERTS_PARAMETER_NAME: dict(type='bool', default=True),
     NAME_PARAMETER_NAME: dict(required=True),
-    DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=''),
+    DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=None),
     POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', options=POLICY_RULE_SPEC,
                                   mutually_exclusive=[('name', 'id')], required_one_of=[('name', 'id')], default=None),
     SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=SERVICE_ID_RULE_SPEC, default=None),
@@ -292,7 +290,10 @@ def update_role(role, configuration):
         'Description': configuration.description,
     }
 
-    # check if the user omitted policies, service identities, or node identities
+    # check if the user omitted the description,  policies, service identities, or node identities
+
+    description_specified = configuration.description is not None
+
     policy_specified = True
     if len(configuration.policies) == 1 and configuration.policies[0] is None:
         policy_specified = False
@@ -305,8 +306,8 @@ def update_role(role, configuration):
     if len(configuration.node_identities) == 1 and configuration.node_identities[0] is None:
         node_id_specified = False
 
-    # if not policy_specified:
-    #     configuration.policies.pop()  # TODO check: do we to do need this?
+    if description_specified:
+        update_role_data["Description"] = configuration.description
 
     if policy_specified:
         update_role_data["Policies"] = [x.to_dict() for x in configuration.policies]
@@ -320,6 +321,11 @@ def update_role(role, configuration):
             x.to_dict() for x in configuration.node_identities]
 
     if configuration.check_mode:
+        if description_specified:
+            description_changed = role.get('Description') != update_role_data["Description"]
+        else:
+            update_role_data["Description"] = role.get("Description")
+
         policies_changed = False
         if policy_specified:
             policies_changed = not (
@@ -343,14 +349,16 @@ def update_role(role, configuration):
                 update_role_data["NodeIdentities"] = role.get('NodeIdentities')
 
         changed = (
-            role['Description'] != update_role_data['Description'] or
+            description_changed or
             policies_changed or
             service_ids_changed or
             node_ids_changed
         )
         return Output(changed=changed, operation=UPDATE_OPERATION, role=update_role_data)
     else:
-        # if policies, service_id or node_id are not specified; we need to get the existing value and apply it
+        # if description, policies, service or node id are not specified; we need to get the existing value and apply it
+        if not description_specified and role.get('Description') is not None:
+            update_role_data["Description"] = role.get('Description')
 
         if not policy_specified and role.get('Policies') is not None:
             update_role_data["Policies"] = role.get('Policies')
