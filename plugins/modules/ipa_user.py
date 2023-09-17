@@ -30,7 +30,9 @@ options:
     default: 'always'
     choices: [ always, on_create ]
   givenname:
-    description: First name.
+    description:
+    - First name.
+    - If user does not exist and O(state=present), the usage of O(givenname) is required.
     type: str
   krbpasswordexpiration:
     description:
@@ -54,7 +56,9 @@ options:
     - Will not be set for an existing user unless O(update_password=always), which is the default.
     type: str
   sn:
-    description: Surname.
+    description:
+    - Surname.
+    - If user does not exist and O(state=present), the usage of O(sn) is required.
     type: str
   sshpubkey:
     description:
