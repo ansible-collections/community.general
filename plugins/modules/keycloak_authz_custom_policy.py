@@ -15,7 +15,7 @@ module: keycloak_authz_custom_policy
 
 short_description: Allows administration of Keycloak client custom Javascript policies via Keycloak API
 
-version_added: 7.4.0
+version_added: 7.5.0
 
 description:
     - This module allows the administration of Keycloak client custom Javascript via the Keycloak REST
