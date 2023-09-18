@@ -1,0 +1,2 @@
+minor_changes:
+  - stop matching running processes before removing them
