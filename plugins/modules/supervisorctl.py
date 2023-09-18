@@ -231,7 +231,7 @@ def main():
             module.exit_json(changed=False, name=name, state=state)
 
         take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped')
-      
+
         if module.check_mode:
             module.exit_json(changed=True)
         run_supervisorctl('reread', check_rc=True)
