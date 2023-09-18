@@ -15,7 +15,7 @@ module: keycloak_realm_key
 
 short_description: Allows administration of Keycloak realm keys via Keycloak API
 
-version_added: 7.4.0
+version_added: 7.5.0
 
 description:
     - This module allows the administration of Keycloak realm keys via the Keycloak REST API. It
