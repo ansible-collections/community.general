@@ -1,0 +1,373 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Remove Keycloak test realm to avoid failures from previous failed runs
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: absent
+
+- name: Create Keycloak test realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: present
+
+- name: Create custom realm key (check mode)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 150
+  check_mode: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["150"]
+      - result.msg == "Realm key testkey would be created"
+
+- name: Create custom realm key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 150
+  diff: true
+  register: result
+
+- name: Assert that realm key was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["150"]
+      - result.msg == "Realm key testkey created"
+
+- name: Create custom realm key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 150
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["150"]
+      - result.msg == "Realm key testkey was in sync"
+
+- name: Update custom realm key (check mode)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 140
+  check_mode: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["140"]
+      - result.msg == "Realm key testkey would be changed: config.priority ['150'] -> ['140']"
+
+- name: Update custom realm key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 140
+  diff: true
+  register: result
+
+- name: Assert that realm key was updated
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["140"]
+      - result.msg == "Realm key testkey changed: config.priority ['150'] -> ['140']"
+
+- name: Update custom realm key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 140
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["140"]
+      - result.msg == "Realm key testkey was in sync"
+
+- name: Force update custom realm key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    force: true
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key_2 }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 140
+  register: result
+
+- name: Assert that forced update ran correctly
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["140"]
+      - result.msg == "Realm key testkey was forcibly updated"
+
+- name: Remove custom realm key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: absent
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      priority: 140
+  diff: true
+  register: result
+
+- name: Assert that realm key was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == "Realm key testkey deleted"
+
+- name: Remove custom realm key (test for idempotency)
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey
+    state: absent
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      priority: 140
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+      - result.msg == "Realm key testkey not present"
+
+- name: Create custom realm key with a custom certificate
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey_with_certificate
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: "{{ realm_certificate }}"
+      enabled: true
+      active: true
+      priority: 150
+  diff: true
+  register: result
+
+- name: Assert that realm key with custom certificate was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey_with_certificate"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["150"]
+      - result.msg == "Realm key testkey_with_certificate created"
+
+- name: Attempt to change the private key and the certificate
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: testkey_with_certificate
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "a different private key string"
+      certificate: "a different certificate string"
+      enabled: true
+      active: true
+      priority: 150
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "testkey_with_certificate"
+      - result.end_state.parentId == "realm_key_test"
+      - result.end_state.providerId == "rsa"
+      - result.end_state.providerType == "org.keycloak.keys.KeyProvider"
+      - result.end_state.config.active == ["true"]
+      - result.end_state.config.enabled == ["true"]
+      - result.end_state.config.algorithm == ["RS256"]
+      - result.end_state.config.priority == ["150"]
+      - result.msg == "Realm key testkey_with_certificate was in sync"
+
+- name: Remove Keycloak test realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: absent

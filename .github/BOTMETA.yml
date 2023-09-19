@@ -725,6 +725,8 @@ files:
     maintainers: kris2kris
   $modules/keycloak_realm_info.py:
     maintainers: fynncfchen
+  $modules/keycloak_realm_key.py:
+    maintainers: mattock
   $modules/keycloak_role.py:
     maintainers: laurpaum
   $modules/keycloak_user.py:
