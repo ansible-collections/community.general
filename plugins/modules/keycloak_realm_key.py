@@ -186,7 +186,7 @@ msg:
 end_state:
     description: Representation of the keycloak_realm_key after module execution.
     returned: on success
-    type: complex
+    type: dict
     contains:
         id:
             description: ID of the realm key.
