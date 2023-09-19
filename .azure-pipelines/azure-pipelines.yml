@@ -397,27 +397,27 @@ stages:
     condition: succeededOrFailed()
     dependsOn:
       - Sanity_devel
-      - Sanity_2_14
-      - Sanity_2_15
       - Sanity_2_16
+      - Sanity_2_15
+      - Sanity_2_14
       - Units_devel
-      - Units_2_14
-      - Units_2_15
       - Units_2_16
+      - Units_2_15
+      - Units_2_14
       - Remote_devel_extra_vms
       - Remote_devel
-      - Remote_2_14
-      - Remote_2_15
       - Remote_2_16
+      - Remote_2_15
+      - Remote_2_14
       - Docker_devel
-      - Docker_2_14
-      - Docker_2_15
       - Docker_2_16
+      - Docker_2_15
+      - Docker_2_14
       - Docker_community_devel
 # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
 #      - Generic_devel
-#      - Generic_2_14
-#      - Generic_2_15
 #      - Generic_2_16
+#      - Generic_2_15
+#      - Generic_2_14
     jobs:
       - template: templates/coverage.yml
