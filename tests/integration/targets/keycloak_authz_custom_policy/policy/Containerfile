@@ -1,0 +1,4 @@
+FROM quay.io/keycloak/keycloak:20.0.2
+
+COPY policy.jar /opt/keycloak/providers/
+RUN /opt/keycloak/bin/kc.sh build
