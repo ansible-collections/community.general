@@ -1,0 +1,14 @@
+{
+    "policies": [
+        {
+            "name": "MyPolicy1",
+            "fileName": "policy-1.js",
+            "description": "My Policy 1"
+        },
+        {
+            "name": "MyPolicy2",
+            "fileName": "policy-2.js",
+            "description": "My Policy 2"
+        }
+    ]
+}
