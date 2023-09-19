@@ -703,6 +703,8 @@ files:
     maintainers: mattock
   $modules/keycloak_authz_permission.py:
     maintainers: mattock
+  $modules/keycloak_authz_custom_policy.py:
+    maintainers: mattock
   $modules/keycloak_authz_permission_info.py:
     maintainers: mattock
   $modules/keycloak_client_rolemapping.py:

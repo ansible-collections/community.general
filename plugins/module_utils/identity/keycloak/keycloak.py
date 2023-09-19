@@ -116,6 +116,9 @@ URL_AUTHZ_PERMISSIONS = "{url}/admin/realms/{realm}/clients/{client_id}/authz/re
 
 URL_AUTHZ_RESOURCES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/resource"
 
+URL_AUTHZ_CUSTOM_POLICY = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy/{policy_type}"
+URL_AUTHZ_CUSTOM_POLICIES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy"
+
 
 def keycloak_argument_spec():
     """
@@ -2921,6 +2924,27 @@ class KeycloakAPI(object):
                     group_dict['name'] = group
                     list_of_groups.append(group_dict)
         return list_of_groups
+
+    def create_authz_custom_policy(self, policy_type, payload, client_id, realm):
+        """Create a custom policy for a Keycloak client"""
+        url = URL_AUTHZ_CUSTOM_POLICY.format(url=self.baseurl, policy_type=policy_type, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create permission %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+
+    def remove_authz_custom_policy(self, policy_id, client_id, realm):
+        """Remove a custom policy from a Keycloak client"""
+        url = URL_AUTHZ_CUSTOM_POLICIES.format(url=self.baseurl, client_id=client_id, realm=realm)
+        delete_url = "%s/%s" % (url, policy_id)
+
+        try:
+            return open_url(delete_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete custom policy %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
 
     def get_authz_permission_by_name(self, name, client_id, realm):
         """Get authorization permission by name"""
