@@ -1,0 +1,23 @@
+plugins/modules/consul.py validate-modules:doc-missing-type
+plugins/modules/consul.py validate-modules:undocumented-parameter
+plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice         # state=get - removed in 8.0.0
+plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/homectl.py import-3.12  # Uses deprecated stdlib library 'crypt'
+plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
+plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
+plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice  # state=list - removed in 8.0.0
+plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
+plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
+plugins/modules/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
+plugins/modules/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
+plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice      # state=list - removed in 8.0.0
+plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
+plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
+plugins/modules/rax_files_objects.py use-argspec-type-path                            # module deprecated - removed in 9.0.0
+plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice          # module deprecated - removed in 9.0.0
+plugins/modules/rax.py use-argspec-type-path                                          # module deprecated - removed in 9.0.0
+plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
+plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/udm_user.py import-3.12  # Uses deprecated stdlib library 'crypt'
+plugins/modules/xfconf.py validate-modules:return-syntax-error
