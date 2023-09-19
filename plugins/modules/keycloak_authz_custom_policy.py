@@ -100,7 +100,7 @@ msg:
 end_state:
     description: Representation of the custom policy after module execution.
     returned: on success
-    type: complex
+    type: dict
     contains:
         name:
             description: Name of the custom policy.
