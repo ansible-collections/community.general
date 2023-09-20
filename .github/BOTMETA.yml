@@ -278,6 +278,8 @@ files:
   $module_utils/gconftool2.py:
     labels: gconftool2
     maintainers: russoz
+  $module_utils/gio_mime.py:
+    maintainers: russoz
   $module_utils/gitlab.py:
     keywords: gitlab source_control
     labels: gitlab
@@ -517,6 +519,8 @@ files:
   $modules/gem.py:
     labels: gem
     maintainers: $team_ansible_core johanwiren
+  $modules/gio_mime.py:
+    maintainers: russoz
   $modules/git_config.py:
     maintainers: djmattyg007 mgedmin
   $modules/github_:

@@ -19,3 +19,4 @@ plugins/modules/rax.py use-argspec-type-path                                    
 plugins/modules/read_csv.py validate-modules:invalid-documentation
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/xfconf.py validate-modules:return-syntax-error
+tests/unit/plugins/modules/test_gio_mime.yaml no-smart-quotes
