@@ -116,7 +116,7 @@ def gitlab_authentication(module):
 def filter_returned_variables(gitlab_variables):
     # pop properties we don't know
     existing_variables = [dict(x.attributes) for x in gitlab_variables]
-    KNOWN = ['key', 'value', 'masked', 'protected', 'variable_type', 'environment_scope']
+    KNOWN = ['key', 'value', 'masked', 'protected', 'variable_type', 'environment_scope', 'raw']
     for item in existing_variables:
         for key in list(item.keys()):
             if key not in KNOWN:
