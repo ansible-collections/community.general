@@ -286,6 +286,14 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Enable SecureBoot
+    community.general.redfish_config:
+      category: Systems
+      command: EnableSecureBoot
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
   - name: Set SecureBoot
     community.general.redfish_config:
       category: Systems
@@ -322,7 +330,7 @@ from ansible.module_utils.common.text.converters import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
-                "SetDefaultBootOrder", "SetSecureBoot", "DeleteVolumes"],
+                "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes"],
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
     "Sessions": ["SetSessionService"],
 }
@@ -445,6 +453,8 @@ def main():
                 result = rf_utils.set_boot_order(boot_order)
             elif command == "SetDefaultBootOrder":
                 result = rf_utils.set_default_boot_order()
+            elif command == "EnableSecureBoot":
+                result = rf_utils.enable_secure_boot()
             elif command == "SetSecureBoot":
                 result = rf_utils.set_secure_boot(secure_boot_enable)
             elif command == "DeleteVolumes":
