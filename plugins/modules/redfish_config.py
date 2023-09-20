@@ -159,13 +159,6 @@ options:
     type: dict
     default: {}
     version_added: '7.4.0'
-  storage_subsystem_id:
-    required: false
-    description:
-      - Id of the Storage Subsystem on which the volume is to be created.
-    type: str
-    default: ''
-    version_added: '7.4.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
