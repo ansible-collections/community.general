@@ -80,6 +80,19 @@ DOCUMENTATION = r"""
         - Override all values of O(numbers), O(upper), O(lower), and O(special) with
           the given list of characters.
         type: str
+      ignore_similar_chars:
+        description:
+        - Ignore similar characters, such as V(l) and V(1), or V(O) and V(0).
+        - These characters can be configured in O(similar_chars).
+        default: false
+        type: bool
+        version_added: 7.5.0
+      similar_chars:
+        description:
+        - Overide a list of characters not to be use in the string.
+        default: "il1LoO0"
+        type: str
+        version_added: 7.5.0
       base64:
         description:
         - Returns base64 encoded string.
@@ -173,8 +186,16 @@ class LookupModule(LookupBase):
         length = self.get_option("length")
         base64_flag = self.get_option("base64")
         override_all = self.get_option("override_all")
+        ignore_similar_chars = self.get_option("ignore_similar_chars")
+        similar_chars = self.get_option("similar_chars")
         values = ""
         available_chars_set = ""
+
+        if ignore_similar_chars:
+            number_chars = "".join([sc for sc in number_chars if sc not in similar_chars])
+            lower_chars = "".join([sc for sc in lower_chars if sc not in similar_chars])
+            upper_chars = "".join([sc for sc in upper_chars if sc not in similar_chars])
+            special_chars = "".join([sc for sc in special_chars if sc not in similar_chars])
 
         if override_all:
             # Override all the values
