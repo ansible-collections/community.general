@@ -1,2 +1,2 @@
 deprecated_features:
-  - redfish_info, redfish_config, redfish_command - adding deprectation for timeout parameter from 10 to 60 (https://github.com/ansible-collections/community.general/pull/7295).
+  - redfish_info, redfish_config, redfish_command - the default value ``10`` for the ``timeout`` option is deprecated and will change to ``60`` in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/7295).
