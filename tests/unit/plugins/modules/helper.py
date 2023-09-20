@@ -51,9 +51,9 @@ class _BaseContext(object):
 
         test_flags = self.test_flags()
         if test_flags.get("skip"):
-            pytest.skip(reason=test_flags["skip"])
+            pytest.skip()
         if test_flags.get("xfail"):
-            pytest.xfail(reason=test_flags["xfail"])
+            pytest.xfail()
 
         func()
 
@@ -90,7 +90,7 @@ class _RunCmdContext(_BaseContext):
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
 
-        assert self.mock_run_cmd.call_count == len(self.run_cmd_calls)
+        assert self.mock_run_cmd.call_count == len(self.run_cmd_calls), "{0} != {1}".format(self.mock_run_cmd.call_count, len(self.run_cmd_calls))
         if self.mock_run_cmd.call_count:
             assert call_args_list == expected_call_args_list
 
