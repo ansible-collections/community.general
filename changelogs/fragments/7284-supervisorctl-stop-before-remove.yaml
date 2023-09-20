@@ -1,2 +1,2 @@
 minor_changes:
-  - stop matching running processes before removing them
+  - supervisorctl - stop matching running processes before removing them (https://github.com/ansible-collections/community.general/pull/7284).
