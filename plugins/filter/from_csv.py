@@ -56,7 +56,7 @@ EXAMPLES = '''
 - name: Parse a CSV file's contents
   ansible.builtin.debug:
     msg: >-
-      {{ csv_data | community.genera.from_csv(dialect='unix') }}
+      {{ csv_data | community.general.from_csv(dialect='unix') }}
   vars:
     csv_data: |
       Column 1,Value
