@@ -1,0 +1,2 @@
+minor_changes:
+  - random_string - added new ``ignore_similar_chars`` and ``similar_chars`` option to ignore certain chars (https://github.com/ansible-collections/community.general/pull/7242).
