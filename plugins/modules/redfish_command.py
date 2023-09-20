@@ -836,7 +836,7 @@ def main():
             'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
                 10, 60
             ),
-            version='7.5.0',
+            version='9.0.0',
             collection_name='community.general'
         )
 
