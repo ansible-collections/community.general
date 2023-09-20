@@ -391,15 +391,10 @@ def main():
             hostinterface_config=dict(type='dict', default={}),
             hostinterface_id=dict(),
             sessions_config=dict(type='dict', default={}),
-<<<<<<< HEAD
             storage_subsystem_id=dict(type='str', default=''),
             volume_ids=dict(type='list', default=[], elements='str'),
             secure_boot_enable=dict(type='bool', default=True),
             volume_details=dict(type='dict', default={})
-=======
-            volume_details=dict(type='dict', default={}),
-            storage_subsystem_id=dict(type='str', default='')
->>>>>>> 1bef8445 (Removing capabilities check and correcting controllers terminology to storage subsystem)
         ),
         required_together=[
             ('username', 'password'),
