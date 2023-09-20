@@ -151,7 +151,7 @@ options:
       - Setting parameter to enable or disable SecureBoot.
     type: bool
     default: True
-    version_added: '7.4.0'
+    version_added: '7.5.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
