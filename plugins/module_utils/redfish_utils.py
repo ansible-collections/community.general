@@ -3432,6 +3432,25 @@ class RedfishUtils(object):
 
         return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)
 
+    def set_secure_boot(self, secure_boot_enable):
+        # This function enable Secure Boot on an OOB controller
+
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response["ret"] is False:
+            return response
+
+        server_details = response["data"]
+        secure_boot_url = server_details["SecureBoot"]["@odata.id"]
+
+        response = self.get_request(self.root_uri + secure_boot_url)
+        if response["ret"] is False:
+            return response
+
+        body = {}
+        body["SecureBootEnable"] = secure_boot_enable
+
+        return self.patch_request(self.root_uri + secure_boot_url, body, check_pyld=True)
+
     def get_hpe_thermal_config(self):
         result = {}
         key = "Thermal"
