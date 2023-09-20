@@ -62,7 +62,6 @@ options:
       - Timeout in seconds for HTTP requests to OOB controller.
       - The default value for this param is C(10) but that is being deprecated
         and it will be replaced with C(60) in community.general 7.5.0.
-    default: 10
     type: int
   update_handle:
     required: false

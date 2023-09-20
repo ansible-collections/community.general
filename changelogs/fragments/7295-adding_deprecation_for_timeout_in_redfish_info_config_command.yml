@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info, redfish_config, redfish_command - adding deprectation for timeout parameter from 10 to 60 (https://github.com/ansible-collections/community.general/pull/7295).
