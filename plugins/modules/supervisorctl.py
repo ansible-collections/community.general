@@ -59,6 +59,7 @@ options:
       - Use O(stop_before_removing=true) to stop the program/group before removing it
     required: false
     default: false
+    version_added: 7.5.0
   signal:
     type: str
     description:
