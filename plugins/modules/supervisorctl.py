@@ -215,9 +215,13 @@ def main():
             if status_filter(status):
                 to_take_action_on.append(process_name)
 
-        if len(to_take_action_on) == 0 and exit_module:
+        if len(to_take_action_on) == 0:
+            if not exit_module:
+                return
             module.exit_json(changed=False, name=name, state=state)
-        if module.check_mode and exit_module:
+        if module.check_mode:
+            if not exit_module:
+                return
             module.exit_json(changed=True)
         for process_name in to_take_action_on:
             rc, out, err = run_supervisorctl(action, process_name, check_rc=True)
