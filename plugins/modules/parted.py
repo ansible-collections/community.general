@@ -570,7 +570,7 @@ def parted(script, device, align):
         align_option = ''
 
     if script and not module.check_mode:
-        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
+        command = "%s -s -f -m %s %s -- %s" % (parted_exec, align_option, device, script)
         rc, out, err = module.run_command(command)
 
         if rc != 0:
