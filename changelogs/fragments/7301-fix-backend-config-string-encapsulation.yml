@@ -1,0 +1,2 @@
+bugfixes:
+  - "terraform module - prevents `-backend-config` option double encapsulating with `shlex_quote` function. (https://github.com/ansible-collections/community.general/pull/7301)."
