@@ -1,0 +1,2 @@
+bugfixes:
+  - mail - skip headers containing equals characters due to missing ``maxsplit`` on header key/value parsing (https://github.com/ansible-collections/community.general/pull/7303).

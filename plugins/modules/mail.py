@@ -354,7 +354,7 @@ def main():
         # NOTE: Backward compatible with old syntax using '|' as delimiter
         for hdr in [x.strip() for x in header.split('|')]:
             try:
-                h_key, h_val = hdr.split('=')
+                h_key, h_val = hdr.split('=', 1)
                 h_val = to_native(Header(h_val, charset))
                 msg.add_header(h_key, h_val)
             except Exception:
