@@ -47,10 +47,11 @@ options:
   locked:
     description:
       - Install with locked dependencies.
+      - This is only used when installing packages.
     required: false
     type: bool
     default: false
-    version_added: 6.5.0
+    version_added: 7.5.0
   state:
     description:
       - The state of the Rust package.
