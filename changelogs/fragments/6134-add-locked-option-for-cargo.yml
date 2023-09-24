@@ -1,0 +1,2 @@
+minor_changes:
+  - "cargo - add option ``locked`` which allows user to specify install the locked version of dependency instead of latest compatible version (https://github.com/ansible-collections/community.general/pull/6134)."
