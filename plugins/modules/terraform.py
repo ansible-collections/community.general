@@ -325,7 +325,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
         for key, val in backend_config.items():
             command.extend([
                 '-backend-config',
-                shlex_quote('{0}={1}'.format(key, val))
+                '{0}={1}'.format(key, val)
             ])
     if backend_config_files:
         for f in backend_config_files:
