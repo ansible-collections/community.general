@@ -4,13 +4,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - vars:
-    package_name: xinetd
-    config_file: /etc/xinetd.conf
+    package_name: mdadm
+    config_file: /etc/mdadm.conf
   block:
     - name: Make sure that {{ package_name }} is not installed
       pacman:
         name: '{{ package_name }}'
         state: absent
+
     - name: Make sure {{config_file}}.pacsave file doesn't exist
       file:
         path: '{{config_file}}.pacsave'
@@ -32,6 +33,7 @@
       pacman:
         name: '{{ package_name }}'
         state: absent
+
     - name: Make sure {{config_file}}.pacsave exists
       stat:
         path: '{{config_file}}.pacsave'
