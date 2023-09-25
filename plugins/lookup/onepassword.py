@@ -40,6 +40,8 @@ DOCUMENTATION = '''
         description: The 1Password subdomain to authenticate against.
       account_id:
         description: The account ID to target.
+        type: str
+        version_added: 7.5.0
       username:
         description: The username used to sign in.
       secret_key:
