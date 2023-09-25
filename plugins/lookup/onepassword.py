@@ -521,7 +521,7 @@ class OnePassCLIv2(OnePassCLIBase):
             # if there are any previously configured accounts.
             args = ["account", "get"]
             if self.account_id:
-              args.extend(["--account", self.account_id])
+                args.extend(["--account", self.account_id])
             elif self.subdomain:
                 account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
                 args.extend(["--account", account])
