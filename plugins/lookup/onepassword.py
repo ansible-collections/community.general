@@ -99,9 +99,9 @@ EXAMPLES = """
                 username='tweety@acme.com',
                 secret_key=vault_secret_key)
 
-- name: Retrieve password from specific account 
+- name: Retrieve password from specific account
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword', 
+    var: lookup('community.general.onepassword',
                 'HAL 9000',
                 account_id='abc123')
 """
@@ -130,7 +130,16 @@ from ansible_collections.community.general.plugins.module_utils.onepassword impo
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
-    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None, service_account_token=None, account_id=None):
+    def __init__(
+        self,
+        subdomain=None,
+        domain="1password.com",
+        username=None,
+        secret_key=None,
+        master_password=None,
+        service_account_token=None,
+        account_id=None,
+    ):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
