@@ -3566,7 +3566,7 @@ class RedfishUtils(object):
                     }
 
             fw_version = resp['FirmwareVersion']
-            ilo_gen = re.sub("\D", "", fw_version).strip()[0]
+            ilo_gen = re.sub(r"\D", "", fw_version).strip()[0]
 
             if int(ilo_gen) < 6:
                 return {
