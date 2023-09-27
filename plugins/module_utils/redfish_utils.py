@@ -130,9 +130,10 @@ class RedfishUtils(object):
         return resp
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri, override_headers={}):
+    def get_request(self, uri, override_headers=None):
         req_headers = dict(GET_HEADERS)
-        if override_headers: req_headers.update(override_headers)
+        if override_headers:
+            req_headers.update(override_headers)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             # Service root is an unauthenticated resource; remove credentials
