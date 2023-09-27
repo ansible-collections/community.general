@@ -10,6 +10,8 @@ import json
 import os
 import random
 import string
+import gzip
+from io import BytesIO
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
@@ -128,8 +130,9 @@ class RedfishUtils(object):
         return resp
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri):
+    def get_request(self, uri, override_headers={}):
         req_headers = dict(GET_HEADERS)
+        if override_headers: req_headers.update(override_headers)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             # Service root is an unauthenticated resource; remove credentials
@@ -141,8 +144,13 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-            data = json.loads(to_native(resp.read()))
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            if override_headers:
+                resp = gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8')
+                data = json.loads(to_native(resp.read()))
+                headers = req_headers
+            else:
+                data = json.loads(to_native(resp.read()))
+                headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -3692,10 +3700,8 @@ class RedfishUtils(object):
             if loc['Language'] == "en":
                 if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
                     rsp_uri = loc['Uri']['extref']
-                    headers = {"Accept": "application/json"}
                 else:
                     rsp_uri = loc['Uri']
-                    headers = {"Accept": "application/json", "Accept-Encoding": "gzip"}
         if not rsp_uri:
             msg = "Language 'en' not found in BIOS Atrribute Registries location, URI: %s, response: %s"
             return {
@@ -3703,22 +3709,20 @@ class RedfishUtils(object):
                 "msg": msg % (resp_uri, str(resp_data))
             }
 
-        if not self.creds["token"]:
-            auth = HTTPBasicAuth(self.creds["user"], self.creds["pswd"])
-            res = requests.get(self.root_uri + rsp_uri, headers=headers, auth=auth, verify=False)
-        else:
-            headers['X-Auth-Token'] = self.creds["token"]
-            res = requests.get(self.root_uri + rsp_uri, headers=headers, verify=False)
-        if res.status_code != 200:
+        res = self.get_request(self.root_uri + rsp_uri)
+        if res['ret'] is False:
+            # WORKAROUND
+            # HPE systems with iLO 4 or iLO5 compresses (gzip) for some URIs
+            # Hence adding encoding to the header
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'HPE':
+                override_headers=dict(GET_HEADERS)
+                override_headers.update({"Accept-Encoding": "gzip"})
+                res = self.get_request(self.root_uri + rsp_uri, override_headers=override_headers)
+        if res['ret']:
             return {
-                "ret": False,
-                "msg": "Failed get on %s" % str(rsp_uri)
+                "ret": True,
+                "rsp_data": res["data"],
+                "rsp_uri": rsp_uri
             }
-
-        rsp_data = json.loads(res.text)
-
-        return {
-            "ret": True,
-            "rsp_data": rsp_data,
-            "rsp_uri": rsp_uri
-        }
+        return res
