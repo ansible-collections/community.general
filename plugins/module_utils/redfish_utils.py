@@ -3717,8 +3717,7 @@ class RedfishUtils(object):
             # Hence adding encoding to the header
             vendor = self._get_vendor()['Vendor']
             if vendor == 'HPE':
-                override_headers=dict(GET_HEADERS)
-                override_headers.update({"Accept-Encoding": "gzip"})
+                override_headers = {"Accept-Encoding": "gzip"}
                 res = self.get_request(self.root_uri + rsp_uri, override_headers=override_headers)
         if res['ret']:
             return {
