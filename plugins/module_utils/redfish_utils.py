@@ -3561,9 +3561,9 @@ class RedfishUtils(object):
             resp = response['data']
             if 'FirmwareVersion' not in resp.keys():
                 return {
-                        "ret": False,
-                        "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
-                    }
+                    "ret": False,
+                    "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
+                }
 
             fw_version = resp['FirmwareVersion']
             ilo_gen = re.sub(r"\D", "", fw_version).strip()[0]
