@@ -2460,7 +2460,7 @@ class RedfishUtils(object):
         result = {}
         properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
                       'NameServers', 'MACAddress', 'PermanentMACAddress',
-                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
+                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status', 'LinkStatus']
         response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
