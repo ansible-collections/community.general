@@ -3547,33 +3547,6 @@ class RedfishUtils(object):
                 'msg': "The following volumes were deleted: %s" % str(volume_ids)}
 
     def create_volume(self, volume_details, storage_subsystem_id):
-        # Fail message if run for iLO5 or lower server
-        vendor = self._get_vendor()['Vendor']
-        if vendor == 'HPE':
-            response = self._find_managers_resource()
-            if response['ret'] is False:
-                return response
-
-            response = self.get_request(self.root_uri + self.manager_uri)
-            if response['ret'] is False:
-                return response
-
-            resp = response['data']
-            if 'FirmwareVersion' not in resp.keys():
-                return {
-                    "ret": False,
-                    "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
-                }
-
-            fw_version = resp['FirmwareVersion']
-            ilo_gen = re.sub(r"\D", "", fw_version).strip()[0]
-
-            if int(ilo_gen) < 6:
-                return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(ilo_gen))
-                }
-
         # Find the Storage resource from the requested ComputerSystem resource
         response = self.get_request(self.root_uri + self.systems_uri)
         if response['ret'] is False:
@@ -3651,6 +3624,32 @@ class RedfishUtils(object):
         payload = volume_details
         response = self.post_request(self.root_uri + data['Volumes']['@odata.id'], payload)
         if response['ret'] is False:
+            # Fail message if run for iLO5 or lower server
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'HPE':
+                response = self._find_managers_resource()
+                if response['ret'] is False:
+                    return response
+
+                response = self.get_request(self.root_uri + self.manager_uri)
+                if response['ret'] is False:
+                    return response
+
+                resp = response['data']
+                if 'FirmwareVersion' not in resp.keys():
+                    return {
+                        "ret": False,
+                        "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
+                    }
+
+                fw_version = resp['FirmwareVersion']
+                ilo_gen = re.sub(r"\D", "", fw_version).strip()[0]
+
+                if int(ilo_gen) < 6:
+                    return {
+                        "ret": False,
+                        "msg": "This operation is not supported for iLO %s servers" % (str(ilo_gen))
+                    }
             return response
         return {'ret': True, 'changed': True,
                 'msg': "Volume Created"}
