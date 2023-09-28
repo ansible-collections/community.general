@@ -510,7 +510,7 @@ Deprecated Features
   we have not heard about anyone using them in those setups. Hence, these
   modules are deprecated, and will be removed in community.general 10.0.0
   in case there are no reports about being still useful, and potentially
-  noone that steps up to maintain them
+  no one that steps up to maintain them
   (https://github.com/ansible-collections/community.general/pull/6493).
 
 Removed Features (previously deprecated)
