@@ -109,7 +109,8 @@ options:
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
-    default: 10
+      - The default value for this param is C(10) but that is being deprecated
+        and it will be replaced with C(60) in community.general 9.0.0.
     type: int
   boot_override_mode:
     description:
@@ -782,7 +783,7 @@ def main():
             update_username=dict(type='str', aliases=["account_updatename"]),
             account_properties=dict(type='dict', default={}),
             bootdevice=dict(),
-            timeout=dict(type='int', default=10),
+            timeout=dict(type='int'),
             uefi_target=dict(),
             boot_next=dict(),
             boot_override_mode=dict(choices=['Legacy', 'UEFI']),
@@ -828,6 +829,16 @@ def main():
         ],
         supports_check_mode=False
     )
+
+    if module.params['timeout'] is None:
+        timeout = 10
+        module.deprecate(
+            'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
+                10, 60
+            ),
+            version='9.0.0',
+            collection_name='community.general'
+        )
 
     category = module.params['category']
     command_list = module.params['command']
