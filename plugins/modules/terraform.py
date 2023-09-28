@@ -178,6 +178,10 @@ notes:
    - To just run a C(terraform plan), use check mode.
 requirements: [ "terraform" ]
 author: "Ryan Scott Brown (@ryansb)"
+deprecated:
+  why: |
+    The module is now further developed in the cloud.terraform collection.
+  alternative: Use `cloud.terraform.terraform`.
 '''
 
 EXAMPLES = """
@@ -458,6 +462,11 @@ def main():
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
+    )
+    module.deprecate(
+        "community.general.terraform is deprecated, use cloud.terraform.terraform instead",
+        version='7.5.0',
+        collection_name='community.general',
     )
 
     project_path = module.params.get('project_path')

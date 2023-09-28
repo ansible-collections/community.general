@@ -1,0 +1,2 @@
+deprecated_features:
+  - community.general.terraform - deprecate module, has been moved to cloud.terraform.terraform
