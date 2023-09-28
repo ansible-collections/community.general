@@ -50,7 +50,12 @@ class TestRedisInfoModule(ModuleTestCase):
                 set_module_args({})
                 self.module.main()
             self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'localhost', 'port': 6379, 'password': None},))
+            self.assertEqual(redis_client.call_args, ({'host': 'localhost',
+                                                       'port': 6379,
+                                                       'password': None,
+                                                       'ssl': False,
+                                                       'ssl_ca_certs': None,
+                                                       'ssl_cert_reqs': 'required'},))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 
     def test_with_parameters(self):
@@ -64,7 +69,34 @@ class TestRedisInfoModule(ModuleTestCase):
                 })
                 self.module.main()
             self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'test', 'port': 1234, 'password': 'PASS'},))
+            self.assertEqual(redis_client.call_args, ({'host': 'test',
+                                                       'port': 1234,
+                                                       'password': 'PASS',
+                                                       'ssl': False,
+                                                       'ssl_ca_certs': None,
+                                                       'ssl_cert_reqs': 'required'},))
+            self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
+
+    def test_with_tls_parameters(self):
+        """Test with tls parameters"""
+        with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
+            with self.assertRaises(AnsibleExitJson) as result:
+                set_module_args({
+                    'login_host': 'test',
+                    'login_port': 1234,
+                    'login_password': 'PASS',
+                    'tls': True,
+                    'ca_certs': '/etc/ssl/ca.pem',
+                    'validate_certs': False
+                })
+                self.module.main()
+            self.assertEqual(redis_client.call_count, 1)
+            self.assertEqual(redis_client.call_args, ({'host': 'test',
+                                                       'port': 1234,
+                                                       'password': 'PASS',
+                                                       'ssl': True,
+                                                       'ssl_ca_certs': '/etc/ssl/ca.pem',
+                                                       'ssl_cert_reqs': None},))
             self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
 
     def test_with_fail_client(self):
