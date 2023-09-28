@@ -17,30 +17,21 @@ version_added: '0.2.0'
 description:
 - Gathers information and statistics about Redis servers.
 extends_documentation_fragment:
+- community.general.redis
 - community.general.attributes
 - community.general.attributes.info_module
 options:
-  login_host:
-    description:
-    - The host running the database.
-    type: str
-    default: localhost
-  login_port:
-    description:
-    - The port to connect to.
-    type: int
-    default: 6379
-  login_password:
-    description:
-    - The password used to authenticate with, when authentication is enabled for the Redis server.
-    type: str
-notes:
-- Requires the redis-py Python package on the remote host. You can
-  install it with pip (C(pip install redis)) or with a package manager.
-  U(https://github.com/andymccurdy/redis-py)
+  login_user:
+    version_added: 7.5.0
+  validate_certs:
+    version_added: 7.5.0
+  tls:
+    default: false
+    version_added: 7.5.0
+  ca_certs:
+    version_added: 7.5.0
 seealso:
 - module: community.general.redis
-requirements: [ redis ]
 author: "Pavlo Bashynskyi (@levonet)"
 '''
 
@@ -199,8 +190,10 @@ except ImportError:
     REDIS_IMP_ERR = traceback.format_exc()
     HAS_REDIS_PACKAGE = False
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.redis import (
+    fail_imports, redis_auth_argument_spec, redis_auth_params)
 
 
 def redis_client(**client_params):
@@ -210,23 +203,16 @@ def redis_client(**client_params):
 # Module execution.
 def main():
     module = AnsibleModule(
-        argument_spec=dict(
-            login_host=dict(type='str', default='localhost'),
-            login_port=dict(type='int', default=6379),
-            login_password=dict(type='str', no_log=True),
-        ),
+        argument_spec=redis_auth_argument_spec(tls_default=False),
         supports_check_mode=True,
     )
 
-    if not HAS_REDIS_PACKAGE:
-        module.fail_json(msg=missing_required_lib('redis'), exception=REDIS_IMP_ERR)
+    fail_imports(module, module.params['tls'])
 
-    login_host = module.params['login_host']
-    login_port = module.params['login_port']
-    login_password = module.params['login_password']
+    redis_params = redis_auth_params(module)
 
     # Connect and check
-    client = redis_client(host=login_host, port=login_port, password=login_password)
+    client = redis_client(**redis_params)
     try:
         client.ping()
     except Exception as e:
