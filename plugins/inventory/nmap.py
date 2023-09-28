@@ -201,43 +201,43 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # setup command
             cmd = [self._nmap]
 
-            if self.get_option['sudo']:
+            if self.get_option('sudo'):
                 cmd.insert(0, 'sudo')
 
-            if self.get_option['port']:
+            if self.get_option('port'):
                 cmd.append('-p')
-                cmd.append(self.get_option['port'])
+                cmd.append(self.get_option('port'))
 
-            if not self.get_option['ports']:
+            if not self.get_option('ports'):
                 cmd.append('-sP')
 
-            if self.get_option['ipv4'] and not self.get_option['ipv6']:
+            if self.get_option('ipv4') and not self.get_option('ipv6'):
                 cmd.append('-4')
-            elif self.get_option['ipv6'] and not self.get_option['ipv4']:
+            elif self.get_option('ipv6') and not self.get_option('ipv4'):
                 cmd.append('-6')
-            elif not self.get_option['ipv6'] and not self.get_option['ipv4']:
+            elif not self.get_option('ipv6') and not self.get_option('ipv4'):
                 raise AnsibleParserError('One of ipv4 or ipv6 must be enabled for this plugin')
 
-            if self.get_option['exclude']:
+            if self.get_option('exclude'):
                 cmd.append('--exclude')
-                cmd.append(','.join(self.get_option['exclude']))
+                cmd.append(','.join(self.get_option('exclude')))
 
-            if self.get_option['dns_resolve']:
+            if self.get_option('dns_resolve'):
                 cmd.append('-n')
 
-            if self.get_option['udp_scan']:
+            if self.get_option('udp_scan'):
                 cmd.append('-sU')
 
-            if self.get_option['icmp_timestamp']:
+            if self.get_option('icmp_timestamp'):
                 cmd.append('-PP')
 
-            if self.get_option['open']:
+            if self.get_option('open'):
                 cmd.append('--open')
 
-            if not self.get_option['use_arp_ping']:
+            if not self.get_option('use_arp_ping'):
                 cmd.append('--disable-arp-ping')
 
-            cmd.append(self.get_option['address'])
+            cmd.append(self.get_option('address'))
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)

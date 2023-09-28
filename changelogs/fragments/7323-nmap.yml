@@ -1,0 +1,2 @@
+bugfixes:
+  - "nmap inventory plugin - fix ``get_option`` calls (https://github.com/ansible-collections/community.general/pull/7323)."
