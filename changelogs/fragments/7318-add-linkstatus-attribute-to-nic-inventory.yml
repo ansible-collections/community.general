@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - adds ``LinkStatus`` to NIC inventory (https://github.com/ansible-collections/community.general/pull/7318).
