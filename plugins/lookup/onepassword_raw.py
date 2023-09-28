@@ -35,6 +35,10 @@ DOCUMENTATION = '''
         version_added: 6.0.0
         default: '1password.com'
         type: str
+      account_id:
+        description: The account ID to target.
+        type: str
+        version_added: 7.5.0
       username:
         description: The username used to sign in.
       secret_key:
@@ -52,6 +56,7 @@ DOCUMENTATION = '''
         performed an initial sign in (meaning C(~/.op/config exists)), then only the O(master_password) is required.
         You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
       - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
+      - Can target a specific account by providing the O(account_id).
       - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
         needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
         to the 1Password master password.
@@ -96,8 +101,9 @@ class LookupModule(LookupBase):
         secret_key = self.get_option("secret_key")
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
+        account_id = self.get_option("account_id")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id)
         op.assert_logged_in()
 
         values = []
