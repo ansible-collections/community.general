@@ -53,6 +53,13 @@ options:
       - The desired state of program/group.
     required: true
     choices: [ "present", "started", "stopped", "restarted", "absent", "signalled" ]
+  stop_before_removing:
+    type: bool
+    description:
+      - Use O(stop_before_removing=true) to stop the program/group before removing it
+    required: false
+    default: false
+    version_added: 7.5.0
   signal:
     type: str
     description:
@@ -65,6 +72,7 @@ notes:
   - When O(state=present), the module will call C(supervisorctl reread) then C(supervisorctl add) if the program/group does not exist.
   - When O(state=restarted), the module will call C(supervisorctl update) then call C(supervisorctl restart).
   - When O(state=absent), the module will call C(supervisorctl reread) then C(supervisorctl remove) to remove the target program/group.
+    If the program/group is still running, the action will fail. If you want to stop the program/group before removing, use O(stop_before_removing=true).
 requirements: [ "supervisorctl" ]
 author:
     - "Matt Wright (@mattupstate)"
@@ -121,6 +129,7 @@ def main():
         password=dict(type='str', no_log=True),
         supervisorctl_path=dict(type='path'),
         state=dict(type='str', required=True, choices=['present', 'started', 'restarted', 'stopped', 'absent', 'signalled']),
+        stop_before_removing=dict(type='bool', default=False),
         signal=dict(type='str'),
     )
 
@@ -136,6 +145,7 @@ def main():
         is_group = True
         name = name.rstrip(':')
     state = module.params['state']
+    stop_before_removing = module.params.get('stop_before_removing')
     config = module.params.get('config')
     server_url = module.params.get('server_url')
     username = module.params.get('username')
@@ -199,22 +209,27 @@ def main():
             matched.append((process_name, status))
         return matched
 
-    def take_action_on_processes(processes, status_filter, action, expected_result):
+    def take_action_on_processes(processes, status_filter, action, expected_result, exit_module=True):
         to_take_action_on = []
         for process_name, status in processes:
             if status_filter(status):
                 to_take_action_on.append(process_name)
 
         if len(to_take_action_on) == 0:
+            if not exit_module:
+                return
             module.exit_json(changed=False, name=name, state=state)
         if module.check_mode:
+            if not exit_module:
+                return
             module.exit_json(changed=True)
         for process_name in to_take_action_on:
             rc, out, err = run_supervisorctl(action, process_name, check_rc=True)
             if '%s: %s' % (process_name, expected_result) not in out:
                 module.fail_json(msg=out)
 
-        module.exit_json(changed=True, name=name, state=state, affected=to_take_action_on)
+        if exit_module:
+            module.exit_json(changed=True, name=name, state=state, affected=to_take_action_on)
 
     if state == 'restarted':
         rc, out, err = run_supervisorctl('update', check_rc=True)
@@ -229,6 +244,9 @@ def main():
     if state == 'absent':
         if len(processes) == 0:
             module.exit_json(changed=False, name=name, state=state)
+
+        if stop_before_removing:
+            take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped', exit_module=False)
 
         if module.check_mode:
             module.exit_json(changed=True)
