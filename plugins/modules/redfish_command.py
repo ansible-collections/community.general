@@ -601,6 +601,8 @@ EXAMPLES = '''
       update_image_file: ~/images/myupdate.img
       update_targets:
         - /redfish/v1/UpdateService/FirmwareInventory/BMC
+      update_oem_params:
+        PreserveConfiguration: false
 
   - name: Perform requested operations to continue the update
     community.general.redfish_command:
@@ -792,6 +794,7 @@ def main():
             update_image_file=dict(type='path'),
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
+            update_oem_params=dict(type='dict', default={}),
             update_creds=dict(
                 type='dict',
                 options=dict(
@@ -874,6 +877,7 @@ def main():
         'update_targets': module.params['update_targets'],
         'update_creds': module.params['update_creds'],
         'update_apply_time': module.params['update_apply_time'],
+        'update_oem_params': module.params['update_oem_params'],
         'update_handle': module.params['update_handle'],
     }
 
