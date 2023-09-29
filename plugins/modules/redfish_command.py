@@ -203,6 +203,12 @@ options:
       - InMaintenanceWindowOnReset
       - OnStartUpdateRequest
     version_added: '6.1.0'
+  update_oem_params:
+    required: false
+    description:
+      - Properties for HTTP Multipart Push Updates.
+    type: dict
+    default: {}
   update_handle:
     required: false
     description:
