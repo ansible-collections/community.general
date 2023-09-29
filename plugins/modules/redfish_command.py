@@ -209,6 +209,7 @@ options:
       - Properties for HTTP Multipart Push Updates.
     type: dict
     default: {}
+    version_added: '7.5.0'
   update_handle:
     required: false
     description:
