@@ -141,7 +141,7 @@
       ansible.builtin.assert:
         that:
           - pnpm_fix_install is success
-          - not (pnpm_fix_install is changed)
+          - pnpm_fix_install is not changed
 
     - name: Install package with version, without executable path
       pnpm:
@@ -302,7 +302,7 @@
       ansible.builtin.assert:
         that:
           - pnpm_reinstall is success
-          - not (pnpm_reinstall is changed)
+          - pnpm_reinstall is not changed
 
     - name: Remove package without dependency globally
       pnpm:
