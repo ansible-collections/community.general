@@ -1,0 +1,2 @@
+minor_changes:
+  - pnpm - set correct version when state is latest or version is not mentioned. Resolves previous idempotency problem (https://github.com/ansible-collections/community.general/pull/7339)
