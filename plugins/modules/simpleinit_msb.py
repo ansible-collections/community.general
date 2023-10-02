@@ -15,9 +15,11 @@ DOCUMENTATION = '''
 ---
 module: simpleinit_msb
 short_description: Manage services on Source Mage GNU/Linux
-version_added: 7.3.0
+version_added: 7.5.0
 description:
   - Controls services on remote hosts using C(simpleinit-msb).
+requirements:
+  - ansible-core 2.15.5 or newer
 author: "Vlad Glagolev (@vaygr)"
 extends_documentation_fragment:
   - community.general.attributes
