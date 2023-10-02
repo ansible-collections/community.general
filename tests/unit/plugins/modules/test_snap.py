@@ -402,6 +402,19 @@ TEST_CASES = [
                 out="hello-world (12345/stable) v12345 from Canonical** installed\n",
                 err="",
             ),
+            RunCmdCall(
+                command=['/testbin/snap', 'list'],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out=(
+                    "Name    Version      Rev    Tracking         Publisher    Notes"
+                    "core20  20220826     1623   latest/stable    canonical**  base"
+                    "lxd     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                    "hello-world     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                    "snapd   2.57.4       17336  latest/stable    canonical**  snapd"
+                    ""),
+                err="",
+            ),
         ]
     ),
     ModuleTestCase(
@@ -436,6 +449,20 @@ TEST_CASES = [
                 environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
                 rc=0,
                 out=issue_6803_kubectl_out,
+                err="",
+            ),
+            RunCmdCall(
+                command=['/testbin/snap', 'list'],
+                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                rc=0,
+                out=(
+                    "Name    Version      Rev    Tracking         Publisher    Notes"
+                    "core20  20220826     1623   latest/stable    canonical**  base"
+                    "lxd     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                    "microk8s     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                    "kubectl     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                    "snapd   2.57.4       17336  latest/stable    canonical**  snapd"
+                    ""),
                 err="",
             ),
         ]
