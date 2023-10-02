@@ -1745,6 +1745,7 @@ class RedfishUtils(object):
         image_file = update_opts.get('update_image_file')
         targets = update_opts.get('update_targets')
         apply_time = update_opts.get('update_apply_time')
+        oem_params = update_opts.get('update_oem_params')
 
         # Ensure the image file is provided
         if not image_file:
@@ -1775,6 +1776,8 @@ class RedfishUtils(object):
             payload["Targets"] = targets
         if apply_time:
             payload["@Redfish.OperationApplyTime"] = apply_time
+        if oem_params:
+            payload["Oem"] = oem_params
         multipart_payload = {
             'UpdateParameters': {'content': json.dumps(payload), 'mime_type': 'application/json'},
             'UpdateFile': {'filename': image_file, 'content': image_payload, 'mime_type': 'application/octet-stream'}

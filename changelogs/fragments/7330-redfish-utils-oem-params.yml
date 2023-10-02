@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_command - add new option ``update_oem_params`` for the ``MultipartHTTPPushUpdate`` command (https://github.com/ansible-collections/community.general/issues/7331).
