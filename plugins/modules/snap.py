@@ -219,7 +219,7 @@ class Snap(StateModuleHelper):
         else:
             status_var = "name"
         self.vars.set("status_var", status_var, output=False)
-        self.vars.set("snap_status", self.snap_status(self.vars[self.vars.status_var], self.vars.channel), output=False)
+        self.vars.set("snap_status", self.snap_status(self.vars[self.vars.status_var], self.vars.channel), output=False, change=True)
         self.vars.set("snap_status_map", dict(zip(self.vars.name, self.vars.snap_status)), output=False, change=True)
 
     def __quit_module__(self):
