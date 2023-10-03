@@ -1213,6 +1213,8 @@ files:
     ignore: ryansb
   $modules/shutdown.py:
     maintainers: nitzmahone samdoran aminvakil
+  $modules/simpleinit_msb.py:
+    maintainers: vaygr
   $modules/sl_vm.py:
     maintainers: mcltn
   $modules/slack.py:
