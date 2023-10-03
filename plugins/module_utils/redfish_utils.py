@@ -3696,13 +3696,17 @@ class RedfishUtils(object):
     def check_location_uri(self, resp_data, resp_uri):
         # Get the location URI response
         # return {"msg": self.creds, "ret": False}
+        vendor = self._get_vendor()['Vendor']
         rsp_uri = ""
         for loc in resp_data['Location']:
             if loc['Language'] == "en":
-                if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
-                    rsp_uri = loc['Uri']['extref']
-                else:
-                    rsp_uri = loc['Uri']
+                rsp_uri = loc['Uri']
+                if vendor == 'HPE':
+                    # WORKAROUND
+                    # HPE systems with iLO 4 will have BIOS Atrribute Registries location URI as a dictonary with key 'extref'
+                    # Hence adding condition to fetch the Uri
+                    if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
+                        rsp_uri = loc['Uri']['extref']
         if not rsp_uri:
             msg = "Language 'en' not found in BIOS Atrribute Registries location, URI: %s, response: %s"
             return {
@@ -3715,7 +3719,6 @@ class RedfishUtils(object):
             # WORKAROUND
             # HPE systems with iLO 4 or iLO5 compresses (gzip) for some URIs
             # Hence adding encoding to the header
-            vendor = self._get_vendor()['Vendor']
             if vendor == 'HPE':
                 override_headers = {"Accept-Encoding": "gzip"}
                 res = self.get_request(self.root_uri + rsp_uri, override_headers=override_headers)
