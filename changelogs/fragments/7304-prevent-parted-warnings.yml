@@ -1,2 +1,2 @@
 minor_changes:
-  - parted - resize : Use --fix option by default (--fix from parted 3.4.64 and up. If you use a old version, the -f is not used)
+  - parted : On resize, use --fix option if available (https://github.com/ansible-collections/community.general/pull/7304)
