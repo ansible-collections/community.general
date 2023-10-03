@@ -1,2 +1,2 @@
 minor_changes:
-  - parted - resize : Use --fix option by default (Note: --fix from parted 3.4.64 and up. If you use a old version, the -f is not used)
+  - parted - resize : Use --fix option by default (--fix from parted 3.4.64 and up. If you use a old version, the -f is not used)
