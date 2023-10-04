@@ -34,23 +34,24 @@ options:
     project:
         description:
           - 'Project of an instance.
-            See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
+            See U(https://documentation.ubuntu.com/lxd/en/latest/projects/).'
         required: false
         type: str
         version_added: 4.8.0
     architecture:
         description:
           - 'The architecture for the instance (for example V(x86_64) or V(i686)).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
+            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
         type: str
         required: false
     config:
         description:
           - 'The config for the instance (for example V({"limits.cpu": "2"})).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
+            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
           - If the instance already exists and its "config" values in metadata
-            obtained from the LXD API U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#instances-containers-and-virtual-machines)
-            are different, this module tries to apply the configurations.
+            obtained from the LXD API U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get)
+            are different, then this module tries to apply the configurations
+            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_put).
           - The keys starting with C(volatile.) are ignored for this comparison when O(ignore_volatile_options=true).
         type: dict
         required: false
@@ -73,13 +74,13 @@ options:
         description:
           - 'The devices for the instance
             (for example V({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
+            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).'
         type: dict
         required: false
     ephemeral:
         description:
           - Whether or not the instance is ephemeral (for example V(true) or V(false)).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).
+            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/instances/instance_get).
         required: false
         type: bool
     source:
@@ -87,7 +88,7 @@ options:
           - 'The source for the instance
             (for example V({ "type": "image", "mode": "pull", "server": "https://images.linuxcontainers.org",
             "protocol": "lxd", "alias": "ubuntu/xenial/amd64" })).'
-          - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
+          - 'See U(https://documentation.ubuntu.com/lxd/en/latest/api/) for complete API documentation.'
           - 'Note that C(protocol) accepts two choices: V(lxd) or V(simplestreams).'
         required: false
         type: dict
