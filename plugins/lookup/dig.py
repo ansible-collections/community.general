@@ -70,6 +70,11 @@ DOCUMENTATION = '''
           - "Class."
         type: str
         default: 'IN'
+      tcp:
+        description: Use TCP to lookup DNS records.
+        default: false
+        type: bool
+        version_added: 7.5.0
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
@@ -329,6 +334,7 @@ class LookupModule(LookupBase):
         flat = self.get_option('flat')
         fail_on_error = self.get_option('fail_on_error')
         real_empty = self.get_option('real_empty')
+        tcp = self.get_option('tcp')
         try:
             rdclass = dns.rdataclass.from_text(self.get_option('class'))
         except Exception as e:
@@ -375,6 +381,8 @@ class LookupModule(LookupBase):
                     fail_on_error = boolean(arg)
                 elif opt == 'real_empty':
                     real_empty = boolean(arg)
+                elif opt == 'tcp':
+                    tcp = boolean(arg)
 
                 continue
 
@@ -408,7 +416,7 @@ class LookupModule(LookupBase):
 
         for domain in domains:
             try:
-                answers = myres.query(domain, qtype, rdclass=rdclass)
+                answers = myres.query(domain, qtype, rdclass=rdclass, tcp=tcp)
                 for rdata in answers:
                     s = rdata.to_text()
                     if qtype.upper() == 'TXT':
