@@ -568,9 +568,7 @@ def check_parted_fix():
     global parted_exec  # pylint: disable=global-variable-not-assigned
 
     parted_major, parted_minor, revision = parted_version()
-    if (parted_major == 3 and parted_minor == 4 and revision >= 64):
-        return True
-    if (parted_major == 3 and parted_minor >= 5) or parted_major > 3:
+    if (parted_major, parted_minor, revision) >= (3, 4, 64):
         return True
 
     return False
