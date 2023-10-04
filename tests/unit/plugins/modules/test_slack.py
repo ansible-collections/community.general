@@ -105,7 +105,7 @@ class TestSlackModule(ModuleTestCase):
                 self.module.main()
 
             self.assertTrue(fetch_url_mock.call_count, 1)
-            self.assertEquals(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.postMessage")
+            self.assertEqual(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.postMessage")
 
     def test_edit_message(self):
         set_module_args({
@@ -125,9 +125,9 @@ class TestSlackModule(ModuleTestCase):
                 self.module.main()
 
             self.assertTrue(fetch_url_mock.call_count, 2)
-            self.assertEquals(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.update")
+            self.assertEqual(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.update")
             call_data = json.loads(fetch_url_mock.call_args[1]['data'])
-            self.assertEquals(call_data['ts'], "12345")
+            self.assertEqual(call_data['ts'], "12345")
 
     def test_message_with_blocks(self):
         """tests sending a message with blocks"""

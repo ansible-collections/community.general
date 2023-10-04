@@ -127,7 +127,7 @@ stages:
             - test: 3.9
             - test: '3.10'
             - test: '3.11'
-            # - test: '3.12'  TODO
+            - test: '3.12'
   - stage: Units_2_16
     displayName: Units 2.16
     dependsOn: []

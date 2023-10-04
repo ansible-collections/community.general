@@ -22,9 +22,9 @@ class PagerDutyAlertsTest(unittest.TestCase):
         return Response(), {'status': 200}
 
     def _assert_compatibility_header(self, module, url, method, headers):
-        self.assertDictContainsSubset(
-            {'Accept': 'application/vnd.pagerduty+json;version=2'},
-            headers,
+        self.assertEqual(
+            'application/vnd.pagerduty+json;version=2',
+            headers.get('Accept'),
             'Accept:application/vnd.pagerduty+json;version=2 HTTP header not found'
         )
         return Response(), {'status': 200}
