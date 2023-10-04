@@ -559,21 +559,6 @@ def parted_version():
     return major, minor, rev
 
 
-def check_parted_fix():
-    """
-    Determines if parted have option --fix (-f). Versions prior
-    to 3.4.64 don't have it. For more information see:
-    http://savannah.gnu.org/news/?id=10114
-    """
-    global parted_exec  # pylint: disable=global-variable-not-assigned
-
-    parted_major, parted_minor, revision = parted_version()
-    if (parted_major, parted_minor, revision) >= (3, 4, 64):
-        return True
-
-    return False
-
-
 def parted(script, device, align):
     """
     Runs a parted script.
@@ -584,7 +569,12 @@ def parted(script, device, align):
     if align == 'undefined':
         align_option = ''
 
-    if check_parted_fix():
+    """
+    Use option --fix (-f) if available. Versions prior
+    to 3.4.64 don't have it. For more information see:
+    http://savannah.gnu.org/news/?id=10114
+    """
+    if parted_version() >= (3, 4, 64):
         script_option = '-s -f'
     else:
         script_option = '-s'
