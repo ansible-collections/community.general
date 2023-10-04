@@ -1,3 +1,4 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
@@ -13,7 +14,7 @@
 # Setup steps
 
 - name: Run tests on OSes
-  include_tasks: run.yml
+  ansible.builtin.include_tasks: run.yml
   vars:
     ansible_system_os: "{{ ansible_system | lower }}"
     nodejs_version: "{{ item.node_version }}"

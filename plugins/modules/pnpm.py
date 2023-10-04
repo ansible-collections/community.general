@@ -189,6 +189,8 @@ class Pnpm(object):
             self.alias_name_ver = (self.alias_name_ver or "") + self.name
             if self.version is not None:
                 self.alias_name_ver = self.alias_name_ver + "@" + str(self.version)
+            else:
+                self.alias_name_ver = self.alias_name_ver + "@latest"
 
     def _exec(self, args, run_in_check_mode=False, check_rc=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
@@ -412,9 +414,6 @@ def main():
 
     if state == "absent" and name is None:
         module.fail_json(msg="Package name is required for uninstalling")
-
-    if state == "latest":
-        version = "latest"
 
     if globally:
         _rc, out, _err = module.run_command(executable + ["root", "-g"], check_rc=True)

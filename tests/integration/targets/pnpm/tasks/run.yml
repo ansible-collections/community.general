@@ -127,11 +127,6 @@
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
 
-    - name: Manually delete package
-      ansible.builtin.file:
-        path: "{{ remote_tmp_dir }}/node_modules/{{ package }}"
-        state: absent
-
     - name: Reinstall package
       pnpm:
         path: "{{ remote_tmp_dir }}"
@@ -146,7 +141,7 @@
       ansible.builtin.assert:
         that:
           - pnpm_fix_install is success
-          - pnpm_fix_install is changed
+          - pnpm_fix_install is not changed
 
     - name: Install package with version, without executable path
       pnpm:
@@ -292,6 +287,22 @@
         that:
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
+
+    - name: Updating package globally, without explicit executable path
+      pnpm:
+        name: "{{ package }}"
+        state: latest
+        global: true
+      environment:
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_env.PATH }}"
+        PNPM_HOME: "{{ pnpm_bin_path }}"
+      register: pnpm_reinstall
+
+    - name: Assert that there is no change
+      ansible.builtin.assert:
+        that:
+          - pnpm_reinstall is success
+          - pnpm_reinstall is not changed
 
     - name: Remove package without dependency globally
       pnpm:
