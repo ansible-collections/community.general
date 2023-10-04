@@ -62,5 +62,5 @@ class TestAzureLogAnalytics(unittest.TestCase):
         args, kwargs = open_url_mock.call_args
         headers = kwargs['headers']
 
-        self.assertRegexpMatches(headers['Authorization'], r'^SharedKey 01234567-0123-0123-0123-01234567890a:.*=$')
+        self.assertRegexMatches(headers['Authorization'], r'^SharedKey 01234567-0123-0123-0123-01234567890a:.*=$')
         self.assertEqual(headers['Log-Type'], 'ansible_playbook')

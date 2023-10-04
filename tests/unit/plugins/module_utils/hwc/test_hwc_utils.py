@@ -29,12 +29,12 @@ class HwcUtilsTestCase(unittest.TestCase):
                            {"foo.quiet.trees": 1}),
             1)
 
-        self.assertRaisesRegexp(HwcModuleException,
-                                r".* key\(q\) is not exist in dict",
-                                navigate_value, value, ["foo", "q", "tree"])
+        self.assertRaisesRegex(HwcModuleException,
+                               r".* key\(q\) is not exist in dict",
+                               navigate_value, value, ["foo", "q", "tree"])
 
-        self.assertRaisesRegexp(HwcModuleException,
-                                r".* the index is out of list",
-                                navigate_value, value,
-                                ["foo", "quiet", "trees"],
-                                {"foo.quiet.trees": 2})
+        self.assertRaisesRegex(HwcModuleException,
+                               r".* the index is out of list",
+                               navigate_value, value,
+                               ["foo", "quiet", "trees"],
+                               {"foo.quiet.trees": 2})
