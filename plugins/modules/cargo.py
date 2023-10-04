@@ -25,6 +25,11 @@ attributes:
   diff_mode:
     support: none
 options:
+  executable:
+    description:
+      - Path to the C(cargo) installed in the system.
+      - If not specified, the module will look C(cargo) in C(PATH).
+    type: path
   name:
     description:
       - The name of a Rust package to install.
@@ -60,7 +65,7 @@ options:
     default: present
     choices: [ "present", "absent", "latest" ]
 requirements:
-    - cargo installed in bin path (recommended /usr/local/bin)
+    - cargo installed
 """
 
 EXAMPLES = r"""
@@ -103,13 +108,12 @@ from ansible.module_utils.basic import AnsibleModule
 class Cargo(object):
     def __init__(self, module, **kwargs):
         self.module = module
+        self.executable = [kwargs["executable"] or module.get_bin_path("cargo", True)]
         self.name = kwargs["name"]
         self.path = kwargs["path"]
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
-
-        self.executable = [module.get_bin_path("cargo", True)]
 
     @property
     def path(self):
@@ -176,6 +180,7 @@ class Cargo(object):
 
 def main():
     arg_spec = dict(
+        executable=dict(default=None, type="path"),
         name=dict(required=True, type="list", elements="str"),
         path=dict(default=None, type="path"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
@@ -185,10 +190,8 @@ def main():
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
-    path = module.params["path"]
     state = module.params["state"]
     version = module.params["version"]
-    locked = module.params["locked"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
@@ -198,7 +201,7 @@ def main():
         LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
     )
 
-    cargo = Cargo(module, name=name, path=path, state=state, version=version, locked=locked)
+    cargo = Cargo(module, **module.params)
     changed, out, err = False, None, None
     installed_packages = cargo.get_installed()
     if state == "present":
