@@ -45,7 +45,7 @@ class TestDNSimple(ModuleTestCase):
     def test_account_token(self, mock_whoami):
         mock_whoami.return_value.data.account = 42
         ds = self.module.DNSimpleV2('fake', 'fake', True, self.module)
-        self.assertEquals(ds.account, 42)
+        self.assertEqual(ds.account, 42)
 
     @patch('dnsimple.service.Accounts.list_accounts')
     @patch('dnsimple.service.Identity.whoami')
@@ -61,4 +61,4 @@ class TestDNSimple(ModuleTestCase):
         mock_accounts.return_value.data = [42]
         mock_whoami.return_value.data.account = None
         ds = self.module.DNSimpleV2('fake', 'fake', True, self.module)
-        self.assertEquals(ds.account, 42)
+        self.assertEqual(ds.account, 42)
