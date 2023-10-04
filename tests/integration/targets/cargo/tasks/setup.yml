@@ -38,3 +38,5 @@
     shell: /tmp/sh.rustup.rs -y
   - set_fact:
       rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"
+  when:
+    - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')
