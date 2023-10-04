@@ -1,2 +1,2 @@
 minor_changes:
-  - dig - add TCP option to enable the use of TCP connection during dns lookup. (https://github.com/ansible-collections/community.general/pull/7343).
+  - dig lookup plugin - add TCP option to enable the use of TCP connection during DNS lookup (https://github.com/ansible-collections/community.general/pull/7343).

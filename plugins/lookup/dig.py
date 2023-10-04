@@ -74,6 +74,7 @@ DOCUMENTATION = '''
         description: Use TCP to lookup DNS records.
         default: false
         type: bool
+        version_added: 7.5.0
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
