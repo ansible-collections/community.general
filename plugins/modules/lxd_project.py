@@ -35,18 +35,19 @@ options:
     config:
         description:
           - 'The config for the project (for example V({"features.profiles": "true"})).
-            See U(https://linuxcontainers.org/lxd/docs/master/projects/).'
+            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get).'
           - If the project already exists and its "config" value in metadata
             obtained from
             C(GET /1.0/projects/<name>)
-            U(https://linuxcontainers.org/lxd/docs/master/api/#/projects/project_get)
-            are different, then this module tries to apply the configurations.
+            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_get)
+            are different, then this module tries to apply the configurations
+            U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_put).
         type: dict
     new_name:
         description:
           - A new name of a project.
           - If this parameter is specified a project will be renamed to this name.
-            See U(https://linuxcontainers.org/lxd/docs/master/api/#/projects/project_post).
+            See U(https://documentation.ubuntu.com/lxd/en/latest/api/#/projects/project_post).
         required: false
         type: str
     merge_project:

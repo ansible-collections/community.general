@@ -47,7 +47,7 @@ DOCUMENTATION = r'''
             - You need to set this password on the lxd server before
                 running this module using the following command
                 C(lxc config set core.trust_password <some random password>)
-                See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
+                See U(https://documentation.ubuntu.com/lxd/en/latest/authentication/#adding-client-certificates-using-a-trust-password).
             - If O(trust_password) is set, this module send a request for authentication before sending any requests.
             type: str
         state:
@@ -359,7 +359,7 @@ class InventoryModule(BaseInventoryPlugin):
         Kwargs:
             None
         Source:
-            https://github.com/lxc/lxd/blob/master/doc/rest-api.md
+            https://documentation.ubuntu.com/lxd/en/latest/rest-api/
         Raises:
             None
         Returns:
