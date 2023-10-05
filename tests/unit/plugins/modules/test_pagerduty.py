@@ -20,9 +20,9 @@ class PagerDutyTest(unittest.TestCase):
         return object(), {'status': 200}
 
     def _assert_ongoing_window_with_v1_compatible_header(self, module, url, headers, data=None, method=None):
-        self.assertDictContainsSubset(
-            {'Accept': 'application/vnd.pagerduty+json;version=2'},
-            headers,
+        self.assertEqual(
+            'application/vnd.pagerduty+json;version=2',
+            headers.get('Accept'),
             'Accept:application/vnd.pagerduty+json;version=2 HTTP header not found'
         )
         return object(), {'status': 200}
@@ -36,17 +36,17 @@ class PagerDutyTest(unittest.TestCase):
         return object(), {'status': 201}
 
     def _assert_create_a_maintenance_window_from_header(self, module, url, headers, data=None, method=None):
-        self.assertDictContainsSubset(
-            {'From': 'requester_id'},
-            headers,
+        self.assertEqual(
+            'requester_id',
+            headers.get('From'),
             'From:requester_id HTTP header not found'
         )
         return object(), {'status': 201}
 
     def _assert_create_window_with_v1_compatible_header(self, module, url, headers, data=None, method=None):
-        self.assertDictContainsSubset(
-            {'Accept': 'application/vnd.pagerduty+json;version=2'},
-            headers,
+        self.assertEqual(
+            'application/vnd.pagerduty+json;version=2',
+            headers.get('Accept'),
             'Accept:application/vnd.pagerduty+json;version=2 HTTP header not found'
         )
         return object(), {'status': 201}
@@ -89,9 +89,9 @@ class PagerDutyTest(unittest.TestCase):
         return object(), {'status': 204}
 
     def _assert_absent_window_with_v1_compatible_header(self, module, url, headers, method=None):
-        self.assertDictContainsSubset(
-            {'Accept': 'application/vnd.pagerduty+json;version=2'},
-            headers,
+        self.assertEqual(
+            'application/vnd.pagerduty+json;version=2',
+            headers.get('Accept'),
             'Accept:application/vnd.pagerduty+json;version=2 HTTP header not found'
         )
         return object(), {'status': 204}
