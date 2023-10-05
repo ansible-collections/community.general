@@ -28,7 +28,7 @@ options:
   executable:
     description:
       - Path to the C(cargo) installed in the system.
-      - If not specified, the module will look C(cargo) in C(PATH).
+      - If not specified, the module will look C(cargo) in E(PATH).
     type: path
     version_added: 7.5.0
   name:
