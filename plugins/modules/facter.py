@@ -84,7 +84,7 @@ def main():
     if module.params['want_facts']:
         module.exit_json(ansible_facts=dict(facter=results))
     else:
-        module.exit_json(**json.loads(out))
+        module.exit_json(**results)
 
 
 if __name__ == '__main__':
