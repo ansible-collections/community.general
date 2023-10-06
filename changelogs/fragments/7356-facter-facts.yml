@@ -1,0 +1,2 @@
+minor_changes:
+  - facter - add option want_facts to return results as facts instead of output variables (https://github.com/ansible-collections/community.general/pull/7356).
