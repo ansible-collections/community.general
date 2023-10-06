@@ -1,0 +1,2 @@
+minor_changes:
+  - "cargo - add option ``executable``, which allows user to specify path to the cargo binary (https://github.com/ansible-collections/community.general/pull/7352)."
