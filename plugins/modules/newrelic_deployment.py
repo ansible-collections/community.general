@@ -113,6 +113,7 @@ def main():
             app_name_exact_match=dict(required=False, type='bool', default=False),
         ),
         required_one_of=[['app_name', 'application_id']],
+        required_if=[('app_name_exact_match', True, ['app_name'])],
         supports_check_mode=True
     )
 
