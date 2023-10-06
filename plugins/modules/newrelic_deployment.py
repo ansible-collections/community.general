@@ -71,7 +71,7 @@ options:
   app_name_exact_match:
     type: bool
     description:
-      - If this flag is set to True then the app id lookup by name would only work for an exact match.
+      - If this flag is set to V(true) then the app id lookup by name would only work for an exact match.
         If set to V(false) it returns the first result.
     required: false
     default: false
