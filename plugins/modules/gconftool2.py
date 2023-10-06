@@ -47,9 +47,8 @@ options:
     type: str
     description:
     - The action to take upon the key/value.
-    - State V(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
     required: true
-    choices: [ absent, get, present ]
+    choices: [ absent, present ]
   config_source:
     type: str
     description:
@@ -114,7 +113,7 @@ class GConftool(StateModuleHelper):
             key=dict(type='str', required=True, no_log=False),
             value_type=dict(type='str', choices=['bool', 'float', 'int', 'string']),
             value=dict(type='str'),
-            state=dict(type='str', required=True, choices=['absent', 'get', 'present']),
+            state=dict(type='str', required=True, choices=['absent', 'present']),
             direct=dict(type='bool', default=False),
             config_source=dict(type='str'),
         ),
@@ -148,12 +147,6 @@ class GConftool(StateModuleHelper):
 
     def _get(self):
         return self.runner("state key", output_process=self._make_process(False)).run(state="get")
-
-    def state_get(self):
-        self.deprecate(
-            msg="State 'get' is deprecated. Please use the module community.general.gconftool2_info instead",
-            version="8.0.0", collection_name="community.general"
-        )
 
     def state_absent(self):
         with self.runner("state key", output_process=self._make_process(False)) as ctx:
