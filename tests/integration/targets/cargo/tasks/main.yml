@@ -18,3 +18,5 @@
   - import_tasks: test_version.yml
   environment: "{{ cargo_environment }}"
   when: has_cargo | default(false)
+- import_tasks: test_rustup_cargo.yml
+  when: rustup_cargo_bin | default(false)
