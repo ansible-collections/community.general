@@ -5,5 +5,6 @@ removed_features:
   - "gconftool2 - ``state=get`` has been removed. Use the module ``community.general.gconftool2_info`` instead (https://github.com/ansible-collections/community.general/pull/7358)."
   - "gitlab_runner - remove the default value for the ``access_level`` option. To restore the previous behavior, explicitly set it to ``ref_protected`` (https://github.com/ansible-collections/community.general/pull/7358)."
   - "manageiq_polices - ``state=list`` has been removed. Use the module ``community.general.manageiq_policies_info`` instead (https://github.com/ansible-collections/community.general/pull/7358)."
+  - "manageiq_tags - ``state=list`` has been removed. Use the module ``community.general.manageiq_tags_info`` instead (https://github.com/ansible-collections/community.general/pull/7358)."
 deprecated_features:
   - "mh.mixins.cmd module utils - the ``ArgFormat`` class has been deprecated and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/7358)."
