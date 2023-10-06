@@ -4,28 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
-- id: test_simple_element_get
-  input:
-    state: get
-    key: /desktop/gnome/background/picture_filename
-  output: {}
-  run_command_calls:
-    - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
-      rc: 0
-      out: "100\n"
-      err: ""
-- id: test_simple_element_get_not_found
-  input:
-    state: get
-    key: /desktop/gnome/background/picture_filename
-  output: {}
-  run_command_calls:
-    - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: *env-def
-      rc: 0
-      out: ""
-      err: "No value set for `/desktop/gnome/background/picture_filename'\n"
 - id: test_simple_element_set
   input:
     state: present
