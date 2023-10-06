@@ -71,7 +71,7 @@ options:
   app_name_exact_match:
     type: bool
     description:
-      - If this flag is set to True then the app id lookup by name would only work for an exact match. 
+      - If this flag is set to True then the app id lookup by name would only work for an exact match.
         If set to false it returns the first result
     required: false
 requirements: []
@@ -169,15 +169,15 @@ def get_application_id(module):
         module.fail_json(msg='No application found with name "%s"' % module.params["app_name"])
 
     if module.params["app_name_exact_match"]:
-      for item in result["applications"]:
-        if item["name"] == module.params["app_name"]:
-          application_id = item["id"]
-          break
-      if application_id is None:
-        module.fail_json(msg='No application found with exact name "%s"' % module.params["app_name"])
+        for item in result["applications"]:
+            if item["name"] == module.params["app_name"]:
+                application_id = item["id"]
+                break
+        if application_id is None:
+            module.fail_json(msg='No application found with exact name "%s"' % module.params["app_name"])
     else:
-      application_id = result["applications"][0]["id"]
-    
+        application_id = result["applications"][0]["id"]
+
     return application_id
 
 
