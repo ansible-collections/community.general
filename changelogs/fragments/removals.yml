@@ -2,3 +2,5 @@ removed_features:
   - "xfconf - the deprecated ``disable_facts`` option was removed (https://github.com/ansible-collections/community.general/pull/7358)."
   - "mh.mixins.cmd module utils - the ``CmdMixin`` mixin has been removed. Use ``community.general.plugins.module_utils.cmd_runner.CmdRunner`` instead (https://github.com/ansible-collections/community.general/pull/7358)."
   - "mh.module_helper module utils - the ``CmdModuleHelper`` and ``CmdStateModuleHelper`` classes have been removed. Use ``community.general.plugins.module_utils.cmd_runner.CmdRunner`` instead (https://github.com/ansible-collections/community.general/pull/7358)."
+deprecated_features:
+  - "mh.mixins.cmd module utils - the ``ArgFormat`` class has been deprecated and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/7358)."

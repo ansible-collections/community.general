@@ -35,8 +35,7 @@ class ArgFormat(object):
     def __init__(self, name, fmt=None, style=FORMAT, stars=0):
         """
         THIS CLASS IS BEING DEPRECATED.
-        It was never meant to be used outside the scope of CmdMixin, and CmdMixin is being deprecated.
-        See the deprecation notice in ``CmdMixin.__init__()`` below.
+        It was never meant to be used outside the scope of CmdMixin, and CmdMixin has been removed.
 
         Creates a CLI-formatter for one specific argument. The argument may be a module parameter or just a named parameter for
         the CLI command execution.
@@ -46,6 +45,12 @@ class ArgFormat(object):
                              Ignored if arg_format is None or not a str (should be callable).
         :param stars: A int with 0, 1 or 2 value, indicating to formatting the value as: value, *value or **value
         """
+        self.module.deprecate(
+            'ArgFormat has been deprecated',
+            version='9.0.0',
+            collection_name='community.general',
+        )
+
         def printf_fmt(_fmt, v):
             try:
                 return [_fmt % v]
