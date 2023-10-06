@@ -10,7 +10,6 @@ import json
 import os
 import random
 import string
-import re
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
