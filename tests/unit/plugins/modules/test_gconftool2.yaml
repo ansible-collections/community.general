@@ -15,7 +15,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
-      environ: *env-def
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: "100\n"
       err: ""
