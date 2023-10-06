@@ -110,7 +110,7 @@ def main():
             revision=dict(required=True),
             user=dict(required=False),
             validate_certs=dict(default=True, type='bool'),
-            app_name_exact_match=dict(required=False, type='bool')
+            app_name_exact_match=dict(required=False, type='bool', default=False),
         ),
         required_one_of=[['app_name', 'application_id']],
         supports_check_mode=True
