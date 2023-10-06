@@ -58,6 +58,19 @@ EXAMPLES = '''
         - timezone
         - is_virtual
 '''
+
+RETURN = r'''
+ansible_facts:
+  description: Dictionary with one key C(facter).
+  returned: when want_facts=true
+  type: dict
+  contains:
+    facter:
+      description: Dictionary containing facts discovered in the remote system.
+      returned: always
+      type: dict
+'''
+
 import json
 
 from ansible.module_utils.basic import AnsibleModule
