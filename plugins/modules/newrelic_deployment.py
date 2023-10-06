@@ -74,6 +74,8 @@ options:
       - If this flag is set to True then the app id lookup by name would only work for an exact match.
         If set to V(false) it returns the first result.
     required: false
+    default: false
+    version_added: 7.5.0
 requirements: []
 '''
 
