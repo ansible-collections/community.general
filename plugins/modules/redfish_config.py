@@ -153,6 +153,13 @@ options:
     type: bool
     default: True
     version_added: '7.5.0'
+  volume_details:
+    required: false
+    description:
+      - Setting dict of volume to be created.
+    type: dict
+    default: {}
+    version_added: '7.5.0'
 author:
   - "Jose Delarosa (@jose-delarosa)"
   - "T S Kushal (@TSKushal)"
@@ -313,6 +320,20 @@ EXAMPLES = '''
       password: "{{ password }}"
       storage_subsystem_id: "DExxxxxx"
       volume_ids: ["volume1", "volume2"]
+
+  - name: Create Volume
+    community.general.redfish_config:
+      category: Systems
+      command: CreateVolume
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      storage_subsystem_id: "DExxxxxx"
+      volume_details:
+        Name: "MR Volume"
+        RAIDType: "RAID0"
+        Drives:
+          - "/redfish/v1/Systems/1/Storage/DE00B000/Drives/1"
 '''
 
 RETURN = '''
@@ -331,7 +352,7 @@ from ansible.module_utils.common.text.converters import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
-                "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes"],
+                "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes", "CreateVolume"],
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
     "Sessions": ["SetSessionService"],
 }
@@ -366,7 +387,8 @@ def main():
             sessions_config=dict(type='dict', default={}),
             storage_subsystem_id=dict(type='str', default=''),
             volume_ids=dict(type='list', default=[], elements='str'),
-            secure_boot_enable=dict(type='bool', default=True)
+            secure_boot_enable=dict(type='bool', default=True),
+            volume_details=dict(type='dict', default={})
         ),
         required_together=[
             ('username', 'password'),
@@ -433,6 +455,10 @@ def main():
     # Set SecureBoot options
     secure_boot_enable = module.params['secure_boot_enable']
 
+    # Volume creation options
+    volume_details = module.params['volume_details']
+    storage_subsystem_id = module.params['storage_subsystem_id']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
@@ -470,6 +496,8 @@ def main():
                 result = rf_utils.set_secure_boot(secure_boot_enable)
             elif command == "DeleteVolumes":
                 result = rf_utils.delete_volumes(storage_subsystem_id, volume_ids)
+            elif command == "CreateVolume":
+                result = rf_utils.create_volume(volume_details, storage_subsystem_id)
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
