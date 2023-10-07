@@ -43,6 +43,12 @@ options:
       The base path where to install the Rust packages. Cargo automatically appends
       V(/bin). In other words, V(/usr/local) will become V(/usr/local/bin).
     type: path
+  registry:
+    description:
+      - Specify which registry to use.
+    required: false
+    type: str
+    version_added: 7.5.0
   version:
     description:
       ->
@@ -98,6 +104,12 @@ EXAMPLES = r"""
   community.general.cargo:
     name: ludusavi
     state: latest
+
+- name: Install "ludusavi" Rust package from "private" registry
+  community.general.cargo:
+    name: ludusavi
+    registry: private
+    state: latest
 """
 
 import os
@@ -112,6 +124,7 @@ class Cargo(object):
         self.executable = [kwargs["executable"] or module.get_bin_path("cargo", True)]
         self.name = kwargs["name"]
         self.path = kwargs["path"]
+        self.registry = kwargs["registry"]
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
@@ -156,6 +169,9 @@ class Cargo(object):
         if self.path:
             cmd.append("--root")
             cmd.append(self.path)
+        if self.registry:
+            cmd.append("--registry")
+            cmd.append(self.registry)
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
@@ -184,6 +200,7 @@ def main():
         executable=dict(default=None, type="path"),
         name=dict(required=True, type="list", elements="str"),
         path=dict(default=None, type="path"),
+        registry=dict(default=None, type="str"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),

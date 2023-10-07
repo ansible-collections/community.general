@@ -1,0 +1,23 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+- name: Alternate registry | Install application helloworld
+  community.general.cargo:
+    name: helloworld
+    registry: alternate
+  register: alternate_registry_install_absent_helloworld
+
+- name: Alternate registry | Uninstall application helloworld
+  community.general.cargo:
+    name: helloworld
+    registry: alternate
+    state: absent
+  register: alternate_registry_uninstall_present_helloworld
+
+- name: Alternate registry | Check assertions helloworld
+  assert:
+    that:
+        - alternate_registry_install_absent_helloworld is changed
+        - alternate_registry_uninstall_present_helloworld is changed
