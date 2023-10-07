@@ -21,4 +21,4 @@
 - import_tasks: test_rustup_cargo.yml
   when: rustup_cargo_bin | default(false)
 - import_tasks: test_alternate_registry.yml
-  when: has_cargo | default(false) or rustup_cargo_bin | default(false)
+  when: rustup_cargo_bin | default(false)

@@ -13,12 +13,14 @@
 - name: Alternate registry | Install application helloworld
   community.general.cargo:
     name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
     registry: alternate
   register: alternate_registry_install_absent_helloworld
 
 - name: Alternate registry | Uninstall application helloworld
   community.general.cargo:
     name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
     registry: alternate
     state: absent
   register: alternate_registry_uninstall_present_helloworld
