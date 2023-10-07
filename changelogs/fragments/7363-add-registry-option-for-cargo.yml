@@ -1,0 +1,2 @@
+minor_changes:
+  - "cargo - add option ``registry``, which allows user to specify an alterate registry (https://github.com/ansible-collections/community.general/pull/7363)."
