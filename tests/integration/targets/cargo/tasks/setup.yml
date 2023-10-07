@@ -40,10 +40,3 @@
       rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"
   when:
     - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')
-
-- name: Configure cargo
-  copy:
-    content: |
-      [registries]
-      alternate = { index = "https://github.com/hotg-ai/crates.io-index" }
-    dest: "{{ lookup('env', 'HOME') }}/.cargo/config.toml"

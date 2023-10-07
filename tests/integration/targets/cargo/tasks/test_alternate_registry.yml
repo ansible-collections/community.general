@@ -3,6 +3,13 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
+- name: Alternate registry | Configure cargo
+  copy:
+    content: |
+      [registries]
+      alternate = { index = "https://github.com/hotg-ai/crates.io-index" }
+    dest: "{{ lookup('env', 'HOME') }}/.cargo/config.toml"
+
 - name: Alternate registry | Install application helloworld
   community.general.cargo:
     name: helloworld
