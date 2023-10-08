@@ -71,3 +71,16 @@ class TestLXCConnectionClass():
 
         with pytest.raises(AnsibleError, match='lxc python bindings are not installed'):
             conn._connect()
+
+    def test_remote_addr_option(self):
+        """Test that the remote_addr option is used"""
+        play_context = PlayContext()
+        in_stream = StringIO()
+        conn = connection_loader.get('lxc', play_context, in_stream)
+
+        container_name = 'my-container'
+        conn.set_option('remote_addr', container_name)
+        assert conn.get_option('remote_addr') == container_name
+
+        conn._connect()
+        assert conn.container_name == container_name
