@@ -6,20 +6,57 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import pytest
+import sys
+
 from io import StringIO
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.plugins.connection import lxc
 from ansible.playbook.play_context import PlayContext
+from ansible.plugins.loader import connection_loader
+from ansible_collections.community.general.tests.unit.compat import mock
 
 
-class TestLXCConnectionClass(unittest.TestCase):
+@pytest.fixture(autouse=True)
+def lxc(request):
+    """Fixture to import/load the lxc plugin module.
 
-    def test_lxc_connection_module(self):
+    The fixture parameter is used to determine the presence of liblxc.
+    When true (default), a mocked liblxc module is injected. If False,
+    no liblxc will be present.
+    """
+    liblxc_present = getattr(request, 'param', True)
+
+    class ContainerMock(mock.MagicMock):
+        def __init__(self, name):
+            super().__init__()
+            self.name = name
+            self.state = 'STARTED'
+
+    liblxc_module_mock = mock.MagicMock()
+    liblxc_module_mock.Container = ContainerMock
+
+    with mock.patch.dict('sys.modules'):
+        if liblxc_present:
+            sys.modules['lxc'] = liblxc_module_mock
+        elif 'lxc' in sys.modules:
+            del sys.modules['lxc']
+
+        from ansible_collections.community.general.plugins.connection import lxc as lxc_plugin_module
+
+        assert lxc_plugin_module.HAS_LIBLXC == liblxc_present
+        assert bool(getattr(lxc_plugin_module, '_lxc', None)) == liblxc_present
+
+        yield lxc_plugin_module
+
+
+class TestLXCConnectionClass():
+
+    @pytest.mark.parametrize('lxc', [True, False], indirect=True)
+    def test_lxc_connection_module(self, lxc):
+        """Test that a connection can be created with the plugin."""
         play_context = PlayContext()
-        play_context.prompt = (
-            '[sudo via ansible, key=ouzmdnewuhucvuaabtjmweasarviygqq] password: '
-        )
         in_stream = StringIO()
 
-        self.assertIsInstance(lxc.Connection(play_context, in_stream), lxc.Connection)
+        conn = connection_loader.get('lxc', play_context, in_stream)
+        assert conn
+        assert isinstance(conn, lxc.Connection)
