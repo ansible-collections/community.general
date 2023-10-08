@@ -11,6 +11,7 @@ import sys
 
 from io import StringIO
 
+from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 from ansible_collections.community.general.tests.unit.compat import mock
@@ -60,3 +61,13 @@ class TestLXCConnectionClass():
         conn = connection_loader.get('lxc', play_context, in_stream)
         assert conn
         assert isinstance(conn, lxc.Connection)
+
+    @pytest.mark.parametrize('lxc', [False], indirect=True)
+    def test_lxc_connection_liblxc_error(self, lxc):
+        """Test that on connect an error is thrown if liblxc is not present."""
+        play_context = PlayContext()
+        in_stream = StringIO()
+        conn = connection_loader.get('lxc', play_context, in_stream)
+
+        with pytest.raises(AnsibleError, match='lxc python bindings are not installed'):
+            conn._connect()

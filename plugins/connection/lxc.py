@@ -68,7 +68,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not HAS_LIBLXC:
-            msg = "lxc bindings for python2 are not installed"
+            msg = "lxc python bindings are not installed"
             raise errors.AnsibleError(msg)
 
         if self.container:
