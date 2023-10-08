@@ -569,8 +569,18 @@ def parted(script, device, align):
     if align == 'undefined':
         align_option = ''
 
+    """
+    Use option --fix (-f) if available. Versions prior
+    to 3.4.64 don't have it. For more information see:
+    http://savannah.gnu.org/news/?id=10114
+    """
+    if parted_version() >= (3, 4, 64):
+        script_option = '-s -f'
+    else:
+        script_option = '-s'
+
     if script and not module.check_mode:
-        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
+        command = "%s %s -m %s %s -- %s" % (parted_exec, script_option, align_option, device, script)
         rc, out, err = module.run_command(command)
 
         if rc != 0:
