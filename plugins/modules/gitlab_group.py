@@ -294,8 +294,8 @@ class GitLabGroup(object):
 
         if not force and len(group.projects.list(all=False)) >= 1:
             self._module.fail_json(
-                msg=("There are still projects in this group."
-                     "These needs to be moved or deleted before this group can be removed."
+                msg=("There are still projects in this group. "
+                     "These needs to be moved or deleted before this group can be removed. "
                      "Use 'force_delete' to 'true' to force deletion of existing projects.")
             )
         else:
