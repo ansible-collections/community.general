@@ -68,6 +68,14 @@ options:
     required: false
     default: true
     type: bool
+  app_name_exact_match:
+    type: bool
+    description:
+      - If this flag is set to V(true) then the application ID lookup by name would only work for an exact match.
+        If set to V(false) it returns the first result.
+    required: false
+    default: false
+    version_added: 7.5.0
 requirements: []
 '''
 
@@ -102,8 +110,10 @@ def main():
             revision=dict(required=True),
             user=dict(required=False),
             validate_certs=dict(default=True, type='bool'),
+            app_name_exact_match=dict(required=False, type='bool', default=False),
         ),
         required_one_of=[['app_name', 'application_id']],
+        required_if=[('app_name_exact_match', True, ['app_name'])],
         supports_check_mode=True
     )
 
@@ -111,7 +121,6 @@ def main():
     params = {}
     if module.params["app_name"] and module.params["application_id"]:
         module.fail_json(msg="only one of 'app_name' or 'application_id' can be set")
-
     app_id = None
     if module.params["app_name"]:
         app_id = get_application_id(module)
@@ -150,6 +159,7 @@ def main():
 def get_application_id(module):
     url = "https://api.newrelic.com/v2/applications.json"
     data = "filter[name]=%s" % module.params["app_name"]
+    application_id = None
     headers = {
         'Api-Key': module.params["token"],
     }
@@ -161,7 +171,17 @@ def get_application_id(module):
     if result is None or len(result.get("applications", "")) == 0:
         module.fail_json(msg='No application found with name "%s"' % module.params["app_name"])
 
-    return result["applications"][0]["id"]
+    if module.params["app_name_exact_match"]:
+        for item in result["applications"]:
+            if item["name"] == module.params["app_name"]:
+                application_id = item["id"]
+                break
+        if application_id is None:
+            module.fail_json(msg='No application found with exact name "%s"' % module.params["app_name"])
+    else:
+        application_id = result["applications"][0]["id"]
+
+    return application_id
 
 
 if __name__ == '__main__':
