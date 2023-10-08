@@ -17,6 +17,7 @@ DOCUMENTATION = '''
       remote_addr:
         description:
             - Container identifier
+        default: inventory_hostname
         vars:
             - name: inventory_hostname
             - name: ansible_host
