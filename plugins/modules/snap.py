@@ -183,7 +183,6 @@ class Snap(StateModuleHelper):
     __disable_re = re.compile(r'(?:\S+\s+){5}(?P<notes>\S+)')
     __set_param_re = re.compile(r'(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)')
     __list_re = re.compile(r'^(?P<name>\S+)\s+\S+\s+\S+\s+(?P<channel>\S+)')
-    __install_re = re.compile(r'(?P<name>\S+)\s.+\s(installed|refreshed)')
     module = dict(
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
@@ -209,14 +208,24 @@ class Snap(StateModuleHelper):
         # if state=present there might be file names passed in 'name', in
         # which case they must be converted to their actual snap names, which
         # is done using the names_from_snaps() method calling 'snap info'.
+        self.vars.set("snapinfo_run_info", [], output=(self.verbosity >= 4))
+        self.vars.set("status_run_info", [], output=(self.verbosity >= 4))
+        self.vars.set("status_out", None, output=(self.verbosity >= 4))
+        self.vars.set("run_info", [], output=(self.verbosity >= 4))
+
         if self.vars.state == "present":
-            self.vars.set("snapinfo_run_info", [], output=(self.verbosity >= 4))
             self.vars.set("snap_names", self.names_from_snaps(self.vars.name))
             status_var = "snap_names"
         else:
             status_var = "name"
-        self.vars.set("snap_status", self.snap_status(self.vars[status_var], self.vars.channel), output=False)
-        self.vars.set("snap_status_map", dict(zip(self.vars.name, self.vars.snap_status)), output=False)
+        self.vars.set("status_var", status_var, output=False)
+        self.vars.set("snap_status", self.snap_status(self.vars[self.vars.status_var], self.vars.channel), output=False, change=True)
+        self.vars.set("snap_status_map", dict(zip(self.vars.name, self.vars.snap_status)), output=False, change=True)
+
+    def __quit_module__(self):
+        self.vars.snap_status = self.snap_status(self.vars[self.vars.status_var], self.vars.channel)
+        if self.vars.channel is None:
+            self.vars.channel = "stable"
 
     def _run_multiple_commands(self, commands, actionable_names, bundle=True, refresh=False):
         results_cmd = []
@@ -251,10 +260,6 @@ class Snap(StateModuleHelper):
             '\n'.join(results_err),
             results_run_info,
         )
-
-    def __quit_module__(self):
-        if self.vars.channel is None:
-            self.vars.channel = "stable"
 
     def convert_json_subtree_to_map(self, json_subtree, prefix=None):
         option_map = {}
@@ -350,9 +355,8 @@ class Snap(StateModuleHelper):
         list_out = out.split('\n')[1:]
         list_out = [self.__list_re.match(x) for x in list_out]
         list_out = [(m.group('name'), m.group('channel')) for m in list_out if m]
-        if self.verbosity >= 4:
-            self.vars.status_out = list_out
-            self.vars.status_run_info = ctx.run_info
+        self.vars.status_out = list_out
+        self.vars.status_run_info = ctx.run_info
 
         return [_status_check(n, channel, list_out) for n in snap_name]
 
@@ -383,14 +387,10 @@ class Snap(StateModuleHelper):
             self.vars.cmd, rc, out, err, run_info = self._run_multiple_commands(params, actionable_snaps, bundle=False, refresh=refresh)
         else:
             self.vars.cmd, rc, out, err, run_info = self._run_multiple_commands(params, actionable_snaps, refresh=refresh)
-        if self.verbosity >= 4:
-            self.vars.run_info = run_info
+        self.vars.run_info = run_info
 
         if rc == 0:
-            match_install2 = [self.__install_re.match(line) for line in out.split('\n')]
-            match_install = [m.group('name') in actionable_snaps for m in match_install2 if m]
-            if len(match_install) == len(actionable_snaps):
-                return
+            return
 
         classic_snap_pattern = re.compile(r'^error: This revision of snap "(?P<package_name>\w+)"'
                                           r' was published using classic confinement')
@@ -480,8 +480,7 @@ class Snap(StateModuleHelper):
         if self.check_mode:
             return
         self.vars.cmd, rc, out, err, run_info = self._run_multiple_commands(params, actionable_snaps)
-        if self.verbosity >= 4:
-            self.vars.run_info = run_info
+        self.vars.run_info = run_info
         if rc == 0:
             return
         msg = "Ooops! Snap operation failed while executing '{cmd}', please examine logs and " \
