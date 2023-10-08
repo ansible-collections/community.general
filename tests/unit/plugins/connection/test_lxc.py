@@ -29,7 +29,7 @@ def lxc(request):
 
     class ContainerMock(mock.MagicMock):
         def __init__(self, name):
-            super().__init__()
+            super(ContainerMock, self).__init__()
             self.name = name
             self.state = 'STARTED'
 
