@@ -97,7 +97,7 @@ options:
   force_delete:
     description:
       - Force delete group even if projects in it.
-      - Used only when state = absent.
+      - Used only when O(state=absent).
     type: bool
     default: false
     version_added: 7.5.0
