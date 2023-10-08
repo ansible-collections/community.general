@@ -1,2 +1,2 @@
 minor_changes:
-  - "gitlab_group - add option ``force_delete`` (default: false) which allows delete group even if projects exists in it. (https://github.com/ansible-collections/community.general/pull/7364)."
+  - "gitlab_group - add option ``force_delete`` (default: false) which allows delete group even if projects exists in it (https://github.com/ansible-collections/community.general/pull/7364)."
