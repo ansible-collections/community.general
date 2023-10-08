@@ -94,6 +94,13 @@ options:
       - This option is only used on creation, not for updates.
     type: path
     version_added: 4.2.0
+  force_delete:
+    description:
+      - Force delete group even if projects in it.
+      - Used only when O(state=absent).
+    type: bool
+    default: false
+    version_added: 7.5.0
 '''
 
 EXAMPLES = '''
@@ -279,12 +286,18 @@ class GitLabGroup(object):
 
         return (changed, group)
 
-    def delete_group(self):
+    '''
+    @param force To delete even if projects inside
+    '''
+    def delete_group(self, force=False):
         group = self.group_object
 
-        if len(group.projects.list(all=False)) >= 1:
+        if not force and len(group.projects.list(all=False)) >= 1:
             self._module.fail_json(
-                msg="There are still projects in this group. These needs to be moved or deleted before this group can be removed.")
+                msg=("There are still projects in this group. "
+                     "These needs to be moved or deleted before this group can be removed. "
+                     "Use 'force_delete' to 'true' to force deletion of existing projects.")
+            )
         else:
             if self._module.check_mode:
                 return True
@@ -295,7 +308,7 @@ class GitLabGroup(object):
                 self._module.fail_json(msg="Failed to delete group: %s " % to_native(e))
 
     '''
-    @param name Name of the groupe
+    @param name Name of the group
     @param full_path Complete path of the Group including parent group path. <parent_path>/<group_path>
     '''
     def exists_group(self, project_identifier):
@@ -322,6 +335,7 @@ def main():
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
         require_two_factor_authentication=dict(type='bool'),
         avatar_path=dict(type='path'),
+        force_delete=dict(type='bool', default=False),
     ))
 
     module = AnsibleModule(
@@ -354,6 +368,7 @@ def main():
     subgroup_creation_level = module.params['subgroup_creation_level']
     require_two_factor_authentication = module.params['require_two_factor_authentication']
     avatar_path = module.params['avatar_path']
+    force_delete = module.params['force_delete']
 
     gitlab_instance = gitlab_authentication(module)
 
@@ -375,7 +390,7 @@ def main():
 
     if state == 'absent':
         if group_exists:
-            gitlab_group.delete_group()
+            gitlab_group.delete_group(force=force_delete)
             module.exit_json(changed=True, msg="Successfully deleted group %s" % group_name)
         else:
             module.exit_json(changed=False, msg="Group deleted or does not exists")
