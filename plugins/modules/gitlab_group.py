@@ -332,7 +332,7 @@ def main():
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
         require_two_factor_authentication=dict(type='bool'),
         avatar_path=dict(type='path'),
-        force_delete=dict(type='bool', default=False)
+        force_delete=dict(type='bool', default=False),
     ))
 
     module = AnsibleModule(
