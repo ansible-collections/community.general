@@ -6,6 +6,21 @@ Community General Release Notes
 
 This changelog describes changes after version 5.0.0.
 
+v6.6.6
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- mail - skip headers containing equals characters due to missing ``maxsplit`` on header key/value parsing (https://github.com/ansible-collections/community.general/pull/7303).
+- onepassword - fix KeyError exception when trying to access value of a field that is not filled out in OnePassword item (https://github.com/ansible-collections/community.general/pull/7241).
+- terraform - prevents ``-backend-config`` option double encapsulating with ``shlex_quote`` function. (https://github.com/ansible-collections/community.general/pull/7301).
+
 v6.6.5
 ======
 

@@ -1557,3 +1557,19 @@ releases:
     - 7200-cmd-runner-abs-path.yml
     - 7219-fix-nsupdate-cname.yaml
     release_date: '2023-09-11'
+  6.6.6:
+    changes:
+      bugfixes:
+      - mail - skip headers containing equals characters due to missing ``maxsplit``
+        on header key/value parsing (https://github.com/ansible-collections/community.general/pull/7303).
+      - onepassword - fix KeyError exception when trying to access value of a field
+        that is not filled out in OnePassword item (https://github.com/ansible-collections/community.general/pull/7241).
+      - terraform - prevents ``-backend-config`` option double encapsulating with
+        ``shlex_quote`` function. (https://github.com/ansible-collections/community.general/pull/7301).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 6.6.6.yml
+    - 7241-prevent-key-error-when-value-does-not-exist.yml
+    - 7301-fix-backend-config-string-encapsulation.yml
+    - 7303-mail-incorrect-header-parsing.yml
+    release_date: '2023-10-08'
