@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - lxc connection plugin - properly evaluate options (https://github.com/ansible-collections/community.general/pull/7369).
