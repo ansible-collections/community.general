@@ -34,11 +34,7 @@ options:
     description:
       - V(absent) - policy_profiles should not exist,
       - V(present) - policy_profiles should exist,
-      - >
-        V(list) - list current policy_profiles and policies.
-        This state is deprecated and will be removed 8.0.0.
-        Please use the module M(community.general.manageiq_policies_info) instead.
-    choices: ['absent', 'present', 'list']
+    choices: ['absent', 'present']
     default: 'present'
   policy_profiles:
     type: list
@@ -133,7 +129,7 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 
 def main():
-    actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
+    actions = {'present': 'assign', 'absent': 'unassign'}
     argument_spec = dict(
         policy_profiles=dict(type='list', elements='dict'),
         resource_id=dict(type='int'),
@@ -141,7 +137,7 @@ def main():
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
-                   choices=['present', 'absent', 'list'], default='present'),
+                   choices=['present', 'absent'], default='present'),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
@@ -162,13 +158,6 @@ def main():
     resource_name = module.params['resource_name']
     state = module.params['state']
 
-    if state == "list":
-        module.deprecate(
-            'The value "list" for "state" is deprecated. Please use community.general.manageiq_policies_info instead.',
-            version='8.0.0',
-            collection_name='community.general'
-        )
-
     # get the action and resource type
     action = actions[state]
     resource_type = manageiq_entities()[resource_type_key]
@@ -176,13 +165,8 @@ def main():
     manageiq = ManageIQ(module)
     manageiq_policies = manageiq.policies(resource_id, resource_type, resource_name)
 
-    if action == 'list':
-        # return a list of current profiles for this object
-        current_profiles = manageiq_policies.query_resource_profiles()
-        res_args = dict(changed=False, profiles=current_profiles)
-    else:
-        # assign or unassign the profiles
-        res_args = manageiq_policies.assign_or_unassign_profiles(policy_profiles, action)
+    # assign or unassign the profiles
+    res_args = manageiq_policies.assign_or_unassign_profiles(policy_profiles, action)
 
     module.exit_json(**res_args)
 

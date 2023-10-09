@@ -34,11 +34,7 @@ options:
     description:
       - V(absent) - tags should not exist.
       - V(present) - tags should exist.
-      - >
-        V(list) - list current tags.
-        This state is deprecated and will be removed 8.0.0.
-        Please use the module M(community.general.manageiq_tags_info) instead.
-    choices: ['absent', 'present', 'list']
+    choices: ['absent', 'present']
     default: 'present'
   tags:
     type: list
@@ -125,7 +121,7 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 
 def main():
-    actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
+    actions = {'present': 'assign', 'absent': 'unassign'}
     argument_spec = dict(
         tags=dict(type='list', elements='dict'),
         resource_id=dict(type='int'),
@@ -133,7 +129,7 @@ def main():
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
-                   choices=['present', 'absent', 'list'], default='present'),
+                   choices=['present', 'absent'], default='present'),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
@@ -154,13 +150,6 @@ def main():
     resource_name = module.params['resource_name']
     state = module.params['state']
 
-    if state == "list":
-        module.deprecate(
-            'The value "list" for "state" is deprecated. Please use community.general.manageiq_tags_info instead.',
-            version='8.0.0',
-            collection_name='community.general'
-        )
-
     # get the action and resource type
     action = actions[state]
     resource_type = manageiq_entities()[resource_type_key]
@@ -173,13 +162,8 @@ def main():
 
     manageiq_tags = ManageIQTags(manageiq, resource_type, resource_id)
 
-    if action == 'list':
-        # return a list of current tags for this object
-        current_tags = manageiq_tags.query_resource_tags()
-        res_args = dict(changed=False, tags=current_tags)
-    else:
-        # assign or unassign the tags
-        res_args = manageiq_tags.assign_or_unassign_tags(tags, action)
+    # assign or unassign the tags
+    res_args = manageiq_tags.assign_or_unassign_tags(tags, action)
 
     module.exit_json(**res_args)
 
