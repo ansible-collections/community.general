@@ -1438,3 +1438,126 @@ releases:
       name: pnpm
       namespace: ''
     release_date: '2023-09-11'
+  7.5.0:
+    changes:
+      bugfixes:
+      - gitlab_group_variable - deleted all variables when used with ``purge=true``
+        due to missing ``raw`` property in KNOWN attributes (https://github.com/ansible-collections/community.general/issues/7250).
+      - gitlab_project_variable - deleted all variables when used with ``purge=true``
+        due to missing ``raw`` property in KNOWN attributes (https://github.com/ansible-collections/community.general/issues/7250).
+      - ldap_search - fix string normalization and the ``base64_attributes`` option
+        on Python 3 (https://github.com/ansible-collections/community.general/issues/5704,
+        https://github.com/ansible-collections/community.general/pull/7264).
+      - lxc connection plugin - properly evaluate options (https://github.com/ansible-collections/community.general/pull/7369).
+      - mail - skip headers containing equals characters due to missing ``maxsplit``
+        on header key/value parsing (https://github.com/ansible-collections/community.general/pull/7303).
+      - nmap inventory plugin - fix ``get_option`` calls (https://github.com/ansible-collections/community.general/pull/7323).
+      - onepassword - fix KeyError exception when trying to access value of a field
+        that is not filled out in OnePassword item (https://github.com/ansible-collections/community.general/pull/7241).
+      - snap - change the change detection mechanism from "parsing installation" to
+        "comparing end state with initial state" (https://github.com/ansible-collections/community.general/pull/7340,
+        https://github.com/ansible-collections/community.general/issues/7265).
+      - terraform - prevents ``-backend-config`` option double encapsulating with
+        ``shlex_quote`` function. (https://github.com/ansible-collections/community.general/pull/7301).
+      deprecated_features:
+      - The next major release, community.general 8.0.0, will drop support for ansible-core
+        2.11 and 2.12, which have been End of Life for some time now. This means that
+        this collection no longer supports Python 2.6 on the target. Individual content
+        might still work with unsupported ansible-core versions, but that can change
+        at any time. Also please note that from now on, for every new major community.general
+        release, we will drop support for all ansible-core versions that have been
+        End of Life for more than a few weeks on the date of the major release (https://github.com/ansible-community/community-topics/discussions/271,
+        https://github.com/ansible-collections/community.general/pull/7259).
+      - redfish_info, redfish_config, redfish_command - the default value ``10`` for
+        the ``timeout`` option is deprecated and will change to ``60`` in community.general
+        9.0.0 (https://github.com/ansible-collections/community.general/pull/7295).
+      minor_changes:
+      - cargo - add option ``executable``, which allows user to specify path to the
+        cargo binary (https://github.com/ansible-collections/community.general/pull/7352).
+      - cargo - add option ``locked`` which allows user to specify install the locked
+        version of dependency instead of latest compatible version (https://github.com/ansible-collections/community.general/pull/6134).
+      - dig lookup plugin - add TCP option to enable the use of TCP connection during
+        DNS lookup (https://github.com/ansible-collections/community.general/pull/7343).
+      - 'gitlab_group - add option ``force_delete`` (default: false) which allows
+        delete group even if projects exists in it (https://github.com/ansible-collections/community.general/pull/7364).'
+      - ini_file - add ``ignore_spaces`` option (https://github.com/ansible-collections/community.general/pull/7273).
+      - newrelic_deployment - add option ``app_name_exact_match``, which filters results
+        for the exact app_name provided (https://github.com/ansible-collections/community.general/pull/7355).
+      - onepassword lookup plugin - introduce ``account_id`` option which allows specifying
+        which account to use (https://github.com/ansible-collections/community.general/pull/7308).
+      - onepassword_raw lookup plugin - introduce ``account_id`` option which allows
+        specifying which account to use (https://github.com/ansible-collections/community.general/pull/7308).
+      - parted - on resize, use ``--fix`` option if available (https://github.com/ansible-collections/community.general/pull/7304).
+      - pnpm - set correct version when state is latest or version is not mentioned.
+        Resolves previous idempotency problem (https://github.com/ansible-collections/community.general/pull/7339).
+      - proxmox - add ``vmid`` (and ``taskid`` when possible) to return values (https://github.com/ansible-collections/community.general/pull/7263).
+      - random_string - added new ``ignore_similar_chars`` and ``similar_chars`` option
+        to ignore certain chars (https://github.com/ansible-collections/community.general/pull/7242).
+      - redfish_command - add new option ``update_oem_params`` for the ``MultipartHTTPPushUpdate``
+        command (https://github.com/ansible-collections/community.general/issues/7331).
+      - redfish_config - add ``CreateVolume`` command to allow creation of volumes
+        on servers (https://github.com/ansible-collections/community.general/pull/6813).
+      - redfish_config - adding ``SetSecureBoot`` command (https://github.com/ansible-collections/community.general/pull/7129).
+      - redfish_info - add support for ``GetBiosRegistries`` command (https://github.com/ansible-collections/community.general/pull/7144).
+      - redfish_info - adds ``LinkStatus`` to NIC inventory (https://github.com/ansible-collections/community.general/pull/7318).
+      - redis_info - refactor the redis_info module to use the redis module_utils
+        enabling to pass TLS parameters to the Redis client (https://github.com/ansible-collections/community.general/pull/7267).
+      - supervisorctl - allow to stop matching running processes before removing them
+        with ``stop_before_removing=true`` (https://github.com/ansible-collections/community.general/pull/7284).
+      release_summary: 'Regular bugfix and feature release.
+
+
+        Please note that this is the last minor 7.x.0 release. Further releases
+
+        with major version 7 will be bugfix releases 7.5.y.
+
+        '
+    fragments:
+    - 6134-add-locked-option-for-cargo.yml
+    - 6813-redfish-config-add-create-volume.yml
+    - 7.5.0.yml
+    - 7129-adding_set_secure_boot_command_to_redfish_config.yml
+    - 7144-add-getbiosregistry-command-to-redfish-info.yml
+    - 7241-prevent-key-error-when-value-does-not-exist.yml
+    - 7242_ignore_similar_chars.yml
+    - 7251-gitlab-variables-deleteing-all-variables.yml
+    - 7263-proxmox-return-vmid-and-taskid.yaml
+    - 7264-ldap_search-strings.yml
+    - 7267-redis_info.yml
+    - 7273-ini_file_ignore_spaces.yml
+    - 7284-supervisorctl-stop-before-remove.yaml
+    - 7295-adding_deprecation_for_timeout_in_redfish_info_config_command.yml
+    - 7301-fix-backend-config-string-encapsulation.yml
+    - 7303-mail-incorrect-header-parsing.yml
+    - 7304-prevent-parted-warnings.yml
+    - 7308-onepassword-multi-acc.yml
+    - 7318-add-linkstatus-attribute-to-nic-inventory.yml
+    - 7323-nmap.yml
+    - 7330-redfish-utils-oem-params.yml
+    - 7339-pnpm-correct-version-when-state-latest.yml
+    - 7340-snap-fix.yml
+    - 7343-dig-tcp-option.yml
+    - 7352-add-executable-option-for-cargo.yml
+    - 7355-newrelic-deployment-add-exact-name.yml
+    - 7364-add-option-force-gitlab-group.yml
+    - 7369-fix-lxc-options.yml
+    - deprecate-ansible-core-2.11-2.12.yml
+    modules:
+    - description: Manipulate Consul roles
+      name: consul_role
+      namespace: ''
+    - description: Set default handler for MIME type, for applications using Gnome
+        GIO
+      name: gio_mime
+      namespace: ''
+    - description: Allows administration of Keycloak client custom Javascript policies
+        via Keycloak API
+      name: keycloak_authz_custom_policy
+      namespace: ''
+    - description: Allows administration of Keycloak realm keys via Keycloak API
+      name: keycloak_realm_key
+      namespace: ''
+    - description: Manage services on Source Mage GNU/Linux
+      name: simpleinit_msb
+      namespace: ''
+    release_date: '2023-10-09'
