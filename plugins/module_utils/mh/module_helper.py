@@ -12,7 +12,6 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 
 # (TODO: remove AnsibleModule!) pylint: disable-next=unused-import
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase, AnsibleModule  # noqa: F401
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin
@@ -65,20 +64,4 @@ class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelper
 
 
 class StateModuleHelper(StateMixin, ModuleHelper):
-    pass
-
-
-class CmdModuleHelper(CmdMixin, ModuleHelper):
-    """
-    THIS CLASS IS BEING DEPRECATED.
-    See the deprecation notice in ``CmdMixin.__init__()``.
-    """
-    pass
-
-
-class CmdStateModuleHelper(CmdMixin, StateMixin, ModuleHelper):
-    """
-    THIS CLASS IS BEING DEPRECATED.
-    See the deprecation notice in ``CmdMixin.__init__()``.
-    """
     pass

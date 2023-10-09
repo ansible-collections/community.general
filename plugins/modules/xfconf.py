@@ -84,13 +84,6 @@ options:
     default: false
     aliases: ['array']
     version_added: 1.0.0
-  disable_facts:
-    description:
-      - The value V(false) is no longer allowed since community.general 4.0.0.
-      - This option is deprecated, and will be removed in community.general 8.0.0.
-    type: bool
-    default: true
-    version_added: 2.1.0
 '''
 
 EXAMPLES = """
@@ -189,11 +182,6 @@ class XFConfProperty(StateModuleHelper):
                             choices=('string', 'int', 'double', 'bool', 'uint', 'uchar', 'char', 'uint64', 'int64', 'float')),
             value=dict(type='list', elements='raw'),
             force_array=dict(type='bool', default=False, aliases=['array']),
-            disable_facts=dict(
-                type='bool', default=True,
-                removed_in_version='8.0.0',
-                removed_from_collection='community.general'
-            ),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
@@ -209,9 +197,6 @@ class XFConfProperty(StateModuleHelper):
         self.vars.set('previous_value', self._get())
         self.vars.set('type', self.vars.value_type)
         self.vars.meta('value').set(initial_value=self.vars.previous_value)
-
-        if self.vars.disable_facts is False:
-            self.do_raise('Returning results as facts has been removed. Stop using disable_facts=false.')
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
