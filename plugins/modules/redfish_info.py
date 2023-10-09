@@ -338,6 +338,14 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Get BIOS registry
+    community.general.redfish_info:
+      category: Systems
+      command: GetBiosRegistries
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -355,7 +363,7 @@ CATEGORY_COMMANDS_ALL = {
     "Systems": ["GetSystemInventory", "GetPsuInventory", "GetCpuInventory",
                 "GetMemoryInventory", "GetNicInventory", "GetHealthReport",
                 "GetStorageControllerInventory", "GetDiskInventory", "GetVolumeInventory",
-                "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia"],
+                "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia", "GetBiosRegistries"],
     "Chassis": ["GetFanInventory", "GetPsuInventory", "GetChassisPower",
                 "GetChassisThermals", "GetChassisInventory", "GetHealthReport", "GetHPEThermalConfig", "GetHPEFanPercentMin"],
     "Accounts": ["ListUsers"],
@@ -489,6 +497,8 @@ def main():
                     result["health_report"] = rf_utils.get_multi_system_health_report()
                 elif command == "GetVirtualMedia":
                     result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
+                elif command == "GetBiosRegistries":
+                    result["bios_registries"] = rf_utils.get_bios_registries()
 
         elif category == "Chassis":
             # execute only if we find Chassis resource
