@@ -315,7 +315,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
     def _list_roles(self):
         return self._list_element('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
-
     def __run__(self):
 
         def process(rc, out, err):
