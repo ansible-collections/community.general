@@ -102,3 +102,42 @@ class TestLXCConnectionClass():
 
         with pytest.raises(AnsibleError, match='my-container is not running'):
             conn._connect()
+
+    def test_container_name_change(self):
+        """Test connect method reconnects when remote_addr changes"""
+        play_context = PlayContext()
+        in_stream = StringIO()
+        conn = connection_loader.get('lxc', play_context, in_stream)
+
+        # setting the option does nothing
+        container1_name = 'my-container'
+        conn.set_option('remote_addr', container1_name)
+        assert conn.container_name is None
+        assert conn.container is None
+
+        # first call initializes the connection
+        conn._connect()
+        assert conn.container_name is container1_name
+        assert conn.container is not None
+        assert conn.container.name == container1_name
+        container1 = conn.container
+
+        # second call is basically a no-op
+        conn._connect()
+        assert conn.container_name is container1_name
+        assert conn.container is container1
+        assert conn.container.name == container1_name
+
+        # setting the option does again nothing
+        container2_name = 'my-other-container'
+        conn.set_option('remote_addr', container2_name)
+        assert conn.container_name == container1_name
+        assert conn.container is container1
+        assert conn.container.name == container1_name
+
+        # first call with a different remote_addr changes the connection
+        conn._connect()
+        assert conn.container_name == container2_name
+        assert conn.container is not None
+        assert conn.container is not container1
+        assert conn.container.name == container2_name
