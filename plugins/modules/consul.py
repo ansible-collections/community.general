@@ -140,8 +140,8 @@ options:
             will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
             The format is V(host:port), for example V(localhost:80).
           - Requires O(interval) to be provided.
-        version_added: '1.3.0'
           - Mutually exclusive with O(script), O(ttl) and O(http).
+        version_added: '1.3.0'
     http:
         type: str
         description:
