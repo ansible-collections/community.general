@@ -10,6 +10,8 @@ import json
 import os
 import random
 import string
+import gzip
+from io import BytesIO
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
@@ -128,8 +130,10 @@ class RedfishUtils(object):
         return resp
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri):
+    def get_request(self, uri, override_headers=None):
         req_headers = dict(GET_HEADERS)
+        if override_headers:
+            req_headers.update(override_headers)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             # Service root is an unauthenticated resource; remove credentials
@@ -141,8 +145,13 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-            data = json.loads(to_native(resp.read()))
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            if override_headers:
+                resp = gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8')
+                data = json.loads(to_native(resp.read()))
+                headers = req_headers
+            else:
+                data = json.loads(to_native(resp.read()))
+                headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -3630,3 +3639,93 @@ class RedfishUtils(object):
 
         return {'ret': True, 'changed': True,
                 'msg': "Volume Created"}
+
+    def get_bios_registries(self):
+        # Get /redfish/v1
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if not response["ret"]:
+            return response
+
+        server_details = response["data"]
+
+        # Get Registries URI
+        if "Bios" not in server_details:
+            msg = "Getting BIOS URI failed, Key 'Bios' not found in /redfish/v1/Systems/1/ response: %s"
+            return {
+                "ret": False,
+                "msg": msg % str(server_details)
+            }
+
+        bios_uri = server_details["Bios"]["@odata.id"]
+        bios_resp = self.get_request(self.root_uri + bios_uri)
+        if not bios_resp["ret"]:
+            return bios_resp
+
+        bios_data = bios_resp["data"]
+        attribute_registry = bios_data["AttributeRegistry"]
+
+        reg_uri = self.root_uri + self.service_root + "Registries/" + attribute_registry
+        reg_resp = self.get_request(reg_uri)
+        if not reg_resp["ret"]:
+            return reg_resp
+
+        reg_data = reg_resp["data"]
+
+        # Get BIOS attribute registry URI
+        lst = []
+
+        # Get the location URI
+        response = self.check_location_uri(reg_data, reg_uri)
+        if not response["ret"]:
+            return response
+
+        rsp_data, rsp_uri = response["rsp_data"], response["rsp_uri"]
+
+        if "RegistryEntries" not in rsp_data:
+            return {
+                "msg": "'RegistryEntries' not present in %s response, %s" % (rsp_uri, str(rsp_data)),
+                "ret": False
+            }
+
+        return {
+            "bios_registry": rsp_data,
+            "bios_registry_uri": rsp_uri,
+            "ret": True
+        }
+
+    def check_location_uri(self, resp_data, resp_uri):
+        # Get the location URI response
+        # return {"msg": self.creds, "ret": False}
+        vendor = self._get_vendor()['Vendor']
+        rsp_uri = ""
+        for loc in resp_data['Location']:
+            if loc['Language'] == "en":
+                rsp_uri = loc['Uri']
+                if vendor == 'HPE':
+                    # WORKAROUND
+                    # HPE systems with iLO 4 will have BIOS Atrribute Registries location URI as a dictonary with key 'extref'
+                    # Hence adding condition to fetch the Uri
+                    if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
+                        rsp_uri = loc['Uri']['extref']
+        if not rsp_uri:
+            msg = "Language 'en' not found in BIOS Atrribute Registries location, URI: %s, response: %s"
+            return {
+                "ret": False,
+                "msg": msg % (resp_uri, str(resp_data))
+            }
+
+        res = self.get_request(self.root_uri + rsp_uri)
+        if res['ret'] is False:
+            # WORKAROUND
+            # HPE systems with iLO 4 or iLO5 compresses (gzip) for some URIs
+            # Hence adding encoding to the header
+            if vendor == 'HPE':
+                override_headers = {"Accept-Encoding": "gzip"}
+                res = self.get_request(self.root_uri + rsp_uri, override_headers=override_headers)
+        if res['ret']:
+            return {
+                "ret": True,
+                "rsp_data": res["data"],
+                "rsp_uri": rsp_uri
+            }
+        return res
