@@ -17,8 +17,7 @@ version_added: 3.5.0
 description:
   - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
 notes:
-  - >
-    Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
+  - Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
   - >
     The module will try and run using the C(C.UTF-8) locale.
     If that fails, it will try C(en_US.UTF-8).
@@ -74,7 +73,6 @@ options:
     description:
       - Force overwriting an existing role or collection.
       - Using O(force=true) is mandatory when downgrading.
-      - "B(Ansible 2.9 and 2.10): Must be V(true) to upgrade roles and collections."
     type: bool
     default: false
   ack_ansible29:
@@ -139,7 +137,6 @@ RETURN = """
     description:
       - If O(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
       - If O(name) is specified, returns that role name and the version installed per path.
-      - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing roles
     contains:
@@ -156,7 +153,6 @@ RETURN = """
     description:
       - If O(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
       - If O(name) is specified, returns that collection name and the version installed per path.
-      - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing collections
     contains:
@@ -279,6 +275,12 @@ class AnsibleGalaxyInstall(ModuleHelper):
         self._RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
                                              r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
                                              r' was installed successfully$')
+        self.vars.set("new_collections", {}, change=True)
+        self.vars.set("new_roles", {}, change=True)
+        if self.vars.type != "collection":
+            self.vars.installed_roles = self._list_roles()
+        if self.vars.type != "roles":
+            self.vars.installed_collections = self._list_collections()
 
     def _list_element(self, _type, path_re, elem_re):
         def process(rc, out, err):
@@ -313,15 +315,9 @@ class AnsibleGalaxyInstall(ModuleHelper):
     def _list_roles(self):
         return self._list_element('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
-    def _setup210plus(self):
-        self.vars.set("new_collections", {}, change=True)
-        self.vars.set("new_roles", {}, change=True)
-        if self.vars.type != "collection":
-            self.vars.installed_roles = self._list_roles()
-        if self.vars.type != "roles":
-            self.vars.installed_collections = self._list_collections()
 
     def __run__(self):
+
         def process(rc, out, err):
             for line in out.splitlines():
                 match = self._RE_INSTALL_OUTPUT.match(line)
@@ -332,7 +328,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 elif match.group("role"):
                     self.vars.new_roles[match.group("role")] = match.group("rversion")
 
-        self._setup210plus()
         with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install")
             if self.verbosity > 2:
