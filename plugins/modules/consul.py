@@ -104,6 +104,7 @@ options:
         description:
           - The script/command that will be run periodically to check the health of the service.
           - Requires O(interval) to be provided.
+          - Mutually exclusive with O(ttl), O(tcp) and O(http).
     interval:
         type: str
         description:
@@ -131,6 +132,7 @@ options:
             Similar to the interval this is a number with a V(s) or V(m) suffix to
             signify the units of seconds or minutes, for example V(15s) or V(1m).
             If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+          - Mutually exclusive with O(script), O(tcp) and O(http).
     tcp:
         type: str
         description:
@@ -139,12 +141,14 @@ options:
             The format is V(host:port), for example V(localhost:80).
           - Requires O(interval) to be provided.
         version_added: '1.3.0'
+          - Mutually exclusive with O(script), O(ttl) and O(http).
     http:
         type: str
         description:
           - Checks can be registered with an HTTP endpoint. This means that consul
             will check that the http endpoint returns a successful HTTP status.
           - Requires O(interval) to be provided.
+          - Mutually exclusive with O(script), O(ttl) and O(tcp).
     timeout:
         type: str
         description:
@@ -377,13 +381,7 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 
 
 def parse_check(module):
-    _checks = [module.params[p] for p in ('script', 'ttl', 'tcp', 'http') if module.params[p]]
-
-    if len(_checks) > 1:
-        module.fail_json(
-            msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
-
-    if module.params['check_id'] or _checks:
+    if module.params['check_id'] or any(module.params[p] is not None for p in ('script', 'ttl', 'tcp', 'http') if module.params[p]):
         return ConsulCheck(
             module.params['check_id'],
             module.params['check_name'],
