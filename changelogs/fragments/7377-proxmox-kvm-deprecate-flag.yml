@@ -1,0 +1,2 @@
+deprecated_features:
+  - proxmox_kvm - deprecate the option ``proxmox_default_behavior`` (https://github.com/ansible-collections/community.general/pull/7377).

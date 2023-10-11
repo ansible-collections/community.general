@@ -555,6 +555,7 @@ options:
       - This affects the O(acpi), O(autostart), O(balloon), O(boot), O(cores), O(cpu),
         O(cpuunits), O(force), O(format), O(kvm), O(memory), O(onboot), O(ostype), O(sockets),
         O(tablet), O(template), and O(vga) options.
+      - This option is deprecated and will be removed in community.general 10.0.0.
     type: str
     default: no_defaults
     choices:
@@ -1240,7 +1241,11 @@ def main():
         virtio=dict(type='dict'),
         vmid=dict(type='int'),
         watchdog=dict(),
-        proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
+        proxmox_default_behavior=dict(type='str',
+                                      default='no_defaults',
+                                      choices=['compatibility', 'no_defaults'],
+                                      removed_from_collection='community.general',
+                                      removed_in_version='10.0.0'),
     )
     module_args.update(kvm_args)
 
