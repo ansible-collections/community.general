@@ -107,7 +107,7 @@
     src: '{{ bl_file }}'
   register: slurp_test_3
 
-- name: assert element is added
+- name: assert element is removed
   assert:
     that:
       - bl_test_3 is changed
@@ -143,7 +143,7 @@
       blacklist cls_rsvp
     mode: '0644'
 
-- name: Remove potentially affected (and unused) modules (7362)
+- name: Block potentially affected (and unused) modules (7362)
   community.general.kernel_blacklist:
     name: "{{ line_item }}"
     state: present
