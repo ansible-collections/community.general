@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - "github_deploy_key - Fix pagination behaviour causing a crash when only a single page of deploy keys exist."
+  - "github_deploy_key - fix pagination behaviour causing a crash when only a single page of deploy keys exist (https://github.com/ansible-collections/community.general/pull/7375)."
