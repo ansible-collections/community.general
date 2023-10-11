@@ -11,3 +11,4 @@ skip/rhel9.0
 skip/rhel9.1
 skip/rhel9.2
 skip/freebsd
+skip/python2.6
