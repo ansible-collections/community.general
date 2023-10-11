@@ -115,8 +115,8 @@ class CallbackModule(CallbackBase):
             line_length = 120
             if self.last_skipped:
                 print()
-            msg = colorize("# {0} {1}".format(task_name,
-                                              '*' * (line_length - len(task_name))), 'bold')
+            line = "# {0} ".format(task_name)
+            msg = colorize("{0}{1}".format(line, '*' * (line_length - len(line))), 'bold')
             print(msg)
 
     def _indent_text(self, text, indent_level):
