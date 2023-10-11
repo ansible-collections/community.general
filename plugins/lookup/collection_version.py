@@ -98,15 +98,10 @@ def load_collection_meta(collection_pkg, no_version='*'):
     if os.path.exists(manifest_path):
         return load_collection_meta_manifest(manifest_path)
 
-    # Try to load galaxy.y(a)ml
+    # Try to load galaxy.yml
     galaxy_path = os.path.join(path, 'galaxy.yml')
-    galaxy_alt_path = os.path.join(path, 'galaxy.yaml')
-    # galaxy.yaml was only supported in ansible-base 2.10 and ansible-core 2.11. Support was removed
-    # in https://github.com/ansible/ansible/commit/595413d11346b6f26bb3d9df2d8e05f2747508a3 for
-    # ansible-core 2.12.
-    for path in (galaxy_path, galaxy_alt_path):
-        if os.path.exists(path):
-            return load_collection_meta_galaxy(path, no_version=no_version)
+    if os.path.exists(galaxy_path):
+        return load_collection_meta_galaxy(galaxy_path, no_version=no_version)
 
     return {}
 

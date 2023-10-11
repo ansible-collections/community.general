@@ -10,13 +10,4 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible.module_utils.six import raise_from
-
-try:
-    from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
-except ImportError:
-    try:
-        from distutils.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
-    except ImportError as exc:
-        msg = 'To use this plugin or module with ansible-core 2.11, you need to use Python < 3.12 with distutils.version present'
-        raise_from(ImportError(msg), exc)
+from ansible.module_utils.compat.version import LooseVersion  # noqa: F401, pylint: disable=unused-import
