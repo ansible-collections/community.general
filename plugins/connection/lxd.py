@@ -16,7 +16,9 @@ DOCUMENTATION = '''
     options:
       remote_addr:
         description:
-            - Container identifier.
+            - Instance (container/VM) identifier.
+            - Since community.general 8.0.0, a FQDN can be provided; in that case, the first component (the part before C(.))
+              is used as the instance identifier.
         default: inventory_hostname
         vars:
             - name: inventory_hostname
@@ -108,11 +110,11 @@ class Connection(ConnectionBase):
         stdout = to_text(stdout)
         stderr = to_text(stderr)
 
-        if stderr == "error: Container is not running.\n":
-            raise AnsibleConnectionFailure("container not running: %s" % self._host())
+        if "is not running" in stderr:
+            raise AnsibleConnectionFailure("instance not running: %s" % self._host())
 
-        if stderr == "error: not found\n":
-            raise AnsibleConnectionFailure("container not found: %s" % self._host())
+        if "not found" in stderr:
+            raise AnsibleConnectionFailure("instance not found: %s" % self._host())
 
         return process.returncode, stdout, stderr
 
