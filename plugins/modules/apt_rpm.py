@@ -255,7 +255,7 @@ def install_packages(module, pkgspec):
 
         # apt-rpm always have 0 for exit code if --force is used
         if rc or not installed:
-            module.fail_json(msg="'apt-get -y install %s' failed: %s" % (packages, err), rc=rc, out=out, err=err)
+            module.fail_json(msg="'apt-get -y install %s' failed: %s" % (packages, err))
         else:
             return (True, "%s present(s)" % packages)
     else:
