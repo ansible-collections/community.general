@@ -28,6 +28,8 @@ options:
   package:
     description:
       - List of packages to install, upgrade, or remove.
+      - May include paths to local C(.rpm) files if C(state=installed|present),
+        requires C(rpm) python module.
     aliases: [ name, pkg ]
     type: list
     elements: str
@@ -63,6 +65,9 @@ options:
     type: bool
     default: false
     version_added: 6.5.0
+requirements:
+  - C(rpm) python package (rpm bindings), optional. Required if C(package)
+    option includes local files.
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
@@ -109,14 +114,21 @@ EXAMPLES = '''
 '''
 
 import os
+import traceback
+
+from ansible.module_utils.basic import (
+    AnsibleModule,
+    missing_required_lib,
+)
 
 try:
     import rpm
-    HAS_RPM_PYTHON = True
 except ImportError:
     HAS_RPM_PYTHON = False
-
-from ansible.module_utils.basic import AnsibleModule
+    RPM_PYTHON_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_RPM_PYTHON = True
+    RPM_PYTHON_IMPORT_ERROR = None
 
 APT_PATH = "/usr/bin/apt-get"
 RPM_PATH = "/usr/bin/rpm"
@@ -156,7 +168,12 @@ def query_package_provides(module, name):
     # 1 if it is not installed
     if name.endswith('.rpm'):
         # Likely a local RPM file
-        # Could probably add a diagnostic message if rpm-python is missing
+        if not HAS_RPM_PYTHON:
+            module.fail_json(
+                msg=missing_required_lib('rpm'),
+                exception=RPM_PYTHON_IMPORT_ERROR,
+            )
+
         name = local_rpm_package_name(name)
 
     rc, out, err = module.run_command("%s -q --provides %s" % (RPM_PATH, name))
