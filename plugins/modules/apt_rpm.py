@@ -110,12 +110,35 @@ EXAMPLES = '''
 
 import os
 
+try:
+    import rpm
+    HAS_RPM_PYTHON = True
+except ImportError:
+    HAS_RPM_PYTHON = False
+
 from ansible.module_utils.basic import AnsibleModule
 
 APT_PATH = "/usr/bin/apt-get"
 RPM_PATH = "/usr/bin/rpm"
 APT_GET_ZERO = "\n0 upgraded, 0 newly installed"
 UPDATE_KERNEL_ZERO = "\nTry to install new kernel "
+
+
+def local_rpm_package_name(path):
+    """return package name of a local rpm passed in.
+    Inspired by ansible.builtin.yum"""
+
+    ts = rpm.TransactionSet()
+    ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        header = ts.hdrFromFdno(fd)
+    except rpm.error as e:
+        return None
+    finally:
+        os.close(fd)
+
+    return header[rpm.RPMTAG_NAME].decode()
 
 
 def query_package(module, name):
@@ -131,6 +154,11 @@ def query_package(module, name):
 def query_package_provides(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
+    if name.endswith('.rpm'):
+        # Likely a local RPM file
+        # Could probably add a diagnostic message if rpm-python is missing
+        name = local_rpm_package_name(name)
+
     rc, out, err = module.run_command("%s -q --provides %s" % (RPM_PATH, name))
     return rc == 0
 
@@ -210,7 +238,7 @@ def install_packages(module, pkgspec):
 
         # apt-rpm always have 0 for exit code if --force is used
         if rc or not installed:
-            module.fail_json(msg="'apt-get -y install %s' failed: %s" % (packages, err))
+            module.fail_json(msg="'apt-get -y install %s' failed: %s" % (packages, err), rc=rc, out=out, err=err)
         else:
             return (True, "%s present(s)" % packages)
     else:
