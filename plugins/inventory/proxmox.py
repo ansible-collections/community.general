@@ -102,7 +102,7 @@ DOCUMENTATION = '''
         type: bool
       qemu_extended_statuses:
         description:
-          - Requires O(want_facts) to be set to V(true) to function. This will allow you to differentiate betweend C(paused) and C(prelaunch)
+          - Requires O(want_facts) to be set to V(true) to function. This will allow you to differentiate between C(paused) and C(prelaunch)
             statuses of the QEMU VMs.
           - This introduces multiple groups [prefixed with O(group_prefix)] C(prelaunch) and C(paused).
         default: false
