@@ -28,8 +28,9 @@ options:
   package:
     description:
       - List of packages to install, upgrade, or remove.
-      - May include paths to local C(.rpm) files if C(state=installed|present),
-        requires C(rpm) python module.
+      - Since community.general 8.0.0, may include paths to local C(.rpm) files
+        if O(state=installed) or O(state=present), requires C(rpm) python
+        module.
     aliases: [ name, pkg ]
     type: list
     elements: str
@@ -66,7 +67,7 @@ options:
     default: false
     version_added: 6.5.0
 requirements:
-  - C(rpm) python package (rpm bindings), optional. Required if C(package)
+  - C(rpm) python package (rpm bindings), optional. Required if O(package)
     option includes local files.
 author:
 - Evgenii Terechkov (@evgkrsk)
@@ -120,6 +121,7 @@ from ansible.module_utils.basic import (
     AnsibleModule,
     missing_required_lib,
 )
+from ansible.module_utils.common.text.converters import to_native
 
 try:
     import rpm
@@ -150,7 +152,7 @@ def local_rpm_package_name(path):
     finally:
         os.close(fd)
 
-    return header[rpm.RPMTAG_NAME].decode()
+    return to_native(header[rpm.RPMTAG_NAME])
 
 
 def query_package(module, name):
