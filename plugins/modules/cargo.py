@@ -48,7 +48,7 @@ options:
       - Specify which registry to use.
     required: false
     type: str
-    version_added: 7.5.0
+    version_added: 8.0.0
   version:
     description:
       ->
