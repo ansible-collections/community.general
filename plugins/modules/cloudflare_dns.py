@@ -59,6 +59,18 @@ options:
     - Required for O(type=TLSA) when O(state=present).
     type: int
     choices: [ 0, 1, 2, 3 ]
+  flag:
+    description:
+    - Issuer Critical Flag.
+    - Required for O(type=CAA) when O(state=present).
+    type: int
+    choices: [ 0, 1 ]
+  tag:
+    description:
+    - CAA issue restriction.
+    - Required for O(type=CAA) when O(state=present).
+    type: str
+    choices: [ issue, issuewild, iodef ]
   hash_type:
     description:
     - Hash type number.
@@ -139,7 +151,7 @@ options:
       - The type of DNS record to create. Required if O(state=present).
       - O(type=DS), O(type=SSHFP), and O(type=TLSA) were added in Ansible 2.7.
     type: str
-    choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, TXT ]
+    choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, CAA, TXT ]
   value:
     description:
     - The record value.
@@ -262,6 +274,15 @@ EXAMPLES = r'''
     hash_type: 1
     value: 6b76d034492b493e15a7376fccd08e63befdad0edab8e442562f532338364bf3
 
+- name: Create a CAA record subdomain.example.com
+  community.general.cloudflare_dns:
+    zone: example.com
+    record: subdomain
+    type: CAA
+    flag: 0
+    tag: issue
+    value: ca.example.com
+
 - name: Create a DS record for subdomain.example.com
   community.general.cloudflare_dns:
     zone: example.com
@@ -291,7 +312,7 @@ record:
             sample: "2016-03-25T19:09:42.516553Z"
         data:
             description: Additional record data.
-            returned: success, if type is SRV, DS, SSHFP or TLSA
+            returned: success, if type is SRV, DS, SSHFP TLSA or CAA
             type: dict
             sample: {
                 name: "jabber",
@@ -391,6 +412,8 @@ class CloudflareAPI(object):
         self.algorithm = module.params['algorithm']
         self.cert_usage = module.params['cert_usage']
         self.hash_type = module.params['hash_type']
+        self.flag = module.params['flag']
+        self.tag = module.params['tag']
         self.key_tag = module.params['key_tag']
         self.port = module.params['port']
         self.priority = module.params['priority']
@@ -595,7 +618,7 @@ class CloudflareAPI(object):
     def delete_dns_records(self, **kwargs):
         params = {}
         for param in ['port', 'proto', 'service', 'solo', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag']:
+                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'flag', 'tag']:
             if param in kwargs:
                 params[param] = kwargs[param]
             else:
@@ -616,7 +639,7 @@ class CloudflareAPI(object):
                 content = str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
         elif params['type'] == 'TLSA':
             if not (params['value'] is None or params['value'] == ''):
-                content = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
+                content = str(params['cert_usage']) + ' ' + str(params['selector']) + ' ' + str(params['hash_type']) + ' ' + params['value']
             search_record = params['port'] + '.' + params['proto'] + '.' + params['record']
         if params['solo']:
             search_value = None
@@ -640,7 +663,7 @@ class CloudflareAPI(object):
     def ensure_dns_record(self, **kwargs):
         params = {}
         for param in ['port', 'priority', 'proto', 'proxied', 'service', 'ttl', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag']:
+                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'flag', 'tag']:
             if param in kwargs:
                 params[param] = kwargs[param]
             else:
@@ -757,12 +780,36 @@ class CloudflareAPI(object):
             }
             search_value = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
 
+        if params['type'] == 'CAA':
+            for attr in [params['flag'], params['tag'], params['value']]:
+                if (attr is None) or (attr == ''):
+                    self.module.fail_json(msg="You must provide flag, tag and a value to create this record type")
+            caa_data = {
+                "flags": params['flag'],
+                "tag": params['tag'],
+                "value": params['value'],
+            }
+            new_record = {
+                "type": params['type'],
+                "name": params['record'],
+                'data': caa_data,
+                "ttl": params['ttl'],
+            }
+            search_value = None
+
         zone_id = self._get_zone_id(params['zone'])
         records = self.get_dns_records(params['zone'], params['type'], search_record, search_value)
         # in theory this should be impossible as cloudflare does not allow
         # the creation of duplicate records but lets cover it anyways
         if len(records) > 1:
-            self.module.fail_json(msg="More than one record already exists for the given attributes. That should be impossible, please open an issue!")
+            # As Cloudflare API cannot filter record containing quotes
+            # CAA records must be compared localy
+            if params['type'] == 'CAA':
+                for record in records:
+                    if record['data']['flags'] == caa_data['flags'] and record['data']['tag'] == caa_data['tag'] and record['data']['value'] == caa_data['value']:
+                        return record, self.changed
+            else:
+                self.module.fail_json(msg="More than one record already exists for the given attributes. That should be impossible, please open an issue!")
         # record already exists, check if it must be updated
         if len(records) == 1:
             cur_record = records[0]
@@ -811,6 +858,8 @@ def main():
             hash_type=dict(type='int', choices=[1, 2]),
             key_tag=dict(type='int', no_log=False),
             port=dict(type='int'),
+            flag=dict(type='int', choices=[0, 1]),
+            tag=dict(type='str', choices=['issue', 'issuewild', 'iodef']),
             priority=dict(type='int', default=1),
             proto=dict(type='str'),
             proxied=dict(type='bool', default=False),
@@ -821,7 +870,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present']),
             timeout=dict(type='int', default=30),
             ttl=dict(type='int', default=1),
-            type=dict(type='str', choices=['A', 'AAAA', 'CNAME', 'DS', 'MX', 'NS', 'SPF', 'SRV', 'SSHFP', 'TLSA', 'TXT']),
+            type=dict(type='str', choices=['A', 'AAAA', 'CNAME', 'DS', 'MX', 'NS', 'SPF', 'SRV', 'SSHFP', 'TLSA', 'CAA', 'TXT']),
             value=dict(type='str', aliases=['content']),
             weight=dict(type='int', default=1),
             zone=dict(type='str', required=True, aliases=['domain']),
@@ -832,6 +881,7 @@ def main():
             ('state', 'absent', ['record']),
             ('type', 'SRV', ['proto', 'service']),
             ('type', 'TLSA', ['proto', 'port']),
+            ('type', 'CAA', ['flag', 'tag']),
         ],
     )
 
@@ -857,6 +907,13 @@ def main():
                 or (module.params['cert_usage'] is None and module.params['selector'] is None and module.params['hash_type'] is None
                     and (module.params['value'] is None or module.params['value'] == ''))):
             module.fail_json(msg="For TLSA records the params cert_usage, selector, hash_type and value all need to be defined, or not at all.")
+
+    if module.params['type'] == 'CAA':
+        if not ((module.params['flag'] is not None and module.params['tag'] is not None
+                 and not (module.params['value'] is None or module.params['value'] == ''))
+                or (module.params['flag'] is None and module.params['tag'] is None
+                    and (module.params['value'] is None or module.params['value'] == ''))):
+            module.fail_json(msg="For CAA records the params flag, tag and value all need to be defined, or not at all.")
 
     if module.params['type'] == 'DS':
         if not ((module.params['key_tag'] is not None and module.params['algorithm'] is not None and module.params['hash_type'] is not None

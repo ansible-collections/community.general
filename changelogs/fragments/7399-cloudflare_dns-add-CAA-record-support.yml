@@ -1,0 +1,2 @@
+minor_changes:
+  - cloudflare_dns - Add CAA record support.
