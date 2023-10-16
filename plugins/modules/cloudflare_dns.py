@@ -805,9 +805,9 @@ class CloudflareAPI(object):
             # As Cloudflare API cannot filter record containing quotes
             # CAA records must be compared localy
             if params['type'] == 'CAA':
-                for record in records:
-                    if record['data']['flags'] == caa_data['flags'] and record['data']['tag'] == caa_data['tag'] and record['data']['value'] == caa_data['value']:
-                        return record, self.changed
+                for rr in records:
+                    if rr['data']['flags'] == caa_data['flags'] and rr['data']['tag'] == caa_data['tag'] and rr['data']['value'] == caa_data['value']:
+                        return rr, self.changed
             else:
                 self.module.fail_json(msg="More than one record already exists for the given attributes. That should be impossible, please open an issue!")
         # record already exists, check if it must be updated
