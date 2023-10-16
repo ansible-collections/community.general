@@ -116,6 +116,13 @@ options:
       - Allow option without value and without '=' symbol.
     type: bool
     default: false
+  modify_inactive_option:
+    description:
+      - Do not replace a commented line that matches the given option. This is useful when you want to keep example
+       key:value pairs for documentation purposes.
+    type: bool
+    default: true
+    version_added: TO_BE_UPDATED
   follow:
     description:
     - This flag indicates that filesystem links, if they exist, should be followed.
@@ -190,7 +197,7 @@ def match_opt(option, line):
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match('( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match('()( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
 def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
@@ -213,7 +220,7 @@ def update_section_line(option, changed, section_lines, index, changed_lines, ig
 
 def do_ini(module, filename, section=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
-           ignore_spaces=False, create=True, allow_no_value=False, follow=False):
+           ignore_spaces=False, create=True, allow_no_value=False, modify_inactive_option=True, follow=False):
 
     if section is not None:
         section = to_text(section)
@@ -310,6 +317,12 @@ def do_ini(module, filename, section=None, option=None, values=None,
     # Keep track of changed section_lines
     changed_lines = [0] * len(section_lines)
 
+    # Determine whether to consider using commented out/inactive options or only active ones
+    if modify_inactive_option:
+        match_function = match_opt
+    else:
+        match_function = match_active_opt
+
     # handling multiple instances of option=value when state is 'present' with/without exclusive is a bit complex
     #
     # 1. edit all lines where we have a option=value pair with a matching value in values[]
@@ -319,8 +332,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     if state == 'present' and option:
         for index, line in enumerate(section_lines):
-            if match_opt(option, line):
-                match = match_opt(option, line)
+            if match_function(option, line):
+                match = match_function(option, line)
                 if values and match.group(7) in values:
                     matched_value = match.group(7)
                     if not matched_value and allow_no_value:
@@ -343,14 +356,14 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_opt(option, line):
+                if not changed_lines[index] and match_function(option, line):
                     newline = assignment_format % (option, values.pop(0))
                     (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     if len(values) == 0:
                         break
         # remove all remaining option occurrences from the rest of the section
         for index in range(len(section_lines) - 1, 0, -1):
-            if not changed_lines[index] and match_opt(option, section_lines[index]):
+            if not changed_lines[index] and match_function(option, section_lines[index]):
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True
@@ -394,7 +407,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
                     section_lines = new_section_lines
             elif not exclusive and len(values) > 0:
                 # delete specified option=value line(s)
-                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(6) in values)]
+                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(7) in values)]
                 if section_lines != new_section_lines:
                     changed = True
                     msg = 'option changed'
@@ -466,6 +479,7 @@ def main():
             no_extra_spaces=dict(type='bool', default=False),
             ignore_spaces=dict(type='bool', default=False),
             allow_no_value=dict(type='bool', default=False),
+            modify_inactive_option=dict(type='bool', default=True),
             create=dict(type='bool', default=True),
             follow=dict(type='bool', default=False)
         ),
@@ -487,6 +501,7 @@ def main():
     no_extra_spaces = module.params['no_extra_spaces']
     ignore_spaces = module.params['ignore_spaces']
     allow_no_value = module.params['allow_no_value']
+    modify_inactive_option = module.params['modify_inactive_option']
     create = module.params['create']
     follow = module.params['follow']
 
@@ -500,7 +515,7 @@ def main():
 
     (changed, backup_file, diff, msg) = do_ini(
         module, path, section, option, values, state, exclusive, backup,
-        no_extra_spaces, ignore_spaces, create, allow_no_value, follow)
+        no_extra_spaces, ignore_spaces, create, allow_no_value, modify_inactive_option, follow)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
