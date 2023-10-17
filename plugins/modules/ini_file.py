@@ -122,7 +122,7 @@ options:
        key:value pairs for documentation purposes.
     type: bool
     default: true
-    version_added: TO_BE_UPDATED
+    version_added: 7.6.0
   follow:
     description:
     - This flag indicates that filesystem links, if they exist, should be followed.
