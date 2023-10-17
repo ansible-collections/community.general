@@ -1,0 +1,2 @@
+bugfixes:
+  - composer module - fix impossible to run working_dir dependent commands. `community.general.composer` was throwing an error when trying to run a working_dir dependent command, because it tried to get the command help without passing the working_dir (https://github.com/ansible-collections/community.general/issues/3787).
