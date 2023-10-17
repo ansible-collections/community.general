@@ -170,9 +170,14 @@ def get_available_options(module, command='install'):
     return command_help_json['definition']['options']
 
 
-def composer_command(module, command, arguments="", options=None, global_command=False):
+def composer_command(module, command, arguments="", options=None):
     if options is None:
         options = []
+
+    global_command = module.params['global_command']
+
+    if not global_command:
+        options.extend(['--working-dir', "'%s'" % module.params['working_dir']])
 
     if module.params['executable'] is None:
         php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
@@ -217,7 +222,6 @@ def main():
         module.fail_json(msg="Use the 'arguments' param for passing arguments with the 'command'")
 
     arguments = module.params['arguments']
-    global_command = module.params['global_command']
     available_options = get_available_options(module=module, command=command)
 
     options = []
@@ -233,9 +237,6 @@ def main():
         if option in available_options:
             option = "--%s" % option
             options.append(option)
-
-    if not global_command:
-        options.extend(['--working-dir', "'%s'" % module.params['working_dir']])
 
     option_params = {
         'prefer_source': 'prefer-source',
@@ -260,7 +261,7 @@ def main():
         else:
             module.exit_json(skipped=True, msg="command '%s' does not support check mode, skipping" % command)
 
-    rc, out, err = composer_command(module, command, arguments, options, global_command)
+    rc, out, err = composer_command(module, command, arguments, options)
 
     if rc != 0:
         output = parse_out(err)
