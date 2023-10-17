@@ -1503,7 +1503,7 @@ EXAMPLES = r'''
       - ip: "0.0.0.0/0"
         next_hop: "192.168.1.1"
         table: "production"
-    routing_rules4: 
+    routing_rules4:
       - "priority 0 from 192.168.1.50 table 200"
 '''
 
