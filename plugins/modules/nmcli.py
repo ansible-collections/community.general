@@ -169,7 +169,7 @@ options:
         version_added: 2.0.0
     routing_rules4:
         description:
-            - Is the same as in an C(ip route add) command, except always requires specifying a priority.
+            - Is the same as in an C(ip rule add) command, except always requires specifying a priority.
         type: list
         elements: str
         version_added: 3.3.0
@@ -1489,6 +1489,22 @@ EXAMPLES = r'''
     vlandev: eth0
     vlanid: 5
     state: present
+
+## Defining ip rules while setting a static IP
+## table 'production' is set with id 200 in this example.
+- name: Set Static ips for interface with ip rules and routes
+  community.general.nmcli:
+    type: ethernet
+    conn_name: 'eth0'
+    ip4: '192.168.1.50'
+    gw4: '192.168.1.1'
+    state: present
+    routes4_extended:
+      - ip: "0.0.0.0/0"
+        next_hop: "192.168.1.1"
+        table: "production"
+    routing_rules4: 
+      - "priority 0 from 192.168.1.50 table 200"
 '''
 
 RETURN = r"""#
