@@ -211,3 +211,49 @@
       that:
         - install_gem_result is changed
         - not gem_bindir_stat.stat.exists
+
+  - name: Check option "--http-proxy"
+    block:
+
+      - name: copy tinyproxy config file
+        copy:
+          src: tinyproxy.conf
+          dest: /etc/tinyproxy/tinyproxy.conf
+
+      - name: start tinyproxy service
+        service:
+          name: tinyproxy
+          state: started
+
+      - name: Install gem through a proxy
+        gem:
+          name: gist
+          state: present
+          http_proxy: 'http://localhost:8888'
+        register: install_gem_result
+
+      - name: List gems
+        command: gem list
+        register: current_gems
+
+      - name: Ensure gem was installed
+        assert:
+          that:
+            - install_gem_result is changed
+            - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+
+      - name: Remove a gem
+        gem:
+          name: gist
+          state: absent
+        register: remove_gem_results
+
+      - name: List gems
+        command: gem list
+        register: current_gems
+
+      - name: Verify gem is not installed
+        assert:
+          that:
+            - remove_gem_results is changed
+            - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
