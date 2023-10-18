@@ -65,6 +65,7 @@ options:
     - Required for O(type=CAA) when O(state=present).
     type: int
     choices: [ 0, 1 ]
+    version_added: 8.0.0
   tag:
     description:
     - CAA issue restriction.
