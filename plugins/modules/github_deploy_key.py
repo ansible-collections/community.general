@@ -227,7 +227,7 @@ class GithubDeployKey(object):
                 yield self.module.from_json(resp.read())
 
                 links = {}
-                for x, y in findall(r'<([^>]+)>;\s*rel="(\w+)"', info["link"]):
+                for x, y in findall(r'<([^>]+)>;\s*rel="(\w+)"', info.get("link", '')):
                     links[y] = x
 
                 url = links.get('next')
