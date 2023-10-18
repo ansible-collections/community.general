@@ -118,11 +118,12 @@ options:
     default: false
   modify_inactive_option:
     description:
-      - Do not replace a commented line that matches the given option. This is useful when you want to keep example
+      - By default the module replaces a commented line that matches the given option.
+      - Set this option to V(false) to avoid this. This is useful when you want to keep example.
        key:value pairs for documentation purposes.
     type: bool
     default: true
-    version_added: 7.6.0
+    version_added: 8.0.0
   follow:
     description:
     - This flag indicates that filesystem links, if they exist, should be followed.
