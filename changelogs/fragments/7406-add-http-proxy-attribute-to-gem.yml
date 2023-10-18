@@ -1,0 +1,2 @@
+minor_changes:
+  - gem module - adds http_proxy attribute whic henables GEM's installations through a proxy (https://github.com/ansible-collections/community.general/pull/7406).
