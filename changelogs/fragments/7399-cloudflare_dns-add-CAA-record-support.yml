@@ -1,2 +1,2 @@
 minor_changes:
-  - cloudflare_dns - Add CAA record support.
+  - cloudflare_dns - add CAA record support (https://github.com/ansible-collections/community.general/pull/7399).
