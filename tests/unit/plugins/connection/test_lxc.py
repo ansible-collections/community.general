@@ -27,11 +27,17 @@ def lxc(request):
     """
     liblxc_present = getattr(request, 'param', True)
 
-    class ContainerMock(mock.MagicMock):
+    class ContainerMock():
+        # dict of container name to its state
+        _container_states = {}
+
         def __init__(self, name):
             super(ContainerMock, self).__init__()
             self.name = name
-            self.state = 'STARTED'
+
+        @property
+        def state(self):
+            return ContainerMock._container_states.get(self.name, 'STARTED')
 
     liblxc_module_mock = mock.MagicMock()
     liblxc_module_mock.Container = ContainerMock
@@ -84,3 +90,54 @@ class TestLXCConnectionClass():
 
         conn._connect()
         assert conn.container_name == container_name
+
+    def test_error_when_stopped(self, lxc):
+        """Test that on connect an error is thrown if the container is stopped."""
+        play_context = PlayContext()
+        in_stream = StringIO()
+        conn = connection_loader.get('lxc', play_context, in_stream)
+        conn.set_option('remote_addr', 'my-container')
+
+        lxc._lxc.Container._container_states['my-container'] = 'STOPPED'
+
+        with pytest.raises(AnsibleError, match='my-container is not running'):
+            conn._connect()
+
+    def test_container_name_change(self):
+        """Test connect method reconnects when remote_addr changes"""
+        play_context = PlayContext()
+        in_stream = StringIO()
+        conn = connection_loader.get('lxc', play_context, in_stream)
+
+        # setting the option does nothing
+        container1_name = 'my-container'
+        conn.set_option('remote_addr', container1_name)
+        assert conn.container_name is None
+        assert conn.container is None
+
+        # first call initializes the connection
+        conn._connect()
+        assert conn.container_name is container1_name
+        assert conn.container is not None
+        assert conn.container.name == container1_name
+        container1 = conn.container
+
+        # second call is basically a no-op
+        conn._connect()
+        assert conn.container_name is container1_name
+        assert conn.container is container1
+        assert conn.container.name == container1_name
+
+        # setting the option does again nothing
+        container2_name = 'my-other-container'
+        conn.set_option('remote_addr', container2_name)
+        assert conn.container_name == container1_name
+        assert conn.container is container1
+        assert conn.container.name == container1_name
+
+        # first call with a different remote_addr changes the connection
+        conn._connect()
+        assert conn.container_name == container2_name
+        assert conn.container is not None
+        assert conn.container is not container1
+        assert conn.container.name == container2_name

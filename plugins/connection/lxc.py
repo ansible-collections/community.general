@@ -71,10 +71,11 @@ class Connection(ConnectionBase):
             msg = "lxc python bindings are not installed"
             raise errors.AnsibleError(msg)
 
-        if self.container:
+        container_name = self.get_option('remote_addr')
+        if self.container and self.container_name == container_name:
             return
 
-        self.container_name = self.get_option('remote_addr')
+        self.container_name = container_name
 
         self._display.vvv("THIS IS A LOCAL LXC DIR", host=self.container_name)
         self.container = _lxc.Container(self.container_name)
