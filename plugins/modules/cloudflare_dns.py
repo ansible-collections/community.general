@@ -640,7 +640,7 @@ class CloudflareAPI(object):
                 content = str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
         elif params['type'] == 'TLSA':
             if not (params['value'] is None or params['value'] == ''):
-                content = str(params['cert_usage']) + ' ' + str(params['selector']) + ' ' + str(params['hash_type']) + ' ' + params['value']
+                content = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
             search_record = params['port'] + '.' + params['proto'] + '.' + params['record']
         if params['solo']:
             search_value = None
