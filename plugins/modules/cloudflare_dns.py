@@ -804,7 +804,7 @@ class CloudflareAPI(object):
         # the creation of duplicate records but lets cover it anyways
         if len(records) > 1:
             # As Cloudflare API cannot filter record containing quotes
-            # CAA records must be compared localy
+            # CAA records must be compared locally
             if params['type'] == 'CAA':
                 for rr in records:
                     if rr['data']['flags'] == caa_data['flags'] and rr['data']['tag'] == caa_data['tag'] and rr['data']['value'] == caa_data['value']:
