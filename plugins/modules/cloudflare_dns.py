@@ -72,6 +72,7 @@ options:
     - Required for O(type=CAA) when O(state=present).
     type: str
     choices: [ issue, issuewild, iodef ]
+    version_added: 8.0.0
   hash_type:
     description:
     - Hash type number.
