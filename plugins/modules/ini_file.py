@@ -119,8 +119,8 @@ options:
   modify_inactive_option:
     description:
       - By default the module replaces a commented line that matches the given option.
-      - Set this option to V(false) to avoid this. This is useful when you want to keep example
-        key:value pairs for documentation purposes.
+      - Set this option to V(false) to avoid this. This is useful when you want to keep commented example
+        C(key=value) pairs for documentation purposes.
     type: bool
     default: true
     version_added: 8.0.0
