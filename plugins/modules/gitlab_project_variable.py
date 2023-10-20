@@ -87,26 +87,26 @@ options:
         type: str
       masked:
         description:
-          - Wether variable value is masked or not.
+          - Whether variable value is masked or not.
           - Support for masked values requires GitLab >= 11.10.
         type: bool
         default: false
       protected:
         description:
-          - Wether variable value is protected or not.
+          - Whether variable value is protected or not.
           - Support for protected values requires GitLab >= 9.3.
         type: bool
         default: false
       raw:
         description:
-          - Wether variable value is raw or not.
+          - Whether variable value is raw or not.
           - Support for raw values requires GitLab >= 15.7.
         type: bool
         default: false
         version_added: '7.4.0'
       variable_type:
         description:
-          - Wether a variable is an environment variable (V(env_var)) or a file (V(file)).
+          - Whether a variable is an environment variable (V(env_var)) or a file (V(file)).
           - Support for O(variables[].variable_type) requires GitLab >= 11.11.
         type: str
         choices: ["env_var", "file"]
