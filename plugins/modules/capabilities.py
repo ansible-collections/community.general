@@ -61,6 +61,12 @@ EXAMPLES = r'''
     path: /bar
     capability: cap_net_bind_service
     state: absent
+
+ - name: Remove all capabilities from /restricted_app
+   community.general.capabilities:
+    path: /restricted_app
+    capability: ""
+    state: absent   
 '''
 
 from ansible.module_utils.basic import AnsibleModule
