@@ -18,6 +18,11 @@ options:
         - FQDN of Nomad server.
       required: true
       type: str
+    port:
+      description:
+        - Port of Nomad server.
+      type: int
+      default: 4646
     use_ssl:
       description:
         - Use TLS/SSL connection.
