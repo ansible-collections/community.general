@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: nomad_job 
+module: nomad_job
 author: FERREIRA Christophe (@chris93111)
 version_added: "1.3.0"
 short_description: Launch a Nomad Job
