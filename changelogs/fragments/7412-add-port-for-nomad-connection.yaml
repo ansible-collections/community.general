@@ -1,2 +1,2 @@
 minor_changes:
-  - Add port parameter to nomad connection (https://github.com/ansible-collections/community.general/pull/7412)
+  - nomad_job, nomad_job_info - add ``port`` parameter (https://github.com/ansible-collections/community.general/pull/7412).
