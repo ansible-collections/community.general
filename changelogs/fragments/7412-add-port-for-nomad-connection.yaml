@@ -1,0 +1,2 @@
+minor_changes:
+  - Add port parameter to nomad connection (https://github.com/ansible-collections/community.general/pull/7412)
