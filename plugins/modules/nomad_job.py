@@ -71,7 +71,7 @@ EXAMPLES = '''
     content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
 
-- name: Connect with port to create job 
+- name: Connect with port to create job
   community.general.nomad_job:
     host: localhost
     port: 4645
