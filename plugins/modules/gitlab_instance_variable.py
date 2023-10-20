@@ -67,17 +67,17 @@ options:
         type: str
       masked:
         description:
-          - Wether variable value is masked or not.
+          - Whether variable value is masked or not.
         type: bool
         default: false
       protected:
         description:
-          - Wether variable value is protected or not.
+          - Whether variable value is protected or not.
         type: bool
         default: false
       variable_type:
         description:
-          - Wether a variable is an environment variable (V(env_var)) or a file (V(file)).
+          - Whether a variable is an environment variable (V(env_var)) or a file (V(file)).
         type: str
         choices: [ "env_var", "file" ]
         default: env_var
