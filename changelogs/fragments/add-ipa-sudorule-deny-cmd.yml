@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa_sudorule - adds in option to include denied commands or command groups
