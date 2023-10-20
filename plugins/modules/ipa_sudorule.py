@@ -47,6 +47,20 @@ options:
     type: list
     elements: str
     version_added: 2.0.0
+  deny_cmd:
+    description:
+    - List of denied commands assigned to the rule.
+    - If an empty list is passed all commands will be removed from the rule.
+    - If option is omitted commands will not be checked or changed.
+    type: list
+    elements: str
+  deny_cmdgroup:
+    description:
+    - List of denied command groups assigned to the rule.
+    - If an empty list is passed all command groups will be removed from the rule.
+    - If option is omitted command groups will not be checked or changed.
+    type: list
+    elements: str
   description:
     description:
     - Description of the sudo rule.
@@ -246,6 +260,12 @@ class SudoRuleIPAClient(IPAClient):
     def sudorule_add_allow_command_group(self, name, item):
         return self._post_json(method='sudorule_add_allow_command', name=name, item={'sudocmdgroup': item})
 
+    def sudorule_add_deny_command(self, name, item):
+        return self._post_json(method='sudorule_add_deny_command', name=name, item={'sudocmd': item})
+
+    def sudorule_add_deny_command_group(self, name, item):
+        return self._post_json(method='sudorule_add_deny_command', name=name, item={'sudocmdgroup': item})
+
     def sudorule_remove_allow_command(self, name, item):
         return self._post_json(method='sudorule_remove_allow_command', name=name, item=item)
 
@@ -303,6 +323,8 @@ def ensure(module, client):
     cmd = module.params['cmd']
     cmdgroup = module.params['cmdgroup']
     cmdcategory = module.params['cmdcategory']
+    deny_cmd = module.params['deny_cmd']
+    deny_cmdgroup = module.params['deny_cmdgroup']
     host = module.params['host']
     hostcategory = module.params['hostcategory']
     hostgroup = module.params['hostgroup']
@@ -358,6 +380,16 @@ def ensure(module, client):
             changed = category_changed(module, client, 'cmdcategory', ipa_sudorule) or changed
             if not module.check_mode:
                 client.sudorule_add_allow_command_group(name=name, item=cmdgroup)
+
+        if deny_cmd is not None:
+            changed = category_changed(module, client, 'cmdcategory', ipa_sudorule) or changed
+            if not module.check_mode:
+                client.sudorule_add_deny_command(name=name, item=deny_cmd)
+
+        if deny_cmdgroup is not None:
+            changed = category_changed(module, client, 'cmdcategory', ipa_sudorule) or changed
+            if not module.check_mode:
+                client.sudorule_add_deny_command_group(name=name, item=deny_cmdgroup)
 
         if runasusercategory is not None:
             changed = category_changed(module, client, 'iparunasusercategory', ipa_sudorule) or changed
@@ -433,6 +465,8 @@ def main():
                          cmdgroup=dict(type='list', elements='str'),
                          cmdcategory=dict(type='str', choices=['all']),
                          cn=dict(type='str', required=True, aliases=['name']),
+                         deny_cmd=dict(type='list', elements='str'),
+                         deny_cmdgroup=dict(type='list', elements='str'),
                          description=dict(type='str'),
                          host=dict(type='list', elements='str'),
                          hostcategory=dict(type='str', choices=['all']),
@@ -447,7 +481,9 @@ def main():
                          runasextusers=dict(type='list', elements='str'))
     module = AnsibleModule(argument_spec=argument_spec,
                            mutually_exclusive=[['cmdcategory', 'cmd'],
+                                               ['cmdcategory', 'deny_cmd'],
                                                ['cmdcategory', 'cmdgroup'],
+                                               ['cmdcategory', 'deny_cmdgroup'],
                                                ['hostcategory', 'host'],
                                                ['hostcategory', 'hostgroup'],
                                                ['usercategory', 'user'],
