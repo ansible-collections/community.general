@@ -29,6 +29,12 @@ options:
             - Specifies arguments for facter.
         type: list
         elements: str
+    want_facts:
+        description:
+            - When V(false) (default), collected facts will be provided as output variable.
+            - When V(true), the output will be of ansible facts.
+        type: bool
+        default: false
 requirements:
     - facter
     - ruby-json
@@ -52,6 +58,19 @@ EXAMPLES = '''
         - timezone
         - is_virtual
 '''
+
+RETURN = r'''
+ansible_facts:
+  description: Dictionary with one key C(facter).
+  returned: when want_facts=true
+  type: dict
+  contains:
+    facter:
+      description: Dictionary containing facts discovered in the remote system.
+      returned: always
+      type: dict
+'''
+
 import json
 
 from ansible.module_utils.basic import AnsibleModule
@@ -60,7 +79,8 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            arguments=dict(required=False, type='list', elements='str')
+            arguments=dict(type='list', elements='str'),
+            want_facts=dict(type='bool', default=False),
         )
     )
 
@@ -73,7 +93,11 @@ def main():
         cmd += module.params['arguments']
 
     rc, out, err = module.run_command(cmd, check_rc=True)
-    module.exit_json(**json.loads(out))
+    results = json.loads(out)
+    if module.params['want_facts']:
+        module.exit_json(ansible_facts=dict(facter=results))
+    else:
+        module.exit_json(**results)
 
 
 if __name__ == '__main__':
