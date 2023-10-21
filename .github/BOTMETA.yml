@@ -497,6 +497,9 @@ files:
   $modules/facter.py:
     labels: facter
     maintainers: $team_ansible_core gamethis
+  $modules/facter_facts.py:
+    labels: facter
+    maintainers: russoz $team_ansible_core gamethis
   $modules/filesize.py:
     maintainers: quidame
   $modules/filesystem.py:
