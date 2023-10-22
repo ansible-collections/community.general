@@ -22,11 +22,6 @@ extends_documentation_fragment:
     - community.general.attributes
     - community.general.attributes.facts
     - community.general.attributes.facts_module
-attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
 options:
     arguments:
         description:
