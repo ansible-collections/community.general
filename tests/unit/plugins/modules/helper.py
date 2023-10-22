@@ -103,8 +103,8 @@ class Helper(object):
 
     @staticmethod
     def from_file(module_main, filename):
-        with open(filename, "r") as TEST_CASES:
-            helper = Helper(module_main, test_cases=TEST_CASES)
+        with open(filename, "r") as test_cases:
+            helper = Helper(module_main, test_cases=test_cases)
             return helper
 
     @staticmethod
