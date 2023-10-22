@@ -35,14 +35,14 @@
       syncMode: FORCE
     mappers:
       - name: "first_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "first_name"
           user.attribute: "first_name"
           syncMode: "INHERIT"
       - name: "last_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "last_name"
@@ -84,14 +84,14 @@
       syncMode: FORCE
     mappers:
       - name: "first_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "first_name"
           user.attribute: "first_name"
           syncMode: "INHERIT"
       - name: "last_name"
-        identityProviderAlias: "oidc-idp"
+        identityProviderAlias: "{{ idp }}"
         identityProviderMapper: "oidc-user-attribute-idp-mapper"
         config:
           claim: "last_name"
