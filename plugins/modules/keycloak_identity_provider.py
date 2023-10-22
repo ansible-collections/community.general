@@ -542,10 +542,14 @@ def main():
                     old_mapper = dict()
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            # eventually this holds all desired mappers, unchanged, modified and newly added
+            changeset['mappers'].append(new_mapper)
+
+        # ensure idempotency in case module.params.mappers is not sorted by name
+        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('name'))
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_idp = before_idp.copy()
