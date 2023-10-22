@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2023, Alexei Znamensky
 # Copyright (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -10,17 +11,17 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: facter
-short_description: Runs the discovery program C(facter) on the remote system
+module: facter_facts
+short_description: Runs the discovery program C(facter) on the remote system and return Ansible facts.
 description:
     - Runs the C(facter) discovery program
-      (U(https://github.com/puppetlabs/facter)) on the remote system, returning
+      (U(https://github.com/puppetlabs/facter)) on the remote system, returning Ansible facts from the
       JSON data that can be useful for inventory purposes.
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
     check_mode:
-        support: none
+        support: full
     diff_mode:
         support: none
 options:
@@ -29,12 +30,6 @@ options:
             - Specifies arguments for facter.
         type: list
         elements: str
-    want_facts:
-        description:
-            - When V(false) (default), collected facts will be provided as output variable.
-            - When V(true), the output will be of ansible facts.
-        type: bool
-        default: false
 requirements:
     - facter
     - ruby-json
@@ -44,14 +39,11 @@ author:
 '''
 
 EXAMPLES = '''
-# Example command-line invocation
-# ansible www.example.net -m facter
-
 - name: Execute facter no arguments
-  community.general.facter:
+  community.general.facter_facts:
 
 - name: Execute facter with arguments
-  community.general.facter:
+  community.general.facter_facts:
     arguments:
         - -p
         - system_uptime
@@ -62,7 +54,7 @@ EXAMPLES = '''
 RETURN = r'''
 ansible_facts:
   description: Dictionary with one key C(facter).
-  returned: when want_facts=true
+  returned: always
   type: dict
   contains:
     facter:
@@ -80,8 +72,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             arguments=dict(type='list', elements='str'),
-            want_facts=dict(type='bool', default=False),
-        )
+        ),
+        supports_check_mode=True,
     )
 
     facter_path = module.get_bin_path(
@@ -93,11 +85,7 @@ def main():
         cmd += module.params['arguments']
 
     rc, out, err = module.run_command(cmd, check_rc=True)
-    results = json.loads(out)
-    if module.params['want_facts']:
-        module.exit_json(ansible_facts=dict(facter=results))
-    else:
-        module.exit_json(**results)
+    module.exit_json(ansible_facts=dict(facter=json.loads(out)))
 
 
 if __name__ == '__main__':
