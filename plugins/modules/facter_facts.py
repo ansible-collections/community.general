@@ -20,6 +20,8 @@ description:
       JSON data that can be useful for inventory purposes.
 extends_documentation_fragment:
     - community.general.attributes
+    - community.general.attributes.facts
+    - community.general.attributes.facts_module
 attributes:
     check_mode:
         support: full
