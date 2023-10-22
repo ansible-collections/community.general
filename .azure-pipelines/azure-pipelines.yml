@@ -244,8 +244,8 @@ stages:
         parameters:
           testFormat: 2.14/{0}
           targets:
-            - name: macOS 12.0
-              test: macos/12.0
+            #- name: macOS 12.0
+            #  test: macos/12.0
             - name: RHEL 9.0
               test: rhel/9.0
             #- name: FreeBSD 12.4
