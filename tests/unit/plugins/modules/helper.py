@@ -107,6 +107,13 @@ class Helper(object):
             helper = Helper(module_main, test_cases=TEST_CASES)
             return helper
 
+    @staticmethod
+    def from_module(module):
+        basename = module.__name__.split(".")[-1]
+        test_spec = "tests/unit/plugins/modules/test_{0}.yaml".format(basename)
+        helper = Helper.from_file(module.main, test_spec)
+        return helper
+
     def __init__(self, module_main, test_cases):
         self.module_main = module_main
         self._test_cases = test_cases

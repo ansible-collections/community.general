@@ -11,6 +11,6 @@ from ansible_collections.community.general.plugins.modules import gconftool2
 from .helper import Helper
 
 
-helper = Helper.from_file(gconftool2.main, "tests/unit/plugins/modules/test_gconftool2.yaml")
+helper = Helper.from_module(gconftool2)
 patch_bin = helper.cmd_fixture
 test_module = helper.test_module
