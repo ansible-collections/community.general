@@ -12,7 +12,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: facter_facts
-short_description: Runs the discovery program C(facter) on the remote system and return Ansible facts.
+short_description: Runs the discovery program C(facter) on the remote system and return Ansible facts
+version_added: 8.0.0
 description:
     - Runs the C(facter) discovery program
       (U(https://github.com/puppetlabs/facter)) on the remote system, returning Ansible facts from the
