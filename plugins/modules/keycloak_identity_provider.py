@@ -616,10 +616,17 @@ def main():
             # do the update
             desired_idp = desired_idp.copy()
             updated_mappers = desired_idp.pop('mappers', [])
+            original_mappers = before_idp.get('mappers', []).copy()
+
             kc.update_identity_provider(desired_idp, realm)
             for mapper in updated_mappers:
                 if mapper.get('id') is not None:
-                    kc.update_identity_provider_mapper(mapper, alias, realm)
+                    # only update existing if there is a change
+                    for i, orig in enumerate(original_mappers):
+                        if mapper['id'] == orig['id']:
+                            del original_mappers[i]
+                            if mapper != orig:
+                                kc.update_identity_provider_mapper(mapper, alias, realm)
                 else:
                     if mapper.get('identityProviderAlias') is None:
                         mapper['identityProviderAlias'] = alias
