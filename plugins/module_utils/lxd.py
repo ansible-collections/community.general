@@ -57,10 +57,20 @@ class LXDClient(object):
         self.debug = debug
         self.logs = []
         if url.startswith('https:'):
-            self.cert_file = cert_file
-            self.key_file = key_file
+            try:
+                with open(cert_file, 'r') as fh:
+                    self.cert_file = cert_file
+            except FileNotFoundError:
+                raise LXDClientException('The certificate "{0}" does not exist.'.format(cert_file))
+
+            try:
+                with open(key_file, 'r') as fh:
+                    self.key_file = key_file
+            except FileNotFoundError:
+                raise LXDClientException('The certificate key "{0}" does not exist.'.format(key_file))
+
             parts = generic_urlparse(urlparse(self.url))
-            ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+            ctx = ssl._create_unverified_context(purpose=ssl.Purpose.SERVER_AUTH)
             ctx.load_cert_chain(cert_file, keyfile=key_file)
             self.connection = HTTPSConnection(parts.get('netloc'), context=ctx)
         elif url.startswith('unix:'):
@@ -103,6 +113,8 @@ class LXDClient(object):
                 if ok_error_codes is not None and resp_json['error_code'] in ok_error_codes:
                     return resp_json
                 if resp_json['error'] == "Certificate already in trust store":
+                    return resp_json
+                if resp_json['error'] == "Client is already trusted":
                     return resp_json
                 self._raise_err_from_json(resp_json)
             return resp_json
