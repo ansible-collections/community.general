@@ -1,0 +1,2 @@
+minor_changes:
+  - "zypper - change remove operation (``status=absent``) to not fail on 104 status (https://github.com/ansible-collections/community.general/pull/7423)."
