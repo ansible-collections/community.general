@@ -129,6 +129,14 @@ DOCUMENTATION = '''
           - pass
           - gopass
         version_added: 5.2.0
+      timestamp:
+        description: Add the password generation information to the end of the file.
+        type: bool
+        default: true
+      preserve:
+        description: Include the old (edited) password inside the pass file.
+        type: bool
+        default: true
     notes:
       - The lookup supports passing all options as lookup parameters since community.general 6.0.0.
 '''
