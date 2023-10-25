@@ -1,0 +1,2 @@
+minor_changes:
+  - nomad_job, nomad_job_info - add ``port`` parameter (https://github.com/ansible-collections/community.general/pull/7412).

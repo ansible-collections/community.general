@@ -281,6 +281,7 @@ def run():
     module = AnsibleModule(
         argument_spec=dict(
             host=dict(required=True, type='str'),
+            port=dict(type='int', default=4646),
             use_ssl=dict(type='bool', default=True),
             timeout=dict(type='int', default=5),
             validate_certs=dict(type='bool', default=True),
@@ -300,6 +301,7 @@ def run():
 
     nomad_client = nomad.Nomad(
         host=module.params.get('host'),
+        port=module.params.get('port'),
         secure=module.params.get('use_ssl'),
         timeout=module.params.get('timeout'),
         verify=module.params.get('validate_certs'),
