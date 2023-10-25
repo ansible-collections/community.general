@@ -47,27 +47,27 @@ options:
         comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
         [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(3).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(3).
     type: str
   cores:
     description:
       - Specify number of cores per socket.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   memory:
     description:
       - memory size in MB for instance
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(512).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(512).
     type: int
   swap:
     description:
       - swap memory size in MB for instance
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(0).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(0).
     type: int
   netif:
     description:
@@ -91,7 +91,7 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   storage:
     description:
@@ -101,7 +101,7 @@ options:
   cpuunits:
     description:
       - CPU weight for a VM
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1000).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1000).
     type: int
   nameserver:
     description:
