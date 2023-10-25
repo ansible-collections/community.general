@@ -1154,7 +1154,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         except Exception as e:
             self.module.fail_json(vmid=vmid, msg="restarting of VM %s failed with exception: %s" % (vmid, e))
             return False
-    
+
     def convert_to_template(self, vm, timeout, force):
         vmid = vm['vmid']
         try:
@@ -1529,7 +1529,7 @@ def main():
             module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
         except Exception as e:
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
-    
+
     elif state == 'template':
         if not vmid:
             module.fail_json(msg='VM with name = %s does not exist in cluster' % name)

@@ -815,7 +815,7 @@ def main():
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid)
         except Exception as e:
             module.fail_json(msg="stopping of VM %s failed with exception: %s" % (vmid, e))
-    
+
     elif state == 'template':
         try:
             vm = proxmox.get_vm(vmid)
