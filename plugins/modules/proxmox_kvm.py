@@ -453,8 +453,9 @@ options:
     description:
       - Indicates desired state of the instance.
       - If V(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - V(template) was added in community.general 8.0.0.
     type: str
-    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current']
+    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template']
     default: present
   storage:
     description:
@@ -1524,8 +1525,8 @@ def main():
             if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
-            if proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout']):
-                module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
+            proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout'])
+            module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
         except Exception as e:
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
     

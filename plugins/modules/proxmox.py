@@ -144,6 +144,7 @@ options:
   state:
     description:
      - Indicate desired state of the instance
+     - V(template) was added in community.general 8.0.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'template']
     default: present
@@ -427,7 +428,7 @@ EXAMPLES = r'''
     api_host: node1
     state: template
 
-- name: Convert container to template(stop container if running)
+- name: Convert container to template (stop container if running)
   community.general.proxmox:
     vmid: 100
     api_user: root@pam
@@ -819,8 +820,8 @@ def main():
         try:
             vm = proxmox.get_vm(vmid)
 
-            if proxmox.convert_to_template(vm, vmid, timeout, force=module.params['force']):
-                module.exit_json(changed=True, msg="VM %s is converted to template" % vmid)
+            proxmox.convert_to_template(vm, vmid, timeout, force=module.params['force'])
+            module.exit_json(changed=True, msg="VM %s is converted to template" % vmid)
         except Exception as e:
             module.fail_json(msg="conversion of VM %s to template failed with exception: %s" % (vmid, e))
 
