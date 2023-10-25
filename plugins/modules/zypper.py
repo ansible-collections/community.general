@@ -205,7 +205,7 @@ EXAMPLES = '''
     allow_vendor_change: true
     extra_args: '--allow-arch-change'
 
-- name: Perform a installaion of nmap with the install option replacefiles
+- name: Perform a installation of nmap with the install option replacefiles
   community.general.zypper:
     name: 'nmap'
     state: latest
