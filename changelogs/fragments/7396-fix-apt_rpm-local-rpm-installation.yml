@@ -1,0 +1,5 @@
+minor_changes:
+  - |
+    apt_rpm - extract package name from local ``.rpm`` path when verifying
+    installation success. Allows installing packages from local ``.rpm`` files
+    (https://github.com/ansible-collections/community.general/pull/7396).
