@@ -394,11 +394,11 @@ class LookupModule(LookupBase):
         # generate new password, insert old lines from current result and return new password
         newpass = self.get_newpass()
         datetime = time.strftime("%d/%m/%Y %H:%M:%S")
-        msg = newpass + '\n'
+        msg = newpass
         if self.paramvals['preserve'] and self.passoutput[1:]:
-            msg += '\n'.join(self.passoutput[1:]) + '\n'
+            msg += '\n' + '\n'.join(self.passoutput[1:])
         if self.paramvals['timestamp'] and self.paramvals['backup']:
-            msg += "lookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
+            msg += "\nlookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
         try:
             check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
