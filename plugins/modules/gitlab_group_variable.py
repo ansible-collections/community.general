@@ -71,7 +71,7 @@ options:
     version_added: 4.5.0
     description:
       - A list of dictionaries that represents CI/CD variables.
-      - This modules works internal with this sructure, even if the older O(vars) parameter is used.
+      - This modules works internal with this structure, even if the older O(vars) parameter is used.
     default: []
     type: list
     elements: dict

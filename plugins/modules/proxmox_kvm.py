@@ -30,7 +30,7 @@ options:
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(true).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(true).
     type: bool
   agent:
     description:
@@ -42,19 +42,19 @@ options:
     description:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
-      - If O(proxmox_default_behavior) is set to V(compatiblity), this option has a default of
+      - If O(proxmox_default_behavior) is set to V(compatibility), this option has a default of
         V(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait).
     type: str
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   balloon:
     description:
       - Specify the amount of RAM for the VM in MB.
       - Using zero disables the balloon driver.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(0).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(0).
     type: int
   bios:
     description:
@@ -66,7 +66,7 @@ options:
       - Specify the boot order -> boot on floppy V(a), hard disk V(c), CD-ROM V(d), or network V(n).
       - For newer versions of Proxmox VE, use a boot order like V(order=scsi0;net0;hostpci0).
       - You can combine to set order.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(cnd).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(cnd).
     type: str
   bootdisk:
     description:
@@ -102,12 +102,12 @@ options:
   cores:
     description:
       - Specify number of cores per socket.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   cpu:
     description:
       - Specify emulated CPU type.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(kvm64).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(kvm64).
     type: str
   cpulimit:
     description:
@@ -118,7 +118,7 @@ options:
     description:
       - Specify CPU weight for a VM.
       - You can disable fair-scheduler configuration by setting this to 0
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1000).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1000).
     type: int
   delete:
     description:
@@ -171,7 +171,7 @@ options:
     description:
       - Allow to force stop VM.
       - Can be used with states V(stopped), V(restarted), and V(absent).
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   format:
     description:
@@ -181,7 +181,7 @@ options:
       - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see
         U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
         supported by the provided storage backend.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(qcow2).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(qcow2).
         If O(proxmox_default_behavior) is set to V(no_defaults), not specifying this option is equivalent to setting it to V(unspecified).
     type: str
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
@@ -249,7 +249,7 @@ options:
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(true).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(true).
     type: bool
   localtime:
     description:
@@ -269,7 +269,7 @@ options:
   memory:
     description:
       - Memory size in MB for instance.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(512).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(512).
     type: int
   migrate:
     description:
@@ -332,13 +332,13 @@ options:
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(true).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(true).
     type: bool
   ostype:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
       - The l26 is Linux 2.6/3.X Kernel.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(l26).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(l26).
     type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'win11', 'l24', 'l26', 'solaris']
   parallel:
@@ -431,7 +431,7 @@ options:
   sockets:
     description:
       - Sets the number of CPU sockets. (1 - N).
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(1).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   sshkeys:
     description:
@@ -463,7 +463,7 @@ options:
   tablet:
     description:
       - Enables/disables the USB tablet device.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   tags:
     description:
@@ -485,7 +485,7 @@ options:
   template:
     description:
       - Enables/disables the template.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(false).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   timeout:
     description:
@@ -526,7 +526,7 @@ options:
   vga:
     description:
       - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatiblity); then the default is V(std).
+      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(std).
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
   virtio:
@@ -950,7 +950,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         only_v4 = ['force', 'protection', 'skiplock']
         only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig', 'tags']
 
-        # valide clone parameters
+        # valid clone parameters
         valid_clone_params = ['format', 'full', 'pool', 'snapname', 'storage', 'target']
         clone_params = {}
         # Default args for vm. Note: -args option is for experts only. It allows you to pass arbitrary arguments to kvm.
@@ -1012,7 +1012,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
         if 'efidisk0' in kwargs:
             efidisk0_str = ''
-            # Regexp to catch underscores in keys name, to replace them after by hypens
+            # Regexp to catch underscores in keys name, to replace them after by hyphens
             hyphen_re = re.compile(r'_')
             # If present, the storage definition should be the first argument
             if 'storage' in kwargs['efidisk0']:

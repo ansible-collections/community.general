@@ -70,7 +70,7 @@ options:
   description:
     description:
       - A description for the merge request.
-      - Gets overriden by a content of file specified at O(description_path), if found.
+      - Gets overridden by a content of file specified at O(description_path), if found.
     type: str
   description_path:
     description:

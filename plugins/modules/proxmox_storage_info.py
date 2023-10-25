@@ -19,12 +19,12 @@ description:
 options:
   storage:
     description:
-      - Only return informations on a specific storage.
+      - Only return information on a specific storage.
     aliases: ['name']
     type: str
   type:
     description:
-      - Filter on a specifc storage type.
+      - Filter on a specific storage type.
     type: str
 author: Tristan Le Guern (@tleguern)
 extends_documentation_fragment:
