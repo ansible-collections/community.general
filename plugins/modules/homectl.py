@@ -439,7 +439,7 @@ class Homectl(object):
             self.result['changed'] = True
 
         if self.disksize:
-            # convert humand readble to bytes
+            # convert human readable to bytes
             if self.disksize != record.get('diskSize'):
                 record['diskSize'] = human_to_bytes(self.disksize)
                 self.result['changed'] = True

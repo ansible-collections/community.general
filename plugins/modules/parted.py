@@ -42,7 +42,7 @@ options:
     required: true
   align:
     description:
-      - Set alignment for newly created partitions. Use V(undefined) for parted default aligment.
+      - Set alignment for newly created partitions. Use V(undefined) for parted default alignment.
     type: str
     choices: [ cylinder, minimal, none, optimal, undefined ]
     default: optimal

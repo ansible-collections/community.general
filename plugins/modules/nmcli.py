@@ -1743,7 +1743,7 @@ class Nmcli(object):
                 'bridge.priority': self.priority,
                 'bridge.stp': self.stp,
             })
-            # priority make sense when stp enabed, otherwise nmcli keeps bridge-priority to 32768 regrdless of input.
+            # priority make sense when stp enabled, otherwise nmcli keeps bridge-priority to 32768 regrdless of input.
             # force ignoring to save idempotency
             if self.stp:
                 options.update({'bridge.priority': self.priority})

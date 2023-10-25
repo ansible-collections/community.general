@@ -382,7 +382,7 @@ def main():
     part = MIMEText(body + "\n\n", _subtype=subtype, _charset=charset)
     msg.attach(part)
 
-    # NOTE: Backware compatibility with old syntax using space as delimiter is not retained
+    # NOTE: Backward compatibility with old syntax using space as delimiter is not retained
     #       This breaks files with spaces in it :-(
     for filename in attach_files:
         try:
