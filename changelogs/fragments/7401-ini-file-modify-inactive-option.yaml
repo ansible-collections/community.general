@@ -1,0 +1,2 @@
+minor_changes:
+  - ini_file - add ``modify_inactive_option`` option (https://github.com/ansible-collections/community.general/pull/7401).
