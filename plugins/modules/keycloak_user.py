@@ -481,13 +481,16 @@ def main():
             module.exit_json(**result)
         else:
             # Delete user
-            kc.delete_user(user_id=before_user['id'], realm=realm)
+            if module._diff:
+                result['diff'] = dict(before=before_user, after={})
+            if not module.check_mode:
+                kc.delete_user(user_id=before_user['id'], realm=realm)
             result["msg"] = 'User %s deleted' % (before_user['username'])
             changed = True
 
     else:
         after_user = {}
-        if force:  # If the force option is set to true
+        if force and before_user:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
 
