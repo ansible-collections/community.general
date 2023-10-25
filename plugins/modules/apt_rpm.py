@@ -28,6 +28,9 @@ options:
   package:
     description:
       - List of packages to install, upgrade, or remove.
+      - Since community.general 8.0.0, may include paths to local C(.rpm) files
+        if O(state=installed) or O(state=present), requires C(rpm) python
+        module.
     aliases: [ name, pkg ]
     type: list
     elements: str
@@ -63,6 +66,9 @@ options:
     type: bool
     default: false
     version_added: 6.5.0
+requirements:
+  - C(rpm) python package (rpm bindings), optional. Required if O(package)
+    option includes local files.
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
@@ -109,13 +115,44 @@ EXAMPLES = '''
 '''
 
 import os
+import traceback
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import (
+    AnsibleModule,
+    missing_required_lib,
+)
+from ansible.module_utils.common.text.converters import to_native
+
+try:
+    import rpm
+except ImportError:
+    HAS_RPM_PYTHON = False
+    RPM_PYTHON_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_RPM_PYTHON = True
+    RPM_PYTHON_IMPORT_ERROR = None
 
 APT_PATH = "/usr/bin/apt-get"
 RPM_PATH = "/usr/bin/rpm"
 APT_GET_ZERO = "\n0 upgraded, 0 newly installed"
 UPDATE_KERNEL_ZERO = "\nTry to install new kernel "
+
+
+def local_rpm_package_name(path):
+    """return package name of a local rpm passed in.
+    Inspired by ansible.builtin.yum"""
+
+    ts = rpm.TransactionSet()
+    ts.setVSFlags(rpm._RPMVSF_NOSIGNATURES)
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        header = ts.hdrFromFdno(fd)
+    except rpm.error as e:
+        return None
+    finally:
+        os.close(fd)
+
+    return to_native(header[rpm.RPMTAG_NAME])
 
 
 def query_package(module, name):
@@ -131,6 +168,16 @@ def query_package(module, name):
 def query_package_provides(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
+    if name.endswith('.rpm'):
+        # Likely a local RPM file
+        if not HAS_RPM_PYTHON:
+            module.fail_json(
+                msg=missing_required_lib('rpm'),
+                exception=RPM_PYTHON_IMPORT_ERROR,
+            )
+
+        name = local_rpm_package_name(name)
+
     rc, out, err = module.run_command("%s -q --provides %s" % (RPM_PATH, name))
     return rc == 0
 
