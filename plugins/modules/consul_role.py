@@ -401,7 +401,7 @@ def create_role(configuration):
     if len(configuration.node_identities) == 1 and configuration.node_identities[0] is None:
         node_id_specified = False
 
-    # get rid of None item so we can set an emtpy list for policies, service identities and node identities
+    # get rid of None item so we can set an empty list for policies, service identities and node identities
     if not policy_specified:
         configuration.policies.pop()
 

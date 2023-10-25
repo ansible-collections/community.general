@@ -169,7 +169,7 @@ records:
             sample: fancy-hostname
         type:
             description: the record type
-            returned: succcess
+            returned: success
             type: str
             sample: A
         value:

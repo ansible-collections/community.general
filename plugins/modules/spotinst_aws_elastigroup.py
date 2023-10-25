@@ -266,14 +266,14 @@ options:
 
   opsworks:
     description:
-      - The elastigroup OpsWorks integration configration.;
+      - The elastigroup OpsWorks integration configuration.;
         Expects the following key -
         layer_id (String)
     type: dict
 
   persistence:
     description:
-      - The Stateful elastigroup configration.;
+      - The Stateful elastigroup configuration.;
         Accepts the following keys -
         should_persist_root_device (Boolean),
         should_persist_block_devices (Boolean),

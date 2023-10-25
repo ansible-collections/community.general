@@ -77,7 +77,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about paginated, filtered ans sorted list of Enclosures
+- name: Print fetched information about paginated, filtered and sorted list of Enclosures
   ansible.builtin.debug:
     msg: "{{ result.enclosures }}"
 

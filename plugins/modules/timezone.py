@@ -447,7 +447,7 @@ class NosystemdTimezone(Timezone):
             filename: The name of the file to edit.
             regexp:   The regular expression to search with.
             value:    The line which will be inserted.
-            key:      For what key the file is being editted.
+            key:      For what key the file is being edited.
         """
         # Read the file
         try:
@@ -725,7 +725,7 @@ class BSDTimezone(Timezone):
         localtime_file = '/etc/localtime'
 
         # Strategy 1:
-        #   If /etc/localtime does not exist, assum the timezone is UTC.
+        #   If /etc/localtime does not exist, assume the timezone is UTC.
         if not os.path.exists(localtime_file):
             self.module.warn('Could not read /etc/localtime. Assuming UTC.')
             return 'UTC'

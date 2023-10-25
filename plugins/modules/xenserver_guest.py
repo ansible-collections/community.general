@@ -36,12 +36,12 @@ notes:
   values V(none) and V(dhcp) have same effect. More info here:
   U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html)'
 - 'On platforms without official support for network configuration inside a guest OS, network parameters will be written to xenstore
-  C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read) tools on \*nix guests or trough
+  C(vm-data/networks/<vif_device>) key. Parameters can be inspected by using C(xenstore ls) and C(xenstore read) tools on \*nix guests or through
   WMI interface on Windows guests. They can also be found in VM facts C(instance.xenstore_data) key as returned by the module. It is up to the user
   to implement a boot time scripts or custom agent that will read the parameters from xenstore and configure network with given parameters.
   Take note that for xenstore data to become available inside a guest, a VM restart is needed hence module will require VM restart if any
-  parameter is changed. This is a limitation of XenAPI and xenstore. Considering these limitations, network configuration trough xenstore is most
-  useful for bootstraping newly deployed VMs, much less for reconfiguring existing ones. More info here:
+  parameter is changed. This is a limitation of XenAPI and xenstore. Considering these limitations, network configuration through xenstore is most
+  useful for bootstrapping newly deployed VMs, much less for reconfiguring existing ones. More info here:
   U(https://support.citrix.com/article/CTX226713)'
 requirements:
 - python >= 2.6
@@ -249,7 +249,7 @@ options:
   custom_params:
     description:
     - Define a list of custom VM params to set on VM.
-    - Useful for advanced users familiar with managing VM params trough xe CLI.
+    - Useful for advanced users familiar with managing VM params through xe CLI.
     - A custom value object takes two fields O(custom_params[].key) and O(custom_params[].value) (see example below).
     type: list
     elements: dict
@@ -272,7 +272,7 @@ options:
     default: false
   state_change_timeout:
     description:
-    - 'By default, module will wait indefinitely for VM to accquire an IP address if O(wait_for_ip_address=true).'
+    - 'By default, module will wait indefinitely for VM to acquire an IP address if O(wait_for_ip_address=true).'
     - If this parameter is set to positive value, the module will instead wait specified number of seconds for the state change.
     - In case of timeout, module will generate an error message.
     type: int
@@ -990,7 +990,7 @@ class XenServerVM(XenServerObject):
                                     vif_device = vm_vif_params['device']
 
                                     # A user could have manually changed network
-                                    # or mac e.g. trough XenCenter and then also
+                                    # or mac e.g. through XenCenter and then also
                                     # make those changes in playbook manually.
                                     # In that case, module will not detect any
                                     # changes and info in xenstore_data will
