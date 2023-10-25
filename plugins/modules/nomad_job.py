@@ -71,6 +71,14 @@ EXAMPLES = '''
     content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
 
+- name: Connect with port to create job
+  community.general.nomad_job:
+    host: localhost
+    port: 4645
+    state: present
+    content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
+    timeout: 120
+
 - name: Stop job
   community.general.nomad_job:
     host: localhost
@@ -103,6 +111,7 @@ def run():
     module = AnsibleModule(
         argument_spec=dict(
             host=dict(required=True, type='str'),
+            port=dict(type='int', default=4646),
             state=dict(required=True, choices=['present', 'absent']),
             use_ssl=dict(type='bool', default=True),
             timeout=dict(type='int', default=5),
@@ -132,6 +141,7 @@ def run():
 
     nomad_client = nomad.Nomad(
         host=module.params.get('host'),
+        port=module.params.get('port'),
         secure=module.params.get('use_ssl'),
         timeout=module.params.get('timeout'),
         verify=module.params.get('validate_certs'),
