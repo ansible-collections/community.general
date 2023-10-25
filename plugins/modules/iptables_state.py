@@ -458,7 +458,7 @@ def main():
     # The issue comes when wanting to restore state from empty iptable-save's
     # output... what happens when, say:
     # - no table is specified, and iptables-save's output is only nat table;
-    # - we give filter's ruleset to iptables-restore, that locks ourselve out
+    # - we give filter's ruleset to iptables-restore, that locks ourselves out
     #   of the host;
     # then trying to roll iptables state back to the previous (working) setup
     # doesn't override current filter table because no filter table is stored

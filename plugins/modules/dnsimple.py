@@ -178,7 +178,7 @@ class DNSimpleV2():
             client = Client(sandbox=self.sandbox, email=self.account_email, access_token=self.account_api_token, user_agent="ansible/community.general")
         else:
             msg = "Option account_email or account_api_token not provided. " \
-                  "Dnsimple authentiction with a .dnsimple config file is not " \
+                  "Dnsimple authentication with a .dnsimple config file is not " \
                   "supported with dnsimple-python>=2.0.0"
             raise DNSimpleException(msg)
         client.identity.whoami()
@@ -225,24 +225,24 @@ class DNSimpleV2():
         self.client.domains.delete_domain(self.account.id, domain)
 
     def get_records(self, zone, dnsimple_filter=None):
-        """return dns ressource records which match a specified filter"""
+        """return dns resource records which match a specified filter"""
         records_list = self._get_paginated_result(self.client.zones.list_records,
                                                   account_id=self.account.id,
                                                   zone=zone, filter=dnsimple_filter)
         return [d.__dict__ for d in records_list]
 
     def delete_record(self, domain, rid):
-        """delete a single dns ressource record"""
+        """delete a single dns resource record"""
         self.client.zones.delete_record(self.account.id, domain, rid)
 
     def update_record(self, domain, rid, ttl=None, priority=None):
-        """update a single dns ressource record"""
+        """update a single dns resource record"""
         zr = ZoneRecordUpdateInput(ttl=ttl, priority=priority)
         result = self.client.zones.update_record(self.account.id, str(domain), str(rid), zr).data.__dict__
         return result
 
     def create_record(self, domain, name, record_type, content, ttl=None, priority=None):
-        """create a single dns ressource record"""
+        """create a single dns resource record"""
         zr = ZoneRecordInput(name=name, type=record_type, content=content, ttl=ttl, priority=priority)
         return self.client.zones.create_record(self.account.id, str(domain), zr).data.__dict__
 

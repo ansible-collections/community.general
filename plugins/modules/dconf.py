@@ -400,7 +400,7 @@ class DconfPreference(object):
         rc, out, err = dbus_wrapper.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while reseting the value with error: %s' % err,
+            self.module.fail_json(msg='dconf failed while resetting the value with error: %s' % err,
                                   out=out,
                                   err=err)
 

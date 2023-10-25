@@ -26,7 +26,7 @@ notes:
       C(subscription-manager) itself gets credentials only as arguments of command line
       parameters, which is I(not) secure, as they can be easily stolen by checking the
       process listing on the system. Due to limitations of the D-Bus interface of C(rhsm),
-      the module will I(not) use D-Bus for registation when trying either to register
+      the module will I(not) use D-Bus for registration when trying either to register
       using O(token), or when specifying O(environment), or when the system is old
       (typically RHEL 6 and older).
     - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an Organization ID.
