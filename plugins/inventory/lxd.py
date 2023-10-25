@@ -41,6 +41,20 @@ DOCUMENTATION = r'''
             aliases: [ cert_file ]
             default: $HOME/.config/lxc/client.crt
             type: path
+        server_cert:
+            description:
+            - The server certificate file path.
+            type: path
+            version_added: 8.0.0
+        server_check_hostname:
+            description:
+            - This option controls if the server's hostname is checked as part of the HTTPS connection verification.
+              This can be useful to disable, if for example, the server certificate provided (see O(server_cert) option)
+              does not cover a name matching the one used to communicate with the server. Such mismatch is common as LXD
+              generates self-signed server certificates by default.
+            type: bool
+            default: true
+            version_added: 8.0.0
         trust_password:
             description:
             - The client trusted password.
@@ -286,7 +300,7 @@ class InventoryModule(BaseInventoryPlugin):
         urls = (url for url in url_list if self.validate_url(url))
         for url in urls:
             try:
-                socket_connection = LXDClient(url, self.client_key, self.client_cert, self.debug)
+                socket_connection = LXDClient(url, self.client_key, self.client_cert, self.debug, self.server_cert, self.server_check_hostname)
                 return socket_connection
             except LXDClientException as err:
                 error_storage[url] = err
@@ -1078,6 +1092,8 @@ class InventoryModule(BaseInventoryPlugin):
         try:
             self.client_key = self.get_option('client_key')
             self.client_cert = self.get_option('client_cert')
+            self.server_cert = self.get_option('server_cert')
+            self.server_check_hostname = self.get_option('server_check_hostname')
             self.project = self.get_option('project')
             self.debug = self.DEBUG
             self.data = {}  # store for inventory-data
