@@ -1,0 +1,123 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## testing modify_inactive_option option
+
+- name: test-modify_inactive_option 1 - create test file
+  copy:
+    content: |
+
+      [section1]
+      # Uncomment the line below to enable foo
+      # foo = bar
+
+    dest: "{{ output_file }}"
+
+- name: test-modify_inactive_option 1 - set value for foo with modify_inactive_option set to true
+  ini_file:
+    path: "{{ output_file }}"
+    section: section1
+    option: foo
+    value: bar
+    modify_inactive_option: true
+  register: result1
+
+- name: test-modify_inactive_option 1 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-modify_inactive_option 1 - set expected content and get current ini file content
+  set_fact:
+    expected1: |
+
+      [section1]
+      # Uncomment the line below to enable foo
+      foo = bar
+
+    content1: "{{ output_content.content | b64decode }}"
+
+- name: test-modify_inactive_option 1 - assert 'changed' is true, content is OK and option changed
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'option changed'
+      - content1 == expected1
+
+
+- name: test-modify_inactive_option 2 - create test file
+  copy:
+    content: |
+
+      [section1]
+      # Uncomment the line below to enable foo
+      # foo = bar
+
+    dest: "{{ output_file }}"
+
+- name: test-modify_inactive_option 2 - set value for foo with modify_inactive_option set to false
+  ini_file:
+    path: "{{ output_file }}"
+    section: section1
+    option: foo
+    value: bar
+    modify_inactive_option: false
+  register: result2
+
+- name: test-modify_inactive_option 2 - read content from output file
+  slurp:
+      src: "{{ output_file }}"
+  register: output_content
+
+- name: test-modify_inactive_option 2 - set expected content and get current ini file content
+  set_fact:
+    expected2: |
+
+      [section1]
+      foo = bar
+      # Uncomment the line below to enable foo
+      # foo = bar
+
+    content2: "{{ output_content.content | b64decode }}"
+
+- name: test-modify_inactive_option 2 - assert 'changed' is true and content is OK and option added
+  assert:
+    that:
+      - result2 is changed
+      - result2.msg == 'option added'
+      - content2 == expected2
+
+
+- name: test-modify_inactive_option 3 - remove foo=bar with modify_inactive_option set to true to ensure it doesn't have effect for removal
+  ini_file:
+    path: "{{ output_file }}"
+    section: section1
+    option: foo
+    value: bar
+    modify_inactive_option: true
+    state: absent
+  register: result3
+
+- name: test-modify_inactive_option 3 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-modify_inactive_option 3 - set expected content and get current ini file content
+  set_fact:
+    expected3: |
+  
+      [section1]
+      # Uncomment the line below to enable foo
+      # foo = bar
+
+    content3: "{{ output_content.content | b64decode }}"
+
+- name: test-modify_inactive_option 3 - assert 'changed' is true and content is OK and active option removed
+  assert:
+    that:
+      - result3 is changed
+      - result3.msg == 'option changed'
+      - content3 == expected3

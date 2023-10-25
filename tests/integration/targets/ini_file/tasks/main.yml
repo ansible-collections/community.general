@@ -44,3 +44,6 @@
 
     - name: include tasks to test ignore_spaces
       include_tasks: tests/05-ignore_spaces.yml
+
+    - name: include tasks to test modify_inactive_option
+      include_tasks: tests/06-modify_inactive_option.yml
