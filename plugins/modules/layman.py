@@ -39,7 +39,7 @@ options:
     description:
       - An URL of the alternative overlays list that defines the overlay to install.
         This list will be fetched and saved under C(${overlay_defs}/${name}.xml), where
-        C(overlay_defs) is readed from the Layman's configuration.
+        C(overlay_defs) is read from the Layman's configuration.
     aliases: [url]
     type: str
   state:

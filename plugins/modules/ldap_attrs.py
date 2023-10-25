@@ -207,7 +207,7 @@ class LdapAttrs(LdapGeneric):
         self.ordered = self.module.params['ordered']
 
     def _order_values(self, values):
-        """ Preprend X-ORDERED index numbers to attribute's values. """
+        """ Prepend X-ORDERED index numbers to attribute's values. """
         ordered_values = []
 
         if isinstance(values, list):

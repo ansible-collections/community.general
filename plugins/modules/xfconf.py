@@ -62,7 +62,7 @@ options:
         be equal to the length of O(value).
       - If only one O(value_type) is provided, but O(value) contains more than
         on element, that O(value_type) will be applied to all elements of O(value).
-      - If the O(property) being set is an array and it can possibly have ony one
+      - If the O(property) being set is an array and it can possibly have only one
         element in the array, then O(force_array=true) must be used to ensure
         that C(xfconf-query) will interpret the value as an array rather than a
         scalar.

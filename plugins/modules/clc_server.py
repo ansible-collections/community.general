@@ -1501,7 +1501,7 @@ class ClcServer:
         return aa_policy_id
 
     #
-    #  This is the function that gets patched to the Request.server object using a lamda closure
+    #  This is the function that gets patched to the Request.server object using a lambda closure
     #
 
     @staticmethod

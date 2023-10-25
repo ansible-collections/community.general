@@ -213,7 +213,7 @@ class LdapEntry(LdapGeneric):
             self.connection.delete_s(self.dn)
 
         def _delete_recursive():
-            """ Attempt recurive deletion using the subtree-delete control.
+            """ Attempt recursive deletion using the subtree-delete control.
             If that fails, do it manually. """
             try:
                 subtree_delete = ldap.controls.ValueLessRequestControl('1.2.840.113556.1.4.805')

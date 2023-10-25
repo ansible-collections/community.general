@@ -127,7 +127,7 @@ options:
     link_text:
         type: str
         description:
-        - A short decription of the link_url.
+        - A short description of the link_url.
         required: false
         version_added: 7.4.0
     source:

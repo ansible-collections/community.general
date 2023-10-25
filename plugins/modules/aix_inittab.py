@@ -204,7 +204,7 @@ def main():
             ":" + module.params['action'] + ":" + module.params['command']
 
         # If current entry exists or fields are different(if the entry does not
-        # exists, then the entry wil be created
+        # exists, then the entry will be created
         if (not current_entry['exist']) or (
                 module.params['runlevel'] != current_entry['runlevel'] or
                 module.params['action'] != current_entry['action'] or

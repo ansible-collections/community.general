@@ -133,7 +133,7 @@ def _check_new_pkg(module, package, repository_path):
 def _check_installed_pkg(module, package, repository_path):
     """
     Check the package on AIX.
-    It verifies if the package is installed and informations
+    It verifies if the package is installed and information
 
     :param module: Ansible module parameters spec.
     :param package: Package/fileset name.

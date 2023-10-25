@@ -69,7 +69,7 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-  description: "JSON parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for the detailled structure of the response."
+  description: "JSON parsed response from ipbase.com. Please refer to U(https://ipbase.com/docs/info) for the detailed structure of the response."
   returned: success
   type: dict
   sample: {

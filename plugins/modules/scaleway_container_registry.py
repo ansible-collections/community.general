@@ -34,7 +34,7 @@ options:
   state:
     type: str
     description:
-      - Indicate desired state of the container regitry.
+      - Indicate desired state of the container registry.
     default: present
     choices:
       - present

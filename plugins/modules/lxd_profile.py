@@ -420,7 +420,7 @@ class LXDProfileManagement(object):
         Rebuild the Profile by the configuration provided in the play.
         Existing configurations are discarded.
 
-        This ist the default behavior.
+        This is the default behavior.
 
         Args:
             dict(config): Dict with the old config in 'metadata' and new config in 'config'

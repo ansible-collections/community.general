@@ -17,7 +17,7 @@ short_description: Allows administration of Keycloak authentication required act
 
 description:
     - This module can register, update and delete required actions.
-    - It also filters out any duplicate required actions by their alias. The first ocurrence is preserved.
+    - It also filters out any duplicate required actions by their alias. The first occurrence is preserved.
 
 version_added: 7.1.0
 

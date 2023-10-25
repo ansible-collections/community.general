@@ -90,7 +90,7 @@ options:
   secret_environment_variables:
     description:
       - Secret environment variables of the function.
-      - Updating thoses values will not output a C(changed) state in Ansible.
+      - Updating those values will not output a C(changed) state in Ansible.
       - Injected in function at runtime.
     type: dict
     default: {}

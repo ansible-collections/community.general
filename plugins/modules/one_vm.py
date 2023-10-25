@@ -47,7 +47,7 @@ options:
     type: str
   template_name:
     description:
-      - Name of VM template to use to create a new instace
+      - Name of VM template to use to create a new instance
     type: str
   template_id:
     description:
@@ -195,12 +195,12 @@ options:
     version_added: '0.2.0'
   datastore_id:
     description:
-      - Name of Datastore to use to create a new instace
+      - Name of Datastore to use to create a new instance
     version_added: '0.2.0'
     type: int
   datastore_name:
     description:
-      - Name of Datastore to use to create a new instace
+      - Name of Datastore to use to create a new instance
     version_added: '0.2.0'
     type: str
   updateconf:
@@ -1390,7 +1390,7 @@ def check_name_attribute(module, attributes):
     if attributes.get("NAME"):
         import re
         if re.match(r'^[^#]+#*$', attributes.get("NAME")) is None:
-            module.fail_json(msg="Ilegal 'NAME' attribute: '" + attributes.get("NAME") +
+            module.fail_json(msg="Illegal 'NAME' attribute: '" + attributes.get("NAME") +
                              "' .Signs '#' are allowed only at the end of the name and the name cannot contain only '#'.")
 
 

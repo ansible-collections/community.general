@@ -44,7 +44,7 @@ options:
     choices: [ attach, comment, create, edit, fetch, link, search, transition, update, worklog ]
     description:
       - The operation to perform.
-      - V(worklog) was added in community.genereal 6.5.0.
+      - V(worklog) was added in community.general 6.5.0.
 
   username:
     type: str
