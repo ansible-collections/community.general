@@ -46,6 +46,7 @@ options:
   registry:
     description:
       - Specify which registry to use.
+      - This is used only when installing new packages or installing another version of a package.
     required: false
     type: str
     version_added: 8.0.0
