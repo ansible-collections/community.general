@@ -142,7 +142,7 @@ class Imgadm(object):
         self.uuid = module.params['uuid']
 
         # Since there are a number of (natural) aliases, prevent having to look
-        # them up everytime we operate on `state`.
+        # them up every time we operate on `state`.
         if self.params['state'] in ['present', 'imported', 'updated']:
             self.present = True
         else:

@@ -170,7 +170,7 @@ result:
             description: The list of the denied network names
             type: list
         hot_standby:
-            description: Use hot standy
+            description: Use hot standby
             type: bool
         path:
             description: Path name

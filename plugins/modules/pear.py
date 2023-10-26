@@ -48,7 +48,7 @@ options:
         description:
             - List of regular expressions that can be used to detect prompts during pear package installation to answer the expected question.
             - Prompts will be processed in the same order as the packages list.
-            - You can optionnally specify an answer to any question in the list.
+            - You can optionally specify an answer to any question in the list.
             - If no answer is provided, the list item will only contain the regular expression.
             - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression: 'an_answer')."
             - You can provide a list containing items with or without answer.
@@ -87,7 +87,7 @@ EXAMPLES = r'''
 - name: Install multiple pear/pecl packages at once with prompts.
     Prompts will be processed on the same order as the packages order.
     If there is more prompts than packages, packages without prompts will be installed without any prompt expected.
-    If there is more packages than prompts, additionnal prompts will be ignored.
+    If there is more packages than prompts, additional prompts will be ignored.
   community.general.pear:
     name: pecl/gnupg, pecl/apcu
     state: present
@@ -98,7 +98,7 @@ EXAMPLES = r'''
 - name: Install multiple pear/pecl packages at once skipping the first prompt.
     Prompts will be processed on the same order as the packages order.
     If there is more prompts than packages, packages without prompts will be installed without any prompt expected.
-    If there is more packages than prompts, additionnal prompts will be ignored.
+    If there is more packages than prompts, additional prompts will be ignored.
   community.general.pear:
     name: pecl/gnupg, pecl/apcu
     state: present
