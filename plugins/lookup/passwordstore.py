@@ -133,6 +133,7 @@ DOCUMENTATION = '''
         description: Add the password generation information to the end of the file.
         type: bool
         default: true
+        version_added: 8.0.0
       preserve:
         description: Include the old (edited) password inside the pass file.
         type: bool
