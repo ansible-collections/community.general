@@ -116,6 +116,10 @@ DOCUMENTATION = '''
           - The default of this option changed from V(true) to V(false) in community.general 6.0.0.
         type: bool
         default: false
+      exclude_nodes:
+        description: Exclude proxmox nodes (and their groups) from the inventory output.
+        type: bool
+        default: false
       filters:
         version_added: 4.6.0
         description: A list of Jinja templates that allow filtering hosts.
@@ -565,7 +569,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         for group in default_groups:
             self.inventory.add_group(self._group('all_%s' % (group)))
-
         nodes_group = self._group('nodes')
         self.inventory.add_group(nodes_group)
 
@@ -607,8 +610,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if name is not None:
                     hosts.append(name)
 
+            # removes node host at the end of this node-specific loop 
+            if self.exclude_nodes: self.inventory.remove_host(self.inventory.hosts[node['node']]) 
         # gather vm's in pools
         self._populate_pool_groups(hosts)
+
+        # removes the general node-group from the inventory list
+        if self.exclude_nodes: self.inventory.remove_group(nodes_group)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
@@ -635,8 +643,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         if self.get_option('qemu_extended_statuses') and not self.get_option('want_facts'):
             raise AnsibleError('You must set want_facts to True if you want to use qemu_extended_statuses.')
-
         # read rest of options
+        self.exclude_nodes = self.get_option('exclude_nodes')
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
         self.host_filters = self.get_option('filters')
