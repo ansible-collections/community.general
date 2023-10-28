@@ -610,8 +610,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if name is not None:
                     hosts.append(name)
 
-            # removes node host at the end of this node-specific loop 
-            if self.exclude_nodes: self.inventory.remove_host(self.inventory.hosts[node['node']]) 
         # gather vm's in pools
         self._populate_pool_groups(hosts)
 
