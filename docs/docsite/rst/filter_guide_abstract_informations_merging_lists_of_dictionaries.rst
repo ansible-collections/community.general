@@ -84,7 +84,7 @@ The filter also accepts two optional parameters: :ansopt:`community.general.list
 **list_merge**
     Is a string, its possible values are :ansval:`replace` (default), :ansval:`keep`, :ansval:`append`, :ansval:`prepend`, :ansval:`append_rp` or :ansval:`prepend_rp`. It modifies the behaviour of :ansplugin:`community.general.lists_mergeby#filter` when the hashes to merge contain arrays/lists.
 
-The examples below set :ansopt:`community.general.lists_mergeby#filter:recursive=true` and display the differences among all six options of :ansplugin:`comunity.general.list_merge#filter`. Functionality of the parameters is exactly the same as in the filter :ansplugin:`ansible.builtin.combine#filter`. See :ref:`Combining hashes/dictionaries <combine_filter>` to learn details about these options.
+The examples below set :ansopt:`community.general.lists_mergeby#filter:recursive=true` and display the differences among all six options of :ansopt:`community.general.lists_mergeby#filter:list_merge`. Functionality of the parameters is exactly the same as in the filter :ansplugin:`ansible.builtin.combine#filter`. See :ref:`Combining hashes/dictionaries <combine_filter>` to learn details about these options.
 
 Let us use the lists below in the following examples
 
