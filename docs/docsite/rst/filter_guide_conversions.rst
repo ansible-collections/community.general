@@ -9,7 +9,7 @@ Conversions
 Parsing CSV files
 ^^^^^^^^^^^^^^^^^
 
-Ansible offers the :ref:`community.general.read_csv module <ansible_collections.community.general.read_csv_module>` to read CSV files. Sometimes you need to convert strings to CSV files instead. For this, the ``from_csv`` filter exists.
+Ansible offers the :ansplugin:`community.general.read_csv module <community.general.read_csv#module>` to read CSV files. Sometimes you need to convert strings to CSV files instead. For this, the ``from_csv`` filter exists.
 
 .. code-block:: yaml+jinja
 
