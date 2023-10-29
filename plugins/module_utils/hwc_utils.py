@@ -203,7 +203,7 @@ class Config(object):
 
         if url == "":
             raise HwcClientException(
-                0, "Can not find the endpoint for %s" % service_type)
+                0, "Cannot find the endpoint for %s" % service_type)
 
         if url[-1] != "/":
             url += "/"

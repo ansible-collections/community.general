@@ -1520,7 +1520,7 @@ class KeycloakAPI(object):
     def get_subgroup_direct_parent(self, parents, realm="master", children_to_resolve=None):
         """ Get keycloak direct parent group API object for a given chain of parents.
 
-        To successfully work the API for subgroups we actually dont need
+        To successfully work the API for subgroups we actually don't need
         to "walk the whole tree" for nested groups but only need to know
         the ID for the direct predecessor of current subgroup. This
         method will guarantee us this information getting there with
