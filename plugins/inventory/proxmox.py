@@ -614,7 +614,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._populate_pool_groups(hosts)
 
         # removes the general node-group from the inventory list
-        if self.exclude_nodes: self.inventory.remove_group(nodes_group)
+        if self.exclude_nodes:
+            self.inventory.remove_group(nodes_group)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
