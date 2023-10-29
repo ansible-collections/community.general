@@ -480,7 +480,7 @@ def main():
                         module.fail_json(msg="Failed to remove volume group %s" % (vg), rc=rc, err=err)
                 else:
                     module.fail_json(msg="Refuse to remove non-empty volume group %s without force=true" % (vg))
-        # activate/inactivate existing VG
+        # activate/deactivate existing VG
         elif state == 'active':
             changed = activate_vg(module=module, vg=vg, active=True)
         elif state == 'inactive':

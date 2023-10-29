@@ -50,7 +50,7 @@
       state: present
 
   # Check if re-installing etcd3 is required
-  - name: Check if etcd3ctl exists for re-use.
+  - name: Check if etcd3ctl exists for reuse.
     shell: "ETCDCTL_API=3 {{ etcd3_path }}/etcdctl --endpoints=localhost:2379 get foo"
     args:
       executable: /bin/bash

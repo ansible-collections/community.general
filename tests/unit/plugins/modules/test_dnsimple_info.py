@@ -89,7 +89,7 @@ class TestDNSimple_Info(ModuleTestCase):
         result = exc_info.exception.args[0]
         # nothing should change
         self.assertFalse(result['changed'])
-        # we should return at least one item with mathing domain
+        # we should return at least one item with matching domain
         assert result['dnsimple_records_info'][0]['name'] == name
 
     @with_httmock(records_resp)

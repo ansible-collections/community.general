@@ -89,7 +89,7 @@ Enabled:   %s
         Enable the specified IDs.
 
         'repo_ids' can be either a string or a list of strings representing
-        an ID (wilcard included).
+        an ID (wildcard included).
 
         Returns the same object, so calls to this can be chained.
         """
@@ -104,7 +104,7 @@ Enabled:   %s
         Disable the specified IDs.
 
         'repo_ids' can be either a string or a list of strings representing
-        an ID (wilcard included).
+        an ID (wildcard included).
 
         Returns the same object, so calls to this can be chained.
         """
