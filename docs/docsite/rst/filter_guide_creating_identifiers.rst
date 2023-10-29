@@ -52,7 +52,7 @@ The hashids filters accept keyword arguments to allow fine-tuning the hashids ge
 Random MACs
 ^^^^^^^^^^^
 
-You can use the ``random_mac`` filter to complete a partial `MAC address <https://en.wikipedia.org/wiki/MAC_address>`_ to a random 6-byte MAC address.
+You can use the :ansplugin:`community.general.random_mac filter <community.general.random_mac#filter>` to complete a partial `MAC address <https://en.wikipedia.org/wiki/MAC_address>`_ to a random 6-byte MAC address.
 
 .. code-block:: yaml+jinja
 

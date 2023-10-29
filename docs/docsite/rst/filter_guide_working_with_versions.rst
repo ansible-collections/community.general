@@ -6,7 +6,7 @@
 Working with versions
 ---------------------
 
-If you need to sort a list of version numbers, the Jinja ``sort`` filter is problematic. Since it sorts lexicographically, ``2.10`` will come before ``2.9``. To treat version numbers correctly, you can use the ``version_sort`` filter:
+If you need to sort a list of version numbers, the Jinja ``sort`` filter is problematic. Since it sorts lexicographically, ``2.10`` will come before ``2.9``. To treat version numbers correctly, you can use the :ansplugin:`community.general.version_sort filter <community.general.version_sort#filter>`:
 
 .. code-block:: yaml+jinja
 

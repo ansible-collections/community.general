@@ -6,7 +6,7 @@
 Dictionaries
 ^^^^^^^^^^^^
 
-You can use the ``dict_kv`` filter to create a single-entry dictionary with ``value | community.general.dict_kv(key)``:
+You can use the :ansplugin:`community.general.dict_kv filter <community.general.dict_kv#filter>` to create a single-entry dictionary with ``value | community.general.dict_kv(key)``:
 
 .. code-block:: yaml+jinja
 
@@ -58,7 +58,7 @@ This produces:
 
 .. versionadded:: 2.0.0
 
-If you need to convert a list of key-value pairs to a dictionary, you can use the ``dict`` function. Unfortunately, this function cannot be used with ``map``. For this, the ``community.general.dict`` filter can be used:
+If you need to convert a list of key-value pairs to a dictionary, you can use the ``dict`` function. Unfortunately, this function cannot be used with ``map``. For this, the :ansplugin:`community.general.dict filter <community.general.dict#filter>` can be used:
 
 .. code-block:: yaml+jinja
 
