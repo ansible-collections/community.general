@@ -11,7 +11,7 @@ The following filters allow to create identifiers.
 Hashids
 ^^^^^^^
 
-`Hashids <https://hashids.org/>`_ allow to convert sequences of integers to short unique string identifiers. This filter needs the `hashids Python library <https://pypi.org/project/hashids/>`_ installed on the controller.
+`Hashids <https://hashids.org/>`_ allow to convert sequences of integers to short unique string identifiers. The :ansplugin:`community.general.hashids_encode#filter` and :ansplugin:`community.general.hashids_decode#filter` filters need the `hashids Python library <https://pypi.org/project/hashids/>`_ installed on the controller.
 
 .. code-block:: yaml+jinja
 

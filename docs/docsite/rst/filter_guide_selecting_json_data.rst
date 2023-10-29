@@ -146,4 +146,4 @@ To extract ports from all clusters with name containing 'server1':
       vars:
         server_name_query: "domain.server[?contains(name,'server1')].port"
 
-.. note:: while using ``starts_with`` and ``contains``, you have to use `` to_json | from_json `` filter for correct parsing of data structure.
+.. note:: while using ``starts_with`` and ``contains``, you have to use ``to_json | from_json`` filter for correct parsing of data structure.
