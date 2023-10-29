@@ -393,7 +393,7 @@ class Homectl(object):
             user_metadata.pop('status', None)
             # Let last change Usec be updated by homed when command runs.
             user_metadata.pop('lastChangeUSec', None)
-            # Now only change fields that are called on leaving whats currently in the record intact.
+            # Now only change fields that are called on leaving what's currently in the record intact.
             record = user_metadata
 
         record['userName'] = self.name

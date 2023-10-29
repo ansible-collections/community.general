@@ -49,7 +49,7 @@ class _Variable(object):
             output (bool, optional): flag indicating whether the variable should be in the output of the module. Defaults to None.
             diff (bool, optional): flag indicating whether to generate diff mode output for this variable. Defaults to None.
             change (bool, optional): flag indicating whether to track if changes happened to this variable. Defaults to None.
-            fact (bool, optional): flag indicating whether the varaiable should be exposed as a fact of the module. Defaults to None.
+            fact (bool, optional): flag indicating whether the variable should be exposed as a fact of the module. Defaults to None.
             initial_value (any, optional): initial value of the variable, to be used with `change`. Defaults to NOTHING.
             verbosity (int, optional): level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
         """
@@ -143,7 +143,7 @@ class VarDict(object):
             output (bool, optional): flag indicating whether the variable should be in the output of the module. Defaults to None.
             diff (bool, optional): flag indicating whether to generate diff mode output for this variable. Defaults to None.
             change (bool, optional): flag indicating whether to track if changes happened to this variable. Defaults to None.
-            fact (bool, optional): flag indicating whether the varaiable should be exposed as a fact of the module. Defaults to None.
+            fact (bool, optional): flag indicating whether the variable should be exposed as a fact of the module. Defaults to None.
             initial_value (any, optional): initial value of the variable, to be used with `change`. Defaults to NOTHING.
             verbosity (int, optional): level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
         """

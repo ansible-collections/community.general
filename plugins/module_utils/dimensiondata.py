@@ -39,7 +39,7 @@ except ImportError:
     LIBCLOUD_IMP_ERR = traceback.format_exc()
     HAS_LIBCLOUD = False
 
-# MCP 2.x version patten for location (datacenter) names.
+# MCP 2.x version pattern for location (datacenter) names.
 #
 # Note that this is not a totally reliable way of determining MCP version.
 # Unfortunately, libcloud's NodeLocation currently makes no provision for extended properties.

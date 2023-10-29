@@ -544,7 +544,7 @@ class KeycloakAPI(object):
         return None
 
     def get_client_group_available_rolemappings(self, gid, cid, realm="master"):
-        """ Fetch the available role of a client in a specified goup on the Keycloak server.
+        """ Fetch the available role of a client in a specified group on the Keycloak server.
 
         :param gid: ID of the group from which to obtain the rolemappings.
         :param cid: ID of the client from which to obtain the rolemappings.
@@ -627,7 +627,7 @@ class KeycloakAPI(object):
                                       % (rid, realm, str(e)))
 
     def add_group_rolemapping(self, gid, cid, role_rep, realm="master"):
-        """ Fetch the composite role of a client in a specified goup on the Keycloak server.
+        """ Fetch the composite role of a client in a specified group on the Keycloak server.
 
         :param gid: ID of the group from which to obtain the rolemappings.
         :param cid: ID of the client from which to obtain the rolemappings.
@@ -1238,7 +1238,7 @@ class KeycloakAPI(object):
 
         :param realm: Realm in which the clientscope resides.
         :param client_id: The client in which the clientscope resides.
-        :return The optinal clientscopes of this realm or client
+        :return The optional clientscopes of this realm or client
         """
         url = URL_OPTIONAL_CLIENTSCOPES if client_id is None else URL_CLIENT_OPTIONAL_CLIENTSCOPES
         return self._get_clientscopes_of_type(realm, url, 'optional', client_id)
@@ -1251,7 +1251,7 @@ class KeycloakAPI(object):
 
         :param realm: Realm in which the clientscope resides.
         :param url_template the template for the right type
-        :param scope_type this can be either optinal or default
+        :param scope_type this can be either optional or default
         :param client_id: The client in which the clientscope resides.
         :return The clientscopes of the specified type of this realm
         """
@@ -1273,7 +1273,7 @@ class KeycloakAPI(object):
 
     def _decide_url_type_clientscope(self, client_id=None, scope_type="default"):
         """Decides which url to use.
-        :param scope_type this can be either optinal or default
+        :param scope_type this can be either optional or default
         :param client_id: The client in which the clientscope resides.
         """
         if client_id is None:
@@ -1520,7 +1520,7 @@ class KeycloakAPI(object):
     def get_subgroup_direct_parent(self, parents, realm="master", children_to_resolve=None):
         """ Get keycloak direct parent group API object for a given chain of parents.
 
-        To succesfully work the API for subgroups we actually dont need
+        To successfully work the API for subgroups we actually dont need
         to "walk the whole tree" for nested groups but only need to know
         the ID for the direct predecessor of current subgroup. This
         method will guarantee us this information getting there with
@@ -2879,7 +2879,7 @@ class KeycloakAPI(object):
             groups_to_add_and_remove = self.extract_groups_to_add_to_and_remove_from_user(groups)
             # If group membership need to be changed
             if not is_struct_included(groups_to_add_and_remove['add'], user_existing_groups):
-                # Get available goups in the realm
+                # Get available groups in the realm
                 realm_groups = self.get_groups(realm=realm)
                 for realm_group in realm_groups:
                     if "name" in realm_group and realm_group["name"] in groups_to_add_and_remove['add']:

@@ -70,7 +70,7 @@ class Connection(ConnectionBase):
         if in_data:
             raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
 
-        # totally ignores privlege escalation
+        # totally ignores privilege escalation
         display.vvv("EXEC %s" % cmd, host=self.host)
         p = self.client.command.run(cmd)[self.host]
         return p[0], p[1], p[2]
