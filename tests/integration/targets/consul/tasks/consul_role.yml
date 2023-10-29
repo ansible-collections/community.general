@@ -161,7 +161,7 @@
       - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
       - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
       - result['role']['Policies'] is not defined
-      - result['role']['NodeIdentities'] == [] # in check mode the cleared field is returned as an emtpy array
+      - result['role']['NodeIdentities'] == [] # in check mode the cleared field is returned as an empty array
 
 - name: Update the role with service identity to remove the service identities
   consul_role:

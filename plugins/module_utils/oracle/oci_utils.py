@@ -434,7 +434,7 @@ def check_and_update_attributes(
     target_instance, attr_name, input_value, existing_value, changed
 ):
     """
-    This function checks the difference between two resource attributes of literal types and sets the attrbute
+    This function checks the difference between two resource attributes of literal types and sets the attribute
     value in the target instance type holding the attribute.
     :param target_instance: The instance which contains the attribute whose values to be compared
     :param attr_name: Name of the attribute whose value required to be compared
@@ -785,7 +785,7 @@ def _get_attributes_to_consider(exclude_attributes, model, module):
         attributes_to_consider = list(model.attribute_map)
         if "freeform_tags" in attributes_to_consider:
             attributes_to_consider.remove("freeform_tags")
-        # Temporarily removing node_count as the exisiting resource does not reflect it
+        # Temporarily removing node_count as the existing resource does not reflect it
         if "node_count" in attributes_to_consider:
             attributes_to_consider.remove("node_count")
     _debug("attributes to consider: {0}".format(attributes_to_consider))
@@ -1771,7 +1771,7 @@ def update_class_type_attr_difference(
 ):
     """
     Checks the difference and updates an attribute which is represented by a class
-    instance. Not aplicable if the attribute type is a primitive value.
+    instance. Not applicable if the attribute type is a primitive value.
     For example, if a class name is A with an attribute x, then if A.x = X(), then only
     this method works.
     :param update_class_details The instance which should be updated if there is change in
@@ -1933,7 +1933,7 @@ def get_target_resource_from_list(
     module, list_resource_fn, target_resource_id=None, **kwargs
 ):
     """
-    Returns a resource filtered by identifer from a list of resources. This method should be
+    Returns a resource filtered by identifier from a list of resources. This method should be
     used as an alternative of 'get resource' method when 'get resource' is nor provided by
     resource api. This method returns a wrapper of response object but that should not be
     used as an input to 'wait_until' utility as this is only a partial wrapper of response object.

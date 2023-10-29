@@ -53,6 +53,6 @@ options:
       type: str
     token:
       description:
-        - ACL token for authentification.
+        - ACL token for authentication.
       type: str
 '''

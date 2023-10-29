@@ -140,7 +140,7 @@
     that:
       - "'active' == '{{ item }}'"
 
-- name: Deactive volume group in check mode
+- name: Deactivate volume group in check mode
   lvg:
     state: inactive
     vg: testvg

@@ -78,6 +78,6 @@ class TestLookupModule(unittest.TestCase):
 
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden_secrets_manager._bitwarden_secrets_manager', new=MockBitwardenSecretsManager())
     def test_bitwarden_secrets_manager_no_match(self):
-        # Getting a nonexistant secret id throws exception
+        # Getting a nonexistent secret id throws exception
         with self.assertRaises(AnsibleLookupError):
             self.lookup.run(['nonexistant_id'], bws_access_token='123')

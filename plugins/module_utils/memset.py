@@ -79,7 +79,7 @@ def memset_api_call(api_key, api_method, payload=None):
             msg = "Memset API returned an error ({0}, {1})." . format(response.json()['error_type'], response.json()['error'])
     except urllib_error.URLError as e:
         has_failed = True
-        msg = "An URLError occured ({0})." . format(type(e))
+        msg = "An URLError occurred ({0})." . format(type(e))
         response.stderr = "{0}" . format(e)
 
     if msg is None:
