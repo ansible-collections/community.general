@@ -63,5 +63,5 @@
   loop_control:
     index_var: provider_index
 
-- name: Test Complex Varibles
+- name: Test Complex Variables
   ansible.builtin.include_tasks: complex_variables.yml

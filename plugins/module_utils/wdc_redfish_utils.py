@@ -182,7 +182,7 @@ class WdcRedfishUtils(RedfishUtils):
 
         :param str bundle_uri:  HTTP URI of the firmware bundle.
         :return: Firmware version number contained in the bundle, and whether or not the bundle is multi-tenant.
-        Either value will be None if unable to deterine.
+        Either value will be None if unable to determine.
         :rtype: str or None, bool or None
         """
         bundle_temp_filename = fetch_file(module=self.module,

@@ -109,7 +109,7 @@
           - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
     when: ansible_user_uid == 0
 
-  # Check cutom gem directory
+  # Check custom gem directory
   - name: Install gem in a custom directory with incorrect options
     gem:
       name: gist

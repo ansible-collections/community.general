@@ -69,7 +69,7 @@ class TestGem(ModuleTestCase):
         assert result['msg'] == "install_dir requires user_install=false"
 
     def test_passes_install_dir_to_gem(self):
-        # XXX: This test is extremely fragile, and makes assuptions about the module code, and how
+        # XXX: This test is extremely fragile, and makes assumptions about the module code, and how
         #      functions are run.
         #      If you start modifying the code of the module, you might need to modify what this
         #      test mocks. The only thing that matters is the assertion that this 'gem install' is

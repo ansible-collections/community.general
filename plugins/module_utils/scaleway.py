@@ -303,7 +303,7 @@ class Scaleway(object):
         wait_timeout = self.module.params["wait_timeout"]
         wait_sleep_time = self.module.params["wait_sleep_time"]
 
-        # Prevent requesting the ressource status too soon
+        # Prevent requesting the resource status too soon
         time.sleep(wait_sleep_time)
 
         start = datetime.datetime.utcnow()

@@ -1277,7 +1277,7 @@ class LxcContainerManagement(object):
         """
 
         vg = self._get_lxc_vg()
-        free_space, messurement = self._get_vg_free_pe(vg_name=vg)
+        free_space, measurement = self._get_vg_free_pe(vg_name=vg)
 
         if free_space < float(snapshot_size_gb):
             message = (

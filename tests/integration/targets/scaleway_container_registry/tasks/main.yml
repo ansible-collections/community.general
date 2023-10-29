@@ -159,7 +159,7 @@
       - cr_deletion_task is success
       - cr_deletion_task is changed
 
-- name: Delete container regitry (Confirmation)
+- name: Delete container registry (Confirmation)
   community.general.scaleway_container_registry:
     state: absent
     name: '{{ name }}'

@@ -174,7 +174,7 @@ class Imgadm(object):
 
         # There is no feedback from imgadm(1M) to determine if anything
         # was actually changed. So treat this as an 'always-changes' operation.
-        # Note that 'imgadm -v' produces unparseable JSON...
+        # Note that 'imgadm -v' produces unparsable JSON...
         self.changed = True
 
     def manage_sources(self):

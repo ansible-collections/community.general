@@ -222,7 +222,7 @@ def main():
     # OID style names are not supported
     if not re.match('^[a-zA-Z0-9_]+$', name):
         module.fail_json(
-            msg="Name may only contain alpha-numeric and underscore characters"
+            msg="Name may only contain alphanumeric and underscore characters"
         )
 
     value = module.params.pop('value')

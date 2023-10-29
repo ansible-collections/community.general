@@ -12,7 +12,7 @@ from ansible.plugins.loader import become_loader, get_shell_plugin
 
 
 def call_become_plugin(task, var_options, cmd, executable=None):
-    """Helper function to call become plugin simiarly on how Ansible itself handles this."""
+    """Helper function to call become plugin similarly on how Ansible itself handles this."""
     plugin = become_loader.get(task['become_method'])
     plugin.set_options(task_keys=task, var_options=var_options)
     shell = get_shell_plugin(executable=executable)

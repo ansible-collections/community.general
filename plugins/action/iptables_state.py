@@ -44,7 +44,7 @@ class ActionModule(ActionBase):
 
     def _async_result(self, async_status_args, task_vars, timeout):
         '''
-        Retrieve results of the asynchonous task, and display them in place of
+        Retrieve results of the asynchronous task, and display them in place of
         the async wrapper results (those with the ansible_job_id key).
         '''
         async_status = self._task.copy()

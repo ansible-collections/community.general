@@ -152,7 +152,7 @@ class TestUnloadModule(ModuleTestCase):
 class TestModuleIsLoadedPersistently(ModuleTestCase):
     def setUp(self):
         if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
-            self.skipTest('open_mock doesnt support readline in earlier python versions')
+            self.skipTest("open_mock doesn't support readline in earlier python versions")
 
         super(TestModuleIsLoadedPersistently, self).setUp()
 
@@ -230,7 +230,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
 class TestPermanentParams(ModuleTestCase):
     def setUp(self):
         if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
-            self.skipTest('open_mock doesnt support readline in earlier python versions')
+            self.skipTest("open_mock doesn't support readline in earlier python versions")
         super(TestPermanentParams, self).setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')

@@ -72,7 +72,7 @@ DOCUMENTATION = r"""
         type: int
       override_special:
         description:
-        - Overide a list of special characters to use in the string.
+        - Override a list of special characters to use in the string.
         - If set O(min_special) should be set to a non-default value.
         type: str
       override_all:
@@ -89,7 +89,7 @@ DOCUMENTATION = r"""
         version_added: 7.5.0
       similar_chars:
         description:
-        - Overide a list of characters not to be use in the string.
+        - Override a list of characters not to be use in the string.
         default: "il1LoO0"
         type: str
         version_added: 7.5.0
@@ -116,7 +116,7 @@ EXAMPLES = r"""
     var: lookup('community.general.random_string', base64=True)
   # Example result: ['NHZ6eWN5Qk0=']
 
-- name: Generate a random string with 1 lower, 1 upper, 1 number and 1 special char (atleast)
+- name: Generate a random string with 1 lower, 1 upper, 1 number and 1 special char (at least)
   ansible.builtin.debug:
     var: lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1)
   # Example result: ['&Qw2|E[-']

@@ -331,7 +331,7 @@ def pritunl_auth_request(
 ):
     """
     Send an API call to a Pritunl server.
-    Taken from https://pritunl.com/api and adaped work with Ansible open_url
+    Taken from https://pritunl.com/api and adapted to work with Ansible open_url
     """
     auth_timestamp = str(int(time.time()))
     auth_nonce = uuid.uuid4().hex

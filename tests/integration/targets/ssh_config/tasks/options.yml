@@ -33,7 +33,7 @@
     src: "{{ ssh_config_test }}"
   register: slurp_ssh_config
 
-- name: "Options - Verify that nothign was added to {{ ssh_config_test }} during change mode"
+- name: "Options - Verify that nothing was added to {{ ssh_config_test }} during change mode"
   assert:
     that:
       - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
@@ -243,7 +243,7 @@
     src: "{{ ssh_config_test }}"
   register: slurp_ssh_config
 
-- name: "Options - Verify that nothign was added to {{ ssh_config_test }} during change mode"
+- name: "Options - Verify that nothing was added to {{ ssh_config_test }} during change mode"
   assert:
     that:
       - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"

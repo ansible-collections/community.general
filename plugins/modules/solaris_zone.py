@@ -46,8 +46,8 @@ options:
     description:
       - Zone name.
       - A zone name must be unique name.
-      - A zone name must begin with an alpha-numeric character.
-      - The name can contain alpha-numeric characters, underscores V(_), hyphens V(-), and periods V(.).
+      - A zone name must begin with an alphanumeric character.
+      - The name can contain alphanumeric characters, underscores V(_), hyphens V(-), and periods V(.).
       - The name cannot be longer than 64 characters.
     type: str
     required: true

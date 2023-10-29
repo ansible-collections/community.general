@@ -8,7 +8,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Get snapshot informations and register it in a variable
+- name: Get snapshot information and register it in a variable
   scaleway_snapshot_info:
     region: par1
   register: snapshots
@@ -22,7 +22,7 @@
     that:
       - snapshots is success
 
-- name: Get snapshot informations and register it in a variable (AMS1)
+- name: Get snapshot information and register it in a variable (AMS1)
   scaleway_snapshot_info:
     region: ams1
   register: ams1_snapshots

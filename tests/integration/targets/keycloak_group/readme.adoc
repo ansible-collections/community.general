@@ -20,7 +20,7 @@ docker run --name mykeycloak -p 8080:8080 -e KC_HTTP_RELATIVE_PATH=/auth -e KEYC
 
 This test suite can run against a fresh unconfigured server instance
 (no preconfiguration required) and cleans up after itself (undoes all
-its config changes) as long as it runs through completly. While its active
+its config changes) as long as it runs through completely. While its active
 it changes the server configuration in the following ways:
 
   * creating, modifying and deleting some keycloak groups
