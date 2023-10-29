@@ -90,7 +90,7 @@
     size: -2G
     state: present
 
-- name: Resizing /mksysb to 100G (no enought space)
+- name: Resizing /mksysb to 100G (no enough space)
   aix_filesystem:
     filesystem: /mksysb
     size: +100G

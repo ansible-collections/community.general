@@ -73,7 +73,7 @@
       state: absent
       force: true
 
-  - name: reenable autoindex
+  - name: re-enable autoindex
     community.general.apache2_module:
       name: autoindex
       state: present

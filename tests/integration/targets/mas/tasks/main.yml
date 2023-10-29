@@ -117,7 +117,7 @@
     that:
     - install_status.stat.exists == true
 
-- name: Unistall Rested
+- name: Uninstall Rested
   mas:
     id: 421879749
     state: absent

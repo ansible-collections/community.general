@@ -23,7 +23,7 @@
     commercial_type: '{{ scaleway_commerial_type }}'
     wait: true
 
-- name: Get server informations of the first page
+- name: Get server information of the first page
   scaleway_server_info:
     region: par1
     query_parameters:
@@ -37,7 +37,7 @@
     that:
       - first_page is success
 
-- name: Get server informations of the second page
+- name: Get server information of the second page
   scaleway_server_info:
     region: par1
     query_parameters:
