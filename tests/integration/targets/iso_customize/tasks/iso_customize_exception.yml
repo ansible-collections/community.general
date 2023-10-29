@@ -59,7 +59,7 @@
   failed_when: customized_result.msg.find("does not exist") == -1
 
 # Test: filenames with whitespaces
-# We report error: the user should be reponsible for the it
+# We report error: the user should be responsible for the it
 - name: "Testcase: filenames with whitespaces"
   community.general.iso_customize:
     src_iso: "{{ test_dir }}/test.iso"

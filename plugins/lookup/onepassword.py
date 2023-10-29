@@ -494,7 +494,7 @@ class OnePassCLIv2(OnePassCLIBase):
                 if field.get("id") == field_name:
                     return field.get("value", "")
 
-            # Look at the section data and get an indentifier. The value of 'id' is either a unique ID
+            # Look at the section data and get an identifier. The value of 'id' is either a unique ID
             # or a human-readable string. If a 'label' field exists, prefer that since
             # it is the value visible in the 1Password UI when both 'id' and 'label' exist.
             section = field.get("section", {})

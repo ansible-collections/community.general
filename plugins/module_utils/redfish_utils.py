@@ -327,7 +327,7 @@ class RedfishUtils(object):
         found in ansible.module_utils.urls, but it takes files and encodes them
         as Base64 strings, which is not expected by Redfish services.  It also
         adds escaping of certain bytes in the payload, such as inserting '\r'
-        any time it finds a standlone '\n', which corrupts the image payload
+        any time it finds a standalone '\n', which corrupts the image payload
         send to the service.  This implementation is simplified to Redfish's
         usage and doesn't necessarily represent an exhaustive method of
         building multipart requests.
@@ -3703,12 +3703,12 @@ class RedfishUtils(object):
                 rsp_uri = loc['Uri']
                 if vendor == 'HPE':
                     # WORKAROUND
-                    # HPE systems with iLO 4 will have BIOS Atrribute Registries location URI as a dictonary with key 'extref'
+                    # HPE systems with iLO 4 will have BIOS Attribute Registries location URI as a dictionary with key 'extref'
                     # Hence adding condition to fetch the Uri
                     if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
                         rsp_uri = loc['Uri']['extref']
         if not rsp_uri:
-            msg = "Language 'en' not found in BIOS Atrribute Registries location, URI: %s, response: %s"
+            msg = "Language 'en' not found in BIOS Attribute Registries location, URI: %s, response: %s"
             return {
                 "ret": False,
                 "msg": msg % (resp_uri, str(resp_data))

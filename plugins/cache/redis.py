@@ -150,7 +150,7 @@ class CacheModule(BaseCacheModule):
         # format: "localhost:26379;localhost2:26379;0:changeme"
         connections = uri.split(';')
         connection_args = connections.pop(-1)
-        if len(connection_args) > 0:  # hanle if no db nr is given
+        if len(connection_args) > 0:  # handle if no db nr is given
             connection_args = connection_args.split(':')
             kw['db'] = connection_args.pop(0)
             try:
