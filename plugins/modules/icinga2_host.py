@@ -106,7 +106,6 @@ options:
     type: str
     description:
       - The IP address of the host.
-    required: true
   variables:
     type: dict
     description:
@@ -243,7 +242,7 @@ def main():
         template=dict(default=None),
         check_command=dict(default="hostalive"),
         display_name=dict(default=None),
-        ip=dict(required=True),
+        ip=dict(),
         variables=dict(type='dict', default=None),
     )
 
