@@ -137,6 +137,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.16/units/{0}/1
           targets:
+            - test: 2.7
             - test: 3.6
             - test: "3.11"
   - stage: Units_2_15
