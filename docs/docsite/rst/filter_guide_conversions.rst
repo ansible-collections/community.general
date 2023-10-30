@@ -9,7 +9,7 @@ Conversions
 Parsing CSV files
 ^^^^^^^^^^^^^^^^^
 
-Ansible offers the :ref:`community.general.read_csv module <ansible_collections.community.general.read_csv_module>` to read CSV files. Sometimes you need to convert strings to CSV files instead. For this, the ``from_csv`` filter exists.
+Ansible offers the :ansplugin:`community.general.read_csv module <community.general.read_csv#module>` to read CSV files. Sometimes you need to convert strings to CSV files instead. For this, the :ansplugin:`community.general.from_csv filter <community.general.from_csv#filter>` exists.
 
 .. code-block:: yaml+jinja
 
@@ -42,7 +42,7 @@ This produces:
         ]
     }
 
-The ``from_csv`` filter has several keyword arguments to control its behavior:
+The :ansplugin:`community.general.from_csv filter <community.general.from_csv#filter>` has several keyword arguments to control its behavior:
 
 :dialect: Dialect of the CSV file. Default is ``excel``. Other possible choices are ``excel-tab`` and ``unix``. If one of ``delimiter``, ``skipinitialspace`` or ``strict`` is specified, ``dialect`` is ignored.
 :fieldnames: A set of column names to use. If not provided, the first line of the CSV is assumed to contain the column names.
@@ -55,7 +55,7 @@ The ``from_csv`` filter has several keyword arguments to control its behavior:
 Converting to JSON
 ^^^^^^^^^^^^^^^^^^
 
-`JC <https://pypi.org/project/jc/>`_ is a CLI tool and Python library which allows to interpret output of various CLI programs as JSON. It is also available as a filter in community.general. This filter needs the `jc Python library <https://pypi.org/project/jc/>`_ installed on the controller.
+`JC <https://pypi.org/project/jc/>`_ is a CLI tool and Python library which allows to interpret output of various CLI programs as JSON. It is also available as a filter in community.general, called :ansplugin:`community.general.jc#filter`. This filter needs the `jc Python library <https://pypi.org/project/jc/>`_ installed on the controller.
 
 .. code-block:: yaml+jinja
 

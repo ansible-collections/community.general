@@ -8,7 +8,7 @@
 Selecting JSON data: JSON queries
 ---------------------------------
 
-To select a single element or a data subset from a complex data structure in JSON format (for example, Ansible facts), use the ``json_query`` filter.  The ``json_query`` filter lets you query a complex JSON structure and iterate over it using a loop structure.
+To select a single element or a data subset from a complex data structure in JSON format (for example, Ansible facts), use the :ansplugin:`community.general.json_query filter <community.general.json_query#filter>`.  The :ansplugin:`community.general.json_query#filter` filter lets you query a complex JSON structure and iterate over it using a loop structure.
 
 .. note:: You must manually install the **jmespath** dependency on the Ansible controller before using this filter. This filter is built upon **jmespath**, and you can use the same syntax. For examples, see `jmespath examples <http://jmespath.org/examples.html>`_.
 
@@ -146,4 +146,4 @@ To extract ports from all clusters with name containing 'server1':
       vars:
         server_name_query: "domain.server[?contains(name,'server1')].port"
 
-.. note:: while using ``starts_with`` and ``contains``, you have to use `` to_json | from_json `` filter for correct parsing of data structure.
+.. note:: while using ``starts_with`` and ``contains``, you have to use ``to_json | from_json`` filter for correct parsing of data structure.

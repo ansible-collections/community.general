@@ -11,7 +11,7 @@ The following filters allow to create identifiers.
 Hashids
 ^^^^^^^
 
-`Hashids <https://hashids.org/>`_ allow to convert sequences of integers to short unique string identifiers. This filter needs the `hashids Python library <https://pypi.org/project/hashids/>`_ installed on the controller.
+`Hashids <https://hashids.org/>`_ allow to convert sequences of integers to short unique string identifiers. The :ansplugin:`community.general.hashids_encode#filter` and :ansplugin:`community.general.hashids_decode#filter` filters need the `hashids Python library <https://pypi.org/project/hashids/>`_ installed on the controller.
 
 .. code-block:: yaml+jinja
 
@@ -52,7 +52,7 @@ The hashids filters accept keyword arguments to allow fine-tuning the hashids ge
 Random MACs
 ^^^^^^^^^^^
 
-You can use the ``random_mac`` filter to complete a partial `MAC address <https://en.wikipedia.org/wiki/MAC_address>`_ to a random 6-byte MAC address.
+You can use the :ansplugin:`community.general.random_mac filter <community.general.random_mac#filter>` to complete a partial `MAC address <https://en.wikipedia.org/wiki/MAC_address>`_ to a random 6-byte MAC address.
 
 .. code-block:: yaml+jinja
 
