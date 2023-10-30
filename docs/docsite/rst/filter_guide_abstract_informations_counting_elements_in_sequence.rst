@@ -6,7 +6,7 @@
 Counting elements in a sequence
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``community.general.counter`` filter plugin allows you to count (hashable) elements in a sequence. Elements are returned as dictionary keys and their counts are stored as dictionary values.
+The :ansplugin:`community.general.counter filter plugin <community.general.counter#filter>` allows you to count (hashable) elements in a sequence. Elements are returned as dictionary keys and their counts are stored as dictionary values.
 
 .. code-block:: yaml+jinja
 
