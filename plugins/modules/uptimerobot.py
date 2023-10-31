@@ -7,16 +7,18 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
 DOCUMENTATION = '''
 
 module: uptimerobot
-short_description: Pause and start Uptime Robot monitoring
+short_description: Interact with Uptime Robot monitoring
 description:
-    - This module will let you start and pause Uptime Robot Monitoring
-author: "Nate Kingsley (@nate-kingsley)"
+    - This module will let you manage your Uptime Robot Monitoring
+author:
+    - "Nate Kingsley (@nate-kingsley)"
+    - "Leon Thiel (@thieleon)"
 requirements:
     - Valid Uptime Robot API Key
+    - python requests module
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -25,133 +27,118 @@ attributes:
     diff_mode:
         support: none
 options:
-    state:
-        type: str
-        description:
-            - Define whether or not the monitor should be running or paused.
-        required: true
-        choices: [ "started", "paused" ]
-    monitorid:
-        type: str
-        description:
-            - ID of the monitor to check.
-        required: true
-    apikey:
+    api_key:
         type: str
         description:
             - Uptime Robot API key.
         required: true
+    action:
+        type: str
+        description:
+            - Uptime Robot API action.
+        required: true
+    params:
+        type: dict
+        description:
+            - required data for api call. See https://uptimerobot.com/api/
+        required: false
 notes:
-    - Support for adding and removing monitors and alert contacts has not yet been implemented.
+    - See the uptimerobot api description on \
+        https://uptimerobot.com/api/ for more information about \
+        required params.
 '''
 
 EXAMPLES = '''
-- name: Pause the monitor with an ID of 12345
+- name: Create a new monitor of type 1 (http), \
+    url "http://example.com" and name "My new monitor"
   community.general.uptimerobot:
-    monitorid: 12345
-    apikey: 12345-1234512345
-    state: paused
+    api_key: 12345-1234512345
+    action: newMonitor
+    params:
+        friendly_name: "My new monitor"
+        url: "http://example.com"
+        type: 1
 
-- name: Start the monitor with an ID of 12345
+- name: Enable the monitor with an ID of 12345
   community.general.uptimerobot:
-    monitorid: 12345
-    apikey: 12345-1234512345
-    state: started
+    api_key: 12345-1234512345
+    action: editMonitor
+    params:
+        status: 1
 '''
 
-import json
-
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.common.text.converters import to_text
+import requests
 
-
-API_BASE = "https://api.uptimerobot.com/"
-
-API_ACTIONS = dict(
-    status='getMonitors?',
-    editMonitor='editMonitor?'
-)
-
+API_URL = "https://api.uptimerobot.com/v2/"
 API_FORMAT = 'json'
 API_NOJSONCALLBACK = 1
-CHANGED_STATE = False
 SUPPORTS_CHECK_MODE = False
 
 
-def checkID(module, params):
+def uptimerobot_api_call(action, params, module=None):
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'cache-control': "no-cache",
+    }
 
-    data = urlencode(params)
-    full_uri = API_BASE + API_ACTIONS['status'] + data
-    req, info = fetch_url(module, full_uri)
-    result = to_text(req.read())
-    jsonresult = json.loads(result)
-    req.close()
-    return jsonresult
+    payload = urlencode(params)
 
+    response = requests.post(API_URL + action, headers=headers, data=payload)
 
-def startMonitor(module, params):
-
-    params['monitorStatus'] = 1
-    data = urlencode(params)
-    full_uri = API_BASE + API_ACTIONS['editMonitor'] + data
-    req, info = fetch_url(module, full_uri)
-    result = to_text(req.read())
-    jsonresult = json.loads(result)
-    req.close()
-    return jsonresult['stat']
-
-
-def pauseMonitor(module, params):
-
-    params['monitorStatus'] = 0
-    data = urlencode(params)
-    full_uri = API_BASE + API_ACTIONS['editMonitor'] + data
-    req, info = fetch_url(module, full_uri)
-    result = to_text(req.read())
-    jsonresult = json.loads(result)
-    req.close()
-    return jsonresult['stat']
-
-
-def main():
-
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(required=True, choices=['started', 'paused']),
-            apikey=dict(required=True, no_log=True),
-            monitorid=dict(required=True)
-        ),
-        supports_check_mode=SUPPORTS_CHECK_MODE
-    )
-
-    params = dict(
-        apiKey=module.params['apikey'],
-        monitors=module.params['monitorid'],
-        monitorID=module.params['monitorid'],
-        format=API_FORMAT,
-        noJsonCallback=API_NOJSONCALLBACK
-    )
-
-    check_result = checkID(module, params)
-
-    if check_result['stat'] != "ok":
-        module.fail_json(
-            msg="failed",
-            result=check_result['message']
-        )
-
-    if module.params['state'] == 'started':
-        monitor_result = startMonitor(module, params)
+    if response.status_code == 200:
+        return response.json()
     else:
-        monitor_result = pauseMonitor(module, params)
-
-    module.exit_json(
-        msg="success",
-        result=monitor_result
-    )
+        raise Exception('API request failed',
+                        response.status_code, response.text)
 
 
 if __name__ == '__main__':
+    from ansible.module_utils.basic import AnsibleModule
+
+    def main():
+        module = AnsibleModule(
+            argument_spec=dict(
+                api_key=dict(type='str', required=True),
+                action=dict(
+                    type='str',
+                    required=True,
+                    choices=[
+                        'getAccountDetails',
+                        'getMonitors',
+                        'newMonitor',
+                        'editMonitor',
+                        'deleteMonitor',
+                        'resetMonitor',
+                        'getAlertContacts',
+                        'newAlertContact',
+                        'editAlertContact',
+                        'deleteAlertContact',
+                        'getMWindows',
+                        'newMWindow',
+                        'editMWindow',
+                        'deleteMWindow',
+                        'getPSPs',
+                        'newPSP',
+                        'editPSP',
+                        'deletePSP'
+                    ]
+                ),
+                params=dict(type='dict', required=False)
+            ),
+            supports_check_mode=SUPPORTS_CHECK_MODE
+        )
+
+        action = module.params['action']
+        params = module.params['params'] or dict()
+        params['api_key'] = module.params['api_key']
+        params['format'] = API_FORMAT
+        params['noJsonCallback'] = API_NOJSONCALLBACK
+
+        try:
+            result = uptimerobot_api_call(action, params, module=module)
+            module.exit_json(changed=True, result=result)
+        except Exception as e:
+            module.fail_json(msg=str(e))
+
     main()
