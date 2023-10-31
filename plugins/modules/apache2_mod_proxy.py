@@ -18,8 +18,8 @@ description:
   - Set and/or get members' attributes of an Apache httpd 2.4 mod_proxy balancer
     pool, using HTTP POST and GET requests. The httpd mod_proxy balancer-member
     status page has to be enabled and accessible, as this module relies on parsing
-    this page. This module supports ansible check_mode, and requires BeautifulSoup
-    python module.
+    this page. This module supports ansible check_mode, and requires BeautifulSoup4
+    python3 module.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
