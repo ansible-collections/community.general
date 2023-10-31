@@ -212,7 +212,7 @@ from ansible.module_utils.six import iteritems
 
 BEAUTIFUL_SOUP_IMP_ERR = None
 try:
-    from BeautifulSoup import BeautifulSoup
+    from bs4 import BeautifulSoup
 except ImportError:
     BEAUTIFUL_SOUP_IMP_ERR = traceback.format_exc()
     HAS_BEAUTIFULSOUP = False
@@ -272,11 +272,11 @@ class BalancerMember(object):
             except TypeError as exc:
                 self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(exc))
             else:
-                subsoup = soup.findAll('table')[1].findAll('tr')
-                keys = subsoup[0].findAll('th')
+                subsoup = soup.find_all('table')[1].find_all('tr')
+                keys = subsoup[0].find_all('th')
                 for valuesset in subsoup[1::1]:
                     if re.search(pattern=self.host, string=str(valuesset)):
-                        values = valuesset.findAll('td')
+                        values = valuesset.find_all('td')
                         return dict((keys[x].string, values[x].string) for x in range(0, len(keys)))
 
     def get_member_status(self):
@@ -345,7 +345,7 @@ class Balancer(object):
         except TypeError:
             self.module.fail_json(msg="Cannot parse balancer page HTML! " + str(self.page))
         else:
-            for element in soup.findAll('a')[1::1]:
+            for element in soup.find_all('a')[1::1]:
                 balancer_member_suffix = str(element.get('href'))
                 if not balancer_member_suffix:
                     self.module.fail_json(msg="Argument 'balancer_member_suffix' is empty!")
