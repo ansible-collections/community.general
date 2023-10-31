@@ -106,6 +106,7 @@ options:
     type: str
     description:
       - The IP address of the host.
+      - This is no longer required since community.general 8.0.0.
   variables:
     type: dict
     description:
