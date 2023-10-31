@@ -1007,7 +1007,7 @@ def main():
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
                 before_norm = normalise_cr(before_client, remove_ids=True)
-                desired_client["attributes"] = before_norm["attributes"] | dict((k,v) for k,v in desired_client["attributes"].items() if v)
+                desired_client["attributes"] = dict((k,v) for k,v in desired_client["attributes"].items() if v is not None)
                 desired_norm = normalise_cr(desired_client, remove_ids=True)
                 
                 if module._diff:
