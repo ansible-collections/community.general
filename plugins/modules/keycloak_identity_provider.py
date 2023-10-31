@@ -616,7 +616,7 @@ def main():
             # do the update
             desired_idp = desired_idp.copy()
             updated_mappers = desired_idp.pop('mappers', [])
-            original_mappers = before_idp.get('mappers', []).copy()
+            original_mappers = list(before_idp.get('mappers', []))
 
             kc.update_identity_provider(desired_idp, realm)
             for mapper in updated_mappers:
