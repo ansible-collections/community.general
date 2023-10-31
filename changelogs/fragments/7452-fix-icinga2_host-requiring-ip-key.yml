@@ -1,2 +1,2 @@
 bugfixes:
-  - icinga2_host - fix module requiring ip key while Icinga 2 allows for empty address attribute (https://github.com/ansible-collections/community.general/pull/7452).
+  - icinga2_host - the ``ip`` option is no longer required, since Icinga 2 allows for an empty address attribute (https://github.com/ansible-collections/community.general/pull/7452).
