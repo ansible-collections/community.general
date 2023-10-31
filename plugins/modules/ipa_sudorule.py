@@ -54,6 +54,7 @@ options:
     - If option is omitted commands will not be checked or changed.
     type: list
     elements: str
+    version_added: 8.0.0
   deny_cmdgroup:
     description:
     - List of denied command groups assigned to the rule.
@@ -61,6 +62,7 @@ options:
     - If option is omitted command groups will not be checked or changed.
     type: list
     elements: str
+    version_added: 8.0.0
   description:
     description:
     - Description of the sudo rule.
