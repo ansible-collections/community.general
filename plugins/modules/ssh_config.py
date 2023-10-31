@@ -108,6 +108,22 @@ options:
       - Sets the C(HostKeyAlgorithms) option.
     type: str
     version_added: 6.1.0
+  controlmaster:
+    description:
+      - Sets the C(ControlMaster) option.
+    choices: [ 'yes', 'no', 'ask', 'auto', 'autoask' ]
+    type: str
+    version_added: 8.1.0
+  controlpath:
+    description:
+      - Sets the C(ControlPath) option.
+    type: str
+    version_added: 8.1.0
+  controlpersist:
+    description:
+      - Sets the C(ControlPersist) option.
+    type: str
+    version_added: 8.1.0
 requirements:
 - paramiko
 '''
@@ -219,6 +235,9 @@ class SSHConfig(object):
             proxycommand=self.params.get('proxycommand'),
             proxyjump=self.params.get('proxyjump'),
             host_key_algorithms=self.params.get('host_key_algorithms'),
+            controlmaster=self.params.get('controlmaster'),
+            controlpath=self.params.get('controlpath'),
+            controlpersist=self.params.get('controlpersist'),
         )
 
         # Convert True / False to 'yes' / 'no' for usage in ssh_config
@@ -320,9 +339,13 @@ def main():
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             strict_host_key_checking=dict(
+                type='str',
                 default=None,
                 choices=['yes', 'no', 'ask']
             ),
+            controlmaster=dict(type='str', default=None, choices=['yes', 'no', 'ask', 'auto', 'autoask']),
+            controlpath=dict(type='str', default=None),
+            controlpersist=dict(type='str', default=None),
             user=dict(default=None, type='str'),
             user_known_hosts_file=dict(type='str', default=None),
         ),
