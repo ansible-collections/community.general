@@ -1,2 +1,2 @@
-bugfixes:
+minor_changes:
   - icinga2_host - the ``ip`` option is no longer required, since Icinga 2 allows for an empty address attribute (https://github.com/ansible-collections/community.general/pull/7452).
