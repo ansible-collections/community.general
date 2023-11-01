@@ -106,7 +106,7 @@ options:
     type: str
     description:
       - The IP address of the host.
-    required: true
+      - This is no longer required since community.general 8.0.0.
   variables:
     type: dict
     description:
@@ -243,7 +243,7 @@ def main():
         template=dict(default=None),
         check_command=dict(default="hostalive"),
         display_name=dict(default=None),
-        ip=dict(required=True),
+        ip=dict(),
         variables=dict(type='dict', default=None),
     )
 
