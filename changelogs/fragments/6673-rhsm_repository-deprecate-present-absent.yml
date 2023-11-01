@@ -1,8 +1,0 @@
-deprecated_features:
-- |
-  rhsm_repository - ``state=present`` has not been working as expected for many years,
-  and it seems it was not noticed so far; also, "presence" is not really a valid concept
-  for subscription repositories, which can only be enabled or disabled. Hence, mark the
-  ``present`` and ``absent`` values of the ``state`` option as deprecated, slating them
-  for removal in community.general 10.0.0
-  (https://github.com/ansible-collections/community.general/pull/6673).

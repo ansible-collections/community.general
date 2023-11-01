@@ -1,6 +1,0 @@
-minor_changes:
-  - |
-    redhat_subscription - the internal ``RegistrationBase`` class was folded
-    into the other internal ``Rhsm`` class, as the separation had no purpose
-    anymore
-    (https://github.com/ansible-collections/community.general/pull/6658).

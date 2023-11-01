@@ -1,6 +1,0 @@
-bugfixes:
-  - |
-    redhat_subscription - use the right D-Bus options for the consumer type when
-    registering a RHEL system older than 9 or a RHEL 9 system older than 9.2
-    and using ``consumer_type``
-    (https://github.com/ansible-collections/community.general/pull/7378).

@@ -1,2 +1,0 @@
-deprecated_features:
-  - CmdRunner module utils - deprecate ``cmd_runner_fmt.as_default_type()`` formatter (https://github.com/ansible-collections/community.general/pull/6601).

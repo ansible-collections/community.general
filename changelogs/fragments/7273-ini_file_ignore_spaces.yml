@@ -1,2 +1,0 @@
-minor_changes:
-  - ini_file - add ``ignore_spaces`` option (https://github.com/ansible-collections/community.general/pull/7273).

@@ -1,2 +1,0 @@
-bugfixes:
-  - keycloak module utils - fix ``is_struct_included`` handling of lists of lists/dictionaries (https://github.com/ansible-collections/community.general/pull/6688).

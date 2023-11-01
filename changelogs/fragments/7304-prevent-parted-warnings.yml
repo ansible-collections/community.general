@@ -1,2 +1,0 @@
-minor_changes:
-  - parted - on resize, use ``--fix`` option if available (https://github.com/ansible-collections/community.general/pull/7304).

@@ -1,3 +1,0 @@
----
-minor_changes:
-  - "mas - disable sign-in check for macOS 12+ as ``mas account`` is non-functional (https://github.com/ansible-collections/community.general/pull/6520)."

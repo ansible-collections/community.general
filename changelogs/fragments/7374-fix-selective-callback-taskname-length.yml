@@ -1,2 +1,0 @@
-bugfixes:
-  - "selective callback plugin - fix length of task name lines in output always being 3 characters longer than desired (https://github.com/ansible-collections/community.general/pull/7374)."

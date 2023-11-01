@@ -1,3 +1,0 @@
-minor_changes:
-  - gitlab_runner - minor refactor removing unnecessary code statements (https://github.com/ansible-collections/community.general/pull/6927).
-  - keyring - minor refactor removing unnecessary code statements (https://github.com/ansible-collections/community.general/pull/6927).

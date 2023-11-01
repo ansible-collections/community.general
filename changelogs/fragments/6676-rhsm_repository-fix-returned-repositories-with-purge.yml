@@ -1,6 +1,0 @@
-bugfixes:
-  - |
-    rhsm_repository - when using the ``purge`` option, the ``repositories``
-    dictionary element in the returned JSON is now properly updated according
-    to the pruning operation
-    (https://github.com/ansible-collections/community.general/pull/6676).

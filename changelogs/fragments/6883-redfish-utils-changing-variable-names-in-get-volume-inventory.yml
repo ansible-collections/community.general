@@ -1,2 +1,0 @@
-bugfixes:
-  - refish_utils module utils - changing variable names to avoid issues occuring when fetching Volumes data (https://github.com/ansible-collections/community.general/pull/6883).

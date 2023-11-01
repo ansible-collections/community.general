@@ -1,2 +1,0 @@
-deprecated_features:
-  - ejabberd_user - deprecate the parameter ``logging`` in favour of producing more detailed information in the module output (https://github.com/ansible-collections/community.general/pull/7043).
