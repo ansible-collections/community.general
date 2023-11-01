@@ -201,6 +201,14 @@ def convert_bool(value):
     return None
 
 
+def fix_bool_str(value):
+    if value == 'True':
+        return 'yes'
+    if value == 'False':
+        return 'no'
+    return value
+
+
 class SSHConfig(object):
     def __init__(self, module):
         self.module = module
@@ -246,7 +254,7 @@ class SSHConfig(object):
             forward_agent=convert_bool(self.params.get('forward_agent')),
             controlmaster=self.params.get('controlmaster'),
             controlpath=self.params.get('controlpath'),
-            controlpersist=self.params.get('controlpersist'),
+            controlpersist=fix_bool_str(self.params.get('controlpersist')),
         )
 
         config_changed = False

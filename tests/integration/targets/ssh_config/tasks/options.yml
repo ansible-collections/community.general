@@ -18,7 +18,7 @@
     host_key_algorithms: "+ssh-rsa"
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: "yes"
+    controlpersist: yes
     state: present
   register: options_add
   check_mode: true
@@ -50,7 +50,7 @@
     host_key_algorithms: "+ssh-rsa"
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: "yes"
+    controlpersist: yes
     state: present
   register: options_add
 
@@ -71,7 +71,7 @@
     host_key_algorithms: "+ssh-rsa"
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: "yes"
+    controlpersist: yes
     state: present
   register: options_add_again
 
@@ -255,7 +255,7 @@
     host_key_algorithms: "+ssh-rsa"
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: "yes"
+    controlpersist: yes
     state: present
   register: options_add
   check_mode: true
@@ -287,7 +287,7 @@
     host_key_algorithms: "+ssh-rsa"
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: "yes"
+    controlpersist: yes
     state: present
   register: options_add
 
@@ -308,7 +308,7 @@
     host_key_algorithms: "+ssh-rsa"
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
-    controlpersist: "yes"
+    controlpersist: yes
     state: present
   register: options_add_again
 
