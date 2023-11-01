@@ -1352,6 +1352,16 @@ releases:
     - 5543-dependent-template.yml
     - fqcn-warnings.yml
     release_date: '2022-11-15'
+  5.8.10:
+    changes:
+      major_changes:
+      - The community.general 5.x.y release stream is now effectively **End of Life**.
+        No more releases will be made, and regular CI runs will stop.
+      release_summary: Final maintenance release of community.general major version
+        5.
+    fragments:
+    - 5.8.10.yml
+    release_date: '2023-11-01'
   5.8.2:
     changes:
       bugfixes:

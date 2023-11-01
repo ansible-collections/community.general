@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 4.0.0.
 
+v5.8.10
+=======
+
+Release Summary
+---------------
+
+Final maintenance release of community.general major version 5.
+
+Major Changes
+-------------
+
+- The community.general 5.x.y release stream is now effectively **End of Life**. No more releases will be made, and regular CI runs will stop.
+
 v5.8.9
 ======
 
