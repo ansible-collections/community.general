@@ -144,7 +144,7 @@ options:
   state:
     description:
      - Indicate desired state of the instance
-     - V(template) was added in community.general 8.0.0.
+     - V(template) was added in community.general 8.1.0.
     type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'template']
     default: present
@@ -814,7 +814,7 @@ def main():
             if proxmox.stop_instance(vm, vmid, timeout, force=module.params['force']):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid)
         except Exception as e:
-            module.fail_json(msg="stopping of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e))
 
     elif state == 'template':
         try:
@@ -823,7 +823,7 @@ def main():
             proxmox.convert_to_template(vm, vmid, timeout, force=module.params['force'])
             module.exit_json(changed=True, msg="VM %s is converted to template" % vmid)
         except Exception as e:
-            module.fail_json(msg="conversion of VM %s to template failed with exception: %s" % (vmid, e))
+            module.fail_json(vmid=vmid, msg="conversion of VM %s to template failed with exception: %s" % (vmid, e))
 
     elif state == 'restarted':
         try:
