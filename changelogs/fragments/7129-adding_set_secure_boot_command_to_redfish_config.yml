@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_config - adding ``SetSecureBoot`` command (https://github.com/ansible-collections/community.general/pull/7129).

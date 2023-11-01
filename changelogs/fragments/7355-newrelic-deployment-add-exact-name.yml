@@ -1,2 +1,0 @@
-minor_changes:
-  - "newrelic_deployment - add option ``app_name_exact_match``, which filters results for the exact app_name provided (https://github.com/ansible-collections/community.general/pull/7355)."

@@ -1,2 +1,0 @@
-bugfixes:
-  - csv module utils - detects and remove unicode BOM markers from incoming CSV content (https://github.com/ansible-collections/community.general/pull/6662).

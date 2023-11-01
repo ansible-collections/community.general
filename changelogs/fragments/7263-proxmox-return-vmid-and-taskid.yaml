@@ -1,2 +1,0 @@
-minor_changes:
-    - proxmox - add ``vmid`` (and ``taskid`` when possible) to return values (https://github.com/ansible-collections/community.general/pull/7263).
