@@ -138,7 +138,7 @@ DOCUMENTATION = '''
         description: Include the old (edited) password inside the pass file.
         type: bool
         default: true
-        version_added: 8.0.0
+        version_added: 8.1.0
     notes:
       - The lookup supports passing all options as lookup parameters since community.general 6.0.0.
 '''
