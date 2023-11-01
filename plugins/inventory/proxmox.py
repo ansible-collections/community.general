@@ -570,7 +570,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for group in default_groups:
             self.inventory.add_group(self._group('all_%s' % (group)))
         nodes_group = self._group('nodes')
-        self.inventory.add_group(nodes_group)
+        if not self.exclude_nodes:
+            self.inventory.add_group(nodes_group)
 
         want_proxmox_nodes_ansible_host = self.get_option("want_proxmox_nodes_ansible_host")
 
@@ -580,22 +581,23 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for node in self._get_nodes():
             if not node.get('node'):
                 continue
-
-            self.inventory.add_host(node['node'])
-            if node['type'] == 'node':
+            if not self.exclude_nodes:
+                self.inventory.add_host(node['node'])
+            if node['type'] == 'node' and not self.exclude_nodes:
                 self.inventory.add_child(nodes_group, node['node'])
 
             if node['status'] == 'offline':
                 continue
 
             # get node IP address
-            if want_proxmox_nodes_ansible_host:
+            if want_proxmox_nodes_ansible_host and not self.exclude_nodes:
                 ip = self._get_node_ip(node['node'])
                 self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
             # Setting composite variables
-            variables = self.inventory.get_host(node['node']).get_vars()
-            self._set_composite_vars(self.get_option('compose'), variables, node['node'], strict=self.strict)
+            if not self.exclude_nodes:
+                variables = self.inventory.get_host(node['node']).get_vars()
+                self._set_composite_vars(self.get_option('compose'), variables, node['node'], strict=self.strict)
 
             # add LXC/Qemu groups for the node
             for ittype in ('lxc', 'qemu'):
@@ -612,10 +614,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # gather vm's in pools
         self._populate_pool_groups(hosts)
-
-        # removes the general node-group from the inventory list
-        if self.exclude_nodes:
-            self.inventory.remove_group(nodes_group)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
