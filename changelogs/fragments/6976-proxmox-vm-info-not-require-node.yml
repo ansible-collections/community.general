@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox_vm_info - ``node`` parameter is no longer required. Information can be obtained for the whole cluster (https://github.com/ansible-collections/community.general/pull/6976).

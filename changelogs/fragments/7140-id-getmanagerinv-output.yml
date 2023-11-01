@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_info - report ``Id`` in the output of ``GetManagerInventory`` (https://github.com/ansible-collections/community.general/pull/7140).

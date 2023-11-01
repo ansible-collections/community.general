@@ -1,2 +1,0 @@
-removed_features:
-  - proxmox module utils - removed unused imports (https://github.com/ansible-collections/community.general/pull/6873).

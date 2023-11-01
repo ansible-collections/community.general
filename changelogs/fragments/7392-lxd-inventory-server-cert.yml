@@ -1,3 +1,0 @@
-minor_changes:
-  - lxd inventory plugin - add ``server_cert`` option for trust anchor to use for TLS verification of server certificates (https://github.com/ansible-collections/community.general/pull/7392).
-  - lxd inventory plugin - add ``server_check_hostname`` option to disable hostname verification of server certificates (https://github.com/ansible-collections/community.general/pull/7392).
