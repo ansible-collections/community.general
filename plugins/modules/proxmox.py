@@ -622,7 +622,9 @@ def main():
         netif=dict(type='dict'),
         mounts=dict(type='dict'),
         ip_address=dict(),
-        ostype=dict(default='auto', choices=['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged']),
+        ostype=dict(default='auto', choices=[
+            'auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged'
+            ]),
         onboot=dict(type='bool'),
         features=dict(type='list', elements='str'),
         storage=dict(default='local'),
