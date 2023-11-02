@@ -99,7 +99,7 @@ if __name__ == '__main__':
     def main():
         module = AnsibleModule(
             argument_spec=dict(
-                api_key=dict(type='str', required=True),
+                api_key=dict(type='str', required=True, aliases=['apikey']),
                 action=dict(
                     type='str',
                     required=True,
@@ -121,20 +121,34 @@ if __name__ == '__main__':
                         'getPSPs',
                         'newPSP',
                         'editPSP',
-                        'deletePSP'
-                    ]
+                        'deletePSP',
+                        # for backwards compatibility
+                        'started',
+                        'paused'
+                    ],
+                    aliases=['state']
                 ),
-                params=dict(type='dict', required=False)
+                params=dict(type='dict', required=False),
+                # for backwards compatibility
+                state=dict(type='str', required=False),
+                monitorid=dict(type='str', required=False)
             ),
             supports_check_mode=SUPPORTS_CHECK_MODE
         )
 
-        action = module.params['action']
+        # collect necessary information for the api call
         params = module.params['params'] or dict()
+        action = module.params['action']
         params['api_key'] = module.params['api_key']
         params['format'] = API_FORMAT
         params['noJsonCallback'] = API_NOJSONCALLBACK
 
+        # test for backwards compatibility
+        if module.params['action'] in ['started', 'paused']:
+            action = 'editMonitor'
+            params['status'] = 1 if module.params['action'] == 'started' else 0
+            params['id'] = module.params['monitorid']
+            
         try:
             result = uptimerobot_api_call(action, params, module=module)
             module.exit_json(changed=True, result=result)
