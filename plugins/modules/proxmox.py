@@ -98,6 +98,12 @@ options:
       - target storage
     type: str
     default: 'local'
+  ostype:
+    description:
+      - specifies the ostype of the lxc container
+    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged']
+    type: str
+    default: 'auto'
   cpuunits:
     description:
       - CPU weight for a VM
