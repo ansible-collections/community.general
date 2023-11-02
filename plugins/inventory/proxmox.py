@@ -120,6 +120,7 @@ DOCUMENTATION = '''
         description: Exclude proxmox nodes (and their groups) from the inventory output.
         type: bool
         default: false
+        version_added: 8.1.0
       filters:
         version_added: 4.6.0
         description: A list of Jinja templates that allow filtering hosts.
