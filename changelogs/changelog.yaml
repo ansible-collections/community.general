@@ -505,7 +505,7 @@ releases:
       - yum_versionlock - add support to pin specific package versions instead of
         only the package itself (https://github.com/ansible-collections/community.general/pull/6861,
         https://github.com/ansible-collections/community.general/issues/4470).
-      release_summary: This is release 9.0.0 of ``community.general``, released on
+      release_summary: This is release 8.0.0 of ``community.general``, released on
         2023-11-01.
       removed_features:
       - The collection no longer supports ansible-core 2.11 and ansible-core 2.12.

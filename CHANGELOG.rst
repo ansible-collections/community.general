@@ -12,7 +12,7 @@ v8.0.0
 Release Summary
 ---------------
 
-This is release 9.0.0 of ``community.general``, released on 2023-11-01.
+This is release 8.0.0 of ``community.general``, released on 2023-11-01.
 
 Minor Changes
 -------------
