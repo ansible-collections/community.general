@@ -624,7 +624,7 @@ def main():
         ip_address=dict(),
         ostype=dict(default='auto', choices=[
             'auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged'
-            ]),
+        ]),
         onboot=dict(type='bool'),
         features=dict(type='list', elements='str'),
         storage=dict(default='local'),
