@@ -117,7 +117,7 @@ DOCUMENTATION = '''
         type: bool
         default: false
       exclude_nodes:
-        description: Exclude proxmox nodes (and their groups) from the inventory output.
+        description: Exclude proxmox nodes and the nodes-group from the inventory output.
         type: bool
         default: false
         version_added: 8.1.0
