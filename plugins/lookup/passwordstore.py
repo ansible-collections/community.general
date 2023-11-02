@@ -400,7 +400,7 @@ class LookupModule(LookupBase):
         if self.paramvals['preserve'] or self.paramvals['timestamp']:
             msg += '\n'
             if self.paramvals['preserve'] and self.passoutput[1:]:
-                msg += '\n'.join(self.passoutput[1:])
+                msg += '\n'.join(self.passoutput[1:]) + '\n'
             if self.paramvals['timestamp'] and self.paramvals['backup']:
                 msg += "lookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
         try:
