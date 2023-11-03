@@ -193,6 +193,14 @@ from ansible_collections.community.general.plugins.module_utils._stormssh import
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
+def convert_bool(value):
+    if value is True:
+        return 'yes'
+    if value is False:
+        return 'no'
+    return None
+
+
 class SSHConfig(object):
     def __init__(self, module):
         self.module = module
@@ -235,16 +243,11 @@ class SSHConfig(object):
             proxycommand=self.params.get('proxycommand'),
             proxyjump=self.params.get('proxyjump'),
             host_key_algorithms=self.params.get('host_key_algorithms'),
+            forward_agent=convert_bool(self.params.get('forward_agent')),
             controlmaster=self.params.get('controlmaster'),
             controlpath=self.params.get('controlpath'),
             controlpersist=self.params.get('controlpersist'),
         )
-
-        # Convert True / False to 'yes' / 'no' for usage in ssh_config
-        if self.params['forward_agent'] is True:
-            args['forward_agent'] = 'yes'
-        if self.params['forward_agent'] is False:
-            args['forward_agent'] = 'no'
 
         config_changed = False
         hosts_changed = []
