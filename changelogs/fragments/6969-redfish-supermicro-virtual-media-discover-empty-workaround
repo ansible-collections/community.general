@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_command - add workaround in ``VirtualMediaInsert`` for Supermicro systems to treat slots marked as ``NotConnected`` as empty (https://github.com/ansible-collections/community.general/issues/6969).
