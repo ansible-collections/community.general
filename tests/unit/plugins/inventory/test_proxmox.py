@@ -730,7 +730,7 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
         'facts_prefix': 'proxmox_',
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
-        'qemu_extended_statuses': False
+        'qemu_extended_statuses': False,
         'exclude_nodes':False
     }
 
@@ -777,7 +777,7 @@ def test_populate_exclude_nodes(inventory, mocker):
     for node in ['testnode', 'testnode2']:
         assert node not in inventory.inventory.hosts
     # make sure that nodes group is absent
-    assert ('%s_nodes' % (inventory.group_prefix) not in inventory.inventory.groups
+    assert ('%s_nodes' % (inventory.group_prefix)) not in inventory.inventory.groups
     # make sure that nodes are not in the "ungrouped" group 
     for node in ['testnode', 'testnode2']:
         assert node not in inventory.inventory.get_groups_dict()["ungrouped"]
