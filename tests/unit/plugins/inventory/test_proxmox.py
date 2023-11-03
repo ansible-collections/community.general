@@ -653,7 +653,7 @@ def test_populate(inventory, mocker):
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
         'qemu_extended_statuses': True,
-        'exclude_nodes':False
+        'exclude_nodes': False
     }
 
     # bypass authentication and API fetch calls
@@ -731,7 +731,7 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
         'qemu_extended_statuses': False,
-        'exclude_nodes':False
+        'exclude_nodes': False
     }
 
     # bypass authentication and API fetch calls
@@ -762,7 +762,7 @@ def test_populate_exclude_nodes(inventory, mocker):
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
         'qemu_extended_statuses': False,
-        'exclude_nodes':True
+        'exclude_nodes': True
     }
 
     # bypass authentication and API fetch calls
@@ -778,6 +778,6 @@ def test_populate_exclude_nodes(inventory, mocker):
         assert node not in inventory.inventory.hosts
     # make sure that nodes group is absent
     assert ('%s_nodes' % (inventory.group_prefix)) not in inventory.inventory.groups
-    # make sure that nodes are not in the "ungrouped" group 
+    # make sure that nodes are not in the "ungrouped" group
     for node in ['testnode', 'testnode2']:
         assert node not in inventory.inventory.get_groups_dict()["ungrouped"]
