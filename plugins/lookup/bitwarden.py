@@ -104,6 +104,8 @@ class Bitwarden(object):
         out, err = p.communicate(to_bytes(stdin))
         rc = p.wait()
         if rc != expected_rc:
+            if len(args) > 2 and args[0] == 'get' and args[1] == 'item' and b'Not found.' in err:
+                return 'null', ''
             raise BitwardenException(err)
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
@@ -125,7 +127,10 @@ class Bitwarden(object):
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
         if search_field == 'id':
-            initial_matches = [initial_matches]
+            if initial_matches == None:
+                initial_matches = []
+            else:
+                initial_matches = [initial_matches]
         # Filter to only include results from the right field.
         return [item for item in initial_matches if item[search_field] == search_value]
 
