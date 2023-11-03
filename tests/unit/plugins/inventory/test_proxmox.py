@@ -646,6 +646,7 @@ def test_populate(inventory, mocker):
     inventory.group_prefix = 'proxmox_'
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
+    inventory.exclude_nodes = False
 
     opts = {
         'group_prefix': 'proxmox_',
@@ -653,7 +654,7 @@ def test_populate(inventory, mocker):
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
         'qemu_extended_statuses': True,
-        'exclude_nodes': False
+        'exclude_nodes' : False
     }
 
     # bypass authentication and API fetch calls
@@ -724,6 +725,7 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
     inventory.group_prefix = 'proxmox_'
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
+    inventory.exclude_nodes = False
 
     opts = {
         'group_prefix': 'proxmox_',
@@ -731,7 +733,7 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
         'qemu_extended_statuses': False,
-        'exclude_nodes': False
+        'exclude_nodes' : False
     }
 
     # bypass authentication and API fetch calls
@@ -755,6 +757,7 @@ def test_populate_exclude_nodes(inventory, mocker):
     inventory.group_prefix = 'proxmox_'
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
+    inventory.exclude_nodes = True
 
     opts = {
         'group_prefix': 'proxmox_',
@@ -762,7 +765,7 @@ def test_populate_exclude_nodes(inventory, mocker):
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
         'qemu_extended_statuses': False,
-        'exclude_nodes': True
+        'exclude_nodes' : True
     }
 
     # bypass authentication and API fetch calls
