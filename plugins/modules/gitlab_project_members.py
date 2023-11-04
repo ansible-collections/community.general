@@ -282,10 +282,10 @@ def main():
     ensure_gitlab_package(module)
 
     access_level_int = {
-        'guest': gitlab.GUEST_ACCESS,
-        'reporter': gitlab.REPORTER_ACCESS,
-        'developer': gitlab.DEVELOPER_ACCESS,
-        'maintainer': gitlab.MAINTAINER_ACCESS,
+        'guest': gitlab.const.GUEST_ACCESS,
+        'reporter': gitlab.const.REPORTER_ACCESS,
+        'developer': gitlab.const.DEVELOPER_ACCESS,
+        'maintainer': gitlab.const.MAINTAINER_ACCESS,
     }
 
     gitlab_project = module.params['project']

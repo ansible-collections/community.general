@@ -94,9 +94,9 @@ class GitlabProtectedBranch(object):
         self._module = module
         self.project = self.get_project(project)
         self.ACCESS_LEVEL = {
-            'nobody': gitlab.NO_ACCESS,
-            'developer': gitlab.DEVELOPER_ACCESS,
-            'maintainer': gitlab.MAINTAINER_ACCESS
+            'nobody': gitlab.const.NO_ACCESS,
+            'developer': gitlab.const.DEVELOPER_ACCESS,
+            'maintainer': gitlab.const.MAINTAINER_ACCESS
         }
 
     def get_project(self, project_name):
