@@ -41,6 +41,18 @@ options:
       - Restrict results to a specific virtual machine(s) by using their name.
       - If VM(s) with the specified name do not exist in a cluster then the resulting list will be empty.
     type: str
+  config:
+    description:
+      - Retrieve the VM configuration along with VM status.
+      - The O(config_current) option defines which config to retrieve (pending or current)
+    type: bool
+    default: false
+  config_current:
+    description:
+      - Retrieve the VM configuration with pending changes applied (V(false)) or the current configuration instead.
+      - Have meaning only in conjunction with O(config)
+    type: bool
+    default: false
 extends_documentation_fragment:
     - community.general.proxmox.documentation
     - community.general.attributes
@@ -73,7 +85,7 @@ EXAMPLES = """
     type: qemu
     vmid: 101
 
-- name: Retrieve information about specific VM by name
+- name: Retrieve information about specific VM by name and get current configuration
   community.general.proxmox_vm_info:
     api_host: proxmoxhost
     api_user: root@pam
@@ -81,6 +93,8 @@ EXAMPLES = """
     node: node01
     type: lxc
     name: lxc05.home.arpa
+    config: true
+    config_current: true
 """
 
 RETURN = """
@@ -154,42 +168,49 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                 msg="Failed to retrieve VMs information from cluster resources: %s" % e
             )
 
-    def get_vms_from_nodes(self, vms_unfiltered, type, vmid=None, name=None, node=None):
-        vms = []
+    def get_vms_from_nodes(self, vms_unfiltered, type, vmid=None, name=None, node=None, config=None):
+        filtered_vms = []
         for vm in vms_unfiltered:
             if (
-                type != vm["type"]
-                or (node and vm["node"] != node)
-                or (vmid and int(vm["vmid"]) != vmid)
-                or (name is not None and vm["name"] != name)
+                    type != vm["type"]
+                    or (node and vm["node"] != node)
+                    or (vmid and int(vm["vmid"]) != vmid)
+                    or (name is not None and vm["name"] != name)
             ):
                 continue
-            vms.append(vm)
-        nodes = frozenset([vm["node"] for vm in vms])
-        for node in nodes:
+            filtered_vms.append(vm)
+        nodes = frozenset([filtered_vm["node"] for filtered_vm in filtered_vms])
+        for this_node in nodes:
             if type == "qemu":
-                vms_from_nodes = self.proxmox_api.nodes(node).qemu().get()
+                vms_from_this_node = self.proxmox_api.nodes(this_node).qemu().get()
             else:
-                vms_from_nodes = self.proxmox_api.nodes(node).lxc().get()
-            for vmn in vms_from_nodes:
-                for vm in vms:
-                    if int(vm["vmid"]) == int(vmn["vmid"]):
-                        vm.update(vmn)
-                        vm["vmid"] = int(vm["vmid"])
-                        vm["template"] = proxmox_to_ansible_bool(vm["template"])
+                vms_from_this_node = self.proxmox_api.nodes(this_node).lxc().get()
+            for detected_vm in vms_from_this_node:
+                for desired_vm in filtered_vms:
+                    if int(desired_vm["vmid"]) == int(detected_vm["vmid"]):
+                        desired_vm.update(detected_vm)
+                        desired_vm["vmid"] = int(desired_vm["vmid"])
+                        desired_vm["template"] = proxmox_to_ansible_bool(desired_vm["template"])
+                        # When user wants to retrieve the VM configuration
+                        if config["get"]:
+                            # GET /nodes/{node}/qemu/{vmid}/config current=[0/1]
+                            desired_vm["config"] = (
+                                self.proxmox_api.nodes(this_node).qemu(desired_vm["vmid"])
+                                .config().get(current=int(config["current"]))
+                            )
                         break
 
-        return vms
+        return filtered_vms
 
-    def get_qemu_vms(self, vms_unfiltered, vmid=None, name=None, node=None):
+    def get_qemu_vms(self, vms_unfiltered, vmid=None, name=None, node=None, config=None):
         try:
-            return self.get_vms_from_nodes(vms_unfiltered, "qemu", vmid, name, node)
+            return self.get_vms_from_nodes(vms_unfiltered, "qemu", vmid, name, node, config)
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve QEMU VMs information: %s" % e)
 
-    def get_lxc_vms(self, vms_unfiltered, vmid=None, name=None, node=None):
+    def get_lxc_vms(self, vms_unfiltered, vmid=None, name=None, node=None, config=None):
         try:
-            return self.get_vms_from_nodes(vms_unfiltered, "lxc", vmid, name, node)
+            return self.get_vms_from_nodes(vms_unfiltered, "lxc", vmid, name, node, config)
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve LXC VMs information: %s" % e)
 
@@ -203,6 +224,9 @@ def main():
         ),
         vmid=dict(type="int", required=False),
         name=dict(type="str", required=False),
+        config=dict(type="bool", default=False, required=False),
+        # False is the Proxmox API default behavior
+        config_current=dict(type="bool", default=False, required=False),
     )
     module_args.update(vm_info_args)
 
@@ -218,6 +242,10 @@ def main():
     type = module.params["type"]
     vmid = module.params["vmid"]
     name = module.params["name"]
+    config = {
+        'get': module.params["config"],
+        'current': module.params["config_current"],
+    }
 
     result = dict(changed=False)
 
@@ -228,16 +256,17 @@ def main():
     vms = []
 
     if type == "lxc":
-        vms = proxmox.get_lxc_vms(vms_cluster_resources, vmid, name, node)
+        vms = proxmox.get_lxc_vms(vms_cluster_resources, vmid, name, node, config)
     elif type == "qemu":
-        vms = proxmox.get_qemu_vms(vms_cluster_resources, vmid, name, node)
+        vms = proxmox.get_qemu_vms(vms_cluster_resources, vmid, name, node, config)
     else:
         vms = proxmox.get_qemu_vms(
             vms_cluster_resources,
             vmid,
             name,
             node,
-        ) + proxmox.get_lxc_vms(vms_cluster_resources, vmid, name, node)
+            config,
+        ) + proxmox.get_lxc_vms(vms_cluster_resources, vmid, name, node, config)
 
     result["proxmox_vms"] = vms
     module.exit_json(**result)
