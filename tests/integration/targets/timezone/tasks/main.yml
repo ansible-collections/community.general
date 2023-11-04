@@ -93,4 +93,4 @@
         - name: Restore original system timezone - {{ original_timezone.diff.before.name }}
           timezone:
             name: "{{ original_timezone.diff.before.name }}"
-          when: original_timezone is changed
+          when: original_timezone is changed and original_timezone.diff.before.name != 'n/a'
