@@ -54,7 +54,7 @@ options:
     - If option is omitted commands will not be checked or changed.
     type: list
     elements: str
-    version_added: 8.0.0
+    version_added: 8.1.0
   deny_cmdgroup:
     description:
     - List of denied command groups assigned to the rule.
