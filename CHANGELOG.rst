@@ -6,6 +6,30 @@ Community General Release Notes
 
 This changelog describes changes after version 5.0.0.
 
+v6.6.7
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+From now on, community.general 6.x.y will only receive major bugfixes and security fixes anymore.
+
+
+Bugfixes
+--------
+
+- composer - fix impossible to run ``working_dir`` dependent commands. The module was throwing an error when trying to run a ``working_dir`` dependent command, because it tried to get the command help without passing the ``working_dir`` (https://github.com/ansible-collections/community.general/issues/3787).
+- github_deploy_key - fix pagination behaviour causing a crash when only a single page of deploy keys exist (https://github.com/ansible-collections/community.general/pull/7375).
+- lxc connection plugin - properly evaluate options (https://github.com/ansible-collections/community.general/pull/7369).
+- memset module utils - make compatible with ansible-core 2.17 (https://github.com/ansible-collections/community.general/pull/7379).
+- redhat_subscription - use the right D-Bus options for the consumer type when
+  registering a RHEL system older than 9 or a RHEL 9 system older than 9.2
+  and using ``consumer_type``
+  (https://github.com/ansible-collections/community.general/pull/7378).
+- selective callback plugin - fix length of task name lines in output always being 3 characters longer than desired (https://github.com/ansible-collections/community.general/pull/7374).
+
 v6.6.6
 ======
 
