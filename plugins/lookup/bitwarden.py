@@ -127,7 +127,7 @@ class Bitwarden(object):
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
         if search_field == 'id':
-            if initial_matches == None:
+            if initial_matches is None:
                 initial_matches = []
             else:
                 initial_matches = [initial_matches]
