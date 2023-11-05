@@ -34,6 +34,7 @@ except Exception:
 
 def auth_argument_spec(spec=None):
     arg_spec = (dict(
+        ca_path=dict(type='str'),
         api_token=dict(type='str', no_log=True),
         api_oauth_token=dict(type='str', no_log=True),
         api_job_token=dict(type='str', no_log=True),
@@ -76,6 +77,7 @@ def ensure_gitlab_package(module):
 def gitlab_authentication(module):
     gitlab_url = module.params['api_url']
     validate_certs = module.params['validate_certs']
+    ca_path = module.params['ca_path']
     gitlab_user = module.params['api_username']
     gitlab_password = module.params['api_password']
     gitlab_token = module.params['api_token']
@@ -84,23 +86,25 @@ def gitlab_authentication(module):
 
     ensure_gitlab_package(module)
 
+    verify = ca_path if validate_certs and ca_path else validate_certs
+
     try:
         # python-gitlab library remove support for username/password authentication since 1.13.0
         # Changelog : https://github.com/python-gitlab/python-gitlab/releases/tag/v1.13.0
         # This condition allow to still support older version of the python-gitlab library
         if LooseVersion(gitlab.__version__) < LooseVersion("1.13.0"):
-            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=validate_certs, email=gitlab_user, password=gitlab_password,
+            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, email=gitlab_user, password=gitlab_password,
                                             private_token=gitlab_token, api_version=4)
         else:
             # We can create an oauth_token using a username and password
             # https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
             if gitlab_user:
                 data = {'grant_type': 'password', 'username': gitlab_user, 'password': gitlab_password}
-                resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data, verify=validate_certs)
+                resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data, verify=verify)
                 resp_data = resp.json()
                 gitlab_oauth_token = resp_data["access_token"]
 
-            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=validate_certs, private_token=gitlab_token,
+            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, private_token=gitlab_token,
                                             oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
 
         gitlab_instance.auth()

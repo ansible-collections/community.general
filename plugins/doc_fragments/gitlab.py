@@ -29,4 +29,9 @@ options:
       - GitLab CI job token for logging in.
     type: str
     version_added: 4.2.0
+  ca_path:
+    description:
+      - The CA certificates bundle to use to verify GitLab server certificate.
+    type: str
+    version_added: 8.1.0
 '''
