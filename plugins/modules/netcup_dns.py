@@ -53,7 +53,7 @@ options:
   type:
     description:
       - Record type.
-    choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
+    choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS', 'OPENPGPKEY', 'SMIMEA', 'SSHFP']
     required: true
     type: str
   value:
@@ -213,7 +213,9 @@ def main():
 
             domain=dict(required=True),
             record=dict(required=False, default='@', aliases=['name']),
-            type=dict(required=True, choices=['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']),
+            type=dict(required=True, choices=['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT',
+                                              'TLSA', 'NS', 'DS', 'OPENPGPKEY', 'SMIMEA',
+                                              'SSHFP']),
             value=dict(required=True),
             priority=dict(required=False, type='int'),
             solo=dict(required=False, type='bool', default=False),
