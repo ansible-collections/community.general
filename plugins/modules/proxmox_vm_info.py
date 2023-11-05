@@ -43,17 +43,17 @@ options:
     type: str
   config:
     description:
-      - Retrieve the VM configuration along with VM status.
-      - The O(config_current) option defines which config to retrieve (pending or current).
-    type: bool
-    default: false
+      - Whether to retrieve the VM configuration along with VM status.
+      - If set to V(none) (default), no configuration will be returned.
+      - If set to V(current), the current running configuration will be returned.
+      - If set to V(pending), the configuration with pending changes applied will be returned.
+    type: str
+    choices:
+      - none
+      - current
+      - pending
+    default: none
     version_added: 8.1.0
-  config_current:
-    description:
-      - Retrieve the VM configuration with pending changes applied (V(false)) or the current configuration instead.
-      - Have meaning only in conjunction with O(config).
-    type: bool
-    default: false
 extends_documentation_fragment:
     - community.general.proxmox.documentation
     - community.general.attributes
@@ -94,8 +94,7 @@ EXAMPLES = """
     node: node01
     type: lxc
     name: lxc05.home.arpa
-    config: true
-    config_current: true
+    config: current
 """
 
 RETURN = """
@@ -193,11 +192,13 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                         desired_vm["vmid"] = int(desired_vm["vmid"])
                         desired_vm["template"] = proxmox_to_ansible_bool(desired_vm["template"])
                         # When user wants to retrieve the VM configuration
-                        if config["get"]:
+                        if config != "none":
+                            # pending = 0, current = 1
+                            config_type = 0 if config == "pending" else 1
                             # GET /nodes/{node}/qemu/{vmid}/config current=[0/1]
                             desired_vm["config"] = (
                                 self.proxmox_api.nodes(this_node).qemu(desired_vm["vmid"])
-                                .config().get(current=int(config["current"]))
+                                .config().get(current=config_type)
                             )
                         break
 
@@ -225,9 +226,7 @@ def main():
         ),
         vmid=dict(type="int", required=False),
         name=dict(type="str", required=False),
-        config=dict(type="bool", default=False, required=False),
-        # False is the Proxmox API default behavior
-        config_current=dict(type="bool", default=False, required=False),
+        config=dict(type="str", default="none", required=False),
     )
     module_args.update(vm_info_args)
 
@@ -243,10 +242,7 @@ def main():
     type = module.params["type"]
     vmid = module.params["vmid"]
     name = module.params["name"]
-    config = {
-        'get': module.params["config"],
-        'current': module.params["config_current"],
-    }
+    config = module.params["config"]
 
     result = dict(changed=False)
 
