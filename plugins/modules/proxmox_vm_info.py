@@ -44,13 +44,14 @@ options:
   config:
     description:
       - Retrieve the VM configuration along with VM status.
-      - The O(config_current) option defines which config to retrieve (pending or current)
+      - The O(config_current) option defines which config to retrieve (pending or current).
     type: bool
     default: false
+    version_added: 8.1.0
   config_current:
     description:
       - Retrieve the VM configuration with pending changes applied (V(false)) or the current configuration instead.
-      - Have meaning only in conjunction with O(config)
+      - Have meaning only in conjunction with O(config).
     type: bool
     default: false
 extends_documentation_fragment:
