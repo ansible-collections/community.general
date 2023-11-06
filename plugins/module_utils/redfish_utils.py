@@ -1658,7 +1658,10 @@ class RedfishUtils(object):
 
             # Scan the messages to see if next steps are needed
             for message in operation_results['messages']:
-                message_id = message['MessageId']
+                message_id = message.get('MessageId')
+                if message_id is None:
+                    # While this is invalid, treat the lack of a MessageId as "no message"
+                    continue
 
                 if message_id.startswith('Update.1.') and message_id.endswith('.OperationTransitionedToJob'):
                     # Operation rerouted to a job; update the status and handle
