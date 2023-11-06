@@ -624,7 +624,7 @@ class OnePassCLIv2(OnePassCLIBase):
 
 class OnePass(object):
     def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
-                 service_account_token=None, account_id=None, connect_host=None, connect_token=None):
+                 service_account_token=None, account_id=None, connect_host=None, connect_token=None, cli_class=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -639,9 +639,12 @@ class OnePass(object):
         self.token = None
 
         self._config = OnePasswordConfig()
-        self._cli = self._get_cli_class()
+        self._cli = self._get_cli_class(cli_class)
 
-    def _get_cli_class(self):
+    def _get_cli_class(self, cli_class=None):
+        if cli_class is not None:
+            return cli_class(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
+
         version = OnePassCLIBase.get_current_version()
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
