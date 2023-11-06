@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_pool_member - absent state for type VM did not delete VMs from the pools (https://github.com/ansible-collections/community.general/pull/7464).
