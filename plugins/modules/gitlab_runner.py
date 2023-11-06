@@ -206,7 +206,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, gitlab
 )
 
 
@@ -384,7 +384,9 @@ def main():
         ],
         supports_check_mode=True,
     )
-    ensure_gitlab_package(module)
+
+    # check prerequisites and connect to gitlab server
+    gitlab_instance = gitlab_authentication(module)
 
     state = module.params['state']
     runner_description = module.params['description']
@@ -398,7 +400,6 @@ def main():
     project = module.params['project']
     group = module.params['group']
 
-    gitlab_instance = gitlab_authentication(module)
     gitlab_project = None
     gitlab_group = None
 
