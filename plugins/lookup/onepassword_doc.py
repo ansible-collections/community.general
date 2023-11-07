@@ -11,53 +11,28 @@ DOCUMENTATION = '''
     author:
       - Sam Doran (@samdoran)
     requirements:
-      - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
-    short_description: Fetch one or more documents stored in a 1Password vault
-    version_added: "9.0.0"
+      - C(op) 1Password command line utility version 2 or later.
+    short_description: Fetch documents stored in 1Password
+    version_added: "8.1.0"
     description:
       - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch document(s) from 1Password.
-    options:
-      _terms:
-        description: identifier(s) (UUID or name, case-insensitive) of documents(s) to retrieve.
-        required: true
-      master_password:
-        description: The password used to unlock the specified vault.
-        aliases: ['vault_password']
-      section:
-        description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
-      subdomain:
-        description: The 1Password subdomain to authenticate against.
-      domain:
-        description: Domain of 1Password.
-        default: '1password.com'
-        type: str
-      account_id:
-        description: The account ID to target.
-        type: str
-      username:
-        description: The username used to sign in.
-      secret_key:
-        description: The secret key used when performing an initial sign in.
-      service_account_token:
-        description:
-          - The access key for a service account.
-          - Only works with 1Password CLI version 2 or later.
-        type: string
-      vault:
-        description: Vault containing the document(s) to retrieve (case-insensitive). If absent will search all vaults.
     notes:
-      - The document contents are a string excatly as stored in 1Password.
+      - The document contents are a string exactly as stored in 1Password.
+      - This plugin requires C(op) version 2 or later.
+
+    extends_documentation_fragment:
+      - community.general.onepassword
 '''
 
 EXAMPLES = """
-- name: Retrieve all data about Wintermute
+- name: Retrieve a private key from 1Password
   ansible.builtin.debug:
     var: lookup('community.general.onepassword_doc', 'Private key')
 """
 
 RETURN = """
   _raw:
-    description: field data requested
+    description: Requested document
     type: list
     elements: string
 """

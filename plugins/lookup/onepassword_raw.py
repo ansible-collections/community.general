@@ -15,67 +15,12 @@ DOCUMENTATION = '''
       - Andrew Zenk (@azenk)
       - Sam Doran (@samdoran)
     requirements:
-      - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
-    short_description: fetch an entire item from 1Password
+      - C(op) 1Password command line utility
+    short_description: Fetch an entire item from 1Password
     description:
       - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.
-    options:
-      _terms:
-        description: identifier(s) (UUID, name, or domain; case-insensitive) of item(s) to retrieve.
-        required: true
-      master_password:
-        description: The password used to unlock the specified vault.
-        aliases: ['vault_password']
-      section:
-        description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
-      subdomain:
-        description: The 1Password subdomain to authenticate against.
-      domain:
-        description: Domain of 1Password.
-        version_added: 6.0.0
-        default: '1password.com'
-        type: str
-      account_id:
-        description: The account ID to target.
-        type: str
-        version_added: 7.5.0
-      username:
-        description: The username used to sign in.
-      secret_key:
-        description: The secret key used when performing an initial sign in.
-      service_account_token:
-        description:
-          - The access key for a service account.
-          - Only works with 1Password CLI version 2 or later.
-        type: string
-        version_added: 7.1.0
-      connect_host:
-        description: The host for 1Password Connect. Must be used in combination with O(connect_token).
-        type: str
-        env:
-          - name: OP_CONNECT_HOST
-        version_added: 8.1.0
-      connect_token:
-        description: The token for 1Password Connect. Must be used in combination with O(connect_host).
-        type: str
-        env:
-          - name: OP_CONNECT_TOKEN
-        version_added: 8.1.0
-      vault:
-        description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
-    notes:
-      - This lookup will use an existing 1Password session if one exists. If not, and you have already
-        performed an initial sign in (meaning C(~/.op/config exists)), then only the O(master_password) is required.
-        You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
-      - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
-      - Can target a specific account by providing the O(account_id).
-      - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
-        needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
-        to the 1Password master password.
-      - This lookup stores potentially sensitive data from 1Password as Ansible facts.
-        Facts are subject to caching if enabled, which means this data could be stored in clear text
-        on disk or in a database.
-      - Tested with C(op) version 2.7.0
+    extends_documentation_fragment:
+      - community.general.onepassword
 '''
 
 EXAMPLES = """
@@ -90,7 +35,7 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description: field data requested
+    description: Entire item requested
     type: list
     elements: dict
 """
