@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
+from ansible.errors import AnsibleOptionsError
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -52,9 +54,13 @@ DOCUMENTATION = '''
       connect_host:
         description: The host for 1Password Connect. Must be used in combination with C(connect_token).
         type: str
+        env:
+          - name: OP_CONNECT_HOST
       connect_token:
         description: The token for 1Password Connect. Must be used in combination with C(connect_host).
         type: str
+        env:
+          - name: OP_CONNECT_TOKEN
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
