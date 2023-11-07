@@ -9,7 +9,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 
 DOCUMENTATION = r'''
@@ -46,6 +45,21 @@ options:
       - If left empty, being omitted, or being set to V(null), the O(option) will be placed before the first O(section).
       - Using V(null) is also required if the config format does not support sections.
     type: str
+  section_has:
+    type: list
+    elements: dict
+    required: false
+    suboptions:
+      option:
+        type: str
+        description: the option to look for within the section
+      value:
+        type: str
+        description: locate the section with this specific value
+    description:
+      Among possibly multiple sections of the same name, select the one that contains these values.
+      - with O(state=present), if a suitable section is not found, a new section will be added, including the required options.
+      - with O(state=absent), at most one O(section) is removed if it contains the values
   option:
     description:
       - If set (required for changing a O(value)), this is the name of the option.
@@ -116,14 +130,6 @@ options:
       - Allow option without value and without '=' symbol.
     type: bool
     default: false
-  modify_inactive_option:
-    description:
-      - By default the module replaces a commented line that matches the given option.
-      - Set this option to V(false) to avoid this. This is useful when you want to keep commented example
-        C(key=value) pairs for documentation purposes.
-    type: bool
-    default: true
-    version_added: 8.0.0
   follow:
     description:
     - This flag indicates that filesystem links, if they exist, should be followed.
@@ -179,16 +185,39 @@ EXAMPLES = r'''
       - pepsi
     mode: '0600'
     state: present
+
+- name: remove the peer configuration for 10.128.0.11/32
+  community.general.ini_file:
+    path: /etc/wireguard/wg0.conf
+    section: Peer
+    section_has:
+      - option: AllowedIps
+      - value: 10.4.0.11/32
+    mode: '0600'
+    state: absent
+
+- name: Update the public key for peer 10.128.0.12/32
+  community.general.ini_file:
+    path: /etc/wireguard/wg0.conf
+    section: Peer
+    section_has:
+      - option: AllowedIps
+      - value: 10.4.0.12/32
+    option: PublicKey
+    value: xxxxxxxxxxxxxxxxxxxx
+    mode: '0600'
+    state: present
 '''
 
-import io
-import os
-import re
-import tempfile
-import traceback
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.basic import AnsibleModule
+import traceback
+import tempfile
+import re
+import os
+import io
+__metaclass__ = type
 
 
 def match_opt(option, line):
@@ -198,7 +227,7 @@ def match_opt(option, line):
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match('()( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
+    return re.match('( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
 def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
@@ -219,9 +248,21 @@ def update_section_line(option, changed, section_lines, index, changed_lines, ig
     return (changed, msg)
 
 
+def check_section_has(section_has, section_lines):
+    if section_has:
+        for check in section_has:
+            for line in section_lines:
+                match = match_opt(check["option"], line)
+                if match and match.group(7) == check["value"]:
+                    break
+            else:
+                return False
+    return True
+
+
 def do_ini(module, filename, section=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
-           ignore_spaces=False, create=True, allow_no_value=False, modify_inactive_option=True, follow=False):
+           ignore_spaces=False, create=True, allow_no_value=False, follow=False):
 
     if section is not None:
         section = to_text(section)
@@ -230,7 +271,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     # deduplicate entries in values
     values_unique = []
-    [values_unique.append(to_text(value)) for value in values if value not in values_unique and value is not None]
+    [values_unique.append(to_text(
+        value)) for value in values if value not in values_unique and value is not None]
     values = values_unique
 
     diff = dict(
@@ -247,7 +289,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     if not os.path.exists(target_filename):
         if not create:
-            module.fail_json(rc=257, msg='Destination %s does not exist!' % target_filename)
+            module.fail_json(
+                rc=257, msg='Destination %s does not exist!' % target_filename)
         destpath = os.path.dirname(target_filename)
         if not os.path.exists(destpath) and not module.check_mode:
             os.makedirs(destpath)
@@ -302,14 +345,22 @@ def do_ini(module, filename, section=None, option=None, values=None,
     section_lines = []
 
     for index, line in enumerate(ini_lines):
+        # end of section:
+        if within_section and line.startswith(u'['):
+            if check_section_has(
+                module.params['section_has'], ini_lines[section_start:index]
+            ):
+                section_end = index
+                break
+            else:
+                # look for another section
+                within_section = False
+                section_start = section_end = 0
+
         # find start and end of section
         if line.startswith(u'[%s]' % section):
             within_section = True
             section_start = index
-        elif line.startswith(u'['):
-            if within_section:
-                section_end = index
-                break
 
     before = ini_lines[0:section_start]
     section_lines = ini_lines[section_start:section_end]
@@ -317,12 +368,6 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     # Keep track of changed section_lines
     changed_lines = [0] * len(section_lines)
-
-    # Determine whether to consider using commented out/inactive options or only active ones
-    if modify_inactive_option:
-        match_function = match_opt
-    else:
-        match_function = match_active_opt
 
     # handling multiple instances of option=value when state is 'present' with/without exclusive is a bit complex
     #
@@ -333,8 +378,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     if state == 'present' and option:
         for index, line in enumerate(section_lines):
-            if match_function(option, line):
-                match = match_function(option, line)
+            if match_opt(option, line):
+                match = match_opt(option, line)
                 if values and match.group(7) in values:
                     matched_value = match.group(7)
                     if not matched_value and allow_no_value:
@@ -344,12 +389,14 @@ def do_ini(module, filename, section=None, option=None, values=None,
                     else:
                         # replace existing option=value line(s)
                         newline = assignment_format % (option, matched_value)
-                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
+                    (changed, msg) = update_section_line(
+                        option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     values.remove(matched_value)
                 elif not values and allow_no_value:
                     # replace existing option with no value line(s)
                     newline = u'%s\n' % option
-                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
+                    (changed, msg) = update_section_line(
+                        option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     option_no_value_present = True
                     break
 
@@ -357,14 +404,15 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_function(option, line):
+                if not changed_lines[index] and match_opt(option, line):
                     newline = assignment_format % (option, values.pop(0))
-                    (changed, msg) = update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
+                    (changed, msg) = update_section_line(
+                        option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg)
                     if len(values) == 0:
                         break
         # remove all remaining option occurrences from the rest of the section
         for index in range(len(section_lines) - 1, 0, -1):
-            if not changed_lines[index] and match_function(option, section_lines[index]):
+            if not changed_lines[index] and match_opt(option, section_lines[index]):
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True
@@ -382,7 +430,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
                         # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
                         if element is not None:
                             # insert option=value line
-                            section_lines.insert(index, assignment_format % (option, element))
+                            section_lines.insert(
+                                index, assignment_format % (option, element))
                             msg = 'option added'
                             changed = True
                         elif element is None and allow_no_value:
@@ -401,14 +450,16 @@ def do_ini(module, filename, section=None, option=None, values=None,
         if option:
             if exclusive:
                 # delete all option line(s) with given option and ignore value
-                new_section_lines = [line for line in section_lines if not (match_active_opt(option, line))]
+                new_section_lines = [line for line in section_lines if not (
+                    match_active_opt(option, line))]
                 if section_lines != new_section_lines:
                     changed = True
                     msg = 'option changed'
                     section_lines = new_section_lines
             elif not exclusive and len(values) > 0:
                 # delete specified option=value line(s)
-                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(7) in values)]
+                new_section_lines = [i for i in section_lines if not (match_active_opt(
+                    option, i) and match_active_opt(option, i).group(6) in values)]
                 if section_lines != new_section_lines:
                     changed = True
                     msg = 'option changed'
@@ -428,8 +479,13 @@ def do_ini(module, filename, section=None, option=None, values=None,
     del ini_lines[-1:]
 
     if not within_section and state == 'present':
+        # if "section_has" make sure the new section has, too
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
+        if 'section_has' in module.params:
+            for check in module.params['section_has']:
+                ini_lines.append(assignment_format %
+                                 (check['option'], check['value']))
         if option and values:
             for value in values:
                 ini_lines.append(assignment_format % (option, value))
@@ -454,7 +510,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
             f.writelines(encoded_ini_lines)
             f.close()
         except IOError:
-            module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
+            module.fail_json(msg="Unable to create temporary file %s",
+                             traceback=traceback.format_exc())
 
         try:
             module.atomic_move(tmpfile, target_filename)
@@ -471,16 +528,20 @@ def main():
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['dest']),
             section=dict(type='str'),
+            section_has=dict(type='list', elements='dict', options=dict(
+                option=dict(type='str'),
+                value=dict(type='str')
+            ), default=None),
             option=dict(type='str'),
             value=dict(type='str'),
             values=dict(type='list', elements='str'),
             backup=dict(type='bool', default=False),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
+            state=dict(type='str', default='present',
+                       choices=['absent', 'present']),
             exclusive=dict(type='bool', default=True),
             no_extra_spaces=dict(type='bool', default=False),
             ignore_spaces=dict(type='bool', default=False),
             allow_no_value=dict(type='bool', default=False),
-            modify_inactive_option=dict(type='bool', default=True),
             create=dict(type='bool', default=True),
             follow=dict(type='bool', default=False)
         ),
@@ -502,12 +563,12 @@ def main():
     no_extra_spaces = module.params['no_extra_spaces']
     ignore_spaces = module.params['ignore_spaces']
     allow_no_value = module.params['allow_no_value']
-    modify_inactive_option = module.params['modify_inactive_option']
     create = module.params['create']
     follow = module.params['follow']
 
     if state == 'present' and not allow_no_value and value is None and not values:
-        module.fail_json(msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
+        module.fail_json(
+            msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
 
     if value is not None:
         values = [value]
@@ -516,7 +577,7 @@ def main():
 
     (changed, backup_file, diff, msg) = do_ini(
         module, path, section, option, values, state, exclusive, backup,
-        no_extra_spaces, ignore_spaces, create, allow_no_value, modify_inactive_option, follow)
+        no_extra_spaces, ignore_spaces, create, allow_no_value, follow)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
