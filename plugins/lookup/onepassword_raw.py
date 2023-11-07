@@ -6,8 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
-from ansible.errors import AnsibleOptionsError
-
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -98,6 +96,7 @@ RETURN = """
 import json
 
 from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
+from ansible.errors import AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 
 

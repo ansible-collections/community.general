@@ -6,8 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
-from ansible.errors import AnsibleOptionsError
-
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -131,7 +129,7 @@ import json
 import subprocess
 
 from ansible.plugins.lookup import LookupBase
-from ansible.errors import AnsibleLookupError
+from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.six import with_metaclass
