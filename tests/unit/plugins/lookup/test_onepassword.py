@@ -270,8 +270,19 @@ def test_signin(op_fixture, request):
     op = request.getfixturevalue(op_fixture)
     op._cli.master_password = "master_pass"
     op._cli.signin()
-    print(op._cli.version)
     op._cli._run.assert_called_once_with(['signin', '--raw'], command_input=b"master_pass")
+
+
+def test_op_doc(mocker):
+    document_contents = "Document Contents\n"
+
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True)
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run", return_value=(0, document_contents, ""))
+
+    op_lookup = lookup_loader.get("community.general.onepassword_doc")
+    result = op_lookup.run(["Private key doc"])
+
+    assert result == [document_contents]
 
 
 @pytest.mark.parametrize(
