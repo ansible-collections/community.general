@@ -3708,7 +3708,7 @@ class RedfishUtils(object):
                     # WORKAROUND
                     # HPE systems with iLO 4 will have BIOS Attribute Registries location URI as a dictionary with key 'extref'
                     # Hence adding condition to fetch the Uri
-                    if type(loc['Uri']) is dict and "extref" in loc['Uri'].keys():
+                    if isinstance(loc['Uri'], dict) and "extref" in loc['Uri'].keys():
                         rsp_uri = loc['Uri']['extref']
         if not rsp_uri:
             msg = "Language 'en' not found in BIOS Attribute Registries location, URI: %s, response: %s"

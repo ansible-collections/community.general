@@ -1529,7 +1529,7 @@ def delete_and_wait(
                                 result[resource_type] = resource
                                 return result
                         # oci.wait_until() returns an instance of oci.util.Sentinel in case the resource is not found.
-                        if type(wait_response) is not Sentinel:
+                        if not isinstance(wait_response, Sentinel):
                             resource = to_dict(wait_response.data)
                         else:
                             resource["lifecycle_state"] = "DELETED"
