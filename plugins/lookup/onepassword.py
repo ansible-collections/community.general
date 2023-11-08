@@ -713,6 +713,9 @@ class LookupModule(LookupBase):
         connect_host = self.get_option("connect_host")
         connect_token = self.get_option("connect_token")
 
+        if (connect_host or connect_token) and None in (connect_host, connect_token):
+            raise AnsibleOptionsError("connect_host and connect_token are required together")
+
         op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, connect_host, connect_token)
         op.assert_logged_in()
 
