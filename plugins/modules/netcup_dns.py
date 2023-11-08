@@ -54,8 +54,8 @@ options:
     description:
       - Record type.
       - Support for V(OPENPGPKEY), V(SMIMEA) and V(SSHFP) was added in community.general 8.1.0.
-      - Record types V(OPENPGPKEY) and V(SMIMEA) require nc-dnsapi >= 0.1.5
-      - Record type V(SSHFP) requires nc-dnsapi >= 0.1.6
+      - Record types V(OPENPGPKEY) and V(SMIMEA) require nc-dnsapi >= 0.1.5.
+      - Record type V(SSHFP) requires nc-dnsapi >= 0.1.6.
     choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS', 'OPENPGPKEY', 'SMIMEA', 'SSHFP']
     required: true
     type: str
