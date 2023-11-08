@@ -1,0 +1,2 @@
+bugfixes:
+  - "ocapi_utils, oci_utils, redfish_utils module utils - replace ``type()`` calls with ``isinstance()`` calls (https://github.com/ansible-collections/community.general/pull/7501)."

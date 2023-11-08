@@ -432,7 +432,7 @@ class OcapiUtils(object):
             else:
                 return response
         details = response["data"]["Status"].get("Details")
-        if type(details) is str:
+        if isinstance(details, str):
             details = [details]
         health_list = response["data"]["Status"]["Health"]
         return_value = {
