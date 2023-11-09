@@ -60,7 +60,7 @@ options:
     description:
       - Among possibly multiple sections of the same name, select the one that contains these values.
       - With O(state=present), if a suitable section is not found, a new section will be added, including the required options.
-      - With O(state=absent), at most one O(section) is removed if it contains the values.    
+      - With O(state=absent), at most one O(section) is removed if it contains the values.
   option:
     description:
       - If set (required for changing a O(value)), this is the name of the option.
@@ -496,8 +496,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         msg = 'section and option added'
         if 'section_has' in module.params:
             for check in module.params['section_has']:
-                ini_lines.append(assignment_format %
-                                  (check['option'], check['value']))
+                ini_lines.append(assignment_format % (check['option'], check['value']))
         if option and values:
             for value in values:
                 ini_lines.append(assignment_format % (option, value))
