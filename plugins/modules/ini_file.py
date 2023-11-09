@@ -57,9 +57,9 @@ options:
         type: str
         description: Locate the section with this specific value.
     description:
-      Among possibly multiple sections of the same name, select the one that contains these values.
-      - with O(state=present), if a suitable section is not found, a new section will be added, including the required options.
-      - with O(state=absent), at most one O(section) is removed if it contains the values
+      - Among possibly multiple sections of the same name, select the one that contains these values.
+      - With O(state=present), if a suitable section is not found, a new section will be added, including the required options.
+      - With O(state=absent), at most one O(section) is removed if it contains the values.
   option:
     description:
       - If set (required for changing a O(value)), this is the name of the option.
