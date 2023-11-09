@@ -1,4 +1,5 @@
 minor_changes:
-  - "ini_file: Add an optional parameter `section_has`. If the
-    target ini file contains more than one `section`, use `section_has`
-    to specify which one should be updated."
+  - "ini_file - add an optional parameter ``section_has``. If the
+    target ini file contains more than one ``section``, use ``section_has``
+    to specify which one should be updated
+    (https://github.com/ansible-collections/community.general/pull/7496)."
