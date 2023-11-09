@@ -46,6 +46,23 @@ options:
       - If left empty, being omitted, or being set to V(null), the O(option) will be placed before the first O(section).
       - Using V(null) is also required if the config format does not support sections.
     type: str
+  section_has:
+    type: list
+    elements: dict
+    required: false
+    suboptions:
+      option:
+        type: str
+        description: The option to look for within the section.
+        required: true
+      value:
+        type: str
+        description: Locate the section with this specific value.
+        required: true
+    description:
+      - Among possibly multiple sections of the same name, select the one that contains these values.
+      - With O(state=present), if a suitable section is not found, a new section will be added, including the required options.
+      - With O(state=absent), at most one O(section) is removed if it contains the values.    
   option:
     description:
       - If set (required for changing a O(value)), this is the name of the option.
@@ -179,6 +196,28 @@ EXAMPLES = r'''
       - pepsi
     mode: '0600'
     state: present
+
+- name: remove the peer configuration for 10.128.0.11/32
+  community.general.ini_file:
+    path: /etc/wireguard/wg0.conf
+    section: Peer
+    section_has:
+      - option: AllowedIps
+        value: 10.4.0.11/32
+    mode: '0600'
+    state: absent
+
+- name: Update the public key for peer 10.128.0.12/32
+  community.general.ini_file:
+    path: /etc/wireguard/wg0.conf
+    section: Peer
+    section_has:
+      - option: AllowedIps
+        value: 10.4.0.12/32
+    option: PublicKey
+    value: xxxxxxxxxxxxxxxxxxxx
+    mode: '0600'
+    state: present
 '''
 
 import io
@@ -217,6 +256,18 @@ def update_section_line(option, changed, section_lines, index, changed_lines, ig
         msg = 'option changed'
     changed_lines[index] = 1
     return (changed, msg)
+
+
+def check_section_has(section_has, section_lines):
+    if section_has:
+        for check in section_has:
+            for line in section_lines:
+                match = match_opt(check["option"], line)
+                if match and match.group(7) == check["value"]:
+                    break
+            else:
+                return False
+    return True
 
 
 def do_ini(module, filename, section=None, option=None, values=None,
@@ -302,14 +353,22 @@ def do_ini(module, filename, section=None, option=None, values=None,
     section_lines = []
 
     for index, line in enumerate(ini_lines):
+        # end of section:
+        if within_section and line.startswith(u'['):
+            if check_section_has(
+                module.params['section_has'], ini_lines[section_start:index]
+            ):
+                section_end = index
+                break
+            else:
+                # look for another section
+                within_section = False
+                section_start = section_end = 0
+
         # find start and end of section
         if line.startswith(u'[%s]' % section):
             within_section = True
             section_start = index
-        elif line.startswith(u'['):
-            if within_section:
-                section_end = index
-                break
 
     before = ini_lines[0:section_start]
     section_lines = ini_lines[section_start:section_end]
@@ -430,6 +489,10 @@ def do_ini(module, filename, section=None, option=None, values=None,
     if not within_section and state == 'present':
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
+        if 'section_has' in module.params:
+            for check in module.params['section_has']:
+                ini_lines.append(assignment_format %
+                                  (check['option'], check['value']))
         if option and values:
             for value in values:
                 ini_lines.append(assignment_format % (option, value))
