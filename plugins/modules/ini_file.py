@@ -539,6 +539,10 @@ def main():
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['dest']),
             section=dict(type='str'),
+            section_has=dict(type='list', elements='dict', options=dict(
+                option=dict(type='str', required=True),
+                value=dict(type='str', required=True)
+            ), default=None),
             option=dict(type='str'),
             value=dict(type='str'),
             values=dict(type='list', elements='str'),
