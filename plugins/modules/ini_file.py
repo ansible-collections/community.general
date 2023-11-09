@@ -61,6 +61,7 @@ options:
       - Among possibly multiple sections of the same name, select the one that contains these values.
       - With O(state=present), if a suitable section is not found, a new section will be added, including the required options.
       - With O(state=absent), at most one O(section) is removed if it contains the values.
+    version_added: 8.0.1
   option:
     description:
       - If set (required for changing a O(value)), this is the name of the option.
