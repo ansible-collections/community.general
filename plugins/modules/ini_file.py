@@ -495,7 +495,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
     if not within_section and state == 'present':
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
-        if 'section_has' in module.params:
+        if 'section_has' in module.params and module.params['section_has']:
             for check in module.params['section_has']:
                 ini_lines.append(assignment_format % (check['option'], check['value']))
         if option and values:
