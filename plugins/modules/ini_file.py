@@ -52,7 +52,7 @@ options:
     suboptions:
       option:
         type: str
-        description: the option to look for within the section
+        description: The option to look for within the section.
       value:
         type: str
         description: locate the section with this specific value
