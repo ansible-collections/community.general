@@ -55,7 +55,7 @@ options:
         description: The option to look for within the section.
       value:
         type: str
-        description: locate the section with this specific value
+        description: Locate the section with this specific value.
     description:
       Among possibly multiple sections of the same name, select the one that contains these values.
       - with O(state=present), if a suitable section is not found, a new section will be added, including the required options.
