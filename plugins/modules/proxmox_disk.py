@@ -254,12 +254,12 @@ options:
   media:
     description:
       - The drive's media type.
-      - O(iso_image) is mandatory when O(media=cdrom) is used.
     type: str
     choices: ['cdrom', 'disk']
   iso_image:
     description:
       - The ISO image to be mounted on the specified in O(disk) CD-ROM.
+      - O(media=cdrom) needs to be specified for this option to work.
       - Image string format
       - C(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
       - C(cdrom) to use physical CD/DVD drive.
@@ -716,7 +716,6 @@ def main():
         required_if=[
             ('create', 'forced', ['storage']),
             ('state', 'resized', ['size']),
-            ('media', 'cdrom', ['iso_image']),
         ],
         required_by={
             'target_disk': 'target_vmid',
