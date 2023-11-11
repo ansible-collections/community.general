@@ -108,6 +108,22 @@ options:
       - Sets the C(HostKeyAlgorithms) option.
     type: str
     version_added: 6.1.0
+  controlmaster:
+    description:
+      - Sets the C(ControlMaster) option.
+    choices: [ 'yes', 'no', 'ask', 'auto', 'autoask' ]
+    type: str
+    version_added: 8.1.0
+  controlpath:
+    description:
+      - Sets the C(ControlPath) option.
+    type: str
+    version_added: 8.1.0
+  controlpersist:
+    description:
+      - Sets the C(ControlPersist) option.
+    type: str
+    version_added: 8.1.0
 requirements:
 - paramiko
 '''
@@ -177,6 +193,22 @@ from ansible_collections.community.general.plugins.module_utils._stormssh import
 from ansible_collections.community.general.plugins.module_utils.ssh import determine_config_file
 
 
+def convert_bool(value):
+    if value is True:
+        return 'yes'
+    if value is False:
+        return 'no'
+    return None
+
+
+def fix_bool_str(value):
+    if value == 'True':
+        return 'yes'
+    if value == 'False':
+        return 'no'
+    return value
+
+
 class SSHConfig(object):
     def __init__(self, module):
         self.module = module
@@ -219,13 +251,11 @@ class SSHConfig(object):
             proxycommand=self.params.get('proxycommand'),
             proxyjump=self.params.get('proxyjump'),
             host_key_algorithms=self.params.get('host_key_algorithms'),
+            forward_agent=convert_bool(self.params.get('forward_agent')),
+            controlmaster=self.params.get('controlmaster'),
+            controlpath=self.params.get('controlpath'),
+            controlpersist=fix_bool_str(self.params.get('controlpersist')),
         )
-
-        # Convert True / False to 'yes' / 'no' for usage in ssh_config
-        if self.params['forward_agent'] is True:
-            args['forward_agent'] = 'yes'
-        if self.params['forward_agent'] is False:
-            args['forward_agent'] = 'no'
 
         config_changed = False
         hosts_changed = []
@@ -320,9 +350,13 @@ def main():
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             strict_host_key_checking=dict(
+                type='str',
                 default=None,
                 choices=['yes', 'no', 'ask']
             ),
+            controlmaster=dict(type='str', default=None, choices=['yes', 'no', 'ask', 'auto', 'autoask']),
+            controlpath=dict(type='str', default=None),
+            controlpersist=dict(type='str', default=None),
             user=dict(default=None, type='str'),
             user_known_hosts_file=dict(type='str', default=None),
         ),

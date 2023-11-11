@@ -16,6 +16,9 @@
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: yes
     state: present
   register: options_add
   check_mode: true
@@ -45,6 +48,9 @@
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: yes
     state: present
   register: options_add
 
@@ -63,6 +69,9 @@
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: yes
     state: present
   register: options_add_again
 
@@ -85,6 +94,9 @@
       - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -93,6 +105,9 @@
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: false
     host_key_algorithms: "+ssh-ed25519"
+    controlmaster: no
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
     state: present
   register: options_update
 
@@ -113,6 +128,9 @@
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: false
     host_key_algorithms: "+ssh-ed25519"
+    controlmaster: no
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
     state: present
   register: options_update
 
@@ -136,6 +154,9 @@
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -164,6 +185,9 @@
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -210,6 +234,9 @@
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
 
 # Proxycommand and ProxyJump are mutually exclusive. 
 # Reset ssh_config before testing options with proxyjump
@@ -226,6 +253,9 @@
     proxyjump: "jumphost.example.com"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: yes
     state: present
   register: options_add
   check_mode: true
@@ -255,6 +285,9 @@
     proxyjump: "jumphost.example.com"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: yes
     state: present
   register: options_add
 
@@ -273,6 +306,9 @@
     proxyjump: "jumphost.example.com"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: yes
     state: present
   register: options_add_again
 
@@ -295,6 +331,9 @@
       - "'proxyjump jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -303,6 +342,9 @@
     proxyjump: "new-jumphost.example.com"
     forward_agent: false
     host_key_algorithms: "+ssh-ed25519"
+    controlmaster: no
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
     state: present
   register: options_update
 
@@ -323,6 +365,9 @@
     proxyjump: "new-jumphost.example.com"
     forward_agent: false
     host_key_algorithms: "+ssh-ed25519"
+    controlmaster: no
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
     state: present
   register: options_update
 
@@ -346,6 +391,9 @@
       - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -374,6 +422,9 @@
       - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -420,3 +471,6 @@
       - "'proxyjump new-jumphost.example.com' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
