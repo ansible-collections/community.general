@@ -221,13 +221,12 @@ project_variable:
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
 '''
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables,
-    HAS_GITLAB_PACKAGE, GITLAB_IMP_ERR
+    auth_argument_spec, gitlab_authentication, filter_returned_variables, vars_to_variables
 )
 
 
@@ -436,10 +435,9 @@ def main():
         ],
         supports_check_mode=True
     )
-    ensure_gitlab_package(module)
 
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+    # check prerequisites and connect to gitlab server
+    gitlab_instance = gitlab_authentication(module)
 
     purge = module.params['purge']
     var_list = module.params['vars']
@@ -453,8 +451,6 @@ def main():
     if state == 'present':
         if any(x['value'] is None for x in variables):
             module.fail_json(msg='value parameter is required for all variables in state present')
-
-    gitlab_instance = gitlab_authentication(module)
 
     this_gitlab = GitlabProjectVariables(module=module, gitlab_instance=gitlab_instance)
 

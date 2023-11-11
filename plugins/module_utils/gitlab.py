@@ -75,6 +75,8 @@ def ensure_gitlab_package(module):
 
 
 def gitlab_authentication(module):
+    ensure_gitlab_package(module)
+
     gitlab_url = module.params['api_url']
     validate_certs = module.params['validate_certs']
     ca_path = module.params['ca_path']
@@ -83,8 +85,6 @@ def gitlab_authentication(module):
     gitlab_token = module.params['api_token']
     gitlab_oauth_token = module.params['api_oauth_token']
     gitlab_job_token = module.params['api_job_token']
-
-    ensure_gitlab_package(module)
 
     verify = ca_path if validate_certs and ca_path else validate_certs
 
