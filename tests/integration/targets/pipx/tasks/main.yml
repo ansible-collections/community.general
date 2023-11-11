@@ -314,3 +314,28 @@
     that:
       - install_tox_sitewide is changed
       - usrlocaltox.stat.exists
+
+##############################################################################
+# Test for issue 7497
+- name: ensure application pyinstaller is uninstalled
+  community.general.pipx:
+    name: pyinstaller
+    state: absent
+
+- name: Install Python Package pyinstaller
+  community.general.pipx:
+    name: pyinstaller
+    state: present
+    system_site_packages: true
+    pip_args: "--no-cache-dir"
+  register: install_pyinstaller
+
+- name: cleanup pyinstaller
+  community.general.pipx:
+    name: pyinstaller
+    state: absent
+
+- name: check assertions
+  assert:
+    that:
+      - install_pyinstaller is changed

@@ -42,7 +42,7 @@ def pipx_runner(module, command, **kwargs):
             system_site_packages=fmt.as_bool("--system-site-packages"),
             _list=fmt.as_fixed(['list', '--include-injected', '--json']),
             editable=fmt.as_bool("--editable"),
-            pip_args=fmt.as_opt_val('--pip-args'),
+            pip_args=fmt.as_opt_eq_val('--pip-args'),
         ),
         environ_update={'USE_EMOJI': '0'},
         check_rc=True,
