@@ -260,7 +260,7 @@ options:
     description:
       - The ISO image to be mounted on the specified in O(disk) CD-ROM.
       - O(media=cdrom) needs to be specified for this option to work.
-      - Image string format:
+      - "Image string format:"
       - V(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
       - V(cdrom) to use physical CD/DVD drive.
       - V(none) to unmount image from existent CD-ROM or create empty CD-ROM drive.
