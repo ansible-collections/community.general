@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_ostype - it is now possible to specify the ``ostype`` when creating an LXC container (https://github.com/ansible-collections/community.general/pull/7462).

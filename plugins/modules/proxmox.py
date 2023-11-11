@@ -98,6 +98,14 @@ options:
       - target storage
     type: str
     default: 'local'
+  ostype:
+    description:
+      - Specifies the C(ostype) of the LXC container.
+      - If set to V(auto), no C(ostype) will be provided on instance creation.
+    choices: ['auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged']
+    type: str
+    default: 'auto'
+    version_added: 8.1.0
   cpuunits:
     description:
       - CPU weight for a VM
@@ -515,6 +523,9 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     self.module.fail_json(msg='%s is not a valid tag' % tag)
             kwargs['tags'] = ",".join(kwargs['tags'])
 
+        if kwargs.get('ostype') == 'auto':
+            kwargs.pop('ostype')
+
         if clone is not None:
             if VZ_TYPE != 'lxc':
                 self.module.fail_json(changed=False, msg="Clone operator is only supported for LXC enabled proxmox clusters.")
@@ -637,6 +648,9 @@ def main():
         netif=dict(type='dict'),
         mounts=dict(type='dict'),
         ip_address=dict(),
+        ostype=dict(default='auto', choices=[
+            'auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged'
+        ]),
         onboot=dict(type='bool'),
         features=dict(type='list', elements='str'),
         storage=dict(default='local'),
@@ -744,6 +758,7 @@ def main():
                                     ostemplate=module.params['ostemplate'],
                                     netif=module.params['netif'],
                                     mounts=module.params['mounts'],
+                                    ostype=module.params['ostype'],
                                     ip_address=module.params['ip_address'],
                                     onboot=ansible_to_proxmox_bool(module.params['onboot']),
                                     cpuunits=module.params['cpuunits'],
