@@ -234,7 +234,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_group, gitlab_authentication, gitlab, ensure_gitlab_package
+    auth_argument_spec, find_group, gitlab_authentication, gitlab
 )
 
 
@@ -616,7 +616,9 @@ def main():
             ('state', 'present', ['name', 'email']),
         )
     )
-    ensure_gitlab_package(module)
+
+    # check prerequisites and connect to gitlab server
+    gitlab_instance = gitlab_authentication(module)
 
     user_name = module.params['name']
     state = module.params['state']
@@ -634,8 +636,6 @@ def main():
     user_external = module.params['external']
     user_identities = module.params['identities']
     overwrite_identities = module.params['overwrite_identities']
-
-    gitlab_instance = gitlab_authentication(module)
 
     gitlab_user = GitLabUser(module, gitlab_instance)
     user_exists = gitlab_user.exists_user(user_username)

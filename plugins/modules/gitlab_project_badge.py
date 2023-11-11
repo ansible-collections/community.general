@@ -97,7 +97,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, find_project, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, find_project
 )
 
 
@@ -159,12 +159,11 @@ state_strategy = {
 
 
 def core(module):
-    ensure_gitlab_package(module)
+    # check prerequisites and connect to gitlab server
+    gl = gitlab_authentication(module)
 
     gitlab_project = module.params['project']
     state = module.params['state']
-
-    gl = gitlab_authentication(module)
 
     project = find_project(gl, gitlab_project)
     # project doesn't exist
