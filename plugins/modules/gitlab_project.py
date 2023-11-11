@@ -340,7 +340,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab, ensure_gitlab_package
+    auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab
 )
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
@@ -558,7 +558,9 @@ def main():
         ],
         supports_check_mode=True,
     )
-    ensure_gitlab_package(module)
+
+    # check prerequisites and connect to gitlab server
+    gitlab_instance = gitlab_authentication(module)
 
     group_identifier = module.params['group']
     project_name = module.params['name']
@@ -595,8 +597,6 @@ def main():
     monitor_access_level = module.params['monitor_access_level']
     security_and_compliance_access_level = module.params['security_and_compliance_access_level']
     topics = module.params['topics']
-
-    gitlab_instance = gitlab_authentication(module)
 
     # Set project_path to project_name if it is empty.
     if project_path is None:

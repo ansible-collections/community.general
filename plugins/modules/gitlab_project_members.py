@@ -163,7 +163,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+    auth_argument_spec, gitlab_authentication, gitlab
 )
 
 
@@ -279,7 +279,9 @@ def main():
         ],
         supports_check_mode=True,
     )
-    ensure_gitlab_package(module)
+
+    # check prerequisites and connect to gitlab server
+    gl = gitlab_authentication(module)
 
     access_level_int = {
         'guest': gitlab.const.GUEST_ACCESS,
@@ -295,9 +297,6 @@ def main():
 
     if purge_users:
         purge_users = [access_level_int[level] for level in purge_users]
-
-    # connect to gitlab server
-    gl = gitlab_authentication(module)
 
     project = GitLabProjectMembers(module, gl)
 

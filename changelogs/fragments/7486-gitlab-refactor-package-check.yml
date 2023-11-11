@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab modules - remove duplicate ``gitlab`` package check (https://github.com/ansible-collections/community.general/pull/7486).
