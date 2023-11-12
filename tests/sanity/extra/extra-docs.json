@@ -7,7 +7,7 @@
     ],
     "output": "path-line-column-message",
     "requirements": [
-        "ansible-core",
+        "ansible-core<2.16",
         "antsibull-docs"
     ]
 }
