@@ -4823,7 +4823,7 @@ def test_unchanged_loopback(mocked_loopback_connection_unchanged, capfd):
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_LOOPBACK_MODIFY, indirect=['patch_ansible_module'])
 def test_add_second_ip4_address_to_loopback_connection(mocked_loopback_connection_modify, capfd):
     """
-    Test : Modify loopback connection from DHCP to static
+    Test : Modify loopback connection
     """
     with pytest.raises(SystemExit):
         nmcli.main()
