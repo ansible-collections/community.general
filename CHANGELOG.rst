@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 7.0.0.
 
+v8.0.2
+======
+
+Release Summary
+---------------
+
+Bugfix release for inclusion in Ansible 9.0.0rc1.
+
+Bugfixes
+--------
+
+- ocapi_utils, oci_utils, redfish_utils module utils - replace ``type()`` calls with ``isinstance()`` calls (https://github.com/ansible-collections/community.general/pull/7501).
+- pipx module utils - change the CLI argument formatter for the ``pip_args`` parameter (https://github.com/ansible-collections/community.general/issues/7497, https://github.com/ansible-collections/community.general/pull/7506).
+
 v8.0.1
 ======
 

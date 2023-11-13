@@ -809,3 +809,17 @@ releases:
     - 7467-fix-gitlab-constants-calls.yml
     - 8.0.1.yml
     release_date: '2023-11-06'
+  8.0.2:
+    changes:
+      bugfixes:
+      - ocapi_utils, oci_utils, redfish_utils module utils - replace ``type()`` calls
+        with ``isinstance()`` calls (https://github.com/ansible-collections/community.general/pull/7501).
+      - pipx module utils - change the CLI argument formatter for the ``pip_args``
+        parameter (https://github.com/ansible-collections/community.general/issues/7497,
+        https://github.com/ansible-collections/community.general/pull/7506).
+      release_summary: Bugfix release for inclusion in Ansible 9.0.0rc1.
+    fragments:
+    - 7501-type.yml
+    - 7506-pipx-pipargs.yml
+    - 8.0.2.yml
+    release_date: '2023-11-13'
