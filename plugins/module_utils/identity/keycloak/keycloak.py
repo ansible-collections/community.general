@@ -2670,23 +2670,23 @@ class KeycloakAPI(object):
                 user_id=userrep['id'],
                 realm=realm)
             groups_to_add_and_remove = self.extract_groups_to_add_to_and_remove_from_user(groups)
-            # If group membership need to be changed
-            if not is_struct_included(groups_to_add_and_remove['add'], user_existing_groups):
-                # Get available goups in the realm
-                realm_groups = self.get_groups(realm=realm)
-                for realm_group in realm_groups:
-                    if "name" in realm_group and realm_group["name"] in groups_to_add_and_remove['add']:
-                        self.add_user_in_group(
-                            user_id=userrep["id"],
-                            group_id=realm_group["id"],
-                            realm=realm)
-                        changed = True
-                    elif "name" in realm_group and realm_group['name'] in groups_to_add_and_remove['remove']:
-                        self.remove_user_from_group(
-                            user_id=userrep['id'],
-                            group_id=realm_group['id'],
-                            realm=realm)
-                        changed = True
+
+            # Get available goups in the realm
+            realm_groups = self.get_groups(realm=realm)
+            for realm_group in realm_groups:
+                if "name" in realm_group and realm_group["name"] in groups_to_add_and_remove['add']:
+                    self.add_user_in_group(
+                        user_id=userrep["id"],
+                        group_id=realm_group["id"],
+                        realm=realm)
+                    changed = True
+                elif "name" in realm_group and realm_group['name'] in groups_to_add_and_remove['remove'] or (
+                    realm_group["name"] in user_existing_groups and realm_group["name"] not in groups_to_add_and_remove["add"]):
+                    self.remove_user_from_group(
+                        user_id=userrep['id'],
+                        group_id=realm_group['id'],
+                        realm=realm)
+                    changed = True
             return changed
         except Exception as e:
             self.module.fail_json(msg='Could not update group membership for user %s in realm %s: %s'
