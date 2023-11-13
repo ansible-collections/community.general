@@ -453,8 +453,9 @@ options:
     description:
       - Indicates desired state of the instance.
       - If V(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - V(template) was added in community.general 8.1.0.
     type: str
-    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current']
+    choices: ['present', 'started', 'absent', 'stopped', 'restarted', 'current', 'template']
     default: present
   storage:
     description:
@@ -791,6 +792,25 @@ EXAMPLES = '''
     name: spynal
     node: sabrewulf
     state: restarted
+
+- name: Convert VM to template
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: template
+
+- name: Convert VM to template (stop VM if running)
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: template
+    force: true
 
 - name: Remove VM
   community.general.proxmox_kvm:
@@ -1135,6 +1155,19 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             self.module.fail_json(vmid=vmid, msg="restarting of VM %s failed with exception: %s" % (vmid, e))
             return False
 
+    def convert_to_template(self, vm, timeout, force):
+        vmid = vm['vmid']
+        try:
+            proxmox_node = self.proxmox_api.nodes(vm['node'])
+            if proxmox_node.qemu(vmid).status.current.get()['status'] == 'running' and force:
+                self.stop_instance(vm, vmid, timeout, force)
+            # not sure why, but templating a container doesn't return a taskid
+            proxmox_node.qemu(vmid).template.post()
+            return True
+        except Exception as e:
+            self.module.fail_json(vmid=vmid, msg="conversion of VM %s to template failed with exception: %s" % (vmid, e))
+            return False
+
     def migrate_vm(self, vm, target_node):
         vmid = vm['vmid']
         proxmox_node = self.proxmox_api.nodes(vm['node'])
@@ -1222,7 +1255,7 @@ def main():
         sshkeys=dict(type='str', no_log=False),
         startdate=dict(type='str'),
         startup=dict(),
-        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
+        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current', 'template']),
         storage=dict(type='str'),
         tablet=dict(type='bool'),
         tags=dict(type='list', elements='str'),
@@ -1492,10 +1525,23 @@ def main():
             if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
-            if proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout']):
-                module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
+            proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout'])
+            module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
         except Exception as e:
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
+
+    elif state == 'template':
+        if not vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
+        status = {}
+        try:
+            vm = proxmox.get_vm(vmid)
+
+            if proxmox.convert_to_template(vm, force=module.params['force'], timeout=module.params['timeout']):
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s is converting to template" % vmid, **status)
+        except Exception as e:
+            module.fail_json(vmid=vmid, msg="conversion of VM %s to template failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'restarted':
         if not vmid:
