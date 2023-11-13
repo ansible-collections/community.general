@@ -1,0 +1,2 @@
+minor_changes:
+  - ssh_config - adds ``controlmaster``, ``controlpath`` and ``controlpersist`` parameters (https://github.com/ansible-collections/community.general/pull/7456).
