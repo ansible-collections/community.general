@@ -63,12 +63,12 @@ options:
             - Type V(generic) is added in Ansible 2.5.
             - Type V(infiniband) is added in community.general 2.0.0.
             - Type V(gsm) is added in community.general 3.7.0.
+            - Type V(loopback) is added in community.general 8.1.0.
             - Type V(macvlan) is added in community.general 6.6.0.
             - Type V(wireguard) is added in community.general 4.3.0.
             - Type V(vpn) is added in community.general 5.1.0.
             - Using V(bond-slave), V(bridge-slave), or V(team-slave) implies V(ethernet) connection type with corresponding O(slave_type) option.
             - If you want to control non-ethernet connection attached to V(bond), V(bridge), or V(team) consider using O(slave_type) option.
-            - Type V(loopback) is added in community.general 8.1.0.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
             wifi, gsm, wireguard, vpn, loopback ]
