@@ -117,7 +117,7 @@ class Connection(ConnectionBase):
         if "is not running" in stderr:
             raise AnsibleConnectionFailure("instance not running: %s" % self._host())
 
-        if "not found" in stderr:
+        if stderr.strip() == "Error: Instance not found" or stderr.strip() == "error: not found":
             raise AnsibleConnectionFailure("instance not found: %s" % self._host())
 
         return process.returncode, stdout, stderr
