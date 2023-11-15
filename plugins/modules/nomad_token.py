@@ -29,15 +29,15 @@ author: Pedro Nascimento(@apecnascimento)
 version_added: "1.0.0"
 short_description: Manage Nomad ACL tokens
 description:
-  - Create Bootstrap token
-  - Create ACL token.
-  - Update ACL token.
-  - Delete ACL token
+    - Create Bootstrap token
+    - Create ACL token.
+    - Update ACL token.
+    - Delete ACL token
 requirements:
-  - python-nomad
+    - python-nomad
 extends_documentation_fragment:
-  - community.general.nomad
-  - community.general.attributes
+    - community.general.nomad
+    - community.general.attributes
 attributes:
     check_mode:
         support: full
@@ -45,31 +45,32 @@ attributes:
         support: none
 options:
     name:
-      description:
-        - Name of acl token to create.
-      type: str
+        description:
+            - Name of acl token to create.
+        type: string
     token_type:
-      description:
-        - The type of the token can be "client", "management" or bootstrap.
-      choices: ["client", "management", "bootstrap"]
-      type: str
-      default: "client"
+        description:
+            - The type of the token can be "client", "management" or bootstrap.
+        choices: ["client", "management", "bootstrap"]
+        type: string
+        default: "client"
     policies:
-      description:
-        - A list of the policies assigned to the token.
-      type: list
-      default: []
+        description:
+            - A list of the policies assigned to the token.
+        type: list
+        elements: string
+        default: []
     global_token:
-      description:
-        - indicates whether or not the token was created with the --global.
-      type: bool
-      default: false
+        description:
+            - indicates whether or not the token was created with the --global.
+        type: bool
+        default: false
     state:
-      description:
-        - Create or remove acl token.
-      choices: ["present", "absent"]
-      required: true
-      type: str
+        description:
+            - Create or remove acl token.
+        choices: ["present", "absent"]
+        required: true
+        type: string
 
 seealso:
   - name: Nomad acl documentation
@@ -90,7 +91,7 @@ EXAMPLES = '''
     name: "Dev token"
     token_type: client
     policies:
-    - readonly
+        - readonly
     global_token: false
     state: absent
 
@@ -100,8 +101,8 @@ EXAMPLES = '''
     name: "Dev token"
     token_type: client
     policies:
-    - readonly
-    - devpolicy
+        - readonly
+        - devpolicy
     global_token: false
     state: absent
 
@@ -114,57 +115,30 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-msg:
-  description: friendly result message
-  type: str
-  sample: "ACL bootstrap already exist."
 result:
-  token:
-  description: Acl token object
-  type: dict
-  sample: "ACL bootstrap already exist."
-  contains:
-    accessor_id:
-      description: token accessor ID.
-      type: str
-    create_index:
-      description: token create index.
-      type: int
-    create_time:
-      description: token createtion time.
-      type: str
-    expiration_ttl:
-      description: token expiration ttl.
-      type: str
-    expiration_time:
-      description: token expiration time.
-      type: str
-    global:
-      description: Global token identifier.
-      type: bool
-    hash:
-      description: Token hash.
-      type: str
-    modify_index:
-      description: Token modify index.
-      type: int
-    name:
-      description: Token name.
-      type: str
-    policies:
-      description: Token policies list.
-      type: list
-      elements: str
-    roles:
-      description: Token roles list.
-      type: list
-      elements: str
-    secret_id:
-      description: Token secret ID.
-      type: str
-    type:
-      description: Token type
-      type: str
+    description: Result returned by nomad with a friendly message
+    type: dict
+    sample: {
+        "msg": "Acl token updated.",
+        "token": {
+            "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
+            "create_index": 14,
+            "create_time": "2023-11-12T18:48:34.248857001Z",
+            "expiration_time": null,
+            "expiration_ttl": "",
+            "global": true,
+            "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
+            "modify_index": 836,
+            "name": "devs",
+            "policies": [
+                "readonly"
+            ],
+            "roles": null,
+            "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
+            "type": "client"
+        }
+    }
+        
 '''
 
 
