@@ -1950,15 +1950,20 @@ class Nmcli(object):
     @property
     def mtu_conn_type(self):
         return self.type in (
+            'bond',
             'dummy',
             'ethernet',
+            'infiniband',
             'team-slave',
             'vlan',
         )
 
     @property
     def mtu_setting(self):
-        return '802-3-ethernet.mtu'
+        if self.type == 'infiniband':
+            return 'infiniband.mtu'
+        else:
+            return '802-3-ethernet.mtu'
 
     @staticmethod
     def mtu_to_string(mtu):
