@@ -18,7 +18,7 @@ from .onepassword_conftest import (  # noqa: F401, pylint: disable=unused-import
 )
 from .onepassword_common import MOCK_ENTRIES
 
-from ansible.errors import AnsibleLookupError
+from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,
@@ -82,12 +82,9 @@ def test_assert_logged_in_v2(mocker, args, out, expected_call_args, expected_cal
     assert result == expected
 
 
-def test_assert_logged_in_v2_connect(mocker, monkeypatch):
-    mocker.patch.object(OnePassCLIv2, "_run", return_value=[1, "", ""])
-
+def test_assert_logged_in_v2_connect():
     op_cli = OnePassCLIv2(connect_host="http://localhost:8080", connect_token="foobar")
     result = op_cli.assert_logged_in()
-    assert not op_cli._run.called
     assert result
 
 
@@ -275,3 +272,34 @@ def test_signin(op_fixture, request):
     op._cli.signin()
     print(op._cli.version)
     op._cli._run.assert_called_once_with(['signin', '--raw'], command_input=b"master_pass")
+
+
+@pytest.mark.parametrize(
+    ("plugin", "connect_host", "connect_token"),
+    [
+        (plugin, connect_host, connect_token)
+        for plugin in ("community.general.onepassword", "community.general.onepassword_raw")
+        for (connect_host, connect_token) in
+        (
+            ("http://localhost", None),
+            (None, "foobar"),
+        )
+    ]
+)
+def test_op_connect_partial_args(plugin, connect_host, connect_token):
+    op_lookup = lookup_loader.get(plugin)
+    with pytest.raises(AnsibleOptionsError):
+        op_lookup.run("login", vault_name="test vault", connect_host=connect_host, connect_token=connect_token)
+
+
+@pytest.mark.parametrize(
+    ("kwargs"),
+    (
+        {"connect_host": "http://localhost", "connect_token": "foobar"},
+        {"service_account_token": "foobar"},
+    )
+)
+def test_opv1_unsupported_features(kwargs):
+    op_cli = OnePassCLIv1(**kwargs)
+    with pytest.raises(AnsibleLookupError):
+        op_cli.full_signin()
