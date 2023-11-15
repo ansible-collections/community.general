@@ -12,6 +12,7 @@ skip/rhel8.0  # FIXME
 skip/rhel9.0  # FIXME
 skip/rhel9.1  # FIXME
 skip/rhel9.2  # FIXME
+skip/rhel9.3  # FIXME
 skip/docker
 needs/root
 needs/target/setup_epel
