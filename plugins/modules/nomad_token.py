@@ -8,23 +8,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
-
-
-import_nomad = None
-
-
-try:
-    import nomad
-    import_nomad = True
-except ImportError:
-    import_nomad = False
-
-
 DOCUMENTATION = '''
 ---
-module: nomad_acl
+module: nomad_token
 author: Pedro Nascimento(@apecnascimento)
 version_added: "1.0.0"
 short_description: Manage Nomad ACL tokens
@@ -47,20 +33,20 @@ options:
     name:
         description:
             - Name of acl token to create.
-        type: string
+        type: str
     token_type:
         description:
             - The type of the token can be "client", "management" or bootstrap.
         choices: ["client", "management", "bootstrap"]
-        type: string
+        type: str
         default: "client"
     policies:
         description:
             - A list of the policies assigned to the token.
         type: list
-        elements: string
+        elements: str
         default: []
-    global_token:
+    global_replicated:
         description:
             - indicates whether or not the token was created with the --global.
         type: bool
@@ -70,7 +56,7 @@ options:
             - Create or remove acl token.
         choices: ["present", "absent"]
         required: true
-        type: string
+        type: str
 
 seealso:
   - name: Nomad acl documentation
@@ -92,7 +78,7 @@ EXAMPLES = '''
     token_type: client
     policies:
         - readonly
-    global_token: false
+    global_replicated: false
     state: absent
 
 - name: Update acl token Dev token
@@ -103,7 +89,7 @@ EXAMPLES = '''
     policies:
         - readonly
         - devpolicy
-    global_token: false
+    global_replicated: false
     state: absent
 
 - name: Delete acl token
@@ -117,6 +103,7 @@ EXAMPLES = '''
 RETURN = '''
 result:
     description: Result returned by nomad with a friendly message
+    returned: always
     type: dict
     sample: {
         "msg": "Acl token updated.",
@@ -140,6 +127,19 @@ result:
     }
 
 '''
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
+
+
+import_nomad = None
+
+
+try:
+    import nomad
+    import_nomad = True
+except ImportError:
+    import_nomad = False
 
 
 def get_token(name, nomad_client):
@@ -179,16 +179,16 @@ def run():
             host=dict(required=True, type='str'),
             port=dict(type='int', default=4646),
             state=dict(required=True, choices=['present', 'absent']),
-            use_ssl=dict(type='bool', default=False),
+            use_ssl=dict(type='bool', default=True),
             timeout=dict(type='int', default=5),
-            validate_certs=dict(type='bool', default=False),
+            validate_certs=dict(type='bool', default=True),
             client_cert=dict(type='path'),
             client_key=dict(type='path'),
             token=dict(type='str', no_log=True),
             name=dict(type='str'),
             token_type=dict(choices=['client', 'management', 'bootstrap'], default='client'),
-            policies=dict(type=list, default=[]),
-            global_token=dict(type=bool, default=False),
+            policies=dict(type='list', elements=str, default=[]),
+            global_replicated=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
@@ -239,7 +239,7 @@ def run():
                     "Name": module.params.get('name'),
                     "Type": module.params.get('token_type'),
                     "Policies": module.params.get('policies'),
-                    "Global": module.params.get('global_token')
+                    "Global": module.params.get('global_replicated')
                 }
 
                 current_token = get_token(token_info['Name'], nomad_client)
