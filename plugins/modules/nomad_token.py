@@ -89,7 +89,7 @@ EXAMPLES = '''
     host: localhost
     name: "Dev token"
     token_type: client
-    policies: 
+    policies:
     - readonly
     global_token: false
     state: absent
@@ -172,7 +172,7 @@ def get_token(name, nomad_client):
 
     tokens = nomad_client.acl.get_tokens()
 
-    token = next((token for token in tokens 
+    token = next((token for token in tokens
                   if token.get('Name') == name), None)
     return token
 
@@ -225,7 +225,6 @@ def run():
         ]
     )
 
-
     if not import_nomad:
         module.fail_json(msg=missing_required_lib("python-nomad"))
 
@@ -250,7 +249,7 @@ def run():
             try:
                 current_token = get_token('Bootstrap Token', nomad_client)
                 if current_token:
-                    result = { "msg": "ACL bootstrap already exist.", "token": {}}
+                    result = {"msg": "ACL bootstrap already exist.", "token": {}}
 
             except nomad.api.exceptions.URLNotAuthorizedNomadException:
                 try:
@@ -268,17 +267,19 @@ def run():
                   "Policies": module.params.get('policies'),
                   "Global": module.params.get('global_token')
                 }
+
                 current_token = get_token(token_info['Name'], nomad_client)
+
                 if  current_token:
                     token_info['AccessorID'] = current_token['AccessorID']
-                    nomad_result = nomad_client.acl.update_token(current_token['AccessorID'], 
+                    nomad_result = nomad_client.acl.update_token(current_token['AccessorID'],
                                                                  token_info)
-                    result = {"msg": "Acl token updated.", 
+                    result = {"msg": "Acl token updated.",
                               "token": transform_response(nomad_result)}
 
                 else:
                     nomad_result = nomad_client.acl.create_token(token_info)
-                    result = {"msg": "Acl token Created.", 
+                    result = {"msg": "Acl token Created.",
                               "token": transform_response(nomad_result)}
                     changed = True
             except Exception as e:
