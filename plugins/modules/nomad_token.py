@@ -95,7 +95,7 @@ EXAMPLES = '''
     global_token: false
     state: absent
 
-- name: "Update acl token Dev token""
+- name: Update acl token Dev token
   community.general.nomad_acl:
     host: localhost
     name: "Dev token"
