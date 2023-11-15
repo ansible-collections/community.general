@@ -11,7 +11,10 @@ __metaclass__ = type
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
+
 import_nomad = None
+
+
 try:
     import nomad
     import_nomad = True
@@ -67,7 +70,6 @@ options:
       choices: ["present", "absent"]
       required: true
       type: str
-      
 
 seealso:
   - name: Nomad acl documentation
@@ -88,7 +90,7 @@ EXAMPLES = '''
     name: "Dev token"
     token_type: client
     policies: 
-      - readonly
+    - readonly
     global_token: false
     state: absent
 
@@ -98,8 +100,8 @@ EXAMPLES = '''
     name: "Dev token"
     token_type: client
     policies: 
-      - readonly
-      - devpolicy
+    - readonly
+    - devpolicy
     global_token: false
     state: absent
 
@@ -165,16 +167,18 @@ result:
       type: str
 '''
 
+
 def get_token(name, nomad_client):
+
     tokens = nomad_client.acl.get_tokens()
 
-    token = next(
-            ( token for token in tokens if token.get('Name') == name ), 
-            None
-    )
+    token = next((token for token in tokens 
+                  if token.get('Name') == name), None)
     return token
 
+
 def transform_response(nomad_response):
+
     transformed_response = {
         "accessor_id": nomad_response['AccessorID'],
         "create_index": nomad_response['CreateIndex'],
@@ -193,89 +197,93 @@ def transform_response(nomad_response):
 
     return transformed_response
 
+
 def run():
-  module = AnsibleModule(
-      argument_spec=dict(
-          host=dict(required=True, type='str'),
-          port=dict(type='int', default=4646),
-          state=dict(required=True, choices=['present', 'absent']),
-          use_ssl=dict(type='bool', default=False),
-          timeout=dict(type='int', default=5),
-          validate_certs=dict(type='bool', default=False),
-          client_cert=dict(type='path'),
-          client_key=dict(type='path'),
-          token=dict(type='str', no_log=True),
-          name=dict(type='str'),
-          token_type=dict(choices=['client', 'management', 'bootstrap'], default='client'),
-          policies=dict(type=list, default=[]),
-          global_token=dict(type=bool, default=False),
-      ),
-      supports_check_mode=True,
-      mutually_exclusive=[
-          ["name"]
-      ],
-      required_one_of=[
-          ['name', 'token_type']
-      ]
-  )
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            host=dict(required=True, type='str'),
+            port=dict(type='int', default=4646),
+            state=dict(required=True, choices=['present', 'absent']),
+            use_ssl=dict(type='bool', default=False),
+            timeout=dict(type='int', default=5),
+            validate_certs=dict(type='bool', default=False),
+            client_cert=dict(type='path'),
+            client_key=dict(type='path'),
+            token=dict(type='str', no_log=True),
+            name=dict(type='str'),
+            token_type=dict(choices=['client', 'management', 'bootstrap'], default='client'),
+            policies=dict(type=list, default=[]),
+            global_token=dict(type=bool, default=False),
+        ),
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ["name"]
+        ],
+        required_one_of=[
+            ['name', 'token_type']
+        ]
+    )
 
 
-  if not import_nomad:
-      module.fail_json(msg=missing_required_lib("python-nomad"))
+    if not import_nomad:
+        module.fail_json(msg=missing_required_lib("python-nomad"))
 
-  certificate_ssl = (module.params.get('client_cert'), module.params.get('client_key'))
+    certificate_ssl = (module.params.get('client_cert'), module.params.get('client_key'))
 
-  nomad_client = nomad.Nomad(
-      host=module.params.get('host'),
-      port=module.params.get('port'),
-      secure=module.params.get('use_ssl'),
-      timeout=module.params.get('timeout'),
-      verify=module.params.get('validate_certs'),
-      cert=certificate_ssl,
-      namespace=module.params.get('namespace'),
-      token=module.params.get('token')
-  )
+    nomad_client = nomad.Nomad(
+        host=module.params.get('host'),
+        port=module.params.get('port'),
+        secure=module.params.get('use_ssl'),
+        timeout=module.params.get('timeout'),
+        verify=module.params.get('validate_certs'),
+        cert=certificate_ssl,
+        namespace=module.params.get('namespace'),
+        token=module.params.get('token')
+    )
 
-  changed = False
-  result = {}
-  if module.params.get('state') == "present":
+    changed = False
+    result = {}
+    if module.params.get('state') == "present":
 
-      if module.params.get('token_type') == 'bootstrap':
-          try:
-              current_token = get_token('Bootstrap Token', nomad_client)
-              if current_token:
-                result = { "msg": "ACL bootstrap already exist.", "token": {}}
+        if module.params.get('token_type') == 'bootstrap':
+            try:
+                current_token = get_token('Bootstrap Token', nomad_client)
+                if current_token:
+                    result = { "msg": "ACL bootstrap already exist.", "token": {}}
 
-          except nomad.api.exceptions.URLNotAuthorizedNomadException:
-              try:
-                  nomad_result = nomad_client.acl.generate_bootstrap()
-                  result = {'msg': "Boostrap token created.",
-                            "token": transform_response(nomad_result)}
-                  changed = True
-              except Exception as e:
-                      module.fail_json(msg=to_native(e))
-      else:
-        try:
-            token_info = {
-              "Name": module.params.get('name'),
-              "Type": module.params.get('token_type'),
-              "Policies": module.params.get('policies'),
-              "Global": module.params.get('global_token')
-            }
-            current_token = get_token(token_info['Name'], nomad_client)
-            if  current_token:
-              token_info['AccessorID'] = current_token['AccessorID']
-              nomad_result = nomad_client.acl.update_token(current_token['AccessorID'], token_info)
-              result = {"msg": "Acl token updated.", "token": transform_response(nomad_result)}
+            except nomad.api.exceptions.URLNotAuthorizedNomadException:
+                try:
+                    nomad_result = nomad_client.acl.generate_bootstrap()
+                    result = {'msg': "Boostrap token created.",
+                              "token": transform_response(nomad_result)}
+                    changed = True
+                except Exception as e:
+                    module.fail_json(msg=to_native(e))
+        else:
+            try:
+                token_info = {
+                  "Name": module.params.get('name'),
+                  "Type": module.params.get('token_type'),
+                  "Policies": module.params.get('policies'),
+                  "Global": module.params.get('global_token')
+                }
+                current_token = get_token(token_info['Name'], nomad_client)
+                if  current_token:
+                    token_info['AccessorID'] = current_token['AccessorID']
+                    nomad_result = nomad_client.acl.update_token(current_token['AccessorID'], 
+                                                                 token_info)
+                    result = {"msg": "Acl token updated.", 
+                              "token": transform_response(nomad_result)}
 
-            else:
-              nomad_result = nomad_client.acl.create_token(token_info)
-              result = {"msg": "Acl token Created.", "token": transform_response(nomad_result)}
-              changed = True
-        except Exception as e:
-          module.fail_json(msg=to_native(e))
-                
-           
+                else:
+                    nomad_result = nomad_client.acl.create_token(token_info)
+                    result = {"msg": "Acl token Created.", 
+                              "token": transform_response(nomad_result)}
+                    changed = True
+            except Exception as e:
+                module.fail_json(msg=to_native(e))
+
     if module.params.get('state') == "absent":
         if module.params.get('token_type') == 'bootstrap':
             module.fail_json(msg="Delete ACL bootstrap token is not allowed.")
@@ -290,15 +298,18 @@ def run():
                 result = {'msg': "Acl token deleted.', ", token: {}}
                 changed = True
             else:
-                result = {'msg': f"Not found token with name '{module.params.get('name')}', ", token: {}}
+                result = {'msg': f"Not found token with name '{module.params.get('name')}'",
+                          token: {}}
 
         except Exception as e:
             module.fail_json(msg=to_native(e))
 
     module.exit_json(changed=changed, result=result)
 
+
 def main():
     run()
+
 
 if __name__ == "__main__":
     main()
