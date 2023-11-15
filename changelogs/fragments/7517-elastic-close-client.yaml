@@ -1,0 +1,2 @@
+minor_changes:
+  - elastic callback plugin - close elastic client to not leak resources (https://github.com/ansible-collections/community.general/pull/7517).
