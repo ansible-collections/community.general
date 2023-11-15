@@ -184,16 +184,14 @@ def run():
             validate_certs=dict(type='bool', default=True),
             client_cert=dict(type='path'),
             client_key=dict(type='path'),
+            namespace=dict(type='str'),
             token=dict(type='str', no_log=True),
             name=dict(type='str'),
             token_type=dict(choices=['client', 'management', 'bootstrap'], default='client'),
-            policies=dict(type='list', elements=str, default=[]),
+            policies=dict(type='list', elements='str', default=[]),
             global_replicated=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[
-            ["name"]
-        ],
         required_one_of=[
             ['name', 'token_type']
         ]
