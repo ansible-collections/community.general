@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa_sudorule - adds options to include denied commands or command groups (https://github.com/ansible-collections/community.general/pull/7415).
