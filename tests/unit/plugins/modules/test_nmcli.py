@@ -1445,7 +1445,8 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
-infiniband.transport-mode               datagram
+infiniband.mtu:                         auto
+infiniband.transport-mode:              datagram
 """
 
 TESTCASE_INFINIBAND_STATIC_MODIFY_TRANSPORT_MODE = [

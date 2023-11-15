@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - allow for the setting of ``MTU`` for ``infiniband`` and ``bond`` interface types (https://github.com/ansible-collections/community.general/pull/7499).
