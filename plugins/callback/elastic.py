@@ -84,6 +84,7 @@ import time
 import uuid
 
 from collections import OrderedDict
+from contextlib import closing
 from os.path import basename
 
 from ansible.errors import AnsibleError, AnsibleRuntimeError
@@ -201,24 +202,25 @@ class ElasticSource(object):
 
         apm_cli = self.init_apm_client(apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key)
         if apm_cli:
-            instrument()  # Only call this once, as early as possible.
-            if traceparent:
-                parent = trace_parent_from_string(traceparent)
-                apm_cli.begin_transaction("Session", trace_parent=parent, start=parent_start_time)
-            else:
-                apm_cli.begin_transaction("Session", start=parent_start_time)
-            # Populate trace metadata attributes
-            if self.ansible_version is not None:
-                label(ansible_version=self.ansible_version)
-            label(ansible_session=self.session, ansible_host_name=self.host, ansible_host_user=self.user)
-            if self.ip_address is not None:
-                label(ansible_host_ip=self.ip_address)
+            with closing(apm_cli):
+                instrument()  # Only call this once, as early as possible.
+                if traceparent:
+                    parent = trace_parent_from_string(traceparent)
+                    apm_cli.begin_transaction("Session", trace_parent=parent, start=parent_start_time)
+                else:
+                    apm_cli.begin_transaction("Session", start=parent_start_time)
+                # Populate trace metadata attributes
+                if self.ansible_version is not None:
+                    label(ansible_version=self.ansible_version)
+                label(ansible_session=self.session, ansible_host_name=self.host, ansible_host_user=self.user)
+                if self.ip_address is not None:
+                    label(ansible_host_ip=self.ip_address)
 
-            for task_data in tasks:
-                for host_uuid, host_data in task_data.host_data.items():
-                    self.create_span_data(apm_cli, task_data, host_data)
+                for task_data in tasks:
+                    for host_uuid, host_data in task_data.host_data.items():
+                        self.create_span_data(apm_cli, task_data, host_data)
 
-            apm_cli.end_transaction(name=__name__, result=status, duration=end_time - parent_start_time)
+                apm_cli.end_transaction(name=__name__, result=status, duration=end_time - parent_start_time)
 
     def create_span_data(self, apm_cli, task_data, host_data):
         """ create the span with the given TaskData and HostData """
