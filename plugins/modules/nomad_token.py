@@ -99,7 +99,7 @@ EXAMPLES = '''
     host: localhost
     name: "Dev token"
     token_type: client
-    policies: 
+    policies:
     - readonly
     - devpolicy
     global_token: false
@@ -262,15 +262,15 @@ def run():
         else:
             try:
                 token_info = {
-                  "Name": module.params.get('name'),
-                  "Type": module.params.get('token_type'),
-                  "Policies": module.params.get('policies'),
-                  "Global": module.params.get('global_token')
+                    "Name": module.params.get('name'),
+                    "Type": module.params.get('token_type'),
+                    "Policies": module.params.get('policies'),
+                    "Global": module.params.get('global_token')
                 }
 
                 current_token = get_token(token_info['Name'], nomad_client)
 
-                if  current_token:
+                if current_token:
                     token_info['AccessorID'] = current_token['AccessorID']
                     nomad_result = nomad_client.acl.update_token(current_token['AccessorID'],
                                                                  token_info)
@@ -299,7 +299,7 @@ def run():
                 result = {'msg': "Acl token deleted.', ", token: {}}
                 changed = True
             else:
-                result = {'msg': f"Not found token with name '{module.params.get('name')}'", token: {}}
+                result = {'msg': "Not found token with name '{0}'".format(module.params.get('name')), token: {}}
 
         except Exception as e:
             module.fail_json(msg=to_native(e))
