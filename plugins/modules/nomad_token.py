@@ -86,7 +86,7 @@ EXAMPLES = '''
   community.general.nomad_acl:
     host: localhost
     name: "Dev token"
-    token_type: "client"
+    token_type: client
     policies: 
       - readonly
     global_token: false
@@ -96,7 +96,7 @@ EXAMPLES = '''
   community.general.nomad_acl:
     host: localhost
     name: "Dev token"
-    token_type: "client"
+    token_type: client
     policies: 
       - readonly
       - devpolicy
