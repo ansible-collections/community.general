@@ -50,15 +50,17 @@ DOCUMENTATION = '''
         type: string
         version_added: 7.1.0
       connect_host:
-        description: The host for 1Password Connect. Must be used in combination with C(connect_token).
+        description: The host for 1Password Connect. Must be used in combination with O(connect_token).
         type: str
         env:
           - name: OP_CONNECT_HOST
+        version_added: 8.1.0
       connect_token:
-        description: The token for 1Password Connect. Must be used in combination with C(connect_host).
+        description: The token for 1Password Connect. Must be used in combination with O(connect_host).
         type: str
         env:
           - name: OP_CONNECT_TOKEN
+        version_added: 8.1.0
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
