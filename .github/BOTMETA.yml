@@ -870,7 +870,7 @@ files:
   $modules/nmcli.py:
     maintainers: alcamie101
   $modules/nomad_:
-    maintainers: chris93111
+    maintainers: chris93111 apecnascimento
   $modules/nosh.py:
     maintainers: tacatac
   $modules/npm.py:
