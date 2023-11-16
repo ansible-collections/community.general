@@ -20,6 +20,11 @@ DOCUMENTATION = '''
       - The document contents are a string exactly as stored in 1Password.
       - This plugin requires C(op) version 2 or later.
 
+    options:
+      _terms:
+        description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+        required: true
+
     extends_documentation_fragment:
       - community.general.onepassword
 '''

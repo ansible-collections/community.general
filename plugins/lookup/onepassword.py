@@ -20,9 +20,19 @@ DOCUMENTATION = '''
     requirements:
       - C(op) 1Password command line utility
     options:
+      _terms:
+        description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
+        required: true
+      account_id:
+        version_added: 7.5.0
+      domain:
+        version_added: 3.2.0
       field:
         description: Field to return from each matching item (case-insensitive).
         default: 'password'
+        type: str
+      service_account_token:
+        version_added: 7.1.0
     extends_documentation_fragment:
       - community.general.onepassword
 '''
@@ -66,7 +76,7 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description: Field data requested
+    description: Field data requested.
     type: list
     elements: str
 """
