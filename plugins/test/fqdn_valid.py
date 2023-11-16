@@ -43,7 +43,7 @@ DOCUMENTATION = '''
       type: str
       required: true
     min_labels:
-      description: Required minimum of labels, separated by period
+      description: Required minimum of labels, separated by period.
       default: 1
       type: int
       required: false
