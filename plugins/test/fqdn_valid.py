@@ -35,7 +35,7 @@ DOCUMENTATION = '''
     - Certificate Authorities like Let's Encrypt run a narrower set of
       string validation logic to determine validity for issuance. This
       test is not intended to achieve functional parity with CA
-      issuance
+      issuance.
     - Single label names are allowed by default (O(min_labels=1)).
   options:
     _input:
