@@ -89,7 +89,7 @@ def fqdn_valid(name, min_labels=1, allow_underscores=False):
         )
 
     fobj = FQDN(name, min_labels=min_labels, allow_underscores=allow_underscores)
-    return(fobj.is_valid)
+    return (fobj.is_valid)
 
 
 class TestModule(object):
