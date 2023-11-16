@@ -18,7 +18,7 @@ else:
 
 DOCUMENTATION = '''
   name: fqdn_valid
-  short_description: Validates fully-qualified domain names against RFC 1123.
+  short_description: Validates fully-qualified domain names against RFC 1123
   version_added: 8.1.0
   author: Vladimir Botka (@vbotka)
   requirements:
