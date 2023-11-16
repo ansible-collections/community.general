@@ -124,7 +124,6 @@ result:
             "type": "client"
         }
     }
-
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
