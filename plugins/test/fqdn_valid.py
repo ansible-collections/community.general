@@ -25,7 +25,7 @@ DOCUMENTATION = '''
       string validation logic to determine validity for issuance. This
       test is not intended to achieve functional parity with CA
       issuance
-    - Single label names are allowed by default (min_labels=1).
+    - Single label names are allowed by default (O(min_labels=1)).
   options:
     _input:
       description: Name of the host.
