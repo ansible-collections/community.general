@@ -8,6 +8,5 @@ destructive
 skip/aix
 skip/freebsd
 skip/alpine
-skip/python2.6
 skip/docker
 needs/root
