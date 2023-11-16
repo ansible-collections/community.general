@@ -6,6 +6,5 @@ azp/posix/1
 destructive
 skip/aix
 skip/rhel
-skip/python2.6  # lookups are controller only, and we no longer support Python 2.6 on the controller
 skip/osx  # FIXME https://github.com/ansible-collections/community.general/issues/2978
 skip/macos  # FIXME https://github.com/ansible-collections/community.general/issues/2978
