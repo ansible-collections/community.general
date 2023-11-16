@@ -1,2 +1,0 @@
-minor_changes:
-  - fqdn_valid test - adds test to validates FQDN names against RFC 112 (https://github.com/ansible-collections/community.general/pull/7533).
