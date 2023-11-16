@@ -38,7 +38,7 @@ DOCUMENTATION = '''
       required: false
     allow_underscores:
       description: Allow underscore characters.
-      default: False
+      default: false
       type: bool
       required: false
 '''
