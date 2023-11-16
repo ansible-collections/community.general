@@ -4,4 +4,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test fqdn_valid
-  import_tasks: fqdn_valid_1.yml
+  ansible.builtin.import_tasks: fqdn_valid_1.yml
