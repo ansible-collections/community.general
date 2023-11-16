@@ -3,5 +3,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 azp/posix/2
-skip/python2.6  # filters are controller only, and we no longer support Python 2.6 on the controller
 skip/aix
