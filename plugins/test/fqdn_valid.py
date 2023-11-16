@@ -8,7 +8,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
   name: fqdn_valid
   short_description: Validates fully-qualified domain names against RFC 1123.
-  version_added: 8.0.3
+  version_added: 8.1.0
   author: Vladimir Botka (@vbotka)
   requirements:
   - fqdn>=1.5.1 (PyPI)
