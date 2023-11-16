@@ -27,7 +27,7 @@ DOCUMENTATION = '''
       issuance
     - Single label names are allowed by default (min_labels=1).
   options:
-    name:
+    _input:
       description: Name of the host.
       type: str
       required: true
