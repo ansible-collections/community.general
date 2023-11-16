@@ -26,7 +26,7 @@ DOCUMENTATION = '''
   description:
     - This test validates Fully Qualified Domain Names (FQDNs)
       conforming to the Internet Engineering Task Force specification
-      RFC 1123 and RFC 952
+      RFC 1123 and RFC 952.
     - The design intent is to validate that a string would be
       traditionally acceptable as a public Internet hostname to
       RFC-conforming software, which is a strict subset of the logic
