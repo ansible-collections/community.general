@@ -61,7 +61,7 @@ options:
 seealso:
   - name: Nomad acl documentation
     description: Complete documentation for Nomad API acl.
-    link: https://developer.hashicorp.com/nomad/api-docs/acl
+    link: https://developer.hashicorp.com/nomad/api-docs/acl/tokens
 '''
 
 EXAMPLES = '''
@@ -97,7 +97,6 @@ EXAMPLES = '''
     host: localhost
     name: "Dev token"
     state: absent
-
 '''
 
 RETURN = '''
