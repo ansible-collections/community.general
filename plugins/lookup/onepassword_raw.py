@@ -49,6 +49,18 @@ DOCUMENTATION = '''
           - Only works with 1Password CLI version 2 or later.
         type: string
         version_added: 7.1.0
+      connect_host:
+        description: The host for 1Password Connect. Must be used in combination with O(connect_token).
+        type: str
+        env:
+          - name: OP_CONNECT_HOST
+        version_added: 8.1.0
+      connect_token:
+        description: The token for 1Password Connect. Must be used in combination with O(connect_host).
+        type: str
+        env:
+          - name: OP_CONNECT_TOKEN
+        version_added: 8.1.0
       vault:
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
@@ -86,6 +98,7 @@ RETURN = """
 import json
 
 from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
+from ansible.errors import AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 
 
@@ -102,8 +115,13 @@ class LookupModule(LookupBase):
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
         account_id = self.get_option("account_id")
+        connect_host = self.get_option("connect_host")
+        connect_token = self.get_option("connect_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id)
+        if (connect_host or connect_token) and None in (connect_host, connect_token):
+            raise AnsibleOptionsError("connect_host and connect_token are required together")
+
+        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, connect_host, connect_token)
         op.assert_logged_in()
 
         values = []
