@@ -63,7 +63,15 @@ RETURN = '''
     type: bool
 '''
 
-from fqdn import FQDN
+from ansible.errors import AnsibleError
+from ansible.module_utils.six import raise_from
+
+try:
+    from fqdn import FQDN
+except ImportError as imp_exc:
+    ANOTHER_LIBRARY_IMPORT_ERROR = imp_exc
+else:
+    ANOTHER_LIBRARY_IMPORT_ERROR = None
 
 try:
     from ansible.errors import AnsiblePluginRemovedError
@@ -77,6 +85,12 @@ def fqdn_valid(name, min_labels=1, allow_underscores=False):
       - 'srv.example.com' is community.general.fqdn_valid
       - 'foo_bar.example.com' is community.general.fqdn_valid(allow_underscores=True)
     """
+
+    if ANOTHER_LIBRARY_IMPORT_ERROR:
+        raise_from(
+            AnsibleError('Python package fqdn must be installed to use this test.'),
+            ANOTHER_LIBRARY_IMPORT_ERROR
+        )
 
     f = FQDN(name,
              min_labels=min_labels,
