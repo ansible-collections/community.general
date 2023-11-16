@@ -73,11 +73,6 @@ except ImportError as imp_exc:
 else:
     ANOTHER_LIBRARY_IMPORT_ERROR = None
 
-try:
-    from ansible.errors import AnsiblePluginRemovedError
-except ImportError:
-    AnsiblePluginRemovedError = Exception
-
 
 def fqdn_valid(name, min_labels=1, allow_underscores=False):
     """
