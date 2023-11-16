@@ -11,53 +11,28 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: nomad_token
-author: Pedro Nascimento(@apecnascimento)
+author: Pedro Nascimento (@apecnascimento)
 version_added: "1.0.0"
 short_description: Manage Nomad ACL tokens
 description:
-    - Create Bootstrap token
-    - Create ACL token.
-    - Update ACL token.
-    - Delete ACL token
+    - Get info for one token
+    - List nomad tokens
 requirements:
     - python-nomad
 extends_documentation_fragment:
     - community.general.nomad
     - community.general.attributes
-attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+    - community.general.attributes.info_module
+
 options:
     name:
         description:
-            - Name of acl token to create.
+            - Acl token name for get info.
         type: str
-    token_type:
+    accessor_id:
         description:
-            - The type of the token can be "client", "management" or bootstrap.
-        choices: ["client", "management", "bootstrap"]
+            - Acl token AccessorID for get info.
         type: str
-        default: "client"
-    policies:
-        description:
-            - A list of the policies assigned to the token.
-        type: list
-        elements: str
-        default: []
-    global_replicated:
-        description:
-            - indicates whether or not the token was created with the --global.
-        type: bool
-        default: false
-    state:
-        description:
-            - Create or remove acl token.
-        choices: ["present", "absent"]
-        required: true
-        type: str
-
 seealso:
   - name: Nomad acl documentation
     description: Complete documentation for Nomad API acl.
@@ -65,14 +40,16 @@ seealso:
 '''
 
 EXAMPLES = '''
-- name: Create boostrap token
-  community.general.nomad_token:
+- name: List tokens
+  community.general.nomad_acl:
     host: localhost
-    token_type: bootstrap
-    state: present
+  register: nomad_tokens
+
+- name: Show tokens
+
 
 - name: Create acl token
-  community.general.nomad_token:
+  community.general.nomad_acl:
     host: localhost
     name: "Dev token"
     token_type: client
@@ -82,7 +59,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Update acl token Dev token
-  community.general.nomad_token:
+  community.general.nomad_acl:
     host: localhost
     name: "Dev token"
     token_type: client
@@ -93,7 +70,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Delete acl token
-  community.general.nomad_token:
+  community.general.nomad_acl:
     host: localhost
     name: "Dev token"
     state: absent
