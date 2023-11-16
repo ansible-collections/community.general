@@ -5,6 +5,17 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+from ansible.errors import AnsibleError
+from ansible.module_utils.six import raise_from
+
+try:
+    from fqdn import FQDN
+except ImportError as imp_exc:
+    ANOTHER_LIBRARY_IMPORT_ERROR = imp_exc
+else:
+    ANOTHER_LIBRARY_IMPORT_ERROR = None
+
+
 DOCUMENTATION = '''
   name: fqdn_valid
   short_description: Validates fully-qualified domain names against RFC 1123.
@@ -62,16 +73,6 @@ RETURN = '''
     description: Whether the name is valid.
     type: bool
 '''
-
-from ansible.errors import AnsibleError
-from ansible.module_utils.six import raise_from
-
-try:
-    from fqdn import FQDN
-except ImportError as imp_exc:
-    ANOTHER_LIBRARY_IMPORT_ERROR = imp_exc
-else:
-    ANOTHER_LIBRARY_IMPORT_ERROR = None
 
 
 def fqdn_valid(name, min_labels=1, allow_underscores=False):
