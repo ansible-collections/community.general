@@ -246,6 +246,7 @@ def run():
                                                                  token_info)
                     result = {"msg": "Acl token updated.",
                               "token": transform_response(nomad_result)}
+                    changed = True
 
                 else:
                     nomad_result = nomad_client.acl.create_token(token_info)
