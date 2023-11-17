@@ -192,7 +192,11 @@ def run():
         supports_check_mode=True,
         required_one_of=[
             ['name', 'token_type']
-        ]
+        ],
+        required_if=[
+            ('token_type', 'client', ('name', )),
+            ('token_type', 'management', ('name', )),
+        ],
     )
 
     if not import_nomad:
