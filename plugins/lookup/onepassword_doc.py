@@ -79,8 +79,21 @@ class LookupModule(LookupBase):
         master_password = self.get_option("master_password")
         service_account_token = self.get_option("service_account_token")
         account_id = self.get_option("account_id")
+        connect_host = self.get_option("connect_host")
+        connect_token = self.get_option("connect_token")
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, OnePassCLIv2Doc)
+        op = OnePass(
+            subdomain=subdomain,
+            domain=domain,
+            username=username,
+            secret_key=secret_key,
+            master_password=master_password,
+            service_account_token=service_account_token,
+            account_id=account_id,
+            connect_host=connect_host,
+            connect_token=connect_token,
+            cli_class=OnePassCLIv2Doc,
+        )
         op.assert_logged_in()
 
         values = []
