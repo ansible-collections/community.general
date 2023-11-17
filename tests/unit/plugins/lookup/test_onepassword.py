@@ -10,12 +10,6 @@ import itertools
 import json
 import pytest
 
-from .onepassword_conftest import (  # noqa: F401, pylint: disable=unused-import
-    OP_VERSION_FIXTURES,
-    fake_op,
-    opv1,
-    opv2,
-)
 from .onepassword_common import MOCK_ENTRIES
 
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
@@ -24,6 +18,12 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,
     OnePassCLIv2,
 )
+
+
+OP_VERSION_FIXTURES = [
+    "opv1",
+    "opv2"
+]
 
 
 @pytest.mark.parametrize(
@@ -297,8 +297,11 @@ def test_op_doc(mocker):
         )
     ]
 )
-def test_op_connect_partial_args(plugin, connect_host, connect_token):
+def test_op_connect_partial_args(plugin, connect_host, connect_token, mocker):
     op_lookup = lookup_loader.get(plugin)
+
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass._get_cli_class", OnePassCLIv2)
+
     with pytest.raises(AnsibleOptionsError):
         op_lookup.run("login", vault_name="test vault", connect_host=connect_host, connect_token=connect_token)
 

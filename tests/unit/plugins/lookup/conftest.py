@@ -10,12 +10,6 @@ import pytest
 from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
 
 
-OP_VERSION_FIXTURES = [
-    "opv1",
-    "opv2"
-]
-
-
 @pytest.fixture
 def fake_op(mocker):
     def _fake_op(version):
