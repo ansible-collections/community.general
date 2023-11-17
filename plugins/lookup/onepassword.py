@@ -597,6 +597,9 @@ class OnePass(object):
         self._config = OnePasswordConfig()
         self._cli = self._get_cli_class(cli_class)
 
+        if (self.connect_host or self.connect_token) and None in (self.connect_host, self.connect_token):
+            raise AnsibleOptionsError("connect_host and connect_token are required together")
+
     def _get_cli_class(self, cli_class=None):
         if cli_class is not None:
             return cli_class(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
@@ -673,9 +676,6 @@ class LookupModule(LookupBase):
         account_id = self.get_option("account_id")
         connect_host = self.get_option("connect_host")
         connect_token = self.get_option("connect_token")
-
-        if (connect_host or connect_token) and None in (connect_host, connect_token):
-            raise AnsibleOptionsError("connect_host and connect_token are required together")
 
         op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, connect_host, connect_token)
         op.assert_logged_in()
