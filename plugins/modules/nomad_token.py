@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: nomad_token
-author: Pedro Nascimento(@apecnascimento)
+author: Pedro Nascimento (@apecnascimento)
 version_added: "1.0.0"
 short_description: Manage Nomad ACL tokens
 description:
