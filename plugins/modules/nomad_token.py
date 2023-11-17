@@ -270,7 +270,7 @@ def run():
                 result = {'msg': "Acl token deleted.', ", token: {}}
                 changed = True
             else:
-                result = {'msg': "Not found token with name '{0}'".format(module.params.get('name')), token: {}}
+                result = {'msg': "No token with name '{0}' found".format(module.params.get('name')), token: {}}
 
         except Exception as e:
             module.fail_json(msg=to_native(e))
