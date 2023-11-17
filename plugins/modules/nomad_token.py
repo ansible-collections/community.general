@@ -45,7 +45,7 @@ options:
         default: []
     global_replicated:
         description:
-            - indicates whether or not the token was created with the --global.
+            - Indicates whether or not the token was created with the C(--global).
         type: bool
         default: false
     state:
