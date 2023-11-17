@@ -11,14 +11,11 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: nomad_token
-author: Pedro Nascimento(@apecnascimento)
-version_added: "1.0.0"
+author: Pedro Nascimento (@apecnascimento)
+version_added: "8.1.0"
 short_description: Manage Nomad ACL tokens
 description:
-    - Create Bootstrap token
-    - Create ACL token.
-    - Update ACL token.
-    - Delete ACL token
+    - This module allows to create Bootstrap tokens, create ACL tokens, update ACL tokens, and delete ACL tokens.
 requirements:
     - python-nomad
 extends_documentation_fragment:
@@ -36,7 +33,7 @@ options:
         type: str
     token_type:
         description:
-            - The type of the token can be "client", "management" or bootstrap.
+            - The type of the token can be V(client), V(management), or V(bootstrap).
         choices: ["client", "management", "bootstrap"]
         type: str
         default: "client"
@@ -48,7 +45,7 @@ options:
         default: []
     global_replicated:
         description:
-            - indicates whether or not the token was created with the --global.
+            - Indicates whether or not the token was created with the C(--global).
         type: bool
         default: false
     state:
@@ -192,7 +189,11 @@ def run():
         supports_check_mode=True,
         required_one_of=[
             ['name', 'token_type']
-        ]
+        ],
+        required_if=[
+            ('token_type', 'client', ('name', )),
+            ('token_type', 'management', ('name', )),
+        ],
     )
 
     if not import_nomad:
@@ -270,7 +271,7 @@ def run():
                 result = {'msg': "Acl token deleted.', ", token: {}}
                 changed = True
             else:
-                result = {'msg': "Not found token with name '{0}'".format(module.params.get('name')), token: {}}
+                result = {'msg': "No token with name '{0}' found".format(module.params.get('name')), token: {}}
 
         except Exception as e:
             module.fail_json(msg=to_native(e))
