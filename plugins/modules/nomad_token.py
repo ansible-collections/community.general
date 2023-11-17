@@ -36,7 +36,7 @@ options:
         type: str
     token_type:
         description:
-            - The type of the token can be "client", "management" or bootstrap.
+            - The type of the token can be V(client), V(management), or V(bootstrap).
         choices: ["client", "management", "bootstrap"]
         type: str
         default: "client"
