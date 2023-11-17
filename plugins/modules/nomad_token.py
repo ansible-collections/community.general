@@ -15,10 +15,7 @@ author: Pedro Nascimento (@apecnascimento)
 version_added: "8.1.0"
 short_description: Manage Nomad ACL tokens
 description:
-    - Create Bootstrap token
-    - Create ACL token.
-    - Update ACL token.
-    - Delete ACL token
+    - This module allows to create Bootstrap tokens, create ACL tokens, update ACL tokens, and delete ACL tokens.
 requirements:
     - python-nomad
 extends_documentation_fragment:
