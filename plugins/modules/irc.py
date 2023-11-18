@@ -195,7 +195,8 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if use_ssl:
-        irc = ssl.wrap_socket(irc)
+        context = ssl.create_default_context()
+        irc = context.wrap_socket(irc)
     irc.connect((server, int(port)))
 
     if passwd:
