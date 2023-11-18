@@ -15,7 +15,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: gitlab_issue
 short_description: Create, update, or delete GitLab issues
-version_added: '8.0.0'
+version_added: '8.1.0'
 description:
   - Creates an issue if it does not exist.
   - When an issue does exist, it will be updated if the provided parameters are different.
@@ -47,7 +47,7 @@ options:
   description:
     description:
       - A description of the issue.
-      - Gets overridden by a content of file specified at description_path, if found.
+      - Gets overridden by a content of file specified at O(description_path), if found.
     type: str
   description_path:
     description:
