@@ -1,0 +1,5 @@
+minor_changes:
+  - "irc - add ``validate_certs`` option, and rename ``use_ssl`` to ``use_tls``, while keeping ``use_ssl`` as an alias.
+     The default value for ``validate_certs`` is ``false`` for backwards compatibility. We recommend to every user of
+     this module to explicitly set ``use_tls=true`` and `validate_certs=true`` whenever possible, especially when
+     communicating to IRC servers over the internet (https://github.com/ansible-collections/community.general/pull/7550)."
