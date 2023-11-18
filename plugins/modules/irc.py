@@ -84,7 +84,7 @@ options:
       - Designates whether TLS/SSL should be used when connecting to the IRC server
       - O(use_tls) is available since community.general 8.1.0, before the option
         was exlusively called O(use_ssl). The latter is now an alias of O(use_tls).
-      - B(Note): for security reasons, you should always set O(use_tls=true) and
+      - B(Note:) for security reasons, you should always set O(use_tls=true) and
         O(validate_certs=true) whenever possible.
     type: bool
     default: false
@@ -107,7 +107,7 @@ options:
       - If set to V(false), the SSL certificates will not be validated.
       - This should always be set to V(true). Using V(false) is unsafe and should only be done
         if the network between between Ansible and the IRC server is known to be safe.
-      - B(Note): for security reasons, you should always set O(use_tls=true) and
+      - B(Note:) for security reasons, you should always set O(use_tls=true) and
         O(validate_certs=true) whenever possible.
     default: false
     type: bool
