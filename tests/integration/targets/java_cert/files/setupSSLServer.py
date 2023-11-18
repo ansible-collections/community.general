@@ -18,7 +18,14 @@ except ModuleNotFoundError:
     from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 httpd = HTTPServer(('localhost', port), SimpleHTTPRequestHandler)
-httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True,
-                               certfile=os.path.join(root_dir, 'cert.pem'),
-                               keyfile=os.path.join(root_dir, 'key.pem'))
+try:
+    httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True,
+                                   certfile=os.path.join(root_dir, 'cert.pem'),
+                                   keyfile=os.path.join(root_dir, 'key.pem'))
+except AttributeError:
+    # Python 3.12 or newer:
+    context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+    context.load_cert_chain(certfile=os.path.join(root_dir, 'cert.pem'),
+                            keyfile=os.path.join(root_dir, 'key.pem'))
+    httpd.socket = context.wrap_socket(httpd.socket)
 httpd.handle_request()
