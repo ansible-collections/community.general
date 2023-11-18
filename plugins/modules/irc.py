@@ -100,6 +100,14 @@ options:
       - Text style for the message. Note italic does not work on some clients
     choices: [ "bold", "underline", "reverse", "italic", "none" ]
     default: none
+  validate_certs:
+    description:
+      - If set to V(false), the SSL certificates will not be validated.
+      - This should always be set to V(true). Using V(false) is unsafe and should only be done
+        if the network between between Ansible and the IRC server is known to be safe.
+    default: false
+    type: bool
+    version_added: 8.1.0
 
 # informational: requirements for nodes
 requirements: [ socket ]
@@ -154,7 +162,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, key=None, topic=None,
-             nick="ansible", color='none', passwd=False, timeout=30, use_tls=False, part=True, style=None):
+             nick="ansible", color='none', passwd=False, timeout=30, use_tls=False, validate_certs=True,
+             part=True, style=None):
     '''send message to IRC'''
     nick_to = [] if nick_to is None else nick_to
 
@@ -199,13 +208,18 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if use_tls:
-        if getattr(ssl, 'PROTOCOL_TLS', None) is not None:
-            # Supported since Python 2.7.13
-            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+        if validate_certs:
+            try:
+                context = ssl.create_default_context()
+            except AttributeError:
+                raise Exception('Need at least Python 2.7.9 for SSL certificate validation')
         else:
-            context = ssl.SSLContext()
-        context.verify_mode = ssl.CERT_NONE
-        # TODO: create a secure context with `context = ssl.create_default_context()` instead!
+            if getattr(ssl, 'PROTOCOL_TLS', None) is not None:
+                # Supported since Python 2.7.13
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+            else:
+                context = ssl.SSLContext()
+            context.verify_mode = ssl.CERT_NONE
         irc = context.wrap_socket(irc)
     irc.connect((server, int(port)))
 
@@ -287,6 +301,7 @@ def main():
             timeout=dict(type='int', default=30),
             part=dict(type='bool', default=True),
             use_tls=dict(type='bool', default=False, aliases=['use_ssl']),
+            validate_certs=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
         required_one_of=[['channel', 'nick_to']]
@@ -308,9 +323,10 @@ def main():
     use_tls = module.params["use_tls"]
     part = module.params["part"]
     style = module.params["style"]
+    validate_certs = module.params["validate_certs"]
 
     try:
-        send_msg(msg, server, port, channel, nick_to, key, topic, nick, color, passwd, timeout, use_tls, part, style)
+        send_msg(msg, server, port, channel, nick_to, key, topic, nick, color, passwd, timeout, use_tls, validate_certs, part, style)
     except Exception as e:
         module.fail_json(msg="unable to send to IRC: %s" % to_native(e), exception=traceback.format_exc())
 
