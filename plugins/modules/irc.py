@@ -195,7 +195,13 @@ def send_msg(msg, server='localhost', port='6667', channel=None, nick_to=None, k
 
     irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     if use_ssl:
-        context = ssl.create_default_context()
+        if getattr(ssl, 'PROTOCOL_TLS', None) is not None:
+            # Supported since Python 2.7.13
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+        else:
+            context = ssl.SSLContext()
+        context.verify_mode = ssl.CERT_NONE
+        # TODO: create a secure context with `context = ssl.create_default_context()` instead!
         irc = context.wrap_socket(irc)
     irc.connect((server, int(port)))
 
