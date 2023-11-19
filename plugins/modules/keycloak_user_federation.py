@@ -347,8 +347,8 @@ options:
                     - Name of the LDAP attribute, which refers to Kerberos principal.
                       This is used to lookup appropriate LDAP user after successful Kerberos/SPNEGO authentication in Keycloak.
                       When this is empty, the LDAP user will be looked based on LDAP username corresponding
-                      to the first part of his Kerberos principal. For instance, for principal 'john@KEYCLOAK.ORG',
-                      it will assume that LDAP username is 'john'.
+                      to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
+                      it will assume that LDAP username is V(john).
                 type: str
                 version_added: 8.1.0
 
