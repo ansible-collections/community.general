@@ -51,7 +51,8 @@ options:
 notes:
   - On SmartOS the C(sm-set-timezone) utility (part of the smtools package) is required to set the zone timezone
   - On AIX only Olson/tz database timezones are usable (POSIX is not supported).
-    - An OS reboot is also required on AIX for the new timezone setting to take effect.
+    An OS reboot is also required on AIX for the new timezone setting to take effect.
+    Note that AIX 6.1+ is needed (OS level 61 or newer).
 author:
   - Shinichi TAMURA (@tmshn)
   - Jasper Lievisse Adriaanse (@jasperla)
