@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_disk - add ability to manipulate CD-ROM drive (https://github.com/ansible-collections/community.general/pull/7495).

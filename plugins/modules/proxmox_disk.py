@@ -256,6 +256,16 @@ options:
       - The drive's media type.
     type: str
     choices: ['cdrom', 'disk']
+  iso_image:
+    description:
+      - The ISO image to be mounted on the specified in O(disk) CD-ROM.
+      - O(media=cdrom) needs to be specified for this option to work.
+      - "Image string format:"
+      - V(<STORAGE>:iso/<ISO_NAME>) to mount ISO.
+      - V(cdrom) to use physical CD/DVD drive.
+      - V(none) to unmount image from existent CD-ROM or create empty CD-ROM drive.
+    type: str
+    version_added: 8.1.0
   queues:
     description:
       - Number of queues (SCSI only).
@@ -412,6 +422,18 @@ EXAMPLES = '''
     vmid: 101
     disk: scsi4
     state: absent
+
+- name: Mount ISO image on CD-ROM (create drive if missing)
+  community.general.proxmox_disk:
+    api_host: node1
+    api_user: root@pam
+    api_token_id: token1
+    api_token_secret: some-token-data
+    vmid: 101
+    disk: ide2
+    media: cdrom
+    iso_image: local:iso/favorite_distro_amd64.iso
+    state: present
 '''
 
 RETURN = '''
@@ -435,17 +457,41 @@ from time import sleep
 
 
 def disk_conf_str_to_dict(config_string):
+    """
+    Transform Proxmox configuration string for disk element into dictionary which has
+    volume option parsed in '{ storage }:{ volume }' format and other options parsed
+    in '{ option }={ value }' format. This dictionary will be compared afterward with
+    attributes that user passed to this module in playbook.\n
+    config_string examples:
+      - local-lvm:vm-100-disk-0,ssd=1,discard=on,size=25G
+      - local:iso/new-vm-ignition.iso,media=cdrom,size=70k
+      - none,media=cdrom
+    :param config_string: Retrieved from Proxmox API configuration string
+    :return: Dictionary with volume option divided into parts ('volume_name', 'storage_name', 'volume') \n
+        and other options as key:value.
+    """
     config = config_string.split(',')
-    storage_volume = config.pop(0).split(':')
-    config.sort()
-    storage_name = storage_volume[0]
-    volume_name = storage_volume[1]
-    config_current = dict(
-        volume='%s:%s' % (storage_name, volume_name),
-        storage_name=storage_name,
-        volume_name=volume_name
-    )
 
+    # When empty CD-ROM drive present, the volume part of config string is "none".
+    storage_volume = config.pop(0)
+    if storage_volume in ["none", "cdrom"]:
+        config_current = dict(
+            volume=storage_volume,
+            storage_name=None,
+            volume_name=None,
+            size=None,
+        )
+    else:
+        storage_volume = storage_volume.split(':')
+        storage_name = storage_volume[0]
+        volume_name = storage_volume[1]
+        config_current = dict(
+            volume='%s:%s' % (storage_name, volume_name),
+            storage_name=storage_name,
+            volume_name=volume_name,
+        )
+
+    config.sort()
     for option in config:
         k, v = option.split('=')
         config_current[k] = v
@@ -497,13 +543,19 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
 
         if (create == 'regular' and disk not in vm_config) or (create == 'forced'):
             # CREATE
-            attributes = self.get_create_attributes()
-            import_string = attributes.pop('import_from', None)
+            playbook_config = self.get_create_attributes()
+            import_string = playbook_config.pop('import_from', None)
+            iso_image = self.module.params.get('iso_image', None)
 
             if import_string:
+                # When 'import_from' option is present in task options.
                 config_str = "%s:%s,import-from=%s" % (self.module.params["storage"], "0", import_string)
                 timeout_str = "Reached timeout while importing VM disk. Last line in task before timeout: %s"
                 ok_str = "Disk %s imported into VM %s"
+            elif iso_image is not None:
+                # disk=<busN>, media=cdrom, iso_image=<ISO_NAME>
+                config_str = iso_image
+                ok_str = "CD-ROM was created on %s bus in VM %s"
             else:
                 config_str = self.module.params["storage"]
                 if self.module.params.get("media") != "cdrom":
@@ -511,29 +563,41 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
                 ok_str = "Disk %s created in VM %s"
                 timeout_str = "Reached timeout while creating VM disk. Last line in task before timeout: %s"
 
-            for k, v in attributes.items():
+            for k, v in playbook_config.items():
                 config_str += ',%s=%s' % (k, v)
 
             disk_config_to_apply = {self.module.params["disk"]: config_str}
 
         if create in ['disabled', 'regular'] and disk in vm_config:
             # UPDATE
-            disk_config = disk_conf_str_to_dict(vm_config[disk])
-            config_str = disk_config["volume"]
             ok_str = "Disk %s updated in VM %s"
-            attributes = self.get_create_attributes()
-            # 'import_from' fails on disk updates
-            attributes.pop('import_from', None)
+            iso_image = self.module.params.get('iso_image', None)
 
-            for k, v in attributes.items():
+            proxmox_config = disk_conf_str_to_dict(vm_config[disk])
+            # 'import_from' fails on disk updates
+            playbook_config = self.get_create_attributes()
+            playbook_config.pop('import_from', None)
+
+            # Begin composing configuration string
+            if iso_image is not None:
+                config_str = iso_image
+            else:
+                config_str = proxmox_config["volume"]
+            # Append all mandatory fields from playbook_config
+            for k, v in playbook_config.items():
                 config_str += ',%s=%s' % (k, v)
 
-            # Now compare old and new config to detect if changes are needed
+            # Append to playbook_config fields which are constants for disk images
             for option in ['size', 'storage_name', 'volume', 'volume_name']:
-                attributes.update({option: disk_config[option]})
+                playbook_config.update({option: proxmox_config[option]})
+            # CD-ROM is special disk device and its disk image is subject to change
+            if iso_image is not None:
+                playbook_config['volume'] = iso_image
             # Values in params are numbers, but strings are needed to compare with disk_config
-            attributes = dict((k, str(v)) for k, v in attributes.items())
-            if disk_config == attributes:
+            playbook_config = dict((k, str(v)) for k, v in playbook_config.items())
+
+            # Now compare old and new config to detect if changes are needed
+            if proxmox_config == playbook_config:
                 return False, "Disk %s is up to date in VM %s" % (disk, vmid)
 
             disk_config_to_apply = {self.module.params["disk"]: config_str}
@@ -602,6 +666,7 @@ def main():
         iops_wr_max=dict(type='int'),
         iops_wr_max_length=dict(type='int'),
         iothread=dict(type='bool'),
+        iso_image=dict(type='str'),
         mbps=dict(type='float'),
         mbps_max=dict(type='float'),
         mbps_rd=dict(type='float'),
@@ -666,6 +731,7 @@ def main():
             'iops_max_length': 'iops_max',
             'iops_rd_max_length': 'iops_rd_max',
             'iops_wr_max_length': 'iops_wr_max',
+            'iso_image': 'media',
         },
         supports_check_mode=False,
         mutually_exclusive=[
