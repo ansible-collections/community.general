@@ -30,11 +30,13 @@ options:
   user:
     description:
       - Vexata API user with administrative privileges.
+      - Uses the E(VEXATA_USER) environment variable as a fallback.
     required: false
     type: str
   password:
     description:
       - Vexata API user password.
+      - Uses the E(VEXATA_PASSWORD) environment variable as a fallback.
     required: false
     type: str
   validate_certs:
@@ -48,7 +50,6 @@ options:
 requirements:
   - Vexata VX100 storage array with VXOS >= v3.5.0 on storage array
   - vexatapi >= 0.0.1
-  - python >= 2.7
-  - VEXATA_USER and VEXATA_PASSWORD environment variables must be set if
+  - E(VEXATA_USER) and E(VEXATA_PASSWORD) environment variables must be set if
     user and password arguments are not passed to the module directly.
 '''
