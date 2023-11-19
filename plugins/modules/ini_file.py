@@ -23,8 +23,7 @@ description:
   - Manage (add, remove, change) individual settings in an INI-style file without having
     to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
   - Adds missing sections if they don't exist.
-  - Before Ansible 2.0, comments are discarded when the source file is read, and therefore will not show up in the destination file.
-  - Since Ansible 2.3, this module adds missing ending newlines to files to keep in line with the POSIX standard, even when
+  - This module adds missing ending newlines to files to keep in line with the POSIX standard, even when
     no other modifications need to be applied.
 attributes:
   check_mode:
@@ -35,7 +34,6 @@ options:
   path:
     description:
       - Path to the INI-style file; this file is created if required.
-      - Before Ansible 2.3 this option was only usable as O(dest).
     type: path
     required: true
     aliases: [ dest ]
@@ -133,7 +131,6 @@ options:
     version_added: 7.1.0
 notes:
    - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
-   - As of Ansible 2.3, the O(dest) option has been changed to O(path) as default, but O(dest) still works as well.
    - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
 author:
     - Jan-Piet Mens (@jpmens)
@@ -141,7 +138,6 @@ author:
 '''
 
 EXAMPLES = r'''
-# Before Ansible 2.3, option 'dest' was used instead of 'path'
 - name: Ensure "fav=lemonade is in section "[drinks]" in specified file
   community.general.ini_file:
     path: /etc/conf

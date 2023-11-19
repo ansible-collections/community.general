@@ -22,9 +22,6 @@ description:
     On AIX, C(chtz) is used.
   - Make sure that the zoneinfo files are installed with the appropriate OS package, like C(tzdata) (usually always installed,
     when not using a minimal installation like Alpine Linux).
-  - As of Ansible 2.3 support was added for SmartOS and BSDs.
-  - As of Ansible 2.4 support was added for macOS.
-  - As of Ansible 2.9 support was added for AIX 6.1+
   - Windows and HPUX are not supported, please let us know if you find any other OS/distro in which this fails.
 extends_documentation_fragment:
   - community.general.attributes

@@ -62,9 +62,6 @@ options:
         description:
           - Image UUID. Can either be a full UUID or V(*) for all images.
         type: str
-
-requirements:
-    - python >= 2.6
 '''
 
 EXAMPLES = '''

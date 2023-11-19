@@ -30,7 +30,6 @@ author:
   - Samy Coenen (@SamyCoenen)
   - Guillaume Martinez (@Lunik)
 requirements:
-  - python >= 2.7
   - python-gitlab >= 1.5.0
 extends_documentation_fragment:
   - community.general.auth_basic

@@ -173,7 +173,6 @@ options:
     default: 600
     type: int
 requirements:
-    - python >= 2.6
     - softlayer >= 4.1.1
 author:
 - Matt Colton (@mcltn)

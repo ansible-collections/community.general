@@ -18,8 +18,6 @@ DOCUMENTATION = '''
     short_description: notify using software speech synthesizer
     description:
       - This plugin will use the C(say) or C(espeak) program to "speak" about play events.
-    notes:
-      - In Ansible 2.8, this callback has been renamed from C(osx_say) into M(community.general.say).
 '''
 
 import platform

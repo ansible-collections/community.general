@@ -12,7 +12,6 @@ module: python_requirements_info
 short_description: Show python path and assert dependency versions
 description:
   - Get info about available Python requirements on the target host, including listing required libraries and gathering versions.
-  - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module

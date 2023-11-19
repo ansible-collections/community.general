@@ -27,9 +27,7 @@ notes:
    accessing XenServer host in trusted environment or use C(https://) scheme explicitly.'
 - 'To use C(https://) scheme for C(hostname) you have to either import host certificate to your OS certificate store or use C(validate_certs: no)
    which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
-- This module was called C(xenserver_guest_facts) before Ansible 2.9. The usage did not change.
 requirements:
-- python >= 2.6
 - XenAPI
 options:
   name:
