@@ -350,6 +350,8 @@ options:
                       to the first part of his Kerberos principal. For instance, for principal 'john@KEYCLOAK.ORG',
                       it will assume that LDAP username is 'john'.
                 type: str
+                version_added: 8.1.0
+
             serverPrincipal:
                 description:
                     - Full name of server principal for HTTP service including server and domain name. For
