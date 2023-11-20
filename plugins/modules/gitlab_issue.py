@@ -25,7 +25,6 @@ description:
 author:
   - zvaraondrej (@zvaraondrej)
 requirements:
-  - Python >= 2.7
   - python-gitlab >= 2.3.0
 extends_documentation_fragment:
   - community.general.auth_basic
@@ -111,6 +110,7 @@ EXAMPLES = '''
     assignee_ids: "testassignee"
     state_filter: "opened"
     state: present
+
 - name: Delete Issue
   community.general.gitlab_issue:
     api_url: https://gitlab.com
