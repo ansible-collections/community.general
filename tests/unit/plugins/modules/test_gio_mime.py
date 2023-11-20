@@ -11,6 +11,4 @@ from ansible_collections.community.general.plugins.modules import gio_mime
 from .helper import Helper
 
 
-helper = Helper.from_module(gio_mime)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(gio_mime, __name__)
