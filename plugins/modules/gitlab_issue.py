@@ -40,9 +40,9 @@ attributes:
 options:
   assignee_ids:
     description:
-      - Comma separated list of assignees usernames omitting V(@) character.
-      - Set to empty string to unassign all assignees.
-    type: str
+      - A list of assignee usernames omitting V(@) character.
+      - Set to an empty array to unassign all assignees.
+    type: list
   description:
     description:
       - A description of the issue.
@@ -61,9 +61,9 @@ options:
     choices: ["issue", "incident", "test_case"]
   labels:
     description:
-      - Comma separated list of label names.
-    type: str
-    default: ""
+      - A list of label names.
+      - Set to an empty array to remove all labels.
+    type: list
   milestone_id:
     description:
       - The name of the milestone.
@@ -106,8 +106,11 @@ EXAMPLES = '''
     project: "group1/project1"
     title: "Ansible demo Issue"
     description: "Demo Issue description"
-    labels: "Ansible,Demo"
-    assignee_ids: "testassignee"
+    labels:
+        - Ansible
+        - Demo
+    assignee_ids:
+        - testassignee
     state_filter: "opened"
     state: present
 
@@ -280,11 +283,11 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        assignee_ids=dict(type='str', required=False),
+        assignee_ids=dict(type='list', elements='str', required=False),
         description=dict(type='str', required=False),
         description_path=dict(type='path', required=False),
         issue_type=dict(type='str', default='issue', choices=["issue", "incident", "test_case"], required=False),
-        labels=dict(type='str', default="", required=False),
+        labels=dict(type='list', elements='str', required=False),
         milestone_id=dict(type='str', required=False),
         milestone_group_id=dict(type='str', required=False),
         project=dict(type='str', required=True),
@@ -362,8 +365,8 @@ def main():
 
         # sorting necessary in order to properly detect changes, as we don't want to get false positive
         # results due to differences in ids ordering;
-        assignee_ids = sorted(this_gitlab.get_user_ids(assignee_ids.split(","))) if assignee_ids else []
-        labels = sorted(labels.split(",")) if labels else []
+        assignee_ids = sorted(this_gitlab.get_user_ids(assignee_ids)) if assignee_ids else assignee_ids
+        labels = sorted(labels) if labels else labels
 
         options = {
             "title": title,
