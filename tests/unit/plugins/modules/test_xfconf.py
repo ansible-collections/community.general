@@ -17,6 +17,4 @@ from ansible_collections.community.general.plugins.modules import xfconf
 from .helper import Helper
 
 
-helper = Helper.from_module(xfconf)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(xfconf, __name__)

@@ -17,6 +17,4 @@ from ansible_collections.community.general.plugins.modules import cpanm
 from .helper import Helper
 
 
-helper = Helper.from_module(cpanm)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(cpanm, __name__)

@@ -11,6 +11,4 @@ from ansible_collections.community.general.plugins.modules import opkg
 from .helper import Helper
 
 
-helper = Helper.from_module(opkg)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(opkg, __name__)

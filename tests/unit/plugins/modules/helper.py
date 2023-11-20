@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import sys
 import json
 from collections import namedtuple
 from itertools import chain, repeat
@@ -108,11 +109,13 @@ class Helper(object):
             return helper
 
     @staticmethod
-    def from_module(module):
+    def from_module(module, test_module_name):
         basename = module.__name__.split(".")[-1]
         test_spec = "tests/unit/plugins/modules/test_{0}.yaml".format(basename)
         helper = Helper.from_file(module.main, test_spec)
-        return helper
+
+        setattr(sys.modules[test_module_name], "patch_bin", helper.cmd_fixture)
+        setattr(sys.modules[test_module_name], "test_module", helper.test_module)
 
     def __init__(self, module_main, test_cases):
         self.module_main = module_main

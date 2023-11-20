@@ -11,6 +11,4 @@ from ansible_collections.community.general.plugins.modules import facter_facts
 from .helper import Helper
 
 
-helper = Helper.from_module(facter_facts)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(facter_facts, __name__)
