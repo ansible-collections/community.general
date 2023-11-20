@@ -10,6 +10,4 @@ from ansible_collections.community.general.plugins.modules import xfconf_info
 from .helper import Helper
 
 
-helper = Helper.from_module(xfconf_info)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(xfconf_info, __name__)
