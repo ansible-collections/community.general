@@ -43,6 +43,7 @@ options:
       - A list of assignee usernames omitting V(@) character.
       - Set to an empty array to unassign all assignees.
     type: list
+    elements: str
   description:
     description:
       - A description of the issue.
@@ -64,6 +65,7 @@ options:
       - A list of label names.
       - Set to an empty array to remove all labels.
     type: list
+    elements: str
   milestone_id:
     description:
       - The name of the milestone.
