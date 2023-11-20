@@ -186,7 +186,7 @@ def run():
             policies=dict(type='list', elements='str', default=[]),
             global_replicated=dict(type='bool', default=False),
         ),
-        supports_check_mode=True,
+        supports_check_mode=False,
         required_one_of=[
             ['name', 'token_type']
         ],
