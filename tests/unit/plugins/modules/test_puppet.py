@@ -17,6 +17,4 @@ from ansible_collections.community.general.plugins.modules import puppet
 from .helper import Helper
 
 
-helper = Helper.from_module(puppet)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_module(puppet, __name__)
