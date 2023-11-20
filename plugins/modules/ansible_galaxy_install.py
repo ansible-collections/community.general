@@ -37,7 +37,6 @@ options:
       - The type of installation performed by C(ansible-galaxy).
       - If O(type=both), then O(requirements_file) must be passed and it may contain both roles and collections.
       - "Note however that the opposite is not true: if using a O(requirements_file), then O(type) can be any of the three choices."
-      - "B(Ansible 2.9): The option V(both) will have the same effect as V(role)."
     type: str
     choices: [collection, role, both]
     required: true
@@ -54,7 +53,6 @@ options:
       - Path to a file containing a list of requirements to be installed.
       - It works for O(type) equals to V(collection) and V(role).
       - O(name) and O(requirements_file) are mutually exclusive.
-      - "B(Ansible 2.9): It can only be used to install either O(type=role) or O(type=collection), but not both at the same run."
     type: path
   dest:
     description:
