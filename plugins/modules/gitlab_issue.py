@@ -73,7 +73,7 @@ options:
     type: str
   milestone_group_id:
     description:
-      - The path or name of the group hosting desired milestone.
+      - The path or numeric ID of the group hosting desired milestone.
     type: str
   project:
     description:
@@ -94,7 +94,7 @@ options:
     default: opened
   title:
     description:
-      - A title for the issue.
+      - A title for the issue. The title is used as a unique identifier to ensure idempotency.
     type: str
     required: true
 '''
@@ -394,12 +394,12 @@ def main():
                 )
             else:
                 module.exit_json(
-                    changed=False, msg="Issue '{t}' already exist".format(t=title),
+                    changed=False, msg="Issue '{t}' already exists".format(t=title),
                     issue=this_issue.asdict()
                 )
     elif state == "absent":
         if not this_issue:
-            module.exit_json(changed=False, msg="Issue '{t}' already deleted.".format(t=title))
+            module.exit_json(changed=False, msg="Issue '{t}' does not exist or has already been deleted.".format(t=title))
         else:
             issue = this_gitlab.delete_issue(this_issue)
             module.exit_json(
