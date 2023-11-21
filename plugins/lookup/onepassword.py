@@ -457,6 +457,7 @@ class OnePassCLIv2(OnePassCLIBase):
             }
         """
         data = json.loads(data_json)
+        field_name = field_name.lower()
         for field in data.get("fields", []):
             if section_title is None:
                 # If the field name exists in the section, return that value
@@ -465,17 +466,22 @@ class OnePassCLIv2(OnePassCLIBase):
 
                 # If the field name doesn't exist in the section, match on the value of "label"
                 # then "id" and return "value"
-                if field.get("label") == field_name:
+                if field.get("label").lower() == field_name:
                     return field.get("value", "")
 
-                if field.get("id") == field_name:
+                if field.get("id").lower() == field_name:
                     return field.get("value", "")
 
             # Look at the section data and get an identifier. The value of 'id' is either a unique ID
             # or a human-readable string. If a 'label' field exists, prefer that since
             # it is the value visible in the 1Password UI when both 'id' and 'label' exist.
             section = field.get("section", {})
-            current_section_title = section.get("label", section.get("id"))
+            try:
+                section_title = section_title.lower()
+            except AttributeError:
+                pass
+
+            current_section_title = section.get("label", section.get("id", "")).lower()
             if section_title == current_section_title:
                 # In the correct section. Check "label" then "id" for the desired field_name
                 if field.get("label") == field_name:
