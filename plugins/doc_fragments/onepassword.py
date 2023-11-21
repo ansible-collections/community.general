@@ -55,6 +55,10 @@ options:
     env:
       - name: OP_CONNECT_TOKEN
     version_added: 8.1.0
+'''
+
+    LOOKUP = r'''
+options: {}
 notes:
   - This lookup will use an existing 1Password session if one exists. If not, and you have already
     performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the

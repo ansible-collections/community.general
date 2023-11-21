@@ -27,6 +27,7 @@ DOCUMENTATION = '''
 
     extends_documentation_fragment:
       - community.general.onepassword
+      - community.general.onepassword.lookup
 '''
 
 EXAMPLES = """
