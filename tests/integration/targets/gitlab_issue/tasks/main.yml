@@ -62,7 +62,7 @@
       assignee_ids: "{{ gitlab_assignee_ids }}"
       description_path: "{{ gitlab_description_path }}"
       labels: "{{ gitlab_labels }}"
-      milestone_id: "{{ gitlab_milestone_id }}"
+      milestone_search: "{{ gitlab_milestone_search }}"
       milestone_group_id: "{{ gitlab_milestone_group_id }}"
       project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
       state: present
@@ -75,14 +75,14 @@
         - gitlab_issue_update_additions.issue.labels[0] == "{{ gitlab_labels[0] }}"
         - gitlab_issue_update_additions.issue.assignees[0].username == "{{ gitlab_assignee_ids[0] }}"
         - "'### Description\n\nIssue test description' in gitlab_issue_update_additions.issue.description"
-        - gitlab_issue_update_additions.issue.milestone.title == "{{ gitlab_milestone_id }}"
+        - gitlab_issue_update_additions.issue.milestone.title == "{{ gitlab_milestone_search }}"
 
   - name: Update Issue Test ( Persistence )
     gitlab_issue:
       api_token: "{{ gitlab_api_token }}"
       api_url: "{{ gitlab_host }}"
       description_path: "{{ gitlab_description_path }}"
-      milestone_id: "{{ gitlab_milestone_id }}"
+      milestone_search: "{{ gitlab_milestone_search }}"
       milestone_group_id: "{{ gitlab_milestone_group_id }}"
       project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
       state: present
@@ -102,7 +102,7 @@
       assignee_ids: []
       description_path: "{{ gitlab_description_path }}"
       labels: []
-      milestone_id: ""
+      milestone_search: ""
       milestone_group_id: ""
       project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
       state: present

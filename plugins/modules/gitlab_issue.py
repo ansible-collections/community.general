@@ -66,7 +66,7 @@ options:
       - Set to an empty array to remove all labels.
     type: list
     elements: str
-  milestone_id:
+  milestone_search:
     description:
       - The name of the milestone.
       - Set to empty string to unassign milestone.
@@ -290,7 +290,7 @@ def main():
         description_path=dict(type='path', required=False),
         issue_type=dict(type='str', default='issue', choices=["issue", "incident", "test_case"], required=False),
         labels=dict(type='list', elements='str', required=False),
-        milestone_id=dict(type='str', required=False),
+        milestone_search=dict(type='str', required=False),
         milestone_group_id=dict(type='str', required=False),
         project=dict(type='str', required=True),
         state=dict(type='str', default="present", choices=["absent", "present"]),
@@ -310,7 +310,7 @@ def main():
         ],
         required_together=[
             ['api_username', 'api_password'],
-            ['milestone_id', 'milestone_group_id'],
+            ['milestone_search', 'milestone_group_id'],
         ],
         required_one_of=[
             ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
@@ -323,7 +323,7 @@ def main():
     description_path = module.params['description_path']
     issue_type = module.params['issue_type']
     labels = module.params['labels']
-    milestone_id = module.params['milestone_id']
+    milestone_id = module.params['milestone_search']
     milestone_group_id = module.params['milestone_group_id']
     project = module.params['project']
     state = module.params['state']

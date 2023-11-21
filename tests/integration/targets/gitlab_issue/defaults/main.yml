@@ -9,7 +9,7 @@ gitlab_project_group: ansible_test_group
 gitlab_host: ansible_test_host
 gitlab_api_token: ansible_test_api_token
 gitlab_labels: ansible_test_label
-gitlab_milestone_id: ansible_test_milestone_id
+gitlab_milestone_search: ansible_test_milestone_search
 gitlab_milestone_group_id: ansible_test_milestone_group_id
 gitlab_assignee_ids: ansible_test_assignee_ids
 gitlab_description_path: ansible_test_description_path
