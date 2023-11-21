@@ -520,15 +520,20 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         # Remove all empty kwarg entries
         kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
-        kwargs["cpulimit"] = cpus
-        kwargs["rootfs"] = disk
+        if cpus is not None:
+            kwargs["cpulimit"] = cpus
+        if disk is not None:
+            kwargs["rootfs"] = disk
+        if memory is not None:
+            kwargs["memory"] = memory
+        if swap is not None:
+            kwargs["swap"] = swap
         if "netif" in kwargs:
             kwargs.update(kwargs["netif"])
             del kwargs["netif"]
         if "mounts" in kwargs:
             kwargs.update(kwargs["mounts"])
             del kwargs["mounts"]
-
         # LXC tags are expected to be valid and presented as a comma/semi-colon delimited string
         if "tags" in kwargs:
             re_tag = re.compile(r"^[a-z0-9_][a-z0-9_\-\+\.]*$")
@@ -537,9 +542,31 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     self.module.fail_json(msg="%s is not a valid tag" % tag)
             kwargs["tags"] = ",".join(kwargs["tags"])
 
-        getattr(proxmox_node, VZ_TYPE)(vmid).config.put(
-            vmid=vmid, node=node, memory=memory, swap=swap, **kwargs
-        )
+        # fetch the current config
+        current_config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
+        
+        # compare the requested config against the current
+        update_config = False
+        for (arg, value) in kwargs.items():
+            # some values are lists, the order isn't always the same, so split them and compare by key
+            if isinstance(value, str):
+                current_values = current_config[arg].split(",")
+                requested_values = value.split(",")
+                for new_value in requested_values:
+                    if new_value not in current_values:
+                        update_config = True
+                        break
+            # if it's not a list (or string) just compare the current value
+            else:
+                # some types don't match with the API, so forcing to string for comparison
+                if str(value) != str(current_config[arg]):
+                    update_config = True
+                    break
+        
+        if update_config:
+            getattr(proxmox_node, VZ_TYPE)(vmid).config.put(vmid=vmid, node=node, **kwargs)
+        else:
+            self.module.exit_json(changed=False, msg="Container config is already up to date")
 
     def create_instance(self, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
 
