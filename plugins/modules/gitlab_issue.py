@@ -315,10 +315,6 @@ def main():
         required_one_of=[
             ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
-        required_if=[
-            ['state', 'present', ['project', 'title'], True],
-            ['state', 'absent', ['project', 'title'], True],
-        ],
         supports_check_mode=True
     )
 
