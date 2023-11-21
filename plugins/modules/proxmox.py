@@ -544,7 +544,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         # fetch the current config
         current_config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
-        
+
         # compare the requested config against the current
         update_config = False
         for (arg, value) in kwargs.items():
@@ -562,7 +562,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 if str(value) != str(current_config[arg]):
                     update_config = True
                     break
-        
+
         if update_config:
             getattr(proxmox_node, VZ_TYPE)(vmid).config.put(vmid=vmid, node=node, **kwargs)
         else:
