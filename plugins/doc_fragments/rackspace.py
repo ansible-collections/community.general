@@ -43,15 +43,14 @@ options:
     type: bool
     aliases: [ verify_ssl ]
 requirements:
-  - python >= 2.6
   - pyrax
 notes:
   - The following environment variables can be used, E(RAX_USERNAME),
     E(RAX_API_KEY), E(RAX_CREDS_FILE), E(RAX_CREDENTIALS), E(RAX_REGION).
   - E(RAX_CREDENTIALS) and E(RAX_CREDS_FILE) point to a credentials file
-    appropriate for pyrax. See U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#authenticating)
-  - E(RAX_USERNAME) and E(RAX_API_KEY) obviate the use of a credentials file
-  - E(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...)
+    appropriate for pyrax. See U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#authenticating).
+  - E(RAX_USERNAME) and E(RAX_API_KEY) obviate the use of a credentials file.
+  - E(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...).
 '''
 
     # Documentation fragment including attributes to enable communication
@@ -67,7 +66,7 @@ options:
     type: str
     description:
       - The URI of the authentication service.
-      - If not specified will be set to U(https://identity.api.rackspacecloud.com/v2.0/)
+      - If not specified will be set to U(https://identity.api.rackspacecloud.com/v2.0/).
   credentials:
     type: path
     description:
@@ -110,13 +109,12 @@ deprecated:
   why: This module relies on the deprecated package pyrax.
   alternative: Use the Openstack modules instead.
 requirements:
-  - python >= 2.6
   - pyrax
 notes:
   - The following environment variables can be used, E(RAX_USERNAME),
     E(RAX_API_KEY), E(RAX_CREDS_FILE), E(RAX_CREDENTIALS), E(RAX_REGION).
   - E(RAX_CREDENTIALS) and E(RAX_CREDS_FILE) points to a credentials file
-    appropriate for pyrax. See U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#authenticating)
-  - E(RAX_USERNAME) and E(RAX_API_KEY) obviate the use of a credentials file
-  - E(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...)
+    appropriate for pyrax. See U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#authenticating).
+  - E(RAX_USERNAME) and E(RAX_API_KEY) obviate the use of a credentials file.
+  - E(RAX_REGION) defines a Rackspace Public Cloud region (DFW, ORD, LON, ...).
 '''

@@ -64,7 +64,7 @@ options:
     description:
       - Configures the transport connection to use when connecting to the
         remote device.  The transport argument supports connectivity to the
-        device over ssh, cli or REST.
+        device over SSH (V(ssh)), CLI (V(cli)), or REST (V(rest)).
     required: true
     type: str
     choices: [ cli, rest, ssh ]

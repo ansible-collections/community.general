@@ -32,11 +32,10 @@ options:
       - FlashBlade API token for admin privileged user.
     type: str
 notes:
-  - This module requires the C(purity_fb) Python library
+  - This module requires the C(purity_fb) Python library.
   - You must set E(PUREFB_URL) and E(PUREFB_API) environment variables
-    if O(fb_url) and O(api_token) arguments are not passed to the module directly
+    if O(fb_url) and O(api_token) arguments are not passed to the module directly.
 requirements:
-  - python >= 2.7
   - purity_fb >= 1.1
 '''
 
@@ -54,10 +53,9 @@ options:
     type: str
     required: true
 notes:
-  - This module requires the C(purestorage) Python library
+  - This module requires the C(purestorage) Python library.
   - You must set E(PUREFA_URL) and E(PUREFA_API) environment variables
-    if O(fa_url) and O(api_token) arguments are not passed to the module directly
+    if O(fa_url) and O(api_token) arguments are not passed to the module directly.
 requirements:
-  - python >= 2.7
   - purestorage
 '''

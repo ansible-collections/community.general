@@ -39,8 +39,7 @@ options:
         default: sysadmin
 requirements:
   - An EMC VNX Storage device.
-  - Ansible 2.7.
-  - storops (0.5.10 or greater). Install using 'pip install storops'.
+  - storops (0.5.10 or greater). Install using C(pip install storops).
 notes:
-  - The modules prefixed with emc_vnx are built to support the EMC VNX storage platform.
+  - The modules prefixed with C(emc_vnx) are built to support the EMC VNX storage platform.
 '''

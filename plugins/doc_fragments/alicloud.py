@@ -47,7 +47,7 @@ options:
     aliases: ['assume_role']
   alicloud_assume_role_arn:
     description:
-      - The Alibaba Cloud role_arn. The ARN of the role to assume. If ARN is set to an empty string,
+      - The Alibaba Cloud C(role_arn). The ARN of the role to assume. If ARN is set to an empty string,
         it does not perform role switching. It supports environment variable E(ALICLOUD_ASSUME_ROLE_ARN).
         ansible will execute with provided credentials.
     aliases: ['assume_role_arn']
@@ -61,7 +61,7 @@ options:
     type: str
   alicloud_assume_role_session_expiration:
     description:
-      - The Alibaba Cloud session_expiration. The time after which the established session for assuming
+      - The Alibaba Cloud C(session_expiration). The time after which the established session for assuming
         role expires. Valid value range 900-3600 seconds. Default to 3600 (in this case Alicloud use own default
         value). It supports environment variable E(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION).
     aliases: ['assume_role_session_expiration']
@@ -85,12 +85,12 @@ options:
     description:
       - This is the path to the shared credentials file. It can also be sourced from the E(ALICLOUD_SHARED_CREDENTIALS_FILE)
         environment variable.
-      - If this is not set and a profile is specified,  ~/.aliyun/config.json will be used.
+      - If this is not set and a profile is specified, C(~/.aliyun/config.json) will be used.
     type: str
 author:
     - "He Guimin (@xiaozhu36)"
 requirements:
-    - "python >= 3.6"
+    - "Python >= 3.6"
 notes:
   - If parameters are not set within the module, the following
     environment variables can be used in decreasing order of precedence
@@ -103,7 +103,7 @@ notes:
     E(ALICLOUD_PROFILE),
     E(ALICLOUD_ASSUME_ROLE_ARN),
     E(ALICLOUD_ASSUME_ROLE_SESSION_NAME),
-    E(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION),
+    E(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION).
   - E(ALICLOUD_REGION) or E(ALICLOUD_REGION_ID) can be typically be used to specify the
-    ALICLOUD region, when required, but this can also be configured in the footmark config file
+    Alicloud region, when required, but this can also be configured in the footmark config file
 '''

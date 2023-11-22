@@ -16,32 +16,29 @@ options:
   hostname:
     description:
     - The hostname or IP address on which InfluxDB server is listening.
-    - Since Ansible 2.5, defaulted to localhost.
     type: str
     default: localhost
   username:
     description:
     - Username that will be used to authenticate against InfluxDB server.
-    - Alias O(login_username) added in Ansible 2.5.
     type: str
     default: root
     aliases: [ login_username ]
   password:
     description:
     - Password that will be used to authenticate against InfluxDB server.
-    - Alias O(login_password) added in Ansible 2.5.
     type: str
     default: root
     aliases: [ login_password ]
   port:
     description:
-    - The port on which InfluxDB server is listening
+    - The port on which InfluxDB server is listening.
     type: int
     default: 8086
   path:
     description:
-    - The path on which InfluxDB server is accessible
-    - Only available when using python-influxdb >= 5.1.0
+    - The path on which InfluxDB server is accessible.
+    - Only available when using python-influxdb >= 5.1.0.
     type: str
     default: ''
     version_added: '0.2.0'
@@ -64,7 +61,7 @@ options:
     description:
     - Number of retries client will try before aborting.
     - V(0) indicates try until success.
-    - Only available when using python-influxdb >= 4.1.0
+    - Only available when using python-influxdb >= 4.1.0.
     type: int
     default: 3
   use_udp:

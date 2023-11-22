@@ -10,22 +10,21 @@ __metaclass__ = type
 class ModuleDocFragment(object):
     DOCUMENTATION = """
     requirements:
-        - "python >= 2.7"
-        -  Python SDK for Oracle Cloud Infrastructure U(https://oracle-cloud-infrastructure-python-sdk.readthedocs.io)
+        - Python SDK for Oracle Cloud Infrastructure U(https://oracle-cloud-infrastructure-python-sdk.readthedocs.io)
     notes:
-        - For OCI python sdk configuration, please refer to
-          U(https://oracle-cloud-infrastructure-python-sdk.readthedocs.io/en/latest/configuration.html)
+        - For OCI Python SDK configuration, please refer to
+          U(https://oracle-cloud-infrastructure-python-sdk.readthedocs.io/en/latest/configuration.html).
     options:
         config_file_location:
             description:
                 - Path to configuration file. If not set then the value of the E(OCI_CONFIG_FILE) environment variable,
-                  if any, is used. Otherwise, defaults to ~/.oci/config.
+                  if any, is used. Otherwise, defaults to C(~/.oci/config).
             type: str
         config_profile_name:
             description:
                 - The profile to load from the config file referenced by O(config_file_location). If not set, then the
                   value of the E(OCI_CONFIG_PROFILE) environment variable, if any, is used. Otherwise, defaults to the
-                  "DEFAULT" profile in O(config_file_location).
+                  C(DEFAULT) profile in O(config_file_location).
             default: "DEFAULT"
             type: str
         api_user:
@@ -70,8 +69,8 @@ class ModuleDocFragment(object):
             description:
                 - OCID of your tenancy. If not set, then the value of the OCI_TENANCY variable, if any, is
                   used. This option is required if the tenancy OCID is not specified through a configuration file
-                  (See O(config_file_location)). To get the tenancy OCID, please refer
-                  U(https://docs.us-phoenix-1.oraclecloud.com/Content/API/Concepts/apisigningkey.htm)
+                  (See O(config_file_location)). To get the tenancy OCID, please refer to
+                  U(https://docs.us-phoenix-1.oraclecloud.com/Content/API/Concepts/apisigningkey.htm).
             type: str
         region:
             description:

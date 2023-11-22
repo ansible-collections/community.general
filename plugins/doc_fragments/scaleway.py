@@ -42,7 +42,7 @@ options:
     type: bool
     default: true
 notes:
-  - Also see the API documentation on U(https://developer.scaleway.com/)
+  - Also see the API documentation on U(https://developer.scaleway.com/).
   - If O(api_token) is not set within the module, the following
     environment variables can be used in decreasing order of precedence
     E(SCW_TOKEN), E(SCW_API_KEY), E(SCW_OAUTH_TOKEN) or E(SCW_API_TOKEN).

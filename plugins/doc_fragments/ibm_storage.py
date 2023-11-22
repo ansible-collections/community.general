@@ -31,8 +31,7 @@ options:
         required: true
 notes:
   - This module requires pyxcli python library.
-    Use 'pip install pyxcli' in order to get pyxcli.
+    Use C(pip install pyxcli) in order to get pyxcli.
 requirements:
-  - python >= 2.7
   - pyxcli
 '''

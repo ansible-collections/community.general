@@ -20,10 +20,10 @@ options:
   region:
     description:
       - The target region.
-      - Regions are defined in Apache libcloud project [libcloud/common/dimensiondata.py]
-      - They are also listed in U(https://libcloud.readthedocs.io/en/latest/compute/drivers/dimensiondata.html)
-      - Note that the default value "na" stands for "North America".
-      - The module prepends 'dd-' to the region choice.
+      - Regions are defined in Apache libcloud project [libcloud/common/dimensiondata.py].
+      - They are also listed in U(https://libcloud.readthedocs.io/en/latest/compute/drivers/dimensiondata.html).
+      - Note that the default value C(na) stands for "North America".
+      - The module prepends C(dd-) to the region choice.
     type: str
     default: na
   mcp_user:
