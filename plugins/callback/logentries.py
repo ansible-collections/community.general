@@ -18,7 +18,7 @@ DOCUMENTATION = '''
     requirements:
       - whitelisting in configuration
       - certifi (Python library)
-      - flatdict (Python library), if you want to use the 'flatten' option
+      - flatdict (Python library), if you want to use the O(flatten) option
     options:
       api:
         description: URI to the Logentries API.
@@ -90,9 +90,9 @@ examples: >
     api = data.logentries.com
     port = 10000
     tls_port = 20000
-    use_tls = no
+    use_tls = true
     token = dd21fc88-f00a-43ff-b977-e3a4233c53af
-    flatten = False
+    flatten = false
 '''
 
 import os
