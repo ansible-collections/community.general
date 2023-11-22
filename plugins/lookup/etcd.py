@@ -54,7 +54,7 @@ EXAMPLES = '''
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.etcd', 'foo', 'bar', 'baz') }}"
 
-- name: "since Ansible 2.5 you can set server options inline"
+- name: "you can set server options inline"
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.etcd', 'foo', version='v2', url='http://192.168.0.27:4001') }}"
 '''
@@ -62,7 +62,7 @@ EXAMPLES = '''
 RETURN = '''
     _raw:
         description:
-            - list of values associated with input keys
+            - List of values associated with input keys.
         type: list
         elements: string
 '''

@@ -19,7 +19,6 @@ description:
     token = <YOUR TOKEN>
     Full documentation available at https://help.spotinst.com/hc/en-us/articles/115003530285-Ansible-
 requirements:
-  - python >= 2.7
   - spotinst_sdk >= 1.0.38
 extends_documentation_fragment:
   - community.general.attributes

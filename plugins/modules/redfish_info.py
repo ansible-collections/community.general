@@ -16,8 +16,6 @@ description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     get information back.
   - Information retrieved is placed in a location specified by the user.
-  - This module was called C(redfish_facts) before Ansible 2.9, returning C(ansible_facts).
-    Note that the M(community.general.redfish_info) module no longer returns C(ansible_facts)!
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module

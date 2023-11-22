@@ -93,7 +93,6 @@ options:
     type: bool
     default: false
 requirements:
-  - "python >= 2.6"
   - pyghmi
 author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
 '''

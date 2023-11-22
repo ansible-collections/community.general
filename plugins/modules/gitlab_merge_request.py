@@ -26,7 +26,6 @@ description:
 author:
   - zvaraondrej (@zvaraondrej)
 requirements:
-  - Python >= 2.7
   - python-gitlab >= 2.3.0
 extends_documentation_fragment:
   - community.general.auth_basic

@@ -64,7 +64,6 @@ options:
     description:
       - The state of the user defaults.
       - If set to V(list) will query the given parameter specified by O(key). Returns V(null) is nothing found or mis-spelled.
-      - V(list) added in Ansible 2.8.
     type: str
     choices: [ absent, list, present ]
     default: present

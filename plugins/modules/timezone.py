@@ -22,9 +22,6 @@ description:
     On AIX, C(chtz) is used.
   - Make sure that the zoneinfo files are installed with the appropriate OS package, like C(tzdata) (usually always installed,
     when not using a minimal installation like Alpine Linux).
-  - As of Ansible 2.3 support was added for SmartOS and BSDs.
-  - As of Ansible 2.4 support was added for macOS.
-  - As of Ansible 2.9 support was added for AIX 6.1+
   - Windows and HPUX are not supported, please let us know if you find any other OS/distro in which this fails.
 extends_documentation_fragment:
   - community.general.attributes
@@ -54,7 +51,8 @@ options:
 notes:
   - On SmartOS the C(sm-set-timezone) utility (part of the smtools package) is required to set the zone timezone
   - On AIX only Olson/tz database timezones are usable (POSIX is not supported).
-    - An OS reboot is also required on AIX for the new timezone setting to take effect.
+    An OS reboot is also required on AIX for the new timezone setting to take effect.
+    Note that AIX 6.1+ is needed (OS level 61 or newer).
 author:
   - Shinichi TAMURA (@tmshn)
   - Jasper Lievisse Adriaanse (@jasperla)

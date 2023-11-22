@@ -43,8 +43,7 @@ options:
         type: str
     force:
         description:
-            - Discards uncommitted changes. Runs C(hg update -C).  Prior to
-              Ansible 1.9, the default was V(true).
+            - Discards uncommitted changes. Runs C(hg update -C).
         type: bool
         default: false
     purge:

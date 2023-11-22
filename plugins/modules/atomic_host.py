@@ -21,7 +21,6 @@ notes:
     - Host should be an atomic platform (verified by existence of '/run/ostree-booted' file).
 requirements:
   - atomic
-  - python >= 2.6
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

@@ -354,8 +354,6 @@ options:
     description:
       - ZFS pool the VM's zone dataset will be created in.
     type: str
-requirements:
-    - python >= 2.6
 '''
 
 EXAMPLES = '''

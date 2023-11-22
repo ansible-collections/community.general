@@ -44,7 +44,6 @@ notes:
   useful for bootstrapping newly deployed VMs, much less for reconfiguring existing ones. More info here:
   U(https://support.citrix.com/article/CTX226713)'
 requirements:
-- python >= 2.6
 - XenAPI
 attributes:
   check_mode:

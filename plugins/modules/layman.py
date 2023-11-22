@@ -19,7 +19,6 @@ description:
   - Uses Layman to manage an additional repositories for the Portage package manager on Gentoo Linux.
     Please note that Layman must be installed on a managed node prior using this module.
 requirements:
-  - "python >= 2.6"
   - layman python module
 extends_documentation_fragment:
   - community.general.attributes

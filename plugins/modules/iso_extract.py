@@ -70,9 +70,6 @@ options:
 notes:
 - Only the file checksum (content) is taken into account when extracting files
   from the ISO image. If O(force=false), only checks the presence of the file.
-- In Ansible 2.3 this module was using C(mount) and C(umount) commands only,
-  requiring root access. This is no longer needed with the introduction of 7zip
-  for extraction.
 '''
 
 EXAMPLES = r'''

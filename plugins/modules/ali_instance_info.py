@@ -31,7 +31,6 @@ short_description: Gather information on instances of Alibaba Cloud ECS
 description:
      - This module fetches data from the Open API in Alicloud.
        The module must be called from within the ECS instance itself.
-     - This module was called C(ali_instance_facts) before Ansible 2.9. The usage did not change.
 
 attributes:
     check_mode:
@@ -61,7 +60,7 @@ options:
 author:
     - "He Guimin (@xiaozhu36)"
 requirements:
-    - "python >= 3.6"
+    - "Python >= 3.6"
     - "footmark >= 1.13.0"
 extends_documentation_fragment:
     - community.general.alicloud

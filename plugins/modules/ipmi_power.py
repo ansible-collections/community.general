@@ -90,7 +90,6 @@ options:
         type: str
 
 requirements:
-  - "python >= 2.6"
   - pyghmi
 author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
 '''

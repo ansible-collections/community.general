@@ -16,7 +16,6 @@ description:
   - Write data points into InfluxDB.
 author: "René Moser (@resmo)"
 requirements:
-  - "python >= 2.6"
   - "influxdb >= 0.9"
 attributes:
   check_mode:

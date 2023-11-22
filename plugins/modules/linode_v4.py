@@ -14,7 +14,6 @@ module: linode_v4
 short_description: Manage instances on the Linode cloud
 description: Manage instances on the Linode cloud.
 requirements:
-  - python >= 2.7
   - linode_api4 >= 2.0.0
 author:
   - Luke Murphy (@decentral1se)

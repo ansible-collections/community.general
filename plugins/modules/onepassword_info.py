@@ -26,9 +26,6 @@ description:
     - M(community.general.onepassword_info) wraps the C(op) command line utility to fetch data about one or more 1Password items.
     - A fatal error occurs if any of the items being searched for can not be found.
     - Recommend using with the C(no_log) option to avoid logging the values of the secrets being retrieved.
-    - This module was called C(onepassword_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(community.general.onepassword_info) module no longer returns C(ansible_facts)!
-      You must now use the C(register) keyword to use the facts in other tasks.
 extends_documentation_fragment:
     - community.general.attributes
     - community.general.attributes.info_module

@@ -13,8 +13,6 @@ DOCUMENTATION = r'''
 module: cloudflare_dns
 author:
 - Michael Gruener (@mgruener)
-requirements:
-   - python >= 2.6
 short_description: Manage Cloudflare DNS records
 description:
    - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)."
@@ -99,7 +97,6 @@ options:
     description:
     - Service protocol. Required for O(type=SRV) and O(type=TLSA).
     - Common values are TCP and UDP.
-    - Before Ansible 2.6 only TCP and UDP were available.
     type: str
   proxied:
     description:
@@ -151,7 +148,6 @@ options:
   type:
     description:
       - The type of DNS record to create. Required if O(state=present).
-      - O(type=DS), O(type=SSHFP), and O(type=TLSA) were added in Ansible 2.7.
     type: str
     choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, CAA, TXT ]
   value:

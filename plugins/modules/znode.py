@@ -81,7 +81,6 @@ options:
         version_added: '6.5.0'
 requirements:
     - kazoo >= 2.1
-    - python >= 2.6
 author: "Trey Perry (@treyperry)"
 '''
 

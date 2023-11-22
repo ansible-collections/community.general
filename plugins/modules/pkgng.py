@@ -32,12 +32,6 @@ options:
         description:
             - Name or list of names of packages to install/remove.
             - "With O(name=*), O(state=latest) will operate, but O(state=present) and O(state=absent) will be noops."
-            - >
-                Warning: In Ansible 2.9 and earlier this module had a misfeature
-                where O(name=*) with O(state=latest) or O(state=present) would
-                install every package from every package repository, filling up
-                the machines disk. Avoid using them unless you are certain that
-                your role will only be used with newer versions.
         required: true
         aliases: [pkg]
         type: list
@@ -45,7 +39,6 @@ options:
     state:
         description:
             - State of the package.
-            - 'Note: V(latest) added in Ansible 2.7.'
         choices: [ 'present', 'latest', 'absent' ]
         required: false
         default: present

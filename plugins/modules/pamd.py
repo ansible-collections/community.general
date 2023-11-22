@@ -88,7 +88,7 @@ options:
       control and module_path.
     - With either V(before) or V(after) O(new_type), O(new_control), and O(new_module_path) must all be specified.
     - If state is V(args_absent) or V(args_present), O(new_type), O(new_control), and O(new_module_path) will be ignored.
-    - State V(absent) will remove the rule.  The V(absent) state was added in Ansible 2.4.
+    - State V(absent) will remove the rule.
     type: str
     choices: [ absent, before, after, args_absent, args_present, updated ]
     default: updated

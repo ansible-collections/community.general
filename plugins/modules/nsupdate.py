@@ -67,7 +67,6 @@ options:
         description:
             - DNS record will be modified on this O(zone).
             - When omitted DNS will be queried to attempt finding the correct zone.
-            - Starting with Ansible 2.7 this parameter is optional.
         type: str
     record:
         description:

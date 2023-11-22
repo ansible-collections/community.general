@@ -14,7 +14,7 @@ short_description: Manage OneView FCoE Network resources
 description:
     - Provides an interface to manage FCoE Network resources. Can create, update, or delete.
 requirements:
-    - "python >= 2.7.9"
+    - "Python >= 2.7.9"
     - "hpOneView >= 4.0.0"
 author: "Felipe Bulsoni (@fgbulsoni)"
 attributes:

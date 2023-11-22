@@ -42,7 +42,7 @@ options:
     - "The size of the physical extent. O(pesize) must be a power of 2 of at least 1 sector
        (where the sector size is the largest sector size of the PVs currently used in the VG),
        or at least 128KiB."
-    - Since Ansible 2.6, pesize can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
+    - O(pesize) can be optionally suffixed by a UNIT (k/K/m/M/g/G), default unit is megabyte.
     type: str
     default: "4"
   pv_options:

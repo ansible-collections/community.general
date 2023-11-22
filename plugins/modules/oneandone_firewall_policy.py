@@ -110,7 +110,6 @@ options:
 
 requirements:
   - "1and1"
-  - "python >= 2.6"
 
 author:
   -  "Amel Ajdinovic (@aajdinov)"

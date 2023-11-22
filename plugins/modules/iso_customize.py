@@ -20,7 +20,6 @@ author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
   - "pycdlib"
-  - "python >= 2.7"
 version_added: '5.8.0'
 
 extends_documentation_fragment:

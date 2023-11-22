@@ -15,8 +15,6 @@ module: vertica_info
 short_description: Gathers Vertica database facts
 description:
   - Gathers Vertica database information.
-  - This module was called C(vertica_facts) before Ansible 2.9, returning C(ansible_facts).
-    Note that the M(community.general.vertica_info) module no longer returns C(ansible_facts)!
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module
