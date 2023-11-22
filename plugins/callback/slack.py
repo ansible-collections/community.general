@@ -18,7 +18,6 @@ DOCUMENTATION = '''
     short_description: Sends play events to a Slack channel
     description:
         - This is an ansible callback plugin that sends status updates to a Slack channel during playbook execution.
-        - Before Ansible 2.4 only environment variables were available for configuring this plugin.
     options:
       webhook_url:
         required: true

@@ -50,8 +50,7 @@ options:
   color:
     type: str
     description:
-      - Text color for the message. ("none" is a valid option in 1.6 or later, in 1.6 and prior, the default color is black, not "none").
-        Added 11 more colors in version 2.0.
+      - Text color for the message.
     default: "none"
     choices: [ "none", "white", "black", "blue", "green", "red", "brown", "purple", "orange", "yellow", "light_green", "teal", "light_cyan",
                "light_blue", "pink", "gray", "light_gray"]

@@ -253,7 +253,7 @@ options:
 author:
     - "He Guimin (@xiaozhu36)"
 requirements:
-    - "python >= 3.6"
+    - "Python >= 3.6"
     - "footmark >= 1.19.0"
 extends_documentation_fragment:
     - community.general.alicloud

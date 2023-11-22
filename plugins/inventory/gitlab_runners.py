@@ -14,7 +14,6 @@ DOCUMENTATION = '''
       - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
     short_description: Ansible dynamic inventory plugin for GitLab runners.
     requirements:
-        - python >= 2.7
         - python-gitlab > 1.8.0
     extends_documentation_fragment:
         - constructed

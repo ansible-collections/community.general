@@ -21,7 +21,6 @@ notes:
     - Host should support C(atomic) command
 requirements:
     - atomic
-    - "python >= 2.6"
 extends_documentation_fragment:
     - community.general.attributes
 attributes:

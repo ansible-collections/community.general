@@ -94,7 +94,7 @@ EXAMPLES = '''
     repo: testrepo
     action: latest_release
 
-- name: Get latest release of test repo using username and password. Ansible 2.4.
+- name: Get latest release of test repo using username and password
   community.general.github_release:
     user: testuser
     password: secret123

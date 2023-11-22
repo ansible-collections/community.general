@@ -86,7 +86,6 @@ options:
 
 requirements:
      - "packet-python >= 1.35"
-     - "python >= 2.6"
 '''
 
 EXAMPLES = '''

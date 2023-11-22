@@ -24,7 +24,6 @@ notes:
     account."
   - "In order to use api_key, cc, bcc, attachments, from_name, html_body, headers
     you must pip install sendgrid"
-  - "Since Ansible 2.2 O(username) and O(password) are not required if you supply an O(api_key)"
 requirements:
   - sendgrid Python library 1.6.22 or lower (Sendgrid API V2 supported)
 extends_documentation_fragment:
@@ -39,12 +38,12 @@ options:
     type: str
     description:
       - Username for logging into the SendGrid account.
-      - Since 2.2 it is only required if O(api_key) is not supplied.
+      - It is only required if O(api_key) is not supplied.
   password:
     type: str
     description:
       - Password that corresponds to the username.
-      - Since 2.2 it is only required if O(api_key) is not supplied.
+      - It is only required if O(api_key) is not supplied.
   from_address:
     type: str
     description:

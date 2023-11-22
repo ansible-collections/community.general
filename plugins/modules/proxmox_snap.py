@@ -86,7 +86,7 @@ options:
 
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
-requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
+requirements: [ "proxmoxer", "requests" ]
 author: Jeffrey van Pelt (@Thulium-Drake)
 extends_documentation_fragment:
     - community.general.proxmox.documentation

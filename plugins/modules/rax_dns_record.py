@@ -90,11 +90,9 @@ options:
 notes:
   - "It is recommended that plays utilizing this module be run with
     C(serial: 1) to avoid exceeding the API request limit imposed by
-    the Rackspace CloudDNS API"
+    the Rackspace CloudDNS API."
   - To manipulate a C(PTR) record either C(loadbalancer) or C(server) must be
-    supplied
-  - As of version 1.7, the O(type) field is required and no longer defaults to an C(A) record.
-  - C(PTR) record support was added in version 1.7
+    supplied.
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
   - community.general.rackspace

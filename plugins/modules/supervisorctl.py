@@ -28,7 +28,6 @@ options:
     description:
       - The name of the supervisord program or group to manage.
       - The name will be taken as group name when it ends with a colon V(:).
-      - Group support is only available in Ansible version 1.6 or later.
       - If O(name=all), all programs and program groups will be managed.
     required: true
   config:

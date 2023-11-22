@@ -57,7 +57,6 @@ options:
     type: path
 
 requirements:
-  - "python >= 2.6"
   - packet-python
 
 '''
