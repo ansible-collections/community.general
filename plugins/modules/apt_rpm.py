@@ -115,6 +115,7 @@ EXAMPLES = '''
 '''
 
 import os
+import re
 import traceback
 
 from ansible.module_utils.basic import (
@@ -132,6 +133,7 @@ else:
     HAS_RPM_PYTHON = True
     RPM_PYTHON_IMPORT_ERROR = None
 
+APT_CACHE = "/usr/bin/apt-cache"
 APT_PATH = "/usr/bin/apt-get"
 RPM_PATH = "/usr/bin/rpm"
 APT_GET_ZERO = "\n0 upgraded, 0 newly installed"
@@ -165,6 +167,21 @@ def query_package(module, name):
         return False
 
 
+def check_package_version(module, name):
+    # compare installed and candidate version
+    # if newest version already installed return True
+    # otherwise return False
+
+    rc, out, err = module.run_command("%s policy %s" % (APT_CACHE, name), \
+                                        environ_update={"LANG": "C"})
+    installed = re.split("\n |: ", out)[2]
+    candidate = re.split("\n |: ", out)[4]
+    if installed >= candidate:
+        return True
+    else:
+        return False
+
+
 def query_package_provides(module, name):
     # rpm -q returns 0 if the package is installed,
     # 1 if it is not installed
@@ -179,8 +196,11 @@ def query_package_provides(module, name):
         name = local_rpm_package_name(name)
 
     rc, out, err = module.run_command("%s -q --provides %s" % (RPM_PATH, name))
-    return rc == 0
-
+    if rc == 0:
+        if check_package_version(module, name):
+            return True
+    else:
+        return False
 
 def update_package_db(module):
     rc, update_out, err = module.run_command([APT_PATH, "update"], check_rc=True, environ_update={"LANG": "C"})
