@@ -86,8 +86,10 @@ options:
         was exlusively called O(use_ssl). The latter is now an alias of O(use_tls).
       - B(Note:) for security reasons, you should always set O(use_tls=true) and
         O(validate_certs=true) whenever possible.
+      - The option currently defaults to V(false). The default has been B(deprecated) and will
+        change to V(true) in community.general 10.0.0. To avoid deprecation warnings, explicitly
+        set this option to a value (preferably V(true)).
     type: bool
-    default: false
     aliases:
       - use_ssl
   part:
@@ -109,7 +111,9 @@ options:
         if the network between between Ansible and the IRC server is known to be safe.
       - B(Note:) for security reasons, you should always set O(use_tls=true) and
         O(validate_certs=true) whenever possible.
-    default: false
+      - The option currently defaults to V(false). The default has been B(deprecated) and will
+        change to V(true) in community.general 10.0.0. To avoid deprecation warnings, explicitly
+        set this option to a value (preferably V(true)).
     type: bool
     version_added: 8.1.0
 
@@ -310,8 +314,8 @@ def main():
             passwd=dict(no_log=True),
             timeout=dict(type='int', default=30),
             part=dict(type='bool', default=True),
-            use_tls=dict(type='bool', default=False, aliases=['use_ssl']),
-            validate_certs=dict(type='bool', default=False),
+            use_tls=dict(type='bool', aliases=['use_ssl']),
+            validate_certs=dict(type='bool'),
         ),
         supports_check_mode=True,
         required_one_of=[['channel', 'nick_to']]
@@ -334,6 +338,25 @@ def main():
     part = module.params["part"]
     style = module.params["style"]
     validate_certs = module.params["validate_certs"]
+
+    if use_tls is None:
+        module.deprecate(
+            'The default of use_tls will change to true in community.general 10.0.0.'
+            ' Set a value now (preferably true, if possible) to avoid the deprecation warning.',
+            version='10.0.0',
+            collection_name='community.general',
+        )
+        use_tls = False
+
+    if validate_certs is None:
+        if use_tls:
+            module.deprecate(
+                'The default of validate_certs will change to true in community.general 10.0.0.'
+                ' Set a value now (prefarably true, if possible) to avoid the deprecation warning.',
+                version='10.0.0',
+                collection_name='community.general',
+            )
+        validate_certs = False
 
     try:
         send_msg(msg, server, port, channel, nick_to, key, topic, nick, color, passwd, timeout, use_tls, validate_certs, part, style)
