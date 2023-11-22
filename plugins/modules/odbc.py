@@ -48,7 +48,6 @@ options:
       default: true
       version_added: 1.3.0
 requirements:
-  - "python >= 2.6"
   - "pyodbc"
 
 notes:

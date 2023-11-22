@@ -73,7 +73,6 @@ notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
      is as easy as C(pip install pymssql) (See M(ansible.builtin.pip).)
 requirements:
-   - python >= 2.7
    - pymssql
 
 author:

@@ -27,7 +27,6 @@ author:
   - Lennert Mertens (@LennertMertens)
   - Stef Graces (@stgrace)
 requirements:
-  - python >= 2.7
   - python-gitlab python module
   - administrator rights on the GitLab server
 extends_documentation_fragment:

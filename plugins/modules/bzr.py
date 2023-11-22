@@ -45,8 +45,7 @@ options:
     force:
         description:
             - If V(true), any modified files in the working
-              tree will be discarded.  Before Ansible 1.9 the default
-              value was V(true).
+              tree will be discarded.
         type: bool
         default: false
     executable:

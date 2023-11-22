@@ -28,7 +28,6 @@ notes:
 - 'To use C(https://) scheme for C(hostname) you have to either import host certificate to your OS certificate store or use C(validate_certs: no)
    which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
 requirements:
-- python >= 2.6
 - XenAPI
 attributes:
   check_mode:

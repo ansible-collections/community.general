@@ -18,7 +18,6 @@ description:
   - Manage InfluxDB users.
 author: "Vitaliy Zhhuta (@zhhuta)"
 requirements:
-  - "python >= 2.6"
   - "influxdb >= 0.9"
 attributes:
   check_mode:

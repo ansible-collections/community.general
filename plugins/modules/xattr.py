@@ -27,7 +27,6 @@ options:
   path:
     description:
       - The full path of the file/object to get the facts of.
-      - Before 2.3 this option was only usable as O(name).
     type: path
     required: true
     aliases: [ name ]
@@ -61,8 +60,6 @@ options:
         otherwise acts on symlink itself.
     type: bool
     default: true
-notes:
-  - As of Ansible 2.3, the O(name) option has been changed to O(path) as default, but O(name) still works as well.
 author:
   - Brian Coca (@bcoca)
 '''

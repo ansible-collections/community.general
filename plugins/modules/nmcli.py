@@ -60,9 +60,8 @@ options:
         description:
             - This is the type of device or network connection that you wish to create or modify.
             - Type V(dummy) is added in community.general 3.5.0.
-            - Type V(generic) is added in Ansible 2.5.
-            - Type V(infiniband) is added in community.general 2.0.0.
             - Type V(gsm) is added in community.general 3.7.0.
+            - Type V(infiniband) is added in community.general 2.0.0.
             - Type V(loopback) is added in community.general 8.1.0.
             - Type V(macvlan) is added in community.general 6.6.0.
             - Type V(wireguard) is added in community.general 4.3.0.

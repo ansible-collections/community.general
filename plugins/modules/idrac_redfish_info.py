@@ -16,8 +16,6 @@ description:
   - Builds Redfish URIs locally and sends them to remote iDRAC controllers to
     get information back.
   - For use with Dell EMC iDRAC operations that require Redfish OEM extensions.
-  - This module was called C(idrac_redfish_facts) before Ansible 2.9, returning C(ansible_facts).
-    Note that the M(community.general.idrac_redfish_info) module no longer returns C(ansible_facts)!
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.info_module

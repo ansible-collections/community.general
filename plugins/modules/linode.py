@@ -163,7 +163,6 @@ options:
     type: bool
     default: true
 requirements:
-    - python >= 2.6
     - linode-python
 author:
 - Vincent Viallet (@zbal)
