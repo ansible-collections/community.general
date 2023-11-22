@@ -124,6 +124,8 @@ EXAMPLES = '''
 - name: Send a message to an IRC channel from nick ansible
   community.general.irc:
     server: irc.example.net
+    use_tls: true
+    validate_certs: true
     channel: #t1
     msg: Hello world
 
@@ -132,6 +134,8 @@ EXAMPLES = '''
     module: irc
     port: 6669
     server: irc.example.net
+    use_tls: true
+    validate_certs: true
     channel: #t1
     msg: 'All finished at {{ ansible_date_time.iso8601 }}'
     color: red
@@ -142,6 +146,8 @@ EXAMPLES = '''
     module: irc
     port: 6669
     server: irc.example.net
+    use_tls: true
+    validate_certs: true
     channel: #t1
     nick_to:
       - nick1
