@@ -1,0 +1,58 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Debug ansible_version
+  ansible.builtin.debug:
+    var: ansible_version
+  when: debug_test|d(false)|bool
+  tags: t0
+
+- name: 1. Test valid hostnames. Default options.
+  block:
+    - name: "1. Default min_labels=1, allow_underscores=False"
+      ansible.builtin.debug:
+        msg: "hosts_invalid: {{ hosts_invalid }}"
+      when: debug_test|d(false)|bool
+    - name: Assert
+      ansible.builtin.assert:
+        that: hosts_invalid|difference(result)|length == 0
+  vars:
+    hosts_valid: "{{ names1|select('community.general.fqdn_valid') }}"
+    hosts_invalid: "{{ names1|difference(hosts_valid) }}"
+    result: [-rv.example.com, -rv, s_v]
+  tags: t1
+
+- name: 2. Test valid hostnames. allow_underscores=True
+  block:
+    - name: "2. allow_underscores=True, default min_labels=1"
+      ansible.builtin.debug:
+        msg: "hosts_invalid: {{ hosts_invalid }}"
+      when: debug_test|d(false)|bool
+    - name: Assert
+      ansible.builtin.assert:
+        that: hosts_invalid|difference(result)|length == 0
+  vars:
+    hosts_valid: "{{ names2|select('community.general.fqdn_valid',
+                                   allow_underscores=True) }}"
+    hosts_invalid: "{{ names2|difference(hosts_valid) }}"
+    result: [-rv]
+  tags: t2
+
+- name: 3. Test valid hostnames. min_labels=2, allow_underscores=True
+  block:
+    - name: "3. allow_underscores=True, min_labels=2"
+      ansible.builtin.debug:
+        msg: "hosts_invalid: {{ hosts_invalid }}"
+      when: debug_test|d(false)|bool
+    - name: Assert
+      ansible.builtin.assert:
+        that: hosts_invalid|difference(result)|length == 0
+  vars:
+    hosts_valid: "{{ names3|select('community.general.fqdn_valid',
+                                   min_labels=2,
+                                   allow_underscores=True) }}"
+    hosts_invalid: "{{ names3|difference(hosts_valid) }}"
+    result: [9rv, s_v-.x.y]
+  tags: t3

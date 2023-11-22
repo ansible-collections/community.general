@@ -1399,6 +1399,8 @@ files:
     maintainers: $team_suse
   $tests/a_module.py:
     maintainers: felixfontein
+  $tests/fqdn_valid.py:
+    maintainers: vbotka
 #########################
   tests/:
     labels: tests
