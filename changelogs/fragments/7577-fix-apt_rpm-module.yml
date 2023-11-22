@@ -1,0 +1,2 @@
+bugfixes:
+  - apt-rpm - not upgrade packages if a newer version exists. Now package will be installed if the candidate is newer than the existing (https://github.com/ansible-collections/community.general/issues/7414).
