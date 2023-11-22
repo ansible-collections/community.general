@@ -34,4 +34,4 @@ options:
       - Only applicable if O(wait=true).
     type: int
     default: 2
-    '''
+'''

@@ -19,8 +19,8 @@ options:
         required: true
     user:
         description:
-            - The user name to login with (currently only user names are
-              supported, and not user IDs).
+            - The user name to login with.
+            - Currently only user names are supported, and not user IDs.
         type: str
         required: true
     password:
@@ -31,14 +31,13 @@ options:
     domain:
         description:
             - The name of the Domain to scope to (Identity v3).
-              (currently only domain names are supported, and not domain IDs).
+            - Currently only domain names are supported, and not domain IDs.
         type: str
         required: true
     project:
         description:
             - The name of the Tenant (Identity v2) or Project (Identity v3).
-              (currently only project names are supported, and not
-               project IDs).
+            - Currently only project names are supported, and not project IDs.
         type: str
         required: true
     region:
@@ -47,20 +46,20 @@ options:
         type: str
     id:
         description:
-            - The id of resource to be managed.
+            - The ID of resource to be managed.
         type: str
 notes:
   - For authentication, you can set identity_endpoint using the
-    E(ANSIBLE_HWC_IDENTITY_ENDPOINT) env variable.
+    E(ANSIBLE_HWC_IDENTITY_ENDPOINT) environment variable.
   - For authentication, you can set user using the
-    E(ANSIBLE_HWC_USER) env variable.
-  - For authentication, you can set password using the E(ANSIBLE_HWC_PASSWORD) env
+    E(ANSIBLE_HWC_USER) environment variable.
+  - For authentication, you can set password using the E(ANSIBLE_HWC_PASSWORD) environment
     variable.
-  - For authentication, you can set domain using the E(ANSIBLE_HWC_DOMAIN) env
+  - For authentication, you can set domain using the E(ANSIBLE_HWC_DOMAIN) environment
     variable.
-  - For authentication, you can set project using the E(ANSIBLE_HWC_PROJECT) env
+  - For authentication, you can set project using the E(ANSIBLE_HWC_PROJECT) environment
     variable.
-  - For authentication, you can set region using the E(ANSIBLE_HWC_REGION) env variable.
+  - For authentication, you can set region using the E(ANSIBLE_HWC_REGION) environment variable.
   - Environment variables values will only be used if the playbook values are
     not set.
 '''

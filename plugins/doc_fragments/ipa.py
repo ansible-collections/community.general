@@ -18,7 +18,6 @@ options:
     - Port of FreeIPA / IPA server.
     - If the value is not specified in the task, the value of environment variable E(IPA_PORT) will be used instead.
     - If both the environment variable E(IPA_PORT) and the value are not specified in the task, then default value is set.
-    - Environment variable fallback mechanism is added in Ansible 2.5.
     type: int
     default: 443
   ipa_host:
@@ -26,9 +25,8 @@ options:
     - IP or hostname of IPA server.
     - If the value is not specified in the task, the value of environment variable E(IPA_HOST) will be used instead.
     - If both the environment variable E(IPA_HOST) and the value are not specified in the task, then DNS will be used to try to discover the FreeIPA server.
-    - The relevant entry needed in FreeIPA is the 'ipa-ca' entry.
+    - The relevant entry needed in FreeIPA is the C(ipa-ca) entry.
     - If neither the DNS entry, nor the environment E(IPA_HOST), nor the value are available in the task, then the default value will be used.
-    - Environment variable fallback mechanism is added in Ansible 2.5.
     type: str
     default: ipa.example.com
   ipa_user:
@@ -36,7 +34,6 @@ options:
     - Administrative account used on IPA server.
     - If the value is not specified in the task, the value of environment variable E(IPA_USER) will be used instead.
     - If both the environment variable E(IPA_USER) and the value are not specified in the task, then default value is set.
-    - Environment variable fallback mechanism is added in Ansible 2.5.
     type: str
     default: admin
   ipa_pass:
@@ -47,14 +44,12 @@ options:
     - If the environment variable E(KRB5CCNAME) is available, the module will use this kerberos credentials cache to authenticate to the FreeIPA server.
     - If the environment variable E(KRB5_CLIENT_KTNAME) is available, and E(KRB5CCNAME) is not; the module will use this kerberos keytab to authenticate.
     - If GSSAPI is not available, the usage of O(ipa_pass) is required.
-    - Environment variable fallback mechanism is added in Ansible 2.5.
     type: str
   ipa_prot:
     description:
     - Protocol used by IPA server.
     - If the value is not specified in the task, the value of environment variable E(IPA_PROT) will be used instead.
     - If both the environment variable E(IPA_PROT) and the value are not specified in the task, then default value is set.
-    - Environment variable fallback mechanism is added in Ansible 2.5.
     type: str
     choices: [ http, https ]
     default: https
