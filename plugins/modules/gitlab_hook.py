@@ -123,7 +123,6 @@ EXAMPLES = '''
     state: present
     push_events: true
     tag_push_events: true
-    hook_validate_certs: false
     token: "my-super-secret-token-that-my-ci-server-will-check"
 
 - name: "Delete the previous hook"

@@ -151,7 +151,6 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: false
     username: myusername
     state: absent
 
@@ -191,7 +190,6 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: false
     username: myusername
     state: blocked
 
@@ -199,7 +197,6 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: false
     username: myusername
     state: unblocked
 '''
