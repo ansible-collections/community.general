@@ -330,7 +330,7 @@ def main():
             if not r:
                 module.fail_json(msg='Unable to find authorization resource with name %s for client %s in realm %s' % (resources[0], cid, realm))
             else:
-                payload['resources'] = r['_id']
+                payload['resources'].append(r['_id'])
 
             for rs in r['scopes']:
                 resource_scopes.append(rs['id'])
