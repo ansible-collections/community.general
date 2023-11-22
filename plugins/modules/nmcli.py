@@ -63,6 +63,7 @@ options:
             - Type V(generic) is added in Ansible 2.5.
             - Type V(infiniband) is added in community.general 2.0.0.
             - Type V(gsm) is added in community.general 3.7.0.
+            - Type V(loopback) is added in community.general 8.1.0.
             - Type V(macvlan) is added in community.general 6.6.0.
             - Type V(wireguard) is added in community.general 4.3.0.
             - Type V(vpn) is added in community.general 5.1.0.
@@ -70,7 +71,7 @@ options:
             - If you want to control non-ethernet connection attached to V(bond), V(bridge), or V(team) consider using O(slave_type) option.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
-            wifi, gsm, wireguard, vpn ]
+            wifi, gsm, wireguard, vpn, loopback ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -1938,6 +1939,7 @@ class Nmcli(object):
             'macvlan',
             'wireguard',
             'vpn',
+            'loopback',
         )
 
     @property
@@ -2421,6 +2423,7 @@ def main():
                           'macvlan',
                           'wireguard',
                           'vpn',
+                          'loopback',
                       ]),
             ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
