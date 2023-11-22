@@ -30,7 +30,7 @@ options:
 
   auth_url:
     description:
-    - lxca https full web address
+    - lxca HTTPS full web address.
     type: str
     required: true
 
@@ -38,7 +38,6 @@ requirements:
   - pylxca
 
 notes:
-  -  Additional detail about pylxca can be found at U(https://github.com/lenovo/pylxca)
-  -  Playbooks using these modules can be found at U(https://github.com/lenovo/ansible.lenovo-lxca)
-  -  Check mode is not supported.
+  - Additional detail about pylxca can be found at U(https://github.com/lenovo/pylxca).
+  - Playbooks using these modules can be found at U(https://github.com/lenovo/ansible.lenovo-lxca).
 '''

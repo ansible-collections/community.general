@@ -21,7 +21,7 @@ class ModuleDocFragment(object):
         wait_until:
             description: The lifecycle state to wait for the resource to transition into when O(wait=true). By default,
                          when O(wait=true), we wait for the resource to get into ACTIVE/ATTACHED/AVAILABLE/PROVISIONED/
-                         RUNNING applicable lifecycle state during create operation & to get into DELETED/DETACHED/
+                         RUNNING applicable lifecycle state during create operation and to get into DELETED/DETACHED/
                          TERMINATED lifecycle state during delete operation.
             type: str
     """

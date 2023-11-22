@@ -20,7 +20,7 @@ options:
     aliases: [ oauth_token ]
   api_url:
     description:
-      - Online API URL
+      - Online API URL.
     type: str
     default: 'https://api.online.net'
     aliases: [ base_url ]
@@ -36,7 +36,7 @@ options:
     type: bool
     default: true
 notes:
-  - Also see the API documentation on U(https://console.online.net/en/api/)
+  - Also see the API documentation on U(https://console.online.net/en/api/).
   - If O(api_token) is not set within the module, the following
     environment variables can be used in decreasing order of precedence
     E(ONLINE_TOKEN), E(ONLINE_API_KEY), E(ONLINE_OAUTH_TOKEN), E(ONLINE_API_TOKEN).
