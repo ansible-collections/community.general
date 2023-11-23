@@ -56,7 +56,7 @@ options:
     type: str
   response_file:
     description:
-      - Specifies the location of a response file to be used if package expects input on install. (added in Ansible 1.4)
+      - Specifies the location of a response file to be used if package expects input on install.
     required: false
     type: str
   zone:

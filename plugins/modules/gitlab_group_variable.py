@@ -21,7 +21,6 @@ description:
 author:
   - Florent Madiot (@scodeman)
 requirements:
-  - python >= 2.7
   - python-gitlab python module
 extends_documentation_fragment:
   - community.general.auth_basic

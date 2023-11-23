@@ -21,8 +21,6 @@ author:
 notes:
     - Tested on CA Spectrum version 10.4.2.0.189.
     - Model creation and deletion are not possible with this module. For that use M(community.general.spectrum_device) instead.
-requirements:
-    - 'python >= 2.7'
 extends_documentation_fragment:
     - community.general.attributes
 attributes:

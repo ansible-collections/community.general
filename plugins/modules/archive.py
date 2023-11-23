@@ -36,7 +36,6 @@ options:
   format:
     description:
       - The type of compression to use.
-      - Support for xz was added in Ansible 2.5.
     type: str
     choices: [ bz2, gz, tar, xz, zip ]
     default: gz

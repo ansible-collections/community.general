@@ -16,7 +16,6 @@ description:
 author:
   - paytroff (@paytroff)
 requirements:
-  - python >= 2.7
   - python-gitlab >= 2.3.0
 extends_documentation_fragment:
   - community.general.auth_basic

@@ -27,7 +27,6 @@ author:
   - PubNub <support@pubnub.com> (@pubnub)
   - Sergey Mamontov <sergey@pubnub.com> (@parfeon)
 requirements:
-  - "python >= 2.7"
   - "pubnub_blocks_client >= 1.0"
 extends_documentation_fragment:
   - community.general.attributes
