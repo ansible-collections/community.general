@@ -41,8 +41,8 @@ options:
     description:
       - Section name in INI file. This is added if O(state=present) automatically when
         a single value is being set.
-      - If left empty, being omitted, or being set to V(null), the O(option) will be placed before the first O(section).
-      - Using V(null) is also required if the config format does not support sections.
+      - If being omitted, the O(option) will be placed before the first O(section).
+      - Omitting O(section) is also required if the config format does not support sections.
     type: str
   option:
     description:
@@ -174,6 +174,13 @@ EXAMPLES = r'''
       - coke
       - pepsi
     mode: '0600'
+    state: present
+
+- name: Add "beverage=lemon juice" outside a section in specified file
+  community.general.ini_file:
+    path: /etc/conf
+    option: beverage
+    value: lemon juice
     state: present
 '''
 
