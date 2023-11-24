@@ -103,7 +103,8 @@ options:
   userauthtype:
     description:
     - The authentication type to use for the user.
-    choices: ["password", "radius", "otp", "pkinit", "hardened"]
+    - The choice V(idp) and V(passkey) has been added in community.general 8.x.x.
+    choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey"]
     type: list
     elements: str
     version_added: '1.2.0'
@@ -378,7 +379,7 @@ def main():
                          title=dict(type='str'),
                          homedirectory=dict(type='str'),
                          userauthtype=dict(type='list', elements='str',
-                                           choices=['password', 'radius', 'otp', 'pkinit', 'hardened']))
+                                           choices=['password', 'radius', 'otp', 'pkinit', 'hardened', 'idp', 'passkey']))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
