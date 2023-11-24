@@ -1,0 +1,2 @@
+bugfixes:
+  - "terraform - fix multiline string handling in complex variables (https://github.com/ansible-collections/community.general/pull/7535)."

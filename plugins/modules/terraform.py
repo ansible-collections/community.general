@@ -513,7 +513,7 @@ def main():
 
     def format_args(vars):
         if isinstance(vars, str):
-            return '"{string}"'.format(string=vars.replace('\\', '\\\\').replace('"', '\\"'))
+            return '"{string}"'.format(string=vars.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '\\n')
         elif isinstance(vars, bool):
             if vars:
                 return 'true'
