@@ -37,7 +37,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: List tasks on node01
-  community.general.proxmox_task_info:
+  community.general.proxmox_tasks_info:
     api_host: proxmoxhost
     api_user: root@pam
     api_password: '{{ password | default(omit) }}'
@@ -47,7 +47,7 @@ EXAMPLES = '''
   register: result
 
 - name: Retrieve information about specific tasks on node01
-  community.general.proxmox_task_info:
+  community.general.proxmox_tasks_info:
     api_host: proxmoxhost
     api_user: root@pam
     api_password: '{{ password | default(omit) }}'
