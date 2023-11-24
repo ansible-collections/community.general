@@ -319,8 +319,8 @@ stages:
         parameters:
           testFormat: 2.14/linux/{0}
           targets:
-            - name: Fedora 36
-              test: fedora36
+            - name: Alpine 3
+              test: alpine3
           groups:
             - 1
             - 2
