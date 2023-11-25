@@ -226,7 +226,10 @@ def main():
         ),
         vmid=dict(type="int", required=False),
         name=dict(type="str", required=False),
-        config=dict(type="str", default="none", required=False),
+        config=dict(
+            type="str", choices=["none", "current", "pending"],
+            default="none", required=False
+        ),
     )
     module_args.update(vm_info_args)
 
@@ -271,3 +274,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
