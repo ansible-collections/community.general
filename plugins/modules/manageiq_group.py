@@ -103,10 +103,10 @@ EXAMPLES = '''
     role: 'EvmRole-user'
     tenant: 'my_tenant'
     manageiq_connection:
-      url: 'https://manageiq_server'
+      url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant with tenant_id 4
   community.general.manageiq_group:
@@ -114,10 +114,10 @@ EXAMPLES = '''
     role: 'EvmRole-user'
     tenant_id: 4
     manageiq_connection:
-      url: 'https://manageiq_server'
+      url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name:
   - Create or update a group in ManageIQ with the role EvmRole-user and tenant my_tenant.
@@ -140,10 +140,10 @@ EXAMPLES = '''
     - "/belongsto/ExtManagementSystem|ProviderName/EmsFolder|Datacenters/EmsFolder|dc_name/EmsFolder|host/EmsCluster|Cluster name"
     belongsto_filters_merge_mode: merge
     manageiq_connection:
-      url: 'https://manageiq_server'
+      url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name: Delete a group in ManageIQ
   community.general.manageiq_group:

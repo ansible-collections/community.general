@@ -93,7 +93,6 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-    validate_certs: false
 
 - name: Ensure vault is present for Admin user
   community.general.ipa_vault:

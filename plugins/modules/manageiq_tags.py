@@ -77,7 +77,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when connecting to localhost!
 
 - name: Create new tags for a provider in ManageIQ.
   community.general.manageiq_tags:
@@ -92,7 +92,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when connecting to localhost!
 
 - name: Remove tags for a provider in ManageIQ.
   community.general.manageiq_tags:
@@ -108,7 +108,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when connecting to localhost!
 '''
 
 RETURN = '''
