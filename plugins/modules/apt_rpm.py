@@ -172,14 +172,12 @@ def check_package_version(module, name):
     # if newest version already installed return True
     # otherwise return False
 
-    rc, out, err = module.run_command("%s policy %s" % (APT_CACHE, name), \
-                                        environ_update={"LANG": "C"})
+    rc, out, err = module.run_command([APT_CACHE, "policy", name], environ_update={"LANG": "C"})
     installed = re.split("\n |: ", out)[2]
     candidate = re.split("\n |: ", out)[4]
     if installed >= candidate:
         return True
-    else:
-        return False
+    return False
 
 
 def query_package_provides(module, name):
@@ -201,6 +199,7 @@ def query_package_provides(module, name):
             return True
     else:
         return False
+
 
 def update_package_db(module):
     rc, update_out, err = module.run_command([APT_PATH, "update"], check_rc=True, environ_update={"LANG": "C"})
