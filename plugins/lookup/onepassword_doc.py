@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018, Scott Buchanan <sbuchanan@ri.pn>
-# Copyright (c) 2016, Andrew Zenk <azenk@umn.edu> (lastpass.py used as starting point)
-# Copyright (c) 2018, Ansible Project
+# Copyright (c) 2023, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,56 +7,68 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    name: onepassword_raw
+    name: onepassword_doc
     author:
-      - Scott Buchanan (@scottsb)
-      - Andrew Zenk (@azenk)
       - Sam Doran (@samdoran)
     requirements:
-      - C(op) 1Password command line utility
-    short_description: Fetch an entire item from 1Password
+      - C(op) 1Password command line utility version 2 or later.
+    short_description: Fetch documents stored in 1Password
+    version_added: "8.1.0"
     description:
-      - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch an entire item from 1Password.
+      - P(community.general.onepassword_doc#lookup) wraps C(op) command line utility to fetch one or more documents from 1Password.
+    notes:
+      - The document contents are a string exactly as stored in 1Password.
+      - This plugin requires C(op) version 2 or later.
+
     options:
       _terms:
         description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
         required: true
-      account_id:
-        version_added: 7.5.0
-      domain:
-        version_added: 6.0.0
-      service_account_token:
-        version_added: 7.1.0
+
     extends_documentation_fragment:
       - community.general.onepassword
       - community.general.onepassword.lookup
 '''
 
 EXAMPLES = """
-- name: Retrieve all data about Wintermute
+- name: Retrieve a private key from 1Password
   ansible.builtin.debug:
-    var: lookup('community.general.onepassword_raw', 'Wintermute')
-
-- name: Retrieve all data about Wintermute when not signed in to 1Password
-  ansible.builtin.debug:
-    var: lookup('community.general.onepassword_raw', 'Wintermute', subdomain='Turing', vault_password='DmbslfLvasjdl')
+    var: lookup('community.general.onepassword_doc', 'Private key')
 """
 
 RETURN = """
   _raw:
-    description: Entire item requested.
+    description: Requested document
     type: list
-    elements: dict
+    elements: string
 """
 
-import json
-
-from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
+from ansible_collections.community.general.plugins.lookup.onepassword import OnePass, OnePassCLIv2
+from ansible.errors import AnsibleLookupError
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.lookup import LookupBase
 
 
-class LookupModule(LookupBase):
+class OnePassCLIv2Doc(OnePassCLIv2):
+    def get_raw(self, item_id, vault=None, token=None):
+        args = ["document", "get", item_id]
+        if vault is not None:
+            args = [*args, "--vault={0}".format(vault)]
 
+        if self.service_account_token:
+            if vault is None:
+                raise AnsibleLookupError("'vault' is required with 'service_account_token'")
+
+            environment_update = {"OP_SERVICE_ACCOUNT_TOKEN": self.service_account_token}
+            return self._run(args, environment_update=environment_update)
+
+        if token is not None:
+            args = [*args, to_bytes("--session=") + token]
+
+        return self._run(args)
+
+
+class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
@@ -83,12 +93,12 @@ class LookupModule(LookupBase):
             account_id=account_id,
             connect_host=connect_host,
             connect_token=connect_token,
+            cli_class=OnePassCLIv2Doc,
         )
         op.assert_logged_in()
 
         values = []
         for term in terms:
-            data = json.loads(op.get_raw(term, vault))
-            values.append(data)
+            values.append(op.get_raw(term, vault))
 
         return values
