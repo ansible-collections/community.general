@@ -342,6 +342,16 @@ options:
                     - Name of kerberos realm.
                 type: str
 
+            krbPrincipalAttribute:
+                description:
+                    - Name of the LDAP attribute, which refers to Kerberos principal.
+                      This is used to lookup appropriate LDAP user after successful Kerberos/SPNEGO authentication in Keycloak.
+                      When this is empty, the LDAP user will be looked based on LDAP username corresponding
+                      to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
+                      it will assume that LDAP username is V(john).
+                type: str
+                version_added: 8.1.0
+
             serverPrincipal:
                 description:
                     - Full name of server principal for HTTP service including server and domain name. For
@@ -764,6 +774,7 @@ def main():
         readTimeout=dict(type='int'),
         searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
+        krbPrincipalAttribute=dict(type='str'),
         startTls=dict(type='bool', default=False),
         syncRegistrations=dict(type='bool', default=False),
         trustEmail=dict(type='bool', default=False),
