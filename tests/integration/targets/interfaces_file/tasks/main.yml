@@ -101,3 +101,25 @@
       iface ens3 inet dhcp
       iface ens3 inet6 static
           address 1:2::3/48
+
+- name: 7610 - modify file again
+  interfaces_file:
+    dest: '{{ interfaces_testfile_7610 }}'
+    iface: ens3
+    option: method
+    value: foobar
+
+- name: 7610 - read file
+  slurp:
+    src: '{{ interfaces_testfile_7610 }}'
+  register: content_7610
+
+- name: 7610 - check assertions
+  assert:
+    that:
+      - content_7610.content | b64decode == expected_content
+  vars:
+    expected_content: |
+      iface ens3 inet foobar
+      iface ens3 inet6 foobar
+          address 1:2::3/48
