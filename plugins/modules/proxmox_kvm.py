@@ -200,6 +200,7 @@ options:
     description:
       - Script that will be executed during various steps in the containers lifetime.
     type: str
+    version_added: 8.1.0
   hostpci:
     description:
       - Specify a hash/dictionary of map host pci devices into guest. O(hostpci='{"key":"value", "key":"value"}').
