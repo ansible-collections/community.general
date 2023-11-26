@@ -300,7 +300,6 @@ EXAMPLES = r'''
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
-    validate_certs: false
     folder: /testvms
     name: testvm_2
     state: poweredon
@@ -327,7 +326,6 @@ EXAMPLES = r'''
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
-    validate_certs: false
     folder: /testvms
     name: testvm_6
     is_template: true

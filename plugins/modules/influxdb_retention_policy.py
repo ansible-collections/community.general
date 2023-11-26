@@ -114,7 +114,6 @@ EXAMPLES = r'''
       duration: INF
       replication: 1
       ssl: false
-      validate_certs: false
       shard_group_duration: 1w
       state: present
 
@@ -126,7 +125,6 @@ EXAMPLES = r'''
       duration: 5d1h30m
       replication: 1
       ssl: false
-      validate_certs: false
       shard_group_duration: 1d10h30m
       state: present
 

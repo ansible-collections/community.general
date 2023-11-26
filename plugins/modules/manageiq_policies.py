@@ -74,7 +74,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name: Unassign a policy_profile for a provider in ManageIQ
   community.general.manageiq_policies:
@@ -87,7 +87,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 '''
 
 RETURN = '''

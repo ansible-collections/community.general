@@ -106,7 +106,6 @@ EXAMPLES = r'''
   community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
-    validate_certs: false
     project: projectname
     gitlab_user: username
     state: absent

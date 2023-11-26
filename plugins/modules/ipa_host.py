@@ -118,7 +118,6 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-    validate_certs: false
     random_password: true
 
 - name: Ensure host is disabled

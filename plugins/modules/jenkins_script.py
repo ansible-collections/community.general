@@ -99,7 +99,7 @@ EXAMPLES = '''
     user: admin
     password: admin
     url: https://localhost
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
 '''
 
 RETURN = '''
