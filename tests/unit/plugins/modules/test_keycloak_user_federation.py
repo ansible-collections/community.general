@@ -326,6 +326,7 @@ class TestKeycloakUserFederation(ModuleTestCase):
                 'connectionPooling': True,
                 'pagination': True,
                 'allowKerberosAuthentication': False,
+                'krbPrincipalAttribute': 'krbPrincipalName',
                 'debug': False,
                 'useKerberosForPasswordAuthentication': False,
             },
@@ -373,6 +374,9 @@ class TestKeycloakUserFederation(ModuleTestCase):
                     ],
                     "enabled": [
                         "true"
+                    ],
+                    "krbPrincipalAttribute": [
+                        "krb5PrincipalName"
                     ],
                     "usernameLDAPAttribute": [
                         "uid"
