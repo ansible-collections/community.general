@@ -14,71 +14,28 @@ DOCUMENTATION = '''
       - Scott Buchanan (@scottsb)
       - Andrew Zenk (@azenk)
       - Sam Doran (@samdoran)
-    requirements:
-      - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
-    short_description: fetch field values from 1Password
+    short_description: Fetch field values from 1Password
     description:
       - P(community.general.onepassword#lookup) wraps the C(op) command line utility to fetch specific field values from 1Password.
+    requirements:
+      - C(op) 1Password command line utility
     options:
       _terms:
-        description: identifier(s) (UUID, name, or subdomain; case-insensitive) of item(s) to retrieve.
+        description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
         required: true
-      field:
-        description: field to return from each matching item (case-insensitive).
-        default: 'password'
-      master_password:
-        description: The password used to unlock the specified vault.
-        aliases: ['vault_password']
-      section:
-        description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
-      domain:
-        description: Domain of 1Password.
-        version_added: 3.2.0
-        default: '1password.com'
-        type: str
-      subdomain:
-        description: The 1Password subdomain to authenticate against.
       account_id:
-        description: The account ID to target.
-        type: str
         version_added: 7.5.0
-      username:
-        description: The username used to sign in.
-      secret_key:
-        description: The secret key used when performing an initial sign in.
+      domain:
+        version_added: 3.2.0
+      field:
+        description: Field to return from each matching item (case-insensitive).
+        default: 'password'
+        type: str
       service_account_token:
-        description:
-          - The access key for a service account.
-          - Only works with 1Password CLI version 2 or later.
-        type: str
         version_added: 7.1.0
-      connect_host:
-        description: The host for 1Password Connect. Must be used in combination with O(connect_token).
-        type: str
-        env:
-          - name: OP_CONNECT_HOST
-        version_added: 8.1.0
-      connect_token:
-        description: The token for 1Password Connect. Must be used in combination with O(connect_host).
-        type: str
-        env:
-          - name: OP_CONNECT_TOKEN
-        version_added: 8.1.0
-      vault:
-        description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
-    notes:
-      - This lookup will use an existing 1Password session if one exists. If not, and you have already
-        performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the
-        C(master_password) is required. You may optionally specify O(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
-      - This lookup can perform an initial login by providing O(subdomain), O(username), O(secret_key), and O(master_password).
-      - Can target a specific account by providing the O(account_id).
-      - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
-        needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
-        to the 1Password master password.
-      - This lookup stores potentially sensitive data from 1Password as Ansible facts.
-        Facts are subject to caching if enabled, which means this data could be stored in clear text
-        on disk or in a database.
-      - Tested with C(op) version 2.7.2
+    extends_documentation_fragment:
+      - community.general.onepassword
+      - community.general.onepassword.lookup
 '''
 
 EXAMPLES = """
@@ -120,7 +77,7 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description: field data requested
+    description: Field data requested.
     type: list
     elements: str
 """
@@ -624,7 +581,7 @@ class OnePassCLIv2(OnePassCLIBase):
 
 class OnePass(object):
     def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None,
-                 service_account_token=None, account_id=None, connect_host=None, connect_token=None):
+                 service_account_token=None, account_id=None, connect_host=None, connect_token=None, cli_class=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -639,9 +596,15 @@ class OnePass(object):
         self.token = None
 
         self._config = OnePasswordConfig()
-        self._cli = self._get_cli_class()
+        self._cli = self._get_cli_class(cli_class)
 
-    def _get_cli_class(self):
+        if (self.connect_host or self.connect_token) and None in (self.connect_host, self.connect_token):
+            raise AnsibleOptionsError("connect_host and connect_token are required together")
+
+    def _get_cli_class(self, cli_class=None):
+        if cli_class is not None:
+            return cli_class(self.subdomain, self.domain, self.username, self.secret_key, self.master_password, self.service_account_token)
+
         version = OnePassCLIBase.get_current_version()
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
@@ -715,10 +678,17 @@ class LookupModule(LookupBase):
         connect_host = self.get_option("connect_host")
         connect_token = self.get_option("connect_token")
 
-        if (connect_host or connect_token) and None in (connect_host, connect_token):
-            raise AnsibleOptionsError("connect_host and connect_token are required together")
-
-        op = OnePass(subdomain, domain, username, secret_key, master_password, service_account_token, account_id, connect_host, connect_token)
+        op = OnePass(
+            subdomain=subdomain,
+            domain=domain,
+            username=username,
+            secret_key=secret_key,
+            master_password=master_password,
+            service_account_token=service_account_token,
+            account_id=account_id,
+            connect_host=connect_host,
+            connect_token=connect_token,
+        )
         op.assert_logged_in()
 
         values = []
