@@ -7,6 +7,7 @@
   set_fact:
     interfaces_testfile: '{{ remote_tmp_dir }}/interfaces'
     interfaces_testfile_3841: '{{ remote_tmp_dir }}/interfaces_3841'
+    interfaces_testfile_7610: '{{ remote_tmp_dir }}/interfaces_7610'
 
 - name: Copy interfaces file
   copy:
@@ -65,3 +66,60 @@
     that:
       - ifile_3841_a is changed
       - ifile_3841_b is not changed
+
+- name: 7610 - create file
+  copy:
+    dest: '{{ interfaces_testfile_7610 }}'
+    content: |
+      iface ens3 inet dhcp
+      iface ens3 inet6 auto
+
+- name: 7610 - modify file
+  interfaces_file:
+    dest: '{{ interfaces_testfile_7610 }}'
+    iface: ens3
+    address_family: "inet6"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  loop:
+    - option: "method"
+      value: "static"
+    - option: "address"
+      value: "1:2::3/48"
+
+- name: 7610 - read file
+  slurp:
+    src: '{{ interfaces_testfile_7610 }}'
+  register: content_7610
+
+- name: 7610 - check assertions
+  assert:
+    that:
+      - content_7610.content | b64decode == expected_content
+  vars:
+    expected_content: |
+      iface ens3 inet dhcp
+      iface ens3 inet6 static
+          address 1:2::3/48
+
+- name: 7610 - modify file again
+  interfaces_file:
+    dest: '{{ interfaces_testfile_7610 }}'
+    iface: ens3
+    option: method
+    value: foobar
+
+- name: 7610 - read file
+  slurp:
+    src: '{{ interfaces_testfile_7610 }}'
+  register: content_7610
+
+- name: 7610 - check assertions
+  assert:
+    that:
+      - content_7610.content | b64decode == expected_content
+  vars:
+    expected_content: |
+      iface ens3 inet foobar
+      iface ens3 inet6 foobar
+          address 1:2::3/48

@@ -340,6 +340,8 @@ def addOptionAfterLine(option, value, iface, lines, last_line_dict, iface_option
         changed = False
         for ln in lines:
             if ln.get('line_type', '') == 'iface' and ln.get('iface', '') == iface and value != ln.get('params', {}).get('method', ''):
+                if address_family is not None and ln.get('address_family') != address_family:
+                    continue
                 changed = True
                 ln['line'] = re.sub(ln.get('params', {}).get('method', '') + '$', value, ln.get('line'))
                 ln['params']['method'] = value

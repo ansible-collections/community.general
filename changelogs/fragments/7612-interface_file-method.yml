@@ -1,0 +1,2 @@
+bugfixes:
+  - "interface_files - also consider ``address_family`` when changing ``option=method`` (https://github.com/ansible-collections/community.general/issues/7610, https://github.com/ansible-collections/community.general/pull/7612)."
