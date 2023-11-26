@@ -646,13 +646,15 @@ def test_populate(inventory, mocker):
     inventory.group_prefix = 'proxmox_'
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
+    inventory.exclude_nodes = False
 
     opts = {
         'group_prefix': 'proxmox_',
         'facts_prefix': 'proxmox_',
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
-        'qemu_extended_statuses': True
+        'qemu_extended_statuses': True,
+        'exclude_nodes': False
     }
 
     # bypass authentication and API fetch calls
@@ -723,13 +725,15 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
     inventory.group_prefix = 'proxmox_'
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
+    inventory.exclude_nodes = False
 
     opts = {
         'group_prefix': 'proxmox_',
         'facts_prefix': 'proxmox_',
         'want_facts': True,
         'want_proxmox_nodes_ansible_host': True,
-        'qemu_extended_statuses': False
+        'qemu_extended_statuses': False,
+        'exclude_nodes': False
     }
 
     # bypass authentication and API fetch calls
@@ -743,3 +747,40 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
     # make sure that ['prelaunch', 'paused'] are not in the group list
     for group in ['paused', 'prelaunch']:
         assert ('%sall_%s' % (inventory.group_prefix, group)) not in inventory.inventory.groups
+
+
+def test_populate_exclude_nodes(inventory, mocker):
+    # module settings
+    inventory.proxmox_user = 'root@pam'
+    inventory.proxmox_password = 'password'
+    inventory.proxmox_url = 'https://localhost:8006'
+    inventory.group_prefix = 'proxmox_'
+    inventory.facts_prefix = 'proxmox_'
+    inventory.strict = False
+    inventory.exclude_nodes = True
+
+    opts = {
+        'group_prefix': 'proxmox_',
+        'facts_prefix': 'proxmox_',
+        'want_facts': True,
+        'want_proxmox_nodes_ansible_host': True,
+        'qemu_extended_statuses': False,
+        'exclude_nodes': True
+    }
+
+    # bypass authentication and API fetch calls
+    inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
+    inventory._get_json = mocker.MagicMock(side_effect=get_json)
+    inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
+    inventory._can_add_host = mocker.MagicMock(return_value=True)
+    inventory._populate()
+
+    # make sure that nodes are not in the inventory
+    for node in ['testnode', 'testnode2']:
+        assert node not in inventory.inventory.hosts
+    # make sure that nodes group is absent
+    assert ('%s_nodes' % (inventory.group_prefix)) not in inventory.inventory.groups
+    # make sure that nodes are not in the "ungrouped" group
+    for node in ['testnode', 'testnode2']:
+        assert node not in inventory.inventory.get_groups_dict()["ungrouped"]
