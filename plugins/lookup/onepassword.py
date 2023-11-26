@@ -466,10 +466,10 @@ class OnePassCLIv2(OnePassCLIBase):
 
                 # If the field name doesn't exist in the section, match on the value of "label"
                 # then "id" and return "value"
-                if field.get("label").lower() == field_name:
+                if field.get("label", "").lower() == field_name:
                     return field.get("value", "")
 
-                if field.get("id").lower() == field_name:
+                if field.get("id", "").lower() == field_name:
                     return field.get("value", "")
 
             # Look at the section data and get an identifier. The value of 'id' is either a unique ID
