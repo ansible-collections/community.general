@@ -94,7 +94,7 @@ options:
     description:
       - The authentication type to use by default.
       - The choice V(idp) has been added in community.general 7.3.0.
-      - The choice V(passkey) has been added in community.general 8.x.x.
+      - The choice V(passkey) has been added in community.general 8.1.0.
     aliases: ["userauthtype"]
     choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey", "disabled"]
     type: list
