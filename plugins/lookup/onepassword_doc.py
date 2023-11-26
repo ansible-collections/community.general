@@ -15,7 +15,7 @@ DOCUMENTATION = '''
     short_description: Fetch documents stored in 1Password
     version_added: "8.1.0"
     description:
-      - P(community.general.onepassword_raw#lookup) wraps C(op) command line utility to fetch document(s) from 1Password.
+      - P(community.general.onepassword_doc#lookup) wraps C(op) command line utility to fetch one or more documents from 1Password.
     notes:
       - The document contents are a string exactly as stored in 1Password.
       - This plugin requires C(op) version 2 or later.
