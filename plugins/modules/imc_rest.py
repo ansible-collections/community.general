@@ -100,7 +100,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
     content: |
       <configConfMo><inConfig>
         <computeRackUnit dn="sys/rack-unit-1" adminPower="down"/>
@@ -112,7 +112,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
     timeout: 120
     content: |
       <!-- Configure Serial-on-LAN -->
@@ -137,7 +137,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
     content: |
       <!-- Configure PXE boot -->
       <configConfMo><inConfig>
@@ -155,7 +155,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
     content: |
       <configConfMo><inConfig>
         <lsbootStorage dn="sys/rack-unit-1/boot-policy/storage-read-write" access="read-write" order="1" type="storage"/>
@@ -167,7 +167,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
     content: |
         <configConfMo><inConfig>
           <computeRackUnit dn="sys/rack-unit-1" usrLbl="Customer Lab - POD{{ pod_id }} - {{ inventory_hostname_short }}"/>
@@ -179,7 +179,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: false
+    validate_certs: false  # only do this when you trust the network!
     timeout: 120
     content: |
         <configConfMo><inConfig>

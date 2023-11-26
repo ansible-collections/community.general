@@ -171,7 +171,6 @@ plugin: community.general.proxmox
 url: http://pve.domain.com:8006
 user: ansible@pve
 password: secure
-validate_certs: false
 want_facts: true
 keyed_groups:
     # proxmox_tags_parsed is an example of a fact only returned when 'want_facts=true'
@@ -192,10 +191,10 @@ want_proxmox_nodes_ansible_host: true
 # Note: my_inv_var demonstrates how to add a string variable to every host used by the inventory.
 # my.proxmox.yml
 plugin: community.general.proxmox
-url: http://pve.domain.com:8006
+url: http://192.168.1.2:8006
 user: ansible@pve
 password: secure
-validate_certs: false
+validate_certs: false  # only do this when you trust the network!
 want_facts: true
 want_proxmox_nodes_ansible_host: false
 compose:

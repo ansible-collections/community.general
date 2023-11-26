@@ -72,7 +72,7 @@ url: http://localhost:5665
 user: ansible
 password: secure
 host_filter: \"linux-servers\" in host.groups
-validate_certs: false
+validate_certs: false  # only do this when connecting to localhost!
 inventory_attr: name
 groups:
   # simple name matching

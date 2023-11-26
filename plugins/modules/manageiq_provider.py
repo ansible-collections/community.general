@@ -438,7 +438,7 @@ EXAMPLES = '''
       url: 'https://cf-6af0.rhpds.opentlc.com'
       username: 'admin'
       password: 'password'
-      validate_certs: false
+      validate_certs: true
 
 - name: Create a new OpenStack Director provider in ManageIQ with rsa keypair
   community.general.manageiq_provider:
