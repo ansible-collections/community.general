@@ -103,7 +103,7 @@ options:
   userauthtype:
     description:
     - The authentication type to use for the user.
-    - The choice V(idp) and V(passkey) has been added in community.general 8.x.x.
+    - The choice V(idp) and V(passkey) has been added in community.general 8.1.0.
     choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey"]
     type: list
     elements: str
