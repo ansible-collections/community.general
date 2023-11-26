@@ -273,7 +273,6 @@ EXAMPLES = r'''
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: false
     name: my_first_project
     state: absent
   delegate_to: localhost

@@ -83,7 +83,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name: Create a tenant in ManageIQ
   community.general.manageiq_tenant:
@@ -94,7 +94,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name: Delete a tenant in ManageIQ
   community.general.manageiq_tenant:
@@ -105,7 +105,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 - name: Set tenant quota for cpu_allocated, mem_allocated, remove quota for vms_allocated
   community.general.manageiq_tenant:
@@ -119,7 +119,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 
 
 - name: Delete a tenant in ManageIQ using a token
@@ -130,7 +130,7 @@ EXAMPLES = '''
     manageiq_connection:
       url: 'http://127.0.0.1:3000'
       token: 'sometoken'
-      validate_certs: false
+      validate_certs: false  # only do this when you trust the network!
 '''
 
 RETURN = '''
