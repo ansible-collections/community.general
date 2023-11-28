@@ -126,7 +126,7 @@ result:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
-import logging
+
 import_nomad = None
 
 try:
