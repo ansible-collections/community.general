@@ -547,7 +547,7 @@ class Rhsm(object):
         # - with subscription-manager < 1.26.5-1 (in RHEL < 8.2);
         #   fixed later by https://github.com/candlepin/subscription-manager/pull/2175
         # - sporadically: https://bugzilla.redhat.com/show_bug.cgi?id=2049296
-        if distro_id == 'fedora' or distro_version[0] >= 7:
+        if distro_id == 'fedora' or (distro_version[0] >= 7 and distro_version[1] > 3):
             cmd = ['systemctl', 'stop', 'rhsm']
             self.module.run_command(cmd, check_rc=True, expand_user_and_vars=False)
 
