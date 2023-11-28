@@ -8,16 +8,12 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from contextlib import contextmanager
-from ansible_collections.community.general.tests.unit.compat import unittest
+import nomad
+from ansible_collections.community.general.plugins.modules import nomad_token
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, \
     ModuleTestCase, \
     set_module_args
-
-from ansible_collections.community.general.plugins.modules import nomad_token
-
-import nomad
 
 
 def mock_acl_get_tokens(empty_list=False):
