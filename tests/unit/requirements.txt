@@ -50,5 +50,5 @@ proxmoxer < 2.0.0 ; python_version >= '2.7' and python_version <= '3.6'
 proxmoxer ; python_version > '3.6'
 
 #requirements for nomad_token modules
-python-nomad == 1.5.0 ; python_version <= '3.6'
-python-nomad == 2.0.0 ; python_version >= '3.7'
+python-nomad < 2.0.0 ; python_version <= '3.6'
+python-nomad >= 2.0.0 ; python_version >= '3.7'
