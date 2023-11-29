@@ -1,0 +1,20 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- include_tasks: "{{ item.import_file }}"
+
+- name: getting only a single value (as string) from an option with multiple values in the git config file
+  git_config_info:
+    name: push.pushoption
+    scope: "{{ item.git_scope }}"
+    path: "{{ item.git_file | default(omit) }}"
+  register: get_result
+
+- name: assert value is correct
+  assert:
+    that:
+      - get_result.config_value == "merge_request.create"
+      - 'get_result.config_values == {"push.pushoption": ["merge_request.create", "merge_request.draft"]}'
+...
