@@ -20,7 +20,7 @@ author:
 requirements: ['git']
 short_description: Read and write git configuration
 description:
-  - The M(community.general.git_config) module changes git configuration by invoking 'git config'.
+  - The M(community.general.git_config) module changes git configuration by invoking C(git config).
     This is needed if you do not want to use M(ansible.builtin.template) for the entire git
     config file (for example because you need to change just C(user.email) in
     /etc/.git/config).  Solutions involving M(ansible.builtin.command) are cumbersome or
