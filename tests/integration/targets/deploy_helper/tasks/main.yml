@@ -17,25 +17,25 @@
   assert:
     that:
     - "'project_path' in deploy_helper"
-    - "deploy_helper.current_path   == '{{ deploy_helper.project_path }}/current'"
-    - "deploy_helper.releases_path  == '{{ deploy_helper.project_path }}/releases'"
-    - "deploy_helper.shared_path    == '{{ deploy_helper.project_path }}/shared'"
+    - "deploy_helper.current_path   == deploy_helper.project_path ~ '/current'"
+    - "deploy_helper.releases_path  == deploy_helper.project_path ~ '/releases'"
+    - "deploy_helper.shared_path    == deploy_helper.project_path ~ '/shared'"
     - "deploy_helper.unfinished_filename == 'DEPLOY_UNFINISHED'"
     - "'previous_release' in deploy_helper"
     - "'previous_release_path' in deploy_helper"
     - "'new_release' in deploy_helper"
     - "'new_release_path' in deploy_helper"
-    - "deploy_helper.new_release_path == '{{ deploy_helper.releases_path }}/{{ deploy_helper.new_release }}'"
+    - "deploy_helper.new_release_path == deploy_helper.releases_path ~ '/' ~ deploy_helper.new_release"
 
 - name: State=query with relative overridden paths
   deploy_helper: path={{ deploy_helper_test_root }} current_path=CURRENT_PATH releases_path=RELEASES_PATH shared_path=SHARED_PATH state=query
 - name: Assert State=query with relative overridden paths
   assert:
     that:
-    - "deploy_helper.current_path   == '{{ deploy_helper.project_path }}/CURRENT_PATH'"
-    - "deploy_helper.releases_path  == '{{ deploy_helper.project_path }}/RELEASES_PATH'"
-    - "deploy_helper.shared_path    == '{{ deploy_helper.project_path }}/SHARED_PATH'"
-    - "deploy_helper.new_release_path == '{{ deploy_helper.releases_path }}/{{ deploy_helper.new_release}}'"
+    - "deploy_helper.current_path   == deploy_helper.project_path ~ '/CURRENT_PATH'"
+    - "deploy_helper.releases_path  == deploy_helper.project_path ~ '/RELEASES_PATH'"
+    - "deploy_helper.shared_path    == deploy_helper.project_path ~ '/SHARED_PATH'"
+    - "deploy_helper.new_release_path == deploy_helper.releases_path ~ '/' ~ deploy_helper.new_release"
 
 - name: State=query with absolute overridden paths
   deploy_helper: path={{ deploy_helper_test_root }} current_path=/CURRENT_PATH releases_path=/RELEASES_PATH shared_path=/SHARED_PATH state=query
@@ -45,7 +45,7 @@
     - "deploy_helper.current_path   == '/CURRENT_PATH'"
     - "deploy_helper.releases_path  == '/RELEASES_PATH'"
     - "deploy_helper.shared_path    == '/SHARED_PATH'"
-    - "deploy_helper.new_release_path == '{{ deploy_helper.releases_path }}/{{ deploy_helper.new_release}}'"
+    - "deploy_helper.new_release_path == deploy_helper.releases_path ~ '/' ~ deploy_helper.new_release"
 
 - name: State=query with overridden unfinished_filename
   deploy_helper: path={{ deploy_helper_test_root }} unfinished_filename=UNFINISHED_DEPLOY state=query

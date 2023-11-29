@@ -29,7 +29,7 @@
     that:
       - archive_no_options is changed
       - "archive_no_options.dest_state == 'archive'"
-      - "{{ archive_no_options.archived | length }} == 3"
+      - "archive_no_options.archived | length == 3"
 
 - name: Remove the archive - no options ({{ format }})
   file:
@@ -54,7 +54,7 @@
     that:
       - archive_file_options_stat is not changed
       - "archive_file_options.mode == '0600'"
-      - "{{ archive_file_options.archived | length }} == 3"
+      - "archive_file_options.archived | length == 3"
 
 - name: Remove the archive - file options ({{ format }})
   file:
@@ -146,7 +146,7 @@
   assert:
     that:
       - archive_path_list is changed
-      - "{{ archive_path_list.archived | length }} == 3"
+      - "archive_path_list.archived | length == 3"
 
 - name: Remove archive - path list ({{ format }})
   file:
@@ -168,8 +168,8 @@
     that:
       - archive_missing_paths is changed
       - "archive_missing_paths.dest_state == 'incomplete'"
-      - "'{{ remote_tmp_dir }}/dne.txt' in archive_missing_paths.missing"
-      - "'{{ remote_tmp_dir }}/foo.txt' not in archive_missing_paths.missing"
+      - "(remote_tmp_dir ~ '/dne.txt') in archive_missing_paths.missing"
+      - "(remote_tmp_dir ~ '/foo.txt') not in archive_missing_paths.missing"
 
 - name: Remove archive - missing paths ({{ format }})
   file:
