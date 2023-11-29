@@ -22,7 +22,7 @@
   assert:
     that:
       - 'alternative is changed'
-      - 'cmd.stdout == "dummy{{ item }}"'
+      - 'cmd.stdout == "dummy" ~ item'
 
 - name: check that alternative has been updated
   command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 60 + item|int }}' '{{ alternatives_dir }}/dummy'"
