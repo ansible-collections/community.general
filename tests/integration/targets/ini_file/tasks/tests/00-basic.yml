@@ -39,4 +39,4 @@
     that:
       - result_basic_2 is not changed
       - result_basic_2 is failed
-      - result_basic_2.msg == "Destination {{ non_existing_file }} does not exist!"
+      - result_basic_2.msg == "Destination " ~ non_existing_file ~ " does not exist!"
