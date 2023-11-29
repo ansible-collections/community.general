@@ -35,7 +35,7 @@
   loop: "{{ initial_lv_status_result.stdout_lines }}"
   assert:
     that:
-      - "'active' == '{{ item }}'"
+      - "'active' == item"
 
 - name: Deactivate volume group
   lvg:
@@ -100,7 +100,7 @@
   loop: "{{ activate_lv_status_result.stdout_lines }}"
   assert:
     that:
-      - "'active' == '{{ item }}'"
+      - "'active' == item"
 
 - name: Activate volume group again to verify idempontency
   lvg:
@@ -138,7 +138,7 @@
   loop: "{{ activate_partial_lv_status_result.stdout_lines }}"
   assert:
     that:
-      - "'active' == '{{ item }}'"
+      - "'active' == item"
 
 - name: Deactivate volume group in check mode
   lvg:
@@ -160,4 +160,4 @@
   loop: "{{ check_mode_deactivate_lv_status_result.stdout_lines }}"
   assert:
     that:
-      - "'active' == '{{ item }}'"
+      - "'active' == item"
