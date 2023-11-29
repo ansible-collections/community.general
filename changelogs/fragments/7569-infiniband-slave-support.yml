@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - allow for ``infiniband`` slaves of ``bond`` interface types (https://github.com/ansible-collections/community.general/pull/7569).
