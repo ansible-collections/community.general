@@ -21,7 +21,7 @@
 - name: Test if state and value are required together
   assert:
     that:
-    - "'following are missing: value' in '{{ missing_value['msg'] }}'"
+    - "'following are missing: value' in missing_value['msg']"
 
 - name: Change value of AppleMeasurementUnits to centimeter in check_mode
   osx_defaults:
@@ -194,7 +194,7 @@
   register: test_data_types
 
 - assert:
-    that: "{{ item.changed }}"
+    that: "item is changed"
   with_items: "{{ test_data_types.results }}"
 
 - name: Use different data types and delete them
@@ -208,7 +208,7 @@
   register: test_data_types
 
 - assert:
-    that: "{{ item.changed }}"
+    that: "item is changed"
   with_items: "{{ test_data_types.results }}"
 
 
