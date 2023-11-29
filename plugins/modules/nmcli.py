@@ -1997,6 +1997,7 @@ class Nmcli(object):
             'bridge-slave',
             'team-slave',
             'wifi',
+            'infiniband',
         )
 
     @property
