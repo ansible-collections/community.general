@@ -1919,6 +1919,9 @@ class KeycloakAPI(object):
                 rolerep["composites"] = keycloak_compatible_composites
             return open_url(roles_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
+        except HTTPError as httpError:
+            self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s: %s'
+                                      % (rolerep['name'], clientid, realm, str(httpError), httpError.read().decode()))
         except Exception as e:
             self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
@@ -1961,6 +1964,9 @@ class KeycloakAPI(object):
             if composites is not None:
                 self.update_role_composites(rolerep=rolerep, clientid=clientid, composites=composites, realm=realm)
             return update_role_response
+        except HTTPError as httpError:
+            self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s:%s'
+                                      % (rolerep['name'], clientid, realm, str(httpError), httpError.read().decode()))
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
@@ -2717,6 +2723,9 @@ class KeycloakAPI(object):
                 username=userrep['username'],
                 realm=realm)
             return created_user
+        except HTTPError as httpError:
+            self.module.fail_json(msg='Could not create user %s in realm %s: %s:%s'
+                                      % (userrep['username'], realm, str(httpError), httpError.read().decode()))
         except Exception as e:
             self.module.fail_json(msg='Could not create user %s in realm %s: %s'
                                       % (userrep['username'], realm, str(e)))
