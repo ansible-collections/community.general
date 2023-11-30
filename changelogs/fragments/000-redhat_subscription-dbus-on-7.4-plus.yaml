@@ -1,0 +1,6 @@
+bugfixes:
+  - |
+    redhat_subscription - use the D-Bus registration on RHEL 7 only on 7.4 and
+    greater; older versions of RHEL 7 do not have it
+    (https://github.com/ansible-collections/community.general/issues/7622,
+    https://github.com/ansible-collections/community.general/pull/7624).

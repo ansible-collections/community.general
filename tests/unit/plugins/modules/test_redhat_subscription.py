@@ -29,6 +29,8 @@ def patch_redhat_subscription(mocker):
                  return_value='/testbin/subscription-manager')
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.Rhsm._can_connect_to_dbus',
                  return_value=False)
+    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.Rhsm._has_dbus_interface',
+                 return_value=False)
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.getuid',
                  return_value=0)
 

@@ -28,7 +28,7 @@ notes:
       process listing on the system. Due to limitations of the D-Bus interface of C(rhsm),
       the module will I(not) use D-Bus for registration when trying either to register
       using O(token), or when specifying O(environment), or when the system is old
-      (typically RHEL 6 and older).
+      (typically RHEL 7 older than 7.4, RHEL 6, and older).
     - In order to register a system, subscription-manager requires either a username and password, or an activationkey and an Organization ID.
     - Since 2.5 values for O(server_hostname), O(server_insecure), O(rhsm_baseurl),
       O(server_proxy_hostname), O(server_proxy_port), O(server_proxy_user) and
@@ -414,6 +414,30 @@ class Rhsm(object):
         else:
             return False
 
+    def _has_dbus_interface(self):
+        """
+        Checks whether subscription-manager has a D-Bus interface.
+
+        :returns: bool -- whether subscription-manager has a D-Bus interface.
+        """
+
+        def str2int(s, default=0):
+            try:
+                return int(s)
+            except ValueError:
+                return default
+
+        distro_id = distro.id()
+        distro_version = tuple(str2int(p) for p in distro.version_parts())
+
+        # subscription-manager in any supported Fedora version has the interface.
+        if distro_id == 'fedora':
+            return True
+        # Any other distro: assume it is EL;
+        # the D-Bus interface was added to subscription-manager in RHEL 7.4.
+        return (distro_version[0] == 7 and distro_version[1] >= 4) or \
+            distro_version[0] >= 8
+
     def _can_connect_to_dbus(self):
         """
         Checks whether it is possible to connect to the system D-Bus bus.
@@ -457,7 +481,8 @@ class Rhsm(object):
         # of rhsm, so always use the CLI in that case;
         # also, since the specified environments are names, and the D-Bus APIs
         # require IDs for the environments, use the CLI also in that case
-        if not token and not environment and self._can_connect_to_dbus():
+        if (not token and not environment and self._has_dbus_interface() and
+           self._can_connect_to_dbus()):
             self._register_using_dbus(was_registered, username, password, auto_attach,
                                       activationkey, org_id, consumer_type,
                                       consumer_name, consumer_id,
