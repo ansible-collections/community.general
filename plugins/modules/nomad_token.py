@@ -51,14 +51,14 @@ options:
         default: false
     state:
         description:
-            - Create or remove acl token.
+            - Create or remove ACL token.
         choices: ["present", "absent"]
         required: true
         type: str
 
 seealso:
-  - name: Nomad acl documentation
-    description: Complete documentation for Nomad API acl.
+  - name: Nomad ACL documentation
+    description: Complete documentation for Nomad API ACL.
     link: https://developer.hashicorp.com/nomad/api-docs/acl/tokens
 '''
 
@@ -69,7 +69,7 @@ EXAMPLES = '''
     token_type: bootstrap
     state: present
 
-- name: Create acl token
+- name: Create ACL token
   community.general.nomad_token:
     host: localhost
     name: "Dev token"
@@ -79,7 +79,7 @@ EXAMPLES = '''
     global_replicated: false
     state: absent
 
-- name: Update acl token Dev token
+- name: Update ACL token Dev token
   community.general.nomad_token:
     host: localhost
     name: "Dev token"
@@ -90,7 +90,7 @@ EXAMPLES = '''
     global_replicated: false
     state: absent
 
-- name: Delete acl token
+- name: Delete ACL token
   community.general.nomad_token:
     host: localhost
     name: "Dev token"
@@ -103,7 +103,7 @@ result:
     returned: always
     type: dict
     sample: {
-        "msg": "Acl token updated.",
+        "msg": "ACL token updated.",
         "token": {
             "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
             "create_index": 14,
@@ -258,13 +258,13 @@ def run(module):
                     token_info['AccessorID'] = current_token['AccessorID']
                     nomad_result = nomad_client.acl.update_token(current_token['AccessorID'],
                                                                  token_info)
-                    result = {"msg": "Acl token updated.",
+                    result = {"msg": "ACL token updated.",
                               "token": transform_response(nomad_result)}
                     changed = True
 
                 else:
                     nomad_result = nomad_client.acl.create_token(token_info)
-                    result = {"msg": "Acl token Created.",
+                    result = {"msg": "ACL token Created.",
                               "token": transform_response(nomad_result)}
                     changed = True
             except Exception as e:
@@ -282,7 +282,7 @@ def run(module):
             token = get_token(module.params.get('name'), nomad_client)
             if token:
                 nomad_client.acl.delete_token(token.get('AccessorID'))
-                result = {'msg': 'Acl token deleted.', 'token': {}}
+                result = {'msg': 'ACL token deleted.', 'token': {}}
                 changed = True
             else:
                 result = {'msg': "No token with name '{0}' found".format(module.params.get('name')), 'token': {}}
