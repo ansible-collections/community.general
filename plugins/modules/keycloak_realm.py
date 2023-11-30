@@ -658,6 +658,8 @@ def main():
         max_failure_wait_seconds=dict(type='int', aliases=['maxFailureWaitSeconds']),
         minimum_quick_login_wait_seconds=dict(type='int', aliases=['minimumQuickLoginWaitSeconds']),
         not_before=dict(type='int', aliases=['notBefore']),
+        oauth2_device_code_lifespan=dict(type='int', aliases=['oauth2DeviceCodeLifespan']),
+        oauth2_device_polling_interval=dict(type='int', aliases=['oauth2DevicePollingInterval']),
         offline_session_idle_timeout=dict(type='int', aliases=['offlineSessionIdleTimeout']),
         offline_session_max_lifespan=dict(type='int', aliases=['offlineSessionMaxLifespan']),
         offline_session_max_lifespan_enabled=dict(type='bool', aliases=['offlineSessionMaxLifespanEnabled']),
