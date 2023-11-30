@@ -30,7 +30,7 @@ attributes:
 options:
     name:
         description:
-            - Name of acl token to create.
+            - Name of ACL token to create.
         type: str
     token_type:
         description:
