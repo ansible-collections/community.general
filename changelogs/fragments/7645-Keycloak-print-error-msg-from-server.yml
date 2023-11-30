@@ -1,0 +1,2 @@
+minor_changes:
+  - Keycloak - Print error message from keycloak server on Badrequest (https://github.com/ansible-collections/community.general/pull/7645).
