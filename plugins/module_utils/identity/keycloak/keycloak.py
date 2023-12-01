@@ -3018,7 +3018,7 @@ class KeycloakAPI(object):
     def fail_open_url(self, e, msg, **kwargs):
         try:
             if isinstance(e, HTTPError):
-                msg += ": " + to_native(e.read())
+                msg = "%s: %s" % (msg, to_native(e.read()))
         except Exception as ingore:
             pass
         self.module.fail_json(msg, **kwargs)
