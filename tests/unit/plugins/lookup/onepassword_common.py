@@ -107,7 +107,7 @@ MOCK_ENTRIES = {
             "queries": ["Omitted values"],
             "kwargs": {
                 "field": "section-label-without-value",
-                "section": "section-without-values"
+                "section": "Section-Without-Values"
             },
             "expected": [""],
             "output": load_file("v2_out_04.json")
