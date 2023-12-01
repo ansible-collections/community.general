@@ -13,10 +13,10 @@
     "additional_information": "Jan 18, 2015, 08:13:38",
     "fields": [
         {
-            "id": "password",
+            "id": "Password",
             "type": "CONCEALED",
             "purpose": "PASSWORD",
-            "label": "password",
+            "label": "Password",
             "value": "OctoberPoppyNuttyDraperySabbath",
             "reference": "op://Test Vault/Authy Backup/password",
             "password_details": {
