@@ -117,7 +117,7 @@ result:
         ],
         "roles": null,
         "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
-        "type": "client"        
+        "type": "client"
     }
 '''
 
