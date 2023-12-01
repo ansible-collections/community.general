@@ -1,0 +1,151 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- block:
+  - name: Create {{ gitlab_project_name }}
+    gitlab_project:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: true
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_name }}"
+      group: "{{ gitlab_project_group }}"
+      default_branch: "{{ gitlab_branch }}"
+      initialize_with_readme: true
+      state: present
+
+  - name: Create label {{ gitlab_project_label }}
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_project_label }}"
+          color: "{{ gitlab_project_label_color }}"
+          description: "{{ gitlab_project_label_description }}"
+          priority: "{{ gitlab_project_label_priority }}"
+        - name: "{{ gitlab_second_project_label }}"
+          color: "{{ gitlab_second_project_label_color }}"
+      state: present
+    register: gitlab_project_label_create
+
+  - name: Test Label Created
+    assert:
+      that:
+        - gitlab_project_label_create is changed
+
+  - name: Create Label ( Idempotency test )
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_project_label }}"
+          color: "{{ gitlab_project_label_color }}"
+          description: "{{ gitlab_project_label_description }}"
+          priority: "{{ gitlab_project_label_priority }}"
+        - name: "{{ gitlab_second_project_label }}"
+          color: "{{ gitlab_second_project_label_color }}"
+      state: present
+    register: gitlab_project_label_create_idempotence
+
+  - name: Test Create Label is Idempotent
+    assert:
+      that:
+        - gitlab_project_label_create_idempotence is not changed
+
+  - name: Update Label Test
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_project_label }}"
+          color: "{{ gitlab_second_project_label_color }}"
+      state: present
+    register: gitlab_project_label_update
+
+  - name: Test Label Updated
+    assert:
+      that:
+        - gitlab_project_label_update.label[0].color == "{{ gitlab_second_project_label_color }}"
+
+  - name: Update Label Test ( Additions )
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_second_project_label }}"
+          description: "{{ gitlab_project_label_description }}"
+          priority: "{{ gitlab_project_label_priority }}"
+      state: present
+    register: gitlab_project_label_update_additions
+
+  - name: Test Label Updated ( Additions )
+    assert:
+      that:
+        - gitlab_project_label_update_additions.label[0].description == "{{ gitlab_project_label_description }}"
+        - gitlab_project_label_update_additions.label[0].priority == "{{ gitlab_project_label_priority }}"
+
+  - name: Update Label Test ( Removals )
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_second_project_label }}"
+          description: "{{ gitlab_project_label_description }}"
+      state: present
+    register: gitlab_project_label_update_removal
+
+  - name: Test label updated
+    assert:
+      that:
+        - gitlab_project_label_update_removal.label.priority == None
+
+  - name: Delete Label
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_second_project_label }}"
+      state: absent
+    register: gitlab_project_label_delete
+
+  - name: Test label is deleted
+    assert:
+      that:
+        - gitlab_project_label_delete is changed
+
+  always:
+  - name: Delete Label
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_project_label }}"
+        - name: "{{ gitlab_second_project_label }}"
+      state: absent
+    register: gitlab_project_label_delete
+  - name: Clean up {{ gitlab_project_name }}
+    gitlab_project:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: false
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_name }}"
+      group: "{{ gitlab_project_group }}"
+      state: absent
