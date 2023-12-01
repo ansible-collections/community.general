@@ -196,6 +196,11 @@ options:
       - Used only with clone
     type: bool
     default: true
+  hookscript:
+    description:
+      - Script that will be executed during various steps in the containers lifetime.
+    type: str
+    version_added: 8.1.0
   hostpci:
     description:
       - Specify a hash/dictionary of map host pci devices into guest. O(hostpci='{"key":"value", "key":"value"}').
@@ -867,6 +872,17 @@ EXAMPLES = '''
     name: spynal
     node: sabrewulf-2
     migrate: true
+
+- name: Add hookscript to existing VM
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    vmid: 999
+    node: sabrewulf
+    hookscript: local:snippets/hookscript.pl
+    update: true
+
 '''
 
 RETURN = '''
@@ -1214,6 +1230,7 @@ def main():
         format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
         freeze=dict(type='bool'),
         full=dict(type='bool', default=True),
+        hookscript=dict(type='str'),
         hostpci=dict(type='dict'),
         hotplug=dict(type='str'),
         hugepages=dict(choices=['any', '2', '1024']),
@@ -1432,6 +1449,7 @@ def main():
                               efidisk0=module.params['efidisk0'],
                               force=module.params['force'],
                               freeze=module.params['freeze'],
+                              hookscript=module.params['hookscript'],
                               hostpci=module.params['hostpci'],
                               hotplug=module.params['hotplug'],
                               hugepages=module.params['hugepages'],

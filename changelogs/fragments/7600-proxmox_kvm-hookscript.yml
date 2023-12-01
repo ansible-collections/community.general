@@ -1,0 +1,2 @@
+minor_changes:
+  - "proxmox_kvm - support the ``hookscript`` parameter (https://github.com/ansible-collections/community.general/issues/7600)."
