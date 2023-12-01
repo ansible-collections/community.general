@@ -1,0 +1,2 @@
+bugfixes:
+  - cloudflare_dns - fix cloudflare lookup of SHFP records in ``cloudflare_dns`` module (https://github.com/ansible-collections/community.general/issues/7652).  
