@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 DOCUMENTATION = '''
 module: gitlab_project_label
@@ -43,7 +43,7 @@ options:
     description:
       - When set to V(true), delete all variables which are not mentioned in the task.
     default: false
-    type: bool    
+    type: bool
   project:
     description:
       - The path and name of the project.
@@ -52,8 +52,7 @@ options:
   labels:
     version_added: 1.0.0
     description:
-      - A list of dictionaries that represents CI/CD variables.
-      - This module works internal with this structure, even if the older O(vars) parameter is used.
+      - A list of dictionaries that represents gitlab project's labels.
     default: []
     type: list
     elements: dict
@@ -165,13 +164,12 @@ project_label:
       sample: ['defg', 'new-label']
 '''
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_project, gitlab, vars_to_variables,
-    HAS_GITLAB_PACKAGE, GITLAB_IMP_ERR
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_project, gitlab
 )
 
 
@@ -233,8 +231,8 @@ class GitlabProjectLabels(object):
         return True
 
 
-def compare(requested_labels: list[Dict],
-            existing_labels: list,
+def compare(requested_labels: List[Dict],
+            existing_labels: List,
             state: str) -> Tuple:
     # we need to do this, because it was determined in a previous version - more or less buggy
     # basically it is not necessary and might result in more/other bugs!
@@ -330,7 +328,7 @@ def native_python_main(this_gitlab: GitlabProjectLabels,
                     return_value['removed'].append(item)
 
     if module.check_mode:
-        return_value = dict(added=_added, updated=_updated, removed=return_value['removed'], untouched=untouched)
+        return_value = dict(added=_added, updated=_updated, removed=return_value['removed'], untouched=_untouched)
 
     if any(return_value[x] for x in ['added', 'removed', 'updated']):
         change = True
