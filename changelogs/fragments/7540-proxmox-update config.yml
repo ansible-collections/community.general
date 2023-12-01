@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox - adds ``update`` parameter, allowing update of an already existing containers configuration (https://github.com/ansible-collections/community.general/pull/7540).
