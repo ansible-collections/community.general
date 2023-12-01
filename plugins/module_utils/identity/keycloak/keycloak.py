@@ -3020,5 +3020,5 @@ class KeycloakAPI(object):
             if isinstance(e, HTTPError):
                 msg += ": " + e.read().decode()
         except Exception as ingore:
-            None
+            pass
         self.module.fail_json(msg, **kwargs)
