@@ -132,6 +132,12 @@ options:
       - timeout for operations
     type: int
     default: 30
+  update:
+    description:
+      - If V(true), the container will be updated with new values.
+    type: bool
+    default: false
+    version_added: 8.1.0
   force:
     description:
       - Forcing operations.
@@ -384,6 +390,16 @@ EXAMPLES = r'''
     hostname: clone.example.org
     storage: local
 
+- name: Update container configuration
+  community.general.proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    netif: '{"net0":"name=eth0,gw=192.168.0.1,ip=192.168.0.3/24,bridge=vmbr0"}'
+    update: true
+
 - name: Start container
   community.general.proxmox:
     vmid: 100
@@ -477,6 +493,80 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
         config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
         return config.get('template', False)
+
+    def update_config(self, vmid, node, disk, cpus, memory, swap, **kwargs):
+        if VZ_TYPE != "lxc":
+            self.module.fail_json(
+                changed=False,
+                msg="Updating configuration is only supported for LXC enabled proxmox clusters.",
+            )
+
+        # Version limited features
+        minimum_version = {"tags": "6.1", "timezone": "6.3"}
+        proxmox_node = self.proxmox_api.nodes(node)
+
+        pve_version = self.version()
+
+        # Fail on unsupported features
+        for option, version in minimum_version.items():
+            if pve_version < LooseVersion(version) and option in kwargs:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_version}".format(
+                        option=option, version=version, pve_version=pve_version
+                    ),
+                )
+
+        # Remove all empty kwarg entries
+        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+
+        if cpus is not None:
+            kwargs["cpulimit"] = cpus
+        if disk is not None:
+            kwargs["rootfs"] = disk
+        if memory is not None:
+            kwargs["memory"] = memory
+        if swap is not None:
+            kwargs["swap"] = swap
+        if "netif" in kwargs:
+            kwargs.update(kwargs["netif"])
+            del kwargs["netif"]
+        if "mounts" in kwargs:
+            kwargs.update(kwargs["mounts"])
+            del kwargs["mounts"]
+        # LXC tags are expected to be valid and presented as a comma/semi-colon delimited string
+        if "tags" in kwargs:
+            re_tag = re.compile(r"^[a-z0-9_][a-z0-9_\-\+\.]*$")
+            for tag in kwargs["tags"]:
+                if not re_tag.match(tag):
+                    self.module.fail_json(msg="%s is not a valid tag" % tag)
+            kwargs["tags"] = ",".join(kwargs["tags"])
+
+        # fetch the current config
+        current_config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
+
+        # compare the requested config against the current
+        update_config = False
+        for (arg, value) in kwargs.items():
+            # some values are lists, the order isn't always the same, so split them and compare by key
+            if isinstance(value, str):
+                current_values = current_config[arg].split(",")
+                requested_values = value.split(",")
+                for new_value in requested_values:
+                    if new_value not in current_values:
+                        update_config = True
+                        break
+            # if it's not a list (or string) just compare the current value
+            else:
+                # some types don't match with the API, so forcing to string for comparison
+                if str(value) != str(current_config[arg]):
+                    update_config = True
+                    break
+
+        if update_config:
+            getattr(proxmox_node, VZ_TYPE)(vmid).config.put(vmid=vmid, node=node, **kwargs)
+        else:
+            self.module.exit_json(changed=False, msg="Container config is already up to date")
 
     def create_instance(self, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
 
@@ -658,6 +748,7 @@ def main():
         nameserver=dict(),
         searchdomain=dict(),
         timeout=dict(type='int', default=30),
+        update=dict(type='bool', default=False),
         force=dict(type='bool', default=False),
         purge=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'template']),
@@ -678,14 +769,15 @@ def main():
         argument_spec=module_args,
         required_if=[
             ('state', 'present', ['node', 'hostname']),
-            ('state', 'present', ('clone', 'ostemplate'), True),  # Require one of clone and ostemplate. Together with mutually_exclusive this ensures that we
-                                                                  # either clone a container or create a new one from a template file.
+            # Require one of clone, ostemplate, or update. Together with mutually_exclusive this ensures that we
+            # either clone a container or create a new one from a template file.
+            ('state', 'present', ('clone', 'ostemplate', 'update'), True),
         ],
         required_together=[
             ('api_token_id', 'api_token_secret')
         ],
         required_one_of=[('api_password', 'api_token_id')],
-        mutually_exclusive=[('clone', 'ostemplate')],  # Creating a new container is done either by cloning an existing one, or based on a template.
+        mutually_exclusive=[('clone', 'ostemplate', 'update')],  # Creating a new container is done either by cloning an existing one, or based on a template.
     )
 
     proxmox = ProxmoxLxcAnsible(module)
@@ -733,8 +825,43 @@ def main():
     # Create a new container
     if state == 'present' and clone is None:
         try:
-            if proxmox.get_vm(vmid, ignore_missing=True) and not module.params['force']:
-                module.exit_json(changed=False, vmid=vmid, msg="VM with vmid = %s is already exists" % vmid)
+            if proxmox.get_vm(vmid, ignore_missing=True):
+                if module.params["update"]:
+                    try:
+                        proxmox.update_config(vmid, node, disk, cpus, memory, swap,
+                                              cores=module.params["cores"],
+                                              hostname=module.params["hostname"],
+                                              netif=module.params["netif"],
+                                              mounts=module.params["mounts"],
+                                              ip_address=module.params["ip_address"],
+                                              onboot=ansible_to_proxmox_bool(module.params["onboot"]),
+                                              cpuunits=module.params["cpuunits"],
+                                              nameserver=module.params["nameserver"],
+                                              searchdomain=module.params["searchdomain"],
+                                              features=",".join(module.params["features"])
+                                              if module.params["features"] is not None
+                                              else None,
+                                              description=module.params["description"],
+                                              hookscript=module.params["hookscript"],
+                                              timezone=module.params["timezone"],
+                                              tags=module.params["tags"])
+                        module.exit_json(
+                            changed=True,
+                            vmid=vmid,
+                            msg="Configured VM %s" % (vmid),
+                        )
+                    except Exception as e:
+                        module.fail_json(
+                            vmid=vmid,
+                            msg="Configuration of %s VM %s failed with exception: %s"
+                            % (VZ_TYPE, vmid, e),
+                        )
+                if not module.params["force"]:
+                    module.exit_json(
+                        changed=False,
+                        vmid=vmid,
+                        msg="VM with vmid = %s is already exists" % vmid,
+                    )
             # If no vmid was passed, there cannot be another VM named 'hostname'
             if (not module.params['vmid'] and
                     proxmox.get_vmid(hostname, ignore_missing=True) and
