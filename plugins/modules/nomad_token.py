@@ -103,24 +103,21 @@ result:
     returned: always
     type: dict
     sample: {
-        "msg": "ACL token updated.",
-        "token": {
-            "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
-            "create_index": 14,
-            "create_time": "2023-11-12T18:48:34.248857001Z",
-            "expiration_time": null,
-            "expiration_ttl": "",
-            "global": true,
-            "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
-            "modify_index": 836,
-            "name": "devs",
-            "policies": [
-                "readonly"
-            ],
-            "roles": null,
-            "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
-            "type": "client"
-        }
+        "accessor_id": "0d01c55f-8d63-f832-04ff-1866d4eb594e",
+        "create_index": 14,
+        "create_time": "2023-11-12T18:48:34.248857001Z",
+        "expiration_time": null,
+        "expiration_ttl": "",
+        "global": true,
+        "hash": "eSn8H8RVqh8As8WQNnC2vlBRqXy6DECogc5umzX0P30=",
+        "modify_index": 836,
+        "name": "devs",
+        "policies": [
+            "readonly"
+        ],
+        "roles": null,
+        "secret_id": "12e878ab-e1f6-e103-b4c4-3b5173bb4cea",
+        "type": "client"        
     }
 '''
 
@@ -220,27 +217,29 @@ def setup_nomad_client(module):
 def run(module):
     nomad_client = setup_nomad_client(module)
 
-    changed = False
+    msg = ""
     result = {}
+    changed = False
     if module.params.get('state') == "present":
 
         if module.params.get('token_type') == 'bootstrap':
             try:
                 current_token = get_token('Bootstrap Token', nomad_client)
                 if current_token:
-                    result = {"msg": "ACL bootstrap already exist.", "token": {}}
+                    msg = "ACL bootstrap already exist."
                 else:
                     nomad_result = nomad_client.acl.generate_bootstrap()
-                    result = {'msg': "Boostrap token created.",
-                              "token": transform_response(nomad_result)}
+                    msg = "Boostrap token created."
+                    result = transform_response(nomad_result)
                     changed = True
 
             except nomad.api.exceptions.URLNotAuthorizedNomadException:
                 try:
                     nomad_result = nomad_client.acl.generate_bootstrap()
-                    result = {'msg': "Boostrap token created.",
-                              "token": transform_response(nomad_result)}
+                    msg = "Boostrap token created."
+                    result = transform_response(nomad_result)
                     changed = True
+
                 except Exception as e:
                     module.fail_json(msg=to_native(e))
         else:
@@ -256,17 +255,17 @@ def run(module):
 
                 if current_token:
                     token_info['AccessorID'] = current_token['AccessorID']
-                    nomad_result = nomad_client.acl.update_token(current_token['AccessorID'],
-                                                                 token_info)
-                    result = {"msg": "ACL token updated.",
-                              "token": transform_response(nomad_result)}
+                    nomad_result = nomad_client.acl.update_token(current_token['AccessorID'], token_info)
+                    msg = "ACL token updated."
+                    result = transform_response(nomad_result)
                     changed = True
 
                 else:
                     nomad_result = nomad_client.acl.create_token(token_info)
-                    result = {"msg": "ACL token Created.",
-                              "token": transform_response(nomad_result)}
+                    msg = "ACL token Created."
+                    result = transform_response(nomad_result)
                     changed = True
+
             except Exception as e:
                 module.fail_json(msg=to_native(e))
 
@@ -282,15 +281,15 @@ def run(module):
             token = get_token(module.params.get('name'), nomad_client)
             if token:
                 nomad_client.acl.delete_token(token.get('AccessorID'))
-                result = {'msg': 'ACL token deleted.', 'token': {}}
+                msg = 'ACL token deleted.'
                 changed = True
             else:
-                result = {'msg': "No token with name '{0}' found".format(module.params.get('name')), 'token': {}}
+                msg = "No token with name '{0}' found".format(module.params.get('name'))
 
         except Exception as e:
             module.fail_json(msg=to_native(e))
 
-    module.exit_json(changed=changed, result=result)
+    module.exit_json(changed=changed, msg=msg, result=result)
 
 
 def main():
