@@ -434,10 +434,10 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         self.connect_mock = patch(
             "ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect",
         ).start()
-        self.connect_mock.return_value.nodes.return_value.lxc.return_value.get.return_value = (
+        self.connect_mock.return_value.nodes.return_value.lxc.get.return_value = (
             RAW_LXC_OUTPUT
         )
-        self.connect_mock.return_value.nodes.return_value.qemu.return_value.get.return_value = (
+        self.connect_mock.return_value.nodes.return_value.qemu.get.return_value = (
             RAW_QEMU_OUTPUT
         )
         self.connect_mock.return_value.cluster.return_value.resources.return_value.get.return_value = (
@@ -566,7 +566,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert result["proxmox_vms"] == expected_output
         assert len(result["proxmox_vms"]) == 2
 
-    def test_get_multiple_vms_with_the_same_name(self):
+    def test_get_vm_with_an_empty_name(self):
         name = ""
         self.connect_mock.return_value.cluster.resources.get.return_value = [
             {"name": name, "vmid": "105"},
@@ -629,7 +629,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert result["proxmox_vms"] == []
 
     def test_module_fail_when_qemu_request_fails(self):
-        self.connect_mock.return_value.nodes.return_value.qemu.return_value.get.side_effect = IOError(
+        self.connect_mock.return_value.nodes.return_value.qemu.get.side_effect = IOError(
             "Some mocked connection error."
         )
         with pytest.raises(AnsibleFailJson) as exc_info:
@@ -640,7 +640,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert "Failed to retrieve QEMU VMs information:" in result["msg"]
 
     def test_module_fail_when_lxc_request_fails(self):
-        self.connect_mock.return_value.nodes.return_value.lxc.return_value.get.side_effect = IOError(
+        self.connect_mock.return_value.nodes.return_value.lxc.get.side_effect = IOError(
             "Some mocked connection error."
         )
         with pytest.raises(AnsibleFailJson) as exc_info:

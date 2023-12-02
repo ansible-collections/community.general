@@ -175,7 +175,7 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                 type != info["type"]
                 or (node and info["node"] != node)
                 or (vmid and int(info["vmid"]) != vmid)
-                or (name and info["name"] != name)
+                or (name is not None and info["name"] != name)
             )
         }
         # Get list of unique node names and loop through it to get info about machines.
