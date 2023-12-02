@@ -52,7 +52,6 @@ options:
     version_added: 1.0.0
     description:
       - A list of dictionaries that represents gitlab project's labels.
-    default: []
     type: list
     elements: dict
     required: true
@@ -77,7 +76,7 @@ options:
         description:
           - Label's description
         type: str
-        default: ""
+        default: null
       new_name:
         description:
           - Optional field to change label's name
@@ -169,8 +168,6 @@ project_label:
       sample: ['defg', 'new-label']
 '''
 
-from typing import Dict, List, Tuple
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 
@@ -238,9 +235,7 @@ class GitlabProjectLabels(object):
         return True
 
 
-def compare(requested_labels: List[Dict],
-            existing_labels: List,
-            state: str) -> Tuple:
+def compare(requested_labels, existing_labels, state):
     # we need to do this, because it was determined in a previous version - more or less buggy
     # basically it is not necessary and might result in more/other bugs!
     # but it is required  and only relevant for check mode!!
@@ -270,12 +265,7 @@ def compare(requested_labels: List[Dict],
     return untouched, updated, added
 
 
-def native_python_main(this_gitlab: GitlabProjectLabels,
-                       purge: bool,
-                       requested_labels: List[Dict],
-                       state: str,
-                       module: AnsibleModule
-                       ) -> Tuple:
+def native_python_main(this_gitlab, purge, requested_labels, state, module):
 
     change = False
     return_value = dict(added=[], updated=[], removed=[], untouched=[])
