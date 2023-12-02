@@ -1679,7 +1679,7 @@ class KeycloakAPI(object):
         :param name: Name of the role to fetch.
         :param realm: Realm in which the role resides; default 'master'.
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name))
+        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name, safe=''))
         try:
             return json.loads(to_native(open_url(role_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
@@ -1716,7 +1716,7 @@ class KeycloakAPI(object):
         :param rolerep: A RoleRepresentation of the updated role.
         :return HTTPResponse object on success
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
+        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']), safe='')
         try:
             composites = None
             if "composites" in rolerep:
@@ -1737,9 +1737,9 @@ class KeycloakAPI(object):
             if clientid is not None:
                 client = self.get_client_by_clientid(client_id=clientid, realm=realm)
                 cid = client['id']
-                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"], safe=''))
             else:
-                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"], safe=''))
             # Get existing composites
             return json.loads(to_native(open_url(
                 composite_url,
@@ -1758,9 +1758,9 @@ class KeycloakAPI(object):
             if clientid is not None:
                 client = self.get_client_by_clientid(client_id=clientid, realm=realm)
                 cid = client['id']
-                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"], safe=''))
             else:
-                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"], safe=''))
             # Get existing composites
             # create new composites
             return open_url(composite_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
@@ -1775,9 +1775,9 @@ class KeycloakAPI(object):
             if clientid is not None:
                 client = self.get_client_by_clientid(client_id=clientid, realm=realm)
                 cid = client['id']
-                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"]))
+                composite_url = URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep["name"], safe=''))
             else:
-                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"]))
+                composite_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=quote(rolerep["name"], safe=''))
             # Get existing composites
             # create new composites
             return open_url(composite_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
@@ -1842,7 +1842,7 @@ class KeycloakAPI(object):
         :param name: The name of the role.
         :param realm: The realm in which this role resides, default "master".
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name))
+        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name, safe=''))
         try:
             return open_url(role_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             validate_certs=self.validate_certs)
@@ -1886,7 +1886,7 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name))
+        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name, safe=''))
         try:
             return json.loads(to_native(open_url(role_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
@@ -1950,7 +1950,7 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
+        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name'], safe=''))
         try:
             composites = None
             if "composites" in rolerep:
@@ -1976,7 +1976,7 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name))
+        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name, safe=''))
         try:
             return open_url(role_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             validate_certs=self.validate_certs)
@@ -2036,7 +2036,7 @@ class KeycloakAPI(object):
                 URL_AUTHENTICATION_FLOW_COPY.format(
                     url=self.baseurl,
                     realm=realm,
-                    copyfrom=quote(config["copyFrom"])),
+                    copyfrom=quote(config["copyFrom"], safe='')),
                 method='POST',
                 http_agent=self.http_agent, headers=self.restheaders,
                 data=json.dumps(new_name),
@@ -2110,7 +2110,7 @@ class KeycloakAPI(object):
                 URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
                     url=self.baseurl,
                     realm=realm,
-                    flowalias=quote(flowAlias)),
+                    flowalias=quote(flowAlias, safe='')),
                 method='PUT',
                 http_agent=self.http_agent, headers=self.restheaders,
                 data=json.dumps(updatedExec),
@@ -2159,7 +2159,7 @@ class KeycloakAPI(object):
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
                     url=self.baseurl,
                     realm=realm,
-                    flowalias=quote(flowAlias)),
+                    flowalias=quote(flowAlias, safe='')),
                 method='POST',
                 http_agent=self.http_agent, headers=self.restheaders,
                 data=json.dumps(newSubFlow),
@@ -2183,7 +2183,7 @@ class KeycloakAPI(object):
                 URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION.format(
                     url=self.baseurl,
                     realm=realm,
-                    flowalias=quote(flowAlias)),
+                    flowalias=quote(flowAlias, safe='')),
                 method='POST',
                 http_agent=self.http_agent, headers=self.restheaders,
                 data=json.dumps(newExec),
@@ -2243,7 +2243,7 @@ class KeycloakAPI(object):
                     URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
                         url=self.baseurl,
                         realm=realm,
-                        flowalias=quote(config["alias"])),
+                        flowalias=quote(config["alias"], safe='')),
                     method='GET',
                     http_agent=self.http_agent, headers=self.restheaders,
                     timeout=self.connection_timeout,
@@ -2336,7 +2336,7 @@ class KeycloakAPI(object):
             return open_url(
                 URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
                     url=self.baseurl,
-                    alias=quote(alias),
+                    alias=quote(alias, safe=''),
                     realm=realm
                 ),
                 method='PUT',
@@ -2363,7 +2363,7 @@ class KeycloakAPI(object):
             return open_url(
                 URL_AUTHENTICATION_REQUIRED_ACTIONS_ALIAS.format(
                     url=self.baseurl,
-                    alias=quote(alias),
+                    alias=quote(alias, safe=''),
                     realm=realm
                 ),
                 method='DELETE',
@@ -2630,7 +2630,7 @@ class KeycloakAPI(object):
 
     def get_authz_authorization_scope_by_name(self, name, client_id, realm):
         url = URL_AUTHZ_AUTHORIZATION_SCOPES.format(url=self.baseurl, client_id=client_id, realm=realm)
-        search_url = "%s/search?name=%s" % (url, quote(name))
+        search_url = "%s/search?name=%s" % (url, quote(name, safe=''))
 
         try:
             return json.loads(to_native(open_url(search_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
