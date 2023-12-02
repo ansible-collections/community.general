@@ -342,7 +342,7 @@ def main():
     argument_spec.update(
         project=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
-        labels=dict(type='list', elements='dict', required=True, default=list(),
+        labels=dict(type='list', elements='dict', required=True,
                     options=dict(
                         name=dict(type='str', required=True),
                         color=dict(type='str', required=False),
