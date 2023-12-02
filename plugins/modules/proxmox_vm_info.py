@@ -259,7 +259,7 @@ def main():
         vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config)
         vms.update(proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config))
 
-    result["proxmox_vms"] = vms.values()
+    result["proxmox_vms"] = list(vms.values())
     module.exit_json(**result)
 
 

@@ -665,13 +665,12 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         )
 
     def test_module_fail_when_node_does_not_exist(self):
-        self.connect_mock.return_value.nodes.get.return_value = []
         with pytest.raises(AnsibleFailJson) as exc_info:
-            set_module_args(get_module_args(type="all", node=NODE1))
+            set_module_args(get_module_args(type="all", node="NODE3"))
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["msg"] == "Node pve doesn't exist in PVE cluster"
+        assert result["msg"] == "Node NODE3 doesn't exist in PVE cluster"
 
     def test_call_to_get_vmid_is_not_used_when_vmid_provided(self):
         with patch(
