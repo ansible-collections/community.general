@@ -1,0 +1,15 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gitlab_branch: ansible_test_branch
+gitlab_project_name: ansible_test_project
+gitlab_project_group: ansible_test_group
+gitlab_host: ansible_test_host
+gitlab_api_token: ansible_test_api_token
+gitlab_labels: ansible_test_label
+gitlab_milestone_search: ansible_test_milestone_search
+gitlab_milestone_group_id: ansible_test_milestone_group_id
+gitlab_assignee_ids: ansible_test_assignee_ids
+gitlab_description_path: ansible_test_description_path
