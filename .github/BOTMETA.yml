@@ -549,6 +549,8 @@ files:
     ignore: dj-wasabi
   $modules/gitlab_branch.py:
     maintainers: paytroff
+  $modules/gitlab_issue.py:
+    maintainers: zvaraondrej
   $modules/gitlab_merge_request.py:
     maintainers: zvaraondrej
   $modules/gitlab_project_variable.py:
