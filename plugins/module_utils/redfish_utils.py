@@ -2955,7 +2955,7 @@ class RedfishUtils(object):
         result = {}
         inventory = {}
         # Get these entries, but does not fail if not found
-        properties = ['Status', 'HostName', 'PowerState', 'Model', 'Manufacturer',
+        properties = ['Status', 'HostName', 'PowerState', 'BootProgress', 'Model', 'Manufacturer',
                       'PartNumber', 'SystemType', 'AssetTag', 'ServiceTag',
                       'SerialNumber', 'SKU', 'BiosVersion', 'MemorySummary',
                       'ProcessorSummary', 'TrustedModules', 'Name', 'Id']
