@@ -7,8 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from typing import Dict, List, Tuple
-
 DOCUMENTATION = '''
 module: gitlab_project_label
 short_description: Creates/updates/deletes GitLab Projects Labels
@@ -44,6 +42,7 @@ options:
       - When set to V(true), delete all variables which are not mentioned in the task.
     default: false
     type: bool
+    required: false
   project:
     description:
       - The path and name of the project.
@@ -56,6 +55,7 @@ options:
     default: []
     type: list
     elements: dict
+    required: true
     suboptions:
       name:
         description:
@@ -78,6 +78,11 @@ options:
           - Label's description
         type: str
         default: ""
+      new_name:
+        description:
+          - Optional field to change label's name
+        type: str
+        default: null
 '''
 
 
@@ -163,6 +168,8 @@ project_label:
       type: list
       sample: ['defg', 'new-label']
 '''
+
+from typing import Dict, List, Tuple
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
@@ -265,7 +272,7 @@ def compare(requested_labels: List[Dict],
 
 def native_python_main(this_gitlab: GitlabProjectLabels,
                        purge: bool,
-                       requested_labels: list[Dict],
+                       requested_labels: List[Dict],
                        state: str,
                        module: AnsibleModule
                        ) -> Tuple:
@@ -344,12 +351,13 @@ def main():
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
         project=dict(type='str', required=True),
+        purge=dict(type='bool', required=False, default=False),
         labels=dict(type='list', elements='dict', required=True, default=list(),
                     options=dict(
                         name=dict(type='str', required=True),
                         color=dict(type='str', required=False),
                         description=dict(type='str', required=False),
-                        priority=dict(type='str', required=False),
+                        priority=dict(type='int', required=False),
                         new_name=dict(type='str', required=False),
         )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
