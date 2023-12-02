@@ -172,10 +172,10 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
         # Leave in dict only machines that user wants to know about
         filtered_vms = {
             vm: info for vm, info in cluster_machines.items() if not (
-                    type != info["type"]
-                    or (node and info["node"] != node)
-                    or (vmid and int(info["vmid"]) != vmid)
-                    or (name and info["name"] != name)
+                type != info["type"]
+                or (node and info["node"] != node)
+                or (vmid and int(info["vmid"]) != vmid)
+                or (name and info["name"] != name)
             )
         }
         # Get list of unique node names and loop through it to get info about machines.
@@ -259,7 +259,7 @@ def main():
         vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config)
         vms.update(proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config))
 
-    result["proxmox_vms"] = [vm_info for vm_info in vms.values()]
+    result["proxmox_vms"] = vms.values()
     module.exit_json(**result)
 
 
