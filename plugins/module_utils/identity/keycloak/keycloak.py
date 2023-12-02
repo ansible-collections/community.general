@@ -78,6 +78,8 @@ URL_CLIENT_USER_ROLEMAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappi
 URL_CLIENT_USER_ROLEMAPPINGS_AVAILABLE = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}/available"
 URL_CLIENT_USER_ROLEMAPPINGS_COMPOSITE = "{url}/admin/realms/{realm}/users/{id}/role-mappings/clients/{client}/composite"
 
+URL_REALM_GROUP_ROLEMAPPINGS = "{url}/admin/realms/{realm}/groups/{group}/role-mappings/realm"
+
 URL_CLIENTSECRET = "{url}/admin/realms/{realm}/clients/{id}/client-secret"
 
 URL_AUTHENTICATION_FLOWS = "{url}/admin/realms/{realm}/authentication/flows"
@@ -625,6 +627,38 @@ class KeycloakAPI(object):
         except Exception as e:
             self.fail_open_url(e, msg="Could not assign roles to composite role %s and realm %s: %s"
                                       % (rid, realm, str(e)))
+
+    def add_group_realm_rolemapping(self, gid, role_rep, realm="master"):
+        """ Add the specified realm role to specified group on the Keycloak server.
+
+        :param gid: ID of the group to add the role mapping.
+        :param role_rep: Representation of the role to assign.
+        :param realm: Realm from which to obtain the rolemappings.
+        :return: None.
+        """
+        url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, group=gid)
+        try:
+            open_url(url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could add realm rolemappings for group %s, realm %s: %s"
+                                      % (gid, realm, str(e)))
+
+    def delete_group_realm_rolemapping(self, gid, role_rep, realm="master"):
+        """ Delete the specified realm role from the specified group on the Keycloak server.
+
+        :param gid: ID of the group from which to obtain the rolemappings.
+        :param role_rep: Representation of the role to assign.
+        :param realm: Realm from which to obtain the rolemappings.
+        :return: None.
+        """
+        url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, group=gid)
+        try:
+            open_url(url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not delete realm rolemappings for group %s, realm %s: %s"
+                                      % (gid, realm, str(e)))
 
     def add_group_rolemapping(self, gid, cid, role_rep, realm="master"):
         """ Fetch the composite role of a client in a specified group on the Keycloak server.
