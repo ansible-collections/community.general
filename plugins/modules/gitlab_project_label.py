@@ -349,7 +349,7 @@ def main():
                         description=dict(type='str', required=False),
                         priority=dict(type='int', required=False),
                         new_name=dict(type='str', required=False),
-        )),
+                    )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
