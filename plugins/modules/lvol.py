@@ -552,9 +552,9 @@ def main():
                 elif rc == 0:
                     changed = True
                     msg = "Volume %s resized to %s%s" % (this_lv['name'], size_requested, unit)
-                elif "matches existing size" in err:
+                elif "matches existing size" in err or "matches existing size" in out:
                     module.exit_json(changed=False, vg=vg, lv=this_lv['name'], size=this_lv['size'])
-                elif "not larger than existing size" in err:
+                elif "not larger than existing size" in err or "not larger than existing size" in out:
                     module.exit_json(changed=False, vg=vg, lv=this_lv['name'], size=this_lv['size'], msg="Original size is larger than requested size", err=err)
                 else:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err)
@@ -585,9 +585,9 @@ def main():
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err, out=out)
                 elif rc == 0:
                     changed = True
-                elif "matches existing size" in err:
+                elif "matches existing size" in err or "matches existing size" in out:
                     module.exit_json(changed=False, vg=vg, lv=this_lv['name'], size=this_lv['size'])
-                elif "not larger than existing size" in err:
+                elif "not larger than existing size" in err or "not larger than existing size" in out:
                     module.exit_json(changed=False, vg=vg, lv=this_lv['name'], size=this_lv['size'], msg="Original size is larger than requested size", err=err)
                 else:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err)
