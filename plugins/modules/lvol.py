@@ -78,7 +78,7 @@ options:
     type: list
     elements: str
     description:
-    - List of physical volumes (e.g. /dev/sda,/dev/sdb).
+    - List of physical volumes (for example V(/dev/sda, /dev/sdb)).
   thinpool:
     type: str
     description:
@@ -111,7 +111,9 @@ EXAMPLES = '''
     vg: firefly
     lv: test
     size: 512
-    pvs: /dev/sda,/dev/sdb
+    pvs:
+      - /dev/sda
+      - /dev/sdb
 
 - name: Create cache pool logical volume
   community.general.lvol:

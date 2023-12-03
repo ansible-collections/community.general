@@ -1,2 +1,2 @@
 minor_changes:
-  - lvol - Change ``pvs`` argument type to list (of str). (https://github.com/ansible-collections/community.general/pull/7676, https://github.com/ansible-collections/community.general/issues/7504).
+  - lvol - change ``pvs`` argument type to list of strings (https://github.com/ansible-collections/community.general/pull/7676, https://github.com/ansible-collections/community.general/issues/7504).
