@@ -119,7 +119,7 @@ files:
     labels: hwc
     maintainers: $team_huawei
   $doc_fragments/nomad.py:
-    maintainers: chris93111
+    maintainers: chris93111 apecnascimento
   $doc_fragments/xenserver.py:
     labels: xenserver
     maintainers: bvitnik
@@ -874,7 +874,7 @@ files:
   $modules/nmcli.py:
     maintainers: alcamie101
   $modules/nomad_:
-    maintainers: chris93111
+    maintainers: chris93111 apecnascimento
   $modules/nosh.py:
     maintainers: tacatac
   $modules/npm.py:
