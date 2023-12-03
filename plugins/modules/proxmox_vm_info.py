@@ -183,12 +183,12 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
         for this_node in nodes:
             # "type" is mandatory and can have only values of "qemu" or "lxc". Seems that use of reflection is safe.
             call_vm_getter = getattr(self.proxmox_api.nodes(this_node), type)
-            vms_from_this_node = call_vm_getter.get()
+            vms_from_this_node = call_vm_getter().get()
             for detected_vm in vms_from_this_node:
-                desired_vm = filtered_vms.get(int(detected_vm["vmid"]), None)
+                this_vm_id = int(detected_vm["vmid"])
+                desired_vm = filtered_vms.get(this_vm_id, None)
                 if desired_vm:
                     desired_vm.update(detected_vm)
-                    this_vm_id = int(desired_vm["vmid"])
                     desired_vm["vmid"] = this_vm_id
                     desired_vm["template"] = proxmox_to_ansible_bool(desired_vm["template"])
                     # When user wants to retrieve the VM configuration
@@ -259,7 +259,7 @@ def main():
         vms = proxmox.get_qemu_vms(cluster_machines, vmid, name, node, config)
         vms.update(proxmox.get_lxc_vms(cluster_machines, vmid, name, node, config))
 
-    result["proxmox_vms"] = list(vms.values())
+    result["proxmox_vms"] = [info for vm, info in sorted(vms.items())]
     module.exit_json(**result)
 
 
