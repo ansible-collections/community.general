@@ -99,7 +99,7 @@ EXAMPLES = '''
 
 RETURN = '''
 result:
-    description: Result returned by nomad with a friendly message
+    description: Result returned by nomad.
     returned: always
     type: dict
     sample: {
