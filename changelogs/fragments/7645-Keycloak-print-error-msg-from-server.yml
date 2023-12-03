@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak module utils - expose error message from Keycloak server for HTTP errors in some specific situations (https://github.com/ansible-collections/community.general/pull/7645).
