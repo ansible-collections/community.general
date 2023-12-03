@@ -1,0 +1,79 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: setup_no_value.yml
+
+- name: setting value
+  git_config:
+    name: push.pushoption
+    add_mode: add
+    value: "{{ item }}"
+    state: present
+    scope: global
+  loop:
+    - 'merge_request.create'
+    - 'merge_request.draft'
+    - 'merge_request.target=foobar'
+  register: set_result1
+
+- name: setting value
+  git_config:
+    name: push.pushoption
+    add_mode: add
+    value: "{{ item }}"
+    state: present
+    scope: global
+  loop:
+    - 'merge_request.create'
+    - 'merge_request.draft'
+    - 'merge_request.target=foobar'
+  register: set_result2
+
+- name: getting the multi-value
+  git_config:
+    name: push.pushoption
+    scope: global
+  register: get_single_result
+
+- name: getting all values for the single option
+  git_config_info:
+    name: push.pushoption
+    scope: global
+  register: get_all_result
+
+- name: replace-all values
+  git_config:
+    name: push.pushoption
+    add_mode: replace-all
+    value: merge_request.create
+    state: present
+    scope: global
+  register: set_result3
+
+- name: assert set changed and value is correct
+  assert:
+    that:
+      - set_result1.results[0] is changed
+      - set_result1.results[1] is changed
+      - set_result1.results[2] is changed
+      - set_result2.results[0] is not changed
+      - set_result2.results[1] is not changed
+      - set_result2.results[2] is not changed
+      - set_result3 is changed
+      - get_single_result.config_value == 'merge_request.create'
+      - 'get_all_result.config_values == {"push.pushoption": ["merge_request.create", "merge_request.draft", "merge_request.target=foobar"]}'
+
+- name: assert the diffs are also right
+  assert:
+    that:
+      - set_result1.results[0].diff.before == "\n"
+      - set_result1.results[0].diff.after == "merge_request.create\n"
+      - set_result1.results[1].diff.before == "merge_request.create\n"
+      - set_result1.results[1].diff.after == ["merge_request.create", "merge_request.draft"]
+      - set_result1.results[2].diff.before == ["merge_request.create", "merge_request.draft"]
+      - set_result1.results[2].diff.after == ["merge_request.create", "merge_request.draft", "merge_request.target=foobar"]
+      - set_result3.diff.before == ["merge_request.create", "merge_request.draft", "merge_request.target=foobar"]
+      - set_result3.diff.after == "merge_request.create\n"
+...
