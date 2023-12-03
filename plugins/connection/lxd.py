@@ -101,6 +101,8 @@ class Connection(ConnectionBase):
             self.get_option("executable"), "-c", cmd
         ])
 
+        self._display.vvvvv(u"EXEC {0}".format(local_cmd), host=self._host())
+
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         in_data = to_bytes(in_data, errors='surrogate_or_strict', nonstring='passthru')
 
@@ -110,10 +112,12 @@ class Connection(ConnectionBase):
         stdout = to_text(stdout)
         stderr = to_text(stderr)
 
+        self._display.vvvvv(u"EXEC lxc output: {0} {1}".format(stdout, stderr), host=self._host())
+
         if "is not running" in stderr:
             raise AnsibleConnectionFailure("instance not running: %s" % self._host())
 
-        if "not found" in stderr:
+        if stderr.strip() == "Error: Instance not found" or stderr.strip() == "error: not found":
             raise AnsibleConnectionFailure("instance not found: %s" % self._host())
 
         return process.returncode, stdout, stderr
