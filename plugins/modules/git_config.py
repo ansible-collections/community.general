@@ -75,6 +75,16 @@ options:
       - When specifying the name of a single setting, supply a value to
         set that setting to the given value.
     type: str
+  add_mode:
+    description:
+      - Specify if a value should replace the existing value(s) or if the new
+        value should be added alongside other values with the same name.
+      - This option is only relevant when adding/replacing values. If O(state=absent) or
+        values are just read out, this option is not considered.
+    choices: [ "add", "replace-all" ]
+    type: str
+    default: "replace-all"
+    version_added: 8.1.0
 '''
 
 EXAMPLES = '''
@@ -117,6 +127,15 @@ EXAMPLES = '''
   community.general.git_config:
     name: color.ui
     value: auto
+
+- name: Add several options for the same name
+  community.general.git_config:
+    name: push.pushoption
+    value: "{{ item }}"
+    add_mode: add
+  loop:
+    - merge_request.create
+    - merge_request.draft
 
 - name: Make etckeeper not complaining when it is invoked by cron
   community.general.git_config:
@@ -178,6 +197,7 @@ def main():
             name=dict(type='str'),
             repo=dict(type='path'),
             file=dict(type='path'),
+            add_mode=dict(required=False, type='str', default='replace-all', choices=['add', 'replace-all']),
             scope=dict(required=False, type='str', choices=['file', 'local', 'global', 'system']),
             state=dict(required=False, type='str', default='present', choices=['present', 'absent']),
             value=dict(required=False),
@@ -197,93 +217,117 @@ def main():
     # Set the locale to C to ensure consistent messages.
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
-    if params['name']:
-        name = params['name']
-    else:
-        name = None
+    name = params['name'] or ''
+    unset = params['state'] == 'absent'
+    new_value = params['value'] or ''
+    add_mode = params['add_mode']
 
-    if params['scope']:
-        scope = params['scope']
-    elif params['list_all']:
-        scope = None
-    else:
-        scope = 'system'
+    scope = determine_scope(params)
+    cwd = determine_cwd(scope, params)
 
-    if params['state'] == 'absent':
-        unset = 'unset'
-        params['value'] = None
-    else:
-        unset = None
+    base_args = [git_path, "config", "--includes"]
 
-    if params['value']:
-        new_value = params['value']
-    else:
-        new_value = None
-
-    args = [git_path, "config", "--includes"]
-    if params['list_all']:
-        args.append('-l')
     if scope == 'file':
-        args.append('-f')
-        args.append(params['file'])
+        base_args.append('-f')
+        base_args.append(params['file'])
     elif scope:
-        args.append("--" + scope)
+        base_args.append("--" + scope)
+
+    list_args = list(base_args)
+
+    if params['list_all']:
+        list_args.append('-l')
+
     if name:
-        args.append(name)
+        list_args.append("--get-all")
+        list_args.append(name)
 
-    if scope == 'local':
-        dir = params['repo']
-    elif params['list_all'] and params['repo']:
-        # Include local settings from a specific repo when listing all available settings
-        dir = params['repo']
-    else:
-        # Run from root directory to avoid accidentally picking up any local config settings
-        dir = "/"
+    (rc, out, err) = module.run_command(list_args, cwd=cwd, expand_user_and_vars=False)
 
-    (rc, out, err) = module.run_command(args, cwd=dir, expand_user_and_vars=False)
     if params['list_all'] and scope and rc == 128 and 'unable to read config file' in err:
         # This just means nothing has been set at the given scope
         module.exit_json(changed=False, msg='', config_values={})
     elif rc >= 2:
         # If the return code is 1, it just means the option hasn't been set yet, which is fine.
-        module.fail_json(rc=rc, msg=err, cmd=' '.join(args))
+        module.fail_json(rc=rc, msg=err, cmd=' '.join(list_args))
+
+    old_values = out.rstrip().splitlines()
 
     if params['list_all']:
-        values = out.rstrip().splitlines()
         config_values = {}
-        for value in values:
+        for value in old_values:
             k, v = value.split('=', 1)
             config_values[k] = v
         module.exit_json(changed=False, msg='', config_values=config_values)
     elif not new_value and not unset:
-        module.exit_json(changed=False, msg='', config_value=out.rstrip())
+        module.exit_json(changed=False, msg='', config_value=old_values[0] if old_values else '')
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
+    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add"):
+        module.exit_json(changed=False, msg="")
+
+    # Until this point, the git config was just read and in case no change is needed, the module has already exited.
+
+    set_args = list(base_args)
+    if unset:
+        set_args.append("--unset-all")
+        set_args.append(name)
     else:
-        old_value = out.rstrip()
-        if old_value == new_value:
-            module.exit_json(changed=False, msg="")
+        set_args.append("--" + add_mode)
+        set_args.append(name)
+        set_args.append(new_value)
 
     if not module.check_mode:
-        if unset:
-            args.insert(len(args) - 1, "--" + unset)
-            cmd = args
-        else:
-            cmd = args + [new_value]
-        (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False, expand_user_and_vars=False)
+        (rc, out, err) = module.run_command(set_args, cwd=cwd, ignore_invalid_cwd=False, expand_user_and_vars=False)
         if err:
-            module.fail_json(rc=rc, msg=err, cmd=cmd)
+            module.fail_json(rc=rc, msg=err, cmd=set_args)
+
+    if unset:
+        after_values = []
+    elif add_mode == "add":
+        after_values = old_values + [new_value]
+    else:
+        after_values = [new_value]
 
     module.exit_json(
         msg='setting changed',
         diff=dict(
-            before_header=' '.join(args),
-            before=old_value + "\n",
-            after_header=' '.join(args),
-            after=(new_value or '') + "\n"
+            before_header=' '.join(set_args),
+            before=build_diff_value(old_values),
+            after_header=' '.join(set_args),
+            after=build_diff_value(after_values),
         ),
         changed=True
     )
+
+
+def determine_scope(params):
+    if params['scope']:
+        return params['scope']
+    elif params['list_all']:
+        return ""
+    else:
+        return 'system'
+
+
+def build_diff_value(value):
+    if not value:
+        return "\n"
+    elif len(value) == 1:
+        return value[0] + "\n"
+    else:
+        return value
+
+
+def determine_cwd(scope, params):
+    if scope == 'local':
+        return params['repo']
+    elif params['list_all'] and params['repo']:
+        # Include local settings from a specific repo when listing all available settings
+        return params['repo']
+    else:
+        # Run from root directory to avoid accidentally picking up any local config settings
+        return "/"
 
 
 if __name__ == '__main__':

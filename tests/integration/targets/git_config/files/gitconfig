@@ -4,3 +4,8 @@
 
 [http]
         proxy = foo
+
+[push]
+pushoption = merge_request.create
+pushoption = merge_request.draft
+pushoption = merge_request.target=foobar
