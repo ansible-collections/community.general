@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: proxmox_node_info
 short_description: Retrieve information about one or more Proxmox VE nodes
-version_added: 8.0.3
+version_added: 8.1
 description:
   - Retrieve information about one or more Proxmox VE nodes.
 author: John Berninger (@jberning)
@@ -53,47 +53,47 @@ proxmox_nodes:
         type: int
       id:
         description: identity of the node
-        return: on success
+        returned: on success
         type: string
       level:
         description: Support level. Can be blank if not under a paid support contract
-        return: on success
+        returned: on success
         type: string
       maxcpu:
         description: Number of available CPUs
-        return: on success
+        returned: on success
         type: int
       maxdisk:
         description: Size of local disk in bytes
-        return: on success
+        returned: on success
         type: int
       maxmem:
         description: Memory size in bytes
-        return: on success
+        returned: on success
         type: int
       mem:
         description: Used memory in bytes
-        return: on success
+        returned: on success
         type: int
       node:
         description: Node name
-        return: on success
+        returned: on success
         type: string
       ssl_fingerprint:
         description: SSL fingerprint of the node certificate
-        return: on success
+        returned: on success
         type: string
       status:
         description: Node status
-        return: on success
+        returned: on success
         type: string 
       type:
         description: Object type being returned
-        return: on success
+        returned: on success
         type: string
       uptime:
         description: Node uptime in seconds
-        return: on success
+        returned: on success
         type: int
 '''
 
