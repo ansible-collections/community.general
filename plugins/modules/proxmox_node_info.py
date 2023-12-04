@@ -13,7 +13,6 @@ DOCUMENTATION = '''
 ---
 module: proxmox_node_info
 short_description: Retrieve information about one or more Proxmox VE nodes
-version_added: 8.1
 description:
   - Retrieve information about one or more Proxmox VE nodes.
 author: John Berninger (@jberning)
@@ -54,11 +53,11 @@ proxmox_nodes:
       id:
         description: identity of the node
         returned: on success
-        type: string
+        type: str
       level:
         description: Support level. Can be blank if not under a paid support contract
         returned: on success
-        type: string
+        type: str
       maxcpu:
         description: Number of available CPUs
         returned: on success
@@ -78,19 +77,19 @@ proxmox_nodes:
       node:
         description: Node name
         returned: on success
-        type: string
+        type: str
       ssl_fingerprint:
         description: SSL fingerprint of the node certificate
         returned: on success
-        type: string
+        type: str
       status:
         description: Node status
         returned: on success
-        type: string 
+        type: str
       type:
         description: Object type being returned
         returned: on success
-        type: string
+        type: str
       uptime:
         description: Node uptime in seconds
         returned: on success
@@ -110,8 +109,7 @@ class ProxmoxNodeInfoAnsible(ProxmoxAnsible):
 
 
 def proxmox_node_info_argument_spec():
-    return dict(
-    )
+    return dict()
 
 
 def main():
