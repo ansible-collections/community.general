@@ -414,7 +414,7 @@ EXPECTED_VMS_OUTPUT = [
 ]
 
 
-def get_module_args(type="all", node=None, vmid=None, name=None):
+def get_module_args(type="all", node=None, vmid=None, name=None, config="none"):
     return {
         "api_host": "host",
         "api_user": "user",
@@ -423,6 +423,7 @@ def get_module_args(type="all", node=None, vmid=None, name=None):
         "type": type,
         "vmid": vmid,
         "name": name,
+        "config": config,
     }
 
 
@@ -460,23 +461,21 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
     def test_get_lxc_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
             set_module_args(get_module_args(type="lxc"))
+            expected_output = [vm for vm in EXPECTED_VMS_OUTPUT if vm["type"] == "lxc"]
             self.module.main()
 
         result = exc_info.value.args[0]
         assert result["changed"] is False
-        assert result["proxmox_vms"] == [
-            vm for vm in EXPECTED_VMS_OUTPUT if vm["type"] == "lxc"
-        ]
+        assert result["proxmox_vms"] == expected_output
 
     def test_get_qemu_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
             set_module_args(get_module_args(type="qemu"))
+            expected_output = [vm for vm in EXPECTED_VMS_OUTPUT if vm["type"] == "qemu"]
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["proxmox_vms"] == [
-            vm for vm in EXPECTED_VMS_OUTPUT if vm["type"] == "qemu"
-        ]
+        assert result["proxmox_vms"] == expected_output
 
     def test_get_all_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
@@ -566,7 +565,7 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         assert result["proxmox_vms"] == expected_output
         assert len(result["proxmox_vms"]) == 2
 
-    def test_get_multiple_vms_with_the_same_name(self):
+    def test_get_vm_with_an_empty_name(self):
         name = ""
         self.connect_mock.return_value.cluster.resources.get.return_value = [
             {"name": name, "vmid": "105"},
@@ -665,13 +664,12 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         )
 
     def test_module_fail_when_node_does_not_exist(self):
-        self.connect_mock.return_value.nodes.get.return_value = []
         with pytest.raises(AnsibleFailJson) as exc_info:
-            set_module_args(get_module_args(type="all", node=NODE1))
+            set_module_args(get_module_args(type="all", node="NODE3"))
             self.module.main()
 
         result = exc_info.value.args[0]
-        assert result["msg"] == "Node pve doesn't exist in PVE cluster"
+        assert result["msg"] == "Node NODE3 doesn't exist in PVE cluster"
 
     def test_call_to_get_vmid_is_not_used_when_vmid_provided(self):
         with patch(
@@ -685,3 +683,32 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
                 self.module.main()
 
         assert get_vmid_mock.call_count == 0
+
+    def test_config_returned_when_specified_qemu_vm_with_config(self):
+        config_vm_value = {
+            'scsi0': 'local-lvm:vm-101-disk-0,iothread=1,size=32G',
+            'net0': 'virtio=4E:79:9F:A8:EE:E4,bridge=vmbr0,firewall=1',
+            'scsihw': 'virtio-scsi-single',
+            'cores': 1,
+            'name': 'test1',
+            'ostype': 'l26',
+            'boot': 'order=scsi0;ide2;net0',
+            'memory': 2048,
+            'sockets': 1,
+        }
+        (self.connect_mock.return_value.nodes.return_value.qemu.return_value.
+         config.return_value.get.return_value) = config_vm_value
+
+        with pytest.raises(AnsibleExitJson) as exc_info:
+            vmid = 101
+            set_module_args(get_module_args(
+                type="qemu",
+                vmid=vmid,
+                config="current",
+            ))
+            expected_output = [vm for vm in EXPECTED_VMS_OUTPUT if vm["vmid"] == vmid]
+            expected_output[0]["config"] = config_vm_value
+            self.module.main()
+
+        result = exc_info.value.args[0]
+        assert result["proxmox_vms"] == expected_output

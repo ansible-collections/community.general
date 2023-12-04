@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_vm_info - add ability to retrieve configuration info (https://github.com/ansible-collections/community.general/pull/7485).
