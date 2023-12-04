@@ -13,6 +13,7 @@ DOCUMENTATION = '''
 ---
 module: proxmox_node_info
 short_description: Retrieve information about one or more Proxmox VE nodes
+version_added: 8.2.0
 description:
   - Retrieve information about one or more Proxmox VE nodes.
 author: John Berninger (@jberning)
@@ -43,11 +44,11 @@ proxmox_nodes:
     elements: dict
     contains:
       cpu:
-        description: Current CPU usage in fractional shares of this host's total available CPU
+        description: Current CPU usage in fractional shares of this host's total available CPU.
         returned: on success
         type: float
       disk:
-        description: Current local disk usage of this host
+        description: Current local disk usage of this host.
         returned: on success
         type: int
       id:
@@ -55,31 +56,31 @@ proxmox_nodes:
         returned: on success
         type: str
       level:
-        description: Support level. Can be blank if not under a paid support contract
+        description: Support level. Can be blank if not under a paid support contract.
         returned: on success
         type: str
       maxcpu:
-        description: Number of available CPUs
+        description: Total number of available CPUs on this host.
         returned: on success
         type: int
       maxdisk:
-        description: Size of local disk in bytes
+        description: Size of local disk in bytes.
         returned: on success
         type: int
       maxmem:
-        description: Memory size in bytes
+        description: Memory size in bytes.
         returned: on success
         type: int
       mem:
-        description: Used memory in bytes
+        description: Used memory in bytes.
         returned: on success
         type: int
       node:
-        description: Node name
+        description: Short hostname of this node.
         returned: on success
         type: str
       ssl_fingerprint:
-        description: SSL fingerprint of the node certificate
+        description: SSL fingerprint of the node certificate.
         returned: on success
         type: str
       status:
@@ -87,11 +88,11 @@ proxmox_nodes:
         returned: on success
         type: str
       type:
-        description: Object type being returned
+        description: Object type being returned.
         returned: on success
         type: str
       uptime:
-        description: Node uptime in seconds
+        description: Node uptime in seconds.
         returned: on success
         type: int
 '''

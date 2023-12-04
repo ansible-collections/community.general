@@ -1038,6 +1038,8 @@ files:
   $modules/proxmox_template.py:
     ignore: skvidal
     maintainers: UnderGreen
+  $modules/proxmox_node_info.py:
+    maintainers: jberning
   $modules/pubnub_blocks.py:
     maintainers: parfeon pubnub
   $modules/pulp_repo.py:
