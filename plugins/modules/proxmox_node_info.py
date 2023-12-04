@@ -16,7 +16,7 @@ short_description: Retrieve information about one or more Proxmox VE nodes
 version_added: 8.2.0
 description:
   - Retrieve information about one or more Proxmox VE nodes.
-author: John Berninger (@jberning)
+author: John Berninger (@jwbernin)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
