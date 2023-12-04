@@ -613,7 +613,7 @@ class CloudflareAPI(object):
                 content = str(params['key_tag']) + '\t' + str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
         elif params['type'] == 'SSHFP':
             if not (params['value'] is None or params['value'] == ''):
-                content = str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
+                content = str(params['algorithm']) + ' ' + str(params['hash_type']) + ' ' + params['value'].upper()
         elif params['type'] == 'TLSA':
             if not (params['value'] is None or params['value'] == ''):
                 content = str(params['cert_usage']) + '\t' + str(params['selector']) + '\t' + str(params['hash_type']) + '\t' + params['value']
@@ -726,7 +726,7 @@ class CloudflareAPI(object):
                 if (attr is None) or (attr == ''):
                     self.module.fail_json(msg="You must provide algorithm, hash_type and a value to create this record type")
             sshfp_data = {
-                "fingerprint": params['value'],
+                "fingerprint": params['value'].upper(),
                 "type": params['hash_type'],
                 "algorithm": params['algorithm'],
             }
@@ -736,7 +736,7 @@ class CloudflareAPI(object):
                 'data': sshfp_data,
                 "ttl": params['ttl'],
             }
-            search_value = str(params['algorithm']) + '\t' + str(params['hash_type']) + '\t' + params['value']
+            search_value = str(params['algorithm']) + ' ' + str(params['hash_type']) + ' ' + params['value']
 
         if params['type'] == 'TLSA':
             for attr in [params['port'], params['proto'], params['cert_usage'], params['selector'], params['hash_type'], params['value']]:
