@@ -1,0 +1,2 @@
+minor_changes:
+  - Added parameter to select Content-Type when accessing the Rundeck API
