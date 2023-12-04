@@ -16,12 +16,6 @@ short_description: Retrieve information about one or more Proxmox VE nodes
 version_added: 8.0.3
 description:
   - Retrieve information about one or more Proxmox VE nodes.
-options:
-  node:
-    description:
-      - Restrict results to a specific node.
-    aliases: ['node', 'name']
-    type: str
 author: John Berninger (@jberning)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
