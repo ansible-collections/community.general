@@ -33,7 +33,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: List existing nodes
   community.general.proxmox_node_info:
-    api_host: helldorado
+    api_host: proxmox1
     api_user: root@pam
     api_password: "{{ password | default(omit) }}"
     api_token_id: "{{ token_id | default(omit) }}"
