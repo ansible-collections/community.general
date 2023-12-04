@@ -75,9 +75,10 @@ options:
     description:
     - The name of a snapshot volume to be configured. When creating a snapshot volume, the O(lv) parameter specifies the origin volume.
   pvs:
-    type: str
+    type: list
+    elements: str
     description:
-    - Comma separated list of physical volumes (e.g. /dev/sda,/dev/sdb).
+    - List of physical volumes (for example V(/dev/sda, /dev/sdb)).
   thinpool:
     type: str
     description:
@@ -110,7 +111,9 @@ EXAMPLES = '''
     vg: firefly
     lv: test
     size: 512
-    pvs: /dev/sda,/dev/sdb
+    pvs:
+      - /dev/sda
+      - /dev/sdb
 
 - name: Create cache pool logical volume
   community.general.lvol:
@@ -299,7 +302,7 @@ def main():
             shrink=dict(type='bool', default=True),
             active=dict(type='bool', default=True),
             snapshot=dict(type='str'),
-            pvs=dict(type='str'),
+            pvs=dict(type='list', elements='str'),
             resizefs=dict(type='bool', default=False),
             thinpool=dict(type='str'),
         ),
@@ -340,7 +343,7 @@ def main():
     if pvs is None:
         pvs = ""
     else:
-        pvs = pvs.replace(",", " ")
+        pvs = " ".join(pvs)
 
     if opts is None:
         opts = ""
