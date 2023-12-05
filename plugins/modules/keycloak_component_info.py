@@ -111,8 +111,9 @@ def main():
                 "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy",
                 "org.keycloak.keys.KeyProvider",
                 "authenticatorConfig",
-                "requiredActions"],
-            required=True),
+                "requiredActions"], 
+            required=True
+        ),
     )
     argument_spec.update(meta_args)
 
@@ -130,26 +131,24 @@ def main():
     kc = KeycloakAPI(module, connection_header)
 
     realm = module.params.get('realm')
-
     name = module.params.get('name')
     providerType = module.params.get('providerType')
+
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
         module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
 
-    filter = "name={name}&type={type}&parent={parent}".format(
-                name=quote(name, safe=''),
-                type=providerType,
-                parent=quote(objRealm['id'], safe='')
-             )
+    filters = ["parent=%s" % (quote(objRealm['id'], safe=''))]
+    if name:
+        filters.append("name=%s" % (quote(name, safe='')))
+    if providerType:
+        filters.append("type=%s" % (providerType))
     
-    components = kc.get_components(filter=filter, realm=realm)
+    components = kc.get_components(filter="&".join(filters), realm=realm)
 
     if len(components) == 1:
         component = components[0]
-        filter = "parent={parent}".format(
-                parent=component["id"]
-             )
+        filter = "parent=%s" % (component["id"])
         subComponents = kc.get_components(filter=filter, realm=realm)
         result['component'] = component
         result['subComponents'] = subComponents
