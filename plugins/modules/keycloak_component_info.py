@@ -18,8 +18,6 @@ module: keycloak_component_info
 
 short_description: Retrive component info in Keycloak.
 
-version_added: "8.0.2"
-
 description:
     - This module retrive information on component from Keycloak.
 options:

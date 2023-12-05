@@ -1,0 +1,128 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: no
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Delete not existing ldap
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    state: absent
+  register: result
+
+- name: Assert no change
+  assert:
+    that:
+    - result is not changed
+
+- name: Create ldap component
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    state: present
+    config: "{{ ldap_config }}"
+    sub_components: "{{ ldap_sub_components }}"
+  register: result
+    
+- name: Assert component creation
+  assert:
+    that:
+    - result is changed
+
+- name: Update with no change ldap component
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    state: present
+    config: "{{ ldap_config }}"
+    sub_components: "{{ ldap_sub_components }}"
+  register: result
+    
+- name: Assert component no change
+  assert:
+    that:
+    - result is not changed
+
+- name: Force update ldap component
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    force: True
+    state: present
+    config: "{{ ldap_config }}"
+    sub_components: "{{ ldap_sub_components }}"
+  register: result
+    
+- name: Assert component no change
+  assert:
+    that:
+    - result is changed
+
+- name: Update ldap config
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    state: present
+    config: "{{ ldap_config | combine({ 'batchSizeForSync': ['1001']}) }}"
+    sub_components: "{{ ldap_sub_components }}"
+  register: result
+    
+- name: Assert component modification
+  assert:
+    that:
+    - result is changed
+
+- name: Delete ldap
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    state: absent
+  register: result
+
+- name: Assert component is deleted
+  assert:
+    that:
+    - result is changed
