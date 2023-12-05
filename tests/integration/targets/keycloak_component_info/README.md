@@ -11,7 +11,7 @@ To run Keycloak component ldap module's integration test, start a keycloak serve
     docker run -d --rm --name mykeycloak --link myldap:ldap.example.com -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=password quay.io/keycloak/keycloak:latest start-dev --http-relative-path /auth
 
 Run integration tests:
-    ansible-test integration -v keycloak_component_ldap --allow-unsupported --docker fedora35 --docker-network host
+    ansible-test integration -v keycloak_component_info --allow-unsupported --docker fedora35 --docker-network host
 
 Cleanup:
 
