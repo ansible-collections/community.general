@@ -1033,13 +1033,13 @@ files:
     maintainers: helldorado
   $modules/proxmox_nic.py:
     maintainers: Kogelvis
+  $modules/proxmox_node_info.py:
+    maintainers: jwbernin
   $modules/proxmox_tasks_info:
     maintainers: paginabianca
   $modules/proxmox_template.py:
     ignore: skvidal
     maintainers: UnderGreen
-  $modules/proxmox_node_info.py:
-    maintainers: jwbernin
   $modules/pubnub_blocks.py:
     maintainers: parfeon pubnub
   $modules/pulp_repo.py:

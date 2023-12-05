@@ -52,7 +52,7 @@ proxmox_nodes:
         returned: on success
         type: int
       id:
-        description: identity of the node
+        description: Identity of the node.
         returned: on success
         type: str
       level:
@@ -84,7 +84,7 @@ proxmox_nodes:
         returned: on success
         type: str
       status:
-        description: Node status
+        description: Node status.
         returned: on success
         type: str
       type:
@@ -122,7 +122,7 @@ def main():
         argument_spec=module_args,
         required_one_of=[('api_password', 'api_token_id')],
         required_together=[('api_token_id', 'api_token_secret')],
-        supports_check_mode=True
+        supports_check_mode=True,
     )
     result = dict(
         changed=False
