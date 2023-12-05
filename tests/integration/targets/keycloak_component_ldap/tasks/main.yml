@@ -38,6 +38,23 @@
     that:
     - result is not changed
 
+- name: Retrive ldap info when absent
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    providerType: "org.keycloak.storage.UserStorageProvider"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert ldap is missing
+  assert:
+    that:
+    - result is not changed
+    - not result.component
+
 - name: Create ldap component
   community.general.keycloak_component_ldap:
     auth_keycloak_url: "{{ url }}"
@@ -56,6 +73,23 @@
     that:
     - result is changed
 
+- name: Retrive ldap info after creation
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    providerType: "org.keycloak.storage.UserStorageProvider"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert ldap exists
+  assert:
+    that:
+    - result is not changed
+    - result.component
+
 - name: Update with no change ldap component
   community.general.keycloak_component_ldap:
     auth_keycloak_url: "{{ url }}"
@@ -73,6 +107,25 @@
   assert:
     that:
     - result is not changed
+
+- name: Force change of credential ldap config
+  community.general.keycloak_component_ldap:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ ldap_name }}"
+    realm: "{{ realm }}"
+    force_credential: True
+    state: present
+    config: "{{ ldap_config | combine({ 'bindCredential': ['newPassword']}) }}"
+    sub_components: "{{ ldap_sub_components }}"
+  register: result
+    
+- name: Assert component modification
+  assert:
+    that:
+    - result is changed
 
 - name: Force update ldap component
   community.general.keycloak_component_ldap:
@@ -110,6 +163,7 @@
   assert:
     that:
     - result is changed
+    - result.component.config.batchSizeForSync[0] == '1001'
 
 - name: Delete ldap
   community.general.keycloak_component_ldap:

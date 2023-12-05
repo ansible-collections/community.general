@@ -49,7 +49,9 @@ ldap_config:
 
 ldap_sub_components:
   org.keycloak.storage.ldap.mappers.LDAPStorageMapper:
-  - config:
+  - name: groupMapper
+    provider_id: group-ldap-mapper
+    config:
       drop.non.existing.groups.during.sync:
       - 'false'
       group.name.ldap.attribute:
@@ -70,9 +72,9 @@ ldap_sub_components:
       - 'true'
       user.roles.retrieve.strategy:
       - LOAD_GROUPS_BY_MEMBER_ATTRIBUTE
-    name: groupMapper
-    provider_id: group-ldap-mapper
-  - config:
+  - name: mobilePhoneNumber
+    provider_id: user-attribute-ldap-mapper
+    config:
       always.read.value.from.ldap:
       - 'false'
       is.mandatory.in.ldap:
@@ -83,9 +85,9 @@ ldap_sub_components:
       - 'false'
       user.model.attribute:
       - mobilePhoneNumber
-    name: mobilePhoneNumber
+  - name: phoneNumber
     provider_id: user-attribute-ldap-mapper
-  - config:
+    config:
       always.read.value.from.ldap:
       - 'false'
       is.mandatory.in.ldap:
@@ -96,9 +98,9 @@ ldap_sub_components:
       - 'false'
       user.model.attribute:
       - phoneNumber
-    name: phoneNumber
+  - name: organisation
     provider_id: user-attribute-ldap-mapper
-  - config:
+    config:
       always.read.value.from.ldap:
       - 'false'
       is.mandatory.in.ldap:
@@ -109,9 +111,9 @@ ldap_sub_components:
       - 'false'
       user.model.attribute:
       - company
-    name: organisation
+  - name: accountExpires
     provider_id: user-attribute-ldap-mapper
-  - config:
+    config:
       always.read.value.from.ldap:
       - 'false'
       is.mandatory.in.ldap:
@@ -122,5 +124,4 @@ ldap_sub_components:
       - 'false'
       user.model.attribute:
       - accountExpires
-    name: accountExpires
-    provider_id: user-attribute-ldap-mapper
+

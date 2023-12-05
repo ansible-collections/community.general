@@ -570,6 +570,11 @@ import json
 import copy
 
 def main():
+    """
+    Module execution
+
+    :return:
+    """
     argument_spec = keycloak_argument_spec()
     config_spec = dict(
         vendor=dict(type='list', choices=['ad', 'tivoli', 'edirectory', 'rhds', 'other']),
@@ -634,6 +639,7 @@ def main():
         sub_components=dict(type='dict', options=sub_components_spec),
         state=dict(choices=["absent", "present"], default='present'),
         force=dict(type='bool', default=False),
+        force_credential=dict(type='bool', default=False),
     )
     argument_spec.update(meta_args)
 
@@ -658,15 +664,16 @@ def main():
     realm = module.params.get('realm')
     state = module.params.get('state')
     force = module.params.get('force')
+    force_credential = module.params.get('force_credential')
 
-    # convert module parameters to realm representation parameters (if they belong in there)
-    params_to_ignore = list(keycloak_argument_spec().keys()) + ['state','realm','force','sub_components']
+    # convert module parameters to component representation parameters (if they belong in there)
+    params_to_ignore = list(keycloak_argument_spec().keys()) + ['state','realm','force','force_credential','sub_components']
 
     # Filter and map the parameters names that apply to the role
     component_params = [x for x in module.params
                     if x not in params_to_ignore and
                     module.params.get(x) is not None]
-        
+
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
         module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
@@ -681,9 +688,9 @@ def main():
     changeset["providerType"] = "org.keycloak.storage.UserStorageProvider"
     changeset["parentId"] = objRealm['id']
 
-    storageMapper = module.params.get("sub_components") #["org.keycloak.storage.ldap.mappers.LDAPStorageMapper"]
+    storageMapper = module.params.get("sub_components")
     changeset_sub_components = {}
-    
+
     if storageMapper:
         for componentType in storageMapper.keys():
             newComponents = []
@@ -699,7 +706,6 @@ def main():
 
     changeset = remove_arguments_with_value_none(changeset)
     changeset_sub_components = remove_arguments_with_value_none(changeset_sub_components)
-    changed = False
 
     filter = "name={name}&type={type}&parent={parent}".format(
                 name=quote(changeset["name"], safe=''),
@@ -724,10 +730,9 @@ def main():
 
     else:  # If component already exist
         if (state == 'present'):  # if desired state is present
-
             desired_component = copy.deepcopy(component)
             merge(changeset, desired_component)
-            result['changed'] = not is_struct_included(component, desired_component, ['bindCredential','lastSync'])        
+            result['changed'] = force_credential or not is_struct_included(component, desired_component, ['bindCredential','lastSync'])
 
             if force:  # If force option is true
                 # Delete the existing component
@@ -752,9 +757,8 @@ def main():
         elif state == 'absent':  # if desired state is absent
             # Delete the component
             kc.delete_component(component['id'], realm)
-            changed = True
             result['msg'] = changeset["name"] + ' deleted'
-            result['changed'] = changed
+            result['changed'] = True
 
     module.exit_json(**result)
 
@@ -766,7 +770,10 @@ def get_sub_components(kc, parent_id, realm):
 
 def merge(source, destination):
     """
-    
+    Deep update Dict.
+    :param source: Partial desired representation
+    :param destination: Current representation
+    :return: Merged representation
     """
     for key, value in source.items():
         if isinstance(value, dict):
@@ -781,8 +788,10 @@ def merge(source, destination):
 def create_update_sub_components(kc, parentid ,subcomponents, newSubComponents, realm):
     """
     Create or Update subcomponents for a component.
-    :param component: Representation of the parent component
-    :param newSubComponents: List of subcomponents to create for this parent
+    :param kc: Keycloak module
+    :param parentid: Sub components parent id
+    :param subcomponents: Current representation of the component
+    :param newSubComponents: List of subcomponents to create/update
     :param realm: Realm
     :return: True if changed
     """
@@ -805,7 +814,6 @@ def create_update_sub_components(kc, parentid ,subcomponents, newSubComponents, 
                     newcomponent['id'] = oldcomponents[name]['id']
                     kc.update_component(newcomponent, realm)
                     retValue = True
-                del oldcomponents[name]
             else:
                 kc.create_component(newcomponent, realm)
                 retValue = True
@@ -813,6 +821,13 @@ def create_update_sub_components(kc, parentid ,subcomponents, newSubComponents, 
     return retValue
 
 def get_component(kc, filter, realm):
+    """
+    Fetch ldap representations in a realm
+    :param kc: Keycloak module
+    :param filter: search filter
+    :param realm: Realm
+    :return: ldap component represetation
+    """
     components = kc.get_components(filter=filter, realm=realm)
     if len(components) == 1:
         return components[0]
@@ -826,7 +841,6 @@ def remove_arguments_with_value_none(argument):
     :param argument: Dict from which to remove NoneType elements
     :return: Dict without None values
     """
-
     if type(argument) is dict:
         newarg = {}
         for key in argument.keys():
