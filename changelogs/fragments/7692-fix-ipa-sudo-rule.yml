@@ -1,2 +1,2 @@
 bugfixes:
-  - ipa_sudorule - fixes issue create rule with both deny_cmdgroup and cmdcategory set (https://github.com/ansible-collections/community.general/issues/7692)
+  - ipa_sudorule - fixes issue create rule with both ``deny_cmdgroup`` and ``cmdcategory`` set (https://github.com/ansible-collections/community.general/issues/7692).
