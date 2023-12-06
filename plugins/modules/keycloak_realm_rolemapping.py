@@ -331,7 +331,7 @@ def main():
                 if role['name'] is None:
                     module.fail_json(msg='Could not fetch realm role %s by ID' % (role['id']))
 
-    assigned_roles_before = group_rep['realmRoles']
+    assigned_roles_before = group_rep.get('realmRoles', [])
 
     result['existing'] = assigned_roles_before
     result['proposed'] = list(assigned_roles_before) if assigned_roles_before else []
@@ -376,9 +376,9 @@ def main():
             result['msg'] = 'Realm roles %s removed from groupId %s.' % (update_roles, gid)
 
         if gid is None:
-            assigned_roles_after = kc.get_group_by_name(group_name, realm=realm, parents=parents)['realmRoles']
+            assigned_roles_after = kc.get_group_by_name(group_name, realm=realm, parents=parents).get('realmRoles', [])
         else:
-            assigned_roles_after = kc.get_group_by_groupid(gid, realm=realm)['realmRoles']
+            assigned_roles_after = kc.get_group_by_groupid(gid, realm=realm).get('realmRoles', [])
         result['end_state'] = assigned_roles_after
         module.exit_json(**result)
     # Do nothing
