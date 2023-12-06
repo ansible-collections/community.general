@@ -384,12 +384,10 @@ def ensure(module, client):
                 client.sudorule_add_allow_command_group(name=name, item=cmdgroup)
 
         if deny_cmd is not None:
-            changed = category_changed(module, client, 'cmdcategory', ipa_sudorule) or changed
             if not module.check_mode:
                 client.sudorule_add_deny_command(name=name, item=deny_cmd)
 
         if deny_cmdgroup is not None:
-            changed = category_changed(module, client, 'cmdcategory', ipa_sudorule) or changed
             if not module.check_mode:
                 client.sudorule_add_deny_command_group(name=name, item=deny_cmdgroup)
 
@@ -483,9 +481,7 @@ def main():
                          runasextusers=dict(type='list', elements='str'))
     module = AnsibleModule(argument_spec=argument_spec,
                            mutually_exclusive=[['cmdcategory', 'cmd'],
-                                               ['cmdcategory', 'deny_cmd'],
                                                ['cmdcategory', 'cmdgroup'],
-                                               ['cmdcategory', 'deny_cmdgroup'],
                                                ['hostcategory', 'host'],
                                                ['hostcategory', 'hostgroup'],
                                                ['usercategory', 'user'],
