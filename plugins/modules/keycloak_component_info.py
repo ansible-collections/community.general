@@ -89,7 +89,7 @@ EXAMPLES = '''
         realm: myrealm
         parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
         provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
-        
+
 
 '''
 
@@ -149,7 +149,7 @@ def main():
         module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
 
     filters = []
-    
+
     if parentId:
         filters.append("parent=%s" % (quote(parentId, safe='')))
     else:
@@ -159,7 +159,7 @@ def main():
         filters.append("name=%s" % (quote(name, safe='')))
     if providerType:
         filters.append("type=%s" % (providerType))
-    
+
     result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
 
     module.exit_json(**result)
