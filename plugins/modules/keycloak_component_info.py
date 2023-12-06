@@ -159,7 +159,7 @@ def main():
     if name:
         filters.append("name=%s" % (quote(name, safe='')))
     if providerType:
-        filters.append("type=%s" % (providerType))
+        filters.append("type=%s" % (quote(providerType, safe='')))
 
     result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
 
