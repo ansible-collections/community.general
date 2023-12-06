@@ -153,7 +153,7 @@
     auth_password: "{{ admin_password }}"
     realm: "{{ realm }}"
     parent_id: "{{ myLdapId }}"
-    sub_provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+    provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
   register: result
 
 - name: Assert ldap sub components filter by type
@@ -255,7 +255,6 @@
     auth_password: "{{ admin_password }}"
     realm: "{{ realm }}"
     name: "{{ realm_key_name }}"
-    sub_provider_type: "Should be ignore with warning"
   register: result
 
 - name: Assert key exists

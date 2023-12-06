@@ -5,7 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 -->
 # Running keycloak_user module integration test
 
-To run Keycloak component ldap module's integration test, start a keycloak server using Docker:
+To run Keycloak component info module's integration test, start a keycloak server using Docker:
 
     docker run -d --rm --name myldap -p 389:389 minkwe/389ds:latest
     docker run -d --rm --name mykeycloak --link myldap:ldap.example.com -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=password quay.io/keycloak/keycloak:latest start-dev --http-relative-path /auth

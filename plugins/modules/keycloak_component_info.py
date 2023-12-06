@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: keycloak_component_info
@@ -35,21 +30,16 @@ options:
     provider_type:
         description:
             - Provider type of components
-        choices:
-            - org.keycloak.storage.UserStorageProvider
-            - org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy
-            - org.keycloak.keys.KeyProvider
-            - authenticatorConfig
-            - requiredActions
+            - Exemple
+                org.keycloak.storage.UserStorageProvider
+                org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy
+                org.keycloak.keys.KeyProvider
+                org.keycloak.userprofile.UserProfileProvider
+                org.keycloak.storage.ldap.mappers.LDAPStorageMapper
         type: str
     parent_id:
         description:
             - Container Id of the components
-        type: str
-    sub_provider_type:
-        description:
-            - Type of sub components
-            - Only effective when O(parent_id) is provided
         type: str
 
 
@@ -61,14 +51,14 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Retrive info for ldap component
+    - name: Retrive info of a UserStorageProvider named myldap
       community.general.keycloak_component_info:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
         auth_realm: master
         realm: myrealm
-        name: ActiveDirectory
+        name: myldap
         provider_type: org.keycloak.storage.UserStorageProvider
 
     - name: Retrive key info component
@@ -97,7 +87,7 @@ EXAMPLES = '''
         auth_realm: master
         realm: myrealm
         parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
-        sub_provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
         
 
 '''
@@ -130,22 +120,12 @@ def main():
         name=dict(type='str'),
         realm=dict(type='str', required=True),
         parent_id=dict(type='str'),
-        provider_type=dict(
-            choices=[
-                "org.keycloak.storage.UserStorageProvider",
-                "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy",
-                "org.keycloak.keys.KeyProvider",
-                "authenticatorConfig",
-                "requiredActions"]
-        ),
-        sub_provider_type=dict(type='str'),
+        provider_type=dict(type='str'),
     )
 
     argument_spec.update(meta_args)
 
-    mutually_exclusive = [["parent_id","provider_type"],["provider_type","sub_provider_type"]]
     module = AnsibleModule(argument_spec=argument_spec,
-                           mutually_exclusive=mutually_exclusive,
                            supports_check_mode=True)
 
     result = dict(changed=False, components=[])
@@ -162,7 +142,6 @@ def main():
     parentId = module.params.get('parent_id')
     name = module.params.get('name')
     providerType = module.params.get('provider_type')
-    subProviderType = module.params.get('sub_provider_type')
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
@@ -179,11 +158,6 @@ def main():
         filters.append("name=%s" % (quote(name, safe='')))
     if providerType:
         filters.append("type=%s" % (providerType))
-    if subProviderType:
-        if parentId:
-            filters.append("type=%s" % (subProviderType))
-        else:
-            module.warn('The parameter sub_provider_type is ignored when parent_id is omitted.')
     
     result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
 
