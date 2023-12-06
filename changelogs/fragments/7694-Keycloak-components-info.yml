@@ -1,2 +1,2 @@
-new_component:
+minor_changes:
   - keycloak utils - retrive JSON representation of components (https://github.com/ansible-collections/community.general/pull/7694).
