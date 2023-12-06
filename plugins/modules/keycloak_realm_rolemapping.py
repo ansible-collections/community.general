@@ -164,7 +164,6 @@ EXAMPLES = '''
     auth_keycloak_url: https://auth.example.com/auth
     token: TOKEN
     state: present
-
     group_name: subgroup1
     parents:
       - name: parent-group
