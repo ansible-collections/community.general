@@ -1,2 +1,2 @@
 bugfixes:
-  - nmcli - fix connection.slave-type wired to 'bond' and not with parameter 'slave_type' in case of connection type wifi
+  - nmcli - fix connection.slave-type wired to 'bond' and not with parameter 'slave_type' in case of connection type wifi (https://github.com/ansible-collections/community.general/issues/7389)
