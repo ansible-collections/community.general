@@ -8,10 +8,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 ## Test Server
 
-Prepare a development server, tested with Keycloak 22.0:
+Prepare a development server, tested with Keycloak versions tagged 22.0 and 23.0:
 
 ```sh
-docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=password --rm quay.io/keycloak/keycloak start-dev
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=password --rm quay.io/keycloak/keycloak:22.0 start-dev
 ```
 
 ## Run Tests
