@@ -12,16 +12,18 @@ DOCUMENTATION = '''
 ---
 module: keycloak_realm_rolemapping
 
-short_description: Allows administration of Keycloak realm_rolemapping with the Keycloak API
+short_description: Allows administration of Keycloak realm role mappings into groups with the Keycloak API
 
 version_added: 8.1.0
 
 description:
-    - This module allows you to add, remove or modify Keycloak realm_rolemapping with the Keycloak REST API.
-      It requires access to the REST API via OpenID Connect; the user connecting and the client being
-      used must have the requisite access rights. In a default Keycloak installation, admin-cli
-      and an admin user would work, as would a separate client definition with the scope tailored
-      to your needs and a user having the expected roles.
+    - This module allows you to add, remove or modify Keycloak realm role
+      mappings into groups with the Keycloak REST API. It requires access to the
+      REST API via OpenID Connect; the user connecting and the client being used
+      must have the requisite access rights. In a default Keycloak installation,
+      admin-cli and an admin user would work, as would a separate client
+      definition with the scope tailored to your needs and a user having the
+      expected roles.
 
     - The names of module options are snake_cased versions of the camelCase ones found in the
       Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/18.0/rest-api/index.html).
