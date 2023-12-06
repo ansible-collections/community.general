@@ -94,7 +94,7 @@ options:
     gid:
         type: str
         description:
-            - Id of the group to be mapped.
+            - ID of the group to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
 
