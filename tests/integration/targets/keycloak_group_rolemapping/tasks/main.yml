@@ -138,3 +138,23 @@
     that:
       - result is changed
       - result.end_state | count == 0
+
+- name: Unmap realm role 2 from group again (idempotency)
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_2 }}"
+    state: absent
+  register: result
+
+- name: Assert no realm roles are assigned to group
+  ansible.builtin.assert:
+    that:
+      - result is not changed
+      - result.end_state | count == 0
