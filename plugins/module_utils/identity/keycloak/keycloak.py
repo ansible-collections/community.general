@@ -641,7 +641,7 @@ class KeycloakAPI(object):
             open_url(url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
-            self.module.fail_json(msg="Could add realm rolemappings for group %s, realm %s: %s"
+            self.fail_open_url(e, msg="Could add realm role mappings for group %s, realm %s: %s"
                                       % (gid, realm, str(e)))
 
     def delete_group_realm_rolemapping(self, gid, role_rep, realm="master"):
@@ -657,7 +657,7 @@ class KeycloakAPI(object):
             open_url(url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
-            self.module.fail_json(msg="Could not delete realm rolemappings for group %s, realm %s: %s"
+            self.fail_open_url(e, msg="Could not delete realm role mappings for group %s, realm %s: %s"
                                       % (gid, realm, str(e)))
 
     def add_group_rolemapping(self, gid, cid, role_rep, realm="master"):
