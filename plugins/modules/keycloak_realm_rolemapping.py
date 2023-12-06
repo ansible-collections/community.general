@@ -267,8 +267,6 @@ def main():
                 name=dict(type='str')
             ),
         ),
-        cid=dict(type='str'),
-        client_id=dict(type='str'),
         roles=dict(type='list', elements='dict', options=roles_spec),
     )
 
