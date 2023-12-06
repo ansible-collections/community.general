@@ -358,7 +358,6 @@ def main():
                 if role['name'] in result['proposed']:  # Handle double removal
                     result['proposed'].remove(role['name'])
 
-    # module.fail_json(msg='update %s  \nprop  %s' % (update_roles, result['proposed']))
     if len(update_roles):
         result['changed'] = True
         if module._diff:
