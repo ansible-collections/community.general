@@ -255,6 +255,7 @@
     auth_password: "{{ admin_password }}"
     realm: "{{ realm }}"
     name: "{{ realm_key_name }}"
+    sub_provider_type: "Should be ignore with warning"
   register: result
 
 - name: Assert key exists

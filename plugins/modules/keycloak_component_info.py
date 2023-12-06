@@ -23,24 +23,31 @@ description:
 options:
     realm:
         description:
-            - The name of the realm in which is the component.
+            - The name of the realm.
         required: true
         type: str
     name:
         description:
             - Name of the Component
-        required: true
         type: str
-    providerType:
+    provider_type:
         description:
-            - Provider type of component
+            - Provider type of components
         choices:
             - org.keycloak.storage.UserStorageProvider
             - org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy
             - org.keycloak.keys.KeyProvider
             - authenticatorConfig
             - requiredActions
-        required: true
+        type: str
+    parent_id:
+        description:
+            - Container Id of the components
+        type: str
+    sub_provider_type:
+        description:
+            - Type of sub components
+            - Only effective when O(parent_id) is provided
         type: str
 
 
@@ -48,29 +55,44 @@ extends_documentation_fragment:
     - keycloak
 
 author:
-    - Philippe Gauthier (@elfelip)
     - Andre Desrosiers (@desand01)
 '''
 
 EXAMPLES = '''
     - name: Retrive info for ldap component
-      keycloak_component_info:
+      community.general.keycloak_component_info:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
         realm: master
         name: ActiveDirectory
-        providerType: org.keycloak.storage.UserStorageProvider
+        provider_type: org.keycloak.storage.UserStorageProvider
 
     - name: Retrive key info component
-      keycloak_component_info:
+      community.general.keycloak_component_info:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
         realm: master
         name: rsa-enc-generated
-        providerType: org.keycloak.keys.KeyProvider
+        provider_type: org.keycloak.keys.KeyProvider
 
+    - name: Retrive all component from realm master
+      community.general.keycloak_component_info:
+        auth_keycloak_url: http://localhost:8080/auth
+        auth_sername: admin
+        auth_password: password
+        realm: master
+
+    - name: Retrive all sub components of parent component filter by type
+      community.general.keycloak_component_info:
+        auth_keycloak_url: http://localhost:8080/auth
+        auth_sername: admin
+        auth_password: password
+        realm: master
+        parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
+        sub_provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+        
 
 '''
 
@@ -156,7 +178,10 @@ def main():
     if providerType:
         filters.append("type=%s" % (providerType))
     if subProviderType:
-        filters.append("type=%s" % (subProviderType))
+        if parentId:
+            filters.append("type=%s" % (subProviderType))
+        else:
+            module.warn('The parameter sub_provider_type is ignored when parent_id is omitted.')
     
     result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
 
