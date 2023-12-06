@@ -52,7 +52,7 @@ options:
 
 
 extends_documentation_fragment:
-    - keycloak
+    - community.general.keycloak
 
 author:
     - Andre Desrosiers (@desand01)
@@ -64,7 +64,8 @@ EXAMPLES = '''
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
-        realm: master
+        auth_realm: master
+        realm: myrealm
         name: ActiveDirectory
         provider_type: org.keycloak.storage.UserStorageProvider
 
@@ -73,7 +74,8 @@ EXAMPLES = '''
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
-        realm: master
+        auth_realm: master
+        realm: myrealm
         name: rsa-enc-generated
         provider_type: org.keycloak.keys.KeyProvider
 
@@ -82,14 +84,16 @@ EXAMPLES = '''
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
-        realm: master
+        auth_realm: master
+        realm: myrealm
 
     - name: Retrive all sub components of parent component filter by type
       community.general.keycloak_component_info:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
-        realm: master
+        auth_realm: master
+        realm: myrealm
         parent_id: "075ef2fa-19fc-4a6d-bf4c-249f57365fd2"
         sub_provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
         
@@ -97,13 +101,9 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-component:
-  description: JSON representation for the component.
-  returned: on success
-  type: dict
-subComponents:
-  description: JSON representation of the sub components list.
-  returned: on success
+components:
+  description: JSON representation of components.
+  returned: always
   type: list
 changed:
   description: Always return False.
