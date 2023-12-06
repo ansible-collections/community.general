@@ -103,24 +103,28 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        name=dict(type='str', required=True),
+        name=dict(type='str'),
         realm=dict(type='str', required=True),
-        providerType=dict(
+        parent_id=dict(type='str'),
+        provider_type=dict(
             choices=[
                 "org.keycloak.storage.UserStorageProvider",
                 "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy",
                 "org.keycloak.keys.KeyProvider",
                 "authenticatorConfig",
-                "requiredActions"], 
-            required=True
+                "requiredActions"]
         ),
+        sub_provider_type=dict(type='str'),
     )
+
     argument_spec.update(meta_args)
 
+    mutually_exclusive = [["parent_id","provider_type"],["provider_type","sub_provider_type"]]
     module = AnsibleModule(argument_spec=argument_spec,
+                           mutually_exclusive=mutually_exclusive,
                            supports_check_mode=True)
 
-    result = dict(changed=False, component={}, subComponents={})
+    result = dict(changed=False, components=[])
 
     # Obtain access token, initialize API
     try:
@@ -131,27 +135,30 @@ def main():
     kc = KeycloakAPI(module, connection_header)
 
     realm = module.params.get('realm')
+    parentId = module.params.get('parent_id')
     name = module.params.get('name')
-    providerType = module.params.get('providerType')
+    providerType = module.params.get('provider_type')
+    subProviderType = module.params.get('sub_provider_type')
 
     objRealm = kc.get_realm_by_id(realm)
     if not objRealm:
         module.fail_json(msg="Failed to retrive realm '{realm}'".format(realm=realm))
 
-    filters = ["parent=%s" % (quote(objRealm['id'], safe=''))]
+    filters = []
+    
+    if parentId:
+        filters.append("parent=%s" % (quote(parentId, safe='')))
+    else:
+        filters.append("parent=%s" % (quote(objRealm['id'], safe='')))
+
     if name:
         filters.append("name=%s" % (quote(name, safe='')))
     if providerType:
         filters.append("type=%s" % (providerType))
+    if subProviderType:
+        filters.append("type=%s" % (subProviderType))
     
-    components = kc.get_components(filter="&".join(filters), realm=realm)
-
-    if len(components) == 1:
-        component = components[0]
-        filter = "parent=%s" % (component["id"])
-        subComponents = kc.get_components(filter=filter, realm=realm)
-        result['component'] = component
-        result['subComponents'] = subComponents
+    result['components'] = kc.get_components(filter="&".join(filters), realm=realm)
 
     module.exit_json(**result)
 
