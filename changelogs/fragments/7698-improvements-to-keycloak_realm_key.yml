@@ -1,0 +1,5 @@
+minor_changes:
+  - keycloak_realm_key module now supports rsa enc key usage (`rsa-enc`) via `provider_id` parameter (https://github.com/ansible-collections/community.general/pull/7698).
+  - keycloak_realm_key module now supports 8 additional key algorithms via `config.algorithm` parameter (https://github.com/ansible-collections/community.general/pull/7698).
+  - keycloak_realm_key module now sets a default empty string for `config.certificate` parameter instead of forcing user to specify a value (https://github.com/ansible-collections/community.general/pull/7698).
+  - keycloak_realm_key module no longer hides log messages for the `config.certificate` parameter value (https://github.com/ansible-collections/community.general/pull/7698).
