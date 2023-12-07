@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_user: when force is set, but user does not exist, don't try to delete it
