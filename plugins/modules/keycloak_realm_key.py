@@ -120,7 +120,7 @@ options:
                       key must match O(config.algorithm) and O(provider_id).
                     - If you want Keycloak to automatically generate a certificate using your private key
                       then set this to an empty string.
-                required: false
+                default: ''
                 type: str
 notes:
     - Current value of the private key cannot be fetched from Keycloak.
@@ -251,7 +251,21 @@ def main():
                 active=dict(type='bool', default=True),
                 enabled=dict(type='bool', default=True),
                 priority=dict(type='int', required=True),
-                algorithm=dict(type='str', default='RS256', choices=['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']),
+                algorithm=dict(
+                    type="str",
+                    default="RS256",
+                    choices=[
+                        "RS256",
+                        "RS384",
+                        "RS512",
+                        "PS256",
+                        "PS384",
+                        "PS512",
+                        "RSA1_5",
+                        "RSA-OAEP",
+                        "RSA-OAEP-256",
+                    ],
+                ),
                 private_key=dict(type='str', required=True, no_log=True),
                 certificate=dict(type='str', default='')
             )
