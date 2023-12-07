@@ -48,7 +48,7 @@ options:
         [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
       - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(3).
-      - Should not be used in conjunction with "storage".
+      - Should not be used in conjunction with O(storage).
     type: str
   cores:
     description:
@@ -97,7 +97,7 @@ options:
   storage:
     description:
       - target storage
-      - Should not be used in conjunction with "disk".
+      - Should not be used in conjunction with O(disk).
     type: str
     default: 'local'
   ostype:
