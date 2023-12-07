@@ -117,8 +117,8 @@
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
     auth_password: "{{ admin_password }}"
-    parent_id: "{{ myLdapId }}"
     realm: "{{ realm }}"
+    parent_id: "{{ myLdapId }}"
   register: result
 
 - name: Assert components exists
