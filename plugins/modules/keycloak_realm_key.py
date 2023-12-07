@@ -74,7 +74,7 @@ options:
     provider_id:
         description:
             - The name of the "provider ID" for the key.
-        choices: ['rsa']
+        choices: ['rsa', 'rsa-enc']
         default: 'rsa'
         type: str
     config:
@@ -103,7 +103,7 @@ options:
                 description:
                     - Key algorithm.
                 default: RS256
-                choices: ['RS256']
+                choices: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']
                 type: str
             private_key:
                 description:
@@ -120,7 +120,7 @@ options:
                       key must match O(config.algorithm) and O(provider_id).
                     - If you want Keycloak to automatically generate a certificate using your private key
                       then set this to an empty string.
-                required: true
+                required: false
                 type: str
 notes:
     - Current value of the private key cannot be fetched from Keycloak.
@@ -244,16 +244,16 @@ def main():
         name=dict(type='str', required=True),
         force=dict(type='bool', default=False),
         parent_id=dict(type='str', required=True),
-        provider_id=dict(type='str', default='rsa', choices=['rsa']),
+        provider_id=dict(type='str', default='rsa', choices=['rsa', 'rsa-enc']),
         config=dict(
             type='dict',
             options=dict(
                 active=dict(type='bool', default=True),
                 enabled=dict(type='bool', default=True),
                 priority=dict(type='int', required=True),
-                algorithm=dict(type='str', default='RS256', choices=['RS256']),
+                algorithm=dict(type='str', default='RS256', choices=['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']),
                 private_key=dict(type='str', required=True, no_log=True),
-                certificate=dict(type='str', required=True, no_log=True)
+                certificate=dict(type='str', default='')
             )
         )
     )
