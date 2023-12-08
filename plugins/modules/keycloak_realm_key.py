@@ -74,6 +74,7 @@ options:
     provider_id:
         description:
             - The name of the "provider ID" for the key.
+            - The value V(rsa-enc) has been added in community.general 8.2.0.
         choices: ['rsa', 'rsa-enc']
         default: 'rsa'
         type: str
@@ -102,6 +103,8 @@ options:
             algorithm:
                 description:
                     - Key algorithm.
+                    - The values V(RS384), V(RS512), V(PS256), V(PS384), V(PS512), V(RSA1_5),
+                      V(RSA-OAEP), V(RSA-OAEP-256) have been added in community.general 8.2.0.
                 default: RS256
                 choices: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']
                 type: str
