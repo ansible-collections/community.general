@@ -149,7 +149,7 @@
   when: ansible_distribution == 'Archlinux'
 
 - name: Make installable on Arch
-  systemd_service:
+  systemd:
     daemon_reload: true
   when: ansible_distribution == 'Archlinux'
 
