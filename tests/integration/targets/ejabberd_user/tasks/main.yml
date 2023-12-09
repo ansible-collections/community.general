@@ -33,6 +33,22 @@
     state: present
   notify: Remove ejabberd
 
+- name: Make runnable on Arch
+  community.general.ini_file:
+    path: /usr/lib/systemd/system/ejabberd.service
+    section: Service
+    option: "{{ item }}"
+    state: absent
+  loop:
+    - PrivateDevices
+    - AmbientCapabilities
+  when: ansible_distribution == 'Archlinux'
+
+- name: Make installable on Arch
+  systemd:
+    daemon_reload: true
+  when: ansible_distribution == 'Archlinux'
+
 - ansible.builtin.service:
     name: ejabberd
     state: started

@@ -127,6 +127,32 @@
     seconds: 5
   when: ansible_os_family == 'Suse'
 
+- name: Make installable on Arch
+  community.general.ini_file:
+    path: /usr/lib/systemd/system/postgresql.service
+    section: Service
+    option: "{{ item }}"
+    state: absent
+  loop:
+    - PrivateTmp
+    - ProtectHome
+    - ProtectSystem
+    - NoNewPrivileges
+    - ProtectControlGroups
+    - ProtectKernelModules
+    - ProtectKernelTunables
+    - PrivateDevices
+    - RestrictAddressFamilies
+    - RestrictNamespaces
+    - RestrictRealtime
+    - SystemCallArchitectures
+  when: ansible_distribution == 'Archlinux'
+
+- name: Make installable on Arch
+  systemd:
+    daemon_reload: true
+  when: ansible_distribution == 'Archlinux'
+
 - name: Initialize postgres (Suse)
   service: name=postgresql state=started
   when: ansible_os_family == 'Suse'
