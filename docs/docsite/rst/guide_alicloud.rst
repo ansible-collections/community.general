@@ -37,7 +37,7 @@ environment variables or by storing them in a vars file.
 
 To pass authentication credentials as environment variables:
 
-.. code-block:: shell
+.. code-block:: console
 
     export ALICLOUD_ACCESS_KEY='Alicloud123'
     export ALICLOUD_SECRET_KEY='AlicloudSecret123'

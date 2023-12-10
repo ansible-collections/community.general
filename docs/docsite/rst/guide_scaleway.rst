@@ -61,7 +61,7 @@ To use the modules and inventory script you will need a Scaleway API token.
 You can generate an API token through the `Scaleway console's credential page <https://cloud.scaleway.com/#/credentials>`__.
 The simplest way to authenticate yourself is to set the Scaleway API token in an environment variable:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ export SCW_TOKEN=00000000-1111-2222-3333-444444444444
 
@@ -69,7 +69,7 @@ If you are not comfortable exporting your API token, you can pass it as a parame
 
 If you want to use a new SSH key pair in this tutorial, you can generate it to ``./id_rsa`` and ``./id_rsa.pub`` as:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ssh-keygen -t rsa -f ./id_rsa
 
@@ -216,7 +216,7 @@ Create a file named ``scaleway_inventory.yml`` with the following content:
 This inventory means that we want all hosts that got the tag ``web_server`` on the zones ``ams1`` and ``par1``.
 Once you have configured this file, you can get the information using the following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ansible-inventory --list -i scaleway_inventory.yml
 

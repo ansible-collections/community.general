@@ -28,7 +28,7 @@ Requirements
 
 The Packet modules connect to the Packet API using the `packet-python package <https://pypi.org/project/packet-python/>`_. You can install it with pip:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install packet-python
 
@@ -36,7 +36,7 @@ In order to check the state of devices created by Ansible on Packet, it is a goo
 
 To use the modules you will need a Packet API token. You can generate an API token through the Packet portal `here <https://app.packet.net/portal#/api-keys>`__. The simplest way to authenticate yourself is to set the Packet API token in an environment variable:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ export PACKET_API_TOKEN=Bfse9F24SFtfs423Gsd3ifGsd43sSdfs
 
@@ -47,7 +47,7 @@ On Packet, devices and reserved IP addresses belong to `projects <https://www.pa
 
 If you want to use a new SSH key pair in this tutorial, you can generate it to ``./id_rsa`` and ``./id_rsa.pub`` as:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ssh-keygen -t rsa -f ./id_rsa
 
@@ -139,7 +139,7 @@ In this example, we will create a CoreOS cluster with `user data <https://packet
 
 The CoreOS cluster will use `etcd <https://etcd.io/>`_ for discovery of other servers in the cluster. Before provisioning your servers, you will need to generate a discovery token for your cluster:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ curl -w "\n" 'https://discovery.etcd.io/new?size=3'
 
@@ -200,13 +200,13 @@ The ``packet_device`` module has a ``wait_for_public_IPv`` that is used to speci
 
 Run the playbook:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ansible-playbook playbook_coreos.yml
 
 Once the playbook quits, your new devices should be reachable through SSH. Try to connect to one and check if etcd has started properly:
 
-.. code-block:: bash
+.. code-block:: console
 
     tomk@work $ ssh -i id_rsa core@$one_of_the_servers_ip
     core@coreos-one ~ $ etcdctl cluster-health

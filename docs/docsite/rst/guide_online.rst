@@ -22,27 +22,28 @@ Ansible has a dynamic inventory plugin that can list your resources.
 
 1. Create a YAML configuration such as ``online_inventory.yml`` with this content:
 
-.. code-block:: yaml
+   .. code-block:: yaml
 
-    plugin: community.general.online
+       plugin: community.general.online
 
 2. Set your ``ONLINE_TOKEN`` environment variable with your token.
-    You need to open an account and log into it before you can get a token.
-    You can find your token at the following page: `https://console.online.net/en/api/access <https://console.online.net/en/api/access>`_
+
+   You need to open an account and log into it before you can get a token.
+   You can find your token at the following page: `https://console.online.net/en/api/access <https://console.online.net/en/api/access>`_
 
 3. You can test that your inventory is working by running:
 
-.. code-block:: bash
+   .. code-block:: console
 
-    $ ansible-inventory -v -i online_inventory.yml --list
+       $ ansible-inventory -v -i online_inventory.yml --list
 
 
 4. Now you can run your playbook or any other module with this inventory:
 
-.. code-block:: console
+   .. code-block:: ansible-output
 
-    $ ansible all -i online_inventory.yml -m ping
-    sd-96735 | SUCCESS => {
-        "changed": false,
-        "ping": "pong"
-    }
+       $ ansible all -i online_inventory.yml -m ping
+       sd-96735 | SUCCESS => {
+           "changed": false,
+           "ping": "pong"
+       }
