@@ -82,7 +82,7 @@ Connection to Scaleway Compute nodes use Secure Shell.
 SSH keys are stored at the account level, which means that you can reuse the same SSH key in multiple nodes.
 The first step to configure Scaleway compute resources is to have at least one SSH key configured.
 
-:ref:`scaleway_sshkey_module` is a module that manages SSH keys on your Scaleway account.
+:ansplugin:`community.general.scaleway_sshkey#module` is a module that manages SSH keys on your Scaleway account.
 You can add an SSH key to your account by including the following task in a playbook:
 
 .. code-block:: yaml+jinja
@@ -118,7 +118,7 @@ How to create a compute instance?
 =================================
 
 Now that we have an SSH key configured, the next step is to spin up a server!
-:ref:`scaleway_compute_module` is a module that can create, update and delete Scaleway compute instances:
+:ansplugin:`community.general.scaleway_compute#module` is a module that can create, update and delete Scaleway compute instances:
 
 .. code-block:: yaml+jinja
 
