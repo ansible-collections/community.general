@@ -24,7 +24,7 @@ Ansible has a dynamic inventory plugin that can list your resources.
 
 .. code-block:: yaml
 
-    plugin: online
+    plugin: community.general.online
 
 2. Set your ``ONLINE_TOKEN`` environment variable with your token.
     You need to open an account and log into it before you can get a token.
