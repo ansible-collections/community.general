@@ -1406,6 +1406,15 @@ files:
   $tests/fqdn_valid.py:
     maintainers: vbotka
 #########################
+  docs/docsite/rst/guide_alicloud.rst:
+    maintainers: xiaozhu36
+  docs/docsite/rst/guide_online.rst:
+    maintainers: remyleone
+  docs/docsite/rst/guide_packet.rst:
+    maintainers: baldwinSPC nurfet-becirevic t0mk teebes
+  docs/docsite/rst/guide_scaleway.rst:
+    maintainers: $team_scaleway
+#########################
   tests/:
     labels: tests
   tests/integration:
