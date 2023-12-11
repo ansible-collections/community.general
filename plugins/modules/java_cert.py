@@ -99,6 +99,30 @@ options:
     choices: [ absent, present ]
     default: present
 requirements: [openssl, keytool]
+installable_requirements:
+  - name: Java keytool
+    blocks:
+      - system:
+          - openjdk11-jre-headless
+        when: ansible_facts.os_family == 'Alpine'
+      - system:
+          - java-11-openjdk-headless
+        when: ansible_facts.os_family in ['RedHat', 'Suse']
+      - system:
+          - jre11-openjdk-headless
+        when: ansible_facts.os_family == 'Archlinux'
+      - system:
+          - ca-certificates-java
+        when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version | int < 12
+      - system:
+          - ca-certificates-java
+          - openjdk-17-jre-headless
+        when: ansible_facts.os_family == 'Debian'
+  - name: OpenSSL
+    blocks:
+      - system:
+          - openssl
+        when: true
 author:
 - Adam Hamsik (@haad)
 '''
