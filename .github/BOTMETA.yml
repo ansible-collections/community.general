@@ -1406,6 +1406,39 @@ files:
   $tests/fqdn_valid.py:
     maintainers: vbotka
 #########################
+  docs/docsite/rst/filter_guide.rst: {}
+  docs/docsite/rst/filter_guide_abstract_informations.rst: {}
+  docs/docsite/rst/filter_guide_abstract_informations_counting_elements_in_sequence.rst:
+    maintainers: keilr
+  docs/docsite/rst/filter_guide_abstract_informations_dictionaries.rst:
+    maintainers: felixfontein giner
+  docs/docsite/rst/filter_guide_abstract_informations_grouping.rst:
+    maintainers: felixfontein
+  docs/docsite/rst/filter_guide_abstract_informations_merging_lists_of_dictionaries.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide_conversions.rst:
+    maintainers: Ajpantuso kellyjonbrazil
+  docs/docsite/rst/filter_guide_creating_identifiers.rst:
+    maintainers: Ajpantuso
+  docs/docsite/rst/filter_guide_paths.rst: {}
+  docs/docsite/rst/filter_guide_selecting_json_data.rst: {}
+  docs/docsite/rst/filter_guide_working_with_times.rst:
+    maintainers: resmo
+  docs/docsite/rst/filter_guide_working_with_unicode.rst:
+    maintainers: Ajpantuso
+  docs/docsite/rst/filter_guide_working_with_versions.rst:
+    maintainers: ericzolf
+  docs/docsite/rst/guide_alicloud.rst:
+    maintainers: xiaozhu36
+  docs/docsite/rst/guide_online.rst:
+    maintainers: remyleone
+  docs/docsite/rst/guide_packet.rst:
+    maintainers: baldwinSPC nurfet-becirevic t0mk teebes
+  docs/docsite/rst/guide_scaleway.rst:
+    maintainers: $team_scaleway
+  docs/docsite/rst/test_guide.rst:
+    maintainers: felixfontein
+#########################
   tests/:
     labels: tests
   tests/integration:

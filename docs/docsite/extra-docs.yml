@@ -8,3 +8,9 @@ sections:
     toctree:
       - filter_guide
       - test_guide
+  - title: Cloud Guides
+    toctree:
+      - guide_alicloud
+      - guide_online
+      - guide_packet
+      - guide_scaleway
