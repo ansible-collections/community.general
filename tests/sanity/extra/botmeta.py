@@ -18,6 +18,10 @@ from voluptuous.humanize import humanize_error
 
 
 IGNORE_NO_MAINTAINERS = [
+    'docs/docsite/rst/filter_guide.rst',
+    'docs/docsite/rst/filter_guide_abstract_informations.rst',
+    'docs/docsite/rst/filter_guide_paths.rst',
+    'docs/docsite/rst/filter_guide_selecting_json_data.rst',
     'plugins/cache/memcached.py',
     'plugins/cache/redis.py',
     'plugins/callback/cgroup_memory_recap.py',
@@ -197,7 +201,7 @@ def main():
 
     # Scan all files
     unmatched = set(files)
-    for dirs in ('plugins', 'tests', 'changelogs'):
+    for dirs in ('docs/docsite/rst', 'plugins', 'tests', 'changelogs'):
         for dirpath, dirnames, filenames in os.walk(dirs):
             for file in sorted(filenames):
                 if file.endswith('.pyc'):
