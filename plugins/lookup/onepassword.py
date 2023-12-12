@@ -598,7 +598,7 @@ class OnePass(object):
         self.username = username
         self.secret_key = secret_key
         self.master_password = master_password
-        self.service_account_token = service_account_token
+        self.service_account_token = service_account_token or os.environ.get("OP_SERVICE_ACCOUNT_TOKEN")
         self.account_id = account_id
         self.connect_host = connect_host
         self.connect_token = connect_token
