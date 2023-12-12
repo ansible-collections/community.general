@@ -40,6 +40,8 @@ options:
       - The access key for a service account.
       - Only works with 1Password CLI version 2 or later.
     type: str
+    env:
+      - name: OP_SERVICE_ACCOUNT_TOKEN
   vault:
     description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     type: str
