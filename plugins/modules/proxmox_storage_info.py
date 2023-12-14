@@ -115,40 +115,7 @@ proxmox_storages:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
-
-
-class ProxmoxStorageInfoAnsible(ProxmoxAnsible):
-    def get_storage(self, storage):
-        try:
-            storage = self.proxmox_api.storage.get(storage)
-        except Exception:
-            self.module.fail_json(msg="Storage '%s' does not exist" % storage)
-        return ProxmoxStorage(storage)
-
-    def get_storages(self, type=None):
-        storages = self.proxmox_api.storage.get(type=type)
-        storages = [ProxmoxStorage(storage) for storage in storages]
-        return storages
-
-
-class ProxmoxStorage:
-    def __init__(self, storage):
-        self.storage = storage
-        # Convert proxmox representation of lists, dicts and boolean for easier
-        # manipulation within ansible.
-        if 'shared' in self.storage:
-            self.storage['shared'] = proxmox_to_ansible_bool(self.storage['shared'])
-        if 'content' in self.storage:
-            self.storage['content'] = self.storage['content'].split(',')
-        if 'nodes' in self.storage:
-            self.storage['nodes'] = self.storage['nodes'].split(',')
-        if 'prune-backups' in storage:
-            options = storage['prune-backups'].split(',')
-            self.storage['prune-backups'] = dict()
-            for option in options:
-                k, v = option.split('=')
-                self.storage['prune-backups'][k] = v
+    proxmox_auth_argument_spec, ProxmoxAnsible)
 
 
 def proxmox_storage_info_argument_spec():
@@ -174,14 +141,14 @@ def main():
         changed=False
     )
 
-    proxmox = ProxmoxStorageInfoAnsible(module)
     storage = module.params['storage']
     storagetype = module.params['type']
+    proxmox = ProxmoxAnsible(module)
 
     if storage:
         storages = [proxmox.get_storage(storage)]
     else:
-        storages = proxmox.get_storages(type=storagetype)
+        storages = proxmox.get_storages_as_objects(type=storagetype)
     result['proxmox_storages'] = [storage.storage for storage in storages]
 
     module.exit_json(**result)

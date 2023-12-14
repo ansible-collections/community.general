@@ -65,6 +65,25 @@ def ansible_to_proxmox_bool(value):
     return 1 if value else 0
 
 
+class ProxmoxStorage:
+    def __init__(self, storage):
+        self.storage = storage
+        # Convert proxmox representation of lists, dicts and boolean for easier
+        # manipulation within ansible.
+        if "shared" in self.storage:
+            self.storage["shared"] = proxmox_to_ansible_bool(self.storage["shared"])
+        if "content" in self.storage:
+            self.storage["content"] = self.storage["content"].split(",")
+        if "nodes" in self.storage:
+            self.storage["nodes"] = self.storage["nodes"].split(",")
+        if "prune-backups" in storage:
+            options = storage["prune-backups"].split(",")
+            self.storage["prune-backups"] = dict()
+            for option in options:
+                k, v = option.split("=")
+                self.storage["prune-backups"][k] = v
+
+
 class ProxmoxAnsible(object):
     """Base class for Proxmox modules"""
     def __init__(self, module):
@@ -170,6 +189,13 @@ class ProxmoxAnsible(object):
         except Exception as e:
             self.module.fail_json(msg="Unable to retrieve pool %s information: %s" % (poolid, e))
 
+    def get_storage(self, storage):
+        try:
+            storage = self.proxmox_api.storage.get(storage)
+        except Exception:
+            self.module.fail_json(msg="Storage '%s' does not exist" % storage)
+        return ProxmoxStorage(storage)
+
     def get_storages(self, type):
         """Retrieve storages information
 
@@ -179,7 +205,19 @@ class ProxmoxAnsible(object):
         try:
             return self.proxmox_api.storage.get(type=type)
         except Exception as e:
-            self.module.fail_json(msg="Unable to retrieve storages information with type %s: %s" % (type, e))
+            self.module.fail_json(
+                msg="Unable to retrieve storages information with type %s: %s"
+                % (type, e)
+            )
+
+    def get_storages_as_objects(self, type):
+        """Retrieve storages information
+
+        :param type: str, optional - type of storages
+        :return: list of ProxmoxStorage - array of storages
+        """
+        storages = self.get_storage(type)
+        return [ProxmoxStorage(storage) for storage in storages]
 
     def get_storage_content(self, node, storage, content=None, vmid=None):
         try:
