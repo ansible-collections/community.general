@@ -1051,6 +1051,8 @@ files:
     maintainers: Kogelvis
   $modules/proxmox_node_info.py:
     maintainers: jwbernin
+  $modules/proxmox_storage_contents_info.py:
+    maintainers: l00ptr
   $modules/proxmox_tasks_info:
     maintainers: paginabianca
   $modules/proxmox_template.py:
