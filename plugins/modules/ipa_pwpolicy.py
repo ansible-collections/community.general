@@ -187,38 +187,33 @@ def get_pwpolicy_dict(maxpwdlife=None, minpwdlife=None, historylength=None, minc
                       minlength=None, priority=None, maxfailcount=None, failinterval=None,
                       lockouttime=None, gracelimit=None, maxrepeat=None, maxsequence=None, dictcheck=None, usercheck=None):
     pwpolicy = {}
-    if maxpwdlife is not None:
-        pwpolicy['krbmaxpwdlife'] = maxpwdlife
-    if minpwdlife is not None:
-        pwpolicy['krbminpwdlife'] = minpwdlife
-    if historylength is not None:
-        pwpolicy['krbpwdhistorylength'] = historylength
-    if minclasses is not None:
-        pwpolicy['krbpwdmindiffchars'] = minclasses
-    if minlength is not None:
-        pwpolicy['krbpwdminlength'] = minlength
-    if priority is not None:
-        pwpolicy['cospriority'] = priority
-    if maxfailcount is not None:
-        pwpolicy['krbpwdmaxfailure'] = maxfailcount
-    if failinterval is not None:
-        pwpolicy['krbpwdfailurecountinterval'] = failinterval
-    if lockouttime is not None:
-        pwpolicy['krbpwdlockoutduration'] = lockouttime
-    if gracelimit is not None:
-        pwpolicy['passwordgracelimit'] = str(gracelimit)
-    if maxrepeat is not None:
-        pwpolicy['ipapwdmaxrepeat'] = str(maxrepeat)
-    if maxsequence is not None:
-        pwpolicy['ipapwdmaxsequence'] = str(maxsequence)
-    if dictcheck is True:
-        pwpolicy['ipapwddictcheck'] = True
-    if dictcheck is False:
-        pwpolicy['ipapwddictcheck'] = False
-    if usercheck is True:
-        pwpolicy['ipapwdusercheck'] = True
-    if usercheck is False:
-        pwpolicy['ipapwdusercheck'] = False
+    pwpolicy_options = {
+        'krbmaxpwdlife': maxpwdlife,
+        'krbminpwdlife': minpwdlife,
+        'krbpwdhistorylength': historylength,
+        'krbpwdmindiffchars': minclasses,
+        'krbpwdminlength': minlength,
+        'cospriority': priority,
+        'krbpwdmaxfailure': maxfailcount,
+        'krbpwdfailurecountinterval': failinterval,
+        'krbpwdlockoutduration': lockouttime,
+        'passwordgracelimit': gracelimit,
+        'ipapwdmaxrepeat': maxrepeat,
+        'ipapwdmaxsequence': maxsequence,
+    }
+
+    pwpolicy_boolean_options = {
+        'ipapwddictcheck': dictcheck,
+        'ipapwdusercheck': usercheck,
+    }
+
+    for option, value in pwpolicy_options.items():
+        if value is not None:
+            pwpolicy[option] = to_native(value)
+
+    for option, value in pwpolicy_boolean_options.items():
+        if value is not None:
+            pwpolicy[option] = bool(value)
 
     return pwpolicy
 
