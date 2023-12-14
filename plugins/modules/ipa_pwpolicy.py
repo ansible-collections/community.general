@@ -64,6 +64,26 @@ options:
     lockouttime:
         description: Period (in seconds) for which users are locked out.
         type: str
+    gracelimit:
+        description: Maximum number of LDAP logins after password expiration.
+        type: int
+        version_added: 8.2.0
+    maxrepeat:
+        description: Maximum number of allowed same consecutive characters in the new password.
+        type: int
+        version_added: 8.2.0
+    maxsequence:
+        description: Maximum length of monotonic character sequences in the new password. An example of a monotonic sequence of length 5 is V(12345).
+        type: int
+        version_added: 8.2.0
+    dictcheck:
+        description: Check whether the password (with possible modifications) matches a word in a dictionary (using cracklib).
+        type: bool
+        version_added: 8.2.0
+    usercheck:
+        description: Check whether the password (with possible modifications) contains the user name in some form (if the name has > 3 characters).
+        type: bool
+        version_added: 8.2.0
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
@@ -93,9 +113,15 @@ EXAMPLES = r'''
       historylength: '16'
       minclasses: '4'
       priority: '10'
+      minlength: '6'
       maxfailcount: '4'
       failinterval: '600'
       lockouttime: '1200'
+      gracelimit: 3
+      maxrepeat: 3
+      maxsequence: 3
+      dictcheck: true
+      usercheck: true
       ipa_host: ipa.example.com
       ipa_user: admin
       ipa_pass: topsecret
@@ -159,7 +185,7 @@ class PwPolicyIPAClient(IPAClient):
 
 def get_pwpolicy_dict(maxpwdlife=None, minpwdlife=None, historylength=None, minclasses=None,
                       minlength=None, priority=None, maxfailcount=None, failinterval=None,
-                      lockouttime=None):
+                      lockouttime=None, gracelimit=None, maxrepeat=None, maxsequence=None, dictcheck=None, usercheck=None):
     pwpolicy = {}
     if maxpwdlife is not None:
         pwpolicy['krbmaxpwdlife'] = maxpwdlife
@@ -179,6 +205,20 @@ def get_pwpolicy_dict(maxpwdlife=None, minpwdlife=None, historylength=None, minc
         pwpolicy['krbpwdfailurecountinterval'] = failinterval
     if lockouttime is not None:
         pwpolicy['krbpwdlockoutduration'] = lockouttime
+    if gracelimit is not None:
+        pwpolicy['passwordgracelimit'] = str(gracelimit)
+    if maxrepeat is not None:
+        pwpolicy['ipapwdmaxrepeat'] = str(maxrepeat)
+    if maxsequence is not None:
+        pwpolicy['ipapwdmaxsequence'] = str(maxsequence)
+    if dictcheck is True:
+        pwpolicy['ipapwddictcheck'] = True
+    if dictcheck is False:
+        pwpolicy['ipapwddictcheck'] = False
+    if usercheck is True:
+        pwpolicy['ipapwdusercheck'] = True
+    if usercheck is False:
+        pwpolicy['ipapwdusercheck'] = False
 
     return pwpolicy
 
@@ -199,7 +239,13 @@ def ensure(module, client):
                                         priority=module.params.get('priority'),
                                         maxfailcount=module.params.get('maxfailcount'),
                                         failinterval=module.params.get('failinterval'),
-                                        lockouttime=module.params.get('lockouttime'))
+                                        lockouttime=module.params.get('lockouttime'),
+                                        gracelimit=module.params.get('gracelimit'),
+                                        maxrepeat=module.params.get('maxrepeat'),
+                                        maxsequence=module.params.get('maxsequence'),
+                                        dictcheck=module.params.get('dictcheck'),
+                                        usercheck=module.params.get('usercheck'),
+                                        )
 
     ipa_pwpolicy = client.pwpolicy_find(name=name)
 
@@ -236,7 +282,13 @@ def main():
                          priority=dict(type='str'),
                          maxfailcount=dict(type='str'),
                          failinterval=dict(type='str'),
-                         lockouttime=dict(type='str'))
+                         lockouttime=dict(type='str'),
+                         gracelimit=dict(type='int'),
+                         maxrepeat=dict(type='int'),
+                         maxsequence=dict(type='int'),
+                         dictcheck=dict(type='bool'),
+                         usercheck=dict(type='bool'),
+                         )
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
