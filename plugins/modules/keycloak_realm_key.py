@@ -123,7 +123,7 @@ options:
                       key must match O(config.algorithm) and O(provider_id).
                     - If you want Keycloak to automatically generate a certificate using your private key
                       then set this to an empty string.
-                default: ''
+                required: true
                 type: str
 notes:
     - Current value of the private key cannot be fetched from Keycloak.
@@ -157,6 +157,7 @@ EXAMPLES = '''
     auth_realm: master
     config:
       private_key: "{{ private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 120
@@ -270,7 +271,7 @@ def main():
                     ],
                 ),
                 private_key=dict(type='str', required=True, no_log=True),
-                certificate=dict(type='str', default='')
+                certificate=dict(type='str', required=True)
             )
         )
     )
