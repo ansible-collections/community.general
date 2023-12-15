@@ -214,6 +214,15 @@ EXAMPLES = r'''
     subject: Ansible-report
     body: System {{ ansible_hostname }} has been successfully provisioned.
     secure: starttls
+
+ - name: Sending an email with a timeout
+   community.general.mail:
+    host: localhost
+    port: 25
+    to: John Smith <john.smith@example.com>
+    subject: Ansible-report
+    body: System {{ ansible_hostname }} has been successfully provisioned.
+    timeout: 10  
 '''
 
 import os
