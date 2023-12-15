@@ -168,6 +168,74 @@
       - host_delete_again.hosts_removed is defined
       - host_delete_again.hosts_added is defined
 
+- name: Add a wildcard host.
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "*"
+    identity_file: '{{ ssh_private_key }}'
+    port: '2223'
+    state: present
+  register: wildcard_host
+
+- name: Check that wildcard name host is added and full and short name hosts are not updated
+  assert:
+    that:
+      - wildcard_host.changed
+      - wildcard_host.hosts_added == ["*"]
+      - wildcard_host.hosts_changed == []
+      - wildcard_host.hosts_removed == []
+
+- name: Add wildcard host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "*"
+    identity_file: '{{ ssh_private_key }}'
+    port: '2223'
+    state: present
+  register: wildcard_add_again
+
+- name: Check for idempotency
+  assert:
+    that:
+      - not wildcard_add_again.changed
+      - host_add.hosts_changed is defined
+      - host_add.hosts_removed is defined
+      - host_add.hosts_added is defined
+
+- name: Update wildcard host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "*"
+    identity_file: '{{ ssh_private_key }}'
+    port: '2224'
+    state: present
+  register: host_update
+
+- name: Check for update operation
+  assert:
+    that:
+      - host_update.changed
+      - host_update.hosts_changed is defined
+      - "'example.com' in host_update.hosts_changed"
+      - host_update.hosts_removed is defined
+      - host_update.hosts_added is defined
+      - host_update.hosts_change_diff is defined
+
+- name: Delete a wildcard host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "*"
+    state: absent
+  register: host_delete
+
+- name: Check if changes are made
+  assert:
+    that:
+      - host_delete.changed
+      - "'*' in host_delete.hosts_removed"
+      - host_delete.hosts_changed is defined
+      - host_delete.hosts_added is defined
+
 - name: Check if user and ssh_config_file are mutually exclusive
   community.general.ssh_config:
     ssh_config_file: "{{ ssh_config_test }}"
