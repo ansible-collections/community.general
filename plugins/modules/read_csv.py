@@ -92,14 +92,6 @@ EXAMPLES = r'''
   register: users
   delegate_to: localhost
 
-# Use Strict parameter to handle potential issues with the CSV file.
-- name: Read users from CSV file with strict checking
-  community.general.read_csv:
-    path: users.csv
-    strict: true
-  register: users
-  delegate_to: localhost
-
 - ansible.builtin.debug:
     msg: 'User {{ users.dict.dag.name }} has UID {{ users.dict.dag.uid }} and GID {{ users.dict.dag.gid }}'
 
@@ -118,10 +110,11 @@ EXAMPLES = r'''
 #   dag;500;500
 #   jeroen;501;500
 
-# Read a CSV file without headers
+# Read a CSV file without headers and handle potential issues with the CSV file.
 - name: Read users from CSV file and return a list
   community.general.read_csv:
     path: users.csv
+    strict: true
     fieldnames: name,uid,gid
     delimiter: ';'
   register: users
