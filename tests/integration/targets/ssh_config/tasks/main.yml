@@ -216,7 +216,7 @@
     that:
       - host_update.changed
       - host_update.hosts_changed is defined
-      - "'example.com' in host_update.hosts_changed"
+      - "'*' in host_update.hosts_changed"
       - host_update.hosts_removed is defined
       - host_update.hosts_added is defined
       - host_update.hosts_change_diff is defined
