@@ -214,7 +214,7 @@ EXAMPLES = r'''
     to: John Smith <john.smith@example.com>
     subject: Ansible-report
     body: System {{ ansible_hostname }} has been successfully provisioned.
-    secure: starttls 
+    secure: starttls
 '''
 
 import os
