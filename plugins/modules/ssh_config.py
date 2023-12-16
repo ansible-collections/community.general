@@ -50,8 +50,11 @@ options:
   host:
     description:
       - The endpoint this configuration is valid for.
-      - Can be an actual address on the internet or an alias that will
-        connect to the value of O(hostname).
+      - Can be an actual address on the internet, an alias that will
+        connect to the value of O(hostname), or V(*) to match all hosts.
+      - If host is V(*) it is best to place it as the last host since ssh
+        goes with the first matching option. This will make sure that any
+        other host options take precedence over the V(*) host.
     required: true
     type: str
   hostname:
