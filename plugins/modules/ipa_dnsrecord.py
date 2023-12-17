@@ -38,7 +38,7 @@ options:
     - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV' and 'MX' are supported.
     - "'A6', 'CNAME', 'DNAME' and 'TXT' are added in version 2.5."
     - "'SRV' and 'MX' are added in version 2.8."
-    - "'NS' are added in version 8.2."
+    - "'NS' are added in comunity.general 8.2.0."
     required: false
     default: 'A'
     choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT']
@@ -52,7 +52,7 @@ options:
     - In the case of 'A6' record type, this will be the A6 Record data.
     - In the case of 'CNAME' record type, this will be the hostname.
     - In the case of 'DNAME' record type, this will be the DNAME target.
-    - In the case of 'NS' record type, this wil be the name server hostname. Hostname must already have a valid A or AAAA record.
+    - In the case of 'NS' record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
     - In the case of 'PTR' record type, this will be the hostname.
     - In the case of 'TXT' record type, this will be a text.
     - In the case of 'SRV' record type, this will be a service record.
