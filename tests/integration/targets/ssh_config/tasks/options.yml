@@ -15,6 +15,7 @@
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     identities_only: true
     controlmaster: "auto"
@@ -48,6 +49,7 @@
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     identities_only: true
     controlmaster: "auto"
@@ -70,6 +72,7 @@
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     identities_only: true
     controlmaster: "auto"
@@ -96,6 +99,7 @@
     that:
       - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent yes' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly yes' in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
@@ -108,6 +112,7 @@
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: false
+    add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
     controlmaster: no
@@ -132,6 +137,7 @@
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: false
+    add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
     controlmaster: no
@@ -159,6 +165,7 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
@@ -191,6 +198,7 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
@@ -241,6 +249,7 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' not in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly no' not in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
@@ -261,6 +270,7 @@
     host: "options.example.com"
     proxyjump: "jumphost.example.com"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     identities_only: true
     controlmaster: "auto"
@@ -294,6 +304,7 @@
     host: "options.example.com"
     proxyjump: "jumphost.example.com"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     identities_only: true
     controlmaster: "auto"
@@ -316,6 +327,7 @@
     host: "options.example.com"
     proxyjump: "jumphost.example.com"
     forward_agent: true
+    add_keys_to_agent: true
     host_key_algorithms: "+ssh-rsa"
     identities_only: true
     controlmaster: "auto"
@@ -342,6 +354,7 @@
     that:
       - "'proxyjump jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent yes' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly yes' in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
@@ -354,6 +367,7 @@
     host: "options.example.com"
     proxyjump: "new-jumphost.example.com"
     forward_agent: false
+    add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
     controlmaster: no
@@ -378,6 +392,7 @@
     host: "options.example.com"
     proxyjump: "new-jumphost.example.com"
     forward_agent: false
+    add_keys_to_agent: false
     host_key_algorithms: "+ssh-ed25519"
     identities_only: false
     controlmaster: no
@@ -405,6 +420,7 @@
     that:
       - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
@@ -437,6 +453,7 @@
     that:
       - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
@@ -487,6 +504,7 @@
     that:
       - "'proxyjump new-jumphost.example.com' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' not in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
       - "'identitiesonly no' not in slurp_ssh_config['content'] | b64decode"
       - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"

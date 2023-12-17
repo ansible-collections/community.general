@@ -106,6 +106,11 @@ options:
       - Sets the C(ForwardAgent) option.
     type: bool
     version_added: 4.0.0
+  add_keys_to_agent:
+    description:
+      - Sets the C(AddKeysToAgent) option.
+    type: bool
+    version_added: 8.2.0
   ssh_config_file:
     description:
       - SSH config file.
@@ -262,6 +267,7 @@ class SSHConfig(object):
             proxyjump=self.params.get('proxyjump'),
             host_key_algorithms=self.params.get('host_key_algorithms'),
             forward_agent=convert_bool(self.params.get('forward_agent')),
+            add_keys_to_agent=convert_bool(self.params.get('add_keys_to_agent')),
             controlmaster=self.params.get('controlmaster'),
             controlpath=self.params.get('controlpath'),
             controlpersist=fix_bool_str(self.params.get('controlpersist')),
@@ -357,6 +363,7 @@ def main():
             proxycommand=dict(type='str', default=None),
             proxyjump=dict(type='str', default=None),
             forward_agent=dict(type='bool'),
+            add_keys_to_agent=dict(type='bool'),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
