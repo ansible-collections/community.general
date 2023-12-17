@@ -72,6 +72,15 @@ options:
         when connecting to this host.
       - File need to exist and have mode V(0600) to be valid.
     type: path
+  identities_only:
+    description:
+      - Specifies that SSH should only use the configured authentication
+        identity and certificate files (either the default files, or
+        those explicitly configured in the C(ssh_config) files or passed on
+        the ssh command-line), even if ssh-agent or a PKCS11Provider or
+        SecurityKeyProvider offers more identities.
+    type: bool
+    version_added: 8.2.0
   user_known_hosts_file:
     description:
       - Sets the user known hosts file option.
@@ -245,6 +254,7 @@ class SSHConfig(object):
             hostname=self.params.get('hostname'),
             port=self.params.get('port'),
             identity_file=self.params.get('identity_file'),
+            identities_only=convert_bool(self.params.get('identities_only')),
             user=self.params.get('remote_user'),
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
@@ -342,6 +352,7 @@ def main():
             hostname=dict(type='str'),
             host_key_algorithms=dict(type='str', no_log=False),
             identity_file=dict(type='path'),
+            identities_only=dict(type='bool'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
             proxyjump=dict(type='str', default=None),
