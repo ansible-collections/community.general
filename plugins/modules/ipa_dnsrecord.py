@@ -35,12 +35,13 @@ options:
   record_type:
     description:
     - The type of DNS record name.
-    - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'PTR', 'TXT', 'SRV' and 'MX' are supported.
+    - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV' and 'MX' are supported.
     - "'A6', 'CNAME', 'DNAME' and 'TXT' are added in version 2.5."
     - "'SRV' and 'MX' are added in version 2.8."
+    - "'NS' are added in version 8.2."
     required: false
     default: 'A'
-    choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'PTR', 'SRV', 'TXT']
+    choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT']
     type: str
   record_value:
     description:
@@ -51,6 +52,7 @@ options:
     - In the case of 'A6' record type, this will be the A6 Record data.
     - In the case of 'CNAME' record type, this will be the hostname.
     - In the case of 'DNAME' record type, this will be the DNAME target.
+    - In the case of 'NS' record type, this wil be the name server hostname. Hostname must already have a valid A or AAAA record.
     - In the case of 'PTR' record type, this will be the hostname.
     - In the case of 'TXT' record type, this will be a text.
     - In the case of 'SRV' record type, this will be a service record.
@@ -64,6 +66,7 @@ options:
     - In the case of 'A6' record type, this will be the A6 Record data.
     - In the case of 'CNAME' record type, this will be the hostname.
     - In the case of 'DNAME' record type, this will be the DNAME target.
+    - In the case of 'NS' record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
     - In the case of 'PTR' record type, this will be the hostname.
     - In the case of 'TXT' record type, this will be a text.
     - In the case of 'SRV' record type, this will be a service record.
@@ -162,6 +165,16 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: topsecret
     state: absent
+
+- name: Ensure an NS record for a subdomain is present
+  community,general.ipa_dnsrecord:
+    name: subdomain
+    zone_name: example.com
+    record_type: 'NS'
+    record_value: 'ns1.subdomain.exmaple.com'
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: ChangeMe!
 '''
 
 RETURN = r'''
@@ -205,6 +218,8 @@ class DNSRecordIPAClient(IPAClient):
                 item.update(cname_part_hostname=value)
             elif details['record_type'] == 'DNAME':
                 item.update(dname_part_target=value)
+            elif details['record_type'] == 'NS':
+                item.update(ns_part_hostname=value)
             elif details['record_type'] == 'PTR':
                 item.update(ptr_part_hostname=value)
             elif details['record_type'] == 'TXT':
@@ -241,6 +256,8 @@ def get_dnsrecord_dict(details=None):
         module_dnsrecord.update(cnamerecord=details['record_values'])
     elif details['record_type'] == 'DNAME' and details['record_values']:
         module_dnsrecord.update(dnamerecord=details['record_values'])
+    elif details['record_type'] == 'NS' and details['record_values']:
+        module_dnsrecord.update(nsrecord=details['record_values'])
     elif details['record_type'] == 'PTR' and details['record_values']:
         module_dnsrecord.update(ptrrecord=details['record_values'])
     elif details['record_type'] == 'TXT' and details['record_values']:
@@ -311,7 +328,7 @@ def ensure(module, client):
 
 
 def main():
-    record_types = ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'PTR', 'TXT', 'SRV', 'MX']
+    record_types = ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX']
     argument_spec = ipa_argument_spec()
     argument_spec.update(
         zone_name=dict(type='str', required=True),
