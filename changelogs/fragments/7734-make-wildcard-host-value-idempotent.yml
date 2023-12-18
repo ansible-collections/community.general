@@ -1,2 +1,2 @@
 bugfixes:
-  - ssh_config - host value "*" was not idempotent resulting in a new host section each time the task was run. Fix makes host value "*" idempotent and allows updates to be made to the "*" host (https://github.com/ansible-collections/community.general/pull/7464).
+  - ssh_config - host value ``*`` was not idempotent resulting in a new host section each time the task was run. Fix makes host value ``*`` idempotent and allows updates to be made to the ``*`` host (https://github.com/ansible-collections/community.general/pull/7464).
