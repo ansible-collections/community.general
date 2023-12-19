@@ -81,10 +81,18 @@ def to_ini(obj):
         raise AnsibleFilterError(f'to_ini failed to parse given dict:'
                                  f'{to_native(ex)}', orig_exc=ex)
 
+    # catching empty dicts
+    if obj == dict():
+        raise AnsibleFilterError(f'to_ini received an empty dict. '
+                                 f'An empty dict cannot be converted.')
+
     config = StringIO()
     ini_parser.write(config)
 
-    return config.getvalue()
+    # config.getvalue() returns to \n at the end
+    # with the below insanity, we remove the very last character of
+    # the resulting string
+    return ''.join(config.getvalue().rsplit(config.getvalue()[ -1], 1))
 
 
 class FilterModule(object):
