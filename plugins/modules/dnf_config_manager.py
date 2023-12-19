@@ -111,8 +111,8 @@ import os
 import re
 
 DNF_BIN = "/usr/bin/dnf"
-REPO_ID_RE = re.compile('^Repo-id\s*:\s*(\S+)$')
-REPO_STATUS_RE = re.compile('^Repo-status\s*:\s*(disabled|enabled)$')
+REPO_ID_RE = re.compile(r'^Repo-id\s*:\s*(\S+)$')
+REPO_STATUS_RE = re.compile(r'^Repo-status\s*:\s*(disabled|enabled)$')
 
 def get_repo_states(module):
     rc, out, err = module.run_command([DNF_BIN, 'repolist', '--all', '--verbose'], check_rc=True)
