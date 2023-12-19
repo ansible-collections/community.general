@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: copr
+module: dnf_config_manager
 short_description: Enable or disable dnf repositories using config-manager
 version_added: 8.1.0
 description: This module enables or disables repositories using the C(dnf config-manager) sub-command.
@@ -132,11 +132,10 @@ def get_repo_states(module):
                 module.fail_json(msg='dnf repolist parse failure: parsed status before repo id')
             repos[last_repo] = m.group(1)
             last_repo = ''
-    return repos, out
+    return repos
 
 def set_repo_states(module, repo_ids, state):
-    rc, out, err = module.run_command([DNF_BIN, 'config-manager', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
-    return out
+    module.run_command([DNF_BIN, 'config-manager', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
 
 def main():
     module_args = dict(
@@ -146,7 +145,9 @@ def main():
 
     result = dict(
         changed=False,
-        msg=''
+        changed_repos=[],
+        repo_states_pre='',
+        repo_states_post=''
     )
 
     module = AnsibleModule(
@@ -157,7 +158,7 @@ def main():
     if not os.path.exists(DNF_BIN):
         module.fail_json(msg="%s was not found" % DNF_BIN)
 
-    repo_states, result['msg'] = get_repo_states(module)
+    repo_states= get_repo_states(module)
     result['repo_states_pre'] = repo_states
 
     desired_repo_state = module.params['state']
@@ -166,7 +167,7 @@ def main():
     to_change = []
     for repo_id in names:
         if not repo_id in repo_states:
-            module.fail_json(msg='unknown repo {0}'.format(repo_id))
+            module.fail_json(msg="did not find repo ID '{0}'".format(repo_id), **result)
         if repo_states[repo_id] != desired_repo_state:
             to_change.append(repo_id)
     result['changed'] = len(to_change) > 0
@@ -175,13 +176,13 @@ def main():
         module.exit_json(**result)
     
     if len(to_change) > 0:
-        result['msg'] = set_repo_states(module, to_change, desired_repo_state)
+        set_repo_states(module, to_change, desired_repo_state)
 
-    repo_states_post, result['msg'] = get_repo_states(module)
+    repo_states_post = get_repo_states(module)
+    result['repo_states_post'] = repo_states_post
     for repo_id in to_change:
       if repo_states_post[repo_id] != desired_repo_state:
-        module.fail_json(msg='repo {0} is not {1} after dnf config-manager command'.format(repo_id, desired_repo_state))
-    result['repo_states_post'] = repo_states_post
+        module.fail_json(msg='repo {0} is not {1} after dnf config-manager command'.format(repo_id, desired_repo_state), **result)
     result['changed_repos'] = to_change
 
     module.exit_json(**result)
