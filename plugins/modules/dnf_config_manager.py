@@ -114,6 +114,7 @@ DNF_BIN = "/usr/bin/dnf"
 REPO_ID_RE = re.compile(r'^Repo-id\s*:\s*(\S+)$')
 REPO_STATUS_RE = re.compile(r'^Repo-status\s*:\s*(disabled|enabled)$')
 
+
 def get_repo_states(module):
     rc, out, err = module.run_command([DNF_BIN, 'repolist', '--all', '--verbose'], check_rc=True)
 
@@ -134,12 +135,14 @@ def get_repo_states(module):
             last_repo = ''
     return repos
 
+
 def set_repo_states(module, repo_ids, state):
     module.run_command([DNF_BIN, 'config-manager', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
 
+
 def main():
     module_args = dict(
-        name=dict(type='list', required=False, default=[]),
+        name=dict(type='list', elements='str', required=False, default=[]),
         state=dict(type='str', required=False, choices=['enabled', 'disabled'], default='enabled')
     )
 
@@ -163,7 +166,7 @@ def main():
 
     desired_repo_state = module.params['state']
     names = module.params['name']
-    
+
     to_change = []
     for repo_id in names:
         if not repo_id in repo_states:
@@ -174,7 +177,7 @@ def main():
 
     if module.check_mode:
         module.exit_json(**result)
-    
+
     if len(to_change) > 0:
         set_repo_states(module, to_change, desired_repo_state)
 
@@ -186,6 +189,7 @@ def main():
     result['changed_repos'] = to_change
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()
