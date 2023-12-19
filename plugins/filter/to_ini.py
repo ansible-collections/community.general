@@ -11,7 +11,9 @@ __metaclass__ = type
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.module_utils.six.moves import StringIO
-from ansible.module_utils.six.moves.configparser import ConfigParser
+from ansible.module_utils.six.moves.configparser import ConfigParser, \
+    DuplicateSectionError
+from ansible.module_utils.common.text.converters import to_native
 
 DOCUMENTATION = r'''
   name: to_ini
@@ -28,7 +30,7 @@ DOCUMENTATION = r'''
 '''
 
 EXAMPLES = r'''
-  - name: 'Define a dictionary'
+  - name: Define a dictionary
     ansible.builtin.set_fact:
       my_dict:
         section_name:
@@ -37,9 +39,9 @@ EXAMPLES = r'''
         another_section:
           connection: 'ssh'
 
-  - name: 'Write dictionary to INI file'
+  - name: Write dictionary to INI file
     ansible.builtin.copy:
-      dest: '/tmp/test.ini'
+      dest: /tmp/test.ini
       content: '{{ my_dict | community.general.to_ini }}'
 
   # /tmp/test.ini will look like this:
@@ -52,7 +54,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
   _value:
-    description: A string formatted as INI file.'
+    description: A string formatted as INI file.
     type: string
 '''
 
@@ -72,7 +74,12 @@ def to_ini(obj):
         raise AnsibleFilterError(f'to_ini requires a dict, got {type(obj)}')
 
     ini_parser = IniParser()
-    ini_parser.read_dict(obj)
+
+    try:
+        ini_parser.read_dict(obj)
+    except (DuplicateSectionError, ValueError) as ex:
+        raise AnsibleFilterError(f'to_ini failed to parse given dict:'
+                                 f'{to_native(ex)}', orig_exc=ex)
 
     config = StringIO()
     ini_parser.write(config)
