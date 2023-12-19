@@ -161,7 +161,7 @@ def main():
     if not os.path.exists(DNF_BIN):
         module.fail_json(msg="%s was not found" % DNF_BIN)
 
-    repo_states= get_repo_states(module)
+    repo_states = get_repo_states(module)
     result['repo_states_pre'] = repo_states
 
     desired_repo_state = module.params['state']
@@ -169,7 +169,7 @@ def main():
 
     to_change = []
     for repo_id in names:
-        if not repo_id in repo_states:
+        if repo_id not in repo_states:
             module.fail_json(msg="did not find repo ID '{0}'".format(repo_id), **result)
         if repo_states[repo_id] != desired_repo_state:
             to_change.append(repo_id)
@@ -184,8 +184,8 @@ def main():
     repo_states_post = get_repo_states(module)
     result['repo_states_post'] = repo_states_post
     for repo_id in to_change:
-      if repo_states_post[repo_id] != desired_repo_state:
-        module.fail_json(msg='repo {0} is not {1} after dnf config-manager command'.format(repo_id, desired_repo_state), **result)
+        if repo_states_post[repo_id] != desired_repo_state:
+            module.fail_json(msg='repo {0} is not {1} after dnf config-manager command'.format(repo_id, desired_repo_state), **result)
     result['changed_repos'] = to_change
 
     module.exit_json(**result)
