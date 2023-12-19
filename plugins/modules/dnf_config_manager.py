@@ -34,7 +34,7 @@ options:
     required: false
     type: list
     elements: str
-state:
+  state:
     description:
       - Whether the repositories should be V(enabled) or V(disabled).
     default: enabled
