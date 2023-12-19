@@ -78,13 +78,13 @@ def to_ini(obj):
     try:
         ini_parser.read_dict(obj)
     except (DuplicateSectionError, ValueError) as ex:
-        raise AnsibleFilterError(f'to_ini failed to parse given dict:'
+        raise AnsibleFilterError('to_ini failed to parse given dict:'
                                  f'{to_native(ex)}', orig_exc=ex)
 
     # catching empty dicts
     if obj == dict():
-        raise AnsibleFilterError(f'to_ini received an empty dict. '
-                                 f'An empty dict cannot be converted.')
+        raise AnsibleFilterError('to_ini received an empty dict. '
+                                 'An empty dict cannot be converted.')
 
     config = StringIO()
     ini_parser.write(config)
