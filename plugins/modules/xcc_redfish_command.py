@@ -604,9 +604,9 @@ class XCCRedfishUtils(RedfishUtils):
             return response
         if 'Actions' not in response['data']:
             if resource_uri_has_actions:
-              return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
+                return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
             else:
-              response['data']['Actions'] = {}
+                response['data']['Actions'] = {}
 
         # check resouce_uri with target uri found in action base uri data
         action_found = False
