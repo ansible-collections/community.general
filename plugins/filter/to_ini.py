@@ -89,7 +89,7 @@ def to_ini(obj):
     config = StringIO()
     ini_parser.write(config)
 
-    # config.getvalue() returns to \n at the end
+    # config.getvalue() returns two \n at the end
     # with the below insanity, we remove the very last character of
     # the resulting string
     return ''.join(config.getvalue().rsplit(config.getvalue()[ -1], 1))
