@@ -92,7 +92,7 @@ def to_ini(obj):
     # config.getvalue() returns two \n at the end
     # with the below insanity, we remove the very last character of
     # the resulting string
-    return ''.join(config.getvalue().rsplit(config.getvalue()[ -1], 1))
+    return ''.join(config.getvalue().rsplit(config.getvalue()[-1], 1))
 
 
 class FilterModule(object):
