@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: dnf_config_manager
 short_description: Enable or disable dnf repositories using config-manager
-version_added: 8.1.0
+version_added: 8.2.0
 description: This module enables or disables repositories using the C(dnf config-manager) sub-command.
 author: Andrew Hyatt (@ahyattdev) <andy@hyatt.xyz>
 requirements:
