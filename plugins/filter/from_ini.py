@@ -11,7 +11,9 @@ __metaclass__ = type
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves import StringIO
-from ansible.module_utils.six.moves.configparser import ConfigParser
+from ansible.module_utils.six.moves.configparser import ConfigParser, \
+    ParsingError
+from ansible.module_utils.common.text.converters import to_native
 
 DOCUMENTATION = r'''
   name: from_ini
@@ -28,16 +30,16 @@ DOCUMENTATION = r'''
 '''
 
 EXAMPLES = r'''
-  - name: 'Slurp an INI file'
+  - name: Slurp an INI file
     ansible.builtin.slurp:
-      src: '/etc/rhsm/rhsm.conf'
-    register: 'rhsm_conf'
+      src: /etc/rhsm/rhsm.conf
+    register: rhsm_conf
 
-  - name: 'Display the INI file as dictionary'
+  - name: Display the INI file as dictionary
     ansible.builtin.debug:
       var: rhsm_conf.content | b64decode | community.general.from_ini
 
-  - name: 'Set a new dictionary fact with the contents of the INI file'
+  - name: Set a new dictionary fact with the contents of the INI file
     ansible.builtin.set_fact:
       rhsm_dict: >-
         {{
@@ -47,7 +49,7 @@ EXAMPLES = r'''
 
 RETURN = '''
   _value:
-    description: A dictionary representing the INI file.'
+    description: A dictionary representing the INI file.
     type: dictionary
 '''
 
@@ -78,7 +80,12 @@ def from_ini(obj):
         raise AnsibleFilterError(f'from_ini requires a str, got {type(obj)}')
 
     parser = IniParser()
-    parser.read_file(StringIO(obj))
+
+    try:
+        parser.read_file(StringIO(obj))
+    except ParsingError as ex:
+        raise AnsibleFilterError(f'from_ini failed to parse given string: '
+                                 f'{to_native(ex)}', orig_exc=ex)
 
     return parser.as_dict()
 
