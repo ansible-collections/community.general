@@ -58,8 +58,48 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-to_change_repo_ids:
-    description: Repos not in desired state.
+repo_states_pre:
+  description: Repo IDs before action taken.
+  returned: success
+  type: dict
+  contains:
+    repo_id:
+      description: Repository ID
+      type: str
+  sample: |-
+    {
+      "appstream": "enabled",
+      "appstream-debuginfo": "disabled",
+      "appstream-source": "disabled",
+      "baseos": "enabled",
+      "baseos-debuginfo": "disabled",
+      "baseos-source": "disabled",
+      "crb": "enabled",
+      "crb-debug": "disabled",
+      "crb-source": "disabled"
+    }
+repo_states_post:
+  description: Repo IDs after action taken.
+  returned: success
+  type: dict
+  contains:
+    repo_id:
+      description: Repository ID
+      type: str
+  sample: |-
+    {
+      "appstream": "enabled",
+      "appstream-debuginfo": "disabled",
+      "appstream-source": "disabled",
+      "baseos": "enabled",
+      "baseos-debuginfo": "disabled",
+      "baseos-source": "disabled",
+      "crb": "enabled",
+      "crb-debug": "disabled",
+      "crb-source": "disabled"
+    }
+changed_repos:
+    description: Repositories changed.
     returned: success
     type: list
     elements: str
@@ -67,13 +107,12 @@ to_change_repo_ids:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import fnmatch
 import os
 import re
 
 DNF_BIN = "/usr/bin/dnf"
-REPO_ID_RE = compile('^Repo-id\s*:\s*(\S+)$')
-REPO_STATUS_RE = compile('^Repo-status\s*:\s*(disabled|enabled)$')
+REPO_ID_RE = re.compile('^Repo-id\s*:\s*(\S+)$')
+REPO_STATUS_RE = re.compile('^Repo-status\s*:\s*(disabled|enabled)$')
 
 def get_repo_states(module):
     rc, out, err = module.run_command([DNF_BIN, 'repolist', '--all', '--verbose'], check_rc=True)
@@ -101,8 +140,8 @@ def set_repo_states(module, repo_ids, state):
 
 def main():
     module_args = dict(
-        name=dict(type='list', required=false, default=[]),
-        state=dict(type='str', required=false, choices=['enabled', 'disabled'], default='enabled')
+        name=dict(type='list', required=False, default=[]),
+        state=dict(type='str', required=False, choices=['enabled', 'disabled'], default='enabled')
     )
 
     result = dict(
@@ -131,7 +170,6 @@ def main():
         if repo_states[repo_id] != desired_repo_state:
             to_change.append(repo_id)
     result['changed'] = len(to_change) > 0
-    result['to_change_repo_ids'] = to_change
 
     if module.check_mode:
         module.exit_json(**result)
@@ -139,7 +177,12 @@ def main():
     if len(to_change) > 0:
         result['msg'] = set_repo_states(module, to_change, desired_repo_state)
 
-    result['repo_states_post'], result['msg'] = get_repo_states(module)
+    repo_states_post, result['msg'] = get_repo_states(module)
+    for repo_id in to_change:
+      if repo_states_post[repo_id] != desired_repo_state:
+        module.fail_json(msg='repo {0} is not {1} after dnf config-manager command'.format(repo_id, desired_repo_state))
+    result['repo_states_post'] = repo_states_post
+    result['changed_repos'] = to_change
 
     module.exit_json(**result)
 
