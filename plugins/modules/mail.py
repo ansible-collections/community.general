@@ -205,7 +205,7 @@ EXAMPLES = r'''
     body: System {{ ansible_hostname }} has been successfully provisioned.
     secure: starttls
 
-- name: Sending an e-mail using StartTLS, remote server, custom EHLO and timeout of 10 seconds
+- name: Sending an e-mail using StartTLS, remote server, custom EHLO, and timeout of 10 seconds
   community.general.mail:
     host: some.smtp.host.tld
     port: 25
