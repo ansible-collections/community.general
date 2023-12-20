@@ -122,6 +122,16 @@ options:
         description:
           - Name for the service check. Required if standalone, ignored if
             part of service definition.
+    check_node:
+        description:
+          - Node name.
+          # TODO: properly document!
+        type: str
+    check_host:
+        description:
+          - Host name.
+          # TODO: properly document!
+        type: str
     ttl:
         type: str
         description:
