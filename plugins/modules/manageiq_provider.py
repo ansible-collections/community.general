@@ -75,6 +75,7 @@ options:
 
   provider:
     description: Default endpoint connection information, required if state is true.
+    type: dict
     suboptions:
       hostname:
         type: str
@@ -104,9 +105,30 @@ options:
       certificate_authority:
         type: str
         description: The CA bundle string with custom certificates. defaults to None.
+      path:
+        type: str
+        description:
+          - TODO needs documentation.
+      project:
+        type: str
+        description:
+          - TODO needs documentation.
+      role:
+        type: str
+        description:
+          - TODO needs documentation.
+      subscription:
+        type: str
+        description:
+          - TODO needs documentation.
+      uid_ems:
+        type: str
+        description:
+          - TODO needs documentation.
 
   metrics:
     description: Metrics endpoint connection information.
+    type: dict
     suboptions:
       hostname:
         type: str
@@ -139,9 +161,26 @@ options:
       path:
         type: str
         description: Database name for oVirt metrics. Defaults to V(ovirt_engine_history).
+      project:
+        type: str
+        description:
+          - TODO needs documentation.
+      role:
+        type: str
+        description:
+          - TODO needs documentation.
+      subscription:
+        type: str
+        description:
+          - TODO needs documentation.
+      uid_ems:
+        type: str
+        description:
+          - TODO needs documentation.
 
   alerts:
     description: Alerts endpoint connection information.
+    type: dict
     suboptions:
       hostname:
         type: str
@@ -171,9 +210,30 @@ options:
       certificate_authority:
         type: str
         description: The CA bundle string with custom certificates. defaults to None.
+      path:
+        type: str
+        description:
+          - TODO needs documentation.
+      project:
+        type: str
+        description:
+          - TODO needs documentation.
+      role:
+        type: str
+        description:
+          - TODO needs documentation.
+      subscription:
+        type: str
+        description:
+          - TODO needs documentation.
+      uid_ems:
+        type: str
+        description:
+          - TODO needs documentation.
 
   ssh_keypair:
     description: SSH key pair used for SSH connections to all hosts in this provider.
+    type: dict
     suboptions:
       hostname:
         type: str
@@ -191,6 +251,43 @@ options:
         type: bool
         default: true
         aliases: [ verify_ssl ]
+      security_protocol:
+        type: str
+        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
+        description:
+          - TODO needs documentation.
+      certificate_authority:
+        type: str
+        description:
+          - TODO needs documentation.
+      password:
+        type: str
+        description:
+          - TODO needs documentation.
+      path:
+        type: str
+        description:
+          - TODO needs documentation.
+      project:
+        type: str
+        description:
+          - TODO needs documentation.
+      role:
+        type: str
+        description:
+          - TODO needs documentation.
+      subscription:
+        type: str
+        description:
+          - TODO needs documentation.
+      uid_ems:
+        type: str
+        description:
+          - TODO needs documentation.
+      port:
+        type: int
+        description:
+          - TODO needs documentation.
 '''
 
 EXAMPLES = '''

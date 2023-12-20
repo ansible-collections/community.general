@@ -1,16 +1,10 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/lookup/etcd.py validate-modules:invalid-documentation
 plugins/lookup/etcd3.py validate-modules:invalid-documentation
-plugins/modules/consul.py validate-modules:doc-missing-type
-plugins/modules/consul.py validate-modules:undocumented-parameter
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
 plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
-plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
-plugins/modules/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
-plugins/modules/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/rax_files_objects.py use-argspec-type-path                            # module deprecated - removed in 9.0.0
