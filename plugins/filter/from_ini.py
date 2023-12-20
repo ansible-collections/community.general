@@ -6,15 +6,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-__metaclass__ = type
-
-from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
-from ansible.module_utils.six.moves import StringIO
-from ansible.module_utils.six.moves.configparser import ConfigParser, \
-    ParsingError
-from ansible.module_utils.common.text.converters import to_native
-
 DOCUMENTATION = r'''
   name: from_ini
   short_description: Converts INI text input into a dictionary
@@ -53,6 +44,14 @@ RETURN = '''
     type: dictionary
 '''
 
+__metaclass__ = type
+
+from ansible.errors import AnsibleFilterError
+from ansible.module_utils.six import string_types
+from ansible.module_utils.six.moves import StringIO
+from ansible.module_utils.six.moves.configparser import ConfigParser
+from ansible.module_utils.common.text.converters import to_native
+
 
 class IniParser(ConfigParser):
     ''' Implements a configparser which is able to return a dict '''
@@ -83,7 +82,7 @@ def from_ini(obj):
 
     try:
         parser.read_file(StringIO(obj))
-    except ParsingError as ex:
+    except Exception as ex:
         raise AnsibleFilterError(f'from_ini failed to parse given string: '
                                  f'{to_native(ex)}', orig_exc=ex)
 
