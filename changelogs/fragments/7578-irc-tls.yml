@@ -1,0 +1,4 @@
+deprecated_features:
+  - "irc - the defaults ``false`` for ``use_tls`` and ``validate_certs`` have been deprecated and will change to ``true`` in community.general 10.0.0
+     to improve security. You can already improve security now by explicitly setting them to ``true``. Specifying values now disables the deprecation
+     warning (https://github.com/ansible-collections/community.general/pull/7578)."
