@@ -6,15 +6,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-__metaclass__ = type
-
-from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common._collections_compat import MutableMapping
-from ansible.module_utils.six.moves import StringIO
-from ansible.module_utils.six.moves.configparser import ConfigParser, \
-    DuplicateSectionError
-from ansible.module_utils.common.text.converters import to_native
-
 DOCUMENTATION = r'''
   name: to_ini
   short_description: Converts a dictionary to the INI file format
@@ -59,6 +50,15 @@ RETURN = r'''
 '''
 
 
+__metaclass__ = type
+
+from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common._collections_compat import MutableMapping
+from ansible.module_utils.six.moves import StringIO
+from ansible.module_utils.six.moves.configparser import ConfigParser
+from ansible.module_utils.common.text.converters import to_native
+
+
 class IniParser(ConfigParser):
     ''' Implements a configparser which sets the correct optionxform '''
 
@@ -77,7 +77,7 @@ def to_ini(obj):
 
     try:
         ini_parser.read_dict(obj)
-    except (DuplicateSectionError, ValueError) as ex:
+    except Exception as ex:
         raise AnsibleFilterError('to_ini failed to parse given dict:'
                                  f'{to_native(ex)}', orig_exc=ex)
 
