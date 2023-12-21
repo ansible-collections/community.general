@@ -83,12 +83,12 @@ EXAMPLES = r'''
 - name: Install system requirements
   ansible.builtin.package:
     name: "{{ requirements.system }}"
-  when: "{{ requirements.system }}"
+  when: "requirements.system"
 
 - name: Install Python requirements
   ansible.builtin.pip:
     name: "{{ requirements.python }}"
-  when: "{{ requirements.python }}"
+  when: "requirements.python"
 '''
 
 RETURN = r'''
