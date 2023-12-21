@@ -481,7 +481,7 @@ def main():
 
     else:
         after_user = {}
-        if force:  # If the force option is set to true
+        if force and before_user:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
 
