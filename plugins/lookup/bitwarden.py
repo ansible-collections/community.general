@@ -71,7 +71,7 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description:
-      - A one-element list of a list of requested fields or JSON objects of matches.
+      - A one-element list that contains a list of requested fields or JSON objects of matches.
       - If you use C(query), you get a list of lists. If you use C(lookup) without C(wantlist=true),
         this always gets reduced to a list of field values or JSON objects.
     type: list
