@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_user - when ``force`` is set, but user does not exist, do not try to delete it (https://github.com/ansible-collections/community.general/pull/7696).
