@@ -58,7 +58,11 @@ options:
 '''
 
     LOOKUP = r'''
-options: {}
+options:
+  service_account_token:
+    env:
+      - name: OP_SERVICE_ACCOUNT_TOKEN
+        version_added: 8.2.0
 notes:
   - This lookup will use an existing 1Password session if one exists. If not, and you have already
     performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the
