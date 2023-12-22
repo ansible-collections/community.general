@@ -53,7 +53,7 @@ RETURN = r'''
 __metaclass__ = type
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common._collections_compat import MutableMapping
+from ansible.module_utils.common._collections_compat import Mapping
 from ansible.module_utils.six.moves import StringIO
 from ansible.module_utils.six.moves.configparser import ConfigParser
 from ansible.module_utils.common.text.converters import to_native
@@ -70,7 +70,7 @@ class IniParser(ConfigParser):
 def to_ini(obj):
     ''' Read the given dict and return an INI formatted string '''
 
-    if not isinstance(obj, MutableMapping):
+    if not isinstance(obj, Mapping):
         raise AnsibleFilterError(f'to_ini requires a dict, got {type(obj)}')
 
     ini_parser = IniParser()
