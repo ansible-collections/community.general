@@ -233,25 +233,25 @@ Repo-status        : disabled
 Repo-status        : disabled
 """
 
-expected_repo_states_crb_enabled = {'appstream': 'enabled',
-                                    'appstream-debuginfo': 'disabled',
-                                    'appstream-source': 'disabled',
-                                    'baseos': 'enabled',
-                                    'baseos-debuginfo': 'disabled',
-                                    'baseos-source': 'disabled',
-                                    'copr:copr.fedorainfracloud.org:uriesk:dracut-crypt-ssh': 'enabled',
-                                    'crb': 'enabled',
-                                    'rpmfusion-nonfree-updates': 'enabled'}
+expected_repo_states_crb_enabled = {'disabled': ['appstream-debuginfo',
+                                                 'appstream-source',
+                                                 'baseos-debuginfo',
+                                                 'baseos-source'],
+                                    'enabled': ['appstream',
+                                                'baseos',
+                                                'copr:copr.fedorainfracloud.org:uriesk:dracut-crypt-ssh',
+                                                'crb',
+                                                'rpmfusion-nonfree-updates']}
 
-expected_repo_states_crb_disabled = {'appstream': 'enabled',
-                                     'appstream-debuginfo': 'disabled',
-                                     'appstream-source': 'disabled',
-                                     'baseos': 'enabled',
-                                     'baseos-debuginfo': 'disabled',
-                                     'baseos-source': 'disabled',
-                                     'copr:copr.fedorainfracloud.org:uriesk:dracut-crypt-ssh': 'enabled',
-                                     'crb': 'disabled',
-                                     'rpmfusion-nonfree-updates': 'enabled'}
+expected_repo_states_crb_disabled = {'disabled': ['appstream-debuginfo',
+                                                  'appstream-source',
+                                                  'baseos-debuginfo',
+                                                  'baseos-source',
+                                                  'crb'],
+                                     'enabled': ['appstream',
+                                                 'baseos',
+                                                 'copr:copr.fedorainfracloud.org:uriesk:dracut-crypt-ssh',
+                                                 'rpmfusion-nonfree-updates']}
 
 call_get_repo_states = call(['/usr/bin/dnf', 'repolist', '--all', '--verbose'], check_rc=True)
 call_disable_crb = call(['/usr/bin/dnf', 'config-manager', '--set-disabled', 'crb'], check_rc=True)

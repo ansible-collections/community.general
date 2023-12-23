@@ -65,37 +65,55 @@ repo_states_pre:
   returned: success
   type: dict
   contains:
-    repo_id:
-      description: Repository ID.
-      type: str
+    enabled:
+      description: Enabled repository IDs.
+      returned: success
+      type: list
+      elements: str
+    disabled:
+      description: Disabled repository IDs.
+      returned: success
+      type: list
+      elements: str
   sample:
-    appsteam: enabled
-    appstream-debuginfo: disabled
-    appstream-source: disabled
-    baseos: enabled
-    baseos-debuginfo: disabled
-    baseos-source: disabled
-    crb: enabled
-    crb-debug: disabled
-    crb-source: disabled
+    enabled:
+      - appstream
+      - baseos
+      - crb
+    disabled:
+      - appstream-debuginfo
+      - appstream-source
+      - baseos-debuginfo
+      - baseos-source
+      - crb-debug
+      - crb-source
 repo_states_post:
-  description: Repo IDs after action taken.
+  description: Repository states after action taken.
   returned: success
   type: dict
   contains:
-    repo_id:
-      description: Repository ID.
-      type: str
+    enabled:
+      description: Enabled repository IDs.
+      returned: success
+      type: list
+      elements: str
+    disabled:
+      description: Disabled repository IDs.
+      returned: success
+      type: list
+      elements: str
   sample:
-    appsteam: enabled
-    appstream-debuginfo: disabled
-    appstream-source: disabled
-    baseos: enabled
-    baseos-debuginfo: disabled
-    baseos-source: disabled
-    crb: enabled
-    crb-debug: disabled
-    crb-source: disabled
+    enabled:
+      - appstream
+      - baseos
+      - crb
+    disabled:
+      - appstream-debuginfo
+      - appstream-source
+      - baseos-debuginfo
+      - baseos-source
+      - crb-debug
+      - crb-source
 changed_repos:
     description: Repositories changed.
     returned: success
@@ -138,6 +156,17 @@ def set_repo_states(module, repo_ids, state):
     module.run_command([DNF_BIN, 'config-manager', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
 
 
+def pack_repo_states_for_return(states):
+    enabled = []
+    disabled = []
+    for repo_id in states:
+        if states[repo_id] == 'enabled':
+            enabled.append(repo_id)
+        else:
+            disabled.append(repo_id)
+    return {'enabled': enabled, 'disabled': disabled}
+
+
 def main():
     module_args = dict(
         name=dict(type='list', elements='str', required=False, default=[]),
@@ -145,10 +174,7 @@ def main():
     )
 
     result = dict(
-        changed=False,
-        changed_repos=[],
-        repo_states_pre={},
-        repo_states_post={}
+        changed=False
     )
 
     module = AnsibleModule(
@@ -160,7 +186,7 @@ def main():
         module.fail_json(msg="%s was not found" % DNF_BIN)
 
     repo_states = get_repo_states(module)
-    result['repo_states_pre'] = repo_states
+    result['repo_states_pre'] = pack_repo_states_for_return(repo_states)
 
     desired_repo_state = module.params['state']
     names = module.params['name']
@@ -181,7 +207,7 @@ def main():
         set_repo_states(module, to_change, desired_repo_state)
 
     repo_states_post = get_repo_states(module)
-    result['repo_states_post'] = repo_states_post
+    result['repo_states_post'] = pack_repo_states_for_return(repo_states_post)
 
     for repo_id in to_change:
         if repo_states_post[repo_id] != desired_repo_state:
