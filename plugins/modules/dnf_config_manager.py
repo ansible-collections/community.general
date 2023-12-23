@@ -164,6 +164,11 @@ def pack_repo_states_for_return(states):
             enabled.append(repo_id)
         else:
             disabled.append(repo_id)
+
+    # Sort for consistent results
+    enabled.sort()
+    disabled.sort()
+
     return {'enabled': enabled, 'disabled': disabled}
 
 
