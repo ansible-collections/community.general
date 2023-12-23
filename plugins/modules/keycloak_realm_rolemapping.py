@@ -14,7 +14,7 @@ module: keycloak_realm_rolemapping
 
 short_description: Allows administration of Keycloak realm role mappings into groups with the Keycloak API
 
-version_added: 8.3.0
+version_added: 8.2.0
 
 description:
     - This module allows you to add, remove or modify Keycloak realm role
