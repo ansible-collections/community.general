@@ -12,13 +12,12 @@ DOCUMENTATION = r'''
 module: dnf_config_manager
 short_description: Enable or disable dnf repositories using config-manager
 version_added: 8.2.0
-description: This module enables or disables repositories using the C(dnf config-manager) sub-command.
+description:
+  - This module enables or disables repositories using the C(dnf config-manager) sub-command.
 author: Andrew Hyatt (@ahyattdev) <andy@hyatt.xyz>
 requirements:
   - dnf
   - dnf-plugins-core
-notes:
-  - Supports C(check_mode).
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -29,7 +28,7 @@ attributes:
 options:
   name:
     description:
-      - Repository id, for example C(crb).
+      - Repository id, for example V(crb).
     default: []
     required: false
     type: list
@@ -149,8 +148,8 @@ def main():
     result = dict(
         changed=False,
         changed_repos=[],
-        repo_states_pre='',
-        repo_states_post=''
+        repo_states_pre={},
+        repo_states_post={}
     )
 
     module = AnsibleModule(
@@ -170,10 +169,11 @@ def main():
     to_change = []
     for repo_id in names:
         if repo_id not in repo_states:
-            module.fail_json(msg="did not find repo ID '{0}'".format(repo_id), **result)
+            module.fail_json(msg="did not find repo with ID '{0}' in dnf repolist --all --verbose".format(repo_id))
         if repo_states[repo_id] != desired_repo_state:
             to_change.append(repo_id)
     result['changed'] = len(to_change) > 0
+    result['changed_repos'] = to_change
 
     if module.check_mode:
         module.exit_json(**result)
@@ -183,10 +183,10 @@ def main():
 
     repo_states_post = get_repo_states(module)
     result['repo_states_post'] = repo_states_post
+
     for repo_id in to_change:
         if repo_states_post[repo_id] != desired_repo_state:
-            module.fail_json(msg='repo {0} is not {1} after dnf config-manager command'.format(repo_id, desired_repo_state), **result)
-    result['changed_repos'] = to_change
+            module.fail_json(msg="dnf config-manager failed to make '{0}' {1}".format(repo_id, desired_repo_state))
 
     module.exit_json(**result)
 
