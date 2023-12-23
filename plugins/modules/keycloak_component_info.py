@@ -26,7 +26,7 @@ options:
         type: str
     name:
         description:
-            - Name of the Component
+            - Name of the Component.
         type: str
     provider_type:
         description:
