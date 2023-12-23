@@ -40,7 +40,7 @@ options:
         type: str
     parent_id:
         description:
-            - Container Id of the components
+            - Container ID of the components.
         type: str
 
 
