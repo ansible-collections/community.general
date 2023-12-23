@@ -100,6 +100,7 @@ components:
   description: JSON representation of components.
   returned: always
   type: list
+  elements: dict
 changed:
   description: Always return False.
   returned: always
