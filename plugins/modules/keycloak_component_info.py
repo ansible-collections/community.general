@@ -101,10 +101,6 @@ components:
   returned: always
   type: list
   elements: dict
-changed:
-  description: Always return False.
-  returned: always
-  type: bool
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, \
