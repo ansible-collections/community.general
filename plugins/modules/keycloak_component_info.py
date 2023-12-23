@@ -30,13 +30,13 @@ options:
         type: str
     provider_type:
         description:
-            - Provider type of components
-            - Exemple
-                org.keycloak.storage.UserStorageProvider
-                org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy
-                org.keycloak.keys.KeyProvider
-                org.keycloak.userprofile.UserProfileProvider
-                org.keycloak.storage.ldap.mappers.LDAPStorageMapper
+            - Provider type of components.
+            - "Example:
+                V(org.keycloak.storage.UserStorageProvider),
+                V(org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy),
+                V(org.keycloak.keys.KeyProvider),
+                V(org.keycloak.userprofile.UserProfileProvider),
+                V(org.keycloak.storage.ldap.mappers.LDAPStorageMapper)."
         type: str
     parent_id:
         description:
