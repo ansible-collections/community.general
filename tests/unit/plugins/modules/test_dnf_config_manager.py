@@ -1,13 +1,14 @@
-# (c) 2023 Andrew Hyatt <andy@hyatt.xyz>
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2023, Andrew Hyatt <andy@hyatt.xyz>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-from unittest.mock import call
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules import dnf_config_manager as dnf_config_manager_module
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, \
     ModuleTestCase, set_module_args
