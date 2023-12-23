@@ -28,7 +28,7 @@ attributes:
 options:
   name:
     description:
-      - Repository id, for example V(crb).
+      - Repository ID, for example V(crb).
     default: []
     required: false
     type: list
@@ -40,6 +40,9 @@ options:
     required: false
     type: str
     choices: [enabled, disabled]
+seealso:
+  - module: ansible.builtin.dnf
+  - module: ansible.builtin.yum_repository
 '''
 
 EXAMPLES = r'''
@@ -53,7 +56,7 @@ EXAMPLES = r'''
     name:
       - appstream
       - zfs
-    state: present
+    state: disabled
 '''
 
 RETURN = r'''
@@ -63,40 +66,36 @@ repo_states_pre:
   type: dict
   contains:
     repo_id:
-      description: Repository ID
+      description: Repository ID.
       type: str
-  sample: |-
-    {
-      "appstream": "enabled",
-      "appstream-debuginfo": "disabled",
-      "appstream-source": "disabled",
-      "baseos": "enabled",
-      "baseos-debuginfo": "disabled",
-      "baseos-source": "disabled",
-      "crb": "enabled",
-      "crb-debug": "disabled",
-      "crb-source": "disabled"
-    }
+  sample:
+    appsteam: enabled
+    appstream-debuginfo: disabled
+    appstream-source: disabled
+    baseos: enabled
+    baseos-debuginfo: disabled
+    baseos-source: disabled
+    crb: enabled
+    crb-debug: disabled
+    crb-source: disabled
 repo_states_post:
   description: Repo IDs after action taken.
   returned: success
   type: dict
   contains:
     repo_id:
-      description: Repository ID
+      description: Repository ID.
       type: str
-  sample: |-
-    {
-      "appstream": "enabled",
-      "appstream-debuginfo": "disabled",
-      "appstream-source": "disabled",
-      "baseos": "enabled",
-      "baseos-debuginfo": "disabled",
-      "baseos-source": "disabled",
-      "crb": "enabled",
-      "crb-debug": "disabled",
-      "crb-source": "disabled"
-    }
+  sample:
+    appsteam: enabled
+    appstream-debuginfo: disabled
+    appstream-source: disabled
+    baseos: enabled
+    baseos-debuginfo: disabled
+    baseos-source: disabled
+    crb: enabled
+    crb-debug: disabled
+    crb-source: disabled
 changed_repos:
     description: Repositories changed.
     returned: success
