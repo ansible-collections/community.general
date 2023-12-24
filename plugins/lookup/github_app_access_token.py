@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     name: github_app_access_token
     author:
       - Poh Wei Sheng (@weisheng-p)
-    short_description: Generats Github App Access token
+    short_description: This plugin generates Github App Access token
     version_added: '3.1.0'
     requirements:
       - jwt (https://github.com/GehirnInc/python-jwt)
