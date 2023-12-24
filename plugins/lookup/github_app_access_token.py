@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     name: github_app_access_token
     author:
       - Poh Wei Sheng (@weisheng-p)
-    short_description: This plugin generates Github App Access token
+    short_description: Obtain short-lived Github App Access tokens
     version_added: '8.2.0'
     requirements:
       - jwt (https://github.com/GehirnInc/python-jwt)
@@ -36,7 +36,7 @@ DOCUMENTATION = '''
         type: str
       token_expiry:
         description:
-        - how long the token should last for in seconds
+        - How long the token should last for in seconds.
         default: 600
         type: int
 '''
