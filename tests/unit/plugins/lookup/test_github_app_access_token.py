@@ -14,15 +14,16 @@ from ansible_collections.community.general.tests.unit.compat.mock import (
     mock_open
 )
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.lookup import github_app_access_token
 
 
 class MockJWT(MagicMock):
     def encode(self, payload, key, alg):
         return 'Foobar'
-    
+
+
 class MockResponse(MagicMock):
     response_token = 'Bar'
+
     def read(self):
         return json.dumps({
             "token": self.response_token,
