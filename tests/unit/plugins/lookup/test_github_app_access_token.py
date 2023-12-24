@@ -28,10 +28,6 @@ class MockResponse(MagicMock):
             "token": self.response_token,
         }).encode('utf-8')
 
-class MockOpenUrl(MagicMock):
-    @staticmethod
-    def post(cls, url, headers={}):
-        return MockResponse()
 
 class TestLookupModule(unittest.TestCase):
 
