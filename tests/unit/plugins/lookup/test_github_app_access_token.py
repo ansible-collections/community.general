@@ -46,6 +46,7 @@ class TestLookupModule(unittest.TestCase):
                     [],
                     key_path="key",
                     app_id="app_id",
-                    installation_id="installation_id"
+                    installation_id="installation_id",
+                    token_expiry=600
                 )
             )

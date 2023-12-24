@@ -18,9 +18,9 @@ DOCUMENTATION = '''
     options:
       key_path:
         description:
-        - Path to your private key
+        - Path to your private key.
         required: true
-        type: str
+        type: path
       app_id:
         description:
         - Your GitHub App ID, you can find this in the settings page.
@@ -34,6 +34,11 @@ DOCUMENTATION = '''
         - Alternatively, you can use PyGithub (https://github.com/PyGithub/PyGithub) to get your installation id
         required: true
         type: str
+      token_expiry:
+        description:
+        - how long the token should last for in seconds
+        default: 600
+        type: int
 '''
 
 EXAMPLES = '''
@@ -126,9 +131,9 @@ def post_request(generated_jwt, installation_id):
     return json_data.get('token')
 
 
-def get_token(key_path, app_id, installation_id):
+def get_token(key_path, app_id, installation_id, expiry=600):
     jwk = read_key(key_path)
-    generated_jwt = encode_jwt(app_id, jwk)
+    generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
     return post_request(generated_jwt, installation_id)
 
 
@@ -141,8 +146,10 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
 
         t = get_token(
-            kwargs['key_path'],
-            kwargs['app_id'],
-            kwargs['installation_id'])
+            self.get_option('key_path'),
+            self.get_option('app_id'),
+            self.get_option('installation_id'),
+            self.get_option('token_expiry'),
+        )
 
         return [t]
