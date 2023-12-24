@@ -1,0 +1,2 @@
+bugfixes:
+  - community.general.statusio_maintenance - fix error caused by incorrectly formed api data payload. was raising Failed to create maintenance HTTP Error 400 Bad Request caused by bad data type for date/time and deprecated dict keys.
