@@ -36,7 +36,7 @@ class TestLookupModule(unittest.TestCase):
                             open=mock_open(read_data="foo_bar"),
                             open_url=MagicMock(return_value=MockResponse()),
                             jwk_from_pem=MagicMock(return_value='private_key'),
-                            JWT=MockJWT,
+                            jwt_instance=MockJWT(),
                             HAS_JWT=True):
             lookup = lookup_loader.get('community.general.github_app_access_token')
             self.assertListEqual(
