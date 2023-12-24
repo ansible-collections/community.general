@@ -23,7 +23,7 @@ DOCUMENTATION = '''
         type: str
       app_id:
         description:
-        - Your Github App Id, you can find this in the settings page
+        - Your GitHub App ID, you can find this in the settings page.
         required: true
         type: str
       installation_id:
