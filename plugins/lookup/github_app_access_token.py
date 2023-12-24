@@ -71,7 +71,9 @@ from ansible.utils.display import Display
 
 if HAS_JWT:
     jwt_instance = JWT()
-
+else:
+    jwk_from_pem = None
+    jwt_instance = None
 
 display = Display()
 
