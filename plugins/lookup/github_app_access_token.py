@@ -14,7 +14,7 @@ DOCUMENTATION = '''
     requirements:
       - jwt (https://github.com/GehirnInc/python-jwt)
     description:
-      - This generates a Github access token that can be used with a git command, if you use a Github App.
+      - This generates a Github access token that can be used with a C(git) command, if you use a Github App.
     options:
       key_path:
         description:
