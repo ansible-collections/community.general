@@ -44,12 +44,13 @@ DOCUMENTATION = '''
 EXAMPLES = '''
 - name: Get access token to be used for git checkout with app_id=123456, installation_id=64209
   ansible.builtin.git:
-    repo: >
-        https://x-access-token:{{ lookup('github_app_token',
-                                  key_path='/home/to_your/key',
-                                  app_id='123456',
-                                  installation_id='64209') }}@github.com/hidden_user/super-secret-repo.git
+    repo: >-
+      https://x-access-token:{{ github_token }}@github.com/hidden_user/super-secret-repo.git
     dest: /srv/checkout
+  vars:
+    github_token: >-
+      lookup('github_app_token', key_path='/home/to_your/key',
+             app_id='123456', installation_id='64209')
 '''
 
 RETURN = '''
