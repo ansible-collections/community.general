@@ -52,3 +52,6 @@ proxmoxer ; python_version > '3.6'
 #requirements for nomad_token modules
 python-nomad < 2.0.0 ; python_version <= '3.6'
 python-nomad >= 2.0.0 ; python_version >= '3.7'
+
+#requirements for github app lookup
+jwt
