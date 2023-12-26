@@ -64,7 +64,7 @@ options:
 
     provider_id:
         description:
-            - Provider for this user federation.
+            - Provider for this user federation. In addition to the listed choices, a custom user storage provider can be used.
         aliases:
             - providerId
         type: str
@@ -805,7 +805,7 @@ def main():
         realm=dict(type='str', default='master'),
         id=dict(type='str'),
         name=dict(type='str'),
-        provider_id=dict(type='str', aliases=['providerId'], choices=['ldap', 'kerberos', 'sssd']),
+        provider_id=dict(type='str', aliases=['providerId']),
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
