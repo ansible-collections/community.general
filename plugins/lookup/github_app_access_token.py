@@ -23,15 +23,15 @@ DOCUMENTATION = '''
         type: path
       app_id:
         description:
-        - Your GitHub App ID, you can find this in the settings page.
+        - Your GitHub App ID, you can find this in the Settings page.
         required: true
         type: str
       installation_id:
         description:
-        - The installation id that contains the git repo you would like access to
-        - As of 2023-12-24, this can be found via settings page > integrations > application. The last part of the url in the
-          configure button is the installation id.
-        - Alternatively, you can use PyGithub (https://github.com/PyGithub/PyGithub) to get your installation id
+        - The installation ID that contains the git repository you would like access to.
+        - As of 2023-12-24, this can be found via Settings page > Integrations > Application. The last part of the URL in the
+          configure button is the installation ID.
+        - Alternatively, you can use PyGithub (U(https://github.com/PyGithub/PyGithub)) to get your installation ID.
         required: true
         type: str
       token_expiry:
@@ -55,7 +55,7 @@ EXAMPLES = '''
 
 RETURN = '''
   _raw:
-    description: A one-element list containing your github access token
+    description: A one-element list containing your GitHub access token.
     type: list
     elements: str
 '''
