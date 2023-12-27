@@ -1,0 +1,2 @@
+minor_changes:
+  - mail - add ``Message-ID`` header; which is required by some mail servers (https://github.com/ansible-collections/community.general/pull/7740).
