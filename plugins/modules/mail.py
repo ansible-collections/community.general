@@ -348,7 +348,11 @@ def main():
     msg['From'] = formataddr((sender_phrase, sender_addr))
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = Header(subject, charset)
-    msg['Message-ID'] = make_msgid(domain='ansible')
+    try:
+        msg['Message-ID'] = make_msgid(domain='ansible')
+    except TypeError:
+        # `domain` is only available in Python 3
+        msg['Message-ID'] = make_msgid()
     msg.preamble = "Multipart message"
 
     for header in headers:
