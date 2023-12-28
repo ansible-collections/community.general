@@ -64,14 +64,11 @@ options:
 
     provider_id:
         description:
-            - Provider for this user federation. In addition to the listed choices, a custom user storage provider can be used.
+            - Provider for this user federation. Built in providers are 'ldap', 'kerberos' and 'ssd'.
+              Custom user storage providers can also be used.
         aliases:
             - providerId
         type: str
-        choices:
-            - ldap
-            - kerberos
-            - sssd
 
     provider_type:
         description:
