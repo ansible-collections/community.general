@@ -64,7 +64,7 @@ options:
 
     provider_id:
         description:
-            - Provider for this user federation. Built in providers are 'ldap', 'kerberos' and 'ssd'.
+            - Provider for this user federation. Built-in providers are V(ldap), V(kerberos), and V(sssd).
               Custom user storage providers can also be used.
         aliases:
             - providerId
