@@ -754,6 +754,8 @@ files:
     maintainers: elfelip
   $modules/keycloak_user_federation.py:
     maintainers: laurpaum
+  $modules/keycloak_component_info.py:
+    maintainers: desand01
   $modules/keycloak_user_rolemapping.py:
     maintainers: bratwurzt
   $modules/keycloak_realm_rolemapping.py:
