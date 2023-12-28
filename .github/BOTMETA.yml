@@ -133,6 +133,8 @@ files:
     maintainers: giner
   $filters/from_csv.py:
     maintainers: Ajpantuso
+  $filters/from_ini.py:
+    maintainers: sscheib
   $filters/groupby_as_dict.py:
     maintainers: felixfontein
   $filters/hashids.py:
