@@ -97,6 +97,9 @@ files:
   $connections/funcd.py:
     maintainers: mscherer
   $connections/iocage.py: {}
+  $connections/incus.py:
+    labels: incus
+    maintainers: stgraber
   $connections/jail.py:
     maintainers: $team_ansible_core
   $connections/lxc.py: {}
