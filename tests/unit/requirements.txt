@@ -6,7 +6,8 @@ unittest2 ; python_version < '2.7'
 importlib ; python_version < '2.7'
 
 # requirement for the memcached cache plugin
-python-memcached
+python-memcached < 1.60 ; python_version < '3.6'
+python-memcached ; python_version >= '3.6'
 
 # requirement for the redis cache plugin
 redis
