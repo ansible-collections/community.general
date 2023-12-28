@@ -654,6 +654,8 @@ files:
     maintainers: bregman-arie
   $modules/ipa_:
     maintainers: $team_ipa
+  $modules/ipa_dnsrecord.py:
+    maintainers: $team_ipa jwbernin
   $modules/ipbase_info.py:
     maintainers: dominikkukacka
   $modules/ipa_pwpolicy.py:
