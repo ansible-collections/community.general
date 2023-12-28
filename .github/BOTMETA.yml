@@ -158,6 +158,8 @@ files:
     maintainers: resmo
   $filters/to_hours.yml:
     maintainers: resmo
+  $filters/to_ini.py:
+    maintainers: sscheib
   $filters/to_milliseconds.yml:
     maintainers: resmo
   $filters/to_minutes.yml:
