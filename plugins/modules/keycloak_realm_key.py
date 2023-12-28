@@ -74,7 +74,8 @@ options:
     provider_id:
         description:
             - The name of the "provider ID" for the key.
-        choices: ['rsa']
+            - The value V(rsa-enc) has been added in community.general 8.2.0.
+        choices: ['rsa', 'rsa-enc']
         default: 'rsa'
         type: str
     config:
@@ -102,8 +103,10 @@ options:
             algorithm:
                 description:
                     - Key algorithm.
+                    - The values V(RS384), V(RS512), V(PS256), V(PS384), V(PS512), V(RSA1_5),
+                      V(RSA-OAEP), V(RSA-OAEP-256) have been added in community.general 8.2.0.
                 default: RS256
-                choices: ['RS256']
+                choices: ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256']
                 type: str
             private_key:
                 description:
@@ -154,6 +157,7 @@ EXAMPLES = '''
     auth_realm: master
     config:
       private_key: "{{ private_key }}"
+      certificate: ""
       enabled: true
       active: true
       priority: 120
@@ -244,16 +248,30 @@ def main():
         name=dict(type='str', required=True),
         force=dict(type='bool', default=False),
         parent_id=dict(type='str', required=True),
-        provider_id=dict(type='str', default='rsa', choices=['rsa']),
+        provider_id=dict(type='str', default='rsa', choices=['rsa', 'rsa-enc']),
         config=dict(
             type='dict',
             options=dict(
                 active=dict(type='bool', default=True),
                 enabled=dict(type='bool', default=True),
                 priority=dict(type='int', required=True),
-                algorithm=dict(type='str', default='RS256', choices=['RS256']),
+                algorithm=dict(
+                    type="str",
+                    default="RS256",
+                    choices=[
+                        "RS256",
+                        "RS384",
+                        "RS512",
+                        "PS256",
+                        "PS384",
+                        "PS512",
+                        "RSA1_5",
+                        "RSA-OAEP",
+                        "RSA-OAEP-256",
+                    ],
+                ),
                 private_key=dict(type='str', required=True, no_log=True),
-                certificate=dict(type='str', required=True, no_log=True)
+                certificate=dict(type='str', required=True)
             )
         )
     )
