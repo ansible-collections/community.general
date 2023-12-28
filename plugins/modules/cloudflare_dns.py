@@ -138,6 +138,7 @@ options:
     description:
       - The type of DNS record to create. Required if O(state=present).
       - O(type=DS), O(type=SSHFP), and O(type=TLSA) were added in Ansible 2.7.
+      - Note that V(SPF) is no longer supported by CloudFlare. Support for it will be removed from community.general 9.0.0.
     type: str
     choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, TXT ]
   value:
