@@ -642,6 +642,7 @@ files:
     maintainers: bregman-arie
   $modules/ipa_:
     maintainers: $team_ipa
+    ignore: fxfitz
   $modules/ipbase_info.py:
     maintainers: dominikkukacka
   $modules/ipa_pwpolicy.py:
@@ -1433,7 +1434,7 @@ macros:
   team_gitlab: Lunik Shaps marwatk waheedi zanssa scodeman metanovii sh0shin nejch lgatellier suukit
   team_hpux: bcoca davx8342
   team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
-  team_ipa: Akasurde Nosmoht fxfitz justchris1
+  team_ipa: Akasurde Nosmoht justchris1
   team_jboss: Wolfant jairojunior wbrefvem
   team_keycloak: eikef ndclt mattock
   team_linode: InTheCloudDan decentral1se displague rmcintosh Charliekenney23 LBGarber
