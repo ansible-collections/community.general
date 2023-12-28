@@ -592,8 +592,9 @@ class XCCRedfishUtils(RedfishUtils):
     def raw_post_resource(self, resource_uri, request_body):
         if resource_uri is None:
             return {'ret': False, 'msg': "resource_uri is missing"}
+        resource_uri_has_actions = True
         if '/Actions/' not in resource_uri:
-            return {'ret': False, 'msg': "Bad uri %s. Keyword /Actions/ should be included in uri" % resource_uri}
+            resource_uri_has_actions = False
         if request_body is None:
             return {'ret': False, 'msg': "request_body is missing"}
         # get action base uri data for further checking
@@ -602,7 +603,10 @@ class XCCRedfishUtils(RedfishUtils):
         if response['ret'] is False:
             return response
         if 'Actions' not in response['data']:
-            return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
+            if resource_uri_has_actions:
+                return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
+            else:
+                response['data']['Actions'] = {}
 
         # check resouce_uri with target uri found in action base uri data
         action_found = False
@@ -634,7 +638,7 @@ class XCCRedfishUtils(RedfishUtils):
                     else:
                         action_target_uri_list.append(response['data']['Actions']['Oem'][key]['target'])
 
-        if not action_found:
+        if not action_found and resource_uri_has_actions:
             return {'ret': False,
                     'msg': 'Specified resource_uri is not a supported action target uri, please specify a supported target uri instead. Supported uri: %s'
                     % (str(action_target_uri_list))}
