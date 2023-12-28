@@ -1,0 +1,58 @@
+---
+# Copyright (c) 2023, Steffen Scheib <steffen@scheib.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: >-
+    Write INI file that reflects using to_ini to {{ ini_test_file_filter }}
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file_filter }}'
+    content: '{{ ini_test_dict | community.general.to_ini }}'
+  vars:
+    ini_test_dict:
+      section_name:
+        key_name: 'key value'
+
+      another_section:
+        connection: 'ssh'
+
+- name: 'Write INI file manually to {{ ini_test_file }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file }}'
+    content: |
+      [section_name]
+      key_name = key value
+
+      [another_section]
+      connection = ssh
+
+- name: 'Slurp the manually created test file: {{ ini_test_file }}'
+  ansible.builtin.slurp:
+    src: '{{ ini_test_file }}'
+  register: 'ini_file_content'
+
+- name: 'Slurp the test file created with to_ini: {{ ini_test_file_filter }}'
+  ansible.builtin.slurp:
+    src: '{{ ini_test_file_filter }}'
+  register: 'ini_file_filter_content'
+
+- name: >-
+    Ensure the manually created test file and the test file created with
+    to_ini are identical
+  ansible.builtin.assert:
+    that:
+      - 'ini_file_content.content | b64decode ==
+         ini_file_filter_content.content | b64decode'
+
+- name: 'Try to convert an empty dictionary with to_ini'
+  ansible.builtin.debug:
+    msg: '{{ {} | community.general.to_ini }}'
+  register: 'ini_empty_dict'
+  ignore_errors: true
+
+- name: 'Ensure the correct exception was raised'
+  ansible.builtin.assert:
+    that:
+      - "'to_ini received an empty dict. An empty dict cannot be converted.' in
+        ini_empty_dict.msg"
+...
