@@ -549,7 +549,7 @@ def main():
             changeset['mappers'].append(new_mapper)
 
         # ensure idempotency in case module.params.mappers is not sorted by name
-        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('name'))
+        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('id') if x.get('name') is None else x['name'])
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_idp = before_idp.copy()
