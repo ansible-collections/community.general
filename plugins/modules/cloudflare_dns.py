@@ -148,6 +148,7 @@ options:
   type:
     description:
       - The type of DNS record to create. Required if O(state=present).
+      - Note that V(SPF) is no longer supported by CloudFlare. Support for it will be removed from community.general 9.0.0.
     type: str
     choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, CAA, TXT ]
   value:
