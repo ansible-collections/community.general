@@ -542,10 +542,14 @@ def main():
                     old_mapper = dict()
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            # eventually this holds all desired mappers, unchanged, modified and newly added
+            changeset['mappers'].append(new_mapper)
+
+        # ensure idempotency in case module.params.mappers is not sorted by name
+        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('id') if x.get('name') is None else x['name'])
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_idp = before_idp.copy()
@@ -612,10 +616,17 @@ def main():
             # do the update
             desired_idp = desired_idp.copy()
             updated_mappers = desired_idp.pop('mappers', [])
+            original_mappers = list(before_idp.get('mappers', []))
+
             kc.update_identity_provider(desired_idp, realm)
             for mapper in updated_mappers:
                 if mapper.get('id') is not None:
-                    kc.update_identity_provider_mapper(mapper, alias, realm)
+                    # only update existing if there is a change
+                    for i, orig in enumerate(original_mappers):
+                        if mapper['id'] == orig['id']:
+                            del original_mappers[i]
+                            if mapper != orig:
+                                kc.update_identity_provider_mapper(mapper, alias, realm)
                 else:
                     if mapper.get('identityProviderAlias') is None:
                         mapper['identityProviderAlias'] = alias
