@@ -1,0 +1,160 @@
+# Copyright (c) 2023, Alexander Groß (@agross)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create realm roles
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ role_1 }}"
+    - "{{ role_2 }}"
+
+- name: Create group
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    name: "{{ group }}"
+    state: present
+
+- name: Map realm roles to group
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_1 }}"
+      - name: "{{ role_2 }}"
+    state: present
+  register: result
+
+- name: Assert realm roles are assigned to group
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state | count == 2
+
+- name: Map realm roles to group again (idempotency)
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_1 }}"
+      - name: "{{ role_2 }}"
+    state: present
+  register: result
+
+- name: Assert realm roles stay assigned to group
+  ansible.builtin.assert:
+    that:
+      - result is not changed
+
+- name: Unmap realm role 1 from group
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_1 }}"
+    state: absent
+  register: result
+
+- name: Assert realm role 1 is unassigned from group
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state | count == 1
+      - result.end_state[0] == role_2
+
+- name: Unmap realm role 1 from group again (idempotency)
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_1 }}"
+    state: absent
+  register: result
+
+- name: Assert realm role 1 stays unassigned from group
+  ansible.builtin.assert:
+    that:
+      - result is not changed
+
+- name: Unmap realm role 2 from group
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_2 }}"
+    state: absent
+  register: result
+
+- name: Assert no realm roles are assigned to group
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state | count == 0
+
+- name: Unmap realm role 2 from group again (idempotency)
+  community.general.keycloak_realm_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    group_name: "{{ group }}"
+    roles:
+      - name: "{{ role_2 }}"
+    state: absent
+  register: result
+
+- name: Assert no realm roles are assigned to group
+  ansible.builtin.assert:
+    that:
+      - result is not changed
+      - result.end_state | count == 0

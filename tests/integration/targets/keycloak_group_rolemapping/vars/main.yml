@@ -1,0 +1,15 @@
+---
+# Copyright (c) 2023, Alexander Groß (@agross)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+url: http://localhost:8080
+admin_realm: master
+admin_user: admin
+admin_password: password
+realm: myrealm
+
+role_1: myrole-1
+role_2: myrole-2
+
+group: mygroup

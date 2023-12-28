@@ -756,6 +756,8 @@ files:
     maintainers: laurpaum
   $modules/keycloak_user_rolemapping.py:
     maintainers: bratwurzt
+  $modules/keycloak_realm_rolemapping.py:
+    maintainers: agross mhuysamen Gaetan2907
   $modules/keyring.py:
     maintainers: ahussey-redhat
   $modules/keyring_info.py:
