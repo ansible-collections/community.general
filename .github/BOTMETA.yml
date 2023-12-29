@@ -482,6 +482,8 @@ files:
     maintainers: russoz
   $modules/dnf_versionlock.py:
     maintainers: moreda
+  $modules/dnf_config_manager.py:
+    maintainers: ahyattdev
   $modules/dnsimple.py:
     maintainers: drcapulet
   $modules/dnsimple_info.py:
