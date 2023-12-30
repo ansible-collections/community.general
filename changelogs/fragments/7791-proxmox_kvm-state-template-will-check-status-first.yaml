@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_kvm - running state:template will check if vm is already a template first
