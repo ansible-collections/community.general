@@ -342,7 +342,10 @@ class GitLabRunner(object):
     @param description Description of the runner
     '''
     def find_runner(self, description):
-        runners = self._runners_endpoint(iterator=True)
+        if LooseVersion(gitlab.__version__) < LooseVersion('3.6.0'):
+            runners = self._runners_endpoint(as_list=False)
+        else:
+            runners = self._runners_endpoint(iterator=True)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
