@@ -129,6 +129,25 @@
     - results_storage.proxmox_storages|length == 1
     - results_storage.proxmox_storages[0].storage == "{{ storage }}"
 
+- name: List content on storage
+  proxmox_storage_contents_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    storage: "{{ storage }}"
+    node: "{{ node }}"
+    content: images
+  register: results_list_storage
+
+- assert:
+    that:
+    - results_storage is not changed
+    - results_storage.proxmox_storage_content is defined
+    - results_storage.proxmox_storage_content |length == 1
+
 - name: VM creation
   tags: [ 'create' ]
   block:
