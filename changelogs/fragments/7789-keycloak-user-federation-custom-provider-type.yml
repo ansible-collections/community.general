@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_user_federation - allow custom user storage providers to be set through ``provider_id`` (https://github.com/ansible-collections/community.general/pull/7789).
