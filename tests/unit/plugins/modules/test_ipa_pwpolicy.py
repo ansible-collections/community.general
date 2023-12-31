@@ -100,7 +100,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '16',
             'maxfailcount': '6',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {}
         mock_calls = (
@@ -124,7 +129,12 @@ class TestIPAPwPolicy(ModuleTestCase):
                     'krbpwdminlength': '16',
                     'krbpwdmaxfailure': '6',
                     'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600'
+                    'krbpwdlockoutduration': '600',
+                    'passwordgracelimit': '3',
+                    'ipapwdmaxrepeat': '3',
+                    'ipapwdmaxsequence': '3',
+                    'ipapwddictcheck': True,
+                    'ipapwdusercheck': True,
                 }
             }
         )
@@ -145,7 +155,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '16',
             'maxfailcount': '6',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {}
         mock_calls = (
@@ -169,7 +184,12 @@ class TestIPAPwPolicy(ModuleTestCase):
                     'krbpwdminlength': '16',
                     'krbpwdmaxfailure': '6',
                     'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600'
+                    'krbpwdlockoutduration': '600',
+                    'passwordgracelimit': '3',
+                    'ipapwdmaxrepeat': '3',
+                    'ipapwdmaxsequence': '3',
+                    'ipapwddictcheck': True,
+                    'ipapwdusercheck': True,
                 }
             }
         )
@@ -190,7 +210,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '12',
             'maxfailcount': '8',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {
             'cn': ['sysops'],
@@ -203,6 +228,11 @@ class TestIPAPwPolicy(ModuleTestCase):
             'krbpwdmaxfailure': ['6'],
             'krbpwdfailurecountinterval': ['60'],
             'krbpwdlockoutduration': ['600'],
+            'passwordgracelimit': ['3'],
+            'ipapwdmaxrepeat': ['3'],
+            'ipapwdmaxsequence': ['3'],
+            'ipapwddictcheck': [True],
+            'ipapwdusercheck': [True],
             'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
             'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
         }
@@ -227,7 +257,12 @@ class TestIPAPwPolicy(ModuleTestCase):
                     'krbpwdminlength': '12',
                     'krbpwdmaxfailure': '8',
                     'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600'
+                    'krbpwdlockoutduration': '600',
+                    'passwordgracelimit': '3',
+                    'ipapwdmaxrepeat': '3',
+                    'ipapwdmaxsequence': '3',
+                    'ipapwddictcheck': True,
+                    'ipapwdusercheck': True,
                 }
             }
         )
@@ -248,7 +283,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '16',
             'maxfailcount': '6',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {
             'cn': ['sysops'],
@@ -281,7 +321,12 @@ class TestIPAPwPolicy(ModuleTestCase):
                     'krbpwdminlength': '16',
                     'krbpwdmaxfailure': '6',
                     'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600'
+                    'krbpwdlockoutduration': '600',
+                    'passwordgracelimit': '3',
+                    'ipapwdmaxrepeat': '3',
+                    'ipapwdmaxsequence': '3',
+                    'ipapwddictcheck': True,
+                    'ipapwdusercheck': True,
                 }
             }
         )
@@ -342,7 +387,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '16',
             'maxfailcount': '6',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {
             'cn': ['admins'],
@@ -355,6 +405,11 @@ class TestIPAPwPolicy(ModuleTestCase):
             'krbpwdmaxfailure': ['6'],
             'krbpwdfailurecountinterval': ['60'],
             'krbpwdlockoutduration': ['600'],
+            'passwordgracelimit': ['3'],
+            'ipapwdmaxrepeat': ['3'],
+            'ipapwdmaxsequence': ['3'],
+            'ipapwddictcheck': [True],
+            'ipapwdusercheck': [True],
             'dn': 'cn=admins,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
             'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
         }
@@ -409,7 +464,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '12',
             'maxfailcount': '8',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {
             'cn': ['global_policy'],
@@ -420,6 +480,11 @@ class TestIPAPwPolicy(ModuleTestCase):
             'krbpwdmaxfailure': ['6'],
             'krbpwdfailurecountinterval': ['60'],
             'krbpwdlockoutduration': ['600'],
+            'passwordgracelimit': ['3'],
+            'ipapwdmaxrepeat': ['3'],
+            'ipapwdmaxsequence': ['3'],
+            'ipapwddictcheck': [True],
+            'ipapwdusercheck': [True],
             'dn': 'cn=global_policy,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
             'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
         }
@@ -443,7 +508,12 @@ class TestIPAPwPolicy(ModuleTestCase):
                     'krbpwdminlength': '12',
                     'krbpwdmaxfailure': '8',
                     'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600'
+                    'krbpwdlockoutduration': '600',
+                    'passwordgracelimit': '3',
+                    'ipapwdmaxrepeat': '3',
+                    'ipapwdmaxsequence': '3',
+                    'ipapwddictcheck': True,
+                    'ipapwdusercheck': True,
                 }
             }
         )
@@ -461,7 +531,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '16',
             'maxfailcount': '6',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {
             'cn': ['global_policy'],
@@ -473,6 +548,11 @@ class TestIPAPwPolicy(ModuleTestCase):
             'krbpwdmaxfailure': ['6'],
             'krbpwdfailurecountinterval': ['60'],
             'krbpwdlockoutduration': ['600'],
+            'passwordgracelimit': ['3'],
+            'ipapwdmaxrepeat': ['3'],
+            'ipapwdmaxsequence': ['3'],
+            'ipapwddictcheck': [True],
+            'ipapwdusercheck': [True],
             'dn': 'cn=global_policy,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
             'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
         }
@@ -504,7 +584,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '16',
             'maxfailcount': '6',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {}
         mock_calls = [
@@ -535,7 +620,12 @@ class TestIPAPwPolicy(ModuleTestCase):
             'minlength': '12',
             'maxfailcount': '8',
             'failinterval': '60',
-            'lockouttime': '600'
+            'lockouttime': '600',
+            'gracelimit': 3,
+            'maxrepeat': 3,
+            'maxsequence': 3,
+            'dictcheck': True,
+            'usercheck': True,
         }
         return_value = {
             'cn': ['sysops'],
@@ -548,6 +638,11 @@ class TestIPAPwPolicy(ModuleTestCase):
             'krbpwdmaxfailure': ['6'],
             'krbpwdfailurecountinterval': ['60'],
             'krbpwdlockoutduration': ['600'],
+            'passwordgracelimit': ['3'],
+            'ipapwdmaxrepeat': ['3'],
+            'ipapwdmaxsequence': ['3'],
+            'ipapwddictcheck': [True],
+            'ipapwdusercheck': [True],
             'dn': 'cn=sysops,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com',
             'objectclass': ['top', 'nscontainer', 'krbpwdpolicy']
         }
