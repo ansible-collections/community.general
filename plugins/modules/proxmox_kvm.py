@@ -1556,6 +1556,9 @@ def main():
         try:
             vm = proxmox.get_vm(vmid)
 
+            if vm['template'] == 1:
+                module.exit_json(changed=False, vmid=vmid, msg="VM %s is already a template" % vmid, **status)
+
             if proxmox.convert_to_template(vm, force=module.params['force'], timeout=module.params['timeout']):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s is converting to template" % vmid, **status)
         except Exception as e:
