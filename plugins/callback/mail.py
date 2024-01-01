@@ -71,6 +71,16 @@ options:
     ini:
         - section: callback_mail
           key: bcc
+  message_id_domain:
+    description:
+        - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
+        - The default is the hostname of the control node.
+    type: str
+    ini:
+        - section: callback_mail
+          key: message_id_domain
+    version_added: 8.2.0
+
 '''
 
 import json
@@ -131,7 +141,7 @@ class CallbackModule(CallbackBase):
             content += 'To: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in to_addresses])
         if self.cc:
             content += 'Cc: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in cc_addresses])
-        content += 'Message-ID: %s\n' % email.utils.make_msgid()
+        content += 'Message-ID: %s\n' % email.utils.make_msgid(domain=self.get_option('message_id_domain'))
         content += 'Subject: %s\n\n' % subject.strip()
         content += body
 
