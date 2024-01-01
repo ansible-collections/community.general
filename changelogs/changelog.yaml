@@ -1662,3 +1662,26 @@ releases:
     - 7641-fix-keycloak-api-client-to-quote-properly.yml
     - 7653-fix-cloudflare-lookup.yml
     release_date: '2023-12-04'
+  7.5.3:
+    changes:
+      bugfixes:
+      - keycloak_identity_provider - ``mappers`` processing was not idempotent if
+        the mappers configuration list had not been sorted by name (in ascending order).
+        Fix resolves the issue by sorting mappers in the desired state using the same
+        key which is used for obtaining existing state (https://github.com/ansible-collections/community.general/pull/7418).
+      - keycloak_identity_provider - it was not possible to reconfigure (add, remove)
+        ``mappers`` once they were created initially. Removal was ignored, adding
+        new ones resulted in dropping the pre-existing unmodified mappers. Fix resolves
+        the issue by supplying correct input to the internal update call (https://github.com/ansible-collections/community.general/pull/7418).
+      - keycloak_user - when ``force`` is set, but user does not exist, do not try
+        to delete it (https://github.com/ansible-collections/community.general/pull/7696).
+      - statusio_maintenance - fix error caused by incorrectly formed API data payload.
+        Was raising "Failed to create maintenance HTTP Error 400 Bad Request" caused
+        by bad data type for date/time and deprecated dict keys (https://github.com/ansible-collections/community.general/pull/7754).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 7.5.3.yml
+    - 7418-kc_identity_provider-mapper-reconfiguration-fixes.yml
+    - 7696-avoid-attempt-to-delete-non-existing-user.yml
+    - 7754-fixed-payload-format.yml
+    release_date: '2024-01-01'
