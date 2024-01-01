@@ -140,6 +140,13 @@ options:
     - Allows for manual specification of host for EHLO.
     type: str
     version_added: 3.8.0
+  message_id_domain:
+    description:
+      - The domain name to use for the L(Message-ID header, https://en.wikipedia.org/wiki/Message-ID).
+      - Note that this is only available on Python 3+. On Python 2, this value will be ignored.
+    type: str
+    default: ansible
+    version_added: 8.2.0
 '''
 
 EXAMPLES = r'''
@@ -254,6 +261,7 @@ def main():
             subtype=dict(type='str', default='plain', choices=['html', 'plain']),
             secure=dict(type='str', default='try', choices=['always', 'never', 'starttls', 'try']),
             timeout=dict(type='int', default=20),
+            message_id_domain=dict(type='str', default='ansible'),
         ),
         required_together=[['password', 'username']],
     )
@@ -275,6 +283,7 @@ def main():
     subtype = module.params.get('subtype')
     secure = module.params.get('secure')
     timeout = module.params.get('timeout')
+    message_id_domain = module.params['message_id_domain']
 
     code = 0
     secure_state = False
@@ -350,10 +359,11 @@ def main():
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = Header(subject, charset)
     try:
-        msg['Message-ID'] = make_msgid(domain='ansible')
+        msg['Message-ID'] = make_msgid(domain=message_id_domain)
     except TypeError:
         # `domain` is only available in Python 3
         msg['Message-ID'] = make_msgid()
+        module.warn("The Message-ID domain cannot be set on Python 2; the system's hostname is used")
     msg.preamble = "Multipart message"
 
     for header in headers:
