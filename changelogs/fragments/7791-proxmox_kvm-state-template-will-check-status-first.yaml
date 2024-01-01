@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_kvm - running ``state=template`` will first check whether VM is already a template (https://github.com/ansible-collections/community.general/pull/7792).
