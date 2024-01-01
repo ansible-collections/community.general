@@ -1,0 +1,2 @@
+minor_changes:
+  - "mail module, mail callback plugin - allow to configure the domain name of the Message-ID header with a new ``message_id_domain`` option (https://github.com/ansible-collections/community.general/pull/7765)."
