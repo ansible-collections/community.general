@@ -45,7 +45,7 @@
 
 - name: Copy templated helper script
   template:
-    src: obtainpid.sh
+    src: obtainpid.sh.j2
     dest: "{{ remote_tmp_dir }}/obtainpid.sh"
     mode: 0755
 
