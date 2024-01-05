@@ -48,9 +48,9 @@ def load_toml(path):
         with open(path, "rb") as f:
             return tomllib.load(f)
     if HAS_TOMLI:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, "r") as f:
             return tomli.loads(f.read())
     if HAS_TOML:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, "r") as f:
             return toml.loads(f.read())
     raise RuntimeError("Need tomllib/tomli/toml library to read TOML file")
