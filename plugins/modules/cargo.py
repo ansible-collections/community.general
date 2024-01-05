@@ -24,6 +24,13 @@ attributes:
   diff_mode:
     support: none
 options:
+  config_path:
+    default: ~/.cargo/config.toml
+    description:
+      - Path to Cargo configuration file. Only used for parsing the registry info.
+    required: required
+    type: path
+    version_added: 8.3.0
   executable:
     description:
       - Path to the C(cargo) installed in the system.
@@ -130,17 +137,14 @@ class CargoError(Exception):
 class Cargo(object):
     def __init__(self, module, **kwargs):
         self.module = module
+        self.config_path = kwargs["config_path"]
         self.executable = [kwargs["executable"] or module.get_bin_path("cargo", True)]
+        self.locked = kwargs["locked"]
         self.name = kwargs["name"]
         self.path = kwargs["path"]
         self.registry = kwargs["registry"]
         self.state = kwargs["state"]
         self.version = kwargs["version"]
-        self.locked = kwargs["locked"]
-
-    @property
-    def config_path(self):
-        return os.path.expanduser("~/.cargo/config.toml")
 
     @property
     def path(self):
@@ -224,12 +228,13 @@ class Cargo(object):
 
 def main():
     arg_spec = dict(
+        config_path=dict(default="~/.cargo/config.toml", type="path"),
         executable=dict(default=None, type="path"),
+        locked=dict(default=False, type="bool"),
         name=dict(required=True, type="list", elements="str"),
         path=dict(default=None, type="path"), registry=dict(default=None, type="str"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
-        locked=dict(default=False, type="bool"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
