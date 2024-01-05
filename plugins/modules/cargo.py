@@ -185,7 +185,7 @@ class Cargo(object):
         try:
             url = cargo_config['registries'][name]['index']
         except KeyError:
-            raise CargoError("Registry {} not found in {}".format(name, self.config_path))
+            raise CargoError("Registry {0} not found in {1}".format(name, self.config_path))
         return url
 
     def install(self, packages=None):
