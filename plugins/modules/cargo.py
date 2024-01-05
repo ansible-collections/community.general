@@ -28,7 +28,7 @@ options:
     default: ~/.cargo/config.toml
     description:
       - Path to Cargo configuration file. Only used for parsing the registry info.
-    required: required
+    required: false
     type: path
     version_added: 8.3.0
   executable:
