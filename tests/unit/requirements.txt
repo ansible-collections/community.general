@@ -11,6 +11,7 @@ python-memcached ; python_version >= '3.6'
 
 # requirement for the redis cache plugin
 redis
+async-timeout ; python_version == '3.11'
 
 # requirement for the linode module
 linode-python  # APIv3
