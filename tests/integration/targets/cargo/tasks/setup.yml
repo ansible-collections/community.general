@@ -41,7 +41,7 @@
   when:
     - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')
 
-- name: Setup | Install tomli
+- name: Setup | Install toml
   pip:
-    name: tomli
+    name: toml
   when: ansible_python_version is version('3.11', '<')
