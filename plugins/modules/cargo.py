@@ -141,7 +141,7 @@ class Cargo(object):
 
     @property
     def config_path(self):
-      return os.path.expanduser("~/.cargo/config.toml")
+        return os.path.expanduser("~/.cargo/config.toml")
 
     @property
     def path(self):
@@ -166,7 +166,7 @@ class Cargo(object):
         cmd = ["install", "--list"]
         data, dummy = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r"^([\w\-]+) v(.+?)( \(registry `(.+)`\))?:$")
+        package_regex = re.compile(r"^([\w\-]+) v(.+?)(?: \(registry `(.+)`\))?:$")
 
         installed = {}
         for line in data.splitlines():
@@ -175,7 +175,7 @@ class Cargo(object):
                 package_name = package_match.group(1)
                 package_info = PackageInfo(
                     version=package_match.group(2),
-                    registry_url=package_match.group(4),
+                    registry_url=package_match.group(3),
                 )
                 installed[package_name] = package_info
 
@@ -186,7 +186,7 @@ class Cargo(object):
         try:
             url = cargo_config['registries'][name]['index']
         except KeyError:
-            raise CargoError(f"Registry {name} not found in {self.config_path}")
+            raise CargoError("Registry {} not found in {}".format(name, self.config_path))
         return url
 
     def install(self, packages=None):
