@@ -49,7 +49,7 @@ options:
       - This is used only when installing new packages or installing another version of a package.
     required: false
     type: str
-    version_added: 8.0.0
+    version_added: 8.3.0
   version:
     description:
       ->
@@ -113,10 +113,19 @@ EXAMPLES = r"""
     state: latest
 """
 
+import collections
 import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils import toml
+
+
+PackageInfo = collections.namedtuple("PackageInfo", ["version", "registry_url"])
+
+
+class CargoError(Exception):
+    pass
 
 
 class Cargo(object):
@@ -129,6 +138,10 @@ class Cargo(object):
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
+
+    @property
+    def config_path(self):
+      return os.path.expanduser("~/.cargo/config.toml")
 
     @property
     def path(self):
@@ -153,15 +166,28 @@ class Cargo(object):
         cmd = ["install", "--list"]
         data, dummy = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r"^([\w\-]+) v(.+?)( \(registry `.+`\))?:$")
+        package_regex = re.compile(r"^([\w\-]+) v(.+?)( \(registry `(.+)`\))?:$")
 
         installed = {}
         for line in data.splitlines():
-            package_info = package_regex.match(line)
-            if package_info:
-                installed[package_info.group(1)] = package_info.group(2)
+            package_match = package_regex.match(line)
+            if package_match:
+                package_name = package_match.group(1)
+                package_info = PackageInfo(
+                    version=package_match.group(2),
+                    registry_url=package_match.group(4),
+                )
+                installed[package_name] = package_info
 
         return installed
+
+    def get_registry_url_from_name(self, name):
+        cargo_config = toml.load_toml(self.config_path)
+        try:
+            url = cargo_config['registries'][name]['index']
+        except KeyError:
+            raise CargoError(f"Registry {name} not found in {self.config_path}")
+        return url
 
     def install(self, packages=None):
         cmd = ["install"]
@@ -180,7 +206,7 @@ class Cargo(object):
         return self._exec(cmd)
 
     def is_outdated(self, name):
-        installed_version = self.get_installed().get(name)
+        installed_version = self.get_installed().get(name).version
 
         cmd = ["search", name, "--limit", "1"]
         data, dummy = self._exec(cmd, True, False, False)
@@ -201,8 +227,7 @@ def main():
     arg_spec = dict(
         executable=dict(default=None, type="path"),
         name=dict(required=True, type="list", elements="str"),
-        path=dict(default=None, type="path"),
-        registry=dict(default=None, type="str"),
+        path=dict(default=None, type="path"), registry=dict(default=None, type="str"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
@@ -210,6 +235,7 @@ def main():
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
+    registry = module.params["registry"]
     state = module.params["state"]
     version = module.params["version"]
 
@@ -229,7 +255,8 @@ def main():
             n
             for n in name
             if (n not in installed_packages)
-            or (version and version != installed_packages[n])
+            or (version and version != installed_packages[n].version)
+            or (registry and cargo.get_registry_url_from_name(registry) != installed_packages[n].registry_url)
         ]
         if to_install:
             changed = True

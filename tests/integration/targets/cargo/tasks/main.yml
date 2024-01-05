@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - import_tasks: setup.yml
+
 - name: Set default environment
   set_fact:
     cargo_environment: {}
@@ -13,12 +14,14 @@
       # See https://github.com/rust-lang/cargo/issues/10230#issuecomment-1201662729:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   when: has_cargo | default(false) and ansible_distribution == 'Alpine'
+
 - block:
   - import_tasks: test_general.yml
   - import_tasks: test_version.yml
   environment: "{{ cargo_environment }}"
   when: has_cargo | default(false)
-- import_tasks: test_rustup_cargo.yml
-  when: rustup_cargo_bin | default(false)
-- import_tasks: test_alternate_registry.yml
+
+- block:
+  - import_tasks: test_alternate_registry.yml
+  - import_tasks: test_rustup_cargo.yml
   when: rustup_cargo_bin | default(false)
