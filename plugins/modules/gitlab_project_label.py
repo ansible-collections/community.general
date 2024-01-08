@@ -86,7 +86,7 @@ options:
 
 
 EXAMPLES = '''
-- name: Create Label
+- name: Create one Label
   community.general.gitlab_project_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
@@ -120,6 +120,16 @@ EXAMPLES = '''
         color: #224488
     state: present
 
+- name: Add label in check mode
+  community.general.gitlab_project_label:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    project: "group1/project1"
+    labels:
+      - name: label_one
+        color: #224488
+    check_mode: true
+
 - name: Delete Label
   community.general.gitlab_project_label:
     api_url: https://gitlab.com
@@ -128,6 +138,23 @@ EXAMPLES = '''
     labels:
       - name: label_one
     state: absent
+
+- name: Change Label name
+  community.general.gitlab_project_label:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    project: "group1/project1"
+    labels:
+      - name: label_one
+        new_name: label_two
+    state: absent
+
+- name: Purge all labels
+  gitlab_project_label:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    project: "group1/project1"
+    purge: true
 
 - name: Delete many labels
   community.general.gitlab_project_label:
@@ -221,9 +248,9 @@ class GitlabProjectLabels(object):
             _label.new_name = var_obj.get('new_name')
 
         if var_obj.get('description') is not None:
-            _label["description"] = var_obj.get('description')
+            _label.description = var_obj.get('description')
         if var_obj.get('priority') is not None:
-            _label["priority"] = var_obj.get('priority')
+            _label.priority = var_obj.get('priority')
 
         _label.save()
         return True
@@ -231,7 +258,8 @@ class GitlabProjectLabels(object):
     def delete_label(self, var_obj):
         if self._module.check_mode:
             return True
-        self.project.labels.delete(var_obj.get('name'))
+        _label = self.project.labels.get(var_obj.get('name'))
+        _label.delete()
         return True
 
 
@@ -266,74 +294,71 @@ def compare(requested_labels, existing_labels, state):
 
 
 def native_python_main(this_gitlab, purge, requested_labels, state, module):
-
     change = False
     return_value = dict(added=[], updated=[], removed=[], untouched=[])
 
-    existing_labels = this_gitlab.list_all_project_labels()
-    before = [x.attributes for x in existing_labels]
+    labels_before = [x.asdict() for x in this_gitlab.list_all_project_labels()]
 
     # filter out and enrich before compare
     for item in requested_labels:
-        item['name'] = item.pop('name')
-        item['color'] = str(item.get('color'))
+        # add defaults when not present
         if item.get('description') is None:
             item['description'] = ""
         if item.get('new_name') is None:
             item['new_name'] = None
         if item.get('priority') is None:
             item['priority'] = None
-
-    if module.check_mode:
-        _untouched, _updated, _added = compare(requested_labels, existing_labels, state)
+    
+    for item in labels_before:
+        # remove field only from server
+        item.pop('id')
+        item.pop('description_html')
+        item.pop('text_color')
+        item.pop('subscribed')
+        item.pop('is_project_label')
+        item['new_name'] = None
 
     if state == 'present':
-        add_or_update = [x for x in requested_labels if x not in existing_labels]
+        add_or_update = [x for x in requested_labels if x not in labels_before]
         for item in add_or_update:
             try:
                 if this_gitlab.create_label(item):
                     return_value['added'].append(item)
-
             except Exception:
+                # create raises exception with following error message when label already exists
                 if this_gitlab.update_label(item):
                     return_value['updated'].append(item)
 
         if purge:
-            # refetch and filter
-            existing_labels = this_gitlab.list_all_project_labels()
+            # re-fetch
+            _labels = this_gitlab.list_all_project_labels()
 
-            remove = [x for x in existing_labels if x not in requested_labels]
-            for item in remove:
+            for item in labels_before:
                 if this_gitlab.delete_label(item):
                     return_value['removed'].append(item)
 
     elif state == 'absent':
-        # value does not matter on removing labels.
-        for item in existing_labels:
-            item.pop('name')
-        for item in requested_labels:
-            item.pop('name')
-
         if not purge:
-            remove_requested = [x for x in requested_labels if x in existing_labels]
+            _label_names_requested = [x['name'] for x in requested_labels]
+            remove_requested = [x for x in labels_before if x['name'] in _label_names_requested]
             for item in remove_requested:
                 if this_gitlab.delete_label(item):
                     return_value['removed'].append(item)
         else:
-            for item in existing_labels:
+            for item in labels_before:
                 if this_gitlab.delete_label(item):
                     return_value['removed'].append(item)
 
     if module.check_mode:
+        _untouched, _updated, _added = compare(requested_labels, labels_before, state)
         return_value = dict(added=_added, updated=_updated, removed=return_value['removed'], untouched=_untouched)
 
     if any(return_value[x] for x in ['added', 'removed', 'updated']):
         change = True
 
-    existing_labels = this_gitlab.list_all_project_labels()
-    after = [x.attributes for x in existing_labels]
+    labels_after = [x.asdict() for x in this_gitlab.list_all_project_labels()]
 
-    return change, return_value, before, after
+    return change, return_value, labels_before, labels_after
 
 
 def main():
@@ -342,7 +367,7 @@ def main():
     argument_spec.update(
         project=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
-        labels=dict(type='list', elements='dict', required=True,
+        labels=dict(type='list', elements='dict', required=False, default=list(),
                     options=dict(
                         name=dict(type='str', required=True),
                         color=dict(type='str', required=False),
@@ -384,11 +409,6 @@ def main():
                              "(installed version: [%s]). Please upgrade "
                              "python-gitlab to version %s or above." % (_min_gitlab, gitlab_version, _min_gitlab))
 
-    if state == 'present':
-        # color is mandatory when creating label
-        if any(x['color'] is None for x in label_list):
-            module.fail_json(msg='color parameter is required for all labels in state present')
-
     gitlab_instance = gitlab_authentication(module)
 
     gitlab_project_id = find_project(gitlab_instance, gitlab_project)
@@ -396,6 +416,13 @@ def main():
         module.fail_json(msg="project '%s' not found." % gitlab_project)
 
     this_gitlab = GitlabProjectLabels(module=module, gitlab_instance=gitlab_instance)
+    
+    if state == 'present':
+        _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_project_labels()]
+
+        # color is mandatory when creating label, but it's optional when changing name or updating other fields
+        if any(x['color'] is None and x['new_name'] is None and x['name'] not in _existing_labels for x in label_list):
+            module.fail_json(msg='color parameter is required for new labels')
 
     change, raw_return_value, before, after = native_python_main(this_gitlab, purge, label_list, state, module)
 
@@ -408,7 +435,7 @@ def main():
     untouched = [x.get('name') for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
-    module.exit_json(changed=change, project_variable=return_value)
+    module.exit_json(changed=change, project_label=return_value)
 
 
 if __name__ == '__main__':
