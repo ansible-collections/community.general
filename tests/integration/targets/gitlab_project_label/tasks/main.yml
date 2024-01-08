@@ -14,6 +14,14 @@
     state: present
 
 - block:
+  - name: Create {{ gitlab_project_group }}
+    gitlab_group:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: true
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_group }}"
+      state: present
+
   - name: Create {{ gitlab_project_name }}
     gitlab_project:
       api_url: "{{ gitlab_host }}"
@@ -25,7 +33,30 @@
       initialize_with_readme: true
       state: present
 
-  - name: Create label {{ gitlab_project_label }}
+  - name: Purge all labels for check_mode test
+    gitlab_project_label:
+      api_url: "{{ gitlab_host }}"
+      api_token: "{{ gitlab_api_token }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      purge: true
+
+  - name: Add a label in check_mode
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_second_project_label }}"
+          color: "{{ gitlab_second_project_label_color }}"
+    check_mode: true
+    register: gitlab_project_label_state
+
+  - name: Check_mode state must be changed
+    assert:
+      that:
+        - gitlab_project_label_state is changed
+
+  - name: Create label {{ gitlab_project_label }} and {{ gitlab_second_project_label }}
     gitlab_project_label:
       api_token: "{{ gitlab_api_token }}"
       api_url: "{{ gitlab_host }}"
@@ -44,6 +75,12 @@
     assert:
       that:
         - gitlab_project_label_create is changed
+        - gitlab_project_label_create.project_label.added|length == 2
+        - gitlab_project_label_create.project_label.untouched|length == 0
+        - gitlab_project_label_create.project_label.removed|length == 0
+        - gitlab_project_label_create.project_label.updated|length == 0
+        - gitlab_project_label_create.project_label.added[0] == "{{ gitlab_project_label }}"
+        - gitlab_project_label_create.project_label.added[1] == "{{ gitlab_second_project_label }}"
 
   - name: Create Label ( Idempotency test )
     gitlab_project_label:
@@ -55,8 +92,6 @@
           color: "{{ gitlab_project_label_color }}"
           description: "{{ gitlab_project_label_description }}"
           priority: "{{ gitlab_project_label_priority }}"
-        - name: "{{ gitlab_second_project_label }}"
-          color: "{{ gitlab_second_project_label_color }}"
       state: present
     register: gitlab_project_label_create_idempotence
 
@@ -65,7 +100,7 @@
       that:
         - gitlab_project_label_create_idempotence is not changed
 
-  - name: Update Label Test
+  - name: Update Label {{ gitlab_project_label }} changing color
     gitlab_project_label:
       api_token: "{{ gitlab_api_token }}"
       api_url: "{{ gitlab_host }}"
@@ -79,7 +114,53 @@
   - name: Test Label Updated
     assert:
       that:
-        - gitlab_project_label_update.label[0].color == "{{ gitlab_second_project_label_color }}"
+        # - gitlab_project_label_update.invocation.module_args.labels[0].color == "{{ gitlab_second_project_label_color }}"
+        - gitlab_project_label_update.project_label.added|length == 0
+        - gitlab_project_label_update.project_label.untouched|length == 0
+        - gitlab_project_label_update.project_label.removed|length == 0
+        - gitlab_project_label_update.project_label.updated|length == 1
+        - gitlab_project_label_update.project_label.updated[0] == "{{ gitlab_project_label }}"
+
+  - name: Change label {{ gitlab_second_project_label }} name to {{ gitlab_second_project_label_new_name }}
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_second_project_label }}"
+          new_name: "{{ gitlab_second_project_label_new_name }}"
+      state: present
+    register: gitlab_project_label_new_name
+
+  - name: Test Label name changed
+    assert:
+      that:
+        # - gitlab_project_label_new_name.labels[0].name == "{{ gitlab_second_project_label_new_name }}"
+        - gitlab_project_label_new_name.project_label.added|length == 0
+        - gitlab_project_label_new_name.project_label.untouched|length == 0
+        - gitlab_project_label_new_name.project_label.removed|length == 0
+        - gitlab_project_label_new_name.project_label.updated|length == 1
+        - gitlab_project_label_new_name.project_label.updated[0] == "{{ gitlab_second_project_label }}"
+
+  - name: Change label name back to {{ gitlab_second_project_label }}
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      labels:
+        - name: "{{ gitlab_second_project_label_new_name }}"
+          new_name: "{{ gitlab_second_project_label }}"
+      state: present
+    register: gitlab_project_label_orig_name
+
+  - name: Test Label name changed back
+    assert:
+      that:
+        - gitlab_project_label_orig_name.project_label.added|length == 0
+        - gitlab_project_label_orig_name.project_label.untouched|length == 0
+        - gitlab_project_label_orig_name.project_label.removed|length == 0
+        - gitlab_project_label_orig_name.project_label.updated|length == 1
+        - gitlab_project_label_orig_name.project_label.updated[0] == "{{ gitlab_second_project_label_new_name }}"
 
   - name: Update Label Test ( Additions )
     gitlab_project_label:
@@ -96,26 +177,15 @@
   - name: Test Label Updated ( Additions )
     assert:
       that:
-        - gitlab_project_label_update_additions.label[0].description == "{{ gitlab_project_label_description }}"
-        - gitlab_project_label_update_additions.label[0].priority == "{{ gitlab_project_label_priority }}"
+        #- gitlab_project_label_update_additions.labels[0].description == "{{ gitlab_project_label_description }}"
+        #- gitlab_project_label_update_additions.labels[0].priority == "{{ gitlab_project_label_priority }}"
+        - gitlab_project_label_update_additions.project_label.added|length == 0
+        - gitlab_project_label_update_additions.project_label.untouched|length == 0
+        - gitlab_project_label_update_additions.project_label.removed|length == 0
+        - gitlab_project_label_update_additions.project_label.updated|length == 1
+        - gitlab_project_label_update_additions.project_label.updated[0] == "{{ gitlab_second_project_label }}"
 
-  - name: Update Label Test ( Removals )
-    gitlab_project_label:
-      api_token: "{{ gitlab_api_token }}"
-      api_url: "{{ gitlab_host }}"
-      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
-      labels:
-        - name: "{{ gitlab_second_project_label }}"
-          description: "{{ gitlab_project_label_description }}"
-      state: present
-    register: gitlab_project_label_update_removal
-
-  - name: Test label updated
-    assert:
-      that:
-        - gitlab_project_label_update_removal.label.priority == None
-
-  - name: Delete Label
+  - name: Delete Label {{ gitlab_second_project_label }}
     gitlab_project_label:
       api_token: "{{ gitlab_api_token }}"
       api_url: "{{ gitlab_host }}"
@@ -129,18 +199,57 @@
     assert:
       that:
         - gitlab_project_label_delete is changed
+        - gitlab_project_label_delete.project_label.added|length == 0
+        - gitlab_project_label_delete.project_label.untouched|length == 0
+        - gitlab_project_label_delete.project_label.removed|length == 1
+        - gitlab_project_label_delete.project_label.updated|length == 0
+        - gitlab_project_label_delete.project_label.removed[0] == "{{ gitlab_second_project_label }}"
 
-  always:
-  - name: Delete Label
+  - name: Create label {{ gitlab_second_project_label }} again purging the other
     gitlab_project_label:
       api_token: "{{ gitlab_api_token }}"
       api_url: "{{ gitlab_host }}"
       project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      purge: true
+      labels:
+        - name: "{{ gitlab_second_project_label }}"
+          color: "{{ gitlab_second_project_label_color }}"
+      state: present
+    register: gitlab_project_label_create_purging
+
+  - name: Test Label Created again
+    assert:
+      that:
+        - gitlab_project_label_create_purging is changed
+        - gitlab_project_label_create_purging.project_label.added|length == 1
+        - gitlab_project_label_create_purging.project_label.untouched|length == 0
+        - gitlab_project_label_create_purging.project_label.removed|length == 1
+        - gitlab_project_label_create_purging.project_label.updated|length == 0
+        - gitlab_project_label_create_purging.project_label.added[0] == "{{ gitlab_second_project_label }}"
+        - gitlab_project_label_create_purging.project_label.removed[0] == "{{ gitlab_project_label }}"
+
+  always:
+  - name: Delete Labels
+    gitlab_project_label:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      purge: true
       labels:
         - name: "{{ gitlab_project_label }}"
         - name: "{{ gitlab_second_project_label }}"
       state: absent
-    register: gitlab_project_label_delete
+    register: gitlab_project_label_always_delete
+
+  - name: Test label are deleted
+    assert:
+      that:
+        - gitlab_project_label_always_delete is changed
+        - gitlab_project_label_always_delete.project_label.added|length == 0
+        - gitlab_project_label_always_delete.project_label.untouched|length == 0
+        - gitlab_project_label_always_delete.project_label.removed|length > 0
+        - gitlab_project_label_always_delete.project_label.updated|length == 0
+
   - name: Clean up {{ gitlab_project_name }}
     gitlab_project:
       api_url: "{{ gitlab_host }}"
@@ -148,4 +257,12 @@
       api_token: "{{ gitlab_api_token }}"
       name: "{{ gitlab_project_name }}"
       group: "{{ gitlab_project_group }}"
+      state: absent
+
+  - name: Clean up {{ gitlab_project_group }}
+    gitlab_group:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: true
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_group }}"
       state: absent
