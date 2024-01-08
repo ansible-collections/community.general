@@ -54,7 +54,8 @@ options:
       - A list of dictionaries that represents gitlab project's labels.
     type: list
     elements: dict
-    required: true
+    required: false
+    default: []
     suboptions:
       name:
         description:
@@ -308,7 +309,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
             item['new_name'] = None
         if item.get('priority') is None:
             item['priority'] = None
-    
+
     for item in labels_before:
         # remove field only from server
         item.pop('id')
@@ -373,8 +374,8 @@ def main():
                         color=dict(type='str', required=False),
                         description=dict(type='str', required=False),
                         priority=dict(type='int', required=False),
-                        new_name=dict(type='str', required=False),
-                    )),
+                        new_name=dict(type='str', required=False),)
+                    ),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
@@ -416,7 +417,7 @@ def main():
         module.fail_json(msg="project '%s' not found." % gitlab_project)
 
     this_gitlab = GitlabProjectLabels(module=module, gitlab_instance=gitlab_instance)
-    
+
     if state == 'present':
         _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_project_labels()]
 
