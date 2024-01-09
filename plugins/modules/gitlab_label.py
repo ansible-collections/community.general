@@ -191,7 +191,7 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-project_label:
+labels:
   description: Four lists of the labels which were added, updated, removed or exist.
   returned: always
   type: dict
@@ -479,7 +479,7 @@ def main():
     untouched = [x.get('name') for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
-    module.exit_json(changed=change, project_label=return_value)
+    module.exit_json(changed=change, labels=return_value)
 
 
 if __name__ == '__main__':
