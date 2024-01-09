@@ -13,7 +13,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 ```sh
 pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 cd <container_path_to>/workspace/ansible_collections/community/general
-ansible-test integration gitlab_project_label -vvv
+ansible-test integration gitlab_label -vvv
 ```
 
 While debugging with `q` package, open a second terminal and run `podman exec -it <image_name> /bin/bash` and inside it do `tail -f /tmp/q` .
