@@ -49,13 +49,11 @@ options:
     description:
       - The path and name of the project, mandatory field but it's alternatively with group.
     required: false
-    default: None
     type: str
   group:
     description:
       - The path of the group, mandatory field but it's alternatively with project.
     required: false
-    default: None
     type: str
   labels:
     version_added: 1.0.0
