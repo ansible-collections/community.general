@@ -201,25 +201,25 @@ from ansible.module_utils.api import basic_auth_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_project, gitlab
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_group, find_project, gitlab
 )
 
 
 class GitlabProjectLabels(object):
 
-    def __init__(self, module, gitlab_instance):
+    def __init__(self, module, gitlab_instance, group_id, project_id):
         self._gitlab = gitlab_instance
-        self.project = find_project(self._gitlab, module.params['project'])
+        self.gitlab_object = group_id if group_id else project_id
         self._module = module
 
-    def list_all_project_labels(self):
+    def list_all_labels(self):
         page_nb = 1
         labels = []
-        vars_page = self.project.labels.list(page=page_nb)
+        vars_page = self.gitlab_object.labels.list(page=page_nb)
         while len(vars_page) > 0:
             labels += vars_page
             page_nb += 1
-            vars_page = self.project.labels.list(page=page_nb)
+            vars_page = self.gitlab_object.labels.list(page=page_nb)
         return labels
 
     def create_label(self, var_obj):
@@ -237,13 +237,13 @@ class GitlabProjectLabels(object):
         if var_obj.get('priority') is not None:
             var["priority"] = var_obj.get('priority')
 
-        self.project.labels.create(var)
+        self.gitlab_object.labels.create(var)
         return True
 
     def update_label(self, var_obj):
         if self._module.check_mode:
             return True
-        _label = self.project.labels.get(var_obj.get('name'))
+        _label = self.gitlab_object.labels.get(var_obj.get('name'))
 
         if var_obj.get('new_name') is not None:
             _label.new_name = var_obj.get('new_name')
@@ -259,7 +259,7 @@ class GitlabProjectLabels(object):
     def delete_label(self, var_obj):
         if self._module.check_mode:
             return True
-        _label = self.project.labels.get(var_obj.get('name'))
+        _label = self.gitlab_object.labels.get(var_obj.get('name'))
         _label.delete()
         return True
 
@@ -298,7 +298,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
     change = False
     return_value = dict(added=[], updated=[], removed=[], untouched=[])
 
-    labels_before = [x.asdict() for x in this_gitlab.list_all_project_labels()]
+    labels_before = [x.asdict() for x in this_gitlab.list_all_labels()]
 
     # filter out and enrich before compare
     for item in requested_labels:
@@ -332,7 +332,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
 
         if purge:
             # re-fetch
-            _labels = this_gitlab.list_all_project_labels()
+            _labels = this_gitlab.list_all_labels()
 
             for item in labels_before:
                 if this_gitlab.delete_label(item):
@@ -357,7 +357,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
     if any(return_value[x] for x in ['added', 'removed', 'updated']):
         change = True
 
-    labels_after = [x.asdict() for x in this_gitlab.list_all_project_labels()]
+    labels_after = [x.asdict() for x in this_gitlab.list_all_labels()]
 
     return change, return_value, labels_before, labels_after
 
@@ -366,7 +366,8 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        project=dict(type='str', required=True),
+        project=dict(type='str', required=False, default=None),
+        group=dict(type='str', required=False, default=None),
         purge=dict(type='bool', required=False, default=False),
         labels=dict(type='list', elements='dict', required=False, default=list(),
                     options=dict(
@@ -387,18 +388,21 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
+            ['project', 'group'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token'],
+            ['project', 'group']
         ],
         supports_check_mode=True
     )
     ensure_gitlab_package(module)
 
     gitlab_project = module.params['project']
+    gitlab_group = module.params['group']
     purge = module.params['purge']
     label_list = module.params['labels']
     state = module.params['state']
@@ -412,14 +416,24 @@ def main():
 
     gitlab_instance = gitlab_authentication(module)
 
+    # find_project can return None, but the other must exist
     gitlab_project_id = find_project(gitlab_instance, gitlab_project)
-    if not gitlab_project_id:
-        module.fail_json(msg="project '%s' not found." % gitlab_project)
 
-    this_gitlab = GitlabProjectLabels(module=module, gitlab_instance=gitlab_instance)
+    # find_group can return None, but the other must exist
+    gitlab_group_id = find_group(gitlab_instance, gitlab_group)
+
+    # if both not found, module must exist
+    if not gitlab_project_id and not gitlab_group_id:
+        if not gitlab_project_id:
+            module.fail_json(msg="project '%s' not found." % gitlab_project)
+        if not gitlab_group_id:
+            module.fail_json(msg="group '%s' not found." % gitlab_group)
+
+    this_gitlab = GitlabProjectLabels(module=module, gitlab_instance=gitlab_instance, group_id=gitlab_group_id,
+                                      project_id=gitlab_project_id)
 
     if state == 'present':
-        _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_project_labels()]
+        _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_labels()]
 
         # color is mandatory when creating label, but it's optional when changing name or updating other fields
         if any(x['color'] is None and x['new_name'] is None and x['name'] not in _existing_labels for x in label_list):
