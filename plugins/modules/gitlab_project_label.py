@@ -8,11 +8,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
-module: gitlab_project_label
-short_description: Creates/updates/deletes GitLab Projects Labels
+module: gitlab_label
+short_description: Creates/updates/deletes GitLab Labels belonging to project or group.
 description:
-  - When a project label does not exist, it will be created.
-  - When a project label does exist, its value will be updated when the values are different.
+  - When a label does not exist, it will be created.
+  - When a label does exist, its value will be updated when the values are different.
+  - Labels can be purged
+  - Task can be run in check mode
 author:
   - "Gabriele Pongelli (@gpongelli)"
 requirements:
@@ -45,8 +47,15 @@ options:
     required: false
   project:
     description:
-      - The path and name of the project.
-    required: true
+      - The path and name of the project, mandatory field but it's alternatively with group.
+    required: false
+    default: None
+    type: str
+  group:
+    description:
+      - The path of the group, mandatory field but it's alternatively with project.
+    required: false
+    default: None
     type: str
   labels:
     version_added: 1.0.0
@@ -87,8 +96,9 @@ options:
 
 
 EXAMPLES = '''
+# same project's task can be executed for group
 - name: Create one Label
-  community.general.gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -97,8 +107,22 @@ EXAMPLES = '''
         color: #123456
     state: present
 
-- name: Create many Labels
-  community.general.gitlab_project_label:
+- name: Create many group labels
+  community.general.gitlab_label:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    group: "group1"
+    labels:
+      - name: label_one
+        color: #123456
+        description: this is a label
+        priority: 20
+      - name: label_two
+        color: #554422
+    state: present
+
+- name: Create many project labels
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -112,7 +136,7 @@ EXAMPLES = '''
     state: present
 
 - name: Set or update some labels
-  community.general.gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -122,7 +146,7 @@ EXAMPLES = '''
     state: present
 
 - name: Add label in check mode
-  community.general.gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -132,7 +156,7 @@ EXAMPLES = '''
     check_mode: true
 
 - name: Delete Label
-  community.general.gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -141,7 +165,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Change Label name
-  community.general.gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -151,14 +175,14 @@ EXAMPLES = '''
     state: absent
 
 - name: Purge all labels
-  gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
     purge: true
 
 - name: Delete many labels
-  community.general.gitlab_project_label:
+  community.general.gitlab_label:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
@@ -205,11 +229,12 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import (
 )
 
 
-class GitlabProjectLabels(object):
+class GitlabLabels(object):
 
     def __init__(self, module, gitlab_instance, group_id, project_id):
         self._gitlab = gitlab_instance
         self.gitlab_object = group_id if group_id else project_id
+        self.is_group_label = True if group_id else False
         self._module = module
 
     def list_all_labels(self):
@@ -310,13 +335,19 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
         if item.get('priority') is None:
             item['priority'] = None
 
+        # group label does not have priority, removing for comparison
+        if this_gitlab.is_group_label:
+            item.pop('priority')
+
     for item in labels_before:
         # remove field only from server
         item.pop('id')
         item.pop('description_html')
         item.pop('text_color')
         item.pop('subscribed')
-        item.pop('is_project_label')
+        # field present only when it's a project's label
+        if 'is_project_label' in item:
+            item.pop('is_project_label')
         item['new_name'] = None
 
     if state == 'present':
@@ -410,7 +441,7 @@ def main():
     gitlab_version = gitlab.__version__
     _min_gitlab = '3.2.0'
     if LooseVersion(gitlab_version) < LooseVersion(_min_gitlab):
-        module.fail_json(msg="community.general.gitlab_project_label requires python-gitlab Python module >= %s "
+        module.fail_json(msg="community.general.gitlab_label requires python-gitlab Python module >= %s "
                              "(installed version: [%s]). Please upgrade "
                              "python-gitlab to version %s or above." % (_min_gitlab, gitlab_version, _min_gitlab))
 
@@ -424,13 +455,13 @@ def main():
 
     # if both not found, module must exist
     if not gitlab_project_id and not gitlab_group_id:
-        if not gitlab_project_id:
+        if gitlab_project and not gitlab_project_id:
             module.fail_json(msg="project '%s' not found." % gitlab_project)
-        if not gitlab_group_id:
+        if gitlab_group and not gitlab_group_id:
             module.fail_json(msg="group '%s' not found." % gitlab_group)
 
-    this_gitlab = GitlabProjectLabels(module=module, gitlab_instance=gitlab_instance, group_id=gitlab_group_id,
-                                      project_id=gitlab_project_id)
+    this_gitlab = GitlabLabels(module=module, gitlab_instance=gitlab_instance, group_id=gitlab_group_id,
+                               project_id=gitlab_project_id)
 
     if state == 'present':
         _existing_labels = [x.asdict()['name'] for x in this_gitlab.list_all_labels()]
