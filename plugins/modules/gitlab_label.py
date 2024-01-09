@@ -34,14 +34,14 @@ attributes:
 options:
   state:
     description:
-      - Create or delete project label.
+      - Create or delete project or group label.
       - Possible values are present and absent.
     default: present
     type: str
     choices: ["present", "absent"]
   purge:
     description:
-      - When set to V(true), delete all variables which are not mentioned in the task.
+      - When set to V(true), delete all labels which are not mentioned in the task.
     default: false
     type: bool
     required: false
@@ -58,7 +58,7 @@ options:
   labels:
     version_added: 1.0.0
     description:
-      - A list of dictionaries that represents gitlab project's labels.
+      - A list of dictionaries that represents gitlab project's or group's labels.
     type: list
     elements: dict
     required: false
