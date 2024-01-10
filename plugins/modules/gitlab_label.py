@@ -247,7 +247,7 @@ class GitlabLabels(object):
 
     def create_label(self, var_obj):
         if self._module.check_mode:
-            return True
+            return True, True
 
         var = {
             "name": var_obj.get('name'),
@@ -260,12 +260,12 @@ class GitlabLabels(object):
         if var_obj.get('priority') is not None:
             var["priority"] = var_obj.get('priority')
 
-        self.gitlab_object.labels.create(var)
-        return True
+        _obj = self.gitlab_object.labels.create(var)
+        return True, _obj.asdict()
 
     def update_label(self, var_obj):
         if self._module.check_mode:
-            return True
+            return True, True
         _label = self.gitlab_object.labels.get(var_obj.get('name'))
 
         if var_obj.get('new_name') is not None:
@@ -276,15 +276,17 @@ class GitlabLabels(object):
         if var_obj.get('priority') is not None:
             _label.priority = var_obj.get('priority')
 
+        # save returns None
         _label.save()
-        return True
+        return True, _label.asdict()
 
     def delete_label(self, var_obj):
         if self._module.check_mode:
-            return True
+            return True, True
         _label = self.gitlab_object.labels.get(var_obj.get('name'))
+        # delete returns None
         _label.delete()
-        return True
+        return True, _label.asdict()
 
 
 def compare(requested_labels, existing_labels, state):
@@ -320,6 +322,7 @@ def compare(requested_labels, existing_labels, state):
 def native_python_main(this_gitlab, purge, requested_labels, state, module):
     change = False
     return_value = dict(added=[], updated=[], removed=[], untouched=[])
+    return_obj = dict(added=[], updated=[], removed=[], untouched=[])
 
     labels_before = [x.asdict() for x in this_gitlab.list_all_labels()]
 
@@ -352,32 +355,42 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
         add_or_update = [x for x in requested_labels if x not in labels_before]
         for item in add_or_update:
             try:
-                if this_gitlab.create_label(item):
+                _rv, _obj = this_gitlab.create_label(item)
+                if _rv:
                     return_value['added'].append(item)
+                    return_obj['added'].append(_obj)
             except Exception:
                 # create raises exception with following error message when label already exists
-                if this_gitlab.update_label(item):
+                _rv, _obj = this_gitlab.update_label(item)
+                if _rv:
                     return_value['updated'].append(item)
+                    return_obj['updated'].append(_obj)
 
         if purge:
             # re-fetch
             _labels = this_gitlab.list_all_labels()
 
             for item in labels_before:
-                if this_gitlab.delete_label(item):
+                _rv, _obj = this_gitlab.delete_label(item)
+                if _rv:
                     return_value['removed'].append(item)
+                    return_obj['removed'].append(_obj)
 
     elif state == 'absent':
         if not purge:
             _label_names_requested = [x['name'] for x in requested_labels]
             remove_requested = [x for x in labels_before if x['name'] in _label_names_requested]
             for item in remove_requested:
-                if this_gitlab.delete_label(item):
+                _rv, _obj = this_gitlab.delete_label(item)
+                if _rv:
                     return_value['removed'].append(item)
+                    return_obj['removed'].append(_obj)
         else:
             for item in labels_before:
-                if this_gitlab.delete_label(item):
+                _rv, _obj = this_gitlab.delete_label(item)
+                if _rv:
                     return_value['removed'].append(item)
+                    return_obj['removed'].append(_obj)
 
     if module.check_mode:
         _untouched, _updated, _added = compare(requested_labels, labels_before, state)
@@ -388,7 +401,7 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
 
     labels_after = [x.asdict() for x in this_gitlab.list_all_labels()]
 
-    return change, return_value, labels_before, labels_after
+    return change, return_value, labels_before, labels_after, return_obj
 
 
 def main():
@@ -468,7 +481,7 @@ def main():
         if any(x['color'] is None and x['new_name'] is None and x['name'] not in _existing_labels for x in label_list):
             module.fail_json(msg='color parameter is required for new labels')
 
-    change, raw_return_value, before, after = native_python_main(this_gitlab, purge, label_list, state, module)
+    change, raw_return_value, before, after, _obj = native_python_main(this_gitlab, purge, label_list, state, module)
 
     if not module.check_mode:
         raw_return_value['untouched'] = [x for x in before if x in after]
@@ -479,7 +492,7 @@ def main():
     untouched = [x.get('name') for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
-    module.exit_json(changed=change, labels=return_value)
+    module.exit_json(changed=change, labels=return_value, label_obj=_obj)
 
 
 if __name__ == '__main__':
