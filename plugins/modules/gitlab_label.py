@@ -216,6 +216,10 @@ labels:
       returned: always
       type: list
       sample: ['defg', 'new-label']
+labels_obj:
+  description: API object.
+  returned: always
+  type: dict
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -322,7 +326,7 @@ def compare(requested_labels, existing_labels, state):
 def native_python_main(this_gitlab, purge, requested_labels, state, module):
     change = False
     return_value = dict(added=[], updated=[], removed=[], untouched=[])
-    return_obj = dict(added=[], updated=[], removed=[], untouched=[])
+    return_obj = dict(added=[], updated=[], removed=[])
 
     labels_before = [x.asdict() for x in this_gitlab.list_all_labels()]
 
@@ -492,7 +496,7 @@ def main():
     untouched = [x.get('name') for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
-    module.exit_json(changed=change, labels=return_value, label_obj=_obj)
+    module.exit_json(changed=change, labels=return_value, labels_obj=_obj)
 
 
 if __name__ == '__main__':
