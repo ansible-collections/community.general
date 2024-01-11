@@ -1,0 +1,3 @@
+bugfixes:
+  - |
+    Suders module needs either user, or group, set but never both.
