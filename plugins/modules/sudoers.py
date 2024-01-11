@@ -199,6 +199,8 @@ class Sudoers(object):
         return content_matches and mode_matches
 
     def content(self):
+        if bool(self.user) == bool(self.group):
+            raise Exception('Username (user), or groupname (group) needs to be set, but not both at the same time')
         if self.user:
             owner = self.user
         elif self.group:
