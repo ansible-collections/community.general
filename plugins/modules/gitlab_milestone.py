@@ -343,7 +343,6 @@ def native_python_main(this_gitlab, purge, requested_milestones, state, module):
         if item.get('start_date') is None:
             item['start_date'] = None
 
-
     for item in milestones_before:
         # remove field only from server
         item.pop('id')
