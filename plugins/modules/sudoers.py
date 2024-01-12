@@ -199,12 +199,12 @@ class Sudoers(object):
         return content_matches and mode_matches
 
     def content(self):
-        if bool(self.user) == bool(self.group):
-            raise Exception('Username (user), or groupname (group) needs to be set, but not both at the same time')
-        if self.user:
+        if self.user is not None:
             owner = self.user
-        elif self.group:
+        elif self.group is not None:
             owner = '%{group}'.format(group=self.group)
+        else:
+            raise Exception('Username (user), or groupname (group) needs to be set, but not both at the same time')
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
