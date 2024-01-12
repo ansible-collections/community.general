@@ -140,6 +140,7 @@ category_commands = {
     "Update": ["SystemFirmwareUpdate"],
 }
 
+
 def main():
     result = {}
     return_values = {}
@@ -153,7 +154,7 @@ def main():
             auth_token=dict(no_log=True),
             timeout=dict(type='int', default=60),
             update_image_type = dict(type='str', default='HPM'),
-            resource_id=dict(type='list',elements='str',default=[],required=False),
+            resource_id=dict(type='list', elements='str', default=[], required=False),
             update_target=dict(required=True,type='str', default=''),
             update_image_path_xd220V=dict(type='str', default='NA'),
             update_image_path_xd225V=dict(type='str', default='NA'),
@@ -161,7 +162,7 @@ def main():
             update_image_path_xd665=dict(type='str', default='NA'),
             update_image_path_xd670=dict(type='str', default='NA'),
             output_file_name=dict(type='str', default='update_output.csv'),
-        ),
+),
         supports_check_mode=False
     )
 
@@ -172,7 +173,6 @@ def main():
     creds = {'user': module.params['username'],
              'pswd': module.params['password'],
              'token': module.params['auth_token']}
-
 
     timeout = module.params['timeout']
     # Build root URI
@@ -188,31 +188,31 @@ def main():
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in category_commands[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, category_commands[category])))
+            module.fail_json(msg = to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, category_commands[category])))
 
           
     if category == "Update":
         for command in command_list:
             if command == "SystemFirmwareUpdate":
                 result = rf_utils.system_fw_update({
-                'baseuri': module.params['baseuri'],
-                'username': module.params['username'],
-                'password': module.params['password'],
-                'update_image_type' : module.params['update_image_type'],
-                'update_target' : module.params['update_target'],
-                'power_state' : module.params['power_state'],
-                'update_image_path_xd220V' : module.params['update_image_path_xd220V'],
-                'update_image_path_xd225V' : module.params['update_image_path_xd225V'],
-                'update_image_path_xd295V' : module.params['update_image_path_xd295V'],
-                'update_image_path_xd665' : module.params['update_image_path_xd665'],
-                'update_image_path_xd670' : module.params['update_image_path_xd670'],
-                'output_file_name': module.params['output_file_name'],
+                    'baseuri': module.params['baseuri'],
+                     'username': module.params['username'],
+                     'password': module.params['password'],
+                     'update_image_type' : module.params['update_image_type'],
+                     'update_target' : module.params['update_target'],
+                     'power_state' : module.params['power_state'],
+                     'update_image_path_xd220V' : module.params['update_image_path_xd220V'],
+                     'update_image_path_xd225V' : module.params['update_image_path_xd225V'],
+                     'update_image_path_xd295V' : module.params['update_image_path_xd295V'],
+                     'update_image_path_xd665' : module.params['update_image_path_xd665'],
+                     'update_image_path_xd670' : module.params['update_image_path_xd670'],
+                     'output_file_name': module.params['output_file_name'],
                 })
                 if result['ret']:
                     msg = result.get('msg', False)
-                    module.exit_json(msg=msg)
+                    module.exit_json(msg = msg)
                 else:
-                    module.fail_json(msg=to_native(result))
+                    module.fail_json(msg = to_native(result))
       
 
 if __name__ == '__main__':
