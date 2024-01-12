@@ -65,7 +65,7 @@ options:
     required: true
     decription:
       - To get or modify the power state of CrayXD670
-    choices: ['NA'] , ['ON'] , ['OFF']
+    choices: [NA, ON, OFF]
   output_file_name:
     required: false
     description:
@@ -90,18 +90,10 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-hpc_get_system_fw_inv:
-    description: Inventory Information of the components of the CrayXD.
-    type: dict
-    contains:
-        hpc_get_system_fw_inv
-            description: Get Inventory Information of the CrayXD components using Redfish API's.
-            type: dict
-            contains:
-                ret:
-                    description: Return True/False based on whether the operation was performed successfully.
-                    type: bool
-    returned: always
+csv:
+  description: Output of this Task is saved to a csv file.
+  type: csv file
+  sample: Output_file.csv
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -129,7 +121,7 @@ def main():
             timeout=dict(type='int', default=600),
             resource_id=dict(type='list', elements='str', default=[], required=False),
             power_state=dict(),
-            output_file_name=dict(type='str', default=''),
+            output_file_name=dict(type='str', default='Power_output.csv'),
         ),
         supports_check_mode=False
     )
