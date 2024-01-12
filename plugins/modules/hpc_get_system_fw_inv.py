@@ -85,18 +85,10 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-hpc_get_system_fw_inv:
-    description: Inventory Information of the components of the CrayXD.
-    type: dict
-    contains:
-        hpc_get_system_fw_inv
-            description: Get Inventory Information of the CrayXD components using Redfish API's.
-            type: dict
-            contains:
-                ret:
-                    description: Return True/False based on whether the operation was performed successfully.
-                    type: bool
-    returned: always
+csv:
+  description: Output of this Task is saved to a csv file.
+  type: csv file
+  sample: Output_file.csv
 '''
 
 from ansible.module_utils.basic import AnsibleModule
