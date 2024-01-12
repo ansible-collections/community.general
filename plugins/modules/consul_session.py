@@ -16,12 +16,12 @@ description:
    cluster. These sessions can then be used in conjunction with key value pairs
    to implement distributed locks. In depth documentation for working with
    sessions can be found at http://www.consul.io/docs/internals/sessions.html
-requirements:
-  - requests
 author:
   - Steve Gargan (@sgargan)
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
+  - community.general.consul.documentation
+  - community.general.consul.token
   - community.general.attributes
 attributes:
     check_mode:
@@ -76,26 +76,6 @@ options:
             the associated lock delay has expired.
         type: list
         elements: str
-    host:
-        description:
-          - The host of the consul agent defaults to localhost.
-        type: str
-        default: localhost
-    port:
-        description:
-          - The port on which the consul agent is running.
-        type: int
-        default: 8500
-    scheme:
-        description:
-          - The protocol scheme on which the consul agent is running.
-        type: str
-        default: http
-    validate_certs:
-        description:
-          - Whether to verify the TLS certificate of the consul agent.
-        type: bool
-        default: true
     behavior:
         description:
           - The optional behavior that can be attached to the session when it
@@ -108,12 +88,6 @@ options:
           - Specifies the duration of a session in seconds (between 10 and 86400).
         type: int
         version_added: 5.4.0
-    token:
-        description:
-          - The token key identifying an ACL rule set that controls access to
-            the key value pair.
-        type: str
-        version_added: 5.6.0
 '''
 
 EXAMPLES = '''
@@ -148,6 +122,13 @@ EXAMPLES = '''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.consul import (
+    auth_argument_spec,
+    auth_options,
+    get_auth_headers,
+    get_consul_url,
+    handle_consul_response_error,
+)
 
 try:
     import requests
@@ -173,58 +154,44 @@ class RequestError(Exception):
     pass
 
 
-def handle_consul_response_error(response):
-    if 400 <= response.status_code < 600:
-        raise RequestError('%d %s' % (response.status_code, response.content))
-
-
-def get_consul_url(module):
-    return '%s://%s:%s/v1' % (module.params.get('scheme'),
-                              module.params.get('host'), module.params.get('port'))
-
-
-def get_auth_headers(module):
-    if 'token' in module.params and module.params.get('token') is not None:
-        return {'X-Consul-Token': module.params.get('token')}
-    else:
-        return {}
-
-
 def list_sessions(module, datacenter):
-    url = '%s/session/list' % get_consul_url(module)
-    headers = get_auth_headers(module)
+    config = module_to_config(module)
+    url = '%s/session/list' % get_consul_url(config)
+    headers = get_auth_headers(config)
     response = requests.get(
         url,
         headers=headers,
         params={
             'dc': datacenter},
-        verify=module.params.get('validate_certs'))
+        verify=config.validate_certs)
     handle_consul_response_error(response)
     return response.json()
 
 
 def list_sessions_for_node(module, node, datacenter):
-    url = '%s/session/node/%s' % (get_consul_url(module), node)
-    headers = get_auth_headers(module)
+    config = module_to_config(module)
+    url = '%s/session/node/%s' % (get_consul_url(config), node)
+    headers = get_auth_headers(config)
     response = requests.get(
         url,
         headers=headers,
         params={
             'dc': datacenter},
-        verify=module.params.get('validate_certs'))
+        verify=config.validate_certs)
     handle_consul_response_error(response)
     return response.json()
 
 
 def get_session_info(module, session_id, datacenter):
-    url = '%s/session/info/%s' % (get_consul_url(module), session_id)
-    headers = get_auth_headers(module)
+    config = module_to_config(module)
+    url = '%s/session/info/%s' % (get_consul_url(config), session_id)
+    headers = get_auth_headers(config)
     response = requests.get(
         url,
         headers=headers,
         params={
             'dc': datacenter},
-        verify=module.params.get('validate_certs'))
+        verify=config.validate_certs)
     handle_consul_response_error(response)
     return response.json()
 
@@ -262,8 +229,9 @@ def lookup_sessions(module):
 
 def create_session(module, name, behavior, ttl, node,
                    lock_delay, datacenter, checks):
-    url = '%s/session/create' % get_consul_url(module)
-    headers = get_auth_headers(module)
+    config = module_to_config(module)
+    url = '%s/session/create' % get_consul_url(config)
+    headers = get_auth_headers(config)
     create_data = {
         "LockDelay": lock_delay,
         "Node": node,
@@ -279,7 +247,7 @@ def create_session(module, name, behavior, ttl, node,
         params={
             'dc': datacenter},
         json=create_data,
-        verify=module.params.get('validate_certs'))
+        verify=config.validate_certs)
     handle_consul_response_error(response)
     create_session_response_dict = response.json()
     return create_session_response_dict["ID"]
@@ -318,12 +286,13 @@ def update_session(module):
 
 
 def destroy_session(module, session_id):
-    url = '%s/session/destroy/%s' % (get_consul_url(module), session_id)
-    headers = get_auth_headers(module)
+    config = module_to_config(module)
+    url = '%s/session/destroy/%s' % (get_consul_url(config), session_id)
+    headers = get_auth_headers(config)
     response = requests.put(
         url,
         headers=headers,
-        verify=module.params.get('validate_certs'))
+        verify=config.validate_certs)
     handle_consul_response_error(response)
     return response.content == "true"
 
@@ -347,6 +316,18 @@ def test_dependencies(module):
             "requests required for this module. See https://pypi.org/project/requests/")
 
 
+class Configuration(object):
+    def __init__(self, token=None, host=None, port=None, scheme=None, validate_certs=None):
+        self.token = token
+        self.host = host
+        self.port = port
+        self.scheme = scheme
+        self.validate_certs = validate_certs
+
+
+def module_to_config(module):
+    return Configuration(**auth_options(module))
+
 def main():
     argument_spec = dict(
         checks=dict(type='list', elements='str'),
@@ -358,10 +339,6 @@ def main():
                 'release',
                 'delete']),
         ttl=dict(type='int'),
-        host=dict(type='str', default='localhost'),
-        port=dict(type='int', default=8500),
-        scheme=dict(type='str', default='http'),
-        validate_certs=dict(type='bool', default=True),
         id=dict(type='str'),
         name=dict(type='str'),
         node=dict(type='str'),
@@ -375,7 +352,7 @@ def main():
                 'node',
                 'present']),
         datacenter=dict(type='str'),
-        token=dict(type='str', no_log=True),
+        **auth_argument_spec()
     )
 
     module = AnsibleModule(

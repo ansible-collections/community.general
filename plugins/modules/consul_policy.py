@@ -19,6 +19,8 @@ description:
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
+  - community.general.consul.documentation
+  - community.general.consul.token
   - community.general.attributes
 attributes:
   check_mode:
@@ -29,7 +31,6 @@ options:
   state:
     description:
       - Whether the policy should be present or absent.
-    required: false
     choices: ['present', 'absent']
     default: present
     type: str
@@ -48,44 +49,12 @@ options:
   description:
     description:
       - Description of the policy.
-    required: false
     type: str
     default: ''
   rules:
     type: str
     description:
       - Rule document that should be associated with the current policy.
-    required: false
-  host:
-    description:
-      - Host of the consul agent, defaults to localhost.
-    required: false
-    default: localhost
-    type: str
-  port:
-    type: int
-    description:
-      - The port on which the consul agent is running.
-    required: false
-    default: 8500
-  scheme:
-    description:
-      - The protocol scheme on which the consul agent is running.
-    required: false
-    default: http
-    type: str
-  token:
-    description:
-      - A management token is required to manipulate the policies.
-    type: str
-  validate_certs:
-    type: bool
-    description:
-      - Whether to verify the TLS certificate of the consul agent or not.
-    required: false
-    default: true
-requirements:
-  - requests
 '''
 
 EXAMPLES = """
@@ -135,6 +104,13 @@ operation:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.consul import (
+    auth_argument_spec,
+    auth_options,
+    get_auth_headers,
+    get_consul_url,
+    handle_consul_response_error,
+)
 
 try:
     from requests.exceptions import ConnectionError
@@ -144,13 +120,8 @@ except ImportError:
     has_requests = False
 
 
-TOKEN_PARAMETER_NAME = "token"
-HOST_PARAMETER_NAME = "host"
-SCHEME_PARAMETER_NAME = "scheme"
-VALIDATE_CERTS_PARAMETER_NAME = "validate_certs"
 NAME_PARAMETER_NAME = "name"
 DESCRIPTION_PARAMETER_NAME = "description"
-PORT_PARAMETER_NAME = "port"
 RULES_PARAMETER_NAME = "rules"
 VALID_DATACENTERS_PARAMETER_NAME = "valid_datacenters"
 STATE_PARAMETER_NAME = "state"
@@ -166,36 +137,15 @@ CREATE_OPERATION = "create"
 _ARGUMENT_SPEC = {
     NAME_PARAMETER_NAME: dict(required=True),
     DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=''),
-    PORT_PARAMETER_NAME: dict(default=8500, type='int'),
     RULES_PARAMETER_NAME: dict(type='str'),
     VALID_DATACENTERS_PARAMETER_NAME: dict(type='list', elements='str', default=[]),
-    HOST_PARAMETER_NAME: dict(default='localhost'),
-    SCHEME_PARAMETER_NAME: dict(default='http'),
-    TOKEN_PARAMETER_NAME: dict(no_log=True),
-    VALIDATE_CERTS_PARAMETER_NAME: dict(type='bool', default=True),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
+    **auth_argument_spec()
 }
-
-
-def get_consul_url(configuration):
-    return '%s://%s:%s/v1' % (configuration.scheme,
-                              configuration.host, configuration.port)
-
-
-def get_auth_headers(configuration):
-    if configuration.token is None:
-        return {}
-    else:
-        return {'X-Consul-Token': configuration.token}
 
 
 class RequestError(Exception):
     pass
-
-
-def handle_consul_response_error(response):
-    if 400 <= response.status_code < 600:
-        raise RequestError('%d %s' % (response.status_code, response.content))
 
 
 def update_policy(policy, configuration):
@@ -343,16 +293,12 @@ def main():
         module.fail_json(msg=str(e))
 
     configuration = Configuration(
-        token=module.params.get(TOKEN_PARAMETER_NAME),
-        host=module.params.get(HOST_PARAMETER_NAME),
-        scheme=module.params.get(SCHEME_PARAMETER_NAME),
-        validate_certs=module.params.get(VALIDATE_CERTS_PARAMETER_NAME),
         name=module.params.get(NAME_PARAMETER_NAME),
         description=module.params.get(DESCRIPTION_PARAMETER_NAME),
-        port=module.params.get(PORT_PARAMETER_NAME),
         rules=module.params.get(RULES_PARAMETER_NAME),
         valid_datacenters=module.params.get(VALID_DATACENTERS_PARAMETER_NAME),
         state=module.params.get(STATE_PARAMETER_NAME),
+        **auth_options(module)
     )
 
     try:

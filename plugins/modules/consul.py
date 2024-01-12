@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
@@ -31,9 +32,10 @@ description:
  - "See U(http://consul.io) for more details."
 requirements:
   - python-consul
-  - requests
 author: "Steve Gargan (@sgargan)"
 extends_documentation_fragment:
+  - community.general.consul.documentation
+  - community.general.consul.token
   - community.general.attributes
 attributes:
   check_mode:
@@ -58,26 +60,6 @@ options:
         description:
           - The ID for the service, must be unique per node. If O(state=absent),
             defaults to the service name if supplied.
-    host:
-        type: str
-        description:
-          - Host of the consul agent defaults to localhost.
-        default: localhost
-    port:
-        type: int
-        description:
-          - The port on which the consul agent is running.
-        default: 8500
-    scheme:
-        type: str
-        description:
-          - The protocol scheme on which the consul agent is running.
-        default: http
-    validate_certs:
-        description:
-          - Whether to verify the TLS certificate of the consul agent.
-        type: bool
-        default: true
     notes:
         type: str
         description:
@@ -166,10 +148,6 @@ options:
             Similar to the interval this is a number with a V(s) or V(m) suffix to
             signify the units of seconds or minutes, for example V(15s) or V(1m).
             If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-    token:
-        type: str
-        description:
-          - The token key identifying an ACL rule set. May be required to register services.
     ack_params_state_absent:
         type: bool
         description:
@@ -263,6 +241,7 @@ except ImportError:
     python_consul_installed = False
 
 import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 

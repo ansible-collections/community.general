@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -19,6 +20,8 @@ description:
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
+  - community.general.consul.documentation
+  - community.general.consul.token
   - community.general.attributes
 attributes:
   check_mode:
@@ -34,7 +37,6 @@ options:
   state:
     description:
       - whether the role should be present or absent.
-    required: false
     choices: ['present', 'absent']
     default: present
     type: str
@@ -42,7 +44,6 @@ options:
     description:
       - Description of the role.
       - If not specified, the assigned description will not be changed.
-    required: false
     type: str
   policies:
     type: list
@@ -51,7 +52,6 @@ options:
       - List of policies to attach to the role. Each policy is a dict.
       - If the parameter is left blank, any policies currently assigned will not be changed.
       - Any empty array (V([])) will clear any policies previously set.
-    required: false
     suboptions:
       name:
         description:
@@ -70,7 +70,6 @@ options:
       - List of service identities to attach to the role.
       - If not specified, any service identities currently assigned will not be changed.
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
-    required: false
     suboptions:
       name:
         description:
@@ -95,7 +94,6 @@ options:
       - List of node identities to attach to the role.
       - If not specified, any node identities currently assigned will not be changed.
       - If the parameter is an empty array (V([])), any node identities assigned will be unassigned.
-    required: false
     suboptions:
       name:
         description:
@@ -110,36 +108,6 @@ options:
           - This will result in effective policy only being valid in this datacenter.
         type: str
         required: true
-  host:
-    description:
-      - Host of the consul agent, defaults to V(localhost).
-    required: false
-    default: localhost
-    type: str
-  port:
-    type: int
-    description:
-      - The port on which the consul agent is running.
-    required: false
-    default: 8500
-  scheme:
-    description:
-      - The protocol scheme on which the consul agent is running.
-    required: false
-    default: http
-    type: str
-  token:
-    description:
-      - A management token is required to manipulate the roles.
-    type: str
-  validate_certs:
-    type: bool
-    description:
-      - Whether to verify the TLS certificate of the consul agent.
-    required: false
-    default: true
-requirements:
-  - requests
 '''
 
 EXAMPLES = """
@@ -203,29 +171,29 @@ operation:
     sample: update
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.basic import missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.consul import (
-    get_consul_url, get_auth_headers, handle_consul_response_error)
 import traceback
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.general.plugins.module_utils.consul import (
+    auth_argument_spec,
+    auth_options,
+    get_auth_headers,
+    get_consul_url,
+    handle_consul_response_error
+)
 
 REQUESTS_IMP_ERR = None
 
 try:
-    from requests.exceptions import ConnectionError
     import requests
+    from requests.exceptions import ConnectionError
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
     REQUESTS_IMP_ERR = traceback.format_exc()
 
-TOKEN_PARAMETER_NAME = "token"
-HOST_PARAMETER_NAME = "host"
-SCHEME_PARAMETER_NAME = "scheme"
-VALIDATE_CERTS_PARAMETER_NAME = "validate_certs"
 NAME_PARAMETER_NAME = "name"
 DESCRIPTION_PARAMETER_NAME = "description"
-PORT_PARAMETER_NAME = "port"
 POLICIES_PARAMETER_NAME = "policies"
 SERVICE_IDENTITIES_PARAMETER_NAME = "service_identities"
 NODE_IDENTITIES_PARAMETER_NAME = "node_identities"
@@ -254,11 +222,6 @@ SERVICE_ID_RULE_SPEC = dict(
 )
 
 _ARGUMENT_SPEC = {
-    TOKEN_PARAMETER_NAME: dict(no_log=True),
-    PORT_PARAMETER_NAME: dict(default=8500, type='int'),
-    HOST_PARAMETER_NAME: dict(default='localhost'),
-    SCHEME_PARAMETER_NAME: dict(default='http'),
-    VALIDATE_CERTS_PARAMETER_NAME: dict(type='bool', default=True),
     NAME_PARAMETER_NAME: dict(required=True),
     DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=None),
     POLICIES_PARAMETER_NAME: dict(type='list', elements='dict', options=POLICY_RULE_SPEC,
@@ -266,6 +229,7 @@ _ARGUMENT_SPEC = {
     SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=SERVICE_ID_RULE_SPEC, default=None),
     NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=NODE_ID_RULE_SPEC, default=None),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
+    **auth_argument_spec()
 }
 
 
@@ -604,19 +568,14 @@ def main():
 
     try:
         configuration = Configuration(
-            token=module.params.get(TOKEN_PARAMETER_NAME),
-            host=module.params.get(HOST_PARAMETER_NAME),
-            port=module.params.get(PORT_PARAMETER_NAME),
-            scheme=module.params.get(SCHEME_PARAMETER_NAME),
-            validate_certs=module.params.get(VALIDATE_CERTS_PARAMETER_NAME),
             name=module.params.get(NAME_PARAMETER_NAME),
             description=module.params.get(DESCRIPTION_PARAMETER_NAME),
             policies=module.params.get(POLICIES_PARAMETER_NAME),
             service_identities=module.params.get(SERVICE_IDENTITIES_PARAMETER_NAME),
             node_identities=module.params.get(NODE_IDENTITIES_PARAMETER_NAME),
             state=module.params.get(STATE_PARAMETER_NAME),
-            check_mode=module.check_mode
-
+            check_mode=module.check_mode,
+            **auth_options(module)
         )
     except ValueError as err:
         module.fail_json(msg='Configuration error: %s' % str(err))
