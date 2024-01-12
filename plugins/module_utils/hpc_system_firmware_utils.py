@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -19,40 +19,40 @@ supported_models = ["HPE CRAY XD220V", "HPE CRAY XD225V", "HPE CRAY XD295V", "HP
 
 # To get inventory, update
 supported_targets = {
-    "HPE CRAY XD220V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"], 
-    "HPE CRAY XD225V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"], 
-    "HPE CRAY XD295V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"], 
-    "HPE CRAY XD665": ["BMC", "BIOS", "RT_NVME", "RT_OTHER", "RT_SA", "PDB", "MainCPLD", "UBM6"], 
-    "HPE CRAY XD670": ["BMCImage1", "BMCImage2", "BIOS", "BIOS2", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"], 
+    "HPE CRAY XD220V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"],
+    "HPE CRAY XD225V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"],
+    "HPE CRAY XD295V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"],
+    "HPE CRAY XD665": ["BMC", "BIOS", "RT_NVME", "RT_OTHER", "RT_SA", "PDB", "MainCPLD", "UBM6"],
+    "HPE CRAY XD670": ["BMCImage1", "BMCImage2", "BIOS", "BIOS2", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"],
 }
 
 unsupported_targets = ["BMCImage1", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"] # Only of Jakku
 # BMCImage1 equivalent to BMC
 # BPB_CPLD1 and BPB_CPLD2 together equivalent to BPB_CPLD
 # MB_CPLD1 and SCM_CPLD1 together equivalent to MB_CPLD1_SCM_CPLD1
-# Change the line no
 all_targets = ['BMC', 'BMCImage1', 'BMCImage2', 'BIOS', 'BIOS2', 'MainCPLD', 
                'MB_CPLD1', 'BPB_CPLD1', 'BPB_CPLD2', 'SCM_CPLD1', 'PDB', 'PDBPIC', 'HDDBPPIC', 'RT_NVME', 'RT_OTHER', 'RT_SA', 'UBM6']
 
 reboot = {
-    "BIOS": ["AC_PC_redfish"], 
-    "BIOS2": ["AC_PC_redfish"], 
-    "MainCPLD": ["AC_PC_ipmi"], 
-    "PDB": ["AC_PC_ipmi"], 
-    "RT_NVME": ["AC_PC_redfish", "AC_PC_ipmi", "AC_PC_redfish"], 
-    "RT_SA": ["AC_PC_redfish", "AC_PC_ipmi", "AC_PC_redfish"], 
-    "RT_OTHER": ["AC_PC_redfish", "AC_PC_ipmi", "AC_PC_redfish"], 
-    "HDDBPPIC": ["AC_PC_redfish"], 
+    "BIOS": ["AC_PC_redfish"],
+    "BIOS2": ["AC_PC_redfish"],
+    "MainCPLD": ["AC_PC_ipmi"],
+    "PDB": ["AC_PC_ipmi"],
+    "RT_NVME": ["AC_PC_redfish", "AC_PC_ipmi", "AC_PC_redfish"],
+    "RT_SA": ["AC_PC_redfish", "AC_PC_ipmi", "AC_PC_redfish"],
+    "RT_OTHER": ["AC_PC_redfish", "AC_PC_ipmi", "AC_PC_redfish"],
+    "HDDBPPIC": ["AC_PC_redfish"],
     "PDBPIC": ["AC_PC_redfish"]
 }
 
 routing = {
-    "HPE CRAY XD220V": "0x34 0xa2 0x00 0x19 0xA9", 
-    "HPE CRAY XD225V": "0x34 0xa2 0x00 0x19 0xA9", 
-    "HPE CRAY XD295V": "0x34 0xa2 0x00 0x19 0xA9", 
+    "HPE CRAY XD220V": "0x34 0xa2 0x00 0x19 0xA9",
+    "HPE CRAY XD225V": "0x34 0xa2 0x00 0x19 0xA9",
+    "HPE CRAY XD295V": "0x34 0xa2 0x00 0x19 0xA9",
     "HPE CRAY XD665": "0x34 0xA2 0x00 0x19 0xa9 0x00"
 }
-#One more line gap add
+
+
 class CrayRedfishUtils(RedfishUtils):
     def post_multi_request(self, uri, headers, payload):
         username, password, basic_auth = self._auth_params(headers)
@@ -143,7 +143,7 @@ class CrayRedfishUtils(RedfishUtils):
                 if power_state.upper() == "OFF":
                     self.power_on()
                 power_state = self.power_state()
-                lis = [IP, model, power_state]  
+                lis = [IP, model, power_state]
             elif option.upper() == "OFF":
                 if power_state.upper() == "ON":
                     self.power_off()
@@ -197,7 +197,7 @@ class CrayRedfishUtils(RedfishUtils):
     def get_sys_fw_inventory(self, attr):
         IP = attr.get('baseuri')
         csv_file_name = attr.get('output_file_name')
-        if not os.path.exists(csv_file_name):      
+        if not os.path.exists(csv_file_name):
             f = open(csv_file_name, "w")
             to_write="IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, 
             MB_CPLD1, BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"
@@ -272,7 +272,7 @@ class CrayRedfishUtils(RedfishUtils):
                                             break
                                         time.sleep(300)
                                     elif reb == "AC_PC_ipmi":
-                                        # based on the model end routing code changes 
+                                        # based on the model end routing code changes
                                         result = self.AC_PC_ipmi(IP, username, password, routing[model.upper()])
                                         if not result:
                                             update_status = "reboot_failed"
@@ -284,7 +284,7 @@ class CrayRedfishUtils(RedfishUtils):
                             # not required to power on the node as it useful only after physical POWER CYCLE and we can't keep the track of the
                             # physical power cycle so skipping it
                             if update_status.lower() == "success":
-                                # call version of respective target and store versions after update    
+                                # call version of respective target and store versions after update
                                 time.sleep(180)  # extra time requiring as of now for systems under test
                                 if target! = "BPB_CPLD" and target! = "SCM_CPLD1" and target! = "MB_CPLD1":
                                     after_version = self.get_fw_version(target)
@@ -405,7 +405,7 @@ class CrayRedfishUtils(RedfishUtils):
                                     lis = [IP, model, "NA", "MB_CPLD1 requires node off, tried powering off the node, but failed to power off"]  # Unable to power off node for MB_CPLD1
                                     # 'msg': 'System Firmware Update skipped due to powered ON state of the node for Cray XD 670, Node needs to be powered OFF for MB_CPLD1 firmware updates, tried powering off, but unable to power off'
                                 else:
-                                    update_status = self.helper_update(update_status, "MB_CPLD1", image_paths[1], image_type, IP, username, password, "HPE Cray XD670")  
+                                    update_status = self.helper_update(update_status, "MB_CPLD1", image_paths[1], image_type, IP, username, password, "HPE Cray XD670")
                                     if update_status.lower() == "success":
                                         remarks = "Please plug out and plug in power cables physically"
                                     else:
