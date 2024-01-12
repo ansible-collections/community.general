@@ -26,11 +26,11 @@ supported_targets = {
     "HPE CRAY XD670": ["BMCImage1", "BMCImage2", "BIOS", "BIOS2", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"],
 }
 
-unsupported_targets = ["BMCImage1", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"] # Only of Jakku
+unsupported_targets = ["BMCImage1", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"]  # Only of Jakku
 # BMCImage1 equivalent to BMC
 # BPB_CPLD1 and BPB_CPLD2 together equivalent to BPB_CPLD
 # MB_CPLD1 and SCM_CPLD1 together equivalent to MB_CPLD1_SCM_CPLD1
-all_targets = ['BMC', 'BMCImage1', 'BMCImage2', 'BIOS', 'BIOS2', 'MainCPLD', 
+all_targets = ['BMC', 'BMCImage1', 'BMCImage2', 'BIOS', 'BIOS2', 'MainCPLD',
                'MB_CPLD1', 'BPB_CPLD1', 'BPB_CPLD2', 'SCM_CPLD1', 'PDB', 'PDBPIC', 'HDDBPPIC', 'RT_NVME', 'RT_OTHER', 'RT_SA', 'UBM6']
 
 reboot = {
@@ -57,10 +57,10 @@ class CrayRedfishUtils(RedfishUtils):
     def post_multi_request(self, uri, headers, payload):
         username, password, basic_auth = self._auth_params(headers)
         try:
-            resp = open_url(uri, data=payload, headers=headers, method="POST", 
-                            url_username=username, url_password=password, 
-                            force_basic_auth=basic_auth, validate_certs=False, 
-                            follow_redirects='all', 
+            resp = open_url(uri, data=payload, headers=headers, method="POST",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
+                            follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
             resp_headers = dict((k.lower(), v) for (k, v) in resp.info().items())
             return True
@@ -161,10 +161,10 @@ class CrayRedfishUtils(RedfishUtils):
         if target in supported_targets[model.upper()]:
             return True
         return False
-    
+
     def get_fw_version(self, target):
         try:
-            response = self.get_request(self.root_uri + "/redfish/v1/UpdateService/FirmwareInventory"+"/"+target)
+            response = self.get_request(self.root_uri + "/redfish/v1/UpdateService/FirmwareInventory" + "/" + target)
             try:
                 version = response['data']['Version']
                 return version
@@ -173,8 +173,7 @@ class CrayRedfishUtils(RedfishUtils):
                 return version
         except Exception:
             return "failed_FI_GET_call/no_version_field"
-    
- 
+
     def AC_PC_redfish(self):
         payload = {"ResetType": "ForceRestart"}
         target_uri = "/redfish/v1/Systems/Self/Actions/ComputerSystem.Reset"
@@ -187,7 +186,7 @@ class CrayRedfishUtils(RedfishUtils):
 
     def AC_PC_ipmi(self, IP, username, password, routing_value):
         try:
-            command='ipmitool -I lanplus -H '+IP+' -U '+username+' -P '+password+' raw '+ routing_value
+            command='ipmitool -I lanplus -H ' + IP + ' -U '+username+' -P '+password+' raw '+ routing_value
             subprocess.run(command, shell = True, check = True, timeout = 15, capture_output = True)
             time.sleep(300)
             return True
@@ -199,11 +198,12 @@ class CrayRedfishUtils(RedfishUtils):
         csv_file_name = attr.get('output_file_name')
         if not os.path.exists(csv_file_name):
             f = open(csv_file_name, "w")
-            to_write = "IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1, BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"
+            to_write = "IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1, BPB_CPLD1,
+                        BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"
             f.write(to_write)
             f.close()                                                            
         model = self.get_model()
-        entry=[]
+        entry = []
         entry.append(IP)
         if model.upper() not in supported_models:
             entry.append("unsupported_model")
@@ -224,7 +224,7 @@ class CrayRedfishUtils(RedfishUtils):
 
     def helper_update(self, update_status, target, image_path, image_type, IP, username, password, model):
         before_version = "failed"
-        if target! = "BPB_CPLD" and target! = "SCM_CPLD1" and target! = "MB_CPLD1":
+        if target != "BPB_CPLD" and target != "SCM_CPLD1" and target != "MB_CPLD1":
             before_version = self.get_fw_version(target)
             after_version = "NA"
         else:
@@ -239,7 +239,7 @@ class CrayRedfishUtils(RedfishUtils):
                 if 'MultipartHttpPushUri' in data:
                     headers = {'Expect': 'Continue', 'Content-Type': 'multipart/form-data'}
                     body = {}
-                    if target! = "BPB_CPLD":
+                    if target != "BPB_CPLD":
                         targets_uri = '/redfish/v1/UpdateService/FirmwareInventory/'+target+'/'
                         body['UpdateParameters'] = (None, json.dumps({"Targets": [targets_uri]}), 'application/json')
                     else:
@@ -285,7 +285,7 @@ class CrayRedfishUtils(RedfishUtils):
                             if update_status.lower() == "success":
                                 # call version of respective target and store versions after update
                                 time.sleep(180)  # extra time requiring as of now for systems under test
-                                if target! = "BPB_CPLD" and target! = "SCM_CPLD1" and target! = "MB_CPLD1":
+                                if target != "BPB_CPLD" and target != "SCM_CPLD1" and target != "MB_CPLD1":
                                     after_version = self.get_fw_version(target)
                             else:
                                 if target != "BPB_CPLD" and target != "SCM_CPLD1" and target != "MB_CPLD1":
@@ -328,7 +328,7 @@ class CrayRedfishUtils(RedfishUtils):
             if target == "BPB_CPLD" or target == "SCM_CPLD1_MB_CPLD1":
                 to_write = "IP_Address, Model, Update_Status, Remarks\n"
             else:
-                to_write = "IP_Address, Model, "+target+'_Pre_Ver, '+target+'_Post_Ver, '+"Update_Status\n"
+                to_write = "IP_Address, Model, " + target + '_Pre_Ver, ' + target + '_Post_Ver, ' + "Update_Status\n"
             f.write(to_write)
             f.close()
 
@@ -354,16 +354,20 @@ class CrayRedfishUtils(RedfishUtils):
                     new_data = ", ".join(lis)
                     return {'ret': True, 'changed': True, 'msg': str(new_data)}
                     # return {'ret': False, 'changed': True, 
-                # 'msg': 'System Firmware Update skipped due to powered off state of the node for Cray XD 670, Node needs to be powered on for CPLD firmware updates'}
+                # 'msg': 'System Firmware Update skipped due to powered off state of the node for Cray XD 670,
+                Node needs to be powered on for CPLD firmware updates'}
                 elif target == 'SCM_CPLD1_MB_CPLD1':
                     is_target_supported = True
                     image_paths = image_path_inputs["HPE CRAY XD670"].split()
                     if len(image_paths) != 2:
-                        return {'ret': False, 'changed': True, 'msg': 'Must specify exactly 2 image_paths, first for SCM_CPLD1 of Cray XD670 and second for MB_CPLD1 of Cray XD670'}
+                        return {'ret': False, 'changed': True, 'msg': 'Must specify exactly 2 image_paths,
+                        first for SCM_CPLD1 of Cray XD670 and second for MB_CPLD1 of Cray XD670'}
                     for img_path in image_paths:
                         if not os.path.isfile(img_path):
-                            return {'ret': False, 'changed': True, 'msg': 'Must specify correct image_paths for SCM_CPLD1_MB_CPLD1, first for SCM_CPLD1 of Cray XD670 and second for MB_CPLD1 of Cray XD670'}
-            
+                            return {'ret': False, 'changed': True,
+                                    'msg': 'Must specify correct image_paths for SCM_CPLD1_MB_CPLD1, first for SCM_CPLD1 
+                                            of Cray XD670 and second for MB_CPLD1 of Cray XD670'}
+
             if target != "SCM_CPLD1_MB_CPLD1" and not os.path.isfile(image_path):
                 update_status = "NA_fw_file_absent"
                 if target == "BPB_CPLD":
