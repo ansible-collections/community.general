@@ -199,8 +199,7 @@ class CrayRedfishUtils(RedfishUtils):
         csv_file_name = attr.get('output_file_name')
         if not os.path.exists(csv_file_name):
             f = open(csv_file_name, "w")
-            to_write="IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, 
-            MB_CPLD1, BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"
+            to_write = "IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1, BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"
             f.write(to_write)
             f.close()                                                            
         model = self.get_model()
