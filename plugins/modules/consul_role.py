@@ -171,26 +171,9 @@ operation:
     sample: update
 """
 
-import traceback
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    auth_argument_spec,
-    auth_options,
-    get_auth_headers,
-    get_consul_url,
-    handle_consul_response_error
-)
-
-REQUESTS_IMP_ERR = None
-
-try:
-    import requests
-    from requests.exceptions import ConnectionError
-    HAS_REQUESTS = True
-except ImportError:
-    HAS_REQUESTS = False
-    REQUESTS_IMP_ERR = traceback.format_exc()
+    ConsulModule, auth_argument_spec)
 
 NAME_PARAMETER_NAME = "name"
 DESCRIPTION_PARAMETER_NAME = "description"
@@ -244,11 +227,7 @@ def compare_consul_api_role_policy_objects(first, second):
     return first == second
 
 
-def update_role(role, configuration):
-    url = '%s/acl/role/%s' % (get_consul_url(configuration),
-                              role['ID'])
-    headers = get_auth_headers(configuration)
-
+def update_role(role, configuration, consul_module):
     update_role_data = {
         'Name': configuration.name,
         'Description': configuration.description,
@@ -334,8 +313,7 @@ def update_role(role, configuration):
         if not node_id_specified and role.get('NodeIdentities') is not None:
             update_role_data["NodeIdentities"] = role.get('NodeIdentities')
 
-        response = requests.put(url, headers=headers, json=update_role_data, verify=configuration.validate_certs)
-        handle_consul_response_error(response)
+        response = consul_module.put(('acl', 'role', role['ID']), json=update_role_data)
 
         resulting_role = response.json()
         changed = (
@@ -348,10 +326,7 @@ def update_role(role, configuration):
         return Output(changed=changed, operation=UPDATE_OPERATION, role=resulting_role)
 
 
-def create_role(configuration):
-    url = '%s/acl/role' % get_consul_url(configuration)
-    headers = get_auth_headers(configuration)
-
+def create_role(configuration, consul_module):
     # check if the user omitted policies, service identities, or node identities
     policy_specified = True
     if len(configuration.policies) == 1 and configuration.policies[0] is None:
@@ -387,9 +362,7 @@ def create_role(configuration):
         create_role_data["NodeIdentities"] = [x.to_dict() for x in configuration.node_identities]
 
     if not configuration.check_mode:
-        response = requests.put(url, headers=headers, json=create_role_data, verify=configuration.validate_certs)
-        handle_consul_response_error(response)
-
+        response = consul_module.put('acl/role', json=create_role_data)
         resulting_role = response.json()
 
         return Output(changed=True, operation=CREATE_OPERATION, role=resulting_role)
@@ -397,18 +370,15 @@ def create_role(configuration):
         return Output(changed=True, operation=CREATE_OPERATION)
 
 
-def remove_role(configuration):
-    roles = get_roles(configuration)
+def remove_role(configuration, consul_module):
+    roles = get_roles(consul_module)
 
     if configuration.name in roles:
 
         role_id = roles[configuration.name]['ID']
 
         if not configuration.check_mode:
-            url = '%s/acl/role/%s' % (get_consul_url(configuration), role_id)
-            headers = get_auth_headers(configuration)
-            response = requests.delete(url, headers=headers, verify=configuration.validate_certs)
-            handle_consul_response_error(response)
+            consul_module.delete(('acl', 'role', role_id))
 
         changed = True
     else:
@@ -416,33 +386,27 @@ def remove_role(configuration):
     return Output(changed=changed, operation=REMOVE_OPERATION)
 
 
-def get_roles(configuration):
-    url = '%s/acl/roles' % get_consul_url(configuration)
-    headers = get_auth_headers(configuration)
-    response = requests.get(url, headers=headers, verify=configuration.validate_certs)
-    handle_consul_response_error(response)
+def get_roles(consul_module):
+    response = consul_module.get('acl/roles')
     roles = response.json()
     existing_roles_mapped_by_id = dict((role['Name'], role) for role in roles if role['Name'] is not None)
     return existing_roles_mapped_by_id
 
 
-def get_consul_version(configuration):
-    url = '%s/agent/self' % get_consul_url(configuration)
-    headers = get_auth_headers(configuration)
-    response = requests.get(url, headers=headers, verify=configuration.validate_certs)
-    handle_consul_response_error(response)
+def get_consul_version(consul_module):
+    response = consul_module.get('agent/self')
     config = response.json()["Config"]
     return ConsulVersion(config["Version"])
 
 
-def set_role(configuration):
-    roles = get_roles(configuration)
+def set_role(configuration, consul_module):
+    roles = get_roles(consul_module)
 
     if configuration.name in roles:
         role = roles[configuration.name]
-        return update_role(role, configuration)
+        return update_role(role, configuration, consul_module)
     else:
-        return create_role(configuration)
+        return create_role(configuration, consul_module)
 
 
 class ConsulVersion:
@@ -520,13 +484,8 @@ class Configuration:
     Configuration for this module.
     """
 
-    def __init__(self, token=None, host=None, scheme=None, validate_certs=None, name=None, description=None, port=None,
-                 policies=None, service_identities=None, node_identities=None, state=None, check_mode=None):
-        self.token = token                                                              # type: str
-        self.host = host                                                                # type: str
-        self.port = port                                                                # type: int
-        self.scheme = scheme                                                            # type: str
-        self.validate_certs = validate_certs                                            # type: bool
+    def __init__(self, name=None, description=None, policies=None, service_identities=None, 
+                 node_identities=None, state=None, check_mode=None):
         self.name = name                                                                # type: str
         self.description = description                                                  # type: str
         if policies is not None:
@@ -561,10 +520,7 @@ def main():
     Main method.
     """
     module = AnsibleModule(_ARGUMENT_SPEC, supports_check_mode=True)
-
-    if not HAS_REQUESTS:
-        module.fail_json(msg=missing_required_lib("requests"),
-                         exception=REQUESTS_IMP_ERR)
+    consul_module = ConsulModule(module)
 
     try:
         configuration = Configuration(
@@ -575,25 +531,18 @@ def main():
             node_identities=module.params.get(NODE_IDENTITIES_PARAMETER_NAME),
             state=module.params.get(STATE_PARAMETER_NAME),
             check_mode=module.check_mode,
-            **auth_options(module)
         )
     except ValueError as err:
         module.fail_json(msg='Configuration error: %s' % str(err))
         return
 
-    try:
+    version = get_consul_version(consul_module)
+    configuration.version = version
 
-        version = get_consul_version(configuration)
-        configuration.version = version
-
-        if configuration.state == PRESENT_STATE_VALUE:
-            output = set_role(configuration)
-        else:
-            output = remove_role(configuration)
-    except ConnectionError as e:
-        module.fail_json(msg='Could not connect to consul agent at %s:%s, error was %s' % (
-            configuration.host, configuration.port, str(e)))
-        raise
+    if configuration.state == PRESENT_STATE_VALUE:
+        output = set_role(configuration, consul_module)
+    else:
+        output = remove_role(configuration, consul_module)
 
     return_values = dict(changed=output.changed, operation=output.operation, role=output.role)
     module.exit_json(**return_values)

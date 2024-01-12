@@ -123,87 +123,50 @@ EXAMPLES = '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    auth_argument_spec,
-    auth_options,
-    get_auth_headers,
-    get_consul_url,
-    handle_consul_response_error,
+    auth_argument_spec, ConsulModule
 )
 
-try:
-    import requests
-    from requests.exceptions import ConnectionError
-    has_requests = True
-except ImportError:
-    has_requests = False
-
-
-def execute(module):
+def execute(module, consul_module):
 
     state = module.params.get('state')
 
     if state in ['info', 'list', 'node']:
-        lookup_sessions(module)
+        lookup_sessions(module, consul_module)
     elif state == 'present':
-        update_session(module)
+        update_session(module, consul_module)
     else:
-        remove_session(module)
+        remove_session(module, consul_module)
 
 
-class RequestError(Exception):
-    pass
-
-
-def list_sessions(module, datacenter):
-    config = module_to_config(module)
-    url = '%s/session/list' % get_consul_url(config)
-    headers = get_auth_headers(config)
-    response = requests.get(
-        url,
-        headers=headers,
-        params={
-            'dc': datacenter},
-        verify=config.validate_certs)
-    handle_consul_response_error(response)
+def list_sessions(consul_module, datacenter):
+    response = consul_module.get(
+        'session/list',
+        params={'dc': datacenter})
     return response.json()
 
 
-def list_sessions_for_node(module, node, datacenter):
-    config = module_to_config(module)
-    url = '%s/session/node/%s' % (get_consul_url(config), node)
-    headers = get_auth_headers(config)
-    response = requests.get(
-        url,
-        headers=headers,
-        params={
-            'dc': datacenter},
-        verify=config.validate_certs)
-    handle_consul_response_error(response)
+def list_sessions_for_node(consul_module, node, datacenter):
+    response = consul_module.get(
+        ('session', 'node', node),
+        params={'dc': datacenter})
     return response.json()
 
 
-def get_session_info(module, session_id, datacenter):
-    config = module_to_config(module)
-    url = '%s/session/info/%s' % (get_consul_url(config), session_id)
-    headers = get_auth_headers(config)
-    response = requests.get(
-        url,
-        headers=headers,
-        params={
-            'dc': datacenter},
-        verify=config.validate_certs)
-    handle_consul_response_error(response)
+def get_session_info(consul_module, session_id, datacenter):
+    response = consul_module.get(
+        ('session', 'info', session_id),
+        params={'dc': datacenter})
     return response.json()
 
 
-def lookup_sessions(module):
+def lookup_sessions(module, consul_module):
 
     datacenter = module.params.get('datacenter')
 
     state = module.params.get('state')
     try:
         if state == 'list':
-            sessions_list = list_sessions(module, datacenter)
+            sessions_list = list_sessions(consul_module, datacenter)
             # Ditch the index, this can be grabbed from the results
             if sessions_list and len(sessions_list) >= 2:
                 sessions_list = sessions_list[1]
@@ -211,14 +174,14 @@ def lookup_sessions(module):
                              sessions=sessions_list)
         elif state == 'node':
             node = module.params.get('node')
-            sessions = list_sessions_for_node(module, node, datacenter)
+            sessions = list_sessions_for_node(consul_module, node, datacenter)
             module.exit_json(changed=True,
                              node=node,
                              sessions=sessions)
         elif state == 'info':
             session_id = module.params.get('id')
 
-            session_by_id = get_session_info(module, session_id, datacenter)
+            session_by_id = get_session_info(consul_module, session_id, datacenter)
             module.exit_json(changed=True,
                              session_id=session_id,
                              sessions=session_by_id)
@@ -227,11 +190,8 @@ def lookup_sessions(module):
         module.fail_json(msg="Could not retrieve session info %s" % e)
 
 
-def create_session(module, name, behavior, ttl, node,
+def create_session(consul_module, name, behavior, ttl, node,
                    lock_delay, datacenter, checks):
-    config = module_to_config(module)
-    url = '%s/session/create' % get_consul_url(config)
-    headers = get_auth_headers(config)
     create_data = {
         "LockDelay": lock_delay,
         "Node": node,
@@ -241,19 +201,16 @@ def create_session(module, name, behavior, ttl, node,
     }
     if ttl is not None:
         create_data["TTL"] = "%ss" % str(ttl)  # TTL is in seconds
-    response = requests.put(
-        url,
-        headers=headers,
+    response = consul_module.put(
+        'session/create',
         params={
             'dc': datacenter},
-        json=create_data,
-        verify=config.validate_certs)
-    handle_consul_response_error(response)
+        json=create_data)
     create_session_response_dict = response.json()
     return create_session_response_dict["ID"]
 
 
-def update_session(module):
+def update_session(module, consul_module):
 
     name = module.params.get('name')
     delay = module.params.get('delay')
@@ -264,7 +221,7 @@ def update_session(module):
     ttl = module.params.get('ttl')
 
     try:
-        session = create_session(module,
+        session = create_session(consul_module,
                                  name=name,
                                  behavior=behavior,
                                  ttl=ttl,
@@ -285,23 +242,16 @@ def update_session(module):
         module.fail_json(msg="Could not create/update session %s" % e)
 
 
-def destroy_session(module, session_id):
-    config = module_to_config(module)
-    url = '%s/session/destroy/%s' % (get_consul_url(config), session_id)
-    headers = get_auth_headers(config)
-    response = requests.put(
-        url,
-        headers=headers,
-        verify=config.validate_certs)
-    handle_consul_response_error(response)
+def destroy_session(consul_module, session_id):
+    response = consul_module.put(('session', 'destroy', session_id))
     return response.content == "true"
 
 
-def remove_session(module):
+def remove_session(module, consul_module):
     session_id = module.params.get('id')
 
     try:
-        destroy_session(module, session_id)
+        destroy_session(consul_module, session_id)
 
         module.exit_json(changed=True,
                          session_id=session_id)
@@ -309,24 +259,6 @@ def remove_session(module):
         module.fail_json(msg="Could not remove session with id '%s' %s" % (
                          session_id, e))
 
-
-def test_dependencies(module):
-    if not has_requests:
-        raise ImportError(
-            "requests required for this module. See https://pypi.org/project/requests/")
-
-
-class Configuration(object):
-    def __init__(self, token=None, host=None, port=None, scheme=None, validate_certs=None):
-        self.token = token
-        self.host = host
-        self.port = port
-        self.scheme = scheme
-        self.validate_certs = validate_certs
-
-
-def module_to_config(module):
-    return Configuration(**auth_options(module))
 
 def main():
     argument_spec = dict(
@@ -364,14 +296,10 @@ def main():
         ],
         supports_check_mode=False
     )
-
-    test_dependencies(module)
+    consul_module = ConsulModule(module)
 
     try:
-        execute(module)
-    except ConnectionError as e:
-        module.fail_json(msg='Could not connect to consul agent at %s:%s, error was %s' % (
-            module.params.get('host'), module.params.get('port'), e))
+        execute(module, consul_module)
     except Exception as e:
         module.fail_json(msg=str(e))
 
