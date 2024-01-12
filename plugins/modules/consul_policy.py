@@ -127,9 +127,9 @@ _ARGUMENT_SPEC = {
     DESCRIPTION_PARAMETER_NAME: dict(required=False, type='str', default=''),
     RULES_PARAMETER_NAME: dict(type='str'),
     VALID_DATACENTERS_PARAMETER_NAME: dict(type='list', elements='str', default=[]),
-    STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
-    **auth_argument_spec()
+    STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE])
 }
+_ARGUMENT_SPEC.update(auth_argument_spec())
 
 
 def update_policy(policy, configuration, consul_module):

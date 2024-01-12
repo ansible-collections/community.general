@@ -169,9 +169,8 @@ except ImportError:
 from collections import defaultdict
 from ansible.module_utils.basic import to_text, AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    auth_argument_spec,
-    auth_options
- )
+    auth_argument_spec
+)
 
 RULE_SCOPES = [
     "agent",
@@ -193,7 +192,11 @@ RULE_SCOPES = [
 ]
 
 MANAGEMENT_PARAMETER_NAME = "mgmt_token"
+HOST_PARAMETER_NAME = "host"
+SCHEME_PARAMETER_NAME = "scheme"
+VALIDATE_CERTS_PARAMETER_NAME = "validate_certs"
 NAME_PARAMETER_NAME = "name"
+PORT_PARAMETER_NAME = "port"
 RULES_PARAMETER_NAME = "rules"
 STATE_PARAMETER_NAME = "state"
 TOKEN_PARAMETER_NAME = "token"
@@ -223,9 +226,9 @@ _ARGUMENT_SPEC = {
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
     TOKEN_PARAMETER_NAME: dict(no_log=False),
     TOKEN_TYPE_PARAMETER_NAME: dict(choices=[CLIENT_TOKEN_TYPE_VALUE, MANAGEMENT_TOKEN_TYPE_VALUE],
-                                    default=CLIENT_TOKEN_TYPE_VALUE),
-    **auth_argument_spec(MANAGEMENT_PARAMETER_NAME)
+                                    default=CLIENT_TOKEN_TYPE_VALUE)
 }
+_ARGUMENT_SPEC.update(auth_argument_spec(MANAGEMENT_PARAMETER_NAME, True))
 
 
 def set_acl(consul_client, configuration):
@@ -609,9 +612,6 @@ def check_dependencies():
         raise ImportError("pyhcl required for this module. "
                           "See: https://pypi.org/project/pyhcl/")
 
-    if not has_requests:
-        raise ImportError("requests required for this module. See https://pypi.org/project/requests/")
-
 
 def main():
     """
@@ -625,12 +625,16 @@ def main():
         module.fail_json(msg=str(e))
 
     configuration = Configuration(
+        management_token=module.params.get(MANAGEMENT_PARAMETER_NAME),
+        host=module.params.get(HOST_PARAMETER_NAME),
+        scheme=module.params.get(SCHEME_PARAMETER_NAME),
+        validate_certs=module.params.get(VALIDATE_CERTS_PARAMETER_NAME),
+        port=module.params.get(PORT_PARAMETER_NAME),
         name=module.params.get(NAME_PARAMETER_NAME),
         rules=decode_rules_as_yml(module.params.get(RULES_PARAMETER_NAME)),
         state=module.params.get(STATE_PARAMETER_NAME),
         token=module.params.get(TOKEN_PARAMETER_NAME),
         token_type=module.params.get(TOKEN_TYPE_PARAMETER_NAME),
-        **auth_options(MANAGEMENT_PARAMETER_NAME)
     )
     consul_client = get_consul_client(configuration)
 

@@ -126,6 +126,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
     auth_argument_spec, ConsulModule
 )
 
+
 def execute(module, consul_module):
 
     state = module.params.get('state')

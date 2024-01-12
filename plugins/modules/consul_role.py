@@ -171,7 +171,7 @@ operation:
     sample: update
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
     ConsulModule, auth_argument_spec)
 
@@ -211,9 +211,9 @@ _ARGUMENT_SPEC = {
                                   mutually_exclusive=[('name', 'id')], required_one_of=[('name', 'id')], default=None),
     SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=SERVICE_ID_RULE_SPEC, default=None),
     NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', options=NODE_ID_RULE_SPEC, default=None),
-    STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
-    **auth_argument_spec()
+    STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE])
 }
+_ARGUMENT_SPEC.update(auth_argument_spec())
 
 
 def compare_consul_api_role_policy_objects(first, second):
@@ -484,7 +484,7 @@ class Configuration:
     Configuration for this module.
     """
 
-    def __init__(self, name=None, description=None, policies=None, service_identities=None, 
+    def __init__(self, name=None, description=None, policies=None, service_identities=None,
                  node_identities=None, state=None, check_mode=None):
         self.name = name                                                                # type: str
         self.description = description                                                  # type: str

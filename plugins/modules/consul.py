@@ -557,7 +557,7 @@ def main():
         argument_spec=dict(
             host=dict(default='localhost'),
             port=dict(default=8500, type='int'),
-            scheme=dict(default='http'),
+            scheme=dict(default='http', choices=['http', 'https']),
             validate_certs=dict(default=True, type='bool'),
             check_id=dict(),
             check_name=dict(),

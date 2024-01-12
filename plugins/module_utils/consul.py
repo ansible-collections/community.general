@@ -45,14 +45,14 @@ class RequestError(Exception):
     pass
 
 
-def auth_argument_spec(token_option_name="token"):
+def auth_argument_spec(token_option_name="token", token_option_required=False):
     args = dict(
         host=dict(default="localhost"),
         port=dict(type="int", default=8500),
         scheme=dict(choices=["http", "https"], default="http"),
         validate_certs=dict(type="bool", default=True),
     )
-    args[token_option_name] = dict(no_log=True)
+    args[token_option_name] = dict(no_log=True, required=token_option_required)
     return args
 
 
