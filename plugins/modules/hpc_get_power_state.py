@@ -113,6 +113,7 @@ category_commands = {
     "Get_Power_State": ["Get_PS"],
 }
 
+
 def main():
     result = {}
     return_values = {}
@@ -126,7 +127,7 @@ def main():
             auth_token=dict(no_log=True),
             session_uri=dict(),
             timeout=dict(type='int', default=600),
-            resource_id=dict(type='list',elements='str',default=[],required=False),
+            resource_id=dict(type='list', elements='str', default=[], required=False),
             power_state=dict(),
             output_file_name=dict(type='str', default=''),
         ),
@@ -141,11 +142,10 @@ def main():
              'pswd': module.params['password'],
              'token': module.params['auth_token']}
 
-
     timeout = module.params['timeout']
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    #update_uri = "/redfish/v1/UpdateService"
+    # update_uri = "/redfish/v1/UpdateService"
     rf_utils = CrayRedfishUtils(creds, root_uri, timeout, module, data_modification=True)
 
     # Check that Category is valid
@@ -160,20 +160,19 @@ def main():
 
     if category == "Get_Power_State":
         for command in command_list:
-            if command=="Get_PS":
+            if command == "Get_PS":
                 result = rf_utils.get_PS_CrayXD670({
-                      'baseuri': module.params['baseuri'],
-                      'username': module.params['username'],
-                      'password': module.params['password'],
-                      'power_state' : module.params['power_state'],
-                      'output_file_name': module.params['output_file_name'],
-                      })
+                     'baseuri': module.params['baseuri'],
+                     'username': module.params['username'],
+                     'password': module.params['password'],
+                     'power_state' : module.params['power_state'],
+                     'output_file_name': module.params['output_file_name'],
+})
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
                 else:
                     module.fail_json(msg=to_native(result))
-      
 
 if __name__ == '__main__':
     main()
