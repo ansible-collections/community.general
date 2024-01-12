@@ -108,6 +108,7 @@ category_commands = {
     "GetInventory": ["GetSystemFWInventory"],
 }
 
+
 def main():
     result = {}
     return_values = {}
@@ -134,11 +135,10 @@ def main():
              'pswd': module.params['password'],
              'token': module.params['auth_token']}
 
-
     timeout = module.params['timeout']
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    #update_uri = "/redfish/v1/UpdateService"
+    # update_uri = "/redfish/v1/UpdateService"
     rf_utils = CrayRedfishUtils(creds, root_uri, timeout, module, data_modification=True)
 
     # Check that Category is valid
@@ -151,22 +151,20 @@ def main():
         if cmd not in category_commands[category]:
             module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, category_commands[category])))
 
-
     if category == "GetInventory":
         for command in command_list:
-            if command=="GetSystemFWInventory":
+            if command == "GetSystemFWInventory":
                 result = rf_utils.get_sys_fw_inventory({
-                      'baseuri': module.params['baseuri'],
-                      'username': module.params['username'],
-                      'password': module.params['password'],
-                      'output_file_name': module.params['output_file_name'],
-                      })
+                    'baseuri': module.params['baseuri'],
+                    'username': module.params['username'],
+                    'password': module.params['password'],
+                    'output_file_name': module.params['output_file_name'],
+})
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
                 else:
                     module.fail_json(msg=to_native(result))
-      
 
 if __name__ == '__main__':
     main()
