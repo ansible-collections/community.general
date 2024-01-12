@@ -70,8 +70,7 @@ options:
     required: true
     decription:
       - To build the Redfish URI and to update that component it is required.
-    choices: ['BMC'] , ['BIOS'] , ['BIOS2'] , ['MainCPLD'] , ['HDDBPPIC'] , ['PDBPIC'] , ['RT_NVME'] , 
-    ['RT_OTHER'] , ['RT_SA'] , ['PDB'] , ['UBM6'] , ['SCM_CPLD1_MB_CPLD1'] , ['BPB_CPLD']
+    choices: [BMC , BIOS , BIOS2 , MainCPLD , HDDBPPIC , PDBPIC , RT_NVME , RT_OTHER , RT_SA , PDB , UBM6 , SCM_CPLD1_MB_CPLD1 , BPB_CPLD]
   update_image_path_xd295V:
     required: false
     description:
@@ -116,18 +115,10 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-hpc_update_system_firmware:
-    description: Update the components of the CrayXD.
-    type: dict
-    contains:
-        hpc_update_system_firmware
-            description: Updates the CrayXD components using Redfish API's.
-            type: dict
-            contains:
-                ret:
-                    description: Return True/False based on whether the operation was performed successfully.
-                    type: bool
-    returned: always
+csv:
+  description: Output of this Task is saved to a csv file.
+  type: csv file
+  sample: Output_file.csv
 '''
 
 
