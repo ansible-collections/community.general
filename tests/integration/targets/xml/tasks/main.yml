@@ -19,6 +19,7 @@
     name:
       - libxml2-devel
       - libxslt-devel
+      - python3-lxml
     state: present
   when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
 
