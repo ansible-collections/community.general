@@ -312,7 +312,7 @@ def update_role(role, configuration, consul_module):
         if not node_id_specified and role.get('NodeIdentities') is not None:
             update_role_data["NodeIdentities"] = role.get('NodeIdentities')
 
-        resulting_role = consul_module.put(('acl', 'role', role['ID']), json=update_role_data)
+        resulting_role = consul_module.put(('acl', 'role', role['ID']), data=update_role_data)
         changed = (
             role['Description'] != resulting_role['Description'] or
             role.get('Policies', None) != resulting_role.get('Policies', None) or
@@ -359,7 +359,7 @@ def create_role(configuration, consul_module):
         create_role_data["NodeIdentities"] = [x.to_dict() for x in configuration.node_identities]
 
     if not configuration.check_mode:
-        resulting_role = consul_module.put('acl/role', json=create_role_data)
+        resulting_role = consul_module.put('acl/role', data=create_role_data)
         return Output(changed=True, operation=CREATE_OPERATION, role=resulting_role)
     else:
         return Output(changed=True, operation=CREATE_OPERATION)

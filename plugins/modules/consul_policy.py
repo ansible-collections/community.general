@@ -132,7 +132,7 @@ _ARGUMENT_SPEC.update(auth_argument_spec())
 
 
 def update_policy(policy, configuration, consul_module):
-    updated_policy = consul_module.put(('acl', 'policy', policy['ID']), json={
+    updated_policy = consul_module.put(('acl', 'policy', policy['ID']), data={
         'Name': configuration.name,  # should be equal at this point.
         'Description': configuration.description,
         'Rules': configuration.rules,
@@ -149,7 +149,7 @@ def update_policy(policy, configuration, consul_module):
 
 
 def create_policy(configuration, consul_module):
-    created_policy = consul_module.put('acl/policy', json={
+    created_policy = consul_module.put('acl/policy', data={
         'Name': configuration.name,
         'Description': configuration.description,
         'Rules': configuration.rules,

@@ -51,30 +51,37 @@ class ConsulModule:
 
         self.module = module
 
-    def _request(self, method, url_parts, **kwargs):
-        params = self.module.params
+    def _request(self, method, url_parts, data=None, params=None):
+        module_params = self.module.params
 
         if isinstance(url_parts, str):
             url_parts = [url_parts]
 
-        base_url = "%s://%s:%s/v1" % (params["scheme"], params["host"], params["port"])
+        base_url = "%s://%s:%s/v1" % (
+            module_params["scheme"],
+            module_params["host"],
+            module_params["port"],
+        )
         url = "/".join([base_url] + list(url_parts))
 
         headers = {}
         token = self.module.params.get("token")
         if token:
             headers["X-Consul-Token"] = token
-        headers.update(kwargs.get("headers", {}))
-
-        kwargs["headers"] = headers
-        kwargs["verify"] = params["validate_certs"]
 
         try:
-            response = requests.request(method, url, **kwargs)
+            response = requests.request(
+                method,
+                url,
+                params=params,
+                json=data,
+                headers=headers,
+                verify=module_params["validate_certs"],
+            )
         except ConnectionError as e:
             self.module.fail_json(
                 msg="Could not connect to consul agent at %s:%s, error was %s"
-                % (params["host"], params["port"], str(e))
+                % (module_params["host"], module_params["port"], str(e))
             )
         else:
             if 400 <= response.status_code < 600:
@@ -84,9 +91,6 @@ class ConsulModule:
 
     def get(self, url_parts, **kwargs):
         return self._request("GET", url_parts, **kwargs)
-
-    def post(self, url_parts, **kwargs):
-        return self._request("POST", url_parts, **kwargs)
 
     def put(self, url_parts, **kwargs):
         return self._request("PUT", url_parts, **kwargs)

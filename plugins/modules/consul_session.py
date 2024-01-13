@@ -202,7 +202,7 @@ def create_session(consul_module, name, behavior, ttl, node,
         'session/create',
         params={
             'dc': datacenter},
-        json=create_data)
+        data=create_data)
     return create_session_response_dict["ID"]
 
 
