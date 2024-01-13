@@ -41,5 +41,5 @@ options:
   ca_path:
     description:
       - The CA bundle to use for https connections
-    types: str
+    type: str
 """
