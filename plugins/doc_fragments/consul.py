@@ -34,14 +34,10 @@ options:
     description:
       - Whether to verify the TLS certificate of the consul agent.
     default: true
-requirements:
-  - requests
-"""
-
-    TOKEN = r"""
-options:
   token:
     description:
       - The token to use for authorization.
     type: str
+requirements:
+  - requests
 """

@@ -40,7 +40,7 @@ def auth_argument_spec():
     )
 
 
-class ConsulModule(object):
+class ConsulModule:
     """Base class for Consule modules"""
 
     def __init__(self, module):

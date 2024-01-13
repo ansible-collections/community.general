@@ -35,7 +35,6 @@ requirements:
 author: "Steve Gargan (@sgargan)"
 extends_documentation_fragment:
   - community.general.consul
-  - community.general.consul.token
   - community.general.attributes
 attributes:
   check_mode:

@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -20,7 +21,6 @@ author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
   - community.general.consul
-  - community.general.consul.token
   - community.general.attributes
 attributes:
   check_mode:
@@ -105,8 +105,7 @@ operation:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    auth_argument_spec, ConsulModule
-)
+    ConsulModule, auth_argument_spec)
 
 NAME_PARAMETER_NAME = "name"
 DESCRIPTION_PARAMETER_NAME = "description"
