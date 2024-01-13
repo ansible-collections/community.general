@@ -20,7 +20,7 @@ description:
 author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
-  - community.general.consul.documentation
+  - community.general.consul
   - community.general.consul.token
   - community.general.attributes
 attributes:

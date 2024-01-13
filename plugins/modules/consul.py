@@ -34,7 +34,7 @@ requirements:
   - python-consul
 author: "Steve Gargan (@sgargan)"
 extends_documentation_fragment:
-  - community.general.consul.documentation
+  - community.general.consul
   - community.general.consul.token
   - community.general.attributes
 attributes:

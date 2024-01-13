@@ -20,7 +20,7 @@ author:
   - Steve Gargan (@sgargan)
   - Colin Nolan (@colin-nolan)
 extends_documentation_fragment:
-  - community.general.consul.documentation
+  - community.general.consul
   - community.general.attributes
 attributes:
   check_mode:
