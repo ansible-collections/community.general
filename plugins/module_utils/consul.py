@@ -80,7 +80,7 @@ class ConsulModule:
             if 400 <= response.status_code < 600:
                 raise RequestError("%d %s" % (response.status_code, response.content))
 
-            return response
+            return response.json()
 
     def get(self, url_parts, **kwargs):
         return self._request("GET", url_parts, **kwargs)

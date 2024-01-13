@@ -312,9 +312,7 @@ def update_role(role, configuration, consul_module):
         if not node_id_specified and role.get('NodeIdentities') is not None:
             update_role_data["NodeIdentities"] = role.get('NodeIdentities')
 
-        response = consul_module.put(('acl', 'role', role['ID']), json=update_role_data)
-
-        resulting_role = response.json()
+        resulting_role = consul_module.put(('acl', 'role', role['ID']), json=update_role_data)
         changed = (
             role['Description'] != resulting_role['Description'] or
             role.get('Policies', None) != resulting_role.get('Policies', None) or
@@ -361,9 +359,7 @@ def create_role(configuration, consul_module):
         create_role_data["NodeIdentities"] = [x.to_dict() for x in configuration.node_identities]
 
     if not configuration.check_mode:
-        response = consul_module.put('acl/role', json=create_role_data)
-        resulting_role = response.json()
-
+        resulting_role = consul_module.put('acl/role', json=create_role_data)
         return Output(changed=True, operation=CREATE_OPERATION, role=resulting_role)
     else:
         return Output(changed=True, operation=CREATE_OPERATION)
@@ -386,15 +382,13 @@ def remove_role(configuration, consul_module):
 
 
 def get_roles(consul_module):
-    response = consul_module.get('acl/roles')
-    roles = response.json()
+    roles = consul_module.get('acl/roles')
     existing_roles_mapped_by_id = dict((role['Name'], role) for role in roles if role['Name'] is not None)
     return existing_roles_mapped_by_id
 
 
 def get_consul_version(consul_module):
-    response = consul_module.get('agent/self')
-    config = response.json()["Config"]
+    config = consul_module.get('agent/self')["Config"]
     return ConsulVersion(config["Version"])
 
 

@@ -132,14 +132,12 @@ _ARGUMENT_SPEC.update(auth_argument_spec())
 
 
 def update_policy(policy, configuration, consul_module):
-    response = consul_module.put(('acl', 'policy', policy['ID']), json={
+    updated_policy = consul_module.put(('acl', 'policy', policy['ID']), json={
         'Name': configuration.name,  # should be equal at this point.
         'Description': configuration.description,
         'Rules': configuration.rules,
         'Datacenters': configuration.valid_datacenters
     })
-
-    updated_policy = response.json()
 
     changed = (
         policy.get('Rules', "") != updated_policy.get('Rules', "") or
@@ -151,13 +149,12 @@ def update_policy(policy, configuration, consul_module):
 
 
 def create_policy(configuration, consul_module):
-    response = consul_module.put('acl/policy', json={
+    created_policy = consul_module.put('acl/policy', json={
         'Name': configuration.name,
         'Description': configuration.description,
         'Rules': configuration.rules,
         'Datacenters': configuration.valid_datacenters
     })
-    created_policy = response.json()
     return Output(changed=True, operation=CREATE_OPERATION, policy=created_policy)
 
 
@@ -177,16 +174,14 @@ def remove_policy(configuration, consul_module):
 
 
 def get_policies(consul_module):
-    response = consul_module.get('acl/policies')
-    policies = response.json()
+    policies = consul_module.get('acl/policies')
     existing_policies_mapped_by_name = dict(
         (policy['Name'], policy) for policy in policies if policy['Name'] is not None)
     return existing_policies_mapped_by_name
 
 
 def get_policy(id, consul_module):
-    response = consul_module.get(('acl', 'policy', id))
-    return response.json()
+    return consul_module.get(('acl', 'policy', id))
 
 
 def set_policy(configuration, consul_module):

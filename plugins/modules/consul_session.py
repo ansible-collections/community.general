@@ -139,24 +139,21 @@ def execute(module, consul_module):
 
 
 def list_sessions(consul_module, datacenter):
-    response = consul_module.get(
+    return consul_module.get(
         'session/list',
         params={'dc': datacenter})
-    return response.json()
 
 
 def list_sessions_for_node(consul_module, node, datacenter):
-    response = consul_module.get(
+    return consul_module.get(
         ('session', 'node', node),
         params={'dc': datacenter})
-    return response.json()
 
 
 def get_session_info(consul_module, session_id, datacenter):
-    response = consul_module.get(
+    return consul_module.get(
         ('session', 'info', session_id),
         params={'dc': datacenter})
-    return response.json()
 
 
 def lookup_sessions(module, consul_module):
@@ -201,12 +198,11 @@ def create_session(consul_module, name, behavior, ttl, node,
     }
     if ttl is not None:
         create_data["TTL"] = "%ss" % str(ttl)  # TTL is in seconds
-    response = consul_module.put(
+    create_session_response_dict = consul_module.put(
         'session/create',
         params={
             'dc': datacenter},
         json=create_data)
-    create_session_response_dict = response.json()
     return create_session_response_dict["ID"]
 
 
@@ -243,8 +239,7 @@ def update_session(module, consul_module):
 
 
 def destroy_session(consul_module, session_id):
-    response = consul_module.put(('session', 'destroy', session_id))
-    return response.content == "true"
+    return consul_module.put(('session', 'destroy', session_id))
 
 
 def remove_session(module, consul_module):
