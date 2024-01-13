@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-class ModuleDocFragment(object):
+class ModuleDocFragment:
     # Common parameters for Consul modules
     DOCUMENTATION = r"""
 options:
@@ -38,6 +38,8 @@ options:
     description:
       - The token to use for authorization.
     type: str
-requirements:
-  - requests
+  ca_path:
+    description:
+      - The CA bundle to use for https connections
+    types: str
 """

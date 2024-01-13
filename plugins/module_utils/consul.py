@@ -6,24 +6,14 @@
 
 from __future__ import absolute_import, division, print_function
 
-import traceback
+import json
+import os
 
-from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.six.moves.urllib import error as urllib_error
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.urls import open_url
 
 __metaclass__ = type
-
-
-REQUESTS_IMP_ERR = None
-try:
-    import requests
-    from requests.exceptions import ConnectionError
-
-    HAS_REQUESTS = True
-except ImportError:
-    requests = ConnectionError = None
-
-    HAS_REQUESTS = False
-    REQUESTS_IMP_ERR = traceback.format_exc()
 
 
 class RequestError(Exception):
@@ -37,6 +27,7 @@ def auth_argument_spec():
         scheme=dict(choices=["http", "https"], default="http"),
         validate_certs=dict(type="bool", default=True),
         token=dict(no_log=True),
+        ca_path=dict(),
     )
 
 
@@ -44,11 +35,6 @@ class ConsulModule:
     """Base class for Consule modules"""
 
     def __init__(self, module):
-        if not HAS_REQUESTS:
-            module.fail_json(
-                msg=missing_required_lib("requests"), exception=REQUESTS_IMP_ERR
-            )
-
         self.module = module
 
     def _request(self, method, url_parts, data=None, params=None):
@@ -56,6 +42,14 @@ class ConsulModule:
 
         if isinstance(url_parts, str):
             url_parts = [url_parts]
+        if params:
+            # Remove values that are None
+            params = {k: v for k, v in params.items() if v is not None}
+
+        ca_path = module_params.get("ca_path")
+        # For backwards compatibility when the module used requests
+        if not ca_path and "REQUESTS_CA_BUNDLE" in os.environ:
+            ca_path = os.environ["REQUESTS_CA_BUNDLE"]
 
         base_url = "%s://%s:%s/v1" % (
             module_params["scheme"],
@@ -70,24 +64,30 @@ class ConsulModule:
             headers["X-Consul-Token"] = token
 
         try:
-            response = requests.request(
-                method,
+            if data:
+                data = json.dumps(data)
+                headers["Content-Type"] = "application/json"
+            if params:
+                url = "%s?%s" % (url, urlencode(params))
+            response = open_url(
                 url,
-                params=params,
-                json=data,
+                method=method,
+                data=data,
                 headers=headers,
-                verify=module_params["validate_certs"],
+                validate_certs=module_params["validate_certs"],
+                ca_path=ca_path,
             )
-        except ConnectionError as e:
+            response_data = response.read()
+        except urllib_error.URLError as e:
             self.module.fail_json(
                 msg="Could not connect to consul agent at %s:%s, error was %s"
                 % (module_params["host"], module_params["port"], str(e))
             )
         else:
-            if 400 <= response.status_code < 600:
-                raise RequestError("%d %s" % (response.status_code, response.content))
+            if 400 <= response.status < 600:
+                raise RequestError("%d %s" % (response.status, response_data))
 
-            return response.json()
+            return json.loads(response_data)
 
     def get(self, url_parts, **kwargs):
         return self._request("GET", url_parts, **kwargs)
