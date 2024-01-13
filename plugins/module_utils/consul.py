@@ -26,34 +26,18 @@ except ImportError:
     REQUESTS_IMP_ERR = traceback.format_exc()
 
 
-def get_consul_url(configuration):
-    return "%s://%s:%s/v1" % (
-        configuration.scheme,
-        configuration.host,
-        configuration.port,
-    )
-
-
-def get_auth_headers(configuration):
-    if configuration.token is None:
-        return {}
-    else:
-        return {"X-Consul-Token": configuration.token}
-
-
 class RequestError(Exception):
     pass
 
 
-def auth_argument_spec(token_option_name="token", token_option_required=False):
-    args = dict(
+def auth_argument_spec():
+    return dict(
         host=dict(default="localhost"),
         port=dict(type="int", default=8500),
         scheme=dict(choices=["http", "https"], default="http"),
         validate_certs=dict(type="bool", default=True),
+        token=dict(no_log=True),
     )
-    args[token_option_name] = dict(no_log=True, required=token_option_required)
-    return args
 
 
 class ConsulModule(object):
@@ -77,9 +61,7 @@ class ConsulModule(object):
         url = "/".join([base_url] + list(url_parts))
 
         headers = {}
-        token = self.module.params.get("mgmt_token")
-        if not token:
-            token = self.module.params.get("token")
+        token = self.module.params.get("token")
         if token:
             headers["X-Consul-Token"] = token
         headers.update(kwargs.get("headers", {}))
