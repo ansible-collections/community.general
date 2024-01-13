@@ -153,9 +153,9 @@ plugin_routing:
     stackdriver:
       deprecation:
         removal_version: 9.0.0
-        warning_text: >
-          This module relies on HTTPS APIs that do not exist anymore, and any new development in the
-          direction of providing an alternative should happen in the context of the google.cloud collection.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore,
+          and any new development in the direction of providing an alternative should
+          happen in the context of the google.cloud collection.
     system.aix_devices:
       redirect: community.general.aix_devices
       deprecation:
@@ -807,7 +807,8 @@ plugin_routing:
     flowdock:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     notification.flowdock:
       redirect: community.general.flowdock
       deprecation:
@@ -4446,7 +4447,8 @@ plugin_routing:
     webfaction_app:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     cloud.webfaction.webfaction_app:
       redirect: community.general.webfaction_app
       deprecation:
@@ -4457,7 +4459,8 @@ plugin_routing:
     webfaction_db:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     cloud.webfaction.webfaction_db:
       redirect: community.general.webfaction_db
       deprecation:
@@ -4468,7 +4471,8 @@ plugin_routing:
     webfaction_domain:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     cloud.webfaction.webfaction_domain:
       redirect: community.general.webfaction_domain
       deprecation:
@@ -4479,7 +4483,8 @@ plugin_routing:
     webfaction_mailbox:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     cloud.webfaction.webfaction_mailbox:
       redirect: community.general.webfaction_mailbox
       deprecation:
@@ -4490,7 +4495,8 @@ plugin_routing:
     webfaction_site:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and there is no clear path to update.
+        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+          there is no clear path to update.
     cloud.webfaction.webfaction_site:
       redirect: community.general.webfaction_site
       deprecation:
@@ -4646,7 +4652,8 @@ plugin_routing:
     rackspace:
       deprecation:
         removal_version: 9.0.0
-        warning_text: This doc fragment is used by rax modules, that rely on the deprecated package pyrax.
+        warning_text: This doc fragment is used by rax modules, that rely on the deprecated
+          package pyrax.
     _gcp:
       redirect: community.google._gcp
     docker:
