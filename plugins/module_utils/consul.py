@@ -84,8 +84,11 @@ class ConsulModule:
                 % (module_params["host"], module_params["port"], str(e))
             )
         else:
-            if 400 <= response.status < 600:
-                raise RequestError("%d %s" % (response.status, response_data))
+            status = (
+                response.status if hasattr(response, "status") else response.getcode()
+            )
+            if 400 <= status < 600:
+                raise RequestError("%d %s" % (status, response_data))
 
             return json.loads(response_data)
 
