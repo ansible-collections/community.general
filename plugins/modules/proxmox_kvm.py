@@ -525,6 +525,12 @@ options:
       - Update of O(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: false
+  update_unsafe:
+    description:
+      - If V(true), does not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi).
+    type: bool
+    default: false
+    version_added: 8.3.0
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
@@ -846,6 +852,20 @@ EXAMPLES = '''
     memory: 16384
     update: true
 
+- name: Update VM configuration (incl. unsafe options)
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    cores: 8
+    memory: 16384
+    net:
+        net0: virtio,bridge=vmbr1
+    update: true
+    update_unsafe: true
+
 - name: Delete QEMU parameters
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -981,7 +1001,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             time.sleep(1)
         return False
 
-    def create_vm(self, vmid, newid, node, name, memory, cpu, cores, sockets, update, **kwargs):
+    def create_vm(self, vmid, newid, node, name, memory, cpu, cores, sockets, update, update_unsafe, **kwargs):
         # Available only in PVE 4
         only_v4 = ['force', 'protection', 'skiplock']
         only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig', 'tags']
@@ -1018,23 +1038,24 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             urlencoded_ssh_keys = quote(kwargs['sshkeys'], safe='')
             kwargs['sshkeys'] = str(urlencoded_ssh_keys)
 
-        # If update, don't update disk (virtio, efidisk0, tpmstate0, ide, sata, scsi) and network interface
+        # If update, don't update disk (virtio, efidisk0, tpmstate0, ide, sata, scsi) and network interface, unless update_unsafe=True
         # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
         if update:
-            if 'virtio' in kwargs:
-                del kwargs['virtio']
-            if 'sata' in kwargs:
-                del kwargs['sata']
-            if 'scsi' in kwargs:
-                del kwargs['scsi']
-            if 'ide' in kwargs:
-                del kwargs['ide']
-            if 'efidisk0' in kwargs:
-                del kwargs['efidisk0']
-            if 'tpmstate0' in kwargs:
-                del kwargs['tpmstate0']
-            if 'net' in kwargs:
-                del kwargs['net']
+            if update_unsafe is not True:
+                if 'virtio' in kwargs:
+                    del kwargs['virtio']
+                if 'sata' in kwargs:
+                    del kwargs['sata']
+                if 'scsi' in kwargs:
+                    del kwargs['scsi']
+                if 'ide' in kwargs:
+                    del kwargs['ide']
+                if 'efidisk0' in kwargs:
+                    del kwargs['efidisk0']
+                if 'tpmstate0' in kwargs:
+                    del kwargs['tpmstate0']
+                if 'net' in kwargs:
+                    del kwargs['net']
             if 'force' in kwargs:
                 del kwargs['force']
             if 'pool' in kwargs:
@@ -1286,6 +1307,7 @@ def main():
                            version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
                        )),
         update=dict(type='bool', default=False),
+        update_unsafe=dict(type='bool', default=False),
         vcpus=dict(type='int'),
         vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
         virtio=dict(type='dict'),
@@ -1320,6 +1342,7 @@ def main():
     sockets = module.params['sockets']
     state = module.params['state']
     update = bool(module.params['update'])
+    update_unsafe = bool(module.params['update_unsafe'])
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
 
@@ -1429,7 +1452,7 @@ def main():
             module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
         try:
-            proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
+            proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update, update_unsafe,
                               archive=module.params['archive'],
                               acpi=module.params['acpi'],
                               agent=module.params['agent'],
