@@ -527,7 +527,7 @@ options:
     default: false
   update_unsafe:
     description:
-      - If V(true), does not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi).
+      - If V(true), does not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), and O(scsi).
     type: bool
     default: false
     version_added: 8.3.0
@@ -1041,7 +1041,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         # If update, don't update disk (virtio, efidisk0, tpmstate0, ide, sata, scsi) and network interface, unless update_unsafe=True
         # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
         if update:
-            if update_unsafe is not True:
+            if update_unsafe is False:
                 if 'virtio' in kwargs:
                     del kwargs['virtio']
                 if 'sata' in kwargs:

@@ -1,2 +1,2 @@
 minor_changes:
-  - proxmox_kvm - Add parameter `update_unsafe` to avoid limitations when updating dangerous values. (https://github.com/ansible-collections/community.general/pull/7843).
+  - proxmox_kvm - add parameter ``update_unsafe`` to avoid limitations when updating dangerous values (https://github.com/ansible-collections/community.general/pull/7843).
