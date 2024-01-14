@@ -26,6 +26,7 @@ options:
   scheme:
     description:
       - The protocol scheme on which the consul agent is running.
+        Defaults to V(http) and can be set to V(https) for secure connections.
     default: http
     choices: [ http, https ]
     type: str

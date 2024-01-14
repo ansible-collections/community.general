@@ -7,7 +7,6 @@
 from __future__ import absolute_import, division, print_function
 
 import json
-import os
 
 from ansible.module_utils.six.moves.urllib import error as urllib_error
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -47,10 +46,6 @@ class ConsulModule:
             params = {k: v for k, v in params.items() if v is not None}
 
         ca_path = module_params.get("ca_path")
-        # For backwards compatibility when the module used requests
-        if not ca_path and "REQUESTS_CA_BUNDLE" in os.environ:
-            ca_path = os.environ["REQUESTS_CA_BUNDLE"]
-
         base_url = "%s://%s:%s/v1" % (
             module_params["scheme"],
             module_params["host"],

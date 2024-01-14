@@ -58,17 +58,6 @@
     ca_path: '{{ remote_dir }}/cert.pem'
   register: result
 
-- name: ensure a secure connection is possible (backwards compat)
-  consul_session:
-    state: info
-    id: dummy
-    port: 8501
-    scheme: https
-    token: "{{ consul_management_token }}"
-  environment:
-    REQUESTS_CA_BUNDLE: '{{ remote_dir }}/cert.pem'
-  register: result
-
 - assert:
     that:
       - result is changed
