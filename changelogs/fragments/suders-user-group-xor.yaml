@@ -1,3 +1,3 @@
 bugfixes:
   - |
-    Suders module needs to have either user, or group, set.
+    sudoers - one of the ``user`` and ``group`` options must be supplied. In case none was supplied, the module crashed (https://github.com/ansible-collections/community.general/pull/7823).
