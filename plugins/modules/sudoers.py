@@ -203,8 +203,6 @@ class Sudoers(object):
             owner = self.user
         elif self.group is not None:
             owner = '%{group}'.format(group=self.group)
-        else:
-            raise Exception('Username (user), or groupname (group) needs to be set, but not both at the same time')
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
@@ -294,6 +292,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[['user', 'group']],
+        required_one_of=[['user', 'group']],
         supports_check_mode=True,
         required_if=[('state', 'present', ['commands'])],
     )
