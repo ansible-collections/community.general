@@ -468,11 +468,7 @@ class LXDContainerManagement(object):
         self.type = self.module.params['type']
 
         # LXD Rest API provides additional endpoints for creating containers and virtual-machines.
-        self.api_endpoint = None
-        if self.type == 'container':
-            self.api_endpoint = '/1.0/containers'
-        elif self.type == 'virtual-machine':
-            self.api_endpoint = '/1.0/virtual-machines'
+        self.api_endpoint = '/1.0/instances'
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
@@ -547,6 +543,8 @@ class LXDContainerManagement(object):
             url_params['target'] = self.target
         if self.project:
             url_params['project'] = self.project
+        if self.type:
+            url_params['type'] = self.type
         if url_params:
             url = '{0}?{1}'.format(url, urlencode(url_params))
         config = self.config.copy()
