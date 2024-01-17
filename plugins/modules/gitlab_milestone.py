@@ -47,7 +47,7 @@ options:
     required: false
   project:
     description:
-      - The path and name of the project, mandatory field but it's alternatively with group.
+      - The path and name of the project. Either this or O(group) is required.
     required: false
     type: str
   group:
