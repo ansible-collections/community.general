@@ -9,7 +9,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_milestone
-short_description: Creates/updates/deletes GitLab Milestones belonging to project or group.
+short_description: Creates/updates/deletes GitLab Milestones belonging to project or group
+version_added: 8.3.0
 description:
   - When a milestone does not exist, it will be created.
   - When a milestone does exist, its value will be updated when the values are different.
