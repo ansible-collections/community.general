@@ -87,6 +87,8 @@ options:
           - Specifies the duration of a session in seconds (between 10 and 86400).
         type: int
         version_added: 5.4.0
+    token:
+        version_added: 5.6.0
 '''
 
 EXAMPLES = '''

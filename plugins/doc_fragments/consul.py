@@ -5,7 +5,6 @@
 
 
 from __future__ import absolute_import, division, print_function
-
 __metaclass__ = type
 
 
@@ -28,7 +27,6 @@ options:
       - The protocol scheme on which the consul agent is running.
         Defaults to V(http) and can be set to V(https) for secure connections.
     default: http
-    choices: [ http, https ]
     type: str
   validate_certs:
     type: bool

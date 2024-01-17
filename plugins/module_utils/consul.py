@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 import json
 
@@ -12,18 +13,33 @@ from ansible.module_utils.six.moves.urllib import error as urllib_error
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import open_url
 
-__metaclass__ = type
+
+def get_consul_url(configuration):
+    return '%s://%s:%s/v1' % (configuration.scheme,
+                              configuration.host, configuration.port)
+
+
+def get_auth_headers(configuration):
+    if configuration.token is None:
+        return {}
+    else:
+        return {'X-Consul-Token': configuration.token}
 
 
 class RequestError(Exception):
     pass
 
 
+def handle_consul_response_error(response):
+    if 400 <= response.status_code < 600:
+        raise RequestError('%d %s' % (response.status_code, response.content))
+
+
 def auth_argument_spec():
     return dict(
         host=dict(default="localhost"),
         port=dict(type="int", default=8500),
-        scheme=dict(choices=["http", "https"], default="http"),
+        scheme=dict(default="http"),
         validate_certs=dict(type="bool", default=True),
         token=dict(no_log=True),
         ca_path=dict(),

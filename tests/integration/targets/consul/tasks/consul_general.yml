@@ -15,7 +15,6 @@
 - assert:
     that:
       - result is failed
-      - "result.msg == 'value of scheme must be one of: http, https, got: non_existent'"
 
 - name: ensure SSL certificate is checked
   consul_session:
