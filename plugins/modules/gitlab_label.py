@@ -56,7 +56,6 @@ options:
     required: false
     type: str
   labels:
-    version_added: 1.0.0
     description:
       - A list of dictionaries that represents gitlab project's or group's labels.
     type: list
