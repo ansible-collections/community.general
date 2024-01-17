@@ -82,7 +82,7 @@ options:
         default: null
       description:
         description:
-          - Label's description
+          - Label's description.
         type: str
         default: null
       new_name:
