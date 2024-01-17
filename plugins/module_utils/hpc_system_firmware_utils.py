@@ -186,8 +186,8 @@ class CrayRedfishUtils(RedfishUtils):
 
     def AC_PC_ipmi(self, IP, username, password, routing_value):
         try:
-            command='ipmitool -I lanplus -H ' + IP + ' -U '+username+' -P '+password+' raw '+ routing_value
-            subprocess.run(command, shell = True, check = True, timeout = 15, capture_output = True)
+            command = 'ipmitool -I lanplus -H ' + IP + ' -U '+ username +' -P '+ password +' raw '+ routing_value
+            subprocess.run(command, shell=True, check=True, timeout=15, capture_output=True)
             time.sleep(300)
             return True
         except Exception:
@@ -198,10 +198,10 @@ class CrayRedfishUtils(RedfishUtils):
         csv_file_name = attr.get('output_file_name')
         if not os.path.exists(csv_file_name):
             f = open(csv_file_name, "w")
-            to_write = "IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1, BPB_CPLD1,
-                        BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"
+            to_write = """IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1, 
+                            BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"""
             f.write(to_write)
-            f.close()                                                            
+            f.close()
         model = self.get_model()
         entry = []
         entry.append(IP)
@@ -213,13 +213,13 @@ class CrayRedfishUtils(RedfishUtils):
             entry.append(model)
             for target in all_targets:
                 if target in supported_targets[model.upper()]:
-                    version=self.get_fw_version(target)
+                    version = self.get_fw_version(target)
                     if version.startswith("failed"):
-                        version="NA"  # "no_comp/no_version"
+                        version = "NA"  # "no_comp/no_version"
                 else:
                     version = "NA"
                 entry.append(version)
-        new_data=", ".join(entry)
+        new_data = ", ".join(entry)
         return {'ret': True, 'changed': True, 'msg': str(new_data)}
 
     def helper_update(self, update_status, target, image_path, image_type, IP, username, password, model):
@@ -240,13 +240,13 @@ class CrayRedfishUtils(RedfishUtils):
                     headers = {'Expect': 'Continue', 'Content-Type': 'multipart/form-data'}
                     body = {}
                     if target != "BPB_CPLD":
-                        targets_uri = '/redfish/v1/UpdateService/FirmwareInventory/'+target+'/'
+                        targets_uri = '/redfish/v1/UpdateService/FirmwareInventory/' + target + '/'
                         body['UpdateParameters'] = (None, json.dumps({"Targets": [targets_uri]}), 'application/json')
                     else:
-                        body['UpdateParameters'] = (None, json.dumps({"Targets": ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/', 
-                                                                                  '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}), 
+                        body['UpdateParameters'] = (None, json.dumps({"Targets": ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/',
+                                                                                  '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}),
                                                     'application/json')
-                    body['OemParameters'] = (None, json.dumps({"ImageType": image_type}) , 'application/json')
+                    body['OemParameters'] = (None , json.dumps({"ImageType": image_type}) , 'application/json')
                     with open(image_path, 'rb') as image_path_rb:
                         body['UpdateFile'] = (image_path, image_path_rb, 'application/octet-stream')
                         encoder = MultipartEncoder(body)
@@ -254,7 +254,7 @@ class CrayRedfishUtils(RedfishUtils):
                         headers['Content-Type'] = encoder.content_type
 
                         response = self.post_multi_request(self.root_uri + data['MultipartHttpPushUri'],
-                                                    headers = headers, payload = body)
+                                                            headers=headers, payload=body)
                         if response is False:
                             update_status = "failed_POST"
                         else:
@@ -277,11 +277,11 @@ class CrayRedfishUtils(RedfishUtils):
                                             update_status = "reboot_failed"
                                             break
 
-                            # if target=="MB_CPLD1" or "BPB" in target:
-                            # turn node back to on -- call power_on_node function
-                            # self.power_on()
-                            # not required to power on the node as it useful only after physical POWER CYCLE and we can't keep the track of the
-                            # physical power cycle so skipping it
+            # if target=="MB_CPLD1" or "BPB" in target:
+            # turn node back to on -- call power_on_node function
+            # self.power_on()
+            # not required to power on the node as it useful only after physical POWER CYCLE and we can't keep the track of the
+            # physical power cycle so skipping it
                             if update_status.lower() == "success":
                                 # call version of respective target and store versions after update
                                 time.sleep(180)  # extra time requiring as of now for systems under test
@@ -296,7 +296,7 @@ class CrayRedfishUtils(RedfishUtils):
                 return before_version, after_version, update_status
             else:
                 return update_status
-           
+
     def system_fw_update(self, attr):
         IP = attr.get('baseuri')
         username = attr.get('username')
@@ -307,20 +307,20 @@ class CrayRedfishUtils(RedfishUtils):
         image_path = "NA"
         target = attr.get('update_target')
         image_path_inputs = {
-                "HPE CRAY XD220V": attr.get('update_image_path_xd220V'),
-                "HPE CRAY XD225V": attr.get('update_image_path_xd225V'),
-                "HPE CRAY XD295V": attr.get('update_image_path_xd295V'),
-                "HPE CRAY XD665": attr.get('update_image_path_xd665'),
-                "HPE CRAY XD670": attr.get('update_image_path_xd670')}
+            "HPE CRAY XD220V": attr.get('update_image_path_xd220V'),
+            "HPE CRAY XD225V": attr.get('update_image_path_xd225V'),
+            "HPE CRAY XD295V": attr.get('update_image_path_xd295V'),
+            "HPE CRAY XD665": attr.get('update_image_path_xd665'),
+            "HPE CRAY XD670": attr.get('update_image_path_xd670')}
         csv_file_name = attr.get('output_file_name')
 
         # Have a check that atleast one image path set based out of the above new logic
         if not any(image_path_inputs.values()):
             return{'ret': False, 'changed': True, 'msg': 'Must specify atleast one update_image_path'}
- 
+
         if target == "" or target.upper() in unsupported_targets:
             return {'ret': False, 'changed': True, 'msg': 'Must specify the correct target for firmware update'}
-       
+
         model = self.get_model()
 
         if not os.path.exists(csv_file_name):
@@ -353,20 +353,17 @@ class CrayRedfishUtils(RedfishUtils):
                     lis = [IP, model, update_status, "node is not ON, please power on the node"]
                     new_data = ", ".join(lis)
                     return {'ret': True, 'changed': True, 'msg': str(new_data)}
-                    # return {'ret': False, 'changed': True, 
-                # 'msg': 'System Firmware Update skipped due to powered off state of the node for Cray XD 670,
-                Node needs to be powered on for CPLD firmware updates'}
                 elif target == 'SCM_CPLD1_MB_CPLD1':
                     is_target_supported = True
                     image_paths = image_path_inputs["HPE CRAY XD670"].split()
                     if len(image_paths) != 2:
-                        return {'ret': False, 'changed': True, 'msg': 'Must specify exactly 2 image_paths,
-                        first for SCM_CPLD1 of Cray XD670 and second for MB_CPLD1 of Cray XD670'}
+                        return {'ret': False, 'changed': True, 'msg': '''Must specify exactly 2 image_paths, 
+                                first for SCM_CPLD1 of Cray XD670 and second for MB_CPLD1 of Cray XD670'''}
                     for img_path in image_paths:
                         if not os.path.isfile(img_path):
                             return {'ret': False, 'changed': True,
-                                    'msg': 'Must specify correct image_paths for SCM_CPLD1_MB_CPLD1, first for SCM_CPLD1 
-                                            of Cray XD670 and second for MB_CPLD1 of Cray XD670'}
+                                    'msg':'''Must specify correct image_paths for SCM_CPLD1_MB_CPLD1, first for SCM_CPLD1 
+                                    of Cray XD670 and second for MB_CPLD1 of Cray XD670'''}
 
             if target != "SCM_CPLD1_MB_CPLD1" and not os.path.isfile(image_path):
                 update_status = "NA_fw_file_absent"
@@ -381,7 +378,7 @@ class CrayRedfishUtils(RedfishUtils):
                     is_target_supported = self.target_supported(model, target)
                 if model.upper() == "HPE CRAY XD670" and (target == "BMC" or target == "BPB_CPLD"):
                     is_target_supported = True
-                
+
                 if not is_target_supported:
                     update_status = "target_not_supported"
                     if target == "SCM_CPLD1_MB_CPLD1" or target == "BPB_CPLD":
@@ -398,17 +395,17 @@ class CrayRedfishUtils(RedfishUtils):
                     # call version of respective target and store versions before update
                     if target == "SCM_CPLD1_MB_CPLD1":
                         update_status = self.helper_update(update_status, "SCM_CPLD1", image_paths[0], image_type, IP, username, password, "HPE Cray XD670")
-                        if update_status.lower() == "success":  # SCM has updates successfully, proceed for MB_CPLD1 update
-                            # check node to be off -- call power_off_node function
+                        if update_status.lower() == "success":  
+                    # SCM has updates successfully, proceed for MB_CPLD1 update
+                    # check node to be off -- call power_off_node function
                             power_state = self.power_state()
                             if power_state.lower() == "on":
                                 self.power_off()
                                 power_state = self.power_state()
                                 if power_state.lower() == "on":
-                                    lis = [IP, model, "NA", "MB_CPLD1 requires node off, tried powering off the node, but failed to power off"]  # Unable to power off node for MB_CPLD1
-                                    # 'msg': 'System Firmware Update skipped due to powered ON state of the node for Cray XD 670, Node needs to be powered OFF for MB_CPLD1 firmware updates, tried powering off, but unable to power off'
-                                else:
-                                    update_status = self.helper_update(update_status, "MB_CPLD1", image_paths[1], image_type, IP, username, password, "HPE Cray XD670")
+                                    lis = [IP, model, "NA", "MB_CPLD1 requires node off, tried powering off the node, but failed to power off"]
+                                    update_status = self.helper_update(update_status, "MB_CPLD1",
+                                                                       image_paths[1], image_type, IP, username, password, "HPE Cray XD670")
                                     if update_status.lower() == "success":
                                         remarks = "Please plug out and plug in power cables physically"
                                     else:
