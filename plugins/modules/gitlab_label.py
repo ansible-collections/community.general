@@ -100,7 +100,7 @@ EXAMPLES = '''
     project: "group1/project1"
     labels:
       - name: label_one
-        color: #123456
+        color: "#123456"
     state: present
 
 - name: Create many group labels
@@ -110,11 +110,11 @@ EXAMPLES = '''
     group: "group1"
     labels:
       - name: label_one
-        color: #123456
+        color: "#123456"
         description: this is a label
         priority: 20
       - name: label_two
-        color: #554422
+        color: "#554422"
     state: present
 
 - name: Create many project labels
@@ -124,11 +124,11 @@ EXAMPLES = '''
     project: "group1/project1"
     labels:
       - name: label_one
-        color: #123456
+        color: "#123456"
         description: this is a label
         priority: 20
       - name: label_two
-        color: #554422
+        color: "#554422"
     state: present
 
 - name: Set or update some labels
@@ -138,7 +138,7 @@ EXAMPLES = '''
     project: "group1/project1"
     labels:
       - name: label_one
-        color: #224488
+        color: "#224488"
     state: present
 
 - name: Add label in check mode
@@ -148,7 +148,7 @@ EXAMPLES = '''
     project: "group1/project1"
     labels:
       - name: label_one
-        color: #224488
+        color: "#224488"
     check_mode: true
 
 - name: Delete Label
