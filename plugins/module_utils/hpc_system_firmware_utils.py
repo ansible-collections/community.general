@@ -12,8 +12,6 @@ import subprocess
 import time
 from requests_toolbelt import MultipartEncoder
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
-from ansible.module_utils.urls import open_url, prepare_multipart
-from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 
 supported_models = ["HPE CRAY XD220V", "HPE CRAY XD225V", "HPE CRAY XD295V", "HPE CRAY XD665", "HPE CRAY XD670"]
 
@@ -186,7 +184,7 @@ class CrayRedfishUtils(RedfishUtils):
 
     def AC_PC_ipmi(self, IP, username, password, routing_value):
         try:
-            command = 'ipmitool -I lanplus -H ' + IP + ' -U '+ username +' -P '+ password +' raw '+ routing_value
+            command = 'ipmitool -I lanplus -H ' + IP + ' -U ' + username + ' -P ' + password + ' raw ' + routing_value
             subprocess.run(command, shell=True, check=True, timeout=15, capture_output=True)
             time.sleep(300)
             return True
@@ -198,7 +196,7 @@ class CrayRedfishUtils(RedfishUtils):
         csv_file_name = attr.get('output_file_name')
         if not os.path.exists(csv_file_name):
             f = open(csv_file_name, "w")
-            to_write = """IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1, 
+            to_write = """IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1,
                             BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"""
             f.write(to_write)
             f.close()
@@ -254,7 +252,7 @@ class CrayRedfishUtils(RedfishUtils):
                         headers['Content-Type'] = encoder.content_type
 
                         response = self.post_multi_request(self.root_uri + data['MultipartHttpPushUri'],
-                                                            headers=headers, payload=body)
+                                                           headers=headers, payload=body)
                         if response is False:
                             update_status = "failed_POST"
                         else:
@@ -316,7 +314,7 @@ class CrayRedfishUtils(RedfishUtils):
 
         # Have a check that atleast one image path set based out of the above new logic
         if not any(image_path_inputs.values()):
-            return{'ret': False, 'changed': True, 'msg': 'Must specify atleast one update_image_path'}
+            return {'ret': False, 'changed': True, 'msg': 'Must specify atleast one update_image_path'}
 
         if target == "" or target.upper() in unsupported_targets:
             return {'ret': False, 'changed': True, 'msg': 'Must specify the correct target for firmware update'}
@@ -343,7 +341,7 @@ class CrayRedfishUtils(RedfishUtils):
             else:
                 lis = [IP, model, "NA", "NA", update_status]
             new_data = ", ".join(lis)
-            return{'ret': True, 'changed': True, 'msg': str(new_data)}
+            return {'ret': True, 'changed': True, 'msg': str(new_data)}
         else:
             image_path = image_path_inputs[model.upper()]
             if model.upper() == "HPE CRAY XD670" and "CPLD" in target.upper():
@@ -357,12 +355,12 @@ class CrayRedfishUtils(RedfishUtils):
                     is_target_supported = True
                     image_paths = image_path_inputs["HPE CRAY XD670"].split()
                     if len(image_paths) != 2:
-                        return {'ret': False, 'changed': True, 'msg': '''Must specify exactly 2 image_paths, 
+                        return {'ret': False, 'changed': True, 'msg': '''Must specify exactly 2 image_paths,
                                 first for SCM_CPLD1 of Cray XD670 and second for MB_CPLD1 of Cray XD670'''}
                     for img_path in image_paths:
                         if not os.path.isfile(img_path):
                             return {'ret': False, 'changed': True,
-                                    'msg':'''Must specify correct image_paths for SCM_CPLD1_MB_CPLD1, first for SCM_CPLD1 
+                                    'msg': '''Must specify correct image_paths for SCM_CPLD1_MB_CPLD1, first for SCM_CPLD1
                                     of Cray XD670 and second for MB_CPLD1 of Cray XD670'''}
 
             if target != "SCM_CPLD1_MB_CPLD1" and not os.path.isfile(image_path):
@@ -395,9 +393,9 @@ class CrayRedfishUtils(RedfishUtils):
                     # call version of respective target and store versions before update
                     if target == "SCM_CPLD1_MB_CPLD1":
                         update_status = self.helper_update(update_status, "SCM_CPLD1", image_paths[0], image_type, IP, username, password, "HPE Cray XD670")
-                        if update_status.lower() == "success":  
-                    # SCM has updates successfully, proceed for MB_CPLD1 update
-                    # check node to be off -- call power_off_node function
+                        if update_status.lower() == "success":
+                            # SCM has updates successfully, proceed for MB_CPLD1 update
+                            # check node to be off -- call power_off_node function
                             power_state = self.power_state()
                             if power_state.lower() == "on":
                                 self.power_off()
@@ -422,4 +420,4 @@ class CrayRedfishUtils(RedfishUtils):
                         bef_ver, aft_ver, update_status = self.helper_update(update_status, target, image_path, image_type, IP, username, password, model)
                         lis = [IP, model, bef_ver, aft_ver, update_status]
                     new_data = ", ".join(lis)
-                    return{'ret': True, 'changed': True, 'msg': str(new_data)}
+                    return {'ret': True, 'changed': True, 'msg': str(new_data)}
