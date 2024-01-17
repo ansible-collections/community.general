@@ -14,8 +14,7 @@ version_added: 8.3.0
 description:
   - When a milestone does not exist, it will be created.
   - When a milestone does exist, its value will be updated when the values are different.
-  - Milestones can be purged
-  - Task can be run in check mode
+  - Milestones can be purged.
 author:
   - "Gabriele Pongelli (@gpongelli)"
 requirements:
