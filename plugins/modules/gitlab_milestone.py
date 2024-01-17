@@ -98,7 +98,7 @@ EXAMPLES = '''
     project: "group1/project1"
     milestones:
       - title: milestone_one
-        start_date: 2024-01-04
+        start_date: "2024-01-04"
     state: present
 
 - name: Create many group milestones
@@ -108,9 +108,9 @@ EXAMPLES = '''
     group: "group1"
     milestones:
       - title: milestone_one
-        start_date: 2024-01-04
+        start_date: "2024-01-04"
         description: this is a milestone
-        due_date: 2024-02-04
+        due_date: "2024-02-04"
       - title: milestone_two
     state: present
 
@@ -121,9 +121,9 @@ EXAMPLES = '''
     project: "group1/project1"
     milestones:
       - title: milestone_one
-        start_date: 2024-01-04
+        start_date: "2024-01-04"
         description: this is a milestone
-        due_date: 2024-02-04
+        due_date: "2024-02-04"
       - title: milestone_two
     state: present
 
@@ -134,7 +134,7 @@ EXAMPLES = '''
     project: "group1/project1"
     milestones:
       - title: milestone_one
-        start_date: 2024-05-04
+        start_date: "2024-05-04"
     state: present
 
 - name: Add milestone in check mode
@@ -144,7 +144,7 @@ EXAMPLES = '''
     project: "group1/project1"
     milestones:
       - title: milestone_one
-        start_date: 2024-05-04
+        start_date: "2024-05-04"
     check_mode: true
 
 - name: Delete milestone
