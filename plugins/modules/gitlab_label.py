@@ -10,6 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: gitlab_label
 short_description: Creates/updates/deletes GitLab Labels belonging to project or group.
+version_added: 8.3.0
 description:
   - When a label does not exist, it will be created.
   - When a label does exist, its value will be updated when the values are different.
