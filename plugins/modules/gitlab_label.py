@@ -14,8 +14,7 @@ version_added: 8.3.0
 description:
   - When a label does not exist, it will be created.
   - When a label does exist, its value will be updated when the values are different.
-  - Labels can be purged
-  - Task can be run in check mode
+  - Labels can be purged.
 author:
   - "Gabriele Pongelli (@gpongelli)"
 requirements:
