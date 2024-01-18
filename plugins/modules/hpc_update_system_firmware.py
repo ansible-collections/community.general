@@ -68,7 +68,7 @@ options:
     default: update_output.csv
   update_target:
     required: true
-    decription:
+    description:
       - To build the Redfish URI and to update that component it is required.
     choices: [BMC , BIOS , BIOS2 , MainCPLD , HDDBPPIC , PDBPIC , RT_NVME , RT_OTHER , RT_SA , PDB , UBM6 , SCM_CPLD1_MB_CPLD1 , BPB_CPLD]
   update_image_path_xd295V:
@@ -94,12 +94,14 @@ options:
 
 
 author:
-  - Srujana Yasa (@srujana.yasa)
+  - "Srujana Yasa (@srujana-yasa)"
+  - "Sharvari Adiga (@sharvari-adiga)"
+  - "Akash Sangnure (@akash-sangnure)"
 '''
 
 EXAMPLES = '''
     - name: Running Firmware Update for Cray XD Servers
-       hpc_update_system_firmware:
+      hpc_update_system_firmware:
         category: Update
         command: SystemFirmwareUpdate
         baseuri: "baseuri"
@@ -117,7 +119,7 @@ EXAMPLES = '''
 RETURN = '''
 csv:
   description: Output of this Task is saved to a csv file.
-  type: csv file
+  returned: Returned an output file containing the details of update.
   sample: Output_file.csv
 '''
 
@@ -141,19 +143,19 @@ def main():
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(required=True),
-            password=dict(no_log=True,required=True),
+            password=dict(no_log=True, required=True),
             auth_token=dict(no_log=True),
             timeout=dict(type='int', default=60),
-            update_image_type = dict(type='str', default='HPM'),
+            update_image_type=dict(type='str', default='HPM'),
             resource_id=dict(type='list', elements='str', default=[], required=False),
-            update_target=dict(required=True,type='str', default=''),
+            update_target=dict(required=True, type='str', default=''),
             update_image_path_xd220V=dict(type='str', default='NA'),
             update_image_path_xd225V=dict(type='str', default='NA'),
             update_image_path_xd295V=dict(type='str', default='NA'),
             update_image_path_xd665=dict(type='str', default='NA'),
             update_image_path_xd670=dict(type='str', default='NA'),
             output_file_name=dict(type='str', default='update_output.csv'),
-),
+            ),
         supports_check_mode=False
     )
 
@@ -179,32 +181,31 @@ def main():
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in category_commands[category]:
-            module.fail_json(msg = to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, category_commands[category])))
+            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, category_commands[category])))
 
-          
     if category == "Update":
         for command in command_list:
             if command == "SystemFirmwareUpdate":
                 result = rf_utils.system_fw_update({
                     'baseuri': module.params['baseuri'],
-                     'username': module.params['username'],
-                     'password': module.params['password'],
-                     'update_image_type' : module.params['update_image_type'],
-                     'update_target' : module.params['update_target'],
-                     'power_state' : module.params['power_state'],
-                     'update_image_path_xd220V' : module.params['update_image_path_xd220V'],
-                     'update_image_path_xd225V' : module.params['update_image_path_xd225V'],
-                     'update_image_path_xd295V' : module.params['update_image_path_xd295V'],
-                     'update_image_path_xd665' : module.params['update_image_path_xd665'],
-                     'update_image_path_xd670' : module.params['update_image_path_xd670'],
-                     'output_file_name': module.params['output_file_name'],
+                    'username': module.params['username'],
+                    'password': module.params['password'],
+                    'update_image_type' : module.params['update_image_type'],
+                    'update_target' : module.params['update_target'],
+                    'power_state' : module.params['power_state'],
+                    'update_image_path_xd220V' : module.params['update_image_path_xd220V'],
+                    'update_image_path_xd225V' : module.params['update_image_path_xd225V'],
+                    'update_image_path_xd295V' : module.params['update_image_path_xd295V'],
+                    'update_image_path_xd665' : module.params['update_image_path_xd665'],
+                    'update_image_path_xd670' : module.params['update_image_path_xd670'],
+                    'output_file_name': module.params['output_file_name'],
                 })
                 if result['ret']:
                     msg = result.get('msg', False)
-                    module.exit_json(msg = msg)
+                    module.exit_json(msg=msg)
                 else:
-                    module.fail_json(msg = to_native(result))
-      
+                    module.fail_json(msg=to_native(result))
+
 
 if __name__ == '__main__':
     main()
