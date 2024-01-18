@@ -87,7 +87,7 @@ EXAMPLES = '''
 RETURN = '''
 csv:
   description: Output of this Task is saved to a csv file.
-  type: csv file
+  returned: Returned an output file containing the details of update.
   sample: Output_file.csv
 '''
 
@@ -151,12 +151,13 @@ def main():
                     'username': module.params['username'],
                     'password': module.params['password'],
                     'output_file_name': module.params['output_file_name'],
-})
+                    })
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
                 else:
                     module.fail_json(msg=to_native(result))
+
 
 if __name__ == '__main__':
     main()
