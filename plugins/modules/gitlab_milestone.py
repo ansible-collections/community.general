@@ -34,7 +34,6 @@ options:
   state:
     description:
       - Create or delete milestone.
-      - Possible values are present and absent.
     default: present
     type: str
     choices: ["present", "absent"]
@@ -51,11 +50,10 @@ options:
     type: str
   group:
     description:
-      - The path of the group, mandatory field but it's alternatively with project.
+      - The path of the group. Either this or O(project) is required.
     required: false
     type: str
   milestones:
-    version_added: 1.0.0
     description:
       - A list of dictionaries that represents gitlab project's or group's milestones.
     type: list
@@ -82,7 +80,7 @@ options:
         default: null
       description:
         description:
-          - Milestone's description
+          - Milestone's description.
         type: str
         default: null
 '''
@@ -176,7 +174,7 @@ EXAMPLES = '''
 RETURN = '''
 milestones:
   description: Four lists of the milestones which were added, updated, removed or exist.
-  returned: always
+  returned: success
   type: dict
   contains:
     added:
