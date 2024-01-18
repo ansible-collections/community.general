@@ -199,7 +199,7 @@ milestones:
       sample: ['defg', 'new-milestone']
 milestones_obj:
   description: API object.
-  returned: always
+  returned: success
   type: dict
 '''
 
