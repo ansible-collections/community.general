@@ -88,11 +88,13 @@ options:
 EXAMPLES = '''
 - name: Import a key via local file
   community.general.pacman_key:
+    id: 01234567890ABCDE01234567890ABCDE12345678
     data: "{{ lookup('file', 'keyfile.asc') }}"
     state: present
 
 - name: Import a key via remote file
   community.general.pacman_key:
+    id: 01234567890ABCDE01234567890ABCDE12345678
     file: /tmp/keyfile.asc
     state: present
 
