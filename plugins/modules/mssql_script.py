@@ -283,7 +283,7 @@ def run_module():
     # Process the script into batches
     queries = []
     current_batch = []
-    for statement in script.splitlines(keepends=True):
+    for statement in script.splitlines(True):
         # Ignore the Byte Order Mark, if found
         if statement.strip() == '\uFEFF':
             continue

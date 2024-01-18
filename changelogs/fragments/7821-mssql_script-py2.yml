@@ -1,0 +1,2 @@
+bugfixes:
+  - "mssql_script - make the module work with Python 2 (https://github.com/ansible-collections/community.general/issues/7818, https://github.com/ansible-collections/community.general/pull/7821)."
