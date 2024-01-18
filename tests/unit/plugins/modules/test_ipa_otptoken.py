@@ -104,7 +104,7 @@ class TestIPAOTPToken(ModuleTestCase):
             {
                 'method': 'otptoken_add',
                 'name': 'NewToken1',
-                'item': {'ipatokendisabled': 'FALSE',
+                'item': {'ipatokendisabled': False,
                          'all': True}
             }
         )
@@ -130,7 +130,7 @@ class TestIPAOTPToken(ModuleTestCase):
             {
                 'method': 'otptoken_add',
                 'name': 'NewToken1',
-                'item': {'ipatokendisabled': 'FALSE',
+                'item': {'ipatokendisabled': False,
                          'all': True}
             }
         )
@@ -176,7 +176,7 @@ class TestIPAOTPToken(ModuleTestCase):
                          'ipatokenotpkey': 'KRSXG5CTMVRXEZLUGE======',
                          'description': 'Test description',
                          'ipatokenowner': 'pinky',
-                         'ipatokendisabled': 'FALSE',
+                         'ipatokendisabled': False,
                          'ipatokennotbefore': '20200101010101Z',
                          'ipatokennotafter': '20900101010101Z',
                          'ipatokenvendor': 'Acme',
@@ -220,7 +220,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'VGVzdFNlY3JldDE='}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -271,7 +271,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'VGVzdFNlY3JldDE='}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -296,7 +296,7 @@ class TestIPAOTPToken(ModuleTestCase):
                 'name': 'NewToken1',
                 'item': {'description': 'Test description',
                          'ipatokenowner': 'brain',
-                         'ipatokendisabled': 'FALSE',
+                         'ipatokendisabled': False,
                          'ipatokennotbefore': '20200101010101Z',
                          'ipatokennotafter': '20900101010101Z',
                          'ipatokenvendor': 'Acme',
@@ -335,7 +335,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'VGVzdFNlY3JldDE='}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -360,7 +360,7 @@ class TestIPAOTPToken(ModuleTestCase):
                 'name': 'NewToken1',
                 'item': {'description': 'New Test description',
                          'ipatokenowner': 'pinky',
-                         'ipatokendisabled': 'TRUE',
+                         'ipatokendisabled': True,
                          'ipatokennotbefore': '20200101010102Z',
                          'ipatokennotafter': '20900101010102Z',
                          'ipatokenvendor': 'NewAcme',
@@ -384,7 +384,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'KRSXG5CTMVRXEZLUGE======'}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -425,7 +425,7 @@ class TestIPAOTPToken(ModuleTestCase):
                         'ipatokenotpkey': [{'__base64__': 'KRSXG5CTMVRXEZLUGE======'}],
                         'description': ['Test description'],
                         'ipatokenowner': ['pinky'],
-                        'ipatokendisabled': ['FALSE'],
+                        'ipatokendisabled': [False],
                         'ipatokennotbefore': ['20200101010101Z'],
                         'ipatokennotafter': ['20900101010101Z'],
                         'ipatokenvendor': ['Acme'],
@@ -448,7 +448,7 @@ class TestIPAOTPToken(ModuleTestCase):
             {
                 'method': 'otptoken_mod',
                 'name': 'NewToken1',
-                'item': {'ipatokendisabled': 'TRUE',
+                'item': {'ipatokendisabled': True,
                           'all': True}
             }
         )

@@ -1,0 +1,5 @@
+removed_features:
+  - "The deprecated redirects for internal module names have been removed.
+     These internal redirects were extra-long FQCNs like ``community.general.packaging.os.apt_rpm`` that redirect to the short FQCN ``community.general.apt_rpm``.
+     They were originally needed to implement flatmapping; as various tooling started to recommend users to use the long names flatmapping was removed from the collection
+     and redirects were added for users who already followed these incorrect recommendations (https://github.com/ansible-collections/community.general/pull/7835)."
