@@ -26,10 +26,5 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || '' }}
 
-      - name: Install dependencies
-        run: |
-          pip install reuse
-
-      - name: Check REUSE compliance
-        run: |
-          reuse lint
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@v2
