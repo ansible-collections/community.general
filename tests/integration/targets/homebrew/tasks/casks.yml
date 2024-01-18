@@ -35,7 +35,7 @@
 #      - upgrade_option_result.changed
 
 - vars:
-    package_name: 1clipboard
+    package_name: kitty
 
   block:
   - name: Make sure {{ package_name }} package is not installed
