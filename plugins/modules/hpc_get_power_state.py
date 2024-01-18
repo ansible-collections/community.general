@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: hpc_get_system_fw_inv
+module: hpc_get_power_state
 short_description: Inventory Information of CrayXD components using Redfish APIs
 version_added: v1.1
 description:
@@ -63,7 +63,7 @@ options:
     type: int
   power_state:
     required: true
-    decription:
+    description:
       - To get or modify the power state of CrayXD670
     choices: [NA, ON, OFF]
   output_file_name:
@@ -92,7 +92,7 @@ EXAMPLES = '''
 RETURN = '''
 csv:
   description: Output of this Task is saved to a csv file.
-  type: csv file
+  returned: Returned an output file containing the details of update
   sample: Output_file.csv
 '''
 
@@ -154,17 +154,18 @@ def main():
         for command in command_list:
             if command == "Get_PS":
                 result = rf_utils.get_PS_CrayXD670({
-                     'baseuri': module.params['baseuri'],
-                     'username': module.params['username'],
-                     'password': module.params['password'],
-                     'power_state' : module.params['power_state'],
-                     'output_file_name': module.params['output_file_name'],
-})
+                    'baseuri': module.params['baseuri'],
+                    'username': module.params['username'],
+                    'password': module.params['password'],
+                    'power_state' : module.params['power_state'],
+                    'output_file_name': module.params['output_file_name'],
+                    })
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
                 else:
                     module.fail_json(msg=to_native(result))
+
 
 if __name__ == '__main__':
     main()
