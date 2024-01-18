@@ -34,7 +34,6 @@ options:
   state:
     description:
       - Create or delete project or group label.
-      - Possible values are present and absent.
     default: present
     type: str
     choices: ["present", "absent"]
@@ -46,12 +45,12 @@ options:
     required: false
   project:
     description:
-      - The path and name of the project, mandatory field but it's alternatively with group.
+      - The path and name of the project.  Either this or O(group) is required.
     required: false
     type: str
   group:
     description:
-      - The path of the group, mandatory field but it's alternatively with project.
+      - The path of the group.  Either this or O(project) is required.
     required: false
     type: str
   labels:
@@ -85,7 +84,7 @@ options:
         default: null
       new_name:
         description:
-          - Optional field to change label's name
+          - Optional field to change label's name.
         type: str
         default: null
 '''
@@ -191,7 +190,7 @@ EXAMPLES = '''
 RETURN = '''
 labels:
   description: Four lists of the labels which were added, updated, removed or exist.
-  returned: always
+  returned: success
   type: dict
   contains:
     added:
@@ -216,7 +215,7 @@ labels:
       sample: ['defg', 'new-label']
 labels_obj:
   description: API object.
-  returned: always
+  returned: success
   type: dict
 '''
 
