@@ -7,6 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+
 DOCUMENTATION = '''
 ---
 module: hpc_get_power_state
@@ -74,7 +75,9 @@ options:
 
 
 author:
-  - Srujana Yasa (@srujana.yasa)
+  - "Srujana Yasa (@srujana-yasa)"
+  - "Sharvari Adiga (@sharvari-adiga)"
+  - "Akash Sangnure (@akash-sangnure)"
 '''
 
 EXAMPLES = '''
@@ -100,7 +103,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.hpc_system_firmware_utils import CrayRedfishUtils
 from ansible.module_utils.common.text.converters import to_native
 
-# More will be added as module features are expanded
+
 category_commands = {
     "Get_Power_State": ["Get_PS"],
 }
@@ -159,7 +162,7 @@ def main():
                     'password': module.params['password'],
                     'power_state' : module.params['power_state'],
                     'output_file_name': module.params['output_file_name'],
-                    })
+                                                   })
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
