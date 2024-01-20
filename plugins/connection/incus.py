@@ -21,6 +21,7 @@ DOCUMENTATION = """
             - The instance identifier.
         default: inventory_hostname
         vars:
+            - name: inventory_hostname
             - name: ansible_host
             - name: ansible_incus_host
       executable:
