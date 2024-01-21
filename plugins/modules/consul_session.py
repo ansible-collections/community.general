@@ -124,7 +124,7 @@ EXAMPLES = '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    auth_argument_spec, ConsulModule
+    auth_argument_spec, _ConsulModule
 )
 
 
@@ -293,7 +293,7 @@ def main():
         ],
         supports_check_mode=False
     )
-    consul_module = ConsulModule(module)
+    consul_module = _ConsulModule(module)
 
     try:
         execute(module, consul_module)

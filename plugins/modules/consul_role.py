@@ -171,7 +171,7 @@ operation:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    ConsulModule, auth_argument_spec)
+    _ConsulModule, auth_argument_spec)
 
 NAME_PARAMETER_NAME = "name"
 DESCRIPTION_PARAMETER_NAME = "description"
@@ -512,7 +512,7 @@ def main():
     Main method.
     """
     module = AnsibleModule(_ARGUMENT_SPEC, supports_check_mode=True)
-    consul_module = ConsulModule(module)
+    consul_module = _ConsulModule(module)
 
     try:
         configuration = Configuration(

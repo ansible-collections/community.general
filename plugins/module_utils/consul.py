@@ -46,8 +46,12 @@ def auth_argument_spec():
     )
 
 
-class ConsulModule:
-    """Base class for Consule modules"""
+class _ConsulModule:
+    """Base class for Consul modules.
+
+    This class is considered private, till the API is fully fleshed out.
+    As such backwards incompatible changes can occur even in bugfix releases.
+    """
 
     def __init__(self, module):
         self.module = module
