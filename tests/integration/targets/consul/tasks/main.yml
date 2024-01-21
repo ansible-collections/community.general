@@ -89,6 +89,8 @@
       - 1
       - 2
       - 3
+    - import_tasks: consul_general.yml
+    - import_tasks: consul_kv.yml
     - import_tasks: consul_session.yml
     - import_tasks: consul_policy.yml
     - import_tasks: consul_role.yml

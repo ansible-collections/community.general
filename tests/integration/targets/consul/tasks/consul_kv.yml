@@ -1,0 +1,57 @@
+---
+# Copyright (c) 2024, Florian Apolloner (@apollo13)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a key
+  consul_kv:
+    key: somekey
+    value: somevalue
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.data.Value == 'somevalue'
+
+#- name: Test the lookup
+#  assert:
+#    that:
+#      - lookup('community.general.consul_kv', 'somekey', token=consul_management_token) == 'somevalue'
+
+- name: Update a key with the same data
+  consul_kv:
+    key: somekey
+    value: somevalue
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.data.Value == 'somevalue'
+
+- name: Remove a key from the store
+  consul_kv:
+    key: somekey
+    state: absent
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.data.Value == 'somevalue'
+
+- name: Remove a non-existant key from the store
+  consul_kv:
+    key: somekey
+    state: absent
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - not result.data
