@@ -1,0 +1,3 @@
+deprecated_features:
+  - "consul_acl - the module has been deprecated and will be removed in community.general 10.0.0. ``consul_token`` and ``consul_policy``
+     can be used instead (https://github.com/ansible-collections/community.general/pull/7901)."
