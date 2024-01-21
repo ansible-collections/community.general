@@ -1,0 +1,2 @@
+minor_changes:
+  - 'consul_policy, consul_role, consul_session - removed dependency on ``requests`` and factored out common parts (https://github.com/ansible-collections/community.general/pull/7826).'
