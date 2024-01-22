@@ -1,0 +1,3 @@
+bugfixes:
+  - ipa_sudorule - the module uses a string for ``ipaenabledflag`` while the returned value is a boolean
+  - ipa_hbacrule - the module uses a string for ``ipaenabledflag`` while the returned value is a boolean
