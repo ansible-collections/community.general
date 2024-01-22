@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: import-galaxy
-'on':
+on:
   # Run CI against all pushes (direct commits, also merged PRs) to main, and all Pull Requests
   push:
     branches:
