@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_update_system_firmware
 short_description: Updates CrayXD components using Redfish APIs
-version_added: v1.1
+version_added: 1.1
 description:
   - using Redfish URI's updates the CrayXD components from the local HPM file
 attributes:
@@ -95,9 +95,8 @@ options:
 
 
 author:
-  - "Srujana Yasa (@srujana-yasa)"
-  - "Sharvari Adiga (@sharvari-adiga)"
-  - "Akash Sangnure (@akash-sangnure)"
+  - Srujana Yasa (@Srujana-2000)
+  - Akash Sangnure (@akash-ashok-sangnure)
 '''
 
 EXAMPLES = '''
@@ -121,9 +120,9 @@ RETURN = '''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update.
+  type: String
   sample: Output_file.csv
 '''
-
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.hpc_system_firmware_utils import CrayRedfishUtils
@@ -188,9 +187,9 @@ def main():
         for command in command_list:
             if command == "SystemFirmwareUpdate":
                 result = rf_utils.system_fw_update({
-                    'baseuri': module.params['baseuri'],
-                    'username': module.params['username'],
-                    'password': module.params['password'],
+                    'baseuri' : module.params['baseuri'],
+                    'username' : module.params['username'],
+                    'password' : module.params['password'],
                     'update_image_type' : module.params['update_image_type'],
                     'update_target' : module.params['update_target'],
                     'power_state' : module.params['power_state'],
@@ -200,7 +199,7 @@ def main():
                     'update_image_path_xd665' : module.params['update_image_path_xd665'],
                     'update_image_path_xd670' : module.params['update_image_path_xd670'],
                     'output_file_name': module.params['output_file_name'],
-                                                   })
+                    })
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
