@@ -335,9 +335,9 @@ def ensure(module, client):
     runasextusers = module.params['runasextusers']
 
     if state in ['present', 'enabled']:
-        ipaenabledflag = 'TRUE'
+        ipaenabledflag = True
     else:
-        ipaenabledflag = 'FALSE'
+        ipaenabledflag = False
 
     sudoopt = module.params['sudoopt']
     user = module.params['user']
