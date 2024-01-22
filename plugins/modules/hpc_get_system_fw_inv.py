@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -89,7 +89,7 @@ RETURN = '''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update.
-  type: String
+  type: str
   sample: Output_file.csv
 '''
 
