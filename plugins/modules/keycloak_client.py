@@ -717,14 +717,14 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
 import copy
 
 
 PROTOCOL_OPENID_CONNECT = 'openid-connect'
 PROTOCOL_SAML = 'saml'
-
+CLIENT_META_DATA = ['authorizationServicesEnabled']
 
 def normalise_cr(clientrep, remove_ids=False):
     """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
@@ -946,7 +946,7 @@ def main():
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
-                result['changed'] = (before_norm != desired_norm)
+                result['changed'] = not is_struct_included(desired_norm, before_norm, CLIENT_META_DATA)
 
                 module.exit_json(**result)
 

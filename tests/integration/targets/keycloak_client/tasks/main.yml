@@ -72,6 +72,7 @@
     redirect_uris: '{{redirect_uris1}}'
     attributes: '{{client_attributes1}}'
     protocol_mappers: '{{protocol_mappers1}}'
+    authorization_services_enabled: False
   check_mode: true
   register: check_client_when_present_and_same
 
