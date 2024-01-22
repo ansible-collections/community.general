@@ -1,17 +1,37 @@
-# !/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-import os
 __metaclass__ = type
+
+import os
 import json
 import subprocess
 import time
-from requests_toolbelt import MultipartEncoder
+
+from functools import wraps
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+from ansible.module_utils.urls import open_url
+try:
+    from requests_toolbelt import MultipartEncoder
+    HAS_REQUESTS_TOOLBELT = True
+except ImportError:
+    HAS_REQUESTS_TOOLBELT = False
+
+
+REQUESTS_TOOLBELT_REQUIRED = "Requests_toolbelt is required for this module."
+
+
+def has_requests_toolbelt(module):
+    """
+    Check Request_toolbelt is installed
+    :param module:
+    """
+    if not HAS_REQUESTS_TOOLBELT:
+        module.fail_json(msg=REQUESTS_TOOLBELT_REQUIRED)
 
 supported_models = ["HPE CRAY XD220V", "HPE CRAY XD225V", "HPE CRAY XD295V", "HPE CRAY XD665", "HPE CRAY XD670"]
 
@@ -241,7 +261,7 @@ class CrayRedfishUtils(RedfishUtils):
                         targets_uri = '/redfish/v1/UpdateService/FirmwareInventory/' + target + '/'
                         body['UpdateParameters'] = (None, json.dumps({"Targets": [targets_uri]}), 'application/json')
                     else:
-                        body['UpdateParameters'] = (None, json.dumps({"Targets": ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/',
+                        body['UpdateParameters'] = (None , json.dumps({"Targets": ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/' ,
                                                                                   '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}),
                                                     'application/json')
                     body['OemParameters'] = (None , json.dumps({"ImageType": image_type}) , 'application/json')
