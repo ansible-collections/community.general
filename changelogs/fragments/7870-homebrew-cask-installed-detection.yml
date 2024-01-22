@@ -1,2 +1,2 @@
 bugfixes:
-  - homebrew - detect already installed formulae and casks using json output from brew info (https://github.com/ansible-collections/community.general/issues/864).
+  - homebrew - detect already installed formulae and casks using JSON output from ``brew info`` (https://github.com/ansible-collections/community.general/issues/864).
