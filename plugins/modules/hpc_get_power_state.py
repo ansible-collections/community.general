@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_get_power_state
 short_description: Inventory Information of CrayXD components using Redfish APIs
-version_added: v1.1
+version_added: 1.1
 description:
   - using Redfish URI's Fetch the CrayXD components Inventory Information
 attributes:
@@ -75,9 +75,8 @@ options:
 
 
 author:
-  - "Srujana Yasa (@srujana-yasa)"
-  - "Sharvari Adiga (@sharvari-adiga)"
-  - "Akash Sangnure (@akash-sangnure)"
+  - Srujana Yasa (@Srujana-2000)
+  - Akash Sangnure (@akash-ashok-sangnure)
 '''
 
 EXAMPLES = '''
@@ -96,6 +95,7 @@ RETURN = '''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update
+  type: String
   sample: Output_file.csv
 '''
 
@@ -162,7 +162,7 @@ def main():
                     'password': module.params['password'],
                     'power_state' : module.params['power_state'],
                     'output_file_name': module.params['output_file_name'],
-                                                   })
+                    })
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
