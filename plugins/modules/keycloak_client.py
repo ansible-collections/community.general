@@ -726,6 +726,7 @@ PROTOCOL_OPENID_CONNECT = 'openid-connect'
 PROTOCOL_SAML = 'saml'
 CLIENT_META_DATA = ['authorizationServicesEnabled']
 
+
 def normalise_cr(clientrep, remove_ids=False):
     """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
     the change detection is more effective.
