@@ -55,6 +55,11 @@ options:
       - Security token for authenticating to OOB controller.
     type: str
     version_added: 2.3.0
+  manager:
+    description:
+      - Name of manager on OOB controller to target.
+    type: str
+    version_added: '8.3.0'
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
@@ -248,6 +253,15 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Get service identification
+    community.general.redfish_info:
+      category: Manager
+      command: GetServiceIdentification
+      manager: "{{ manager }}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
   - name: Get software inventory
     community.general.redfish_info:
       category: Update
@@ -369,7 +383,7 @@ CATEGORY_COMMANDS_ALL = {
     "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory",
                "GetUpdateStatus"],
     "Manager": ["GetManagerNicInventory", "GetVirtualMedia", "GetLogs", "GetNetworkProtocols",
-                "GetHealthReport", "GetHostInterfaces", "GetManagerInventory"],
+                "GetHealthReport", "GetHostInterfaces", "GetManagerInventory", "GetServiceIdentification"],
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
@@ -395,6 +409,7 @@ def main():
             auth_token=dict(no_log=True),
             timeout=dict(type='int'),
             update_handle=dict(),
+            manager=dict(),
         ),
         required_together=[
             ('username', 'password'),
@@ -428,6 +443,9 @@ def main():
 
     # update handle
     update_handle = module.params['update_handle']
+
+    # manager
+    manager = module.params['manager']
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -579,6 +597,8 @@ def main():
                     result["host_interfaces"] = rf_utils.get_hostinterfaces()
                 elif command == "GetManagerInventory":
                     result["manager"] = rf_utils.get_multi_manager_inventory()
+                elif command == "GetServiceIdentification":
+                    result["service_id"] = rf_utils.get_service_identification(manager)
 
     # Return data back
     module.exit_json(redfish_facts=result)
