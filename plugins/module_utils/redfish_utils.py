@@ -3365,7 +3365,8 @@ class RedfishUtils(object):
         inventory = {}
         # Get these entries, but does not fail if not found
         properties = ['Id', 'FirmwareVersion', 'ManagerType', 'Manufacturer', 'Model',
-                      'PartNumber', 'PowerState', 'SerialNumber', 'Status', 'UUID']
+                      'PartNumber', 'PowerState', 'SerialNumber', 'ServiceIdentification',
+                      'Status', 'UUID']
 
         response = self.get_request(self.root_uri + manager_uri)
         if response['ret'] is False:
@@ -3382,6 +3383,30 @@ class RedfishUtils(object):
 
     def get_multi_manager_inventory(self):
         return self.aggregate_managers(self.get_manager_inventory)
+
+    def get_service_identification(self, manager):
+        result = {}
+        if manager is None:
+            if len(self.manager_uris) == 1:
+                manager = self.manager_uris[0].split('/')[-1]
+            elif len(self.manager_uris) > 1:
+                entries = self.get_multi_manager_inventory()['entries']
+                managers = [m[0]['manager_uri'] for m in entries if m[1].get('ServiceIdentification')]
+                if len(managers) == 1:
+                    manager = managers[0].split('/')[-1]
+                else:
+                    self.module.fail_json(msg=[
+                        "Multiple managers with ServiceIdentification were found: %s" % str(managers),
+                        "Please specify by using the 'manager' parameter in your playbook"])
+            elif len(self.manager_uris) == 0:
+                self.module.fail_json(msg="No manager identities were found")
+        response = self.get_request(self.root_uri + '/redfish/v1/Managers/' + manager, override_headers=None)
+        try:
+            result['service_identification'] = response['data']['ServiceIdentification']
+        except Exception as e:
+            self.module.fail_json(msg="Service ID not found for manager %s" % manager)
+        result['ret'] = True
+        return result
 
     def set_session_service(self, sessions_config):
         if sessions_config is None:
