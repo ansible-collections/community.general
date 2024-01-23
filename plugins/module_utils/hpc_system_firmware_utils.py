@@ -1,3 +1,4 @@
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -30,6 +31,7 @@ def has_requests_toolbelt(module):
     """
     if not HAS_REQUESTS_TOOLBELT:
         module.fail_json(msg=REQUESTS_TOOLBELT_REQUIRED)
+
 
 supported_models = ["HPE CRAY XD220V", "HPE CRAY XD225V", "HPE CRAY XD295V", "HPE CRAY XD665", "HPE CRAY XD670"]
 
@@ -257,11 +259,10 @@ class CrayRedfishUtils(RedfishUtils):
                     body = {}
                     if target != "BPB_CPLD":
                         targets_uri = '/redfish/v1/UpdateService/FirmwareInventory/' + target + '/'
-                        body['UpdateParameters'] = (None, json.dumps({"Targets": [targets_uri]}), 'application/json')
+                        body['UpdateParameters'] = (None , json.dumps({"Targets": [targets_uri]}) , 'application/json')
                     else:
                         body['UpdateParameters'] = (None , json.dumps({"Targets": ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/' ,
-                                                                                  '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}),
-                                                    'application/json')
+                                                                                  '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}) , 'application/json')
                     body['OemParameters'] = (None , json.dumps({"ImageType": image_type}) , 'application/json')
                     with open(image_path, 'rb') as image_path_rb:
                         body['UpdateFile'] = (image_path, image_path_rb, 'application/octet-stream')
