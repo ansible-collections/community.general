@@ -1,0 +1,2 @@
+bugfixes:
+  - "incus connection plugin - treats ``inventory_hostname`` as a variable instead of a literal in remote connections (https://github.com/ansible-collections/community.general/issues/7874)."
