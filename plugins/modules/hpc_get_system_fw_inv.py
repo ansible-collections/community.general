@@ -28,14 +28,12 @@ options:
     description:
       - Category to Get Inventory of the CrayXD components.
     type: str
-    choices: ['GetInventory']
   command:
     required: true
     description:
       - List of commands to execute on the CrayXD.
     type: list
     elements: str
-    choices: ['GetSystemFWInventory']
   baseuri:
     required: true
     description:
