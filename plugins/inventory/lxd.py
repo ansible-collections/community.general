@@ -456,7 +456,7 @@ class InventoryModule(BaseInventoryPlugin):
         Helper to get the preferred interface provide by neme pattern from 'prefered_instance_network_interface'.
 
         Args:
-            str(containe_name): name of instance
+            str(instance_name): name of instance
         Kwargs:
             None
         Raises:
@@ -481,7 +481,7 @@ class InventoryModule(BaseInventoryPlugin):
         Helper to get the VLAN_ID from the instance
 
         Args:
-            str(containe_name): name of instance
+            str(instance_name): name of instance
         Kwargs:
             None
         Raises:
