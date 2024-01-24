@@ -261,7 +261,7 @@ class CrayRedfishUtils(RedfishUtils):
                         targets_uri = '/redfish/v1/UpdateService/FirmwareInventory/' + target + '/'
                         body['UpdateParameters'] = (None , json.dumps({"Targets": [targets_uri]}) , 'application/json')
                     else:
-                        body['UpdateParameters'] = (None , json.dumps({"Targets": 
+                        body['UpdateParameters'] = (None , json.dumps({"Targets":
                                                                                 ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/' ,
                                                                                  '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}) ,
                                                                                  'application/json')
