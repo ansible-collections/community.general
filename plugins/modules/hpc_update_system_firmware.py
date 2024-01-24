@@ -28,14 +28,12 @@ options:
     description:
       - Category to Update the components of CrayXD.
     type: str
-    choices: ['Update']
   command:
     required: true
     description:
       - List of commands to execute on the CrayXD.
     type: list
     elements: str
-    choices: ['SystemFirmwareUpdate']
   baseuri:
     required: true
     description:
@@ -60,39 +58,56 @@ options:
     required: false
     description:
       - Timeout in seconds for HTTP requests to CrayXD.
-    default: 60
+    default: 300
     type: int
   output_file_name:
     required: false
     description:
       - To save the output of the update mention the output file name in csv.
+    type: str
     default: update_output.csv
   update_target:
     required: true
     description:
       - To build the Redfish URI and to update that component it is required.
+    type: str
     choices: [BMC , BIOS , BIOS2 , MainCPLD , HDDBPPIC , PDBPIC , RT_NVME , RT_OTHER , RT_SA , PDB , UBM6 , SCM_CPLD1_MB_CPLD1 , BPB_CPLD]
   update_image_path_xd295V:
     required: false
     description:
       - To get the path of local HPM file the Image path needs to be mentioned
+    type: str
+    default: NA
   update_image_path_xd225V:
     required: false
     description:
       - To get the path of local HPM file the Image path needs to be mentioned
+    type: str
+    default: NA
   update_image_path_xd220V:
     required: false
     description:
       - To get the path of local HPM file the Image path needs to be mentioned
+    type: str
+    default: NA
   update_image_path_xd665:
     required: false
     description:
       - To get the path of local HPM file the Image path needs to be mentioned
+    type: str
+    default: NA
   update_image_path_xd670:
     required: false
     description:
       - To get the path of local HPM file the Image path needs to be mentioned
-
+    type: str
+    default: NA
+  update_image_type:
+    required: false
+    description:
+      - Type of the file that is being uploaded for the update
+    default: HPM
+    type: str
 
 author:
   - Srujana Yasa (@Srujana-2000)
@@ -139,16 +154,18 @@ def main():
     return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True),
+            category=dict(required=True, type=str),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
+            username=dict(required=True, type=str),
             password=dict(no_log=True, required=True),
-            auth_token=dict(no_log=True),
-            timeout=dict(type='int', default=60),
+            auth_token=dict(no_log=True, type=str),
+            timeout=dict(type='int', default=300),
             update_image_type=dict(type='str', default='HPM'),
-            resource_id=dict(type='list', elements='str', default=[], required=False),
-            update_target=dict(required=True, type='str', default=''),
+            update_target=dict(required=True, type='str', choices=['BMC', 'BIOS', 'BIOS2', 'MainCPLD',
+                                                                   'HDDBPPIC', 'PDBPIC', 'RT_NVME',
+                                                                   'RT_OTHER', 'RT_SA', 'PDB', 'UBM6',
+                                                                   'SCM_CPLD1_MB_CPLD1', 'BPB_CPLD']),
             update_image_path_xd220V=dict(type='str', default='NA'),
             update_image_path_xd225V=dict(type='str', default='NA'),
             update_image_path_xd295V=dict(type='str', default='NA'),
