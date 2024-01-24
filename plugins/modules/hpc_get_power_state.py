@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_get_power_state
 short_description: Inventory Information of CrayXD components using Redfish APIs
-version_added: 1.1
+version_added: "1.1"
 description:
   - using Redfish URI's Fetch the CrayXD components Inventory Information
 attributes:
@@ -28,14 +28,12 @@ options:
     description:
       - Category to Get Inventory of the CrayXD components.
     type: str
-    choices: ['GetInventory']
   command:
     required: true
     description:
       - List of commands to execute on the CrayXD.
     type: list
     elements: str
-    choices: ['GetSystemFWInventory']
   baseuri:
     required: true
     description:
@@ -50,7 +48,6 @@ options:
     required: true
     description:
       - Password for authenticating to CrayXD.
-    type: str
   auth_token:
     required: false
     description:
@@ -60,18 +57,20 @@ options:
     required: false
     description:
       - Timeout in seconds for HTTP requests to CrayXD.
-    default: 60
+    default: 300
     type: int
   power_state:
     required: true
     description:
       - To get or modify the power state of CrayXD670
     choices: [NA, ON, OFF]
+    type: str
   output_file_name:
     required: false
     description:
       - To save the output of the Inventory, mention the output file name in csv.
-    default: get_output.csv
+    default: Power_output.csv
+    type: str
 
 
 author:
@@ -114,16 +113,14 @@ def main():
     return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True),
+            category=dict(required=True, type=str),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
-            auth_token=dict(no_log=True),
-            session_uri=dict(),
-            timeout=dict(type='int', default=600),
-            resource_id=dict(type='list', elements='str', default=[], required=False),
-            power_state=dict(),
+            username=dict(required=True, type=str),
+            password=dict(required=True, no_log=True),
+            auth_token=dict(no_log=True, type=str),
+            timeout=dict(type='int', default=300),
+            power_state=dict(required=True, default='NA', choices=['ON', 'OFF', 'NA'], type=str),
             output_file_name=dict(type='str', default='Power_output.csv'),
         ),
         supports_check_mode=False
