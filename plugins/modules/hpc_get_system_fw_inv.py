@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_get_system_fw_inv
 short_description: Inventory Information of CrayXD components using Redfish APIs
-version_added: 1.1
+version_added: "1.1"
 description:
   - using Redfish URI's Fetch the CrayXD components Inventory Information
 attributes:
@@ -58,13 +58,14 @@ options:
     required: false
     description:
       - Timeout in seconds for HTTP requests to CrayXD.
-    default: 60
+    default: 300
     type: int
   output_file_name:
     required: false
     description:
       - To save the output of the Inventory, mention the output file name in csv.
     default: get_output.csv
+    type: str
 
 
 author:
@@ -109,11 +110,10 @@ def main():
             category=dict(required=True),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(),
-            password=dict(no_log=True),
+            username=dict(required=True),
+            password=dict(no_log=True, required=True),
             auth_token=dict(no_log=True),
-            session_uri=dict(),
-            timeout=dict(type='int', default=600),
+            timeout=dict(type='int', default=300),
             output_file_name=dict(type='str', default='get_output.csv'),
         ),
         supports_check_mode=False
