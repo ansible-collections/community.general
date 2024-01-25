@@ -48,6 +48,7 @@ options:
     required: true
     description:
       - Password for authenticating to CrayXD.
+    type: str
   auth_token:
     required: false
     description:
@@ -63,7 +64,8 @@ options:
     required: true
     description:
       - To get or modify the power state of CrayXD670
-    choices: [NA, ON, OFF]
+    choices: ['ON', 'OFF', 'NA']
+    default: NA
     type: str
   output_file_name:
     required: false
@@ -113,14 +115,14 @@ def main():
     return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True, type=str),
+            category=dict(required=True),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True, type=str),
+            username=dict(required=True),
             password=dict(required=True, no_log=True),
-            auth_token=dict(no_log=True, type=str),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=300),
-            power_state=dict(required=True, default='NA', choices=['ON', 'OFF', 'NA'], type=str),
+            power_state=dict(required=True, choices=['ON', 'OFF', 'NA']),
             output_file_name=dict(type='str', default='Power_output.csv'),
         ),
         supports_check_mode=False
