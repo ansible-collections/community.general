@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_update_system_firmware
 short_description: Updates CrayXD components using Redfish APIs
-version_added: "1.1"
+version_added: 1.1.0
 description:
   - using Redfish URI's updates the CrayXD components from the local HPM file
 attributes:
