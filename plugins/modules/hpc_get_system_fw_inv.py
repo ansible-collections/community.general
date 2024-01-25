@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_get_system_fw_inv
 short_description: Inventory Information of CrayXD components using Redfish APIs
-version_added: "1.1"
+version_added: 1.1.0
 description:
   - using Redfish URI's Fetch the CrayXD components Inventory Information
 attributes:
