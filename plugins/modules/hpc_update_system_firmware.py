@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: hpc_update_system_firmware
 short_description: Updates CrayXD components using Redfish APIs
-version_added: 1.1
+version_added: "1.1"
 description:
   - using Redfish URI's updates the CrayXD components from the local HPM file
 attributes:
@@ -154,12 +154,12 @@ def main():
     return_values = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True, type=str),
+            category=dict(required=True),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True, type=str),
+            username=dict(required=True),
             password=dict(no_log=True, required=True),
-            auth_token=dict(no_log=True, type=str),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=300),
             update_image_type=dict(type='str', default='HPM'),
             update_target=dict(required=True, type='str', choices=['BMC', 'BIOS', 'BIOS2', 'MainCPLD',
@@ -172,7 +172,7 @@ def main():
             update_image_path_xd665=dict(type='str', default='NA'),
             update_image_path_xd670=dict(type='str', default='NA'),
             output_file_name=dict(type='str', default='update_output.csv')
-                          ),
+        ),
         supports_check_mode=False
     )
 
