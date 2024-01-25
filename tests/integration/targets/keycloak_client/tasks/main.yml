@@ -81,3 +81,25 @@
     that:
       - desire_client_when_present_and_same is not changed
       - check_client_when_present_and_same is not changed
+
+- name: Check client again with changed props
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authorization_services_enabled: False
+    service_accounts_enabled: True
+  check_mode: true
+  register: check_client_when_present_and_changed
+
+- name: Assert changes detected in last tasks
+  assert:
+    that:
+      - check_client_when_present_and_changed is changed
