@@ -65,7 +65,6 @@ options:
     description:
       - To get or modify the power state of CrayXD670
     choices: ['ON', 'OFF', 'NA']
-    default: NA
     type: str
   output_file_name:
     required: false
