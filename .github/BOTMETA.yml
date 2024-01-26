@@ -562,6 +562,8 @@ files:
     maintainers: paytroff
   $modules/gitlab_issue.py:
     maintainers: zvaraondrej
+  $modules/gitlab_label.py:
+    maintainers: gpongelli
   $modules/gitlab_merge_request.py:
     maintainers: zvaraondrej
   $modules/gitlab_milestone.py:
