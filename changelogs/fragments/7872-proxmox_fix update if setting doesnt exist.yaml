@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox - fix updating a container config if the setting does not already exist (https://github.com/ansible-collections/community.general/pull/7872).

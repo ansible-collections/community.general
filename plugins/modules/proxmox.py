@@ -562,6 +562,10 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         # compare the requested config against the current
         update_config = False
         for (arg, value) in kwargs.items():
+            # if the arg isn't in the current config, it needs to be updated
+            if arg not in current_config:
+                update_config = True
+                break
             # some values are lists, the order isn't always the same, so split them and compare by key
             if isinstance(value, str):
                 current_values = current_config[arg].split(",")
