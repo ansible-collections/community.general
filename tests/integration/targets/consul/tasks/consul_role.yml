@@ -13,7 +13,6 @@
         key "private/foo" {
             policy = "deny"
         }
-    token: "{{ consul_management_token }}"
   register: policy_result
 
 - name: Create another policy with rules
@@ -26,7 +25,6 @@
         key "private/bar" {
             policy = "deny"
         }
-    token: "{{ consul_management_token }}"
   register: policy_result
 
 - name: Create a role with policy
@@ -34,7 +32,6 @@
     name: foo-role-with-policy
     policies:
       - name: "foo-access-for-role"
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -47,7 +44,6 @@
   consul_role:
     name: foo-role-with-policy
     description: "Testing updating description"
-    token: "{{ consul_management_token }}"
   check_mode: yes
   register: result
 
@@ -62,7 +58,6 @@
   consul_role:
     name: foo-role-with-policy
     description: "Role for testing policies"
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -78,7 +73,6 @@
     policies:
       - name: "foo-access-for-role"
       - name: "bar-access-for-role"
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -91,7 +85,6 @@
 
 - name: Create a role with service identity
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-service-identity
     service_identities:
       - name: web
@@ -107,7 +100,6 @@
 
 - name: Update the role with service identity in check mode
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-service-identity
     service_identities:
       - name: web
@@ -124,7 +116,6 @@
 
 - name: Update the role with service identity to add a policy, leaving the service id unchanged
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-service-identity
     policies:
       - name: "foo-access-for-role"
@@ -139,7 +130,6 @@
 
 - name: Update the role with service identity to remove the policies
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-service-identity
     policies: []
   register: result
@@ -153,7 +143,6 @@
 
 - name: Update the role with service identity to remove the node identities, in check mode
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-service-identity
     node_identities: []
   register: result
@@ -169,7 +158,6 @@
 
 - name: Update the role with service identity to remove the service identities
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-service-identity
     service_identities: []
   register: result
@@ -182,7 +170,6 @@
 
 - name: Create a role with node identity
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-node-identity
     node_identities:
       - name: node-1
@@ -197,7 +184,6 @@
 
 - name: Remove the last role
   consul_role:
-    token: "{{ consul_management_token }}"
     name: role-with-node-identity
     state: absent
   register: result

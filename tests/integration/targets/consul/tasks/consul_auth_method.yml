@@ -19,7 +19,6 @@
           cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
           mwIDAQAB
           -----END PUBLIC KEY-----
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -32,7 +31,6 @@
   community.general.consul_auth_method:
     name: test
     max_token_ttl: 30m80s
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -45,7 +43,6 @@
   community.general.consul_auth_method:
     name: test
     max_token_ttl: 30m80s
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -58,7 +55,6 @@
   community.general.consul_auth_method:
     name: test
     state: absent
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -70,7 +66,6 @@
   community.general.consul_auth_method:
     name: test
     state: absent
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:

@@ -4,6 +4,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 requires_ansible: '>=2.13.0'
+action_groups:
+  consul:
+    - consul_auth_method
+    - consul_binding_rule
+    - consul_policy
+    - consul_role
+    - consul_session
+    - consul_token
 plugin_routing:
   connection:
     docker:
