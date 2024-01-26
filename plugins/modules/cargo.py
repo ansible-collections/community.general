@@ -102,8 +102,37 @@ EXAMPLES = r"""
 
 import os
 import re
+import json
+from collections import deque
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six.moves.urllib.parse import urlsplit, parse_qs
+from ansible.module_utils.urls import fetch_url
+
+# From : https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/inventory/toml.py
+HAS_TOMLI = False
+try:
+    import tomllib as toml
+
+    HAS_TOMLI = True
+except ImportError:
+    try:
+        import tomli as toml
+
+        HAS_TOMLI = True
+    except ImportError:
+        pass
+
+HAS_TOML = False
+if not HAS_TOMLI:
+    try:
+        import toml
+
+        HAS_TOML = True
+    except ImportError:
+        pass
+
+NAME_REGEX = re.compile(r"([^\s]+) ([^\s]+) \(([^\s]+)\)")
 
 
 class Cargo(object):
@@ -115,6 +144,20 @@ class Cargo(object):
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
+        self.features = kwargs["features"]
+        self.all_features = kwargs["all_features"]
+        self.directory = kwargs["directory"]
+        self.registry = kwargs["registry"]
+        self.git = kwargs["git"]
+        self.branch = kwargs["branch"]
+        self.tag = kwargs["tag"]
+        self.rev = kwargs["rev"]
+        self.debug = kwargs["debug"]
+
+        self.metadata = dict()
+        self.cargo_dir = ""
+        self.registry_url = None
+        self.metadata_cached = False
 
     @property
     def path(self):
@@ -131,10 +174,11 @@ class Cargo(object):
     ):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
             cmd = self.executable + args
-            rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
+            dummy, out, err = self.module.run_command(cmd, check_rc=check_rc)
             return out, err
         return "", ""
 
+<<<<<<< HEAD
     def get_installed(self):
         cmd = ["install", "--list"]
         if self.path:
@@ -142,15 +186,282 @@ class Cargo(object):
             cmd.append(self.path)
 
         data, dummy = self._exec(cmd, True, False, False)
+=======
+    def cache_metadata(self):
+        if self.metadata_cached:
+            return
+>>>>>>> 0d5fa807a ((feat): make cargo module feature complete)
 
-        package_regex = re.compile(r"^([\w\-]+) v(.+):$")
-        installed = {}
-        for line in data.splitlines():
-            package_info = package_regex.match(line)
-            if package_info:
-                installed[package_info.group(1)] = package_info.group(2)
+        self.cargo_dir = (
+            self.path
+            or os.getenv("CARGO_HOME")
+            or os.path.join(os.path.expanduser("~"), ".cargo")
+        )
+        if self.cargo_dir is None:
+            self.module.fail_json(
+                msg="Cannot detect cargo home directory, set CARGO_HOME environment variable explicitly"
+            )
 
-        return installed
+        crates_json = os.path.join(self.cargo_dir, ".crates2.json")
+        if not os.path.isfile(crates_json):
+            self.module.fail_json(
+                msg=".crates2.json file not present in cargo directory"
+            )
+
+        with open(crates_json, "r") as f:
+            all_installed_info = json.load(f)["installs"]
+
+        for key, value in all_installed_info.items():
+            dummy, name, version, url, dummy = NAME_REGEX.split(key)
+            parsed_url = urlsplit(url)
+            scheme = parsed_url.scheme.split("+")
+
+            if scheme[0] == "git":
+                self.metadata[name] = {
+                    "git": "%s://%s%s"
+                    % (scheme[-1], parsed_url.netloc, parsed_url.path),
+                    "rev": parsed_url.fragment,
+                    "branch": None,
+                    "tag": None,
+                    "feat": value["features"],
+                    "allf": value["all_features"],
+                    "prof": value["profile"],
+                    "scm": scheme[0],
+                }
+                if parsed_url.query != "":
+                    for k, v in parse_qs(parsed_url.query).items():
+                        self.metadata[name][k] = v[0]
+            elif scheme[0] == "path":
+                self.metadata[name] = {
+                    "path": parsed_url.path,
+                    "feat": value["features"],
+                    "allf": value["all_features"],
+                    "prof": value["profile"],
+                    "scm": scheme[0],
+                }
+            else:
+                registry_url = "%s://%s%s" % (
+                    scheme[-1],
+                    parsed_url.netloc,
+                    parsed_url.path,
+                )
+                is_sparse = False
+                if "sparse" in scheme:
+                    registry_url = "sparse+%s" % (registry_url)
+                    is_sparse = True
+                self.metadata[name] = {
+                    "ver": version,
+                    "reg": registry_url,
+                    "feat": value["features"],
+                    "allf": value["all_features"],
+                    "prof": value["profile"],
+                    "scm": "registry" if is_sparse else "sparse",
+                }
+
+        self.metadata_cached = True
+
+    def is_present(self, name):
+        if not self.metadata_cached:
+            self.cache_metadata()
+
+        if name not in self.metadata:
+            return False
+
+        if self.state == "absent":
+            return True
+
+        metadata = self.metadata[name]
+        version = self.version
+
+        if "@" in name:
+            name, version = name.split("@")
+
+        if (
+            self.all_features != metadata["allf"]
+            or ("dev" if self.debug else "release") != metadata["prof"]
+            or self.features != metadata["feat"]
+        ):
+            return False
+
+        if self.directory is not None:
+            return (
+                metadata["scm"] == "path"
+                and os.path.expanduser(self.directory) == metadata["path"]
+            )
+
+        if self.git is not None:
+            self.git = self.git.split("+")[-1]
+            return (
+                metadata["scm"] == "git"
+                and self.git == metadata["git"]
+                and (self.rev is None or self.rev == metadata["rev"])
+                and self.branch == metadata["branch"]
+                and self.tag == metadata["tag"]
+            )
+
+        if version is not None and version != metadata["ver"]:
+            return False
+
+        if HAS_TOMLI or HAS_TOML or self.registry_url is None:
+            config = os.path.join(self.cargo_dir, "config.toml")
+            if not os.path.isfile(config):
+                self.module.fail_json(
+                    msg="config.toml file not present in cargo directory"
+                )
+
+            read_mode = "rb" if HAS_TOMLI else "r"
+
+            with open(config, read_mode) as f:
+                toml_conf = toml.load(f)
+
+            self.registry = self.registry or toml_conf.get("registry", {}).get(
+                "default", "crates-io"
+            )
+
+            is_default_sparse = (
+                toml_conf.get("registries", {})
+                .get("crates-io", {})
+                .get("protocol", "sparse")
+            ) == "sparse"
+
+            DEFAULT_SPARSE = "sparse+https://index.crates.io"
+            DEFAULT_GIT = "https://github.com/rust-lang/crates.io-index"
+
+            reg_to_index = {
+                k: v["index"] for k, v in toml_conf.get("registries", {}).items()
+            }
+
+            reg_to_index["crates-io"] = "default"
+
+            if metadata["reg"] in [DEFAULT_SPARSE, DEFAULT_GIT]:
+                metadata["reg"] = "default"
+
+            # NOTE: It is not clear what happens when under [source.<name>]
+            # along with replace-with other options like directory, git,
+            # registry, or local-registry is present simultaneously. I decided
+            # that the source name should be resolved with "replace-with" first.
+            replace = self.registry
+            source = toml_conf.get("source", {})
+            while source.get(replace, {}).get("replace-with") is not None:
+                replace = source[replace]["replace-with"]
+
+            self.registry = replace
+
+            # NOTE: If the registry is not in [registries] in config.toml, then
+            # the only other place it can be is in [source.<name>.registry]. Of
+            # course, it can be in directory, local-registry, or git too. But,
+            # I don't know how the registry url changes then, as I have never
+            # used any local registry myself. In the meantime, if you want to
+            # use any of these options, you have to set them in ansible script
+            # manually.
+            self.registry_url = reg_to_index.get(self.registry) or source.get(
+                self.registry, {}
+            ).get("registry")
+
+            if self.registry_url == metadata["reg"]:
+                if self.registry_url == "default":
+                    self.registry_url = (
+                        DEFAULT_SPARSE if is_default_sparse else DEFAULT_GIT
+                    )
+                return True
+            else:
+                return False
+
+        return True
+
+    def is_outdated(self, name):
+        # NOTE: If features differed, or all_features had been different this time,
+        # those differences would have been caught in is_present_exact. So, this
+        # time, we have to check for only a subset.
+
+        metadata = self.metadata[name]
+
+        # HACK: Since we cannot ensure whether cargo install was ran with the
+        # --locked option previously, I decided that we have to update the package
+        # every time, regardless whether there is an update or not. This is
+        # subject to change if we can decide it from .crates2.json someday.
+        if self.locked:
+            return True
+
+        if metadata["scm"] == "path":
+            return False
+
+        # We have already checked whether the git urls match, or whether the
+        # branches match, or tags, or revs, as mentioned in the script with one
+        # installed. If self.rev matches, we have nothing to do. Otherwise, we
+        # have to check whether they changed or not. We use the git ls-remote
+        # command for that, and filter by branch if present, or by tags that is
+        # present, as branch might get updated, and so can tag, but rev can
+        # never change.
+        if metadata["scm"] == "git":
+            if self.rev is not None:
+                return False
+
+            filter_ls = "HEAD"
+            if self.branch is not None:
+                filter_ls = "refs/heads/%s" % self.branch
+            if self.tag is not None:
+                filter_ls = "refs/tags/v%s" % self.tag
+
+            git_bin = self.module.get_bin_path("git", True)
+            dummy, out, err = self.module.run_command(
+                [git_bin, "ls-remote", self.git, filter_ls]
+            )
+
+            if err:
+                self.module.fail_json(
+                    "Failed to run git ls-remote %s %s" % (self.git, filter_ls)
+                )
+
+            new_rev = out[:40]
+            if new_rev != metadata["rev"]:
+                return True
+
+        # If the version installed is already equal to one mentioned, we don't
+        # need to update
+        if self.version is not None:
+            return False
+
+        # For this one, we just have to check whether the version in remote
+        # index and local install are same. However, cargo search <name>
+        # --registry <registry.name> --limit 1, doesn't update the local
+        # registry, so, version in remote might still be different. There is
+        # already an open issue in cargo (https://github.com/rust-lang/cargo/issues/11034)
+        # about this. Until then, we can just fetch the the file from index for
+        # the package if this is a sparse index. However, if it is a git index,
+        # we have to manually fetch the index in local storage. That causes an
+        # unintended system state, something that in my opinion shouldn't be
+        # done. Moreover, since sparse index are faster and now the default, I
+        # haven't taken care of the git index.
+        latest_version = metadata["ver"]
+        if metadata["scm"] == "sparse" and self.registry_url is not None:
+            url = self.registry_url
+            url = url[7:] if url.startswith("sparse+") else url
+            url = url.rstrip("/")
+
+            name_elems = []
+            if len(name) < 3:
+                name_elems = [len(name), name]
+            elif len(name) == 3:
+                name_elems = [len(name), name[0], name]
+            else:
+                name_elems = [name[0:2], name[2:4], name]
+
+            url = "%s/%s" % (url, "/".join(name_elems))
+
+            resp, info = fetch_url(self.module, url)
+            if info["status"] == 200:
+                latest_version = json.loads(deque(resp, 1)[0])["vers"]
+            return metadata["ver"] != latest_version
+
+        cmd = ["search", name, "--registry", self.registry, "--limit", "1"]
+        data, err = self._exec(cmd, True, False, False)
+
+        match = re.search(r'"(.+)"', data)
+        if match:
+            latest_version = match.group(1)
+
+        return metadata["ver"] != latest_version
 
     def install(self, packages=None):
         cmd = ["install"]
@@ -163,19 +474,32 @@ class Cargo(object):
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
+        if len(self.features) > 0:
+            cmd.append("--features")
+            cmd.append('"%s"' % (",".join(self.features)))
+        if self.all_features:
+            cmd.append("--all-features")
+        if self.directory is not None:
+            cmd.append("--path")
+            cmd.append(self.directory)
+        if self.registry is not None:
+            cmd.append("--registry")
+            cmd.append(self.registry)
+        if self.git is not None:
+            cmd.append("--git")
+            cmd.append(self.git)
+        if self.branch is not None:
+            cmd.append("--branch")
+            cmd.append(self.branch)
+        if self.tag is not None:
+            cmd.append("--tag")
+            cmd.append(self.tag)
+        if self.rev is not None:
+            cmd.append("--rev")
+            cmd.append(self.rev)
+        if self.debug:
+            cmd.append("--debug")
         return self._exec(cmd)
-
-    def is_outdated(self, name):
-        installed_version = self.get_installed().get(name)
-
-        cmd = ["search", name, "--limit", "1"]
-        data, dummy = self._exec(cmd, True, False, False)
-
-        match = re.search(r'"(.+)"', data)
-        if match:
-            latest_version = match.group(1)
-
-        return installed_version != latest_version
 
     def uninstall(self, packages=None):
         cmd = ["uninstall"]
@@ -191,15 +515,68 @@ def main():
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
+        features=dict(default=None, type=list, elements="str"),
+        all_features=dict(default=False, type="bool"),
+        force=dict(default=False, type="bool"),
+        directory=dict(default=None, type="str"),
+        git=dict(default=None, type="str"),
+        branch=dict(default=None, type="str"),
+        tag=dict(default=None, type="str"),
+        rev=dict(default=None, type="str"),
+        registry=dict(default=None, type="str"),
+        debug=dict(default=False, type="bool"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
     state = module.params["state"]
     version = module.params["version"]
+    force = module.params["force"]
+    features = module.params["features"]
+    all_features = module.params["all_features"]
+    directory = module.params["directory"]
+    registry = module.params["registry"]
+    git = module.params["git"]
+    branch = module.params["branch"]
+    tag = module.params["tag"]
+    rev = module.params["rev"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
+
+    if len(name) > 1 and features:
+        module.fail_json(
+            msg="Cannot determine which features are for what package for multiple packages"
+        )
+
+    if len(name) > 1 and version:
+        module.fail_json(msg='Instead of version, use "crate@version"...')
+
+    if version and (directory or git or branch or tag or rev):
+        module.fail_json(msg="version option only works with a registry")
+
+    if features and all_features:
+        module.fail_json(msg="features list is a redundant with all_features")
+
+    if version is not None and (git is not None or directory is not None):
+        module.fail_json(msg="version option can only be used with a cargo registry")
+
+    if sum(1 for x in [git, directory, registry] if x is not None) > 1:
+        module.fail_json(msg="Only one of git, registry or directory is allowed")
+
+    if git is not None:
+        if sum(1 for x in [branch, tag, rev] if x is not None) > 1:
+            module.fail_json(
+                msg="Only one of branch, tag, or rev option is allowed with git"
+            )
+
+    elif branch is not None or tag is not None or rev is not None:
+        module.fail_json(msg="Specify git option for branch, tag or rev")
+
+    if directory is not None and not os.path.isdir(directory):
+        module.fail_json(
+            msg="Directory from where to install doesn't exist or format not understood"
+        )
 
     # Set LANG env since we parse stdout
     module.run_command_environ_update = dict(
@@ -208,26 +585,22 @@ def main():
 
     cargo = Cargo(module, **module.params)
     changed, out, err = False, None, None
-    installed_packages = cargo.get_installed()
     if state == "present":
-        to_install = [
-            n
-            for n in name
-            if (n not in installed_packages)
-            or (version and version != installed_packages[n])
-        ]
+        to_install = [n for n in name if (force or not cargo.is_present(n))]
         if to_install:
             changed = True
             out, err = cargo.install(to_install)
     elif state == "latest":
         to_update = [
-            n for n in name if n not in installed_packages or cargo.is_outdated(n)
+            n
+            for n in name
+            if (force or not cargo.is_present(n) or cargo.is_outdated(n))
         ]
         if to_update:
             changed = True
             out, err = cargo.install(to_update)
     else:  # absent
-        to_uninstall = [n for n in name if n in installed_packages]
+        to_uninstall = [n for n in name if cargo.is_present(n)]
         if to_uninstall:
             changed = True
             out, err = cargo.uninstall(to_uninstall)
