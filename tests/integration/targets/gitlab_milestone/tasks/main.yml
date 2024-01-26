@@ -1,0 +1,388 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- block:
+###
+### Group milestone
+###
+  - name: Create {{ gitlab_project_group }}
+    gitlab_group:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: true
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_group }}"
+      state: present
+
+  - name: Purge all group milestones for check_mode test
+    gitlab_milestone:
+      api_url: "{{ gitlab_host }}"
+      api_token: "{{ gitlab_api_token }}"
+      group: "{{ gitlab_project_group }}"
+      purge: true
+
+  - name: Group milestone - Add a milestone in check_mode
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+    check_mode: true
+    register: gitlab_group_milestone_state
+
+  - name: Group milestone - Check_mode state must be changed
+    assert:
+      that:
+        - gitlab_group_milestone_state is changed
+
+  - name: Purge all group milestones for project milestone test - cannot exist with same name
+    gitlab_milestone:
+      api_url: "{{ gitlab_host }}"
+      api_token: "{{ gitlab_api_token }}"
+      group: "{{ gitlab_project_group }}"
+      purge: true
+    register: gitlab_group_milestone_purged
+
+  - name: Group milestone - Create milestone {{ gitlab_first_milestone }} and {{ gitlab_second_milestone }}
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+          start_date: "{{ gitlab_first_milestone_start_date }}"
+          due_date: "{{ gitlab_first_milestone_due_date }}"
+        - title: "{{ gitlab_second_milestone }}"
+      state: present
+    register: gitlab_group_milestone_create
+
+  - name: Group milestone - Test milestone Created
+    assert:
+      that:
+        - gitlab_group_milestone_create is changed
+        - gitlab_group_milestone_create.milestones.added|length == 2
+        - gitlab_group_milestone_create.milestones.untouched|length == 0
+        - gitlab_group_milestone_create.milestones.removed|length == 0
+        - gitlab_group_milestone_create.milestones.updated|length == 0
+        - gitlab_group_milestone_create.milestones.added[0] == "{{ gitlab_first_milestone }}"
+        - gitlab_group_milestone_create.milestones.added[1] == "{{ gitlab_second_milestone }}"
+
+  - name: Group milestone - Create milestone ( Idempotency test )
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+          start_date: "{{ gitlab_first_milestone_start_date }}"
+          due_date: "{{ gitlab_first_milestone_due_date }}"
+      state: present
+    register: gitlab_group_milestone_create_idempotence
+
+  - name: Group milestone - Test Create milestone is Idempotent
+    assert:
+      that:
+        - gitlab_group_milestone_create_idempotence is not changed
+
+  - name: Group milestone - Update milestone {{ gitlab_first_milestone }} changing dates
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+          start_date: "{{ gitlab_first_milestone_new_start_date }}"
+          due_date: "{{ gitlab_first_milestone_new_due_date }}"
+      state: present
+    register: gitlab_group_milestone_update
+
+  - name: Group milestone - Test milestone Updated
+    assert:
+      that:
+        - gitlab_group_milestone_update.milestones.added|length == 0
+        - gitlab_group_milestone_update.milestones.untouched|length == 0
+        - gitlab_group_milestone_update.milestones.removed|length == 0
+        - gitlab_group_milestone_update.milestones.updated|length == 1
+        - gitlab_group_milestone_update.milestones.updated[0] == "{{ gitlab_first_milestone }}"
+
+  - name: Group milestone - Update milestone Test ( Additions )
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+          description: "{{ gitlab_first_milestone_description }}"
+      state: present
+    register: gitlab_group_milestone_update_additions
+
+  - name: Group milestone - Test milestone Updated ( Additions )
+    assert:
+      that:
+        - gitlab_group_milestone_update_additions.milestones.added|length == 0
+        - gitlab_group_milestone_update_additions.milestones.untouched|length == 0
+        - gitlab_group_milestone_update_additions.milestones.removed|length == 0
+        - gitlab_group_milestone_update_additions.milestones.updated|length == 1
+        - gitlab_group_milestone_update_additions.milestones.updated[0] == "{{ gitlab_second_milestone }}"
+
+  - name: Group milestone - Delete milestone {{ gitlab_second_milestone }}
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+      state: absent
+    register: gitlab_group_milestone_delete
+
+  - name: Group milestone - Test milestone is deleted
+    assert:
+      that:
+        - gitlab_group_milestone_delete is changed
+        - gitlab_group_milestone_delete.milestones.added|length == 0
+        - gitlab_group_milestone_delete.milestones.untouched|length == 0
+        - gitlab_group_milestone_delete.milestones.removed|length == 1
+        - gitlab_group_milestone_delete.milestones.updated|length == 0
+        - gitlab_group_milestone_delete.milestones.removed[0] == "{{ gitlab_second_milestone }}"
+
+  - name: Group milestone - Create group milestone {{ gitlab_second_milestone }} again purging the other
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      group: "{{ gitlab_project_group }}"
+      purge: true
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+      state: present
+    register: gitlab_group_milestone_create_purging
+
+  - name: Group milestone - Test milestone Created again
+    assert:
+      that:
+        - gitlab_group_milestone_create_purging is changed
+        - gitlab_group_milestone_create_purging.milestones.added|length == 1
+        - gitlab_group_milestone_create_purging.milestones.untouched|length == 0
+        - gitlab_group_milestone_create_purging.milestones.removed|length == 1
+        - gitlab_group_milestone_create_purging.milestones.updated|length == 0
+        - gitlab_group_milestone_create_purging.milestones.added[0] == "{{ gitlab_second_milestone }}"
+        - gitlab_group_milestone_create_purging.milestones.removed[0] == "{{ gitlab_first_milestone }}"
+
+###
+### Project milestone
+###
+  - name: Purge all group milestones for project milestone test - cannot exist with same name
+    gitlab_milestone:
+      api_url: "{{ gitlab_host }}"
+      api_token: "{{ gitlab_api_token }}"
+      group: "{{ gitlab_project_group }}"
+      purge: true
+    register: gitlab_group_milestone_purged
+
+  - name: Create {{ gitlab_project_name }}
+    gitlab_project:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: true
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_name }}"
+      group: "{{ gitlab_project_group }}"
+      default_branch: "{{ gitlab_branch }}"
+      initialize_with_readme: true
+      state: present
+
+  - name: Purge all milestones for check_mode test
+    gitlab_milestone:
+      api_url: "{{ gitlab_host }}"
+      api_token: "{{ gitlab_api_token }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      purge: true
+
+  - name: Add a milestone in check_mode
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+          description: "{{ gitlab_second_milestone_description }}"
+    check_mode: true
+    register: gitlab_first_milestone_state
+
+  - name: Check_mode state must be changed
+    assert:
+      that:
+        - gitlab_first_milestone_state is changed
+
+  - name: Create milestone {{ gitlab_first_milestone }} and {{ gitlab_second_milestone }}
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+          start_date: "{{ gitlab_first_milestone_start_date }}"
+          due_date: "{{ gitlab_first_milestone_due_date }}"
+        - title: "{{ gitlab_second_milestone }}"
+      state: present
+    register: gitlab_milestones_create
+
+  - name: Test milestone Created
+    assert:
+      that:
+        - gitlab_milestones_create is changed
+        - gitlab_milestones_create.milestones.added|length == 2
+        - gitlab_milestones_create.milestones.untouched|length == 0
+        - gitlab_milestones_create.milestones.removed|length == 0
+        - gitlab_milestones_create.milestones.updated|length == 0
+        - gitlab_milestones_create.milestones.added[0] == "{{ gitlab_first_milestone }}"
+        - gitlab_milestones_create.milestones.added[1] == "{{ gitlab_second_milestone }}"
+
+  - name: Create milestone ( Idempotency test )
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+          start_date: "{{ gitlab_first_milestone_start_date }}"
+          due_date: "{{ gitlab_first_milestone_due_date }}"
+      state: present
+    register: gitlab_first_milestone_create_idempotence
+
+  - name: Test Create milestone is Idempotent
+    assert:
+      that:
+        - gitlab_first_milestone_create_idempotence is not changed
+
+  - name: Update milestone {{ gitlab_first_milestone }} changing dates
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+          start_date: "{{ gitlab_first_milestone_new_start_date }}"
+          due_date: "{{ gitlab_first_milestone_new_due_date }}"
+      state: present
+    register: gitlab_first_milestone_update
+
+  - name: Test milestone Updated
+    assert:
+      that:
+        - gitlab_first_milestone_update.milestones.added|length == 0
+        - gitlab_first_milestone_update.milestones.untouched|length == 0
+        - gitlab_first_milestone_update.milestones.removed|length == 0
+        - gitlab_first_milestone_update.milestones.updated|length == 1
+        - gitlab_first_milestone_update.milestones.updated[0] == "{{ gitlab_first_milestone }}"
+
+  - name: Update milestone Test ( Additions )
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+          description: "{{ gitlab_second_milestone_description }}"
+      state: present
+    register: gitlab_first_milestone_update_additions
+
+  - name: Test milestone Updated ( Additions )
+    assert:
+      that:
+        - gitlab_first_milestone_update_additions.milestones.added|length == 0
+        - gitlab_first_milestone_update_additions.milestones.untouched|length == 0
+        - gitlab_first_milestone_update_additions.milestones.removed|length == 0
+        - gitlab_first_milestone_update_additions.milestones.updated|length == 1
+        - gitlab_first_milestone_update_additions.milestones.updated[0] == "{{ gitlab_second_milestone }}"
+
+  - name: Delete milestone {{ gitlab_second_milestone }}
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+      state: absent
+    register: gitlab_first_milestone_delete
+
+  - name: Test milestone is deleted
+    assert:
+      that:
+        - gitlab_first_milestone_delete is changed
+        - gitlab_first_milestone_delete.milestones.added|length == 0
+        - gitlab_first_milestone_delete.milestones.untouched|length == 0
+        - gitlab_first_milestone_delete.milestones.removed|length == 1
+        - gitlab_first_milestone_delete.milestones.updated|length == 0
+        - gitlab_first_milestone_delete.milestones.removed[0] == "{{ gitlab_second_milestone }}"
+
+  - name: Create milestone {{ gitlab_second_milestone }} again purging the other
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      purge: true
+      milestones:
+        - title: "{{ gitlab_second_milestone }}"
+      state: present
+    register: gitlab_first_milestone_create_purging
+
+  - name: Test milestone Created again
+    assert:
+      that:
+        - gitlab_first_milestone_create_purging is changed
+        - gitlab_first_milestone_create_purging.milestones.added|length == 1
+        - gitlab_first_milestone_create_purging.milestones.untouched|length == 0
+        - gitlab_first_milestone_create_purging.milestones.removed|length == 1
+        - gitlab_first_milestone_create_purging.milestones.updated|length == 0
+        - gitlab_first_milestone_create_purging.milestones.added[0] == "{{ gitlab_second_milestone }}"
+        - gitlab_first_milestone_create_purging.milestones.removed[0] == "{{ gitlab_first_milestone }}"
+
+  always:
+  - name: Delete milestones
+    gitlab_milestone:
+      api_token: "{{ gitlab_api_token }}"
+      api_url: "{{ gitlab_host }}"
+      project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+      purge: true
+      milestones:
+        - title: "{{ gitlab_first_milestone }}"
+        - title: "{{ gitlab_second_milestone }}"
+      state: absent
+    register: gitlab_first_milestone_always_delete
+
+  - name: Test milestone are deleted
+    assert:
+      that:
+        - gitlab_first_milestone_always_delete is changed
+        - gitlab_first_milestone_always_delete.milestones.added|length == 0
+        - gitlab_first_milestone_always_delete.milestones.untouched|length == 0
+        - gitlab_first_milestone_always_delete.milestones.removed|length > 0
+        - gitlab_first_milestone_always_delete.milestones.updated|length == 0
+
+  - name: Clean up {{ gitlab_project_name }}
+    gitlab_project:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: false
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_name }}"
+      group: "{{ gitlab_project_group }}"
+      state: absent
+
+  - name: Clean up {{ gitlab_project_group }}
+    gitlab_group:
+      api_url: "{{ gitlab_host }}"
+      validate_certs: true
+      api_token: "{{ gitlab_api_token }}"
+      name: "{{ gitlab_project_group }}"
+      state: absent
