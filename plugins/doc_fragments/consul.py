@@ -47,3 +47,14 @@ options:
       - The token to use for authorization.
     type: str
 """
+
+    ACTIONGROUP_CONSUL = r"""
+options: {}
+attributes:
+  action_group:
+    description: Use C(group/community.general.consul) in C(module_defaults) to set defaults for this module.
+    support: full
+    membership:
+      - community.general.consul
+    version_added: 8.3.0
+"""
