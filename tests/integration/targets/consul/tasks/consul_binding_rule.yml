@@ -19,14 +19,12 @@
           cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
           mwIDAQAB
           -----END PUBLIC KEY-----      
-    token: "{{ consul_management_token }}"
 
 - name: Create a binding rule
   community.general.consul_binding_rule:
     name: test-binding
     description: my description
     auth_method: test
-    token: "{{ consul_management_token }}"
     bind_type: service
     bind_name: yolo
   register: result
@@ -42,7 +40,6 @@
   community.general.consul_binding_rule:
     name: test-binding
     auth_method: test
-    token: "{{ consul_management_token }}"
     bind_name: yolo2
   register: result
 
@@ -56,7 +53,6 @@
   community.general.consul_binding_rule:
     name: test-binding
     auth_method: test
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -70,7 +66,6 @@
     name: test-binding
     auth_method: test
     state: absent
-    token: "{{ consul_management_token }}"
   register: result
 - assert:
     that:

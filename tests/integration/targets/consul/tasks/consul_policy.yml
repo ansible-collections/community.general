@@ -13,7 +13,6 @@
         key "private/foo" {
             policy = "deny"
         }
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -35,7 +34,6 @@
         event "bbq" {
             policy = "write"
         }
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -56,7 +54,6 @@
         event "bbq" {
             policy = "write"
         }
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -67,7 +64,6 @@
 - name: Remove a policy
   consul_policy:
     name: foo-access
-    token: "{{ consul_management_token }}"
     state: absent
   register: result
 - assert:

@@ -6,7 +6,6 @@
 - name: list sessions
   consul_session:
     state: list
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -18,7 +17,6 @@
   consul_session:
     state: present
     name: testsession
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -33,7 +31,6 @@
 - name: list sessions after creation
   consul_session:
     state: list
-    token: "{{ consul_management_token }}"
   register: result
 
 - set_fact:
@@ -61,7 +58,6 @@
   consul_session:
     state: info
     id: '{{ session_id }}'
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -72,7 +68,6 @@
   consul_session:
     state: info
     name: test
-    token: "{{ consul_management_token }}"
   register: result
   ignore_errors: true
 
@@ -84,7 +79,6 @@
   consul_session:
     state: absent
     id: '{{ session_id }}'
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -94,7 +88,6 @@
 - name: list sessions after deletion
   consul_session:
     state: list
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -121,7 +114,6 @@
     state: present
     name: session-with-ttl
     ttl: 180  # sec
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
