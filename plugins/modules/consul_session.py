@@ -21,6 +21,7 @@ author:
   - Håkon Lerring (@Hakon)
 extends_documentation_fragment:
   - community.general.consul
+  - community.general.consul.token
   - community.general.attributes
 attributes:
     check_mode:
@@ -124,7 +125,7 @@ EXAMPLES = '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
-    auth_argument_spec, _ConsulModule
+    AUTH_ARGUMENTS_SPEC, _ConsulModule
 )
 
 
@@ -281,7 +282,7 @@ def main():
                 'node',
                 'present']),
         datacenter=dict(type='str'),
-        **auth_argument_spec()
+        **AUTH_ARGUMENTS_SPEC
     )
 
     module = AnsibleModule(

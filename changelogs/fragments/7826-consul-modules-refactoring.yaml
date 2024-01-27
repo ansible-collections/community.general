@@ -1,2 +1,7 @@
 minor_changes:
-  - 'consul_policy, consul_role, consul_session - removed dependency on ``requests`` and factored out common parts (https://github.com/ansible-collections/community.general/pull/7826).'
+  - 'consul_policy, consul_role, consul_session - removed dependency on ``requests`` and factored out common parts (https://github.com/ansible-collections/community.general/pull/7826, https://github.com/ansible-collections/community.general/pull/7878).'
+  - consul_policy - added support for diff and check mode (https://github.com/ansible-collections/community.general/pull/7878).
+  - consul_role - added support for diff mode (https://github.com/ansible-collections/community.general/pull/7878).
+  - consul_role - added support for templated policies (https://github.com/ansible-collections/community.general/pull/7878).
+  - consul_role - ``service_identities`` now expects a ``service_name`` option to match the Consul API, the old ``name`` is still supported as alias (https://github.com/ansible-collections/community.general/pull/7878).
+  - consul_role - ``node_identities`` now expects a ``node_name`` option to match the Consul API, the old ``name`` is still supported as alias (https://github.com/ansible-collections/community.general/pull/7878).
