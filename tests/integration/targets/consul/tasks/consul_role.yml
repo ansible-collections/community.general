@@ -40,7 +40,8 @@
 - assert:
     that:
       - result is changed
-      - result['role']['Name'] == 'foo-role-with-policy'
+      - result.role.Name == 'foo-role-with-policy'
+      - result.operation == 'create'
 
 - name: Update policy description, in check mode
   consul_role:
@@ -53,8 +54,9 @@
 - assert:
     that:
       - result is changed
-      - result['role']['Description'] == "Testing updating description"
-      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+      - result.role.Description == "Testing updating description"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+      - result.operation == 'update'
 
 - name: Update policy to add the description
   consul_role:
@@ -66,8 +68,9 @@
 - assert:
     that:
       - result is changed
-      - result['role']['Description'] == "Role for testing policies"
-      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+      - result.role.Description == "Role for testing policies"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+      - result.operation == 'update'
 
 - name: Update the role with another policy, also testing leaving description blank
   consul_role:
@@ -81,9 +84,10 @@
 - assert:
     that:
       - result is changed
-      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
-      - result['role']['Policies'][1]['Name'] == 'bar-access-for-role'
-      - result['role']['Description'] == "Role for testing policies"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+      - result.role.Policies.1.Name == 'bar-access-for-role'
+      - result.role.Description == "Role for testing policies"
+      - result.operation == 'update'
 
 - name: Create a role with service identity
   consul_role:
@@ -98,8 +102,8 @@
 - assert:
     that:
       - result is changed
-      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
-      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
 
 - name: Update the role with service identity in check mode
   consul_role:
@@ -115,8 +119,8 @@
 - assert:
     that:
       - result is changed
-      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
-      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc2"
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc2"
 
 - name: Update the role with service identity to add a policy, leaving the service id unchanged
   consul_role:
@@ -129,9 +133,9 @@
 - assert:
     that:
       - result is changed
-      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
-      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
-      - result['role']['Policies'][0]['Name'] == 'foo-access-for-role'
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
 
 - name: Update the role with service identity to remove the policies
   consul_role:
@@ -143,9 +147,9 @@
 - assert:
     that:
       - result is changed
-      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
-      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
-      - result['role']['Policies'] is not defined
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+      - result.role.Policies is not defined
 
 - name: Update the role with service identity to remove the node identities, in check mode
   consul_role:
@@ -158,10 +162,10 @@
 - assert:
     that:
       - result is changed
-      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
-      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
-      - result['role']['Policies'] is not defined
-      - result['role']['NodeIdentities'] == [] # in check mode the cleared field is returned as an empty array
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+      - result.role.Policies is not defined
+      - result.role.NodeIdentities == [] # in check mode the cleared field is returned as an empty array
 
 - name: Update the role with service identity to remove the service identities
   consul_role:
@@ -173,8 +177,8 @@
 - assert:
     that:
       - result is changed
-      - result['role']['ServiceIdentities'] is not defined # in normal mode the dictionary is removed from the result
-      - result['role']['Policies'] is not defined
+      - result.role.ServiceIdentities is not defined # in normal mode the dictionary is removed from the result
+      - result.role.Policies is not defined
 
 - name: Create a role with node identity
   consul_role:
@@ -188,14 +192,17 @@
 - assert:
     that:
       - result is changed
-      - result['role']['NodeIdentities'][0]['NodeName'] == "node-1"
-      - result['role']['NodeIdentities'][0]['Datacenter'] == "dc2"
+      - result.role.NodeIdentities.0.NodeName == "node-1"
+      - result.role.NodeIdentities.0.Datacenter == "dc2"
 
 - name: Remove the last role
   consul_role:
     token: "{{ consul_management_token }}"
     name: role-with-node-identity
     state: absent
+  register: result
+
 - assert:
     that:
       - result is changed
+      - result.operation == 'remove'
