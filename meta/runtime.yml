@@ -30,6 +30,10 @@ plugin_routing:
     nios_next_network:
       redirect: infoblox.nios_modules.nios_next_network
   modules:
+    consul_acl:
+      deprecation:
+        removal_version: 10.0.0
+        warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
     rax_cbs_attachments:
       deprecation:
         removal_version: 9.0.0
