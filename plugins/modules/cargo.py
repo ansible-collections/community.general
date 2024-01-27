@@ -58,6 +58,14 @@ options:
     type: bool
     default: false
     version_added: 7.5.0
+  force:
+    description:
+      - Forcefully install package(s).
+      - Ignores many checks, and updates/installs forcefully.
+    type: bool
+    default: false
+    required: false
+    version_added: 8.2.0
   state:
     description:
       - The state of the Rust package.
@@ -65,8 +73,71 @@ options:
     type: str
     default: present
     choices: [ "present", "absent", "latest" ]
+  features:
+    description:
+      - List of features to enable for the package.
+      - Don't use with multiple names
+    type: list
+    elements: str
+    required: false
+    default: []
+    version_added: 8.2.0
+  all_features:
+    description:
+      - Enable all features for package(s).
+    type: bool
+    default: false
+    required: false
+    version_added: 8.2.0
+  directory:
+    description:
+      - Path to install the package(s) from.
+    type: path
+    required: false
+    version_added: 8.2.0
+  registry:
+    description:
+      - Registry to install the package(s) from.
+    type: str
+    required: false
+    version_added: 8.2.0
+  git:
+    description:
+      - Git URL to install the package(s) from.
+      - Can optionally either be used with C(branch), C(tag) or C(rev).
+    type: str
+    required: false
+    version_added: 8.2.0
+  branch:
+    description:
+      - Git branch to install the package(s) from.
+      - C(git) option must be specified.
+    type: str
+    required: false
+    version_added: 8.2.0
+  tag:
+    description:
+      - Git tag to install the package(s) from.
+      - C(git) option must be specified.
+    type: str
+    required: false
+    version_added: 8.2.0
+  rev:
+    description:
+      - Git commit to install the package(s) from.
+      - C(git) option must be specified.
+    type: str
+    required: false
+    version_added: 8.2.0
+  debug:
+    description:
+      - Specify whether to install package(s) in debug mode.
+    type: bool
+    default: false
+    required: false
+    version_added: 8.2.0
 requirements:
-    - cargo installed
+    - cargo  and git installed
 """
 
 EXAMPLES = r"""
@@ -146,6 +217,7 @@ class Cargo(object):
         self.locked = kwargs["locked"]
         self.features = kwargs["features"]
         self.all_features = kwargs["all_features"]
+        self.force = kwargs["force"]
         self.directory = kwargs["directory"]
         self.registry = kwargs["registry"]
         self.git = kwargs["git"]
@@ -204,9 +276,8 @@ class Cargo(object):
 
         crates_json = os.path.join(self.cargo_dir, ".crates2.json")
         if not os.path.isfile(crates_json):
-            self.module.fail_json(
-                msg=".crates2.json file not present in cargo directory"
-            )
+            # On first install, might not be present, so return gracefully
+            return
 
         with open(crates_json, "r") as f:
             all_installed_info = json.load(f)["installs"]
@@ -257,12 +328,15 @@ class Cargo(object):
                     "prof": value["profile"],
                     "scm": "registry" if is_sparse else "sparse",
                 }
-
         self.metadata_cached = True
 
     def is_present(self, name):
         if not self.metadata_cached:
             self.cache_metadata()
+
+        version = self.version
+        if "@" in name:
+            name, version = name.split("@")
 
         if name not in self.metadata:
             return False
@@ -271,10 +345,6 @@ class Cargo(object):
             return True
 
         metadata = self.metadata[name]
-        version = self.version
-
-        if "@" in name:
-            name, version = name.split("@")
 
         if (
             self.all_features != metadata["allf"]
@@ -284,10 +354,7 @@ class Cargo(object):
             return False
 
         if self.directory is not None:
-            return (
-                metadata["scm"] == "path"
-                and os.path.expanduser(self.directory) == metadata["path"]
-            )
+            return metadata["scm"] == "path" and self.directory == metadata["path"]
 
         if self.git is not None:
             self.git = self.git.split("+")[-1]
@@ -305,14 +372,11 @@ class Cargo(object):
         if HAS_TOMLI or HAS_TOML or self.registry_url is None:
             config = os.path.join(self.cargo_dir, "config.toml")
             if not os.path.isfile(config):
-                self.module.fail_json(
-                    msg="config.toml file not present in cargo directory"
-                )
-
-            read_mode = "rb" if HAS_TOMLI else "r"
-
-            with open(config, read_mode) as f:
-                toml_conf = toml.load(f)
+                toml_conf = {}
+            else:
+                read_mode = "rb" if HAS_TOMLI else "r"
+                with open(config, read_mode) as f:
+                    toml_conf = toml.load(f)
 
             self.registry = self.registry or toml_conf.get("registry", {}).get(
                 "default", "crates-io"
@@ -328,7 +392,9 @@ class Cargo(object):
             DEFAULT_GIT = "https://github.com/rust-lang/crates.io-index"
 
             reg_to_index = {
-                k: v["index"] for k, v in toml_conf.get("registries", {}).items()
+                k: v["index"]
+                for k, v in toml_conf.get("registries", {}).items()
+                if isinstance(v, dict) and v.get("index") is not None
             }
 
             reg_to_index["crates-io"] = "default"
@@ -373,6 +439,10 @@ class Cargo(object):
         # NOTE: If features differed, or all_features had been different this time,
         # those differences would have been caught in is_present_exact. So, this
         # time, we have to check for only a subset.
+
+        version = self.version
+        if "@" in name:
+            name, version = name.split("@")
 
         metadata = self.metadata[name]
 
@@ -419,7 +489,7 @@ class Cargo(object):
 
         # If the version installed is already equal to one mentioned, we don't
         # need to update
-        if self.version is not None:
+        if version is not None:
             return False
 
         # For this one, we just have to check whether the version in remote
@@ -474,11 +544,6 @@ class Cargo(object):
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
-        if len(self.features) > 0:
-            cmd.append("--features")
-            cmd.append('"%s"' % (",".join(self.features)))
-        if self.all_features:
-            cmd.append("--all-features")
         if self.directory is not None:
             cmd.append("--path")
             cmd.append(self.directory)
@@ -497,6 +562,13 @@ class Cargo(object):
         if self.rev is not None:
             cmd.append("--rev")
             cmd.append(self.rev)
+        if len(self.features) > 0:
+            cmd.append("--features")
+            cmd.append('"%s"' % (",".join(self.features)))
+        if self.all_features:
+            cmd.append("--all-features")
+        if self.force:
+            cmd.append("--force")
         if self.debug:
             cmd.append("--debug")
         return self._exec(cmd)
@@ -515,10 +587,10 @@ def main():
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
-        features=dict(default=None, type=list, elements="str"),
+        features=dict(default=[], type="list", elements="str"),
         all_features=dict(default=False, type="bool"),
         force=dict(default=False, type="bool"),
-        directory=dict(default=None, type="str"),
+        directory=dict(default=None, type="path"),
         git=dict(default=None, type="str"),
         branch=dict(default=None, type="str"),
         tag=dict(default=None, type="str"),
