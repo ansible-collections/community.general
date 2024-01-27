@@ -19,7 +19,9 @@
 - assert:
     that:
       - result is changed
-      - result['policy']['Name'] == 'foo-access'
+      - result.policy.Name == 'foo-access'
+      - result.operation == 'create'
+
 - name: Update the rules associated to a policy
   consul_policy:
     name: foo-access
@@ -35,9 +37,12 @@
         }
     token: "{{ consul_management_token }}"
   register: result
+
 - assert:
     that:
       - result is changed
+      - result.operation == 'update'
+
 - name: Update reports not changed when updating again without changes
   consul_policy:
     name: foo-access
@@ -53,9 +58,12 @@
         }
     token: "{{ consul_management_token }}"
   register: result
+
 - assert:
     that:
       - result is not changed
+      - result.operation is not defined
+
 - name: Remove a policy
   consul_policy:
     name: foo-access
@@ -65,3 +73,4 @@
 - assert:
     that:
       - result is changed
+      - result.operation == 'remove'
