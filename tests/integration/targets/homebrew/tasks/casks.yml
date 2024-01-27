@@ -1,0 +1,99 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the homebrew module.
+# Copyright (c) 2020, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Find brew binary
+  command: which brew
+  register: brew_which
+  when: ansible_distribution in ['MacOSX']
+
+- name: Get owner of brew binary
+  stat:
+    path: "{{ brew_which.stdout }}"
+  register: brew_stat
+  when: ansible_distribution in ['MacOSX']
+
+#- name: Use ignored-pinned option while upgrading all
+#  homebrew:
+#    upgrade_all: true
+#    upgrade_options: ignore-pinned
+#  become: true
+#  become_user: "{{ brew_stat.stat.pw_name }}"
+#  register: upgrade_option_result
+#  environment:
+#    HOMEBREW_NO_AUTO_UPDATE: True
+
+#- assert:
+#    that:
+#      - upgrade_option_result.changed
+
+- vars:
+    package_name: kitty
+
+  block:
+  - name: Make sure {{ package_name }} package is not installed
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+
+  - name: Again install {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
+
+  - name: Uninstall {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+
+  - name: Again uninstall {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
