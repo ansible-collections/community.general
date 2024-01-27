@@ -89,12 +89,18 @@
       - 3
     - import_tasks: consul_general.yml
     - import_tasks: consul_kv.yml
-    - import_tasks: consul_session.yml
-    - import_tasks: consul_policy.yml
-    - import_tasks: consul_role.yml
-    - import_tasks: consul_token.yml
-    - import_tasks: consul_auth_method.yml
-    - import_tasks: consul_binding_rule.yml
+
+    - block:
+        - import_tasks: consul_session.yml
+        - import_tasks: consul_policy.yml
+        - import_tasks: consul_role.yml
+        - import_tasks: consul_token.yml
+        - import_tasks: consul_auth_method.yml
+        - import_tasks: consul_binding_rule.yml
+      module_defaults:
+        group/community.general.consul:
+          token: "{{ consul_management_token }}"
+
     always:
     - name: Kill consul process
       shell: kill $(cat {{ remote_tmp_dir }}/consul.pid)
