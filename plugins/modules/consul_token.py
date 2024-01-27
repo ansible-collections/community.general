@@ -22,6 +22,7 @@ author:
 extends_documentation_fragment:
   - community.general.consul
   - community.general.consul.token
+  - community.general.consul.actiongroup_consul
   - community.general.attributes
 attributes:
   check_mode:

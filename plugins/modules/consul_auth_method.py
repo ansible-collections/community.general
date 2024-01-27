@@ -21,6 +21,7 @@ author:
   - Florian Apolloner (@apollo13)
 extends_documentation_fragment:
   - community.general.consul
+  - community.general.consul.actiongroup_consul
   - community.general.consul.token
   - community.general.attributes
 attributes:
