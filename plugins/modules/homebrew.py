@@ -165,6 +165,7 @@ changed_pkgs:
     version_added: '0.2.0'
 '''
 
+import json
 import os.path
 import re
 
@@ -184,6 +185,10 @@ def _create_regex_group_complement(s):
     chars = filter(None, (line.split('#')[0].strip() for line in lines))
     group = r'[^' + r''.join(chars) + r']'
     return re.compile(group)
+
+
+def _check_package_in_json(json_output, package_type):
+    return bool(json_output.get(package_type, []) and json_output[package_type][0].get("installed"))
 # /utils ------------------------------------------------------------------ }}}
 
 
@@ -479,17 +484,13 @@ class Homebrew(object):
         cmd = [
             "{brew_path}".format(brew_path=self.brew_path),
             "info",
+            "--json=v2",
             self.current_package,
         ]
         rc, out, err = self.module.run_command(cmd)
-        for line in out.split('\n'):
-            if (
-                re.search(r'Built from source', line)
-                or re.search(r'Poured from bottle', line)
-            ):
-                return True
+        data = json.loads(out)
 
-        return False
+        return _check_package_in_json(data, "formulae") or _check_package_in_json(data, "casks")
 
     def _current_package_is_outdated(self):
         if not self.valid_package(self.current_package):
