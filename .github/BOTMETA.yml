@@ -566,6 +566,8 @@ files:
     maintainers: gpongelli
   $modules/gitlab_merge_request.py:
     maintainers: zvaraondrej
+  $modules/gitlab_milestone.py:
+    maintainers: gpongelli
   $modules/gitlab_project_variable.py:
     maintainers: markuman
   $modules/gitlab_instance_variable.py:
