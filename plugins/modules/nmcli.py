@@ -1832,7 +1832,7 @@ class Nmcli(object):
         elif self.type == 'wifi':
             options.update({
                 '802-11-wireless.ssid': self.ssid,
-                'connection.slave-type': 'bond' if self.master else None,
+                'connection.slave-type': ('bond' if self.slave_type is None else self.slave_type) if self.master else None,
             })
             if self.wifi:
                 for name, value in self.wifi.items():
