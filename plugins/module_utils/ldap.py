@@ -139,5 +139,7 @@ class LdapGeneric(object):
 
     def _xorder_dn(self):
         # match X_ORDERed DNs
-        regex = r"\w+=\{\d+\}.+"
-        return re.match(regex, self.module.params['dn']) is not None
+        regex = r".+\{\d+\}.+"
+        explode_dn = ldap.dn.explode_dn(self.module.params['dn'])
+
+        return re.match(regex, explode_dn[0]) is not None
