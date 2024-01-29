@@ -334,6 +334,16 @@ EXAMPLES = '''
         RAIDType: "RAID0"
         Drives:
           - "/redfish/v1/Systems/1/Storage/DE00B000/Drives/1"
+
+  - name: Set service identification to {{ service_id }}
+    community.general.redfish_config:
+      category: Manager
+      command: SetServiceIdentification
+      manager: "{{ resource_id }}"
+      service_id: "{{ service_id ""}
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -353,7 +363,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
                 "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes", "CreateVolume"],
-    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
+    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface", "SetServiceIdentification" ],
     "Sessions": ["SetSessionService"],
 }
 
@@ -376,6 +386,7 @@ def main():
                 default={}
             ),
             resource_id=dict(),
+            service_id=dict(),
             nic_addr=dict(default='null'),
             nic_config=dict(
                 type='dict',
@@ -445,6 +456,9 @@ def main():
     # HostInterface instance ID
     hostinterface_id = module.params['hostinterface_id']
 
+    # Service Identification
+    service_id = module.params['service_id']
+
     # Sessions config options
     sessions_config = module.params['sessions_config']
 
@@ -512,6 +526,8 @@ def main():
                 result = rf_utils.set_manager_nic(nic_addr, nic_config)
             elif command == "SetHostInterface":
                 result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
+            elif command == "SetServiceIdentification":
+                result = rf_utils.set_service_identification(resource_id, service_id)
 
     elif category == "Sessions":
         # execute only if we find a Sessions resource
