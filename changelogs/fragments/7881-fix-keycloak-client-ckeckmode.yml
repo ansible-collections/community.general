@@ -1,2 +1,2 @@
 bugfixes:
-  - keycloak_client - fixes issue when metadata is provided in desired state when task is in "check_mode" (https://github.com/ansible-collections/community.general/issues/1226).
+  - keycloak_client - fixes issue when metadata is provided in desired state when task is in check mode (https://github.com/ansible-collections/community.general/issues/1226).
