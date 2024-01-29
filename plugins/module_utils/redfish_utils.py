@@ -3409,9 +3409,6 @@ class RedfishUtils(object):
         return result
 
     def set_service_identification(self, manager, service_id):
-        if manager == None: 
-          current = self.get_service_identification(manager)
-          manager = list(current.values())[0]
         data = {"ServiceIdentification": service_id}
         resp = self.patch_request(self.root_uri + '/redfish/v1/Managers/' + manager, data, check_pyld=True)
         return resp
