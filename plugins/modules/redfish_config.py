@@ -339,7 +339,6 @@ EXAMPLES = '''
     community.general.redfish_config:
       category: Manager
       command: SetServiceIdentification
-      manager: "{{ resource_id }}"
       service_id: "{{ service_id ""}
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
@@ -527,7 +526,7 @@ def main():
             elif command == "SetHostInterface":
                 result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
             elif command == "SetServiceIdentification":
-                result = rf_utils.set_service_identification(resource_id, service_id)
+                result = rf_utils.set_service_identification(service_id)
 
     elif category == "Sessions":
         # execute only if we find a Sessions resource
