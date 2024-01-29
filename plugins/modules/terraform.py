@@ -21,7 +21,8 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
+    version_added: 8.3.0
 options:
   state:
     choices: ['planned', 'present', 'absent']
@@ -428,6 +429,42 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     ))
 
 
+def get_diff(diff_output):
+    def get_tf_resource_address(e):
+        return e['resource']
+
+    diff_json_output = json.loads(diff_output)
+    tf_reosource_changes = diff_json_output['resource_changes']
+    diff_after = []
+    diff_before = []
+    changed = False
+    for item in tf_reosource_changes:
+        item_change = item['change']
+        tf_before_state = {'resource': item['address'], 'change': item['change']['before']}
+        tf_after_state = {'resource': item['address'], 'change': item['change']['after']}
+
+        if item_change['actions'] == ['update'] or item_change['actions'] == ['delete', 'create']:
+            diff_before.append(tf_before_state)
+            diff_after.append(tf_after_state)
+            changed = True
+
+        if item_change['actions'] == ['delete']:
+            diff_before.append(tf_before_state)
+            changed = True
+
+        if item_change['actions'] == ['create']:
+            diff_after.append(tf_after_state)
+            changed = True
+
+    diff_before.sort(key=get_tf_resource_address)
+    diff_after.sort(key=get_tf_resource_address)
+
+    return changed, dict(
+        before=({'data': diff_before}),
+        after=({'data': diff_after}),
+    )
+
+
 def main():
     global module
     module = AnsibleModule(
@@ -619,6 +656,19 @@ def main():
                                  "Consider switching the 'check_destroy' to false to suppress this error")
         command.append(plan_file)
 
+    result_diff = dict()
+    if module._diff or module.check_mode:
+        diff_command = [command[0], 'show', '-json', plan_file]
+        rc, diff_output, err = module.run_command(diff_command, check_rc=False, cwd=project_path)
+        changed, result_diff = get_diff(diff_output)
+        if rc != 0:
+            if workspace_ctx["current"] != workspace:
+                select_workspace(command[0], project_path, workspace_ctx["current"])
+            module.fail_json(msg=err.rstrip(), rc=rc, stdout=out,
+                             stdout_lines=out.splitlines(), stderr=err,
+                             stderr_lines=err.splitlines(),
+                             cmd=' '.join(command))
+
     if needs_application and not module.check_mode and state != 'planned':
         rc, out, err = module.run_command(command, check_rc=False, cwd=project_path)
         if rc != 0:
@@ -651,7 +701,18 @@ def main():
     if state == 'absent' and workspace != 'default' and purge_workspace is True:
         remove_workspace(command[0], project_path, workspace)
 
-    module.exit_json(changed=changed, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
+    result = {
+        'state': state,
+        'workspace': workspace,
+        'outputs': outputs,
+        'stdout': out,
+        'stderr': err,
+        'command': ' '.join(command),
+        'changed': changed,
+        'diff': result_diff,
+    }
+
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
