@@ -1685,3 +1685,26 @@ releases:
     - 7696-avoid-attempt-to-delete-non-existing-user.yml
     - 7754-fixed-payload-format.yml
     release_date: '2024-01-01'
+  7.5.4:
+    changes:
+      bugfixes:
+      - homebrew - detect already installed formulae and casks using JSON output from
+        ``brew info`` (https://github.com/ansible-collections/community.general/issues/864).
+      - ipa_otptoken - the module expect ``ipatokendisabled`` as string but the ``ipatokendisabled``
+        value is returned as a boolean (https://github.com/ansible-collections/community.general/pull/7795).
+      - ldap - previously the order number (if present) was expected to follow an
+        equals sign in the DN. This makes it so the order number string is identified
+        correctly anywhere within the DN (https://github.com/ansible-collections/community.general/issues/7646).
+      - mssql_script - make the module work with Python 2 (https://github.com/ansible-collections/community.general/issues/7818,
+        https://github.com/ansible-collections/community.general/pull/7821).
+      - nmcli - fix ``connection.slave-type`` wired to ``bond`` and not with parameter
+        ``slave_type`` in case of connection type ``wifi`` (https://github.com/ansible-collections/community.general/issues/7389).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 7.5.4.yml
+    - 7389-nmcli-issue-with-creating-a-wifi-bridge-slave.yml
+    - 7646-fix-order-number-detection-in-dn.yml
+    - 7797-ipa-fix-otp-idempotency.yml
+    - 7821-mssql_script-py2.yml
+    - 7870-homebrew-cask-installed-detection.yml
+    release_date: '2024-01-29'
