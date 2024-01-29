@@ -3408,6 +3408,14 @@ class RedfishUtils(object):
         result['ret'] = True
         return result
 
+    def set_service_identification(self, manager, service_id):
+        if manager == None: 
+          current = self.get_service_identification(manager)
+          manager = list(current.values())[0]
+        data = {"ServiceIdentification": service_id}
+        resp = self.patch_request(self.root_uri + '/redfish/v1/Managers/' + manager, data, check_pyld=True)
+        return resp
+
     def set_session_service(self, sessions_config):
         if sessions_config is None:
             return {'ret': False, 'msg':
