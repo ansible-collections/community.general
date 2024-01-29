@@ -1072,3 +1072,76 @@ releases:
         name: github_app_access_token
         namespace: null
     release_date: '2024-01-01'
+  8.3.0:
+    changes:
+      bugfixes:
+      - homebrew - detect already installed formulae and casks using JSON output from
+        ``brew info`` (https://github.com/ansible-collections/community.general/issues/864).
+      - incus connection plugin - treats ``inventory_hostname`` as a variable instead
+        of a literal in remote connections (https://github.com/ansible-collections/community.general/issues/7874).
+      - ipa_otptoken - the module expect ``ipatokendisabled`` as string but the ``ipatokendisabled``
+        value is returned as a boolean (https://github.com/ansible-collections/community.general/pull/7795).
+      - ldap - previously the order number (if present) was expected to follow an
+        equals sign in the DN. This makes it so the order number string is identified
+        correctly anywhere within the DN (https://github.com/ansible-collections/community.general/issues/7646).
+      - mssql_script - make the module work with Python 2 (https://github.com/ansible-collections/community.general/issues/7818,
+        https://github.com/ansible-collections/community.general/pull/7821).
+      - nmcli - fix ``connection.slave-type`` wired to ``bond`` and not with parameter
+        ``slave_type`` in case of connection type ``wifi`` (https://github.com/ansible-collections/community.general/issues/7389).
+      - proxmox - fix updating a container config if the setting does not already
+        exist (https://github.com/ansible-collections/community.general/pull/7872).
+      deprecated_features:
+      - consul_acl - the module has been deprecated and will be removed in community.general
+        10.0.0. ``consul_token`` and ``consul_policy`` can be used instead (https://github.com/ansible-collections/community.general/pull/7901).
+      minor_changes:
+      - consul_auth_method, consul_binding_rule, consul_policy, consul_role, consul_session,
+        consul_token - added action group ``community.general.consul`` (https://github.com/ansible-collections/community.general/pull/7897).
+      - consul_policy - added support for diff and check mode (https://github.com/ansible-collections/community.general/pull/7878).
+      - consul_policy, consul_role, consul_session - removed dependency on ``requests``
+        and factored out common parts (https://github.com/ansible-collections/community.general/pull/7826,
+        https://github.com/ansible-collections/community.general/pull/7878).
+      - consul_role - ``node_identities`` now expects a ``node_name`` option to match
+        the Consul API, the old ``name`` is still supported as alias (https://github.com/ansible-collections/community.general/pull/7878).
+      - consul_role - ``service_identities`` now expects a ``service_name`` option
+        to match the Consul API, the old ``name`` is still supported as alias (https://github.com/ansible-collections/community.general/pull/7878).
+      - consul_role - added support for diff mode (https://github.com/ansible-collections/community.general/pull/7878).
+      - consul_role - added support for templated policies (https://github.com/ansible-collections/community.general/pull/7878).
+      - redfish_info - add command ``GetServiceIdentification`` to get service identification
+        (https://github.com/ansible-collections/community.general/issues/7882).
+      - terraform - add support for ``diff_mode`` for terraform resource_changes (https://github.com/ansible-collections/community.general/pull/7896).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 7389-nmcli-issue-with-creating-a-wifi-bridge-slave.yml
+    - 7646-fix-order-number-detection-in-dn.yml
+    - 7797-ipa-fix-otp-idempotency.yml
+    - 7821-mssql_script-py2.yml
+    - 7826-consul-modules-refactoring.yaml
+    - 7870-homebrew-cask-installed-detection.yml
+    - 7872-proxmox_fix-update-if-setting-doesnt-exist.yaml
+    - 7874-incus_connection_treats_inventory_hostname_as_literal_in_remotes.yml
+    - 7882-add-redfish-get-service-identification.yml
+    - 7896-add-terraform-diff-mode.yml
+    - 7897-consul-action-group.yaml
+    - 7901-consul-acl-deprecation.yaml
+    - 8.3.0.yml
+    modules:
+    - description: Bootstrap ACLs in Consul
+      name: consul_acl_bootstrap
+      namespace: ''
+    - description: Manipulate Consul auth methods
+      name: consul_auth_method
+      namespace: ''
+    - description: Manipulate Consul binding rules
+      name: consul_binding_rule
+      namespace: ''
+    - description: Manipulate Consul tokens
+      name: consul_token
+      namespace: ''
+    - description: Creates/updates/deletes GitLab Labels belonging to project or group.
+      name: gitlab_label
+      namespace: ''
+    - description: Creates/updates/deletes GitLab Milestones belonging to project
+        or group
+      name: gitlab_milestone
+      namespace: ''
+    release_date: '2024-01-29'
