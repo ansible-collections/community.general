@@ -339,7 +339,7 @@ EXAMPLES = '''
     community.general.redfish_config:
       category: Manager
       command: SetServiceIdentification
-      service_id: "{{ service_id ""}
+      service_id: "{{ service_id }}"
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
