@@ -88,6 +88,12 @@ options:
       - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
+  service_id:
+    required: false
+    description:
+      - ID of the manager to update
+    type: str
+    version_added: '8.4.0'
   nic_addr:
     required: false
     description:
