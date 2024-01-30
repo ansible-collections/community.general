@@ -3410,7 +3410,7 @@ class RedfishUtils(object):
 
     def set_service_identification(self, service_id):
         data = {"ServiceIdentification": service_id}
-        resp = self.patch_request(self.root_uri + '/redfish/v1/Managers/' + manager, data, check_pyld=True)
+        resp = self.patch_request(self.root_uri + '/redfish/v1/Managers/' + self.resource_id, data, check_pyld=True)
         return resp
 
     def set_session_service(self, sessions_config):
