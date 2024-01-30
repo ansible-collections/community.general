@@ -362,7 +362,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
                 "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes", "CreateVolume"],
-    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface", "SetServiceIdentification" ],
+    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface", "SetServiceIdentification"],
     "Sessions": ["SetSessionService"],
 }
 
