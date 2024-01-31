@@ -562,8 +562,12 @@ files:
     maintainers: paytroff
   $modules/gitlab_issue.py:
     maintainers: zvaraondrej
+  $modules/gitlab_label.py:
+    maintainers: gpongelli
   $modules/gitlab_merge_request.py:
     maintainers: zvaraondrej
+  $modules/gitlab_milestone.py:
+    maintainers: gpongelli
   $modules/gitlab_project_variable.py:
     maintainers: markuman
   $modules/gitlab_instance_variable.py:
@@ -1490,7 +1494,7 @@ macros:
   team_ansible_core:
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
-  team_consul: sgargan
+  team_consul: sgargan apollo13
   team_cyberark_conjur: jvanderhoof ryanprior
   team_e_spirit: MatrixCrawler getjack
   team_flatpak: JayKayy oolongbrothers

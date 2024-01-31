@@ -77,12 +77,10 @@
     - name: Start Consul (dev mode enabled)
       shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
     - name: Bootstrap ACL
-      command: '{{ consul_cmd }} acl bootstrap --format=json'
-      register: consul_bootstrap_result_string
+      consul_acl_bootstrap:
+      register: consul_bootstrap_result
     - set_fact:
-        consul_management_token: '{{ consul_bootstrap_json_result["SecretID"] }}'
-      vars:
-        consul_bootstrap_json_result: '{{ consul_bootstrap_result_string.stdout | from_json }}'
+        consul_management_token: '{{ consul_bootstrap_result.result.SecretID }}'
     - name: Create some data
       command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'
       loop:
@@ -91,9 +89,18 @@
       - 3
     - import_tasks: consul_general.yml
     - import_tasks: consul_kv.yml
-    - import_tasks: consul_session.yml
-    - import_tasks: consul_policy.yml
-    - import_tasks: consul_role.yml
+
+    - block:
+        - import_tasks: consul_session.yml
+        - import_tasks: consul_policy.yml
+        - import_tasks: consul_role.yml
+        - import_tasks: consul_token.yml
+        - import_tasks: consul_auth_method.yml
+        - import_tasks: consul_binding_rule.yml
+      module_defaults:
+        group/community.general.consul:
+          token: "{{ consul_management_token }}"
+
     always:
     - name: Kill consul process
       shell: kill $(cat {{ remote_tmp_dir }}/consul.pid)

@@ -5,6 +5,7 @@
 
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
@@ -33,12 +34,27 @@ options:
     description:
       - Whether to verify the TLS certificate of the consul agent.
     default: true
-  token:
-    description:
-      - The token to use for authorization.
-    type: str
   ca_path:
     description:
       - The CA bundle to use for https connections
     type: str
+"""
+
+    TOKEN = r"""
+options:
+  token:
+    description:
+      - The token to use for authorization.
+    type: str
+"""
+
+    ACTIONGROUP_CONSUL = r"""
+options: {}
+attributes:
+  action_group:
+    description: Use C(group/community.general.consul) in C(module_defaults) to set defaults for this module.
+    support: full
+    membership:
+      - community.general.consul
+    version_added: 8.3.0
 """

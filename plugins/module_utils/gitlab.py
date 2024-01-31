@@ -59,11 +59,11 @@ def find_project(gitlab_instance, identifier):
 
 def find_group(gitlab_instance, identifier):
     try:
-        project = gitlab_instance.groups.get(identifier)
+        group = gitlab_instance.groups.get(identifier)
     except Exception as e:
         return None
 
-    return project
+    return group
 
 
 def ensure_gitlab_package(module):
