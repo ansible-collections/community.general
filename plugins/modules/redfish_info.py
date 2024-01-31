@@ -59,7 +59,7 @@ options:
     description:
       - Name of manager on OOB controller to target.
     type: str
-    version_added: '8.3.0'
+    version_added: '8.2.0'
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
