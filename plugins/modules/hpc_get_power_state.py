@@ -154,11 +154,11 @@ def main():
     if category == "Get_Power_State":
         for command in command_list:
             if command == "Get_PS":
-                result = rf_utils.get_PS_CrayXD670({'baseuri' : module.params['baseuri'],
-                                                    'username' : module.params['username'],
-                                                    'password' : module.params['password'],
-                                                    'power_state' : module.params['power_state'],
-                                                    'output_file_name' : module.params['output_file_name']})
+                result = rf_utils.get_PS_CrayXD670({'baseuri': module.params['baseuri'],
+                                                    'username': module.params['username'],
+                                                    'password': module.params['password'],
+                                                    'power_state': module.params['power_state'],
+                                                    'output_file_name': module.params['output_file_name']})
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
