@@ -74,7 +74,8 @@ options:
     type: str
 
 
-author: Srujana Yasa
+author:
+  - '@Srujana-2000'
 '''
 
 EXAMPLES = '''
