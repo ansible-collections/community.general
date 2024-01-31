@@ -110,7 +110,7 @@ options:
     type: str
 
 author:
-  - Srujana Yasa (@Srujana)
+  - Srujana Yasa (@srujana)
 '''
 
 EXAMPLES = '''
