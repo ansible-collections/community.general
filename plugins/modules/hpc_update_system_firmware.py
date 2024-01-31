@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: hpc_update_system_firmware
 short_description: Updates CrayXD components using Redfish APIs
@@ -113,7 +113,7 @@ author:
   - Srujana Yasa (@srujana)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
     - name: Running Firmware Update for Cray XD Servers
       hpc_update_system_firmware:
         category: Update
@@ -130,7 +130,7 @@ EXAMPLES = '''
         update_image_path_xd670: "path"
 '''
 
-RETURN = '''
+RETURN = r'''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update.
