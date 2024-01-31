@@ -123,9 +123,9 @@ def main():
     command_list = module.params['command']
 
     # admin credentials used for authentication
-    creds = {'user' : module.params['username'],
-             'pswd' : module.params['password'],
-             'token' : module.params['auth_token']}
+    creds = {'user': module.params['username'],
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     timeout = module.params['timeout']
     # Build root URI
@@ -146,10 +146,10 @@ def main():
     if category == "GetInventory":
         for command in command_list:
             if command == "GetSystemFWInventory":
-                result = rf_utils.get_sys_fw_inventory({'baseuri' : module.params['baseuri'],
-                                                        'username' : module.params['username'],
-                                                        'password' : module.params['password'],
-                                                        'output_file_name' : module.params['output_file_name']})
+                result = rf_utils.get_sys_fw_inventory({'baseuri': module.params['baseuri'],
+                                                        'username': module.params['username'],
+                                                        'password': module.params['password'],
+                                                        'output_file_name': module.params['output_file_name']})
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
