@@ -522,12 +522,14 @@ options:
       - If V(true), the VM will be updated with new value.
       - Because of the operations of the API and security reasons, I have disabled the update of the following parameters
         O(net), O(virtio), O(ide), O(sata), O(scsi). Per example updating O(net) update the MAC address and C(virtio) create always new disk...
+        This security feature can be disabled by setting the O(update_unsafe) to V(true).
       - Update of O(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: false
   update_unsafe:
     description:
-      - If V(true), does not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), and O(scsi).
+      - If V(true), do not enforce limitations on parameters O(net), O(virtio), O(ide), O(sata), O(scsi), O(efidisk0), and O(tpmstate0).
+        Use this option with caution because an improper configuration might result in a permanent loss of data (e.g. disk recreated).
     type: bool
     default: false
     version_added: 8.3.0
