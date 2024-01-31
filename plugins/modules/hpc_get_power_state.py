@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: hpc_get_power_state
 short_description: Inventory Information of CrayXD components using Redfish APIs
@@ -78,7 +78,7 @@ author:
   - Srujana Yasa (@Srujana-2000)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
     - name: Getting Power State of Cray XD670 Server nodes
       get_power_state:
         category: Get_Power_State
@@ -90,7 +90,7 @@ EXAMPLES = '''
         output_file_name: "output_file"
 '''
 
-RETURN = '''
+RETURN = r'''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update
