@@ -368,11 +368,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
                 "SetDefaultBootOrder", "EnableSecureBoot", "SetSecureBoot", "DeleteVolumes", "CreateVolume"],
-<<<<<<< HEAD
     "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface", "SetServiceIdentification"],
-=======
-    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface", "SetServiceIdentification" ],
->>>>>>> 64854e12c (Update redfish_config.py)
     "Sessions": ["SetSessionService"],
 }
 
@@ -536,15 +532,7 @@ def main():
             elif command == "SetHostInterface":
                 result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
             elif command == "SetServiceIdentification":
-<<<<<<< HEAD
-<<<<<<< HEAD
                 result = rf_utils.set_service_identification(service_id)
-=======
-                result = rf_utils.set_service_identification(resource_id, service_id)
->>>>>>> 64854e12c (Update redfish_config.py)
-=======
-                result = rf_utils.set_service_identification(service_id)
->>>>>>> 74631484d (Update redfish_config.py)
 
     elif category == "Sessions":
         # execute only if we find a Sessions resource
