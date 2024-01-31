@@ -69,8 +69,7 @@ options:
 
 
 author:
-  - Srujana Yasa (@Srujana-2000)
-  - Akash Sangnure (@akash-ashok-sangnure)
+  - Srujana Yasa (@Srujana)
 '''
 
 EXAMPLES = '''
