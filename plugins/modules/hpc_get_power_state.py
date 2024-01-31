@@ -75,7 +75,7 @@ options:
 
 
 author:
-  - Srujana Yasa (@Srujana-2000)
+  - Srujana Yasa (@Srujana)
 '''
 
 EXAMPLES = r'''
