@@ -262,9 +262,9 @@ class CrayRedfishUtils(RedfishUtils):
                         body['UpdateParameters'] = (None, json.dumps({"Targets": [targets_uri]}), 'application/json')
                     else:
                         body['UpdateParameters'] = (None, json.dumps({"Targets":
-                                                                        ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/',
-                                                                            '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}),
-                                                                            'application/json')
+                                                                      ['/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD1/',
+                                                                       '/redfish/v1/UpdateService/FirmwareInventory/BPB_CPLD2/']}),
+                                                    'application/json')
                     body['OemParameters'] = (None, json.dumps({"ImageType": image_type}), 'application/json')
                     with open(image_path, 'rb') as image_path_rb:
                         body['UpdateFile'] = (image_path, image_path_rb, 'application/octet-stream')
