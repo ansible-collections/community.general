@@ -610,6 +610,12 @@ files:
     maintainers: jameslivulpi
   $modules/honeybadger_deployment.py:
     maintainers: stympy
+  $modules/hpc_get_power_state.py:
+    maintainers: srujana
+  $modules/hpc_get_system_fw_inv.py:
+    maintainers: srujana
+  $modules/hpc_update_system_firmware.py:
+    maintainers: srujana
   $modules/hpilo_:
     ignore: dagwieers
     maintainers: haad
