@@ -74,7 +74,7 @@ options:
     type: str
 
 
-author: "Srujana Yasa"
+author: Srujana Yasa
 '''
 
 EXAMPLES = '''
