@@ -180,9 +180,9 @@ def main():
     command_list = module.params['command']
 
     # admin credentials used for authentication
-    creds = {'user' : module.params['username'],
-             'pswd' : module.params['password'],
-             'token' : module.params['auth_token']}
+    creds = {'user': module.params['username'],
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     timeout = module.params['timeout']
     # Build root URI
@@ -203,17 +203,17 @@ def main():
     if category == "Update":
         for command in command_list:
             if command == "SystemFirmwareUpdate":
-                result = rf_utils.system_fw_update({'baseuri' : module.params['baseuri'],
-                                                    'username' : module.params['username'],
-                                                    'password' : module.params['password'],
-                                                    'update_image_type' : module.params['update_image_type'],
-                                                    'update_target' : module.params['update_target'],
-                                                    'power_state' : module.params['power_state'],
-                                                    'update_image_path_xd220V' : module.params['update_image_path_xd220V'],
-                                                    'update_image_path_xd225V' : module.params['update_image_path_xd225V'],
-                                                    'update_image_path_xd295V' : module.params['update_image_path_xd295V'],
-                                                    'update_image_path_xd665' : module.params['update_image_path_xd665'],
-                                                    'update_image_path_xd670' : module.params['update_image_path_xd670'],
+                result = rf_utils.system_fw_update({'baseuri': module.params['baseuri'],
+                                                    'username': module.params['username'],
+                                                    'password': module.params['password'],
+                                                    'update_image_type': module.params['update_image_type'],
+                                                    'update_target': module.params['update_target'],
+                                                    'power_state': module.params['power_state'],
+                                                    'update_image_path_xd220V': module.params['update_image_path_xd220V'],
+                                                    'update_image_path_xd225V': module.params['update_image_path_xd225V'],
+                                                    'update_image_path_xd295V': module.params['update_image_path_xd295V'],
+                                                    'update_image_path_xd665': module.params['update_image_path_xd665'],
+                                                    'update_image_path_xd670': module.params['update_image_path_xd670'],
                                                     'output_file_name': module.params['output_file_name']})
                 if result['ret']:
                     msg = result.get('msg', False)
