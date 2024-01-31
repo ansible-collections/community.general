@@ -75,7 +75,7 @@ options:
 
 
 author:
-  - '@Srujana-2000'
+  - Srujana Yasa (@Srujana-2000)
 '''
 
 EXAMPLES = '''
