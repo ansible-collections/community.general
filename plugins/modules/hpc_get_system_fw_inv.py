@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: hpc_get_system_fw_inv
 short_description: Inventory Information of CrayXD components using Redfish APIs
@@ -72,7 +72,7 @@ author:
   - Srujana Yasa (@srujana)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
   - name: Fetching System Firmware Inventory Details
     hpc_get_system_fw_inv:
       category: GetInventory
@@ -83,7 +83,7 @@ EXAMPLES = '''
       output_file_name: "output_file.csv"
 '''
 
-RETURN = '''
+RETURN = r'''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update.
