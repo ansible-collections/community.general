@@ -537,10 +537,14 @@ def main():
                 result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
             elif command == "SetServiceIdentification":
 <<<<<<< HEAD
+<<<<<<< HEAD
                 result = rf_utils.set_service_identification(service_id)
 =======
                 result = rf_utils.set_service_identification(resource_id, service_id)
 >>>>>>> 64854e12c (Update redfish_config.py)
+=======
+                result = rf_utils.set_service_identification(service_id)
+>>>>>>> 74631484d (Update redfish_config.py)
 
     elif category == "Sessions":
         # execute only if we find a Sessions resource
