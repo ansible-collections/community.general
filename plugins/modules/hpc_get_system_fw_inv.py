@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -8,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: hpc_get_system_fw_inv
 short_description: Inventory Information of CrayXD components using Redfish APIs
@@ -72,7 +73,7 @@ author:
   - Srujana Yasa (@srujana)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
   - name: Fetching System Firmware Inventory Details
     hpc_get_system_fw_inv:
       category: GetInventory
@@ -83,7 +84,7 @@ EXAMPLES = '''
       output_file_name: "output_file.csv"
 '''
 
-RETURN = '''
+RETURN = r'''
 csv:
   description: Output of this Task is saved to a csv file.
   returned: Returned an output file containing the details of update.
@@ -122,9 +123,9 @@ def main():
     command_list = module.params['command']
 
     # admin credentials used for authentication
-    creds = {'user' : module.params['username'],
-             'pswd' : module.params['password'],
-             'token' : module.params['auth_token']}
+    creds = {'user': module.params['username'],
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     timeout = module.params['timeout']
     # Build root URI
@@ -145,10 +146,10 @@ def main():
     if category == "GetInventory":
         for command in command_list:
             if command == "GetSystemFWInventory":
-                result = rf_utils.get_sys_fw_inventory({'baseuri' : module.params['baseuri'],
-                                                        'username' : module.params['username'],
-                                                        'password' : module.params['password'],
-                                                        'output_file_name' : module.params['output_file_name']})
+                result = rf_utils.get_sys_fw_inventory({'baseuri': module.params['baseuri'],
+                                                        'username': module.params['username'],
+                                                        'password': module.params['password'],
+                                                        'output_file_name': module.params['output_file_name']})
                 if result['ret']:
                     msg = result.get('msg', False)
                     module.exit_json(msg=msg)
