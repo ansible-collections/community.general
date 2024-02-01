@@ -70,7 +70,7 @@ options:
         type: str
         required: true
 notes:
-- The C(pycdlib) library states it supports Python 2.7 and 3.4 only.
+- The C(pycdlib) library states it supports Python 2.7 and 3.4+.
 - >
   The function C(add_file) in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet / UDF.
   But it will not overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10.
