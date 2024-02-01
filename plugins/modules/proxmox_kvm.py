@@ -532,7 +532,7 @@ options:
         Use this option with caution because an improper configuration might result in a permanent loss of data (e.g. disk recreated).
     type: bool
     default: false
-    version_added: 8.3.0
+    version_added: 8.4.0
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
