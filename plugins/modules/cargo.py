@@ -510,9 +510,9 @@ class Cargo(object):
 
             name_elems = []
             if len(name) < 3:
-                name_elems = [len(name), name]
+                name_elems = ["%s" % len(name), name]
             elif len(name) == 3:
-                name_elems = [len(name), name[0], name]
+                name_elems = ["%s" % len(name), name[0], name]
             else:
                 name_elems = [name[0:2], name[2:4], name]
 
