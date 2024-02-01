@@ -484,8 +484,7 @@ class Cargo(object):
                 )
 
             new_rev = out[:40]
-            if new_rev != metadata["rev"]:
-                return True
+            return new_rev != metadata["rev"]
 
         # If the version installed is already equal to one mentioned, we don't
         # need to update
