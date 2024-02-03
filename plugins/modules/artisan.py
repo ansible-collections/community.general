@@ -259,8 +259,8 @@ def run_module():
         working_dir=dict(type='path', required=True),
         command=dict(type='str', required=True),
         php_path=dict(type='path'),
-        options=dict(type='list', default=[]),
-        args=dict(type='list', default=[]),
+        options=dict(type='list', elements='str', default=[]),
+        args=dict(type='list', elements='str', default=[]),
     )
 
     # instantiate the AnsibleModule object
