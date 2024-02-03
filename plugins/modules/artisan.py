@@ -1,16 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2024, Ralf Langebrake <ralf@langebrake.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import (absolute_import, division, print_function)
+# Copyright (c) 2024, Ralf Langebrake <ralf@langebrake.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
-
-import os
-import re
-
-from ansible.module_utils.basic import AnsibleModule
 
 DOCUMENTATION = r'''
 ---
@@ -18,12 +14,10 @@ module: artisan
 
 short_description: Laravel command line interface
 
-version_added: "1.0.0"
-
 description:
     - >
-      Artisan is the command line interface included with Laravel, the 
-      PHP web application framework for artisans. The module was heavily 
+      Artisan is the command line interface included with Laravel, the
+      PHP web application framework for artisans. The module was heavily
       inspired by composer, which is typically used together with artisan.
 
 extends_documentation_fragment:
@@ -50,11 +44,15 @@ options:
         description:
             - Command options like seed or force without leading hyphens.
         required: false
+        elements: str
+        default: []
         type: list
     args:
         description:
             - Command arguments, mainly in custom commands.
         required: false
+        elements: str
+        default: []
         type: list
     php_path:
         description:
@@ -125,6 +123,11 @@ EXAMPLES = r'''
     - view:clear
     - up
 '''
+
+import os
+import re
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 def parse(out):

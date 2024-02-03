@@ -400,6 +400,8 @@ files:
     maintainers: evgkrsk
   $modules/archive.py:
     maintainers: bendoh
+  $modules/artisan.py:
+    maintainers: codebarista
   $modules/atomic_:
     maintainers: krsacme
   $modules/atomic_container.py:
