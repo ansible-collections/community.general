@@ -16,7 +16,6 @@ Bugfix release.
 
 From now on, community.general 6.x.y will only receive major bugfixes and security fixes anymore.
 
-
 Bugfixes
 --------
 
