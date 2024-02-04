@@ -12,6 +12,9 @@ mention_ancestor: true
 flatmap: true
 new_plugins_after_name: removed_features
 notesdir: fragments
+output_formats:
+  - md
+  - rst
 prelude_section_name: release_summary
 prelude_section_title: Release Summary
 sections:
