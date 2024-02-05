@@ -1,0 +1,2 @@
+minor_changes:
+  - filesystem - removes ``-f`` from ``MKFS_FORCE_FLAGS`` from the mkswap class (https://github.com/ansible-collections/community.general/issues/7946)
