@@ -3,7 +3,9 @@
 {
 	"name": "Alpine",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	//"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	"service": "ansible",
+    "dockerComposeFile": "docker-compose.yml",
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/ansible:2": {}
 	},

@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  ansible:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    volumes:
+      - ..:/workspaces/ansible_collections/community/general
+    restart: always
+    command: sleep infinity
