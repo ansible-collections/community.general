@@ -1,12 +1,13 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
-	"name": "Alpine",
+	"name": "ansible",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	//"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"service": "ansible",
     "dockerComposeFile": "docker-compose.yml",
 	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
 		"ghcr.io/devcontainers-contrib/features/ansible:2": {}
 	},
 
