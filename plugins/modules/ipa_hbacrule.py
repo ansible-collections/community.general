@@ -161,6 +161,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 class HBACRuleIPAClient(IPAClient):
@@ -231,10 +232,17 @@ def ensure(module, client):
     name = module.params['cn']
     state = module.params['state']
 
+    ipa_version = client.get_ipa_version()
     if state in ['present', 'enabled']:
-        ipaenabledflag = True
+        if LooseVersion(ipa_version) < LooseVersion('4.10.0'):
+            ipaenabledflag = True
+        else:
+            ipaenabledflag = 'TRUE'
     else:
-        ipaenabledflag = False
+        if LooseVersion(ipa_version) < LooseVersion('4.10.0'):
+            ipaenabledflag = False
+        else:
+            ipaenabledflag = 'FALSE'
 
     host = module.params['host']
     hostcategory = module.params['hostcategory']
