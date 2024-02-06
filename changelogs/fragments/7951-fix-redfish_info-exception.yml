@@ -1,0 +1,2 @@
+bugfixes:
+  - "redfish_info - correct uncaught exception when attempting to retrieve `Chassis` information"
