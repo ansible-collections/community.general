@@ -337,12 +337,12 @@ def ensure(module, client):
 
     ipa_version = client.get_ipa_version()
     if state in ['present', 'enabled']:
-        if LooseVersion(ipa_version) < LooseVersion('4.10.0'):
+        if LooseVersion(ipa_version) < LooseVersion('4.9.10'):
             ipaenabledflag = True
         else:
             ipaenabledflag = 'TRUE'
     else:
-        if LooseVersion(ipa_version) < LooseVersion('4.10.0'):
+        if LooseVersion(ipa_version) < LooseVersion('4.9.10'):
             ipaenabledflag = False
         else:
             ipaenabledflag = 'FALSE'
