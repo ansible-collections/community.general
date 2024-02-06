@@ -23,7 +23,16 @@ DOCUMENTATION = r'''
     - ansible.builtin.result_format_callback
 '''
 
-EXAMPLES = r'''#'''
+EXAMPLES = r'''
+# Enable callback in ansible.cfg:
+ansible_config: |
+  [defaults]
+  stdout_callback = community.general.default_without_diff
+
+# Enable callback with environment variables:
+environment_variable: |
+  ANSIBLE_STDOUT_CALLBACK=community.general.default_without_diff
+'''
 
 from ansible.plugins.callback.default import CallbackModule as Default
 

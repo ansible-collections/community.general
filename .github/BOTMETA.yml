@@ -50,6 +50,8 @@ files:
   $callbacks/cgroup_memory_recap.py: {}
   $callbacks/context_demo.py: {}
   $callbacks/counter_enabled.py: {}
+  $callbacks/default_without_diff.py:
+    maintainers: felixfontein
   $callbacks/dense.py:
     maintainers: dagwieers
   $callbacks/diy.py:
