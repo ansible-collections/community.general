@@ -1,0 +1,2 @@
+minor_changes:
+  - "lxd_container - uses ``/1.0/instances`` API endpoint, if available. Falls back to ``/1.0/containers`` or ``/1.0/virtual-machines``. Fixes issue when using Incus or LXD 5.19 due to migrating to ``/1.0/instances`` endpoint. (https://github.com/ansible-collections/community.general/pull/7980)."
