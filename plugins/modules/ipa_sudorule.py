@@ -338,14 +338,14 @@ def ensure(module, client):
     ipa_version = client.get_ipa_version()
     if state in ['present', 'enabled']:
         if LooseVersion(ipa_version) < LooseVersion('4.9.10'):
-            ipaenabledflag = True
-        else:
             ipaenabledflag = 'TRUE'
+        else:
+            ipaenabledflag = True
     else:
         if LooseVersion(ipa_version) < LooseVersion('4.9.10'):
-            ipaenabledflag = False
-        else:
             ipaenabledflag = 'FALSE'
+        else:
+            ipaenabledflag = False
 
     sudoopt = module.params['sudoopt']
     user = module.params['user']
