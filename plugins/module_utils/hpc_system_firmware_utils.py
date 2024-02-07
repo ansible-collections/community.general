@@ -21,7 +21,7 @@ except ImportError:
     HAS_REQUESTS_TOOLBELT = False
 
 
-REQUESTS_TOOLBELT_REQUIRED = "Requests_toolbelt is required for this module."
+REQUESTS_TOOLBELT_REQUIRED = "Requests_toolbelt is required for this module"
 
 
 def has_requests_toolbelt(module):
