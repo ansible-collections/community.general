@@ -1522,8 +1522,9 @@ def main():
         status = {}
         try:
             vm = proxmox.get_vm(vmid)
-            status['status'] = vm['status']
-            if vm['status'] == 'running':
+            current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
+            status['status'] = current
+            if current == 'running':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already running" % vmid, **status)
 
             if proxmox.start_vm(vm):
@@ -1538,9 +1539,9 @@ def main():
         status = {}
         try:
             vm = proxmox.get_vm(vmid)
-
-            status['status'] = vm['status']
-            if vm['status'] == 'stopped':
+            current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
+            status['status'] = current
+            if current == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
             proxmox.stop_vm(vm, force=module.params['force'], timeout=module.params['timeout'])
@@ -1570,8 +1571,9 @@ def main():
 
         status = {}
         vm = proxmox.get_vm(vmid)
-        status['status'] = vm['status']
-        if vm['status'] == 'stopped':
+        current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
+        status['status'] = current
+        if current == 'stopped':
             module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
 
         if proxmox.restart_vm(vm, force=module.params['force']):
@@ -1588,8 +1590,9 @@ def main():
                 module.exit_json(changed=False, vmid=vmid)
 
             proxmox_node = proxmox.proxmox_api.nodes(vm['node'])
-            status['status'] = vm['status']
-            if vm['status'] == 'running':
+            current = proxmox_node.qemu(vmid).status.current.get()['status']
+            status['status'] = current
+            if current == 'running':
                 if module.params['force']:
                     proxmox.stop_vm(vm, True, timeout=module.params['timeout'])
                 else:
