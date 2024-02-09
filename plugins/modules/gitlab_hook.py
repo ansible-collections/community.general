@@ -97,6 +97,11 @@ options:
       - Trigger hook on wiki events.
     type: bool
     default: false
+  releases_events:
+    description:
+      - Trigger hook on release events.
+    type: book
+    default: false
   hook_validate_certs:
     description:
       - Whether GitLab will do SSL verification when triggering the hook.
@@ -201,6 +206,7 @@ class GitLabHook(object):
                 'job_events': options['job_events'],
                 'pipeline_events': options['pipeline_events'],
                 'wiki_page_events': options['wiki_page_events'],
+                'releases_events': options['releases_events'],
                 'enable_ssl_verification': options['enable_ssl_verification'],
                 'token': options['token'],
             })
@@ -216,6 +222,7 @@ class GitLabHook(object):
                 'job_events': options['job_events'],
                 'pipeline_events': options['pipeline_events'],
                 'wiki_page_events': options['wiki_page_events'],
+                'releases_events': options['releases_events'],
                 'enable_ssl_verification': options['enable_ssl_verification'],
                 'token': options['token'],
             })
@@ -302,6 +309,7 @@ def main():
         job_events=dict(type='bool', default=False),
         pipeline_events=dict(type='bool', default=False),
         wiki_page_events=dict(type='bool', default=False),
+        releases_events=dict(type='bool', default=False),
         hook_validate_certs=dict(type='bool', default=False, aliases=['enable_ssl_verification']),
         token=dict(type='str', no_log=True),
     ))
@@ -339,6 +347,7 @@ def main():
     job_events = module.params['job_events']
     pipeline_events = module.params['pipeline_events']
     wiki_page_events = module.params['wiki_page_events']
+    releases_events = module.params['releases_events']
     enable_ssl_verification = module.params['hook_validate_certs']
     hook_token = module.params['token']
 
@@ -369,6 +378,7 @@ def main():
             "job_events": job_events,
             "pipeline_events": pipeline_events,
             "wiki_page_events": wiki_page_events,
+            "releases_events": releases_events,
             "enable_ssl_verification": enable_ssl_verification,
             "token": hook_token,
         }):
