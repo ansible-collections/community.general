@@ -100,7 +100,7 @@ options:
   releases_events:
     description:
       - Trigger hook on release events.
-    type: book
+    type: bool
     default: false
   hook_validate_certs:
     description:
