@@ -492,7 +492,7 @@ class OnePassCLIv2(OnePassCLIBase):
                 if field.get("label", "").lower() == field_name:
                     return field.get("value", "")
 
-                if field.get("id") == field_name:
+                if field.get("id", "").lower() == field_name:
                     return field.get("value", "")
 
         return ""
