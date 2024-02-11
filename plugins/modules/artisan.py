@@ -67,7 +67,7 @@ requirements:
     - PHP
 
 notes:
-    - Always appended in each execution are --no-ansi, --no-interaction and --force if available.
+    - Always appended in each execution are C(--no-ansi), C(--no-interaction), and C(--force) if available.
     - Ansible Artisan is intended primarily, but not exclusively, for production deployments.
 
 author:
