@@ -14,6 +14,8 @@ module: artisan
 
 short_description: Laravel command line interface
 
+version_added: 8.4.0
+
 description:
     - >
       Artisan is the command line interface included with Laravel, the
