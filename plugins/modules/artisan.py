@@ -68,7 +68,7 @@ requirements:
 
 notes:
     - Always appended in each execution are --no-ansi, --no-interaction and --force if available.
-    - Ansible Artisan is intended primarily, but not exclusively, for production deployments
+    - Ansible Artisan is intended primarily, but not exclusively, for production deployments.
 
 author:
     - Ralf Langebrake (@codebarista)
