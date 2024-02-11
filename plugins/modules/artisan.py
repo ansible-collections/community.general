@@ -58,7 +58,7 @@ options:
         type: list
     php_path:
         description:
-            - Path to the PHP executable on the remote host if PHP is not included in PATH.
+            - Path to the PHP executable on the remote host if PHP is not included in E(PATH).
         required: false
         type: path
 
