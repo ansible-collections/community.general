@@ -20,7 +20,7 @@ description:
     - >
       Artisan is the command line interface included with Laravel, the
       PHP web application framework for artisans. The module was heavily
-      inspired by composer, which is typically used together with artisan.
+      inspired by M(community.general.composer), which is typically used together with artisan.
 
 extends_documentation_fragment:
     - community.general.attributes
