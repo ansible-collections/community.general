@@ -101,7 +101,7 @@ options:
     description:
       - Trigger hook on release events.
     type: bool
-    default: false
+    version_added: '8.4.0'
   hook_validate_certs:
     description:
       - Whether GitLab will do SSL verification when triggering the hook.
@@ -309,7 +309,7 @@ def main():
         job_events=dict(type='bool', default=False),
         pipeline_events=dict(type='bool', default=False),
         wiki_page_events=dict(type='bool', default=False),
-        releases_events=dict(type='bool', default=False),
+        releases_events=dict(type='bool', default=None),
         hook_validate_certs=dict(type='bool', default=False, aliases=['enable_ssl_verification']),
         token=dict(type='str', no_log=True),
     ))
