@@ -39,7 +39,7 @@ options:
         type: path
     command:
         description:
-            - Artisan command like "migrate", "clear-compiled" or "app:custom-command".
+            - Artisan command like V(migrate), V(clear-compiled), or V(app:custom-command).
         required: true
         type: str
     options:
