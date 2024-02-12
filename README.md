@@ -115,7 +115,7 @@ See the [Releasing guidelines](https://github.com/ansible/community-docs/blob/ma
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.rst).
+See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.md).
 
 ## Roadmap
 
