@@ -200,7 +200,7 @@ files:
     labels: cloud opennebula
     maintainers: feldsam
   $inventories/proxmox.py:
-    maintainers: $team_virt ilijamt
+    maintainers: $team_virt ilijamt krauthosting
   $inventories/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
@@ -1043,27 +1043,27 @@ files:
   $modules/proxmox:
     keywords: kvm libvirt proxmox qemu
     labels: proxmox virt
-    maintainers: $team_virt UnderGreen
+    maintainers: $team_virt UnderGreen krauthosting
     ignore: tleguern
   $modules/proxmox.py:
     ignore: skvidal
-    maintainers: UnderGreen
+    maintainers: UnderGreen krauthosting
   $modules/proxmox_disk.py:
-    maintainers: castorsky
+    maintainers: castorsky krauthosting
   $modules/proxmox_kvm.py:
     ignore: skvidal
-    maintainers: helldorado
+    maintainers: helldorado krauthosting
   $modules/proxmox_nic.py:
-    maintainers: Kogelvis
+    maintainers: Kogelvis krauthosting
   $modules/proxmox_node_info.py:
-    maintainers: jwbernin
+    maintainers: jwbernin krauthosting
   $modules/proxmox_storage_contents_info.py:
-    maintainers: l00ptr
+    maintainers: l00ptr krauthosting
   $modules/proxmox_tasks_info:
-    maintainers: paginabianca
+    maintainers: paginabianca krauthosting
   $modules/proxmox_template.py:
     ignore: skvidal
-    maintainers: UnderGreen
+    maintainers: UnderGreen krauthosting
   $modules/pubnub_blocks.py:
     maintainers: parfeon pubnub
   $modules/pulp_repo.py:
