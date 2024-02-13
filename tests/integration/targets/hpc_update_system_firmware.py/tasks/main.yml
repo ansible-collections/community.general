@@ -1,0 +1,19 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Running Firmware Update for Cray XD Servers
+  hpc_update_system_firmware:
+    category: Update
+    command: SystemFirmwareUpdate
+    baseuri: "{{ baseuri }}"
+    username: "{{ bmc_username }}"
+    password: "{{ bmc_password }}"
+    output_file_name: "{{ output_file_name }}"
+    update_target: "{{ target }}"
+    update_image_path_xd295V: "{{ path }}"
+    update_image_path_xd225V: "{{ path }}"
+    update_image_path_xd220V: "{{ path }}"
+    update_image_path_xd665: "{{ path }}"
+    update_image_path_xd670: "{{ path }}"
