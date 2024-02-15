@@ -176,8 +176,8 @@ def query_package(module, name):
             #     '>' - installed but newer than the repository version
 
             if (package in ('reading local summary...',
-                           'processing local summary...',
-                           'downloading pkg_summary.xz done.')) or \
+                            'processing local summary...',
+                            'downloading pkg_summary.xz done.')) or \
                (package.startswith('processing remote summary (')):
                 continue
 
