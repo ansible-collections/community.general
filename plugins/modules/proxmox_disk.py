@@ -816,6 +816,8 @@ def main():
             actual_size = disk_config['size']
             if size == actual_size:
                 module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already %s size" % (disk, size))
+            elif size < actual_size:
+                module.fail_json(changed=False, vmid=vmid, msg="Disk %s is size %s, which is smaller than %s: shrinking disks is not supported" % (disk, actual_size, size))
             proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s resized in VM %s" % (disk, vmid))
         except Exception as e:
