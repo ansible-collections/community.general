@@ -1,0 +1,2 @@
+bugfixes:
+  - pkgin - pkgin (pkgsrc package manager used by SmartOS) raises erratic exceptions and spurious "changed" instead of "ok".
