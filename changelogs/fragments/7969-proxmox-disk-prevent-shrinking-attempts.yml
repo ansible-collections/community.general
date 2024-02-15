@@ -1,0 +1,2 @@
+bugfixes: 
+  - proxmox_disk - the module doesn't detect that shrinking a disk is not supported and fails
