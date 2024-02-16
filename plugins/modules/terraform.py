@@ -376,7 +376,7 @@ def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
-def build_plan(command, project_path, variables_args, state_file, targets, state, apply_args, plan_path=None):
+def build_plan(command, project_path, variables_args, state_file, targets, state, args, plan_path=None):
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
@@ -389,10 +389,14 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
             plan_command.append(c)
 
     if state == "present":
-        for a in apply_args:
+        for a in args:
             local_command.remove(a)
         for c in local_command[1:]:
             plan_command.append(c)
+
+    if state == "absent":
+        for a in args:
+            plan_command.append(a)
 
     plan_command.extend(['-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path])
 
@@ -434,7 +438,14 @@ def get_diff(diff_output):
         return e['resource']
 
     diff_json_output = json.loads(diff_output)
-    tf_reosource_changes = diff_json_output['resource_changes']
+
+    # Ignore diff if resource_changes does not exists in tfplan
+    if 'resource_changes' in diff_json_output:
+        tf_reosource_changes = diff_json_output['resource_changes']
+    else:
+        module.warn("Cannot find resource_changes in terraform plan, diff/check ignored")
+        return False, {}
+
     diff_after = []
     diff_before = []
     changed = False
@@ -658,6 +669,10 @@ def main():
 
     result_diff = dict()
     if module._diff or module.check_mode:
+        if state == 'absent':
+            plan_absent_args = ['-destroy']
+            plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
+                                                                         module.params.get('targets'), state, plan_absent_args, plan_file)
         diff_command = [command[0], 'show', '-json', plan_file]
         rc, diff_output, err = module.run_command(diff_command, check_rc=False, cwd=project_path)
         changed, result_diff = get_diff(diff_output)
