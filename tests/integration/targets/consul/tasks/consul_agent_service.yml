@@ -1,0 +1,110 @@
+---
+# Copyright (c) 2024, Michael Ilg (@Ilgmi)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a service with name nginx
+  community.general.consul_agent_service:
+    name: nginx
+    service_port: 80
+    address: localhost
+    tags:
+      - http
+    meta:
+      nginx_version: 1.25.3
+    checks:
+      - name: nginx-check2
+        check_id: nginx-check2
+        service_id: nginx
+        interval: 60s
+        notes: "My Note"
+        http: http://localhost:80/morestatus
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.service.ID is defined
+      - result.service.Service == 'nginx'
+      - result.service.Address == 'localhost'
+      - result.service.Port == 80
+      - result.service.Tags[0] == 'http'
+      - result.service.Meta.nginx_version is defined
+      - result.service.Meta.nginx_version == '1.25.3'
+      - result.service.ContentHash is defined
+
+
+- name: Read service with name nginx
+  community.general.consul_agent_service:
+    name: nginx
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.service.ID is defined
+      - result.service.Service == 'nginx'
+      - result.service.Address == 'localhost'
+      - result.service.Port == 80
+      - result.service.Tags[0] == 'http'
+      - result.service.Meta.nginx_version is defined
+      - result.service.Meta.nginx_version == '1.25.3'
+      - result.service.ContentHash is defined
+
+- name: Read check with name nginx-check2
+  community.general.consul_agent_check:
+    name: nginx-check2
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.check is defined
+      - result.check.CheckID == 'nginx-check2'
+      - result.check.ServiceID == 'nginx'
+      - result.check.Interval == '1m0s'
+      - result.check.Type == 'http'
+      - result.check.Notes == 'My Note'
+
+- name: Add a check for service nginx
+  community.general.consul_agent_check:
+    name: nginx_check
+    id: nginx_check
+    interval: 30s
+    http: http://localhost:80/morestatus
+    notes: "Nginx Check"
+    token: "{{ consul_management_token }}"
+    service_id: nginx
+  register: result
+
+- name: Read check with name nginx
+  community.general.consul_agent_check:
+    name: nginx_check
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.check is defined
+      - result.check.CheckID == 'nginx_check'
+      - result.check.ServiceID == 'nginx'
+      - result.check.Interval == '30s'
+      - result.check.Type == 'http'
+      - result.check.Notes == 'Nginx Check'
+
+- name: Remove a service with name nginx
+  community.general.consul_agent_service:
+    name: nginx
+    state: absent
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result is not failed
+      - result.operation == 'remove'

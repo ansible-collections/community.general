@@ -10,6 +10,7 @@ __metaclass__ = type
 
 import copy
 import json
+import re
 
 from ansible.module_utils.six.moves.urllib import error as urllib_error
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -66,6 +67,26 @@ def camel_case_key(key):
         else:
             parts.append(part.capitalize())
     return "".join(parts)
+
+
+def validate_check(check):
+    validate_duration_keys = ['Interval', 'Ttl', 'Timeout']
+    validate_tcp_regex = r"(?P<host>.*):(?P<port>(?:[0-9]+))$"
+    if 'Tcp' in check and check['Tcp'] is not None:
+        match = re.match(validate_tcp_regex, check['Tcp'])
+        if not match:
+            raise Exception('tcp check must be in host:port format')
+    for duration in validate_duration_keys:
+        if duration in check and check[duration] is not None:
+            check[duration] = validate_duration(check[duration])
+
+
+def validate_duration(duration):
+    if duration:
+        duration_units = ['ns', 'us', 'ms', 's', 'm', 'h']
+        if not any(duration.endswith(suffix) for suffix in duration_units):
+            duration = "{0}s".format(duration)
+    return duration
 
 
 STATE_PARAMETER = "state"
@@ -233,7 +254,8 @@ class _ConsulModule:
         if self._module.check_mode:
             return obj
         else:
-            return self.put(self.api_endpoint, data=self.prepare_object({}, obj))
+            url = self.endpoint_url(OPERATION_CREATE)
+            return self.put(url, data=self.prepare_object({}, obj))
 
     def update_object(self, existing, obj):
         url = self.endpoint_url(
@@ -309,7 +331,9 @@ class _ConsulModule:
         if 400 <= status < 600:
             raise RequestError(status, response_data)
 
-        return json.loads(response_data)
+        if len(response_data) > 0:
+            return json.loads(response_data)
+        return {}
 
     def get(self, url_parts, **kwargs):
         return self._request("GET", url_parts, **kwargs)
