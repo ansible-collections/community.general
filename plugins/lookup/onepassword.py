@@ -489,10 +489,10 @@ class OnePassCLIv2(OnePassCLIBase):
             current_section_title = section.get("label", section.get("id", "")).lower()
             if section_title == current_section_title:
                 # In the correct section. Check "label" then "id" for the desired field_name
-                if field.get("label") == field_name:
+                if field.get("label", "").lower() == field_name:
                     return field.get("value", "")
 
-                if field.get("id") == field_name:
+                if field.get("id", "").lower() == field_name:
                     return field.get("value", "")
 
         return ""
