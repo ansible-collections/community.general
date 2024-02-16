@@ -87,6 +87,11 @@
       - 1
       - 2
       - 3
+
+    - name: Print result
+      debug:
+        var: consul_management_token
+
     - import_tasks: consul_general.yml
     - import_tasks: consul_kv.yml
 
@@ -97,6 +102,7 @@
         - import_tasks: consul_token.yml
         - import_tasks: consul_auth_method.yml
         - import_tasks: consul_binding_rule.yml
+        - import_tasks: consul_agent_service.yml
       module_defaults:
         group/community.general.consul:
           token: "{{ consul_management_token }}"
