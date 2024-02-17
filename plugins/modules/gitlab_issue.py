@@ -183,7 +183,7 @@ class GitlabIssue(object):
     def get_issue(self, title, state_filter):
         issues = []
         try:
-            issues = self.project.issues.list(title=title, state=state_filter)
+            issues = self.project.issues.list(query_parameters={"search": title, "in": "title", "state": state_filter})
         except gitlab.exceptions.GitlabGetError as e:
             self._module.fail_json(msg="Failed to list the Issues: %s" % to_native(e))
 
