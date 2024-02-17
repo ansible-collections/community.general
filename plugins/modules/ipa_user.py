@@ -104,7 +104,8 @@ options:
     description:
     - The authentication type to use for the user.
     - The choice V(idp) and V(passkey) has been added in community.general 8.1.0.
-    choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey"]
+    - The choice V(global) unset authentication type to use for the user option and freeipa will use ipa default auth type.
+    choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey", "global"]
     type: list
     elements: str
     version_added: '1.2.0'
@@ -336,6 +337,17 @@ def ensure(module, client):
 
     changed = False
     if state in ['present', 'enabled', 'disabled']:
+        # To unset ipauserauthtypes from an IPA user
+        # If ipauserauthtype is not present for an IPA user, IPA doesn't provide an empty list.
+        # To address this, pass None to get_user_diff when ipauserauthtype is missing.
+        # If ipauserauthtype is present, set it to an empty list during create/modifications to effectively remove authentication methods.
+        if 'ipauserauthtype' in module_user:
+            if 'global' in module_user['ipauserauthtype']:
+                if 'ipauserauthtype' not in ipa_user:
+                    module_user.pop('ipauserauthtype', None)
+                else:
+                    module_user['ipauserauthtype'] = ['']
+
         if not ipa_user:
             changed = True
             if not module.check_mode:
@@ -379,7 +391,7 @@ def main():
                          title=dict(type='str'),
                          homedirectory=dict(type='str'),
                          userauthtype=dict(type='list', elements='str',
-                                           choices=['password', 'radius', 'otp', 'pkinit', 'hardened', 'idp', 'passkey']))
+                                           choices=['password', 'radius', 'otp', 'pkinit', 'hardened', 'idp', 'passkey', 'global']))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)

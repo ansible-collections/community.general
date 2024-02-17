@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa_user - add choice ``global`` in ``userauthtype`` to unset ``userauthtype`` from an IPA user (https://github.com/ansible-collections/community.general/pull/7981).
