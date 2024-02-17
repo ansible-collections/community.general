@@ -2,58 +2,78 @@
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: no
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
 
 - name: Delete realm
-  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
-  vars:
-    call_args:
-      id: "{{ realm }}"
-      realm: "{{ realm }}"
-      state: absent
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: absent
 
 - name: Create realm
-  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
-  vars:
-    call_args:
-      id: "{{ realm }}"
-      realm: "{{ realm }}"
-      state: present
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
 
 - name: Desire client
-  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
-  vars:
-    call_args:
-      realm: "{{ realm }}"
-      client_id: "{{ client_id }}"
-      state: present
-      redirect_uris: '{{redirect_uris1}}'
-      attributes: '{{client_attributes1}}'
-      protocol_mappers: '{{protocol_mappers1}}'
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
   register: desire_client_not_present
 
 - name: Desire client again with same props
-  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
-  vars:
-    call_args:
-      realm: "{{ realm }}"
-      client_id: "{{ client_id }}"
-      state: present
-      redirect_uris: '{{redirect_uris1}}'
-      attributes: '{{client_attributes1}}'
-      protocol_mappers: '{{protocol_mappers1}}'
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
   register: desire_client_when_present_and_same
 
 - name: Check client again with same props
-  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authorization_services_enabled: False
   check_mode: true
-  vars:
-    call_args:
-      realm: "{{ realm }}"
-      client_id: "{{ client_id }}"
-      state: present
-      redirect_uris: '{{redirect_uris1}}'
-      attributes: '{{client_attributes1}}'
-      protocol_mappers: '{{protocol_mappers1}}'
   register: check_client_when_present_and_same
 
 - name: Assert changes not detected in last two tasks (desire when same, and check)
@@ -61,3 +81,25 @@
     that:
       - desire_client_when_present_and_same is not changed
       - check_client_when_present_and_same is not changed
+
+- name: Check client again with changed props
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authorization_services_enabled: False
+    service_accounts_enabled: True
+  check_mode: true
+  register: check_client_when_present_and_changed
+
+- name: Assert changes detected in last tasks
+  assert:
+    that:
+      - check_client_when_present_and_changed is changed
