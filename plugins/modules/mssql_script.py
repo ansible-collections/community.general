@@ -58,10 +58,12 @@ options:
         type: str
     transaction:
         description:
-          - If transactional mode is requested, start a transaction and commit the change only if the script succeed else rollback the transaction.
+          - If transactional mode is requested, start a transaction and commit the change only if the script succeed.
+            Otherwise, rollback the transaction.
           - If transactional mode is not requested (default), automatically commit the change.
         type: bool
         default: false
+        version_added: 8.4.0
     output:
         description:
           - With V(default) each row will be returned as a list of values. See RV(query_results).
@@ -249,7 +251,7 @@ def run_module():
         script=dict(required=True),
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
-        transaction=dict(type='bool', default=False)
+        transaction=dict(type='bool', default=False),
     )
 
     result = dict(
@@ -295,11 +297,8 @@ def run_module():
             module.fail_json(msg="unable to connect, check login_user and login_password are correct, or alternatively check your "
                                  "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
 
-    conn.autocommit(True)
-
     # If transactional mode is requested, start a transaction
-    if transaction:
-        conn.autocommit(False)
+    conn.autocommit(not transaction)
 
     query_results_key = 'query_results'
     if output == 'dict':
