@@ -56,6 +56,12 @@ options:
           - Each batch must return at least one result set.
         required: true
         type: str
+    transaction:
+        description:
+          - If transactional mode is requested, start a transaction and commit the change only if the script succeed else rollback the transaction.
+          - If transactional mode is not requested (default), automatically commit the change.
+        type: bool
+        default: false
     output:
         description:
           - With V(default) each row will be returned as a list of values. See RV(query_results).
@@ -104,6 +110,19 @@ EXAMPLES = r'''
     that:
       - result_params.query_results[0][0][0][0] == 'msdb'
       - result_params.query_results[0][0][0][1] == 'ONLINE'
+
+- name: Query within a transaction
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: |
+      UPDATE sys.SomeTable SET desc = 'some_table_desc' WHERE name = %(dbname)s
+      UPDATE sys.AnotherTable SET desc = 'another_table_desc' WHERE name = %(dbname)s
+    transaction: true
+    params:
+      dbname: msdb
 
 - name: two batches with default output
   community.general.mssql_script:
@@ -230,6 +249,7 @@ def run_module():
         script=dict(required=True),
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
+        transaction=dict(type='bool', default=False)
     )
 
     result = dict(
@@ -252,6 +272,8 @@ def run_module():
     script = module.params['script']
     output = module.params['output']
     sql_params = module.params['params']
+    # Added param to set the transactional mode (true/false)
+    transaction = module.params['transaction']
 
     login_querystring = login_host
     if login_port != 1433:
@@ -274,6 +296,10 @@ def run_module():
                                  "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
 
     conn.autocommit(True)
+
+    # If transactional mode is requested, start a transaction
+    if transaction:
+        conn.autocommit(False)
 
     query_results_key = 'query_results'
     if output == 'dict':
@@ -322,8 +348,15 @@ def run_module():
             ):
                 query_results.append([])
             else:
+                # Rollback transaction before failing the module in case of error
+                if transaction:
+                    conn.rollback()
                 error_msg = '%s: %s' % (type(e).__name__, str(e))
                 module.fail_json(msg="query failed", query=query, error=error_msg, **result)
+
+    # Commit transaction before exiting the module in case of no error
+    if transaction:
+        conn.commit()
 
     # ensure that the result is json serializable
     qry_results = json.loads(json.dumps(query_results, default=clean_output))
