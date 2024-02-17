@@ -24,7 +24,7 @@ redirect_uris1:
   - "http://example.b.com/"
   - "http://example.a.com/"
 
-client_attributes1: {"backchannel.logout.session.required": true, "backchannel.logout.revoke.offline.tokens": false}
+client_attributes1: {"backchannel.logout.session.required": true, "backchannel.logout.revoke.offline.tokens": false, "client.secret.creation.time": 0}
 
 protocol_mappers1:
   - name: 'email'
