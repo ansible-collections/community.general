@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_issue - fix behavior to search GitLab issue, using ``search`` keyword instead of ``title`` (https://github.com/ansible-collections/community.general/issues/7846).
