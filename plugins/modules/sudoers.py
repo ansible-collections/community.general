@@ -50,6 +50,7 @@ options:
       - Whether a command is prevented to run further commands itself.
     default: false
     type: bool
+    version_added: 8.4.0
   nopassword:
     description:
       - Whether a password will be required to run the sudo'd command.
