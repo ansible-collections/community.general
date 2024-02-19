@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
-module: consul
+module: consul_agent_check
 short_description: Add, modify & delete checks within a consul cluster
 description:
  - Registers checks for an agent with a consul cluster.
@@ -29,12 +29,9 @@ description:
    changed occurred. An API method is planned to supply this metadata so at that
    stage change management will be added.
  - "See U(http://consul.io) for more details."
-requirements:
-  - python-consul
-  - requests
-author: "Steve Gargan (@sgargan)"
+author: "Michael Ilg (@Ilgmi)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general.consul
 attributes:
   check_mode:
     support: none
