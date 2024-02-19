@@ -47,70 +47,18 @@ options:
           - Register or deregister the consul service, defaults to present.
         default: present
         choices: ['present', 'absent']
-    service_name:
+    name:
         type: str
         description:
-          - Unique name for the service on a node, must be unique per node,
-            required if registering a service. May be omitted if registering
-            a node level check.
+          - . Required name for the service check.
+    check_id:
+        type: str
+        description:
+          - An unique ID for the service check.
     service_id:
         type: str
         description:
-          - The ID for the service, must be unique per node. If O(state=absent),
-            defaults to the service name if supplied.
-    host:
-        type: str
-        description:
-          - Host of the consul agent defaults to localhost.
-        default: localhost
-    port:
-        type: int
-        description:
-          - The port on which the consul agent is running.
-        default: 8500
-    scheme:
-        type: str
-        description:
-          - The protocol scheme on which the consul agent is running.
-        default: http
-    validate_certs:
-        description:
-          - Whether to verify the TLS certificate of the consul agent.
-        type: bool
-        default: true
-    notes:
-        type: str
-        description:
-          - Notes to attach to check when registering it.
-    service_port:
-        type: int
-        description:
-          - The port on which the service is listening. Can optionally be supplied for
-            registration of a service, that is if O(service_name) or O(service_id) is set.
-    service_address:
-        type: str
-        description:
-          - The address to advertise that the service will be listening on.
-            This value will be passed as the C(address) parameter to Consul's
-            C(/v1/agent/service/register) API method, so refer to the Consul API
-            documentation for further details.
-    tags:
-        type: list
-        elements: str
-        description:
-          - Tags that will be attached to the service registration.
-    meta:
-        type: dic
-        description:
-          - Optional meta data used for filtering. 
-            Key: Allowed characters are A-Z, a-z, 0-9, _, -
-                 Not allowed characters are replaced with underscores
-    script:
-        type: str
-        description:
-          - The script/command that will be run periodically to check the health of the service.
-          - Requires O(interval) to be provided.
-          - Mutually exclusive with O(ttl), O(tcp) and O(http).
+          -  Specifies the ID of a service to associate the registered check with an existing service provided by the agent.
     interval:
         type: str
         description:
@@ -118,26 +66,19 @@ options:
             This is a number with a V(s) or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m).
             If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
           - Required if one of the parameters O(script), O(http), or O(tcp) is specified.
-    check_id:
+    notes:
         type: str
         description:
-          - An ID for the service check. If O(state=absent), defaults to
-            O(check_name). Ignored if part of a service definition.
-    check_name:
+          - Notes to attach to check when registering it.
+    args:
         type: str
         description:
-          - Name for the service check. Required if standalone, ignored if
-            part of service definition.
-    check_node:
-        description:
-          - Node name.
-          # TODO: properly document!
-        type: str
-    check_host:
-        description:
-          - Host name.
-          # TODO: properly document!
-        type: str
+          - Specifies command arguments to run to update the status of the check.
+          - Requires O(interval) to be provided.
+          - Mutually exclusive with O(ttl), O(tcp) and O(http).
+          - There is an issue with args. It throws an 'Invalid check: TTL must be > 0 for TTL checks'
+            https://github.com/hashicorp/consul/issues/6923#issuecomment-564476529
+    
     ttl:
         type: str
         description:
@@ -176,79 +117,32 @@ options:
         type: str
         description:
           - The token key identifying an ACL rule set. May be required to register services.
-    ack_params_state_absent:
-        type: bool
-        description:
-          - This parameter has no more effect and is deprecated. It will be removed in community.general 10.0.0.
+    
 '''
 
 EXAMPLES = '''
-- name: Register nginx service with the local consul agent
-  community.general.consul_agent_service:
-    name: nginx
-    service_port: 80
-
-- name: Register nginx service with curl check
-  community.general.consul_agent_service:
-    name: nginx
-    service_port: 80
-    check:
-        script: curl http://localhost
-        interval: 60s
-
-- name: register nginx with a tcp check
-  community.general.consul:
-    service_name: nginx
-    service_port: 80
+- name: register tcp check for service 'nginx'
+  community.general.consul_agent_check:
+    name: nginx_tcp_check
+    service_id: nginx
     interval: 60s
     tcp: localhost:80
+    notes: "Nginx Check"
 
-- name: Register nginx with an http check
-  community.general.consul:
-    service_name: nginx
-    service_port: 80
+- name: register http check for service 'nginx'
+  community.general.consul_agent_check:
+    name: nginx_http_check
+    service_id: nginx
     interval: 60s
     http: http://localhost:80/status
+    notes: "Nginx Check"
+    
 
-- name: Register external service nginx available at 10.1.5.23
-  community.general.consul:
-    service_name: nginx
-    service_port: 80
-    service_address: 10.1.5.23
-
-- name: Register nginx with some service tags
-  community.general.consul:
-    service_name: nginx
-    service_port: 80
-    tags:
-      - prod
-      - webservers
-
-- name: Register nginx with some service meta 
-  community.general.consul:
-    service_name: nginx
-    service_port: 80
-    meta:
-      nginx_version: 1.25.3
-
-- name: Remove nginx service
-  community.general.consul:
-    service_name: nginx
+- name: Remove check for service 'nginx'
+  community.general.consul_agent_check:
     state: absent
-
-- name: Register celery worker service
-  community.general.consul:
-    service_name: celery-worker
-    tags:
-      - prod
-      - worker
-
-- name: Create a node level check to test disk usage
-  community.general.consul:
-    check_name: Disk usage
-    check_id: disk_usage
-    script: /opt/disk_usage.py
-    interval: 5m
+    id: nginx_http_check
+    service_id: "{{ nginx_service.ID }}"
 
 
 '''
@@ -280,7 +174,7 @@ _ARGUMENT_SPEC = {
 }
 
 _MUTUALLY_EXCLUSIVE = [
-    ('script', 'ttl', 'tcp', 'http'),
+    ('args', 'ttl', 'tcp', 'http'),
 ]
 
 _REQUIRED_IF = [
@@ -289,7 +183,7 @@ _REQUIRED_IF = [
 ]
 
 _REQUIRED_BY = {
-    'script': 'interval',
+    'args': 'interval',
     'http': 'interval',
     'tcp': 'interval',
 }
@@ -331,6 +225,9 @@ class ConsulAgentCheckModule(_ConsulModule):
         }
 
         validate_check(existing)
+
+        if 'Args' in existing and existing['Args']:
+            existing['Args'] = ["sh", "-c", existing['Args']]
 
         return existing
 

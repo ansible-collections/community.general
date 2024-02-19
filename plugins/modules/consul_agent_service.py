@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
-module: consul
+module: consul_agent_service
 short_description: Add, modify & delete services within a consul cluster
 description:
  - Registers services and checks for an agent with a consul cluster.
@@ -29,17 +29,19 @@ description:
    changed occurred. An API method is planned to supply this metadata so at that
    stage change management will be added.
  - "See U(http://consul.io) for more details."
-requirements:
-  - python-consul
-  - requests
-author: "Steve Gargan (@sgargan)"
+author: "Michael Ilg (@Ilgmi)"
 extends_documentation_fragment:
-  - community.general.attributes
+  - community.general.consul
 attributes:
+  attributes:
   check_mode:
-    support: none
+    support: full
+    version_added: 8.3.0
   diff_mode:
-    support: none
+    support: partial
+    version_added: 8.3.0
+    details:
+      - In check mode the diff will miss operational attributes.
 options:
     state:
         type: str
@@ -47,208 +49,173 @@ options:
           - Register or deregister the consul service, defaults to present.
         default: present
         choices: ['present', 'absent']
-    service_name:
+    name:
         type: str
         description:
           - Unique name for the service on a node, must be unique per node,
             required if registering a service. May be omitted if registering
             a node level check.
-    service_id:
+    id:
         type: str
         description:
           - The ID for the service, must be unique per node. If O(state=absent),
             defaults to the service name if supplied.
-    host:
-        type: str
+    tags:
+        type: list
+        elements: str
         description:
-          - Host of the consul agent defaults to localhost.
-        default: localhost
-    port:
-        type: int
-        description:
-          - The port on which the consul agent is running.
-        default: 8500
-    scheme:
-        type: str
-        description:
-          - The protocol scheme on which the consul agent is running.
-        default: http
-    validate_certs:
-        description:
-          - Whether to verify the TLS certificate of the consul agent.
-        type: bool
-        default: true
-    notes:
-        type: str
-        description:
-          - Notes to attach to check when registering it.
-    service_port:
-        type: int
-        description:
-          - The port on which the service is listening. Can optionally be supplied for
-            registration of a service, that is if O(service_name) or O(service_id) is set.
-    service_address:
+          - Tags that will be attached to the service registration.
+    address:
         type: str
         description:
           - The address to advertise that the service will be listening on.
             This value will be passed as the C(address) parameter to Consul's
             C(/v1/agent/service/register) API method, so refer to the Consul API
             documentation for further details.
-    tags:
-        type: list
-        elements: str
-        description:
-          - Tags that will be attached to the service registration.
     meta:
         type: dic
         description:
           - Optional meta data used for filtering. 
             Key: Allowed characters are A-Z, a-z, 0-9, _, -
-                 Not allowed characters are replaced with underscores
-    script:
-        type: str
+                 Not allowed characters are replaced with underscores        
+    service_port:
+        type: int
         description:
-          - The script/command that will be run periodically to check the health of the service.
-          - Requires O(interval) to be provided.
-          - Mutually exclusive with O(ttl), O(tcp) and O(http).
-    interval:
-        type: str
+          - The port on which the service is listening. Can optionally be supplied for
+            registration of a service, that is if O(service_name) or O(service_id) is set.
+    checks:
+        type: list
+        elements: dict
         description:
-          - The interval at which the service check will be run.
-            This is a number with a V(s) or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-          - Required if one of the parameters O(script), O(http), or O(tcp) is specified.
-    check_id:
-        type: str
-        description:
-          - An ID for the service check. If O(state=absent), defaults to
-            O(check_name). Ignored if part of a service definition.
-    check_name:
-        type: str
-        description:
-          - Name for the service check. Required if standalone, ignored if
-            part of service definition.
-    check_node:
-        description:
-          - Node name.
-          # TODO: properly document!
-        type: str
-    check_host:
-        description:
-          - Host name.
-          # TODO: properly document!
-        type: str
-    ttl:
-        type: str
-        description:
-          - Checks can be registered with a TTL instead of a O(script) and O(interval)
-            this means that the service will check in with the agent before the
-            TTL expires. If it doesn't the check will be considered failed.
-            Required if registering a check and the script an interval are missing
-            Similar to the interval this is a number with a V(s) or V(m) suffix to
-            signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-          - Mutually exclusive with O(script), O(tcp) and O(http).
-    tcp:
-        type: str
-        description:
-          - Checks can be registered with a TCP port. This means that consul
-            will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
-            The format is V(host:port), for example V(localhost:80).
-          - Requires O(interval) to be provided.
-          - Mutually exclusive with O(script), O(ttl) and O(http).
-        version_added: '1.3.0'
-    http:
-        type: str
-        description:
-          - Checks can be registered with an HTTP endpoint. This means that consul
-            will check that the http endpoint returns a successful HTTP status.
-          - Requires O(interval) to be provided.
-          - Mutually exclusive with O(script), O(ttl) and O(tcp).
-    timeout:
-        type: str
-        description:
-          - A custom HTTP check timeout. The consul default is 10 seconds.
-            Similar to the interval this is a number with a V(s) or V(m) suffix to
-            signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+            - Checks to
+        suboptions:
+            name:
+                type: str
+                description:
+                  - . Required name for the service check.
+            check_id:
+                type: str
+                description:
+                  - An unique ID for the service check.
+            interval:
+                type: str
+                description:
+                  - The interval at which the service check will be run.
+                    This is a number with a V(s) or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m).
+                    If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+                  - Required if one of the parameters O(script), O(http), or O(tcp) is specified.
+            notes:
+                type: str
+                description:
+                  - Notes to attach to check when registering it.
+            args:
+                type: list
+                elements: str
+                description:
+                  - Specifies command arguments to run to update the status of the check.
+                  - Requires O(interval) to be provided.
+                  - Mutually exclusive with O(ttl), O(tcp) and O(http).
+                  - There is an issue with args. It throws an 'Invalid check: TTL must be > 0 for TTL checks'
+                    https://github.com/hashicorp/consul/issues/6923#issuecomment-564476529
+            
+            ttl:
+                type: str
+                description:
+                  - Checks can be registered with a TTL instead of a O(script) and O(interval)
+                    this means that the service will check in with the agent before the
+                    TTL expires. If it doesn't the check will be considered failed.
+                    Required if registering a check and the script an interval are missing
+                    Similar to the interval this is a number with a V(s) or V(m) suffix to
+                    signify the units of seconds or minutes, for example V(15s) or V(1m).
+                    If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+                  - Mutually exclusive with O(script), O(tcp) and O(http).
+            tcp:
+                type: str
+                description:
+                  - Checks can be registered with a TCP port. This means that consul
+                    will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
+                    The format is V(host:port), for example V(localhost:80).
+                  - Requires O(interval) to be provided.
+                  - Mutually exclusive with O(script), O(ttl) and O(http).
+                version_added: '1.3.0'
+            http:
+                type: str
+                description:
+                  - Checks can be registered with an HTTP endpoint. This means that consul
+                    will check that the http endpoint returns a successful HTTP status.
+                  - Requires O(interval) to be provided.
+                  - Mutually exclusive with O(script), O(ttl) and O(tcp).
+            timeout:
+                type: str
+                description:
+                  - A custom HTTP check timeout. The consul default is 10 seconds.
+                    Similar to the interval this is a number with a V(s) or V(m) suffix to
+                    signify the units of seconds or minutes, for example V(15s) or V(1m).
+                    If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
+                
     token:
         type: str
         description:
           - The token key identifying an ACL rule set. May be required to register services.
-    ack_params_state_absent:
-        type: bool
-        description:
-          - This parameter has no more effect and is deprecated. It will be removed in community.general 10.0.0.
 '''
 
 EXAMPLES = '''
 - name: Register nginx service with the local consul agent
-  community.general.consul_agent_service:
+    community.general.consul_agent_service:
     name: nginx
     service_port: 80
-
-- name: Register nginx service with curl check
-  community.general.consul_agent_service:
-    name: nginx
-    service_port: 80
-    check:
-        script: curl http://localhost
-        interval: 60s
 
 - name: register nginx with a tcp check
-  community.general.consul:
-    service_name: nginx
+  community.general.consul_agent_service:
+    name: nginx
     service_port: 80
-    interval: 60s
-    tcp: localhost:80
+    checks:
+      - name: nginx-check2
+        interval: 60s
+        tcp: localhost:80
 
 - name: Register nginx with an http check
-  community.general.consul:
-    service_name: nginx
+  community.general.consul_agent_service:
+    name: nginx
     service_port: 80
-    interval: 60s
-    http: http://localhost:80/status
+    checks:
+      - name: nginx-check2
+        interval: 60s
+        http: http://localhost:80/status
+    
 
 - name: Register external service nginx available at 10.1.5.23
-  community.general.consul:
-    service_name: nginx
+  community.general.consul_agent_service:
+    name: nginx
     service_port: 80
-    service_address: 10.1.5.23
+    address: 10.1.5.23
 
 - name: Register nginx with some service tags
-  community.general.consul:
-    service_name: nginx
+  community.general.consul_agent_service:
+    name: nginx
     service_port: 80
     tags:
       - prod
       - webservers
 
 - name: Register nginx with some service meta 
-  community.general.consul:
-    service_name: nginx
+  community.general.consul_agent_service:
+    name: nginx
     service_port: 80
     meta:
       nginx_version: 1.25.3
 
 - name: Remove nginx service
-  community.general.consul:
-    service_name: nginx
+  community.general.consul_agent_service:
+    service_id: nginx
     state: absent
 
 - name: Register celery worker service
-  community.general.consul:
-    service_name: celery-worker
+  community.general.consul_agent_service:
+    name: celery-worker
     tags:
       - prod
       - worker
-
-- name: Create a node level check to test disk usage
-  community.general.consul:
-    check_name: Disk usage
-    check_id: disk_usage
-    script: /opt/disk_usage.py
-    interval: 5m
 
 
 '''
@@ -278,21 +245,21 @@ _ARGUMENT_SPEC = {
         type='list',
         elements='dict',
         options=dict(
-            name=dict(type='str', required=True),
+            name=dict(type='str'),
             check_id=dict(type='str'),
             interval=dict(type='str'),
             notes=dict(type='str'),
+            args=dict(type='list', elements='str'),
             http=dict(type='str'),
             tcp=dict(type='str'),
             ttl=dict(type='str'),
             timeout=dict(type='str'),
-            service_id=dict(type='str'),
         )
     ),
 }
 
 _MUTUALLY_EXCLUSIVE = [
-    ('script', 'ttl', 'tcp', 'http'),
+    ('args', 'ttl', 'tcp', 'http'),
 ]
 
 _REQUIRED_IF = [
@@ -301,7 +268,7 @@ _REQUIRED_IF = [
 ]
 
 _REQUIRED_BY = {
-    'script': 'interval',
+    'args': 'interval',
     'http': 'interval',
     'tcp': 'interval',
 }
@@ -339,6 +306,8 @@ class ConsulAgentServiceModule(_ConsulModule):
         if existing['Checks']:
             for check in existing['Checks']:
                 validate_check(check)
+                if 'Args' in check and check['Args']:
+                    check['Args'] = ["sh", "-c"].append(check['Args'])
 
         return existing
 
