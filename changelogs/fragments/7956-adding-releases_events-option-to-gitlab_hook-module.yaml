@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_hook - adds ``releases_events`` parameter for supporting Releases events triggers on GitLab hooks (https://github.com/ansible-collections/community.general/pull/7956).
