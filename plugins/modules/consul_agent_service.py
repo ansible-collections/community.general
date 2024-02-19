@@ -268,7 +268,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
 
 _ARGUMENT_SPEC = {
     "state": dict(default="present", choices=["present", "absent"]),
-    "name": dict(type='str', required=True),
+    "name": dict(type='str'),
     "id": dict(type='str'),
     "tags": dict(type='list', elements='str'),
     "address": dict(type='str'),
@@ -288,7 +288,22 @@ _ARGUMENT_SPEC = {
             timeout=dict(type='str'),
             service_id=dict(type='str'),
         )
-    )
+    ),
+}
+
+_MUTUALLY_EXCLUSIVE = [
+    ('script', 'ttl', 'tcp', 'http'),
+]
+
+_REQUIRED_IF = [
+    ('state', 'present', ['name']),
+    ('state', 'absent', ['id']),
+]
+
+_REQUIRED_BY = {
+    'script': 'interval',
+    'http': 'interval',
+    'tcp': 'interval',
 }
 
 _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
@@ -297,10 +312,12 @@ _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
 class ConsulAgentServiceModule(_ConsulModule):
     api_endpoint = "agent/service"
     result_key = "service"
-    unique_identifier = "name"
+    unique_identifier = "id"
 
     def endpoint_url(self, operation, identifier=None):
-        if operation == OPERATION_CREATE:
+        if operation == OPERATION_READ and identifier is None and self.params["name"] is not None:
+            return [self.api_endpoint, self.params["name"]]
+        if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])
         if operation == OPERATION_DELETE:
             return "/".join([self.api_endpoint, "deregister", identifier])
@@ -310,8 +327,10 @@ class ConsulAgentServiceModule(_ConsulModule):
     def prepare_object(self, existing, obj):
         existing = super(ConsulAgentServiceModule, self).prepare_object(existing, obj)
 
-        if 'Id' not in existing:
-            existing['Id'] = existing['Name']
+        operational_attributes = {"Service", "ContentHash", "Datacenter"}
+        existing = {
+            k: v for k, v in existing.items() if k not in operational_attributes
+        }
 
         if existing['ServicePort']:
             existing['Port'] = existing['ServicePort']
@@ -319,14 +338,19 @@ class ConsulAgentServiceModule(_ConsulModule):
 
         if existing['Checks']:
             for check in existing['Checks']:
-                if 'CheckId' not in check:
-                    check['CheckId'] = check['Name']
                 validate_check(check)
 
         return existing
 
     def create_object(self, obj):
-        obj = super(ConsulAgentServiceModule, self).create_object(obj)
+        super(ConsulAgentServiceModule, self).create_object(obj)
+        if self._module.check_mode:
+            return obj
+        else:
+            return self.read_object()
+
+    def update_object(self, existing, obj):
+        super(ConsulAgentServiceModule, self).update_object(existing, obj)
         if self._module.check_mode:
             return obj
         else:
@@ -337,18 +361,18 @@ class ConsulAgentServiceModule(_ConsulModule):
             return {}
         else:
             url = self.endpoint_url(
-                OPERATION_DELETE, obj.get(camel_case_key("Service"))
+                OPERATION_DELETE, obj.get(camel_case_key(self.unique_identifier))
             )
             self.put(url)
             return {}
-
-    def _needs_update(self, api_obj, module_obj):
-        return False
 
 
 def main():
     module = AnsibleModule(
         _ARGUMENT_SPEC,
+        mutually_exclusive=_MUTUALLY_EXCLUSIVE,
+        required_if=_REQUIRED_IF,
+        required_by=_REQUIRED_BY,
         supports_check_mode=True,
     )
 
