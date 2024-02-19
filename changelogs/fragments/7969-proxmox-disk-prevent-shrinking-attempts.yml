@@ -1,2 +1,2 @@
 bugfixes: 
-  - proxmox_disk - the module doesn't detect that shrinking a disk is not supported and fails
+  - proxmox_disk - the module did not detect that shrinking a disk is not supported and failed (https://github.com/ansible-collections/community.general/pull/7969).
