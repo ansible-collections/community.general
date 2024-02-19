@@ -22,6 +22,9 @@
     token: "{{ consul_management_token }}"
   register: result
 
+- set_fact:
+    nginx_service: "{{result.service}}"
+
 - assert:
     that:
       - result is changed
@@ -34,42 +37,44 @@
       - result.service.Meta.nginx_version == '1.25.3'
       - result.service.ContentHash is defined
 
-
-- name: Read service with name nginx
+- name: Update a service with name {{ nginx_service.Service }}
   community.general.consul_agent_service:
+    id: "{{ nginx_service.ID }}"
     name: nginx
+    service_port: 8080
+    address: 127.0.0.1
+    tags:
+      - http
+      - new_tag
+    meta:
+      nginx_version: 1.25.3
+      nginx: 1.25.3
+    checks:
+      - name: nginx-check2
+        check_id: nginx-check2
+        service_id: nginx
+        interval: 30s
+        notes: "New Note"
+        http: http://127.0.0.1:80/
     token: "{{ consul_management_token }}"
   register: result
 
 - assert:
     that:
-      - result is not changed
+      - result is changed
       - result.service.ID is defined
       - result.service.Service == 'nginx'
-      - result.service.Address == 'localhost'
-      - result.service.Port == 80
+      - result.service.Address == '127.0.0.1'
+      - result.service.Port == 8080
       - result.service.Tags[0] == 'http'
+      - result.service.Tags[1] == 'new_tag'
       - result.service.Meta.nginx_version is defined
       - result.service.Meta.nginx_version == '1.25.3'
+      - result.service.Meta.nginx is defined
+      - result.service.Meta.nginx == '1.25.3'
       - result.service.ContentHash is defined
 
-- name: Read check with name nginx-check2
-  community.general.consul_agent_check:
-    name: nginx-check2
-    token: "{{ consul_management_token }}"
-  register: result
-
-- assert:
-    that:
-      - result is not changed
-      - result.check is defined
-      - result.check.CheckID == 'nginx-check2'
-      - result.check.ServiceID == 'nginx'
-      - result.check.Interval == '1m0s'
-      - result.check.Type == 'http'
-      - result.check.Notes == 'My Note'
-
-- name: Add a check for service nginx
+- name: Add a check for service {{ nginx_service.ID }}
   community.general.consul_agent_check:
     name: nginx_check
     id: nginx_check
@@ -77,18 +82,12 @@
     http: http://localhost:80/morestatus
     notes: "Nginx Check"
     token: "{{ consul_management_token }}"
-    service_id: nginx
-  register: result
-
-- name: Read check with name nginx
-  community.general.consul_agent_check:
-    name: nginx_check
-    token: "{{ consul_management_token }}"
+    service_id: "{{ nginx_service.ID }}"
   register: result
 
 - assert:
     that:
-      - result is not changed
+      - result is changed
       - result.check is defined
       - result.check.CheckID == 'nginx_check'
       - result.check.ServiceID == 'nginx'
@@ -96,9 +95,45 @@
       - result.check.Type == 'http'
       - result.check.Notes == 'Nginx Check'
 
-- name: Remove a service with name nginx
+
+- name: "Update a check with name nginx_check for service {{ nginx_service.ID }}"
+  community.general.consul_agent_check:
+    name: nginx_check
+    id: nginx_check
+    interval: 60s
+    http: https://local-host.de/morestatus
+    notes: "New Nginx Check"
+    token: "{{ consul_management_token }}"
+    service_id: "{{ nginx_service.ID }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.check is defined
+      - result.check.CheckID == 'nginx_check'
+      - result.check.ServiceID == 'nginx'
+      - result.check.Interval == '1m0s'
+      - result.check.Type == 'http'
+      - result.check.Notes == 'New Nginx Check'
+
+- name: "Remove check with Id: nginx_check"
+  community.general.consul_agent_check:
+    id: nginx_check
+    state: absent
+    service_id: "{{ nginx_service.ID }}"
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result is not failed
+      - result.operation == 'remove'
+
+- name: "Remove a service with Id: {{ nginx_service.ID }}"
   community.general.consul_agent_service:
-    name: nginx
+    id: "{{ nginx_service.ID }}"
     state: absent
     token: "{{ consul_management_token }}"
   register: result
