@@ -13,10 +13,7 @@
     meta:
       nginx_version: 1.25.3
     checks:
-      - name: nginx-check2
-        check_id: nginx-check2
-        service_id: nginx
-        interval: 60s
+      - interval: 60s
         notes: "My Note"
         http: http://localhost:80/morestatus
     token: "{{ consul_management_token }}"
@@ -52,7 +49,6 @@
     checks:
       - name: nginx-check2
         check_id: nginx-check2
-        service_id: nginx
         interval: 30s
         notes: "New Note"
         http: http://127.0.0.1:80/
@@ -143,3 +139,38 @@
       - result is changed
       - result is not failed
       - result.operation == 'remove'
+
+
+- name: register nginx with a tcp check
+  community.general.consul_agent_service:
+    name: nginx
+    service_port: 80
+    checks:
+      - name: nginx-check2
+        interval: 60s
+        tcp: localhost:80
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.service.ID is defined
+      - result.service.Service == 'nginx'
+
+- name: Register nginx with an http check
+  community.general.consul_agent_service:
+    name: nginx
+    service_port: 80
+    checks:
+      - name: nginx-check2
+        interval: 60s
+        http: http://localhost:80/status
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.service.ID is defined
+      - result.service.Service == 'nginx'
