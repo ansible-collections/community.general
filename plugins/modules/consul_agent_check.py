@@ -108,7 +108,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: register tcp check for service 'nginx'
+- name: Register tcp check for service 'nginx'
   community.general.consul_agent_check:
     name: nginx_tcp_check
     service_id: nginx
@@ -116,7 +116,7 @@ EXAMPLES = '''
     tcp: localhost:80
     notes: "Nginx Check"
 
-- name: register http check for service 'nginx'
+- name: Register http check for service 'nginx'
   community.general.consul_agent_check:
     name: nginx_http_check
     service_id: nginx

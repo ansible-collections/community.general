@@ -161,7 +161,7 @@ EXAMPLES = '''
     name: nginx
     service_port: 80
 
-- name: register nginx with a tcp check
+- name: Register nginx with a tcp check
   community.general.consul_agent_service:
     host: consul1.example.com
     token: some_management_acl

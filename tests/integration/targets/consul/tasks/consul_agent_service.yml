@@ -137,7 +137,7 @@
       - result.operation == 'remove'
 
 
-- name: register nginx with a tcp check
+- name: Register nginx with a tcp check
   community.general.consul_agent_service:
     name: nginx
     service_port: 80
