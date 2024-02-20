@@ -285,11 +285,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self.inventory_attr = self.get_option('inventory_attr')
 
         if self.templar.is_template(self.icinga2_url):
-            self.icinga2_url=self.templar.template(variable=self.icinga2_url,disable_lookups=False)
+            self.icinga2_url = self.templar.template(variable=self.icinga2_url, disable_lookups=False)
         if self.templar.is_template(self.user):
-            self.user=self.templar.template(variable=self.user,disable_lookups=False)
+            self.user = self.templar.template(variable=self.user, disable_lookups=False)
         if self.templar.is_template(self.password):
-            self.password=self.templar.template(variable=self.password,disable_lookups=False)
+            self.password = self.templar.template(variable=self.password, disable_lookups=False)
 
         self.icinga2_url = self.icinga2_url.rstrip('/') + '/v1'
 
