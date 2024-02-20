@@ -370,7 +370,21 @@ class Cargo(object):
         if version is not None and version != metadata["ver"]:
             return False
 
-        if HAS_TOMLI or HAS_TOML or self.registry_url is None:
+        DEFAULT_SPARSE = "sparse+https://index.crates.io"
+        DEFAULT_GIT = "https://github.com/rust-lang/crates.io-index"
+
+        if metadata["reg"] in [DEFAULT_SPARSE, DEFAULT_GIT]:
+            metadata["reg"] = "default"
+
+        if self.registry_url is not None:
+            if self.registry_url == metadata["reg"] or (
+                metadata["reg"] == "default"
+                and self.registry_url in [DEFAULT_SPARSE, DEFAULT_GIT]
+            ):
+                return True
+            return False
+
+        if HAS_TOMLI or HAS_TOML:
             config = os.path.join(self.cargo_dir, "config.toml")
             if not os.path.isfile(config):
                 toml_conf = {}
@@ -389,9 +403,6 @@ class Cargo(object):
                 .get("protocol", "sparse")
             ) == "sparse"
 
-            DEFAULT_SPARSE = "sparse+https://index.crates.io"
-            DEFAULT_GIT = "https://github.com/rust-lang/crates.io-index"
-
             reg_to_index = {
                 k: v["index"]
                 for k, v in toml_conf.get("registries", {}).items()
@@ -399,9 +410,6 @@ class Cargo(object):
             }
 
             reg_to_index["crates-io"] = "default"
-
-            if metadata["reg"] in [DEFAULT_SPARSE, DEFAULT_GIT]:
-                metadata["reg"] = "default"
 
             # NOTE: It is not clear what happens when under [source.<name>]
             # along with replace-with other options like directory, git,
@@ -431,10 +439,8 @@ class Cargo(object):
                         DEFAULT_SPARSE if is_default_sparse else DEFAULT_GIT
                     )
                 return True
-            else:
-                return False
 
-        return True
+        return False
 
     def is_outdated(self, name):
         # NOTE: If features differed, or all_features had been different this time,
@@ -598,20 +604,31 @@ def main():
         registry=dict(default=None, type="str"),
         debug=dict(default=False, type="bool"),
     )
-    module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=arg_spec,
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ("git", "registry", "directory"),
+            ("version", "directory"),
+            ("version", "git"),
+            ("version", "branch"),
+            ("version", "tag"),
+            ("version", "rev"),
+            ("features", "all_features"),
+            ("branch", "tag", "rev"),
+        ],
+        required_by={
+            "branch": "git",
+            "tag": "git",
+            "rev": "git",
+        },
+    )
 
     name = module.params["name"]
     state = module.params["state"]
-    version = module.params["version"]
     force = module.params["force"]
     features = module.params["features"]
-    all_features = module.params["all_features"]
     directory = module.params["directory"]
-    registry = module.params["registry"]
-    git = module.params["git"]
-    branch = module.params["branch"]
-    tag = module.params["tag"]
-    rev = module.params["rev"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
@@ -620,30 +637,6 @@ def main():
         module.fail_json(
             msg="Cannot determine which features are for what package for multiple packages"
         )
-
-    if len(name) > 1 and version:
-        module.fail_json(msg='Instead of version, use "crate@version"...')
-
-    if version and (directory or git or branch or tag or rev):
-        module.fail_json(msg="version option only works with a registry")
-
-    if features and all_features:
-        module.fail_json(msg="features list is a redundant with all_features")
-
-    if version is not None and (git is not None or directory is not None):
-        module.fail_json(msg="version option can only be used with a cargo registry")
-
-    if sum(1 for x in [git, directory, registry] if x is not None) > 1:
-        module.fail_json(msg="Only one of git, registry or directory is allowed")
-
-    if git is not None:
-        if sum(1 for x in [branch, tag, rev] if x is not None) > 1:
-            module.fail_json(
-                msg="Only one of branch, tag, or rev option is allowed with git"
-            )
-
-    elif branch is not None or tag is not None or rev is not None:
-        module.fail_json(msg="Specify git option for branch, tag or rev")
 
     if directory is not None and not os.path.isdir(directory):
         module.fail_json(
