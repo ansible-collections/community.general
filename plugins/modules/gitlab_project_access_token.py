@@ -30,7 +30,7 @@ notes:
   - Access tokens can not be changed. If a parameter needs to be changed, an acceess token has to be recreated.
     Whether tokens will be recreated is controlled by the O(recreate) option, which defaults to V(never).
   - Token string is contained in the result only when access token is created or recreated. It can not be fetched afterwards.
-  - Token matching is done by comparing O(name) option
+  - Token matching is done by comparing O(name) option.
 
 attributes:
   check_mode:
@@ -72,8 +72,8 @@ options:
   recreate:
     description:
       - Whether the access token will be recreated if it already exists.
-      - When V(never) the token will never be recreated
-      - When V(always) the token will always be recreated
+      - When V(never) the token will never be recreated.
+      - When V(always) the token will always be recreated.
       - When V(state_change) the token will be recreated if there is a difference between desired state and actual state.
     type: str
     choices: ["never", "always", "state_change"]
