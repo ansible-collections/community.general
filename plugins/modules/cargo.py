@@ -137,8 +137,8 @@ options:
     required: false
     version_added: 8.4.0
 requirements:
-    - cargo installed, optionally have a toml library like toml or tomli
-      present, if Python version is less than 3.11
+    - cargo and git installed
+    - Optional: toml or tomli library present, if Python version is less than 3.11
 """
 
 EXAMPLES = r"""

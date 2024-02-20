@@ -1,6 +1,5 @@
 bugfixes:
   - "cargo - correctly parse version for sparse registries (https://github.com/ansible-collections/community.general/pull/7895)."
-  - "cargo - remove ambiguity for version option (https://github.com/ansible-collections/community.general/pull/7895)."
 minor_changes:
   - "cargo - add option ``features``, which allows user to specify features (https://github.com/ansible-collections/community.general/pull/7895)."
   - "cargo - add option ``all_features``, which allows user to specify installing with all features enabled (https://github.com/ansible-collections/community.general/pull/7895)."
