@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: consul_agent_service
-short_description: Add, modify & delete services within a consul cluster
+short_description: Add, modify and delete services within a consul cluster
 description:
  - Registers services and checks for an agent with a consul cluster.
    A service is some process running on the agent node that should be advertised by
@@ -21,19 +21,21 @@ description:
    notify the health of the entire node to the cluster.
    Service level checks do not require a check name or id as these are derived
    by Consul from the Service name and id respectively by appending 'service:'
-   Node level checks require a O(check_name) and optionally a O(check_id)."
+   Node level checks require a O(name) and optionally a O(check_id)."
  - Currently, there is no complete way to retrieve the script, interval or TTL
    metadata for a registered check. Without this metadata it is not possible to
    tell if the data supplied with ansible represents a change to a check. As a
    result this does not attempt to determine changes and will always report a
    changed occurred. An API method is planned to supply this metadata so at that
    stage change management will be added.
- - "See U(http://consul.io) for more details."
+ - "See U(https://developer.hashicorp.com/consul/api-docs/agent/service) for more details."
 author: "Michael Ilg (@Ilgmi)"
 extends_documentation_fragment:
   - community.general.consul
+  - community.general.consul.actiongroup_consul
+  - community.general.consul.token
+  - community.general.attributes
 attributes:
-  attributes:
   check_mode:
     support: full
     version_added: 8.3.0
@@ -152,21 +154,20 @@ options:
                     Similar to the interval this is a number with a V(s) or V(m) suffix to
                     signify the units of seconds or minutes, for example V(15s) or V(1m).
                     If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-                
-    token:
-        type: str
-        description:
-          - The token key identifying an ACL rule set. May be required to register services.
 '''
 
 EXAMPLES = '''
 - name: Register nginx service with the local consul agent
     community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: nginx
     service_port: 80
 
 - name: register nginx with a tcp check
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: nginx
     service_port: 80
     checks:
@@ -176,6 +177,8 @@ EXAMPLES = '''
 
 - name: Register nginx with an http check
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: nginx
     service_port: 80
     checks:
@@ -186,12 +189,16 @@ EXAMPLES = '''
 
 - name: Register external service nginx available at 10.1.5.23
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: nginx
     service_port: 80
     address: 10.1.5.23
 
 - name: Register nginx with some service tags
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: nginx
     service_port: 80
     tags:
@@ -200,6 +207,8 @@ EXAMPLES = '''
 
 - name: Register nginx with some service meta 
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: nginx
     service_port: 80
     meta:
@@ -207,18 +216,43 @@ EXAMPLES = '''
 
 - name: Remove nginx service
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     service_id: nginx
     state: absent
 
 - name: Register celery worker service
   community.general.consul_agent_service:
+    host: consul1.example.com
+    token: some_management_acl
     name: celery-worker
     tags:
       - prod
       - worker
-
-
 '''
+
+RETURN = """
+service:
+    Address: localhost
+    ContentHash: 61a245cd985261ac
+    Datacenter: dc1
+    EnableTagOverride: false
+    ID: nginx
+    Meta: 
+        - nginx_version: 1.23.3
+    Port: 80
+    Service: nginx
+    Tags: 
+        - http
+    Weights: 
+        Passing: 1
+        Warning: 1
+operation:
+    description: The operation performed.
+    returned: changed
+    type: str
+    sample: update
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
@@ -264,7 +298,7 @@ _MUTUALLY_EXCLUSIVE = [
 
 _REQUIRED_IF = [
     ('state', 'present', ['name']),
-    ('state', 'absent', ['id']),
+    ('state', 'absent', ('id', 'name'), True),
 ]
 
 _REQUIRED_BY = {
@@ -282,11 +316,18 @@ class ConsulAgentServiceModule(_ConsulModule):
     unique_identifier = "id"
 
     def endpoint_url(self, operation, identifier=None):
-        if operation == OPERATION_READ and identifier is None and self.params["name"] is not None:
-            return [self.api_endpoint, self.params["name"]]
+        if operation == OPERATION_READ:
+            if identifier is None:
+                if self.params["id"] is not None:
+                    return [self.api_endpoint, self.params["id"]]
+                if self.params["name"] is not None:
+                    return [self.api_endpoint, self.params["name"]]
+
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])
         if operation == OPERATION_DELETE:
+            if identifier is None and self.params["name"] is not None:
+                return [self.api_endpoint, "deregister", self.params["name"]]
             return "/".join([self.api_endpoint, "deregister", identifier])
 
         return super(ConsulAgentServiceModule, self).endpoint_url(operation, identifier)
@@ -326,14 +367,12 @@ class ConsulAgentServiceModule(_ConsulModule):
             return self.read_object()
 
     def delete_object(self, obj):
-        if self._module.check_mode:
-            return {}
-        else:
+        if not self._module.check_mode:
             url = self.endpoint_url(
                 OPERATION_DELETE, obj.get(camel_case_key(self.unique_identifier))
             )
             self.put(url)
-            return {}
+        return {}
 
 
 def main():

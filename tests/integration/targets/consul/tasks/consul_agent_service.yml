@@ -16,7 +16,6 @@
       - interval: 60s
         notes: "My Note"
         http: http://localhost:80/morestatus
-    token: "{{ consul_management_token }}"
   register: result
 
 - set_fact:
@@ -34,17 +33,17 @@
       - result.service.Meta.nginx_version == '1.25.3'
       - result.service.ContentHash is defined
 
-- name: Update a service with name {{ nginx_service.Service }}
+- name: Update service with name {{ nginx_service.Service }}
   community.general.consul_agent_service:
     id: "{{ nginx_service.ID }}"
-    name: nginx
+    name: "{{ nginx_service.Service }}"
     service_port: 8080
     address: 127.0.0.1
     tags:
       - http
       - new_tag
     meta:
-      nginx_version: 1.25.3
+      nginx_version: 1.0.0
       nginx: 1.25.3
     checks:
       - name: nginx-check2
@@ -52,7 +51,6 @@
         interval: 30s
         notes: "New Note"
         http: http://127.0.0.1:80/
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -65,7 +63,7 @@
       - result.service.Tags[0] == 'http'
       - result.service.Tags[1] == 'new_tag'
       - result.service.Meta.nginx_version is defined
-      - result.service.Meta.nginx_version == '1.25.3'
+      - result.service.Meta.nginx_version == '1.0.0'
       - result.service.Meta.nginx is defined
       - result.service.Meta.nginx == '1.25.3'
       - result.service.ContentHash is defined
@@ -77,7 +75,6 @@
     interval: 30s
     http: http://localhost:80/morestatus
     notes: "Nginx Check"
-    token: "{{ consul_management_token }}"
     service_id: "{{ nginx_service.ID }}"
   register: result
 
@@ -91,15 +88,16 @@
       - result.check.Type == 'http'
       - result.check.Notes == 'Nginx Check'
 
+- set_fact:
+    nginx_service_check: "{{result.check}}"
 
-- name: "Update a check with name nginx_check for service {{ nginx_service.ID }}"
+- name: "Update check with name {{nginx_service_check.Name}} for service {{ nginx_service.ID }}"
   community.general.consul_agent_check:
-    name: nginx_check
-    id: nginx_check
+    name: "{{ nginx_service_check.Name }}"
+    id: "{{ nginx_service_check.CheckID }}"
     interval: 60s
     http: https://local-host.de/morestatus
     notes: "New Nginx Check"
-    token: "{{ consul_management_token }}"
     service_id: "{{ nginx_service.ID }}"
   register: result
 
@@ -115,10 +113,9 @@
 
 - name: "Remove check with Id: nginx_check"
   community.general.consul_agent_check:
-    id: nginx_check
+    id: "{{ nginx_service_check.Name }}"
     state: absent
     service_id: "{{ nginx_service.ID }}"
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -127,11 +124,10 @@
       - result is not failed
       - result.operation == 'remove'
 
-- name: "Remove a service with Id: {{ nginx_service.ID }}"
+- name: "Remove service with Id: {{ nginx_service.ID }}"
   community.general.consul_agent_service:
     id: "{{ nginx_service.ID }}"
     state: absent
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -149,7 +145,6 @@
       - name: nginx-check2
         interval: 60s
         tcp: localhost:80
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:
@@ -157,6 +152,18 @@
       - result is changed
       - result.service.ID is defined
       - result.service.Service == 'nginx'
+
+- name: "Remove service with name: {{ result.service.Service }}"
+  community.general.consul_agent_service:
+    name: "{{ result.service.Service }}"
+    state: absent
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result is not failed
+      - result.operation == 'remove'
 
 - name: Register nginx with an http check
   community.general.consul_agent_service:
@@ -166,7 +173,6 @@
       - name: nginx-check2
         interval: 60s
         http: http://localhost:80/status
-    token: "{{ consul_management_token }}"
   register: result
 
 - assert:

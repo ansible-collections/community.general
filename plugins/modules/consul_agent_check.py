@@ -132,16 +132,13 @@ EXAMPLES = '''
     service_id: nginx
     interval: 60s
     http: http://localhost:80/status
-    notes: "Nginx Check"
-    
+    notes: "Nginx Check"   
 
 - name: Remove check for service 'nginx'
   community.general.consul_agent_check:
     state: absent
     id: nginx_http_check
     service_id: "{{ nginx_service.ID }}"
-
-
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -176,7 +173,7 @@ _MUTUALLY_EXCLUSIVE = [
 
 _REQUIRED_IF = [
     ('state', 'present', ['name']),
-    ('state', 'absent', ['id']),
+    ('state', 'absent', ('id', 'name'), True),
 ]
 
 _REQUIRED_BY = {
@@ -195,7 +192,7 @@ class ConsulAgentCheckModule(_ConsulModule):
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
-            return "/".join([self.api_endpoint + 's'])
+            return 'agent/checks'
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])
         if operation == OPERATION_DELETE:
@@ -206,11 +203,12 @@ class ConsulAgentCheckModule(_ConsulModule):
     def read_object(self):
         url = self.endpoint_url(OPERATION_READ)
         checks = self.get(url)
-
-        if self.params.get(self.unique_identifier) in checks:
-            return checks[self.params.get(self.unique_identifier)]
-        else:
-            return
+        unique_identifiers = [self.unique_identifier, "name"]
+        for identifier in unique_identifiers:
+            if self.params.get(identifier) in checks:
+                return checks[self.params.get(self.unique_identifier)]
+            else:
+                return None
 
     def prepare_object(self, existing, obj):
         existing = super(ConsulAgentCheckModule, self).prepare_object(existing, obj)
@@ -243,14 +241,12 @@ class ConsulAgentCheckModule(_ConsulModule):
             return self.read_object()
 
     def delete_object(self, obj):
-        if self._module.check_mode:
-            return {}
-        else:
+        if not self._module.check_mode:
             url = self.endpoint_url(
                 OPERATION_DELETE, obj.get("CheckID")
             )
             self.put(url)
-            return {}
+        return {}
 
 
 def main():

@@ -87,11 +87,6 @@
       - 1
       - 2
       - 3
-
-    - name: Print result
-      debug:
-        var: consul_management_token
-
     - import_tasks: consul_general.yml
     - import_tasks: consul_kv.yml
 
