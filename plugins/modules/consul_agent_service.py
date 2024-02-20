@@ -263,7 +263,6 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
     OPERATION_READ,
     _ConsulModule,
     camel_case_key,
-    RequestError,
     validate_check,
 )
 

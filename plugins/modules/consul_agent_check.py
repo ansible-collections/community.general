@@ -75,7 +75,6 @@ options:
           - Mutually exclusive with O(ttl), O(tcp) and O(http).
           - There is an issue with args. It throws an 'Invalid check: TTL must be > 0 for TTL checks'
             https://github.com/hashicorp/consul/issues/6923#issuecomment-564476529
-    
     ttl:
         type: str
         description:
@@ -109,12 +108,7 @@ options:
           - A custom HTTP check timeout. The consul default is 10 seconds.
             Similar to the interval this is a number with a V(s) or V(m) suffix to
             signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-    token:
-        type: str
-        description:
-          - The token key identifying an ACL rule set. May be required to register services.
-    
+            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).    
 '''
 
 EXAMPLES = '''
@@ -149,8 +143,6 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
     OPERATION_DELETE,
     OPERATION_READ,
     _ConsulModule,
-    camel_case_key,
-    RequestError,
     validate_check,
 )
 
