@@ -210,9 +210,6 @@ class ConsulAgentCheckModule(_ConsulModule):
 
         validate_check(existing)
 
-        if 'Args' in existing and existing['Args']:
-            existing['Args'] = ["sh", "-c", existing['Args']]
-
         return existing
 
     def create_object(self, obj):

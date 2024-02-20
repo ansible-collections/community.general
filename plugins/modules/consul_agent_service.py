@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: consul_agent_service
 short_description: Add, modify and delete services within a consul cluster
-description: 
+description:
  - Allows the addition, modification and deletion of services in a consul
    cluster via the agent. For more details on using and configuring Checks,
    see U(https://developer.hashicorp.com/consul/api-docs/agent/service).
@@ -345,8 +345,6 @@ class ConsulAgentServiceModule(_ConsulModule):
         if existing['Checks']:
             for check in existing['Checks']:
                 validate_check(check)
-                if 'Args' in check and check['Args']:
-                    check['Args'] = ["sh", "-c"].append(check['Args'])
 
         return existing
 
