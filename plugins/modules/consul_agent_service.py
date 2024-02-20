@@ -20,7 +20,7 @@ description:
    notify the health of the entire node to the cluster.
    Service level checks do not require a check name or id as these are derived
    by Consul from the Service name and id respectively by appending 'service:'
-   Node level checks require a O(checks.name) and optionally a O(checks.check_id)."
+   Node level checks require a O(checks[].name) and optionally a O(checks[].check_id)."
  - Currently, there is no complete way to retrieve the script, interval or TTL
    metadata for a registered check. Without this metadata it is not possible to
    tell if the data supplied with ansible represents a change to a check. As a
@@ -102,7 +102,7 @@ options:
           - The interval at which the service check will be run.
             This is a number with a V(s) or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m).
             If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-          - Required if one of the parameters O(checks.args), O(checks.http), or O(checks.tcp) is specified.
+          - Required if one of the parameters O(checks[].args), O(checks[].http), or O(checks[].tcp) is specified.
         type: str
       notes:
         description:
@@ -111,38 +111,38 @@ options:
       args:
         description:
           - Specifies command arguments to run to update the status of the check.
-          - Requires O(checks.interval) to be provided.
-          - Mutually exclusive with O(checks.ttl), O(checks.tcp) and O(checks.http).
+          - Requires O(checks[].interval) to be provided.
+          - Mutually exclusive with O(checks[].ttl), O(checks[].tcp) and O(checks[].http).
           - "There is an issue with args. It throws an 'Invalid check: TTL must be > 0 for TTL checks'"
           - See U(https://github.com/hashicorp/consul/issues/6923#issuecomment-564476529) for more details
         type: list
         elements: str
       ttl:
         description:
-          - Checks can be registered with a TTL instead of a O(checks.args) and O(checks.interval)
+          - Checks can be registered with a TTL instead of a O(checks[].args) and O(checks[].interval)
             this means that the service will check in with the agent before the
             TTL expires. If it doesn't the check will be considered failed.
             Required if registering a check and the script an interval are missing
             Similar to the interval this is a number with a V(s) or V(m) suffix to
             signify the units of seconds or minutes, for example V(15s) or V(1m).
             If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-          - Mutually exclusive with O(checks.args), O(checks.tcp) and O(checks.http).
+          - Mutually exclusive with O(checks[].args), O(checks[].tcp) and O(checks[].http).
         type: str
       tcp:
         description:
           - Checks can be registered with a TCP port. This means that consul
             will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
             The format is V(host:port), for example V(localhost:80).
-          - Requires O(checks.interval) to be provided.
-          - Mutually exclusive with O(checks.args), O(checks.ttl) and O(checks.http).
+          - Requires O(checks[].interval) to be provided.
+          - Mutually exclusive with O(checks[].args), O(checks[].ttl) and O(checks[].http).
         type: str
         version_added: '1.3.0'
       http:
         description:
           - Checks can be registered with an HTTP endpoint. This means that consul
             will check that the http endpoint returns a successful HTTP status.
-          - Requires O(checks.interval) to be provided.
-          - Mutually exclusive with O(checks.args), O(checks.ttl) and O(checks.tcp).
+          - Requires O(checks[].interval) to be provided.
+          - Mutually exclusive with O(checks[].args), O(checks[].ttl) and O(checks[].tcp).
         type: str
       timeout:
         description:
