@@ -1,0 +1,2 @@
+minor_changes:
+  - icinga2 inventory - add Jinja2 templating support to url, user and password paramenters.
