@@ -333,7 +333,7 @@ class _ConsulModule:
 
         if len(response_data) > 0:
             return json.loads(response_data)
-        return {}
+        return None
 
     def get(self, url_parts, **kwargs):
         return self._request("GET", url_parts, **kwargs)
