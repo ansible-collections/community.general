@@ -103,6 +103,7 @@ options:
   userauthtype:
     description:
     - The authentication type to use for the user.
+    - To remove all authentication types from the user, use an empty list V([]).
     - The choice V(idp) and V(passkey) has been added in community.general 8.1.0.
     choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", "passkey"]
     type: list
