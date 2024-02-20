@@ -65,7 +65,7 @@ options:
     type: bool
     default: false
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   state:
     description:
       - The state of the Rust package.
@@ -76,7 +76,7 @@ options:
   features:
     description:
       - List of features to enable for the package.
-      - Don't use with multiple names
+      - Do not use with multiple names.
     type: list
     elements: str
     required: false
