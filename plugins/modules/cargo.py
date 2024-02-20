@@ -81,61 +81,61 @@ options:
     elements: str
     required: false
     default: []
-    version_added: 8.2.0
+    version_added: 8.4.0
   all_features:
     description:
       - Enable all features for package(s).
     type: bool
     default: false
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   directory:
     description:
       - Path to install the package(s) from.
     type: path
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   registry:
     description:
       - Registry to install the package(s) from.
     type: str
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   git:
     description:
       - Git URL to install the package(s) from.
       - Can optionally either be used with C(branch), C(tag) or C(rev).
     type: str
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   branch:
     description:
       - Git branch to install the package(s) from.
       - C(git) option must be specified.
     type: str
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   tag:
     description:
       - Git tag to install the package(s) from.
       - C(git) option must be specified.
     type: str
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   rev:
     description:
       - Git commit to install the package(s) from.
       - C(git) option must be specified.
     type: str
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
   debug:
     description:
       - Specify whether to install package(s) in debug mode.
     type: bool
     default: false
     required: false
-    version_added: 8.2.0
+    version_added: 8.4.0
 requirements:
     - cargo installed, optionally have a toml library like toml or tomli
       present, if Python version is less than 3.11
