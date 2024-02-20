@@ -77,7 +77,7 @@
       - create_token_status is changed
       - create_token_status.access_token.token is defined
 
-- name: Check existing access token
+- name: Check existing access token recreate=never (default)
   community.general.gitlab_group_access_token:
     api_token: "{{ gitlab_api_token }}"
     api_url: "{{ gitlab_api_url }}"
@@ -91,13 +91,13 @@
     - api
     - read_api
   register: check_token_status
-- name: Assert that token creation without changes succeeds with status not changed
+- name: Assert that token creation without changes and recreate=never succeeds with status not changed
   assert:
     that:
       - check_token_status is not changed
       - check_token_status.access_token.token is not defined
 
-- name: Check existing access token with recreate flag
+- name: Check existing access token with recreate=state_change
   community.general.gitlab_group_access_token:
     api_token: "{{ gitlab_api_token }}"
     api_url: "{{ gitlab_api_url }}"
@@ -110,16 +110,16 @@
     scopes:
     - api
     - read_api
-    recreate: true
+    recreate: state_change
   register: check_recreate_token_status
-- name: Assert that token creation without changes and recreate argument succeeds with status not changed
+- name: Assert that token creation without changes and recreate=state_change succeeds with status not changed
   assert:
     that:
       - check_recreate_token_status is not changed
       - check_recreate_token_status.access_token.token is not defined
 
 - block:
-    - name: Try to change existing access token 
+    - name: Try to change existing access token with recreate=never
       community.general.gitlab_group_access_token:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_api_url }}"
@@ -134,13 +134,13 @@
         - read_api
       register: change_token_status
   always:
-    - name: Assert that token change without recreate argument fails
+    - name: Assert that token change with recreate=never fails
       assert:
         that:
           - change_token_status is failed
   ignore_errors: true
 
-- name: Try to change existing access token with recreate flag
+- name: Try to change existing access token with recreate=state_change
   community.general.gitlab_group_access_token:
     api_token: "{{ gitlab_api_token }}"
     api_url: "{{ gitlab_api_url }}"
@@ -153,13 +153,34 @@
     scopes:
     - api
     - read_api
-    recreate: true
+    recreate: state_change
   register: change_recreate_token_status
-- name: Assert that token change with recreate argument succeeds
+- name: Assert that token change with recreate=state_change succeeds
   assert:
     that:
       - change_recreate_token_status is changed
       - change_recreate_token_status.access_token.token is defined
+
+- name: Try to change existing access token with recreate=always
+  community.general.gitlab_group_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    group: "{{ gitlab_group_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: present
+    expires_at: '2025-01-01'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+    recreate: always
+  register: change_recreate1_token_status
+- name: Assert that token change with recreate=always succeeds
+  assert:
+    that:
+      - change_recreate1_token_status is changed
+      - change_recreate1_token_status.access_token.token is defined
 
 - name: Revoke access token
   community.general.gitlab_group_access_token:

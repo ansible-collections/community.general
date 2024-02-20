@@ -15,8 +15,9 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 module: gitlab_group_access_token
 short_description: Manages GitLab group access tokens
+version_added: 8.4.0
 description:
-  - Creates, gets and revokes group access tokens.
+  - Creates and revokes group access tokens.
 author:
   - Zoran Krleza (@pixslx)
 requirements:
@@ -26,8 +27,10 @@ extends_documentation_fragment:
   - community.general.gitlab
   - community.general.attributes
 notes:
-  - Access tokens can not be changed. If a parameter needs to be changed, acceess token has to be recreated.
+  - Access tokens can not be changed. If a parameter needs to be changed, an acceess token has to be recreated.
+    Whether tokens will be recreated is controlled by the O(recreate) option, which defaults to V(never).
   - Token string is contained in the result only when access token is created or recreated. It can not be fetched afterwards.
+  - Token matching is done by comparing O(name) option
 
 attributes:
   check_mode:
@@ -62,14 +65,19 @@ options:
     choices: ["guest", "reporter", "developer", "maintainer", "owner"]
   expires_at:
     description:
-      - Expiration date of the access token in YYYY-MM-DD format.
+      - Expiration date of the access token in C(YYYY-MM-DD) format.
+      - Make sure to quote this value in YAML to ensure it is kept as a string and not interpreted as a YAML date.
     type: str
     required: true
   recreate:
     description:
-      - Whether the access token will be recreated if there is a difference between desired state and actial state.
-    type: bool
-    default: false
+      - Whether the access token will be recreated if it already exists.
+      - When V(never) the token will never be recreated
+      - When V(always) the token will always be recreated
+      - When V(state_change) the token will be recreated if there is a difference between desired state and actual state.
+    type: str
+    choices: ["never", "always", "state_change"]
+    default: never
   state:
     description:
       - When V(present) the access token will be added to the group if it does not exist.
@@ -109,7 +117,7 @@ EXAMPLES = r'''
       - write_repository
     state: absent
 
-- name: "Change (recreate) existing key (used for extending tokens validity, or changing its parameters by reissuing it)"
+- name: "Change (recreate) existing token if its actual state is different than desired state"
   community.general.gitlab_group_access_token:
     api_url: https://gitlab.example.com/
     api_token: "somegitlabapitoken"
@@ -121,17 +129,11 @@ EXAMPLES = r'''
       - read_api
       - read_repository
       - write_repository
-    recreate: true
+    recreate: state_change
     state: present
 '''
 
 RETURN = r'''
-msg:
-  description: Success or failure message.
-  returned: always
-  type: str
-  sample: "Success"
-
 result:
   description: JSON parsed response from the server.
   returned: always
@@ -143,8 +145,10 @@ error:
   type: str
   sample: "400: key is already in use"
 
-acecss_token:
-  description: API object.
+access_token:
+  description:
+    - API object.
+    - Only contains the value of the token if the token was created or recreated.
   returned: always
   type: dict
 '''
@@ -212,7 +216,7 @@ class GitLabGroupAccessToken(object):
 
         return changed
 
-    def compare_access_token(self):
+    def access_tokens_equal(self):
         if self.access_token_object.name != self._module.params['name']:
             return False
         if self.access_token_object.scopes != self._module.params['scopes']:
@@ -246,7 +250,7 @@ def main():
                              'k8s_proxy']),
         access_level=dict(type='str', required=False, default='maintainer', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
         expires_at=dict(type='str', required=True),
-        recreate=dict(type='bool', default=False)
+        recreate=dict(type='str', default='never', choices=['never', 'always', 'state_change'])
     ))
 
     module = AnsibleModule(
@@ -304,15 +308,20 @@ def main():
 
     if state == 'present':
         if gitlab_access_token_exists:
-            if gitlab_access_token.compare_access_token():
-                module.exit_json(changed=False, msg="Access token already exists", access_token=gitlab_access_token.access_token_object._attrs)
-            else:
-                if recreate:
+            if gitlab_access_token.access_tokens_equal():
+                if recreate == 'always':
                     gitlab_access_token.revoke_access_token()
                     gitlab_access_token.create_access_token(group, {'name': name, 'scopes': scopes, 'access_level': access_level, 'expires_at': expires_at})
                     module.exit_json(changed=True, msg="Successfully recreated access token", access_token=gitlab_access_token.access_token_object._attrs)
                 else:
+                    module.exit_json(changed=False, msg="Access token already exists", access_token=gitlab_access_token.access_token_object._attrs)
+            else:
+                if recreate == 'never':
                     module.fail_json(msg="Access token already exists and its state is different. It can not be updated without recreating.")
+                else:
+                    gitlab_access_token.revoke_access_token()
+                    gitlab_access_token.create_access_token(group, {'name': name, 'scopes': scopes, 'access_level': access_level, 'expires_at': expires_at})
+                    module.exit_json(changed=True, msg="Successfully recreated access token", access_token=gitlab_access_token.access_token_object._attrs)
         else:
             gitlab_access_token.create_access_token(group, {'name': name, 'scopes': scopes, 'access_level': access_level, 'expires_at': expires_at})
             module.exit_json(changed=True, msg="Successfully created access token", access_token=gitlab_access_token.access_token_object._attrs)
