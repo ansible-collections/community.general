@@ -331,7 +331,7 @@ class _ConsulModule:
         if 400 <= status < 600:
             raise RequestError(status, response_data)
 
-        if len(response_data) > 0:
+        if response_data:
             return json.loads(response_data)
         return None
 
