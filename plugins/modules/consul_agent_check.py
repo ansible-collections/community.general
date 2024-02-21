@@ -193,12 +193,10 @@ class ConsulAgentCheckModule(_ConsulModule):
     def read_object(self):
         url = self.endpoint_url(OPERATION_READ)
         checks = self.get(url)
-        unique_identifiers = [self.unique_identifier, "name"]
-        for identifier in unique_identifiers:
-            if self.params.get(identifier) in checks:
-                return checks[self.params.get(self.unique_identifier)]
-            else:
-                return None
+        unique_identifier = self.get_first_appearing_identifier([self.unique_identifier, "name"])
+        if unique_identifier in checks:
+            return checks[unique_identifier]
+        return None
 
     def prepare_object(self, existing, obj):
         existing = super(ConsulAgentCheckModule, self).prepare_object(existing, obj)
