@@ -27,7 +27,6 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    version_added: 8.4.0
   diff_mode:
     support: partial
     details:
