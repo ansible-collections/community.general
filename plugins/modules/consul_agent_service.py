@@ -349,20 +349,6 @@ class ConsulAgentServiceModule(_ConsulModule):
 
         return existing
 
-    def create_object(self, obj):
-        super(ConsulAgentServiceModule, self).create_object(obj)
-        if self._module.check_mode:
-            return obj
-        else:
-            return self.read_object()
-
-    def update_object(self, existing, obj):
-        super(ConsulAgentServiceModule, self).update_object(existing, obj)
-        if self._module.check_mode:
-            return obj
-        else:
-            return self.read_object()
-
     def delete_object(self, obj):
         if not self._module.check_mode:
             url = self.endpoint_url(

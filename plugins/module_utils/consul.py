@@ -255,7 +255,10 @@ class _ConsulModule:
             return obj
         else:
             url = self.endpoint_url(OPERATION_CREATE)
-            return self.put(url, data=self.prepare_object({}, obj))
+            created_obj = self.put(url, data=self.prepare_object({}, obj))
+            if created_obj is None:
+                return self.read_object()
+            return created_obj
 
     def update_object(self, existing, obj):
         url = self.endpoint_url(
@@ -265,7 +268,10 @@ class _ConsulModule:
         if self._module.check_mode:
             return merged_object
         else:
-            return self.put(url, data=merged_object)
+            updated_obj = self.put(url, data=merged_object)
+            if updated_obj is None:
+                return self.read_object()
+            return updated_obj
 
     def delete_object(self, obj):
         if self._module.check_mode:
