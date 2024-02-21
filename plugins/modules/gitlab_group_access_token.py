@@ -134,22 +134,11 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-result:
-  description: JSON parsed response from the server.
-  returned: always
-  type: dict
-
-error:
-  description: the error message returned by the GitLab API.
-  returned: failed
-  type: str
-  sample: "400: key is already in use"
-
 access_token:
   description:
     - API object.
     - Only contains the value of the token if the token was created or recreated.
-  returned: always
+  returned: success and O(state=present)
   type: dict
 '''
 
