@@ -261,9 +261,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
     OPERATION_CREATE,
     OPERATION_UPDATE,
     OPERATION_DELETE,
-    OPERATION_READ,
     _ConsulModule,
-    camel_case_key,
     validate_check,
 )
 
