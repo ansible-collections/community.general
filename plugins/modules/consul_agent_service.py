@@ -27,7 +27,7 @@ description:
    result this does not attempt to determine changes and will always report a
    changed occurred. An API method is planned to supply this metadata so at that
    stage change management will be added.
-author: 
+author:
   - Florian Apolloner (@apollo13)
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
