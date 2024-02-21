@@ -86,6 +86,8 @@ def get_option(option):
         return {}
     elif option == 'strict':
         return False
+    elif option == 'group_by_hostgroups':
+        return True
     else:
         return None
 
