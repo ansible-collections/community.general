@@ -68,8 +68,7 @@ DOCUMENTATION = '''
           - Uses Icinga2 hostgroups as groups
         type: boolean
         default: true
-        choices: 
-        version_added: 8.4.0      
+        version_added: 8.4.0
 '''
 
 EXAMPLES = r'''
@@ -256,8 +255,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 host_attrs['state'] = 'on'
             else:
                 host_attrs['state'] = 'off'
-            self.inventory.add_host(host_name)
-            
+            self.inventory.add_host(host_name)            
             if (self.group_by_hostgroups):
                 host_groups = host_attrs.get('groups')
                 for group in host_groups:
