@@ -316,11 +316,9 @@ class ConsulAgentServiceModule(_ConsulModule):
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
-            if identifier is None:
-                if self.params["id"] is not None:
-                    return [self.api_endpoint, self.params["id"]]
-                if self.params["name"] is not None:
-                    return [self.api_endpoint, self.params["name"]]
+            unique_identifier = self.get_first_appearing_identifier([self.unique_identifier, "name"])
+            if unique_identifier:
+                return [self.api_endpoint, unique_identifier]
 
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])

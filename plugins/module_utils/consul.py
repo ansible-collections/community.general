@@ -232,6 +232,12 @@ class _ConsulModule:
             existing[k] = v
         return existing
 
+    def get_first_appearing_identifier(self, identifiers):
+        for identifier in identifiers:
+            if self.params.get(identifier):
+                return self.params.get(identifier)
+        return None
+
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_CREATE:
             return self.api_endpoint
