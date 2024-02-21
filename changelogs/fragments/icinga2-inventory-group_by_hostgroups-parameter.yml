@@ -1,0 +1,2 @@
+minor_changes:
+  - icinga2 inventory plugin - adds new parameter ``group_by_hostgroups`` in order to make grouping by Icinga2 hostgroups optional
