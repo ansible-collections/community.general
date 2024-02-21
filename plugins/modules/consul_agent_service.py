@@ -12,6 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: consul_agent_service
 short_description: Add, modify and delete services within a consul cluster
+version_added: 8.4.0
 description:
  - Allows the addition, modification and deletion of services in a consul
    cluster via the agent. For more details on using and configuring Checks,
@@ -38,10 +39,8 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    version_added: 8.4.0
   diff_mode:
     support: partial
-    version_added: 8.4.0
     details:
       - In check mode the diff will miss operational attributes.
 options:
