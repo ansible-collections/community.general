@@ -477,7 +477,7 @@ files:
     ignore: resmo
     maintainers: dmtrs
   $modules/consul:
-    ignore: colin-nolan Hakon
+    ignore: colin-nolan Hakon Ilgmi
     maintainers: $team_consul
   $modules/copr.py:
     maintainers: schlupov

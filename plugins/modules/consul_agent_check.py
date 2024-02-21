@@ -11,12 +11,14 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: consul_agent_check
-short_description: Add, modify and delete checks within a consul cluster
+short_description: Add, modify, and delete checks within a consul cluster
 description:
  - Allows the addition, modification and deletion of checks in a consul
    cluster via the agent. For more details on using and configuring Checks,
    see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
-author: "Michael Ilg (@Ilgmi)"
+author: 
+  - Florian Apolloner (@apollo13)
+  - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
   - community.general.consul
   - community.general.consul.actiongroup_consul
@@ -25,10 +27,10 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    version_added: 8.3.0
+    version_added: 8.4.0
   diff_mode:
     support: partial
-    version_added: 8.3.0
+    version_added: 8.4.0
     details:
       - In check mode the diff will miss operational attributes.
 options:
