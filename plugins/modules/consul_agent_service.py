@@ -27,7 +27,9 @@ description:
    result this does not attempt to determine changes and will always report a
    changed occurred. An API method is planned to supply this metadata so at that
    stage change management will be added.
-author: "Michael Ilg (@Ilgmi)"
+author: 
+  - Florian Apolloner (@apollo13)
+  - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
   - community.general.consul
   - community.general.consul.actiongroup_consul
@@ -36,10 +38,10 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    version_added: 8.3.0
+    version_added: 8.4.0
   diff_mode:
     support: partial
-    version_added: 8.3.0
+    version_added: 8.4.0
     details:
       - In check mode the diff will miss operational attributes.
 options:
