@@ -16,7 +16,7 @@ description:
  - Allows the addition, modification and deletion of checks in a consul
    cluster via the agent. For more details on using and configuring Checks,
    see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
-author: 
+author:
   - Florian Apolloner (@apollo13)
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
