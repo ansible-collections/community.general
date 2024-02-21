@@ -98,6 +98,7 @@ def test_populate(inventory, mocker):
     inventory.icinga2_password = 'password'
     inventory.icinga2_url = 'https://localhost:5665' + '/v1'
     inventory.inventory_attr = "address"
+    inventory.group_by_hostgroups = True
 
     # bypass authentication and API fetch calls
     inventory._check_api = mocker.MagicMock(side_effect=check_api)
