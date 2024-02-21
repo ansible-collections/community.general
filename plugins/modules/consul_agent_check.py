@@ -178,7 +178,7 @@ _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
 class ConsulAgentCheckModule(_ConsulModule):
     api_endpoint = "agent/check"
     result_key = "check"
-    unique_identifier = "id"
+    unique_identifiers = ["id", "name"]
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
@@ -193,10 +193,11 @@ class ConsulAgentCheckModule(_ConsulModule):
     def read_object(self):
         url = self.endpoint_url(OPERATION_READ)
         checks = self.get(url)
-        unique_identifier = self.get_first_appearing_identifier([self.unique_identifier, "name"])
-        if unique_identifier in checks:
-            return checks[unique_identifier]
-        return None
+        for identifier in self.unique_identifiers:
+            if self.params.get(identifier) in checks:
+                return checks[self.params.get(identifier)]
+            else:
+                return None
 
     def prepare_object(self, existing, obj):
         existing = super(ConsulAgentCheckModule, self).prepare_object(existing, obj)
