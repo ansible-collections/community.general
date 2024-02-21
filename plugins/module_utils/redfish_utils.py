@@ -145,17 +145,14 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
             try:
-                if headers.get('content-encoding', '') == 'gzip':
-                    data = json.loads(to_native(gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8').read()))
-                else:
-                    data = json.loads(to_native(resp.read()))
+                data = json.loads(to_native(resp.read()))
             except Exception as e:
                 # No response data; this is okay in certain cases
                 data = None
                 if not allow_no_resp:
                     raise
+            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
