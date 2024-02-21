@@ -259,8 +259,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             self.inventory.add_host(host_name)
             if (self.group_by_hostgroups):
                 host_groups = host_attrs.get('groups')
-                if self.group_by_hostgroups:
-                host_groups = host_attrs.get('groups')
                 for group in host_groups:
                         if group not in self.inventory.groups.keys():
                             self.inventory.add_group(group)
