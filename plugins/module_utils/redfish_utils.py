@@ -130,7 +130,7 @@ class RedfishUtils(object):
         return resp
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri, override_headers=None):
+    def get_request(self, uri, override_headers=None, allow_no_resp=False):
         req_headers = dict(GET_HEADERS)
         if override_headers:
             req_headers.update(override_headers)
@@ -145,13 +145,17 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-            if override_headers:
-                resp = gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8')
-                data = json.loads(to_native(resp.read()))
-                headers = req_headers
-            else:
-                data = json.loads(to_native(resp.read()))
-                headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            try:
+                if headers.get('content-encoding', '') == 'gzip':
+                    data = json.loads(to_native(gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8').read()))
+                else:
+                    data = json.loads(to_native(resp.read()))
+            except Exception as e:
+                # No response data; this is okay in certain cases
+                data = None
+                if not allow_no_resp:
+                    raise
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -1813,7 +1817,7 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': 'Must provide a handle tracking the update.'}
 
         # Get the task or job tracking the update
-        response = self.get_request(self.root_uri + update_handle)
+        response = self.get_request(self.root_uri + update_handle, allow_no_resp=True)
         if response['ret'] is False:
             return response
 
