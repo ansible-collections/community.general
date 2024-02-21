@@ -19,5 +19,5 @@
 - name: Check assertions helloworld
   assert:
     that:
-        - rustup_install_absent_helloworld is changed
-        - rustup_uninstall_present_helloworld is changed
+      - rustup_install_absent_helloworld is changed
+      - rustup_uninstall_present_helloworld is changed

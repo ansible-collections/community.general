@@ -29,7 +29,7 @@
 - name: Check assertions helloworld
   assert:
     that:
-        - uninstall_absent_helloworld is not changed
-        - install_absent_helloworld is changed
-        - install_present_helloworld is not changed
-        - uninstall_present_helloworld is changed
+      - uninstall_absent_helloworld is not changed
+      - install_absent_helloworld is changed
+      - install_present_helloworld is not changed
+      - uninstall_present_helloworld is changed

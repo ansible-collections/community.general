@@ -1,0 +1,53 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+- name: Alternate registry | Configure cargo
+  copy:
+    content: |
+      [registries]
+      alternate = { index = "https://github.com/hotg-ai/crates.io-index" }
+    dest: "{{ lookup('env', 'HOME') }}/.cargo/config.toml"
+
+- name: Alternate registry | Install application helloworld from alternate
+  community.general.cargo:
+    name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
+    registry: alternate
+  register: alternate_registry_install_absent_helloworld
+
+- name: Alternate registry | Uninstall application helloworld
+  community.general.cargo:
+    name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
+    registry: alternate
+    state: absent
+  register: alternate_registry_uninstall_present_helloworld
+
+- name: Alternate registry | Install application helloworld from crates.io
+  community.general.cargo:
+    name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
+  register: alternate_registry_install_absent_helloworld_from_crates
+
+- name: Alternate registry | Change application helloworld to alternate registry
+  community.general.cargo:
+    name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
+    registry: alternate
+  register: alternate_registry_change_helloworld_registry
+
+- name: Alternate registry | Uninstall application helloworld
+  community.general.cargo:
+    name: helloworld
+    executable: "{{ rustup_cargo_bin }}"
+    state: absent
+
+- name: Alternate registry | Check assertions helloworld
+  assert:
+    that:
+      - alternate_registry_install_absent_helloworld is changed
+      - alternate_registry_uninstall_present_helloworld is changed
+      - alternate_registry_install_absent_helloworld_from_crates is changed
+      - alternate_registry_change_helloworld_registry is changed
