@@ -1,2 +1,2 @@
 minor_changes:
-  - icinga2 inventory - add Jinja2 templating support to url, user and password paramenters.
+  - icinga2 inventory plugin - add Jinja2 templating support to ``url``, ``user``, and ``password`` paramenters (https://github.com/ansible-collections/community.general/issues/7074, https://github.com/ansible-collections/community.general/pull/7996).
