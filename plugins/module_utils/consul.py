@@ -127,6 +127,7 @@ class _ConsulModule:
 
     api_endpoint = None  # type: str
     unique_identifier = None  # type: str
+    unique_identifiers = None  # type: list
     result_key = None  # type: str
     create_only_fields = set()
     params = {}
@@ -232,11 +233,12 @@ class _ConsulModule:
             existing[k] = v
         return existing
 
-    def get_first_appearing_identifier(self, identifiers):
-        for identifier in identifiers:
-            if self.params.get(identifier):
-                return self.params.get(identifier)
-        return None
+    def get_unique_identifier(self):
+        if self.unique_identifiers:
+            for identifier in self.unique_identifiers:
+                if self.params.get(identifier):
+                    return identifier
+        return self.unique_identifier
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_CREATE:
@@ -246,7 +248,8 @@ class _ConsulModule:
         raise RuntimeError("invalid arguments passed")
 
     def read_object(self):
-        url = self.endpoint_url(OPERATION_READ, self.params.get(self.unique_identifier))
+        identifier = self.get_unique_identifier()
+        url = self.endpoint_url(OPERATION_READ, self.params.get(identifier))
         try:
             return self.get(url)
         except RequestError as e:
@@ -267,8 +270,9 @@ class _ConsulModule:
             return created_obj
 
     def update_object(self, existing, obj):
+        identifier = self.get_unique_identifier()
         url = self.endpoint_url(
-            OPERATION_UPDATE, existing.get(camel_case_key(self.unique_identifier))
+            OPERATION_UPDATE, existing.get(camel_case_key(identifier))
         )
         merged_object = self.prepare_object(existing, obj)
         if self._module.check_mode:
@@ -283,8 +287,9 @@ class _ConsulModule:
         if self._module.check_mode:
             return {}
         else:
+            identifier = self.get_unique_identifier()
             url = self.endpoint_url(
-                OPERATION_DELETE, obj.get(camel_case_key(self.unique_identifier))
+                OPERATION_DELETE, obj.get(camel_case_key(identifier))
             )
             return self.delete(url)
 

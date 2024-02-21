@@ -312,13 +312,9 @@ _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
 class ConsulAgentServiceModule(_ConsulModule):
     api_endpoint = "agent/service"
     result_key = "service"
-    unique_identifier = "id"
+    unique_identifiers = ["id", "name"]
 
     def endpoint_url(self, operation, identifier=None):
-        if operation == OPERATION_READ:
-            unique_identifier = self.get_first_appearing_identifier([self.unique_identifier, "name"])
-            if unique_identifier:
-                return [self.api_endpoint, unique_identifier]
 
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])
@@ -350,7 +346,7 @@ class ConsulAgentServiceModule(_ConsulModule):
     def delete_object(self, obj):
         if not self._module.check_mode:
             url = self.endpoint_url(
-                OPERATION_DELETE, obj.get(camel_case_key(self.unique_identifier))
+                OPERATION_DELETE, obj.get("ID")
             )
             self.put(url)
         return {}
