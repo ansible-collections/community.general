@@ -35,7 +35,7 @@ options:
     default: false
   name:
     description:
-      - A package name, like V(foo), or multiple packages, like V(foo, bar).
+      - A package name, like V(foo), or multiple packages, like V(foo,bar). Do not include additional whitespace when specifying multiple packages.
     type: list
     elements: str
   no_cache:
