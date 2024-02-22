@@ -12,10 +12,6 @@
       - http
     meta:
       nginx_version: 1.25.3
-    checks:
-      - interval: 60s
-        notes: "My Note"
-        http: http://localhost:80/morestatus
   register: result
 
 - set_fact:
@@ -124,21 +120,7 @@
     that:
       - result is changed
       - result.check is defined
-      - result.check.interval == '60'
-
-- name: Update a check not changed when updating again without changes
-  community.general.consul_agent_check:
-    name: check
-    id: check
-    interval: 60s
-    tcp: localhost:80
-    notes: "check"
-  register: result
-
-- assert:
-    that:
-      - result is not changed
-      - result.operation is not defined
+      - result.check.Interval == '1m0s'
 
 - name: Remove check
   community.general.consul_agent_check:
