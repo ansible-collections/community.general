@@ -10,6 +10,8 @@ import json
 import os
 import random
 import string
+import gzip
+from io import BytesIO
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.common.text.converters import to_text
@@ -18,6 +20,8 @@ from ansible.module_utils.six import text_type
 from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlparse
+from ansible.module_utils.ansible_release import __version__ as ansible_version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
@@ -143,14 +147,19 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
+            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
             try:
-                data = json.loads(to_native(resp.read()))
+                if headers.get('content-encoding') == 'gzip' and LooseVersion(ansible_version) < LooseVersion('2.14'):
+                    # Older versions of Ansible do not automatically decompress the data
+                    # Starting in 2.14, open_url will decompress the response data by default
+                    data = json.loads(to_native(gzip.open(BytesIO(resp.read()), 'rt', encoding='utf-8').read()))
+                else:
+                    data = json.loads(to_native(resp.read()))
             except Exception as e:
                 # No response data; this is okay in certain cases
                 data = None
                 if not allow_no_resp:
                     raise
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
