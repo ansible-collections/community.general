@@ -179,7 +179,7 @@ class ConsulAgentCheckModule(_ConsulModule):
     result_key = "check"
     unique_identifiers = ["id", "name"]
     operational_attributes = {"Node", "CheckID", "Output", "ServiceName", "ServiceTags",
-                                            "Status", "Type", "ExposedPort", "Definition"}
+                              "Status", "Type", "ExposedPort", "Definition"}
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
