@@ -29,7 +29,6 @@ description:
    changed occurred. An API method is planned to supply this metadata so at that
    stage change management will be added.
 author:
-  - Florian Apolloner (@apollo13)
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
   - community.general.consul
@@ -311,41 +310,30 @@ class ConsulAgentServiceModule(_ConsulModule):
     api_endpoint = "agent/service"
     result_key = "service"
     unique_identifiers = ["id", "name"]
+    operational_attributes = {"Service", "ContentHash", "Datacenter"}
 
     def endpoint_url(self, operation, identifier=None):
-
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])
         if operation == OPERATION_DELETE:
-            if identifier is None and self.params["name"] is not None:
-                return [self.api_endpoint, "deregister", self.params["name"]]
             return "/".join([self.api_endpoint, "deregister", identifier])
 
         return super(ConsulAgentServiceModule, self).endpoint_url(operation, identifier)
 
     def prepare_object(self, existing, obj):
         existing = super(ConsulAgentServiceModule, self).prepare_object(existing, obj)
+        if "ServicePort" in existing:
+            existing["Port"] = existing.pop("ServicePort")
 
-        operational_attributes = {"Service", "ContentHash", "Datacenter"}
-        existing = {
-            k: v for k, v in existing.items() if k not in operational_attributes
-        }
-
-        if existing['ServicePort']:
-            existing['Port'] = existing['ServicePort']
-            del existing['ServicePort']
-
-        if existing['Checks']:
-            for check in existing['Checks']:
+        if "Checks" in existing:
+            for check in existing["Checks"]:
                 validate_check(check)
 
         return existing
 
     def delete_object(self, obj):
         if not self._module.check_mode:
-            url = self.endpoint_url(
-                OPERATION_DELETE, obj.get("ID")
-            )
+            url = self.endpoint_url(OPERATION_DELETE, self.id_from_obj(obj, camel_case=True))
             self.put(url)
         return {}
 

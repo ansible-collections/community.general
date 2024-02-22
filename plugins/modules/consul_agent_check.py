@@ -18,7 +18,6 @@ description:
    cluster via the agent. For more details on using and configuring Checks,
    see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
 author:
-  - Florian Apolloner (@apollo13)
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
   - community.general.consul
@@ -179,6 +178,8 @@ class ConsulAgentCheckModule(_ConsulModule):
     api_endpoint = "agent/check"
     result_key = "check"
     unique_identifiers = ["id", "name"]
+    operational_attributes = {"Node", "CheckID", "Output", "ServiceName", "ServiceTags",
+                                            "Status", "Type", "ExposedPort", "Definition"}
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
@@ -193,31 +194,19 @@ class ConsulAgentCheckModule(_ConsulModule):
     def read_object(self):
         url = self.endpoint_url(OPERATION_READ)
         checks = self.get(url)
-        for identifier in self.unique_identifiers:
-            if self.params.get(identifier) in checks:
-                return checks[self.params.get(identifier)]
-            else:
-                return None
+        identifier = self.id_from_obj(self.params)
+        if identifier in checks:
+            return checks[identifier]
+        return None
 
     def prepare_object(self, existing, obj):
         existing = super(ConsulAgentCheckModule, self).prepare_object(existing, obj)
-
-        operational_attributes = {"Node", "CheckID", "Output", "ServiceName", "ServiceTags",
-                                  "Status", "Type", "ExposedPort", "Definition"}
-        existing = {
-            k: v for k, v in existing.items() if k not in operational_attributes
-        }
-
         validate_check(existing)
-
         return existing
 
     def delete_object(self, obj):
         if not self._module.check_mode:
-            url = self.endpoint_url(
-                OPERATION_DELETE, obj.get("CheckID")
-            )
-            self.put(url)
+            self.put(self.endpoint_url(OPERATION_DELETE, obj.get("CheckID")))
         return {}
 
 

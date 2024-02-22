@@ -102,7 +102,7 @@ OPERATION_DELETE = "remove"
 def _normalize_params(params, arg_spec):
     final_params = {}
     for k, v in params.items():
-        if k not in arg_spec:  # Alias
+        if k not in arg_spec or v is None:  # Alias
             continue
         spec = arg_spec[k]
         if (
@@ -130,6 +130,7 @@ class _ConsulModule:
     unique_identifiers = None  # type: list
     result_key = None  # type: str
     create_only_fields = set()
+    operational_attributes = set()
     params = {}
 
     def __init__(self, module):
@@ -140,6 +141,11 @@ class _ConsulModule:
             for k in self.params
             if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
         }
+
+        self.operational_attributes.update({"CreateIndex", "CreateTime", "Hash", "ModifyIndex"})
+
+        if self.unique_identifier:
+            self.unique_identifiers = [self.unique_identifier]
 
     def execute(self):
         obj = self.read_object()
@@ -225,20 +231,23 @@ class _ConsulModule:
         return False
 
     def prepare_object(self, existing, obj):
-        operational_attributes = {"CreateIndex", "CreateTime", "Hash", "ModifyIndex"}
         existing = {
-            k: v for k, v in existing.items() if k not in operational_attributes
+            k: v for k, v in existing.items() if k not in self.operational_attributes
         }
         for k, v in obj.items():
             existing[k] = v
         return existing
 
-    def get_unique_identifier(self):
+    def id_from_obj(self, obj, camel_case=False):
+        def key_func(key):
+            return camel_case_key(key) if camel_case else key
+
         if self.unique_identifiers:
             for identifier in self.unique_identifiers:
-                if self.params.get(identifier):
-                    return identifier
-        return self.unique_identifier
+                identifier = key_func(identifier)
+                if identifier in obj:
+                    return obj[identifier]
+        return None
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_CREATE:
@@ -248,8 +257,8 @@ class _ConsulModule:
         raise RuntimeError("invalid arguments passed")
 
     def read_object(self):
-        identifier = self.get_unique_identifier()
-        url = self.endpoint_url(OPERATION_READ, self.params.get(identifier))
+        identifier = self.id_from_obj(self.params)
+        url = self.endpoint_url(OPERATION_READ, identifier)
         try:
             return self.get(url)
         except RequestError as e:
@@ -266,31 +275,25 @@ class _ConsulModule:
             url = self.endpoint_url(OPERATION_CREATE)
             created_obj = self.put(url, data=self.prepare_object({}, obj))
             if created_obj is None:
-                return self.read_object()
+                created_obj = self.read_object()
             return created_obj
 
     def update_object(self, existing, obj):
-        identifier = self.get_unique_identifier()
-        url = self.endpoint_url(
-            OPERATION_UPDATE, existing.get(camel_case_key(identifier))
-        )
         merged_object = self.prepare_object(existing, obj)
         if self._module.check_mode:
             return merged_object
         else:
+            url = self.endpoint_url(OPERATION_UPDATE, self.id_from_obj(existing, camel_case=True))
             updated_obj = self.put(url, data=merged_object)
             if updated_obj is None:
-                return self.read_object()
+                updated_obj = self.read_object()
             return updated_obj
 
     def delete_object(self, obj):
         if self._module.check_mode:
             return {}
         else:
-            identifier = self.get_unique_identifier()
-            url = self.endpoint_url(
-                OPERATION_DELETE, obj.get(camel_case_key(identifier))
-            )
+            url = self.endpoint_url(OPERATION_DELETE, self.id_from_obj(obj, camel_case=True))
             return self.delete(url)
 
     def _request(self, method, url_parts, data=None, params=None):

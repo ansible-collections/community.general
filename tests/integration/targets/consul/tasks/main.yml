@@ -98,6 +98,7 @@
         - import_tasks: consul_auth_method.yml
         - import_tasks: consul_binding_rule.yml
         - import_tasks: consul_agent_service.yml
+        - import_tasks: consul_agent_check.yml
       module_defaults:
         group/community.general.consul:
           token: "{{ consul_management_token }}"
