@@ -76,7 +76,8 @@ options:
   features:
     description:
       - List of features to enable for the package.
-      - Do not use with multiple names.
+      - If O(name) contains multiple values, the module will try to install all
+        of them with these same features.
     type: list
     elements: str
     required: false
@@ -84,7 +85,9 @@ options:
     version_added: 8.4.0
   all_features:
     description:
-      - Enable all features for package(s).
+      - Enable all features for a package.
+      - If O(name) has multiple values, for each package all of their features
+        would be enabled.
     type: bool
     default: false
     required: false
@@ -104,7 +107,7 @@ options:
   git:
     description:
       - Git URL to install the package(s) from.
-      - Can optionally either be used with C(branch), C(tag) or C(rev).
+      - Can optionally either be used with O(branch), O(tag) or O(rev).
     type: str
     required: false
     version_added: 8.4.0
@@ -251,19 +254,9 @@ class Cargo(object):
             return out, err
         return "", ""
 
-<<<<<<< HEAD
-    def get_installed(self):
-        cmd = ["install", "--list"]
-        if self.path:
-            cmd.append("--root")
-            cmd.append(self.path)
-
-        data, dummy = self._exec(cmd, True, False, False)
-=======
     def cache_metadata(self):
         if self.metadata_cached:
             return
->>>>>>> 0d5fa807a ((feat): make cargo module feature complete)
 
         self.cargo_dir = (
             self.path
@@ -627,16 +620,10 @@ def main():
     name = module.params["name"]
     state = module.params["state"]
     force = module.params["force"]
-    features = module.params["features"]
     directory = module.params["directory"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
-
-    if len(name) > 1 and features:
-        module.fail_json(
-            msg="Cannot determine which features are for what package for multiple packages"
-        )
 
     if directory is not None and not os.path.isdir(directory):
         module.fail_json(
