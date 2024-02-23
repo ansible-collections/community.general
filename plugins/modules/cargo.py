@@ -137,6 +137,10 @@ class Cargo(object):
 
     def get_installed(self):
         cmd = ["install", "--list"]
+        if self.path:
+            cmd.append("--root")
+            cmd.append(self.path)
+
         data, dummy = self._exec(cmd, True, False, False)
 
         package_regex = re.compile(r"^([\w\-]+) v(.+):$")
