@@ -1,0 +1,2 @@
+minor_changes:
+  - mssql_script - adds transactional (rollback/commit) support via optional boolean param ``transaction`` (https://github.com/ansible-collections/community.general/pull/7976).
