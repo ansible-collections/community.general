@@ -1,0 +1,10 @@
+bugfixes:
+  - "cargo - fix idempotency issues when using a custom installation path
+    for packages (using the ``--path`` parameter).
+    The initial installation runs fine, but subsequent runs use the
+    ``get_installed()`` function which did not check the given installation
+    location, before running ``cargo install``. This resulted in a false
+    ``changed`` state.
+    Also the removal of packeges using ``state: absent`` failed, as the
+    installation check did not use the given parameter
+    (https://github.com/ansible-collections/community.general/pull/7970)."
