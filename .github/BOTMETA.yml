@@ -151,8 +151,18 @@ files:
   $filters/jc.py:
     maintainers: kellyjonbrazil
   $filters/json_query.py: {}
+  $filters/lists.py:
+    maintainers: cfiehe
+  $filters/lists_difference.yml:
+    maintainers: cfiehe
+  $filters/lists_intersect.yml:
+    maintainers: cfiehe
   $filters/lists_mergeby.py:
     maintainers: vbotka
+  $filters/lists_symmetric_difference.yml:
+    maintainers: cfiehe
+  $filters/lists_union.yml:
+    maintainers: cfiehe
   $filters/random_mac.py: {}
   $filters/time.py:
     maintainers: resmo
@@ -1442,6 +1452,8 @@ files:
     maintainers: felixfontein giner
   docs/docsite/rst/filter_guide_abstract_informations_grouping.rst:
     maintainers: felixfontein
+  docs/docsite/rst/filter_guide_abstract_informations_lists_helper.rst:
+    maintainers: cfiehe
   docs/docsite/rst/filter_guide_abstract_informations_merging_lists_of_dictionaries.rst:
     maintainers: vbotka
   docs/docsite/rst/filter_guide_conversions.rst:

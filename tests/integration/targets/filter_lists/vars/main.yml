@@ -1,0 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+list1: [1, 2, 5, 3, 4, 10]
+list2: [1, 2, 3, 4, 5, 11, 99]
+list3: [1, 2, 4, 5, 10, 99, 101]

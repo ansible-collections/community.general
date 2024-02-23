@@ -1,0 +1,64 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test predictive list union
+  ansible.builtin.assert:
+    that:
+      - 'list1 | community.general.lists_union(list2,  list3) == [1, 2, 5, 3, 4, 10, 11, 99, 101]'
+      - '[list1, list2, list3] | community.general.lists_union(flatten=True) == [1, 2, 5, 3, 4, 10, 11, 99, 101]'
+      - '[1, 2, 3] | community.general.lists_union([4, 5, 6]) == [1, 2, 3, 4, 5, 6]'
+      - '[1, 2, 3] | community.general.lists_union([3, 4, 5, 6]) == [1, 2, 3, 4, 5, 6]'
+      - '[1, 2, 3] | community.general.lists_union([3, 2, 1]) == [1, 2, 3]'
+      - '["a", "A", "b"] | community.general.lists_union(["B", "c", "C"]) == ["a", "A", "b", "B", "c", "C"]'
+      - '["a", "A", "b"] | community.general.lists_union(["b", "B", "c", "C"]) == ["a", "A", "b", "B", "c", "C"]'
+      - '["a", "A", "b"] | community.general.lists_union(["b", "A", "a"]) == ["a", "A", "b"]'
+      - '[["a"]] | community.general.lists_union([["b"], ["a"]]) == [["a"], ["b"]]'
+      - '[["a"]] | community.general.lists_union([["b"]], ["a"]) == [["a"], ["b"], "a"]'
+      - '[["a"]] | community.general.lists_union(["b"], ["a"]) == [["a"], "b", "a"]'
+
+- name: Test predictive list intersection
+  ansible.builtin.assert:
+    that:
+      - 'list1 | community.general.lists_intersect(list2,  list3) == [1, 2, 5, 4]'
+      - '[list1, list2, list3] | community.general.lists_intersect(flatten=True) == [1, 2, 5, 4]'
+      - '[1, 2, 3] | community.general.lists_intersect([4, 5, 6]) == []'
+      - '[1, 2, 3] | community.general.lists_intersect([3, 4, 5, 6]) == [3]'
+      - '[1, 2, 3] | community.general.lists_intersect([3, 2, 1]) == [1, 2, 3]'
+      - '["a", "A", "b"] | community.general.lists_intersect(["B", "c", "C"]) == []'
+      - '["a", "A", "b"] | community.general.lists_intersect(["b", "B", "c", "C"]) == ["b"]'
+      - '["a", "A", "b"] | community.general.lists_intersect(["b", "A", "a"]) == ["a", "A", "b"]'
+      - '[["a"]] | community.general.lists_intersect([["b"], ["a"]]) == [["a"]]'
+      - '[["a"]] | community.general.lists_intersect([["b"]], ["a"]) == []'
+      - '[["a"]] | community.general.lists_intersect(["b"], ["a"]) == []'
+
+- name: Test predictive list difference
+  ansible.builtin.assert:
+    that:
+      - 'list1 | community.general.lists_difference(list2, list3) == []'
+      - '[list1, list2, list3] | community.general.lists_difference(flatten=True) == []'
+      - '[1, 2, 3] | community.general.lists_difference([4, 5, 6]) == [1, 2, 3]'
+      - '[1, 2, 3] | community.general.lists_difference([3, 4, 5, 6]) == [1, 2]'
+      - '[1, 2, 3] | community.general.lists_difference([3, 2, 1]) == []'
+      - '["a", "A", "b"] | community.general.lists_difference(["B", "c", "C"]) == ["a", "A", "b"]'
+      - '["a", "A", "b"] | community.general.lists_difference(["b", "B", "c", "C"]) == ["a", "A"]'
+      - '["a", "A", "b"] | community.general.lists_difference(["b", "A", "a"]) == []'
+      - '[["a"]] | community.general.lists_difference([["b"], ["a"]]) == []'
+      - '[["a"]] | community.general.lists_difference([["b"]], ["a"]) == [["a"]]'
+      - '[["a"]] | community.general.lists_difference(["b"], ["a"]) == [["a"]]'
+
+- name: Test predictive list symmetric difference
+  ansible.builtin.assert:
+    that:
+      - 'list1 | community.general.lists_symmetric_difference(list2, list3) == [11, 1, 2, 4, 5, 101]'
+      - '[list1, list2, list3] | community.general.lists_symmetric_difference(flatten=True) == [11, 1, 2, 4, 5, 101]'
+      - '[1, 2, 3] | community.general.lists_symmetric_difference([4, 5, 6]) == [1, 2, 3, 4, 5, 6]'
+      - '[1, 2, 3] | community.general.lists_symmetric_difference([3, 4, 5, 6]) == [1, 2, 4, 5, 6]'
+      - '[1, 2, 3] | community.general.lists_symmetric_difference([3, 2, 1]) == []'
+      - '["a", "A", "b"] | community.general.lists_symmetric_difference(["B", "c", "C"]) == ["a", "A", "b", "B", "c", "C"]'
+      - '["a", "A", "b"] | community.general.lists_symmetric_difference(["b", "B", "c", "C"]) == ["a", "A", "B", "c", "C"]'
+      - '["a", "A", "b"] | community.general.lists_symmetric_difference(["b", "A", "a"]) == []'
+      - '[["a"]] | community.general.lists_symmetric_difference([["b"], ["a"]]) == [["b"]]'
+      - '[["a"]] | community.general.lists_symmetric_difference([["b"]], ["a"]) == [["a"], ["b"], "a"]'
+      - '[["a"]] | community.general.lists_symmetric_difference(["b"], ["a"]) == [["a"], "b", "a"]'
