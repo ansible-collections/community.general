@@ -45,6 +45,12 @@ options:
       - The name of the sudoers rule.
       - This will be used for the filename for the sudoers file managed by this rule.
     type: str
+  noexec:
+    description:
+      - Whether a command is prevented to run further commands itself.
+    default: false
+    type: bool
+    version_added: 8.4.0
   nopassword:
     description:
       - Whether a password will be required to run the sudo'd command.
@@ -143,6 +149,15 @@ EXAMPLES = '''
     user: alice
     commands: /usr/local/bin/upload
     setenv: true
+
+- name: >-
+    Allow alice to sudo /usr/bin/less but prevent less from
+    running further commands itself
+  community.general.sudoers:
+    name: allow-alice-restricted-less
+    user: alice
+    commands: /usr/bin/less
+    noexec: true
 '''
 
 import os
@@ -162,6 +177,7 @@ class Sudoers(object):
         self.user = module.params['user']
         self.group = module.params['group']
         self.state = module.params['state']
+        self.noexec = module.params['noexec']
         self.nopassword = module.params['nopassword']
         self.setenv = module.params['setenv']
         self.host = module.params['host']
@@ -205,13 +221,15 @@ class Sudoers(object):
             owner = '%{group}'.format(group=self.group)
 
         commands_str = ', '.join(self.commands)
+        noexec_str = 'NOEXEC:' if self.noexec else ''
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
         setenv_str = 'SETENV:' if self.setenv else ''
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
-        return "{owner} {host}={runas}{nopasswd}{setenv} {commands}\n".format(
+        return "{owner} {host}={runas}{noexec}{nopasswd}{setenv} {commands}\n".format(
             owner=owner,
             host=self.host,
             runas=runas_str,
+            noexec=noexec_str,
             nopasswd=nopasswd_str,
             setenv=setenv_str,
             commands=commands_str
@@ -257,6 +275,10 @@ def main():
         'group': {},
         'name': {
             'required': True,
+        },
+        'noexec': {
+            'type': 'bool',
+            'default': False,
         },
         'nopassword': {
             'type': 'bool',

@@ -159,6 +159,20 @@
     src: "{{ sudoers_path }}/my-sudo-rule-8"
   register: rule_8_contents
 
+- name: Create rule with noexec parameters
+  community.general.sudoers:
+    name: my-sudo-rule-9
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    noexec: true
+  register: rule_9
+
+- name: Grab contents of my-sudo-rule-9
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-9"
+  register: rule_9_contents
+
 - name: Revoke rule 1
   community.general.sudoers:
     name: my-sudo-rule-1
@@ -257,6 +271,7 @@
       - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob)NOPASSWD: /usr/local/bin/command\n'"
       - "rule_7_contents['content'] | b64decode == 'alice host-1=NOPASSWD: /usr/local/bin/command\n'"
       - "rule_8_contents['content'] | b64decode == 'alice ALL=NOPASSWD:SETENV: /usr/local/bin/command\n'"
+      - "rule_9_contents['content'] | b64decode == 'alice ALL=NOEXEC:NOPASSWD: /usr/local/bin/command\n'"
 
 - name: Check revocation stat
   ansible.builtin.assert:
