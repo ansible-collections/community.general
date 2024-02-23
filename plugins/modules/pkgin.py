@@ -174,6 +174,13 @@ def query_package(module, name):
             #     '<' - installed but out of date
             #     '=' - installed and up to date
             #     '>' - installed but newer than the repository version
+
+            if (package in ('reading local summary...',
+                            'processing local summary...',
+                            'downloading pkg_summary.xz done.')) or \
+               (package.startswith('processing remote summary (')):
+                continue
+
             pkgname_with_version, raw_state = package.split(splitchar)[0:2]
 
             # Search for package, stripping version
@@ -317,7 +324,7 @@ def do_upgrade_packages(module, full=False):
         format_pkgin_command(module, cmd))
 
     if rc == 0:
-        if re.search('^nothing to do.\n$', out):
+        if re.search('^(.*\n|)nothing to do.\n$', out):
             module.exit_json(changed=False, msg="nothing left to upgrade")
     else:
         module.fail_json(msg="could not %s packages" % cmd, stdout=out, stderr=err)
