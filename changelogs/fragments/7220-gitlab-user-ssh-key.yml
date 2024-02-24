@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_user - the module correctly identifies existing keys by their public key value now (https://github.com/ansible-collections/community.general/pull/7220).

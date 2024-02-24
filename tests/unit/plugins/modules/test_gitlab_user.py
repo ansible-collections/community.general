@@ -9,7 +9,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.gitlab_user import GitLabUser
+from ansible_collections.community.general.plugins.modules.gitlab_user import GitLabUser, ssh_key_value
 
 
 def _dummy(x):
@@ -129,10 +129,20 @@ class TestGitlabUser(GitlabModuleTestCase):
     def test_sshkey_exist(self):
         user = self.gitlab_instance.users.get(1)
 
-        exist = self.moduleUtil.ssh_key_exists(user, "Public key")
+        exist = self.moduleUtil.ssh_key_exists(
+            user,
+            "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k"
+            "6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfDzpvZK2H"
+            "5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0= test_gitlab_user.py")
         self.assertEqual(exist, True)
 
-        notExist = self.moduleUtil.ssh_key_exists(user, "Private key")
+        notExist = self.moduleUtil.ssh_key_exists(
+            user,
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcUdRuSuA5z"
+            "szUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+xawxKWmI7hJ5S0tO"
+            "v6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2jTiGHTi9AIjLnyD/jWRpOgtdf"
+            "kLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0xc809OHLi7FDf+E7U4wiZJCFuUizMeXyu"
+            "K/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF")
         self.assertEqual(notExist, False)
 
     @with_httmock(resp_get_user)
@@ -150,12 +160,13 @@ class TestGitlabUser(GitlabModuleTestCase):
         self.assertEqual(rvalue, False)
 
         rvalue = self.moduleUtil.add_ssh_key_to_user(user, {
-            'name': "Private key",
+            'name': "Not a private key",
             'file': "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA1YotVDm2mAyk2tPt4E7AHm01sS6JZmcU"
                     "dRuSuA5zszUJzYPPUSRAX3BCgTqLqYx//UuVncK7YqLVSbbwjKR2Ez5lISgCnVfLVEXzwhv+"
                     "xawxKWmI7hJ5S0tOv6MJ+IxyTa4xcKwJTwB86z22n9fVOQeJTR2dSOH1WJrf0PvRk+KVNY2j"
                     "TiGHTi9AIjLnyD/jWRpOgtdfkLRc8EzAWrWlgNmH2WOKBw6za0az6XoG75obUdFVdW3qcD0x"
-                    "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ+mhF069XD/zhUPJsvwEF",
+                    "c809OHLi7FDf+E7U4wiZJCFuUizMeXyuK/SkaE1aee4Qp5R4dxTR4TP9M1XAYkf+kF0W9srZ"
+                    "+mhF069XD/zhUPJsvwEF",
             'expires_at': "2027-01-01"})
         self.assertEqual(rvalue, True)
 
@@ -182,3 +193,18 @@ class TestGitlabUser(GitlabModuleTestCase):
 
         rvalue = self.moduleUtil.assign_user_to_group(user, group.id, "guest")
         self.assertEqual(rvalue, True)
+
+    def test_ssh_key_value(self):
+        ssh_public_key = (
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCVA7p3quYXJfihdZIrHb/miia7DPL14mQ6wMp2LnJm"
+            "BW8QqrFZ0xZDxEIbSZ+cnBhL76+xWi83eBeedeTBHsCUY2teqG8FFIJhB0YwjtSXQqRefgH3x6bincx4"
+            "b3Hv8rRTwpKuGw6Q1sHbvzTSL9w5hhAm0iU7wSq67jBTFGvhXmFzcHwRZEh2yI0qIrp79mXF8pVsdUhU"
+            "Uzg/pstNUHXQhwMo5ur1yQVZsFPnrwvybzkfZ1rp9UqnJQC7695ILxT+pCOn7vL5PHiRCTw6l37uo/K4"
+            "i8JlUf/+Pmc/xnqLBPe5yzTdcJth/lXvP5M0vwjnYK9SaUDIzfpCnMmFGt/Rfa9tOXqhE7c3U6E1Iv7C"
+            "ifktSsnYS+87Eif7xkC5Mpk7aBD+b4RjOJ1tNFNcl7xAa0mE6g/qOHbRK1ZNEVtw9ofqe7ycqdg3ojpm"
+            "vS9XFmROcikAyOt+f02gyiv07LC0tlBVCKU7QawH+UoN0rKYNDEjq2mLrqMcAH0hmSMM26E="
+        )
+        self.assertEqual(ssh_public_key, ssh_key_value(ssh_public_key + " test_gitlab_user.py"))
+        self.assertEqual(ssh_public_key, ssh_key_value(ssh_public_key + " some comment with more spaces"))
+        self.assertEqual(ssh_public_key, ssh_key_value(ssh_public_key))
+        self.assertEqual("garbage", ssh_key_value("garbage"))
