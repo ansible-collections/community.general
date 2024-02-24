@@ -2915,8 +2915,7 @@ class RedfishUtils(object):
 
         # Get a list of all Chassis and build URIs, then get all PowerSupplies
         # from each Power entry in the Chassis
-        chassis_uri_list = self.chassis_uris
-        for chassis_uri in chassis_uri_list:
+        for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
             if response['ret'] is False:
                 return response
@@ -3478,33 +3477,30 @@ class RedfishUtils(object):
         result = {}
         key = "Thermal"
         # Go through list
-        for chassis_uri in self.chassis_uri_list:
+        for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
             if response['ret'] is False:
                 return response
             result['ret'] = True
             data = response['data']
-            oem = data.get['Oem']
-            hpe = oem.get['Hpe']
-            thermal_config = hpe.get('ThermalConfiguration')
-        result["current_thermal_config"] = thermal_config
-        return result
+            val = data.get('Oem', {}).get('Hpe', {}).get('ThermalConfiguration')
+            if val is not None:
+                return {"ret": True, "current_thermal_config": val}
+        return {"ret": False}
 
     def get_hpe_fan_percent_min(self):
         result = {}
         key = "Thermal"
         # Go through list
-        for chassis_uri in self.chassis_uri_list:
+        for chassis_uri in self.chassis_uris:
             response = self.get_request(self.root_uri + chassis_uri)
             if response['ret'] is False:
                 return response
-            result['ret'] = True
             data = response['data']
-            oem = data.get['Oem']
-            hpe = oem.get['Hpe']
-            fan_percent_min_config = hpe.get('FanPercentMinimum')
-        result["fan_percent_min"] = fan_percent_min_config
-        return result
+            val = data.get('Oem', {}).get('Hpe', {}).get('FanPercentMinimum')
+            if val is not None:
+                return {"ret": True, "fan_percent_min": val}
+        return {"ret": False}
 
     def delete_volumes(self, storage_subsystem_id, volume_ids):
         # Find the Storage resource from the requested ComputerSystem resource
