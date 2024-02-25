@@ -588,6 +588,10 @@ files:
     maintainers: SamyCoenen
   $modules/gitlab_user.py:
     maintainers: LennertMertens stgrace
+  $modules/gitlab_group_access_token.py:
+    maintainers: pixslx
+  $modules/gitlab_project_access_token.py:
+    maintainers: pixslx
   $modules/grove.py:
     maintainers: zimbatm
   $modules/gunicorn.py:
