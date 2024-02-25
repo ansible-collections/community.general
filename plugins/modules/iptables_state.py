@@ -585,12 +585,9 @@ def main():
         restored_state = filter_and_format_state(stdout)
 
     if restored_state not in (initref_state, initial_state):
-        if module.check_mode:
+        tables_after = per_table_state(SAVECOMMAND, stdout)
+        if tables_after != tables_before:
             changed = True
-        else:
-            tables_after = per_table_state(SAVECOMMAND, stdout)
-            if tables_after != tables_before:
-                changed = True
 
     if _back is None or module.check_mode:
         module.exit_json(
