@@ -590,9 +590,8 @@ def main():
 
         (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
         restored_state = filter_and_format_state(stdout)
-
+    tables_after = parse_per_table_state('\n'.join(restored_state))
     if restored_state not in (initref_state, initial_state):
-        tables_after = parse_per_table_state('\n'.join(restored_state))
         for table_after in tables_after:
             if table_after not in tables_before:
                 changed = True
@@ -603,6 +602,7 @@ def main():
             changed=changed,
             cmd=cmd,
             tables=tables_before,
+            tables_after=tables_after,
             initial_state=initial_state,
             restored=restored_state,
             applied=True)
@@ -628,6 +628,7 @@ def main():
             changed=changed,
             cmd=cmd,
             tables=tables_before,
+            tables_after=tables_after,
             initial_state=initial_state,
             restored=restored_state,
             applied=True)
@@ -651,6 +652,7 @@ def main():
         msg=msg,
         cmd=cmd,
         tables=tables_before,
+        tables_after=tables_after,
         initial_state=initial_state,
         restored=restored_state,
         applied=False)
