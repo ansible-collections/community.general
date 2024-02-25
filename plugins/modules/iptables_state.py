@@ -207,7 +207,7 @@ saved:
       "# Completed"
     ]
 tables:
-  description: 
+  description:
     - The iptables on the system before the module has run, separated by table.
     - If the option O(table) is used, only this table is included.
   type: dict
@@ -236,10 +236,10 @@ tables:
     }
   returned: always
 tables_after:
-  description: 
+  description:
     - The iptables on the system after the module has run, separated by table.
-    - If the option O(table) is used, only this table is included.
-    - If the module fails and no changes are made, O(tables_after) will have the same content as O(tables)
+    - If the option table is used, only this table is included.
+    - If the module fails and no changes are made, tables_after will have the same content as tables
   type: dict
   contains:
     table:
