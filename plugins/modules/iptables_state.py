@@ -356,7 +356,7 @@ def parse_per_table_state(all_states_dump):
     current_table = ''
     current_list = list()
     for line in lines:
-        if re.match(r'^[*](filter|mangle|nat|raw|security)$'):
+        if re.match(r'^[*](filter|mangle|nat|raw|security)$', line):
             current_table = line[1:]
             continue
         if line == 'COMMIT':
