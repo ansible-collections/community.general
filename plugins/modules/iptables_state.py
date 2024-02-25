@@ -601,7 +601,6 @@ def main():
             changed=changed,
             cmd=cmd,
             tables=tables_before,
-            tables_after=tables_after,
             initial_state=initial_state,
             restored=restored_state,
             applied=True)
