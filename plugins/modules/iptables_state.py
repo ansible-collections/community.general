@@ -601,7 +601,6 @@ def main():
                 # Content of some table changes
                 changed = True
                 break
-            
 
     if _back is None or module.check_mode:
         module.exit_json(

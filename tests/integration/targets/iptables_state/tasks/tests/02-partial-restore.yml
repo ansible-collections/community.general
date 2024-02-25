@@ -9,9 +9,14 @@
     content: |
       *filter
       :INPUT ACCEPT [0:0]
+      :OUTPUT ACCEPT [0:0]
+      :FORWARD ACCEPT [0:0]
       -A INPUT -m state --state NEW,ESTABLISHED -j ACCEPT
       COMMIT
       *nat
+      :PREROUTING ACCEPT [151:17304]
+      :INPUT ACCEPT [151:17304]
+      :OUTPUT ACCEPT [151:17304]
       :POSTROUTING ACCEPT [151:17304]
       -A POSTROUTING -o eth0 -j MASQUERADE
       COMMIT
@@ -29,6 +34,8 @@
     content: |
       *filter
       :INPUT ACCEPT [0:0]
+      :OUTPUT ACCEPT [0:0]
+      :FORWARD ACCEPT [0:0]
       -A INPUT -m state --state NEW,ESTABLISHED -j ACCEPT
       COMMIT
 
