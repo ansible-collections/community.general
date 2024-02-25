@@ -174,7 +174,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_project, gitlab_authentication
+    auth_argument_spec, find_project, gitlab_authentication, list_all_kwargs
 )
 
 
@@ -271,8 +271,7 @@ class GitLabHook(object):
     @param hook_url Url to call on event
     '''
     def find_hook(self, project, hook_url):
-        hooks = project.hooks.list(all=True)
-        for hook in hooks:
+        for hook in project.hooks.list(**list_all_kwargs):
             if (hook.url == hook_url):
                 return hook
 

@@ -97,7 +97,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, find_project
+    auth_argument_spec, gitlab_authentication, find_project, list_all_kwargs
 )
 
 
@@ -105,7 +105,7 @@ def present_strategy(module, gl, project, wished_badge):
     changed = False
 
     existing_badge = None
-    for badge in project.badges.list(iterator=True):
+    for badge in project.badges.list(**list_all_kwargs):
         if badge.image_url == wished_badge["image_url"]:
             existing_badge = badge
             break
@@ -135,7 +135,7 @@ def absent_strategy(module, gl, project, wished_badge):
     changed = False
 
     existing_badge = None
-    for badge in project.badges.list(iterator=True):
+    for badge in project.badges.list(**list_all_kwargs):
         if badge.image_url == wished_badge["image_url"]:
             existing_badge = badge
             break

@@ -160,7 +160,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab
+    auth_argument_spec, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -171,16 +171,20 @@ class GitLabGroup(object):
 
     # get user id if the user exists
     def get_user_id(self, gitlab_user):
-        user_exists = self._gitlab.users.list(username=gitlab_user, all=True)
-        if user_exists:
-            return user_exists[0].id
+        return next(
+            (u.id for u in self._gitlab.users.list(username=gitlab_user, **list_all_kwargs)),
+            None
+        )
 
     # get group id if group exists
     def get_group_id(self, gitlab_group):
-        groups = self._gitlab.groups.list(search=gitlab_group, all=True)
-        for group in groups:
-            if group.full_path == gitlab_group:
-                return group.id
+        return next(
+            (
+                g.id for g in self._gitlab.groups.list(search=gitlab_group, **list_all_kwargs)
+                if g.full_path == gitlab_group
+            ),
+            None
+        )
 
     # get all members in a group
     def get_members_in_a_group(self, gitlab_group_id):
