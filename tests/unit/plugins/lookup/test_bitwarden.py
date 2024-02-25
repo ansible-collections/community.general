@@ -158,3 +158,23 @@ class TestLookupModule(unittest.TestCase):
         record_name = record['name']
         with self.assertRaises(AnsibleError):
             self.lookup.run([record_name], field='password')
+
+    def test_bitwarden_plugin_without_session_option(self):
+        mock_bitwarden = MockBitwarden()
+        with patch("ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden", mock_bitwarden):
+            record = MOCK_RECORDS[0]
+            record_name = record['name']
+            session = 'session'
+
+            self.lookup.run([record_name], field=None)
+            self.assertIsNone(mock_bitwarden.session)
+
+    def test_bitwarden_plugin_session_option(self):
+        mock_bitwarden = MockBitwarden()
+        with patch("ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden", mock_bitwarden):
+            record = MOCK_RECORDS[0]
+            record_name = record['name']
+            session = 'session'
+
+            self.lookup.run([record_name], field=None, bw_session=session)
+            self.assertEqual(mock_bitwarden.session, session)
