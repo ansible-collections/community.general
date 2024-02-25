@@ -1,0 +1,221 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2024, Zoran Krleza <zoran.krleza@true-north.hr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- block:
+    - name: Try to create access token in nonexisting project
+      community.general.gitlab_project_access_token:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_api_url }}"
+        validate_certs: "{{ gitlab_validate_certs }}"
+        project: "some_nonexisting_project"
+        name: "{{ gitlab_token_name }}"
+        state: present
+        expires_at: '2025-01-01'
+        access_level: developer
+        scopes:
+        - api
+        - read_api
+      register: create_pfail_token_status
+  always:
+    - name: Assert that token creation in nonexisting project failed
+      assert:
+        that:
+          - create_pfail_token_status is failed
+  ignore_errors: true
+
+- block:
+    - name: Try to create access token with nonvalid expires_at
+      community.general.gitlab_project_access_token:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_api_url }}"
+        validate_certs: "{{ gitlab_validate_certs }}"
+        project: "some_nonexisting_project"
+        name: "{{ gitlab_token_name }}"
+        state: present
+        expires_at: '2025-13-01'
+        access_level: developer
+        scopes:
+        - api
+        - read_api
+      register: create_efail_token_status
+  always:
+    - name: Assert that token creation with invalid expires_at failed
+      assert:
+        that:
+          - create_efail_token_status is failed
+  ignore_errors: true
+
+- name: Create access token
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: present
+    expires_at: '2024-12-31'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+  register: create_token_status
+- name: Assert that token creation with valid arguments is successfull
+  assert:
+    that:
+      - create_token_status is changed
+      - create_token_status.access_token.token is defined
+
+- name: Check existing access token recreate=never (default)
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: present
+    expires_at: '2024-12-31'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+  register: check_token_status
+- name: Assert that token creation without changes and recreate=never succeeds with status not changed
+  assert:
+    that:
+      - check_token_status is not changed
+      - check_token_status.access_token.token is not defined
+
+- name: Check existing access token with recreate=state_change
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: present
+    expires_at: '2024-12-31'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+    recreate: state_change
+  register: check_recreate_token_status
+- name: Assert that token creation without changes and recreate=state_change succeeds with status not changed
+  assert:
+    that:
+      - check_recreate_token_status is not changed
+      - check_recreate_token_status.access_token.token is not defined
+
+- block:
+    - name: Try to change existing access token with recreate=never
+      community.general.gitlab_project_access_token:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_api_url }}"
+        validate_certs: "{{ gitlab_validate_certs }}"
+        project: "{{ gitlab_project_name }}"
+        name: "{{ gitlab_token_name }}"
+        state: present
+        expires_at: '2025-01-01'
+        access_level: developer
+        scopes:
+        - api
+        - read_api
+      register: change_token_status
+  always:
+    - name: Assert that token change with recreate=never fails
+      assert:
+        that:
+          - change_token_status is failed
+  ignore_errors: true
+
+- name: Try to change existing access token with recreate=state_change
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: present
+    expires_at: '2025-01-01'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+    recreate: state_change
+  register: change_recreate_token_status
+- name: Assert that token change with recreate=state_change succeeds
+  assert:
+    that:
+      - change_recreate_token_status is changed
+      - change_recreate_token_status.access_token.token is defined
+
+- name: Try to change existing access token with recreate=always
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: present
+    expires_at: '2025-01-01'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+    recreate: always
+  register: change_recreate1_token_status
+- name: Assert that token change with recreate=always succeeds
+  assert:
+    that:
+      - change_recreate1_token_status is changed
+      - change_recreate1_token_status.access_token.token is defined
+
+- name: Revoke access token
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: absent
+    expires_at: '2024-12-31'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+  register: revoke_token_status
+- name: Assert that token revocation succeeds
+  assert:
+    that:
+      - revoke_token_status is changed
+
+- name: Revoke nonexisting access token
+  community.general.gitlab_project_access_token:
+    api_token: "{{ gitlab_api_token }}"
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: "{{ gitlab_validate_certs }}"
+    project: "{{ gitlab_project_name }}"
+    name: "{{ gitlab_token_name }}"
+    state: absent
+    expires_at: '2024-12-31'
+    access_level: developer
+    scopes:
+    - api
+    - read_api
+  register: revoke_token_status
+- name: Assert that token revocation succeeds with status not changed
+  assert:
+    that:
+      - revoke_token_status is not changed
