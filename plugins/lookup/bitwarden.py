@@ -39,6 +39,10 @@ DOCUMENTATION = """
         description: Collection ID to filter results by collection. Leave unset to skip filtering.
         type: str
         version_added: 6.3.0
+      bw_session:
+        description: Pass session key instead of reading from env.
+        type: str
+        version_added: 8.4.0
 """
 
 EXAMPLES = """
@@ -66,6 +70,11 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='api_key') }}
+
+- name: "Get 'password' from all Bitwarden records named 'a_test', using given session key"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'a_test', field='password', bw_session='bXZ9B5TXi6...') }}
 """
 
 RETURN = """
@@ -94,10 +103,19 @@ class Bitwarden(object):
 
     def __init__(self, path='bw'):
         self._cli_path = path
+        self._session = None
 
     @property
     def cli_path(self):
         return self._cli_path
+
+    @property
+    def session(self):
+        return self._session
+
+    @session.setter
+    def session(self, value):
+        self._session = value
 
     @property
     def unlocked(self):
@@ -106,6 +124,9 @@ class Bitwarden(object):
         return decoded['status'] == 'unlocked'
 
     def _run(self, args, stdin=None, expected_rc=0):
+        if self.session:
+            args += ['--session', self.session]
+
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         out, err = p.communicate(to_bytes(stdin))
         rc = p.wait()
@@ -179,6 +200,8 @@ class LookupModule(LookupBase):
         field = self.get_option('field')
         search_field = self.get_option('search')
         collection_id = self.get_option('collection_id')
+        _bitwarden.session = self.get_option('bw_session')
+
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
 
