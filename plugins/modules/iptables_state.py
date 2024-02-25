@@ -592,7 +592,7 @@ def main():
         restored_state = filter_and_format_state(stdout)
 
     if restored_state not in (initref_state, initial_state):
-        tables_after = parse_per_table_state(state_to_restore)
+        tables_after = parse_per_table_state(restored_state.join('\n'))
         for table_after in tables_after:
             if table_after not in tables_before:
                 changed = True
