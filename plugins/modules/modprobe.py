@@ -232,12 +232,16 @@ class Modprobe(object):
 
     @property
     def modules_files(self):
+        if not os.path.isdir(MODULES_LOAD_LOCATION):
+            return []
         modules_paths = [os.path.join(MODULES_LOAD_LOCATION, path)
                          for path in os.listdir(MODULES_LOAD_LOCATION)]
         return [path for path in modules_paths if os.path.isfile(path)]
 
     @property
     def modprobe_files(self):
+        if not os.path.isdir(PARAMETERS_FILES_LOCATION):
+            return []
         modules_paths = [os.path.join(PARAMETERS_FILES_LOCATION, path)
                          for path in os.listdir(PARAMETERS_FILES_LOCATION)]
         return [path for path in modules_paths if os.path.isfile(path)]
