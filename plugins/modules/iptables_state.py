@@ -207,7 +207,9 @@ saved:
       "# Completed"
     ]
 tables:
-  description: The iptables we have interest for when module starts.
+  description: 
+    - The iptables on the system before the module has run, separated by table.
+    - If the option O(table) is used, only this table is included.
   type: dict
   contains:
     table:
@@ -233,6 +235,36 @@ tables:
       ]
     }
   returned: always
+tables_after:
+  description: 
+    - The iptables on the system after the module has run, separated by table.
+    - If the option O(table) is used, only this table is included.
+    - If the module fails and no changes are made, O(tables_after) will have the same content as O(tables)
+  type: dict
+  contains:
+    table:
+      description: Policies and rules for all chains of the named table.
+      type: list
+      elements: str
+  sample: |-
+    {
+      "filter": [
+        ":INPUT ACCEPT",
+        ":FORWARD ACCEPT",
+        ":OUTPUT ACCEPT",
+        "-A INPUT -i lo -j ACCEPT",
+        "-A INPUT -p icmp -j ACCEPT",
+        "-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT",
+        "-A INPUT -j REJECT --reject-with icmp-host-prohibited"
+      ],
+      "nat": [
+        ":PREROUTING ACCEPT",
+        ":INPUT ACCEPT",
+        ":OUTPUT ACCEPT",
+        ":POSTROUTING ACCEPT"
+      ]
+    }
+  returned: Only if O(state=restored)
 '''
 
 
@@ -550,6 +582,7 @@ def main():
                 stdout=stdout,
                 stderr=stderr,
                 tables=tables_before,
+                tables_after=tables_before,
                 initial_state=initial_state,
                 restored=state_to_restore,
                 applied=False)
@@ -584,6 +617,7 @@ def main():
                 stdout=stdout,
                 stderr=stderr,
                 tables=tables_before,
+                tables_after=tables_before,
                 initial_state=initial_state,
                 restored=state_to_restore,
                 applied=False)
