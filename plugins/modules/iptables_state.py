@@ -346,21 +346,25 @@ def filter_and_format_state(string):
     return lines
 
 
-def per_table_state(command, state):
+def parse_per_table_state(all_states_dump):
     '''
     Convert raw iptables-save output into usable datastructure, for reliable
     comparisons between initial and final states.
     '''
+    lines = filter_and_format_state(all_states_dump)
     tables = dict()
-    for t in TABLES:
-        COMMAND = list(command)
-        if '*%s' % t in state.splitlines():
-            COMMAND.extend(['--table', t])
-            dummy, out, dummy = module.run_command(COMMAND, check_rc=True)
-            out = re.sub(r'(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, r'', out)
-            out = re.sub(r' *\[[0-9]+:[0-9]+\] *', r'', out)
-            tables[t] = [tt for tt in out.splitlines() if tt != '']
-    return tables
+    current_table=''
+    current_list=list()
+    for line in lines:
+        if re.match(r'^[*](filter|mangle|nat|raw|security)$'):
+            current_table = line[1:] 
+            continue
+        if line == 'COMMIT':
+            tables[current_table] = current_list 
+            current_table = ''
+            current_list = list()
+            continue
+        current_list.append(line)
 
 
 def main():
@@ -486,7 +490,7 @@ def main():
     # Depending on the value of 'table', initref_state may differ from
     # initial_state.
     (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
-    tables_before = per_table_state(SAVECOMMAND, stdout)
+    tables_before = parse_per_table_state(stdout)
     initref_state = filter_and_format_state(stdout)
 
     if state == 'saved':
@@ -585,7 +589,7 @@ def main():
         restored_state = filter_and_format_state(stdout)
 
     if restored_state not in (initref_state, initial_state):
-        tables_after = per_table_state(SAVECOMMAND, stdout)
+        tables_after = parse_per_table_state(restored_state)
         for table_after in tables_after:
             if table_after not in tables_before:
                 changed = True
@@ -633,7 +637,7 @@ def main():
     os.remove(b_back)
 
     (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
-    tables_rollback = per_table_state(SAVECOMMAND, stdout)
+    tables_rollback = parse_per_table_state(stdout)
 
     msg = (
         "Failed to confirm state restored from %s after %ss. "
