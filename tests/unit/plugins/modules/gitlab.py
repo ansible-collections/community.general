@@ -284,6 +284,36 @@ def resp_delete_group(url, request):
     return response(204, content, headers, None, 5, request)
 
 
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/access_tokens", method="get")
+def resp_list_group_access_tokens(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('[{"user_id" : 1, "scopes" : ["api"], "name" : "token1", "expires_at" : "2021-01-31",'
+               '"id" : 1, "active" : false, "created_at" : "2021-01-20T22:11:48.151Z", "revoked" : true,'
+               '"access_level": 40},{"user_id" : 2, "scopes" : ["api"], "name" : "token2", "expires_at" : "2021-02-31",'
+               '"id" : 2, "active" : true, "created_at" : "2021-02-20T22:11:48.151Z", "revoked" : false,'
+               '"access_level": 40}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/access_tokens", method="post")
+def resp_create_group_access_tokens(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('{"user_id" : 1, "scopes" : ["api"], "name" : "token1", "expires_at" : "2021-01-31",'
+               '"id" : 1, "active" : false, "created_at" : "2021-01-20T22:11:48.151Z", "revoked" : true,'
+               '"access_level": 40, "token": "Der423FErcdv35qEEWc"}')
+    content = content.encode("utf-8")
+    return response(201, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/access_tokens/1", method="delete")
+def resp_revoke_group_access_tokens(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('')
+    content = content.encode("utf-8")
+    return response(204, content, headers, None, 5, request)
+
+
 '''
 GROUP MEMBER API
 '''
@@ -528,6 +558,36 @@ def resp_get_protected_branch_not_exist(url, request):
 
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="delete")
 def resp_delete_protected_branch(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('')
+    content = content.encode("utf-8")
+    return response(204, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/access_tokens", method="get")
+def resp_list_project_access_tokens(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('[{"user_id" : 1, "scopes" : ["api"], "name" : "token1", "expires_at" : "2021-01-31",'
+               '"id" : 1, "active" : false, "created_at" : "2021-01-20T22:11:48.151Z", "revoked" : true,'
+               '"access_level": 40},{"user_id" : 2, "scopes" : ["api"], "name" : "token2", "expires_at" : "2021-02-31",'
+               '"id" : 2, "active" : true, "created_at" : "2021-02-20T22:11:48.151Z", "revoked" : false,'
+               '"access_level": 40}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/access_tokens", method="post")
+def resp_create_project_access_tokens(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('{"user_id" : 1, "scopes" : ["api"], "name" : "token1", "expires_at" : "2021-01-31",'
+               '"id" : 1, "active" : false, "created_at" : "2021-01-20T22:11:48.151Z", "revoked" : true,'
+               '"access_level": 40, "token": "Der423FErcdv35qEEWc"}')
+    content = content.encode("utf-8")
+    return response(201, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/access_tokens/1", method="delete")
+def resp_revoke_project_access_tokens(url, request):
     headers = {'content-type': 'application/json'}
     content = ('')
     content = content.encode("utf-8")

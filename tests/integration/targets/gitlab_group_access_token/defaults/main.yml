@@ -1,0 +1,15 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2024, Zoran Krleza <zoran.krleza@true-north.hr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gitlab_api_token: 
+gitlab_api_url: 
+gitlab_validate_certs: false
+gitlab_group_name: 
+gitlab_token_name: 
