@@ -589,13 +589,14 @@ def main():
         for table_after in tables_after:
             if table_after not in tables_before:
                 changed = True
-                break 
+                break
 
     if _back is None or module.check_mode:
         module.exit_json(
             changed=changed,
             cmd=cmd,
             tables=tables_before,
+            tables_after=tables_after,
             initial_state=initial_state,
             restored=restored_state,
             applied=True)
