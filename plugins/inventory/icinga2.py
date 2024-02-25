@@ -277,12 +277,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self._read_config_data(path)
 
         # Store the options from the YAML file
-        self.icinga2_url = self.get_option('url').rstrip('/') + '/v1'
+        self.icinga2_url = self.get_option('url')
         self.icinga2_user = self.get_option('user')
         self.icinga2_password = self.get_option('password')
         self.ssl_verify = self.get_option('validate_certs')
         self.host_filter = self.get_option('host_filter')
         self.inventory_attr = self.get_option('inventory_attr')
+
+        if self.templar.is_template(self.icinga2_url):
+            self.icinga2_url = self.templar.template(variable=self.icinga2_url, disable_lookups=False)
+        if self.templar.is_template(self.icinga2_user):
+            self.icinga2_user = self.templar.template(variable=self.icinga2_user, disable_lookups=False)
+        if self.templar.is_template(self.icinga2_password):
+            self.icinga2_password = self.templar.template(variable=self.icinga2_password, disable_lookups=False)
+
+        self.icinga2_url = self.icinga2_url.rstrip('/') + '/v1'
+
         # Not currently enabled
         # self.cache_key = self.get_cache_key(path)
         # self.use_cache = cache and self.get_option('cache')
