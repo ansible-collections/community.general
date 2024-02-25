@@ -592,10 +592,16 @@ def main():
         restored_state = filter_and_format_state(stdout)
     tables_after = parse_per_table_state('\n'.join(restored_state))
     if restored_state not in (initref_state, initial_state):
-        for table_after in tables_after:
-            if table_after not in tables_before:
+        for table_name, table_content in tables_after.items():
+            if table_name not in tables_before:
+                # Would initialize a table, which doesn't exist yet
                 changed = True
                 break
+            if tables_before[table_name] != table_content:
+                # Content of some table changes
+                changed = True
+                break
+            
 
     if _back is None or module.check_mode:
         module.exit_json(
