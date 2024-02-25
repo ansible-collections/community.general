@@ -586,8 +586,10 @@ def main():
 
     if restored_state not in (initref_state, initial_state):
         tables_after = per_table_state(SAVECOMMAND, stdout)
-        if tables_after != tables_before:
-            changed = True
+        for table_after in tables_after:
+            if table_after not in tables_before:
+                changed = True
+                break 
 
     if _back is None or module.check_mode:
         module.exit_json(
