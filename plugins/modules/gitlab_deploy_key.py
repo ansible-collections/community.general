@@ -120,7 +120,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_project, gitlab_authentication, gitlab
+    auth_argument_spec, find_project, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -208,8 +208,7 @@ class GitLabDeployKey(object):
     @param key_title Title of the key
     '''
     def find_deploy_key(self, project, key_title):
-        deploy_keys = project.keys.list(all=True)
-        for deploy_key in deploy_keys:
+        for deploy_key in project.keys.list(**list_all_kwargs):
             if (deploy_key.title == key_title):
                 return deploy_key
 

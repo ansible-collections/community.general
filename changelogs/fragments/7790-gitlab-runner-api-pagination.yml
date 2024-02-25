@@ -1,0 +1,8 @@
+bugfixes:
+  - gitlab_runner - fix pagination when checking for existing runners (https://github.com/ansible-collections/community.general/pull/7790).
+
+minor_changes:
+  - gitlab_deploy_key, gitlab_group_members, gitlab_group_variable, gitlab_hook,
+    gitlab_instance_variable, gitlab_project_badge, gitlab_project_variable,
+    gitlab_user - improve API pagination and compatibility with different versions
+    of ``python-gitlab`` (https://github.com/ansible-collections/community.general/pull/7790).

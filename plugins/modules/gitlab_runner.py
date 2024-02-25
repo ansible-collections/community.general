@@ -219,7 +219,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, gitlab
+    auth_argument_spec, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -342,7 +342,7 @@ class GitLabRunner(object):
     @param description Description of the runner
     '''
     def find_runner(self, description):
-        runners = self._runners_endpoint(as_list=False)
+        runners = self._runners_endpoint(**list_all_kwargs)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner

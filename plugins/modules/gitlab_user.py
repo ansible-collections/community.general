@@ -230,7 +230,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, find_group, gitlab_authentication, gitlab
+    auth_argument_spec, find_group, gitlab_authentication, gitlab, list_all_kwargs
 )
 
 
@@ -345,9 +345,10 @@ class GitLabUser(object):
     @param sshkey_name Name of the ssh key
     '''
     def ssh_key_exists(self, user, sshkey_name):
-        keyList = map(lambda k: k.title, user.keys.list(all=True))
-
-        return sshkey_name in keyList
+        return any(
+            k.title == sshkey_name
+            for k in user.keys.list(**list_all_kwargs)
+        )
 
     '''
     @param user User object
@@ -515,10 +516,13 @@ class GitLabUser(object):
     @param username Username of the user
     '''
     def find_user(self, username):
-        users = self._gitlab.users.list(search=username, all=True)
-        for user in users:
-            if (user.username == username):
-                return user
+        return next(
+            (
+                user for user in self._gitlab.users.list(search=username, **list_all_kwargs)
+                if user.username == username
+            ),
+            None
+        )
 
     '''
     @param username Username of the user
