@@ -1,50 +1,58 @@
 # Community General Release Notes
 
 **Topics**
-- <a href="#v8-3-0">v8\.3\.0</a>
+- <a href="#v8-4-0">v8\.4\.0</a>
   - <a href="#release-summary">Release Summary</a>
   - <a href="#minor-changes">Minor Changes</a>
-  - <a href="#deprecated-features">Deprecated Features</a>
   - <a href="#bugfixes">Bugfixes</a>
+  - <a href="#new-plugins">New Plugins</a>
+    - <a href="#callback">Callback</a>
+    - <a href="#filter">Filter</a>
   - <a href="#new-modules">New Modules</a>
-- <a href="#v8-2-0">v8\.2\.0</a>
+- <a href="#v8-3-0">v8\.3\.0</a>
   - <a href="#release-summary-1">Release Summary</a>
   - <a href="#minor-changes-1">Minor Changes</a>
+  - <a href="#deprecated-features">Deprecated Features</a>
   - <a href="#bugfixes-1">Bugfixes</a>
-  - <a href="#new-plugins">New Plugins</a>
-    - <a href="#connection">Connection</a>
-    - <a href="#filter">Filter</a>
-    - <a href="#lookup">Lookup</a>
   - <a href="#new-modules-1">New Modules</a>
-- <a href="#v8-1-0">v8\.1\.0</a>
+- <a href="#v8-2-0">v8\.2\.0</a>
   - <a href="#release-summary-2">Release Summary</a>
   - <a href="#minor-changes-2">Minor Changes</a>
   - <a href="#bugfixes-2">Bugfixes</a>
   - <a href="#new-plugins-1">New Plugins</a>
+    - <a href="#connection">Connection</a>
+    - <a href="#filter-1">Filter</a>
+    - <a href="#lookup">Lookup</a>
+  - <a href="#new-modules-2">New Modules</a>
+- <a href="#v8-1-0">v8\.1\.0</a>
+  - <a href="#release-summary-3">Release Summary</a>
+  - <a href="#minor-changes-3">Minor Changes</a>
+  - <a href="#bugfixes-3">Bugfixes</a>
+  - <a href="#new-plugins-2">New Plugins</a>
     - <a href="#lookup-1">Lookup</a>
     - <a href="#test">Test</a>
-  - <a href="#new-modules-2">New Modules</a>
+  - <a href="#new-modules-3">New Modules</a>
 - <a href="#v8-0-2">v8\.0\.2</a>
-  - <a href="#release-summary-3">Release Summary</a>
-  - <a href="#bugfixes-3">Bugfixes</a>
-- <a href="#v8-0-1">v8\.0\.1</a>
   - <a href="#release-summary-4">Release Summary</a>
   - <a href="#bugfixes-4">Bugfixes</a>
-- <a href="#v8-0-0">v8\.0\.0</a>
+- <a href="#v8-0-1">v8\.0\.1</a>
   - <a href="#release-summary-5">Release Summary</a>
-  - <a href="#minor-changes-3">Minor Changes</a>
+  - <a href="#bugfixes-5">Bugfixes</a>
+- <a href="#v8-0-0">v8\.0\.0</a>
+  - <a href="#release-summary-6">Release Summary</a>
+  - <a href="#minor-changes-4">Minor Changes</a>
   - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
   - <a href="#deprecated-features-1">Deprecated Features</a>
   - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-  - <a href="#bugfixes-5">Bugfixes</a>
+  - <a href="#bugfixes-6">Bugfixes</a>
   - <a href="#known-issues">Known Issues</a>
-  - <a href="#new-plugins-2">New Plugins</a>
+  - <a href="#new-plugins-3">New Plugins</a>
     - <a href="#lookup-2">Lookup</a>
-  - <a href="#new-modules-3">New Modules</a>
+  - <a href="#new-modules-4">New Modules</a>
 This changelog describes changes after version 7\.0\.0\.
 
-<a id="v8-3-0"></a>
-## v8\.3\.0
+<a id="v8-4-0"></a>
+## v8\.4\.0
 
 <a id="release-summary"></a>
 ### Release Summary
@@ -52,6 +60,62 @@ This changelog describes changes after version 7\.0\.0\.
 Regular bugfix and feature release\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* bitwarden lookup plugin \- add <code>bw\_session</code> option\, to pass session key instead of reading from env \([https\://github\.com/ansible\-collections/community\.general/pull/7994](https\://github\.com/ansible\-collections/community\.general/pull/7994)\)\.
+* gitlab\_deploy\_key\, gitlab\_group\_members\, gitlab\_group\_variable\, gitlab\_hook\, gitlab\_instance\_variable\, gitlab\_project\_badge\, gitlab\_project\_variable\, gitlab\_user \- improve API pagination and compatibility with different versions of <code>python\-gitlab</code> \([https\://github\.com/ansible\-collections/community\.general/pull/7790](https\://github\.com/ansible\-collections/community\.general/pull/7790)\)\.
+* gitlab\_hook \- adds <code>releases\_events</code> parameter for supporting Releases events triggers on GitLab hooks \([https\://github\.com/ansible\-collections/community\.general/pull/7956](https\://github\.com/ansible\-collections/community\.general/pull/7956)\)\.
+* icinga2 inventory plugin \- add Jinja2 templating support to <code>url</code>\, <code>user</code>\, and <code>password</code> paramenters \([https\://github\.com/ansible\-collections/community\.general/issues/7074](https\://github\.com/ansible\-collections/community\.general/issues/7074)\, [https\://github\.com/ansible\-collections/community\.general/pull/7996](https\://github\.com/ansible\-collections/community\.general/pull/7996)\)\.
+* mssql\_script \- adds transactional \(rollback/commit\) support via optional boolean param <code>transaction</code> \([https\://github\.com/ansible\-collections/community\.general/pull/7976](https\://github\.com/ansible\-collections/community\.general/pull/7976)\)\.
+* proxmox\_kvm \- add parameter <code>update\_unsafe</code> to avoid limitations when updating dangerous values \([https\://github\.com/ansible\-collections/community\.general/pull/7843](https\://github\.com/ansible\-collections/community\.general/pull/7843)\)\.
+* redfish\_config \- add command <code>SetServiceIdentification</code> to set service identification \([https\://github\.com/ansible\-collections/community\.general/issues/7916](https\://github\.com/ansible\-collections/community\.general/issues/7916)\)\.
+* sudoers \- add support for the <code>NOEXEC</code> tag in sudoers rules \([https\://github\.com/ansible\-collections/community\.general/pull/7983](https\://github\.com/ansible\-collections/community\.general/pull/7983)\)\.
+* terraform \- fix <code>diff\_mode</code> in state <code>absent</code> and when terraform <code>resource\_changes</code> does not exist \([https\://github\.com/ansible\-collections/community\.general/pull/7963](https\://github\.com/ansible\-collections/community\.general/pull/7963)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* cargo \- fix idempotency issues when using a custom installation path for packages \(using the <code>\-\-path</code> parameter\)\. The initial installation runs fine\, but subsequent runs use the <code>get\_installed\(\)</code> function which did not check the given installation location\, before running <code>cargo install</code>\. This resulted in a false <code>changed</code> state\. Also the removal of packeges using <code>state\: absent</code> failed\, as the installation check did not use the given parameter \([https\://github\.com/ansible\-collections/community\.general/pull/7970](https\://github\.com/ansible\-collections/community\.general/pull/7970)\)\.
+* gitlab\_issue \- fix behavior to search GitLab issue\, using <code>search</code> keyword instead of <code>title</code> \([https\://github\.com/ansible\-collections/community\.general/issues/7846](https\://github\.com/ansible\-collections/community\.general/issues/7846)\)\.
+* gitlab\_runner \- fix pagination when checking for existing runners \([https\://github\.com/ansible\-collections/community\.general/pull/7790](https\://github\.com/ansible\-collections/community\.general/pull/7790)\)\.
+* keycloak\_client \- fixes issue when metadata is provided in desired state when task is in check mode \([https\://github\.com/ansible\-collections/community\.general/issues/1226](https\://github\.com/ansible\-collections/community\.general/issues/1226)\, [https\://github\.com/ansible\-collections/community\.general/pull/7881](https\://github\.com/ansible\-collections/community\.general/pull/7881)\)\.
+* modprobe \- listing modules files or modprobe files could trigger a FileNotFoundError if <code>/etc/modprobe\.d</code> or <code>/etc/modules\-load\.d</code> did not exist\. Relevant functions now return empty lists if the directories do not exist to avoid crashing the module \([https\://github\.com/ansible\-collections/community\.general/issues/7717](https\://github\.com/ansible\-collections/community\.general/issues/7717)\)\.
+* onepassword lookup plugin \- failed for fields that were in sections and had uppercase letters in the label/ID\. Field lookups are now case insensitive in all cases \([https\://github\.com/ansible\-collections/community\.general/pull/7919](https\://github\.com/ansible\-collections/community\.general/pull/7919)\)\.
+* pkgin \- pkgin \(pkgsrc package manager used by SmartOS\) raises erratic exceptions and spurious <code>changed\=true</code> \([https\://github\.com/ansible\-collections/community\.general/pull/7971](https\://github\.com/ansible\-collections/community\.general/pull/7971)\)\.
+* redfish\_info \- allow for a GET operation invoked by <code>GetUpdateStatus</code> to allow for an empty response body for cases where a service returns 204 No Content \([https\://github\.com/ansible\-collections/community\.general/issues/8003](https\://github\.com/ansible\-collections/community\.general/issues/8003)\)\.
+* redfish\_info \- correct uncaught exception when attempting to retrieve <code>Chassis</code> information \([https\://github\.com/ansible\-collections/community\.general/pull/7952](https\://github\.com/ansible\-collections/community\.general/pull/7952)\)\.
+
+<a id="new-plugins"></a>
+### New Plugins
+
+<a id="callback"></a>
+#### Callback
+
+* default\_without\_diff \- The default ansible callback without diff output
+
+<a id="filter"></a>
+#### Filter
+
+* lists\_difference \- Difference of lists with a predictive order
+* lists\_intersect \- Intersection of lists with a predictive order
+* lists\_symmetric\_difference \- Symmetric Difference of lists with a predictive order
+* lists\_union \- Union of lists with a predictive order
+
+<a id="new-modules"></a>
+### New Modules
+
+* gitlab\_group\_access\_token \- Manages GitLab group access tokens
+* gitlab\_project\_access\_token \- Manages GitLab project access tokens
+
+<a id="v8-3-0"></a>
+## v8\.3\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Regular bugfix and feature release\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * consul\_auth\_method\, consul\_binding\_rule\, consul\_policy\, consul\_role\, consul\_session\, consul\_token \- added action group <code>community\.general\.consul</code> \([https\://github\.com/ansible\-collections/community\.general/pull/7897](https\://github\.com/ansible\-collections/community\.general/pull/7897)\)\.
@@ -69,7 +133,7 @@ Regular bugfix and feature release\.
 
 * consul\_acl \- the module has been deprecated and will be removed in community\.general 10\.0\.0\. <code>consul\_token</code> and <code>consul\_policy</code> can be used instead \([https\://github\.com/ansible\-collections/community\.general/pull/7901](https\://github\.com/ansible\-collections/community\.general/pull/7901)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * homebrew \- detect already installed formulae and casks using JSON output from <code>brew info</code> \([https\://github\.com/ansible\-collections/community\.general/issues/864](https\://github\.com/ansible\-collections/community\.general/issues/864)\)\.
@@ -80,7 +144,7 @@ Regular bugfix and feature release\.
 * nmcli \- fix <code>connection\.slave\-type</code> wired to <code>bond</code> and not with parameter <code>slave\_type</code> in case of connection type <code>wifi</code> \([https\://github\.com/ansible\-collections/community\.general/issues/7389](https\://github\.com/ansible\-collections/community\.general/issues/7389)\)\.
 * proxmox \- fix updating a container config if the setting does not already exist \([https\://github\.com/ansible\-collections/community\.general/pull/7872](https\://github\.com/ansible\-collections/community\.general/pull/7872)\)\.
 
-<a id="new-modules"></a>
+<a id="new-modules-1"></a>
 ### New Modules
 
 * consul\_acl\_bootstrap \- Bootstrap ACLs in Consul
@@ -93,12 +157,12 @@ Regular bugfix and feature release\.
 <a id="v8-2-0"></a>
 ## v8\.2\.0
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * ipa\_dnsrecord \- adds ability to manage NS record types \([https\://github\.com/ansible\-collections/community\.general/pull/7737](https\://github\.com/ansible\-collections/community\.general/pull/7737)\)\.
@@ -114,7 +178,7 @@ Regular bugfix and feature release\.
 * ssh\_config \- new feature to set <code>IdentitiesOnly</code> option to <code>yes</code> or <code>no</code> \([https\://github\.com/ansible\-collections/community\.general/pull/7704](https\://github\.com/ansible\-collections/community\.general/pull/7704)\)\.
 * xcc\_redfish\_command \- added support for raw POSTs \(<code>command\=PostResource</code> in <code>category\=Raw</code>\) without a specific action info \([https\://github\.com/ansible\-collections/community\.general/pull/7746](https\://github\.com/ansible\-collections/community\.general/pull/7746)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * keycloak\_identity\_provider \- <code>mappers</code> processing was not idempotent if the mappers configuration list had not been sorted by name \(in ascending order\)\. Fix resolves the issue by sorting mappers in the desired state using the same key which is used for obtaining existing state \([https\://github\.com/ansible\-collections/community\.general/pull/7418](https\://github\.com/ansible\-collections/community\.general/pull/7418)\)\.
@@ -123,7 +187,7 @@ Regular bugfix and feature release\.
 * proxmox\_kvm \- running <code>state\=template</code> will first check whether VM is already a template \([https\://github\.com/ansible\-collections/community\.general/pull/7792](https\://github\.com/ansible\-collections/community\.general/pull/7792)\)\.
 * statusio\_maintenance \- fix error caused by incorrectly formed API data payload\. Was raising \"Failed to create maintenance HTTP Error 400 Bad Request\" caused by bad data type for date/time and deprecated dict keys \([https\://github\.com/ansible\-collections/community\.general/pull/7754](https\://github\.com/ansible\-collections/community\.general/pull/7754)\)\.
 
-<a id="new-plugins"></a>
+<a id="new-plugins-1"></a>
 ### New Plugins
 
 <a id="connection"></a>
@@ -131,7 +195,7 @@ Regular bugfix and feature release\.
 
 * incus \- Run tasks in Incus instances via the Incus CLI\.
 
-<a id="filter"></a>
+<a id="filter-1"></a>
 #### Filter
 
 * from\_ini \- Converts INI text input into a dictionary
@@ -142,7 +206,7 @@ Regular bugfix and feature release\.
 
 * github\_app\_access\_token \- Obtain short\-lived Github App Access tokens
 
-<a id="new-modules-1"></a>
+<a id="new-modules-2"></a>
 ### New Modules
 
 * dnf\_config\_manager \- Enable or disable dnf repositories using config\-manager
@@ -154,12 +218,12 @@ Regular bugfix and feature release\.
 <a id="v8-1-0"></a>
 ## v8\.1\.0
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * bitwarden lookup plugin \- when looking for items using an item ID\, the item is now accessed directly with <code>bw get item</code> instead of searching through all items\. This doubles the lookup speed \([https\://github\.com/ansible\-collections/community\.general/pull/7468](https\://github\.com/ansible\-collections/community\.general/pull/7468)\)\.
@@ -196,7 +260,7 @@ Regular bugfix and feature release\.
 * redfish\_info \- adding the <code>BootProgress</code> property when getting <code>Systems</code> info \([https\://github\.com/ansible\-collections/community\.general/pull/7626](https\://github\.com/ansible\-collections/community\.general/pull/7626)\)\.
 * ssh\_config \- adds <code>controlmaster</code>\, <code>controlpath</code> and <code>controlpersist</code> parameters \([https\://github\.com/ansible\-collections/community\.general/pull/7456](https\://github\.com/ansible\-collections/community\.general/pull/7456)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * apt\-rpm \- the module did not upgrade packages if a newer version exists\. Now the package will be reinstalled if the candidate is newer than the installed version \([https\://github\.com/ansible\-collections/community\.general/issues/7414](https\://github\.com/ansible\-collections/community\.general/issues/7414)\)\.
@@ -214,7 +278,7 @@ Regular bugfix and feature release\.
   [https\://github\.com/ansible\-collections/community\.general/pull/7624](https\://github\.com/ansible\-collections/community\.general/pull/7624)\)\.
 * terraform \- fix multiline string handling in complex variables \([https\://github\.com/ansible\-collections/community\.general/pull/7535](https\://github\.com/ansible\-collections/community\.general/pull/7535)\)\.
 
-<a id="new-plugins-1"></a>
+<a id="new-plugins-2"></a>
 ### New Plugins
 
 <a id="lookup-1"></a>
@@ -227,7 +291,7 @@ Regular bugfix and feature release\.
 
 * fqdn\_valid \- Validates fully\-qualified domain names against RFC 1123
 
-<a id="new-modules-2"></a>
+<a id="new-modules-3"></a>
 ### New Modules
 
 * git\_config\_info \- Read git configuration
@@ -237,12 +301,12 @@ Regular bugfix and feature release\.
 <a id="v8-0-2"></a>
 ## v8\.0\.2
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 9\.0\.0rc1\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * ocapi\_utils\, oci\_utils\, redfish\_utils module utils \- replace <code>type\(\)</code> calls with <code>isinstance\(\)</code> calls \([https\://github\.com/ansible\-collections/community\.general/pull/7501](https\://github\.com/ansible\-collections/community\.general/pull/7501)\)\.
@@ -251,12 +315,12 @@ Bugfix release for inclusion in Ansible 9\.0\.0rc1\.
 <a id="v8-0-1"></a>
 ## v8\.0\.1
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 9\.0\.0b1\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * gitlab\_group\_members \- fix gitlab constants call in <code>gitlab\_group\_members</code> module \([https\://github\.com/ansible\-collections/community\.general/issues/7467](https\://github\.com/ansible\-collections/community\.general/issues/7467)\)\.
@@ -269,12 +333,12 @@ Bugfix release for inclusion in Ansible 9\.0\.0b1\.
 <a id="v8-0-0"></a>
 ## v8\.0\.0
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 This is release 8\.0\.0 of <code>community\.general</code>\, released on 2023\-11\-01\.
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * The collection will start using semantic markup \([https\://github\.com/ansible\-collections/community\.general/pull/6539](https\://github\.com/ansible\-collections/community\.general/pull/6539)\)\.
@@ -473,7 +537,7 @@ This is release 8\.0\.0 of <code>community\.general</code>\, released on 2023\-1
 * proxmox module utils \- removed unused imports \([https\://github\.com/ansible\-collections/community\.general/pull/6873](https\://github\.com/ansible\-collections/community\.general/pull/6873)\)\.
 * xfconf \- the deprecated <code>disable\_facts</code> option was removed \([https\://github\.com/ansible\-collections/community\.general/pull/7358](https\://github\.com/ansible\-collections/community\.general/pull/7358)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * CmdRunner module utils \- does not attempt to resolve path if executable is a relative or absolute path \([https\://github\.com/ansible\-collections/community\.general/pull/7200](https\://github\.com/ansible\-collections/community\.general/pull/7200)\)\.
@@ -560,7 +624,7 @@ This is release 8\.0\.0 of <code>community\.general</code>\, released on 2023\-1
 
 * Ansible markup will show up in raw form on ansible\-doc text output for ansible\-core before 2\.15\. If you have trouble deciphering the documentation markup\, please upgrade to ansible\-core 2\.15 \(or newer\)\, or read the HTML documentation on [https\://docs\.ansible\.com/ansible/devel/collections/community/general/](https\://docs\.ansible\.com/ansible/devel/collections/community/general/) \([https\://github\.com/ansible\-collections/community\.general/pull/6539](https\://github\.com/ansible\-collections/community\.general/pull/6539)\)\.
 
-<a id="new-plugins-2"></a>
+<a id="new-plugins-3"></a>
 ### New Plugins
 
 <a id="lookup-2"></a>
@@ -568,7 +632,7 @@ This is release 8\.0\.0 of <code>community\.general</code>\, released on 2023\-1
 
 * bitwarden\_secrets\_manager \- Retrieve secrets from Bitwarden Secrets Manager
 
-<a id="new-modules-3"></a>
+<a id="new-modules-4"></a>
 ### New Modules
 
 * consul\_policy \- Manipulate Consul policies

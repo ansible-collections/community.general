@@ -1145,3 +1145,100 @@ releases:
       name: gitlab_milestone
       namespace: ''
     release_date: '2024-01-29'
+  8.4.0:
+    changes:
+      bugfixes:
+      - 'cargo - fix idempotency issues when using a custom installation path for
+        packages (using the ``--path`` parameter). The initial installation runs fine,
+        but subsequent runs use the ``get_installed()`` function which did not check
+        the given installation location, before running ``cargo install``. This resulted
+        in a false ``changed`` state. Also the removal of packeges using ``state:
+        absent`` failed, as the installation check did not use the given parameter
+        (https://github.com/ansible-collections/community.general/pull/7970).'
+      - gitlab_issue - fix behavior to search GitLab issue, using ``search`` keyword
+        instead of ``title`` (https://github.com/ansible-collections/community.general/issues/7846).
+      - gitlab_runner - fix pagination when checking for existing runners (https://github.com/ansible-collections/community.general/pull/7790).
+      - keycloak_client - fixes issue when metadata is provided in desired state when
+        task is in check mode (https://github.com/ansible-collections/community.general/issues/1226,
+        https://github.com/ansible-collections/community.general/pull/7881).
+      - modprobe - listing modules files or modprobe files could trigger a FileNotFoundError
+        if ``/etc/modprobe.d`` or ``/etc/modules-load.d`` did not exist. Relevant
+        functions now return empty lists if the directories do not exist to avoid
+        crashing the module (https://github.com/ansible-collections/community.general/issues/7717).
+      - onepassword lookup plugin - failed for fields that were in sections and had
+        uppercase letters in the label/ID. Field lookups are now case insensitive
+        in all cases (https://github.com/ansible-collections/community.general/pull/7919).
+      - pkgin - pkgin (pkgsrc package manager used by SmartOS) raises erratic exceptions
+        and spurious ``changed=true`` (https://github.com/ansible-collections/community.general/pull/7971).
+      - redfish_info - allow for a GET operation invoked by ``GetUpdateStatus`` to
+        allow for an empty response body for cases where a service returns 204 No
+        Content (https://github.com/ansible-collections/community.general/issues/8003).
+      - redfish_info - correct uncaught exception when attempting to retrieve ``Chassis``
+        information (https://github.com/ansible-collections/community.general/pull/7952).
+      minor_changes:
+      - bitwarden lookup plugin - add ``bw_session`` option, to pass session key instead
+        of reading from env (https://github.com/ansible-collections/community.general/pull/7994).
+      - gitlab_deploy_key, gitlab_group_members, gitlab_group_variable, gitlab_hook,
+        gitlab_instance_variable, gitlab_project_badge, gitlab_project_variable, gitlab_user
+        - improve API pagination and compatibility with different versions of ``python-gitlab``
+        (https://github.com/ansible-collections/community.general/pull/7790).
+      - gitlab_hook - adds ``releases_events`` parameter for supporting Releases events
+        triggers on GitLab hooks (https://github.com/ansible-collections/community.general/pull/7956).
+      - icinga2 inventory plugin - add Jinja2 templating support to ``url``, ``user``,
+        and ``password`` paramenters (https://github.com/ansible-collections/community.general/issues/7074,
+        https://github.com/ansible-collections/community.general/pull/7996).
+      - mssql_script - adds transactional (rollback/commit) support via optional boolean
+        param ``transaction`` (https://github.com/ansible-collections/community.general/pull/7976).
+      - proxmox_kvm - add parameter ``update_unsafe`` to avoid limitations when updating
+        dangerous values (https://github.com/ansible-collections/community.general/pull/7843).
+      - redfish_config - add command ``SetServiceIdentification`` to set service identification
+        (https://github.com/ansible-collections/community.general/issues/7916).
+      - sudoers - add support for the ``NOEXEC`` tag in sudoers rules (https://github.com/ansible-collections/community.general/pull/7983).
+      - terraform - fix ``diff_mode`` in state ``absent`` and when terraform ``resource_changes``
+        does not exist (https://github.com/ansible-collections/community.general/pull/7963).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 7717-prevent-modprobe-error.yml
+    - 7790-gitlab-runner-api-pagination.yml
+    - 7843-proxmox_kvm-update_unsafe.yml
+    - 7847-gitlab-issue-title.yml
+    - 7881-fix-keycloak-client-ckeckmode.yml
+    - 7916-add-redfish-set-service-identification.yml
+    - 7919-onepassword-fieldname-casing.yaml
+    - 7951-fix-redfish_info-exception.yml
+    - 7956-adding-releases_events-option-to-gitlab_hook-module.yaml
+    - 7963-fix-terraform-diff-absent.yml
+    - 7970-fix-cargo-path-idempotency.yaml
+    - 7976-add-mssql_script-transactional-support.yml
+    - 7983-sudoers-add-support-noexec.yml
+    - 7994-bitwarden-session-arg.yaml
+    - 7996-add-templating-support-to-icinga2-inventory.yml
+    - 8.4.0.yml
+    - 8003-redfish-get-update-status-empty-response.yml
+    - pkgin.yml
+    modules:
+    - description: Manages GitLab group access tokens
+      name: gitlab_group_access_token
+      namespace: ''
+    - description: Manages GitLab project access tokens
+      name: gitlab_project_access_token
+      namespace: ''
+    plugins:
+      callback:
+      - description: The default ansible callback without diff output
+        name: default_without_diff
+        namespace: null
+      filter:
+      - description: Difference of lists with a predictive order
+        name: lists_difference
+        namespace: null
+      - description: Intersection of lists with a predictive order
+        name: lists_intersect
+        namespace: null
+      - description: Symmetric Difference of lists with a predictive order
+        name: lists_symmetric_difference
+        namespace: null
+      - description: Union of lists with a predictive order
+        name: lists_union
+        namespace: null
+    release_date: '2024-02-26'
