@@ -124,7 +124,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         self.cache_key = None
         self.use_cache = None
-        self.group_by_hostgroups = None
 
     def verify_file(self, path):
         valid = False
