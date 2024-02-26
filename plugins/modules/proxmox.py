@@ -340,7 +340,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
-    ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     mounts: '{"mp0":"local:8,mp=/mnt/test/"}'
 
 - name: Create new container with minimal options defining a cpu core limit
@@ -352,7 +352,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
-    ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
 
 - name: Create new container with minimal options and same timezone as proxmox host
@@ -376,7 +376,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
-    ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     features:
      - nesting=1
      - mount=cifs,nfs
