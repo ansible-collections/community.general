@@ -120,6 +120,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self.ssl_verify = None
         self.host_filter = None
         self.inventory_attr = None
+        self.group_by_hostgroups = None
 
         self.cache_key = None
         self.use_cache = None
