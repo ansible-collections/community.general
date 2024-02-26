@@ -65,7 +65,7 @@ DOCUMENTATION = '''
         version_added: 4.2.0
       group_by_hostgroups:
         description:
-          - Uses Icinga2 hostgroups as groups
+          - Uses Icinga2 hostgroups as groups.
         type: boolean
         default: true
         version_added: 8.4.0
