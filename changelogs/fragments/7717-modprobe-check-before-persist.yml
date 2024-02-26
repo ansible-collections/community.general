@@ -1,0 +1,2 @@
+bugfixes:
+  - modprobe - persisting modules files or modprobe files could trigger a FileNotFoundError if ``/etc/modprobe.d`` or ``/etc/modules-load.d`` did not exist. Relevant functions now create the directories if they not exist to avoid crashing the module (https://github.com/ansible-collections/community.general/issues/7717).

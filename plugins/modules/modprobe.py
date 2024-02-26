@@ -161,6 +161,8 @@ class Modprobe(object):
         return params
 
     def create_module_file(self):
+        if not os.path.exists(MODULES_LOAD_LOCATION):
+            os.makedirs(MODULES_LOAD_LOCATION, exist_ok=True)
         file_path = os.path.join(MODULES_LOAD_LOCATION,
                                  self.name + '.conf')
         with open(file_path, 'w') as file:
@@ -173,6 +175,8 @@ class Modprobe(object):
         return '\n'.join(file_content) + '\n'
 
     def create_module_options_file(self):
+        if not os.path.exists(PARAMETERS_FILES_LOCATION):
+            os.makedirs(PARAMETERS_FILES_LOCATION, exist_ok=True)
         new_file_path = os.path.join(PARAMETERS_FILES_LOCATION,
                                      self.name + '.conf')
         with open(new_file_path, 'w') as file:
