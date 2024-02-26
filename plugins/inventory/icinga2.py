@@ -259,9 +259,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if self.group_by_hostgroups:
                 host_groups = host_attrs.get('groups')
                 for group in host_groups:
-                        if group not in self.inventory.groups.keys():
-                            self.inventory.add_group(group)
-                        self.inventory.add_child(group, host_name)
+                    if group not in self.inventory.groups.keys():
+                        self.inventory.add_group(group)
+                    self.inventory.add_child(group, host_name)
             # If the address attribute is populated, override ansible_host with the value
             if host_attrs.get('address') != '':
                 self.inventory.set_variable(host_name, 'ansible_host', host_attrs.get('address'))
