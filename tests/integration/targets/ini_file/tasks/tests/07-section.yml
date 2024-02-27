@@ -1,0 +1,240 @@
+- name: test-section 1 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 1 - Create ini file
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    option: car
+    value: volvo
+    state: present
+  register: result1
+
+- name: test-section 1 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 1 - Create expected ini file
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+      car = volvo
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 1 - Option was adde to first section
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'option added'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 2 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 2 - Create ini file
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: beverage
+        value: pineapple juice
+    option: car
+    value: volvo
+    state: present
+  register: result1
+
+- name: test-section 2 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 2 - Create expected ini file
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+      car = volvo
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 2 - Option added to second section specified with section_has_values
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'option added'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 3 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 3 - Create ini file
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: beverage
+        value: pineapple juice
+    option: fav
+    value: lemonade
+    state: absent
+  register: result1
+
+- name: test-section 3 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 3 - Create expected ini file
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      beverage = pineapple juice
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 3 - Option was removed from specified section
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'option changed'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 4 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+
+    dest: "{{ output_file }}"
+
+- name: test-section 4 - Create ini file
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: beverage
+        value: alligator slime
+    option: fav
+    value: tea
+    state: present
+  register: result1
+
+- name: test-section 4 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 4 - Create expected ini file
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      fav = lemonade
+      beverage = pineapple juice
+      [drinks]
+      beverage = alligator slime
+      fav = tea
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 4 - New section created, including required values
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'section and option added'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 5 - modify the result of test-section 4
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: fav
+        value: lemonade
+      - option: beverage
+        value: pineapple juice
+    state: absent
+  register: result1
+
+- name: test-section 5 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 5 - Create expected ini file
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      beverage = alligator slime
+      fav = tea
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 5 - Section removed as specified
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'section removed'
+      - output1 == expected1

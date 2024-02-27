@@ -44,7 +44,7 @@ options:
       - If being omitted, the O(option) will be placed before the first O(section).
       - Omitting O(section) is also required if the config format does not support sections.
     type: str
-  section_has:
+  section_has_values:
     type: list
     elements: dict
     required: false
@@ -262,9 +262,9 @@ def update_section_line(option, changed, section_lines, index, changed_lines, ig
     return (changed, msg)
 
 
-def check_section_has(section_has, section_lines):
-    if section_has:
-        for check in section_has:
+def check_section_has_values(condition, section_lines):
+    if condition:
+        for check in condition:
             for line in section_lines:
                 match = match_opt(check["option"], line)
                 if match and match.group(7) == check["value"]:
@@ -361,8 +361,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
     for index, line in enumerate(ini_lines):
         # end of section:
         if within_section and line.startswith(u'['):
-            if check_section_has(
-                module.params['section_has'], ini_lines[section_start:index]
+            if check_section_has_values(
+                module.params['section_has_values'], ini_lines[section_start:index]
             ):
                 section_end = index
                 break
@@ -495,8 +495,8 @@ def do_ini(module, filename, section=None, option=None, values=None,
     if not within_section and state == 'present':
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
-        if 'section_has' in module.params and module.params['section_has']:
-            for check in module.params['section_has']:
+        if module.params.get('section_has_values'):
+            for check in module.params['section_has_values']:
                 ini_lines.append(assignment_format % (check['option'], check['value']))
         if option and values:
             for value in values:
@@ -539,7 +539,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['dest']),
             section=dict(type='str'),
-            section_has=dict(type='list', elements='dict', options=dict(
+            section_has_values=dict(type='list', elements='dict', options=dict(
                 option=dict(type='str', required=True),
                 value=dict(type='str', required=True)
             ), default=None),
