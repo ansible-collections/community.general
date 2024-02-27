@@ -81,6 +81,14 @@ options:
     type: list
     elements: str
     version_added: 2.0.0
+  startup:
+    description:
+      - Specifies the startup order of the container.
+      - order=# - where # is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. 
+      - up=# - where # is in seconds, which specifies a delay to wait before the next VM is started 
+      - down=# - where # is in seconds, which specifies a delay to wait before the next VM is stopped.
+    type: list
+    elements: str
   mounts:
     description:
       - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points
@@ -761,6 +769,7 @@ def main():
         ]),
         onboot=dict(type='bool'),
         features=dict(type='list', elements='str'),
+        startup=dict(type='list', elements='str'),
         storage=dict(default='local'),
         cpuunits=dict(type='int'),
         nameserver=dict(),
@@ -859,6 +868,9 @@ def main():
                                               features=",".join(module.params["features"])
                                               if module.params["features"] is not None
                                               else None,
+                                              startup=",".join(module.params["startup"])
+                                              if module.params["startup"] is not None
+                                              else None,
                                               description=module.params["description"],
                                               hookscript=module.params["hookscript"],
                                               timezone=module.params["timezone"],
@@ -912,6 +924,7 @@ def main():
                                     force=ansible_to_proxmox_bool(module.params['force']),
                                     pubkey=module.params['pubkey'],
                                     features=",".join(module.params['features']) if module.params['features'] is not None else None,
+                                    startup=",".join(module.params['startup']) if module.params['startup'] is not None else None,
                                     unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                                     description=module.params['description'],
                                     hookscript=module.params['hookscript'],
