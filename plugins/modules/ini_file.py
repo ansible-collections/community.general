@@ -229,7 +229,7 @@ EXAMPLES = r'''
     option: beverage
     value: lemon juice
     state: present
-  
+
 - name: remove the peer configuration for 10.128.0.11/32
   community.general.ini_file:
     path: /etc/wireguard/wg0.conf
