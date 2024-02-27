@@ -84,8 +84,8 @@ options:
   startup:
     description:
       - Specifies the startup order of the container.
-      - order=# - where # is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. 
-      - up=# - where # is in seconds, which specifies a delay to wait before the next VM is started 
+      - order=# - where # is a non-negative number defining the general startup order. Shutdown in done with reverse ordering.
+      - up=# - where # is in seconds, which specifies a delay to wait before the next VM is started.
       - down=# - where # is in seconds, which specifies a delay to wait before the next VM is stopped.
     type: list
     elements: str
