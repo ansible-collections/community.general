@@ -71,6 +71,7 @@ options:
 notes:
   - "This module depends on the C(passlib) Python library, which needs to be installed on all target systems."
   - "On Debian, Ubuntu, or Fedora: install C(python-passlib)."
+  - "On Debian 12: install C(python3-passlib)."
   - "On RHEL or CentOS: Enable EPEL, then install C(python-passlib)."
 requirements: [ passlib>=1.6 ]
 author: "Ansible Core Team"
