@@ -211,18 +211,6 @@ EXAMPLES = r'''
     mode: '0600'
     state: absent
 
-- name: Update the public key for peer 10.128.0.12/32
-  community.general.ini_file:
-    path: /etc/wireguard/wg0.conf
-    section: Peer
-    section_has:
-      - option: AllowedIps
-        value: 10.128.0.12/32
-    option: PublicKey
-    value: xxxxxxxxxxxxxxxxxxxx
-    mode: '0600'
-    state: present
-
 - name: Add "beverage=lemon juice" outside a section in specified file
   community.general.ini_file:
     path: /etc/conf
@@ -230,11 +218,23 @@ EXAMPLES = r'''
     value: lemon juice
     state: present
 
+- name: Update the public key for peer 10.128.0.12/32
+  community.general.ini_file:
+    path: /etc/wireguard/wg0.conf
+    section: Peer
+    section_has_values:
+      - option: AllowedIps
+        value: 10.128.0.12/32
+    option: PublicKey
+    value: xxxxxxxxxxxxxxxxxxxx
+    mode: '0600'
+    state: present
+
 - name: remove the peer configuration for 10.128.0.11/32
   community.general.ini_file:
     path: /etc/wireguard/wg0.conf
     section: Peer
-    section_has:
+    section_has_values:
       - option: AllowedIps
         value: 10.4.0.11/32
     mode: '0600'
@@ -244,7 +244,7 @@ EXAMPLES = r'''
   community.general.ini_file:
     path: /etc/wireguard/wg0.conf
     section: Peer
-    section_has:
+    section_has_values:
       - option: AllowedIps
         value: 10.4.0.12/32
     option: PublicKey
