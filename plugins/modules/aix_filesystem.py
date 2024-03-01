@@ -365,7 +365,7 @@ def create_fs(
         # Creates a LVM file system.
         crfs_cmd = module.get_bin_path('crfs', True)
         if not module.check_mode:
-            cmd = [ crfs_cmd ]
+            cmd = [crfs_cmd]
             cmd.append("-v")
             cmd.append(fs_type)
             if device:
@@ -377,7 +377,7 @@ def create_fs(
             if mount_group:
                 cmd.append(mount_group)
             if auto_mount:
-                cmd.append(automount)
+                cmd.append(auto_mount)
             if account_subsystem:
                 cmd.append(account_subsystem)
             cmd.append("-p")
