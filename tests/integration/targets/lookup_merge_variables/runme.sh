@@ -13,4 +13,4 @@ ANSIBLE_MERGE_VARIABLES_PATTERN_TYPE=suffix \
     ansible-playbook test_with_env.yml "$@"
 
 ANSIBLE_LOG_PATH=/tmp/ansible-test-merge-variables \
-    ansible-playbook -vvv -i test_inventory_all_hosts.yml test_all_hosts.yml "$@"
+    ansible-playbook -i test_inventory_all_hosts.yml test_all_hosts.yml "$@"

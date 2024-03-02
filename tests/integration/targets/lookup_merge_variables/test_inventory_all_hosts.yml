@@ -6,6 +6,7 @@
 
 all:
   hosts:
+    host0:
     host1:
       testdict1__merge_dict_ex:
         item1: value1
@@ -27,11 +28,23 @@ all:
           - test3
 
       testdict3__merge_dict_in:
-        target_inventory_hostname: host1
+        item2: value2
+        list_item:
+          - test2
+    host3:
+      testdict3__merge_dict_in:
         item3: value3
         list_item:
           - test3
 
-test_group:
+dummy1:
   hosts:
     host1:
+
+dummy2:
+  hosts:
+    host2:
+
+dummy3:
+  hosts:
+    host3:

@@ -161,8 +161,9 @@ class LookupModule(LookupBase):
                         host_result = self._merge_vars(term, initial_value, variables["hostvars"][host])
 
                         if cross_host_merge_result is None:
-                            cross_host_merge_result = host_result
-                            cross_host_var_type = _verify_and_get_type(cross_host_merge_result)
+                            if host_result:
+                                cross_host_merge_result = host_result
+                                cross_host_var_type = _verify_and_get_type(cross_host_merge_result)
                         else:
                             if host_result:
                                 if cross_host_var_type == "dict":
