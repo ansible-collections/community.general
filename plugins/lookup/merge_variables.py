@@ -10,6 +10,7 @@ DOCUMENTATION = """
     author:
       - Roy Lenferink (@rlenferink)
       - Mark Ettema (@m-a-r-k-e)
+      - Alexander Petrenz (@alpex8)
     name: merge_variables
     short_description: merge variables with a certain suffix
     description:
@@ -61,6 +62,13 @@ DOCUMENTATION = """
         ini:
           - section: merge_variables_lookup
             key: override
+      groups:
+        description:
+          - Search for variables accross hosts that belong to the given groups. This allows to collect configuration pieces
+             accross different hosts (for example a service on a host with its database on another host).
+        type: list
+        elements: str
+        version_added: 8.4.0
 """
 
 EXAMPLES = """
@@ -117,6 +125,7 @@ import re
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+from ansible.module_utils.common.collections import is_string
 
 display = Display()
 
@@ -131,21 +140,46 @@ def _verify_and_get_type(variable):
 
 
 class LookupModule(LookupBase):
-
     def run(self, terms, variables=None, **kwargs):
         self.set_options(direct=kwargs)
         initial_value = self.get_option("initial_value", None)
         self._override = self.get_option('override', 'error')
         self._pattern_type = self.get_option('pattern_type', 'regex')
 
+        self._groups = self.get_option('groups', None)
+
         ret = []
         for term in terms:
             if not isinstance(term, str):
                 raise AnsibleError("Non-string type '{0}' passed, only 'str' types are allowed!".format(type(term)))
 
-            ret.append(self._merge_vars(term, initial_value, variables))
+            if not self._groups:  # consider only own variables
+                ret.append(self._merge_vars(term, initial_value, variables))
+            else:  # consider variables of hosts in given groups
+                cross_host_merge_result = None
+                for host in variables["hostvars"]:
+                    if self._host_in_allowed_groups(variables["hostvars"][host]['group_names']):
+                        host_result = self._merge_vars(term, initial_value, variables["hostvars"][host])
+
+                        if cross_host_merge_result is None:
+                            cross_host_merge_result = host_result
+                        else:
+                            if host_result:
+                                cross_host_merge_result = self._merge_dict(host_result, cross_host_merge_result, [""])
+
+                ret.append(cross_host_merge_result)
 
         return ret
+
+    def _host_in_allowed_groups(self, host_groups):
+        if 'all' in self._groups:
+            return True
+
+        group_intersection = [host_group_name for host_group_name in host_groups if host_group_name in self._groups]
+        if group_intersection:
+            return True
+
+        return False
 
     def _var_matches(self, key, search_pattern):
         if self._pattern_type == "prefix":
@@ -162,7 +196,6 @@ class LookupModule(LookupBase):
         display.vvv("Merge variables with {0}: {1}".format(self._pattern_type, search_pattern))
         var_merge_names = sorted([key for key in variables.keys() if self._var_matches(key, search_pattern)])
         display.vvv("The following variables will be merged: {0}".format(var_merge_names))
-
         prev_var_type = None
         result = None
 

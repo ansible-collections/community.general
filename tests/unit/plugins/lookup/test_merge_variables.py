@@ -24,7 +24,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         self.merge_vars_lookup = merge_variables.LookupModule(loader=self.loader, templar=self.templar)
 
     @patch.object(AnsiblePlugin, 'set_options')
-    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix'])
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[['item1'], ['item3']])
     def test_merge_list(self, mock_set_options, mock_get_option, mock_template):
         results = self.merge_vars_lookup.run(['__merge_list'], {
@@ -36,7 +36,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         self.assertEqual(results, [['item1', 'item3']])
 
     @patch.object(AnsiblePlugin, 'set_options')
-    @patch.object(AnsiblePlugin, 'get_option', side_effect=[['initial_item'], 'ignore', 'suffix'])
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[['initial_item'], 'ignore', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[['item1'], ['item3']])
     def test_merge_list_with_initial_value(self, mock_set_options, mock_get_option, mock_template):
         results = self.merge_vars_lookup.run(['__merge_list'], {
@@ -48,7 +48,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         self.assertEqual(results, [['initial_item', 'item1', 'item3']])
 
     @patch.object(AnsiblePlugin, 'set_options')
-    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix'])
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[{'item1': 'test', 'list_item': ['test1']},
                                                     {'item2': 'test', 'list_item': ['test2']}])
     def test_merge_dict(self, mock_set_options, mock_get_option, mock_template):
@@ -73,7 +73,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
 
     @patch.object(AnsiblePlugin, 'set_options')
     @patch.object(AnsiblePlugin, 'get_option', side_effect=[{'initial_item': 'random value', 'list_item': ['test0']},
-                                                            'ignore', 'suffix'])
+                                                            'ignore', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[{'item1': 'test', 'list_item': ['test1']},
                                                     {'item2': 'test', 'list_item': ['test2']}])
     def test_merge_dict_with_initial_value(self, mock_set_options, mock_get_option, mock_template):
@@ -98,7 +98,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         ])
 
     @patch.object(AnsiblePlugin, 'set_options')
-    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'warn', 'suffix'])
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'warn', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[{'item': 'value1'}, {'item': 'value2'}])
     @patch.object(Display, 'warning')
     def test_merge_dict_non_unique_warning(self, mock_set_options, mock_get_option, mock_template, mock_display):
@@ -111,7 +111,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         self.assertEqual(results, [{'item': 'value2'}])
 
     @patch.object(AnsiblePlugin, 'set_options')
-    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'error', 'suffix'])
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'error', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[{'item': 'value1'}, {'item': 'value2'}])
     def test_merge_dict_non_unique_error(self, mock_set_options, mock_get_option, mock_template):
         with self.assertRaises(AnsibleError):
@@ -121,7 +121,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
             })
 
     @patch.object(AnsiblePlugin, 'set_options')
-    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix'])
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix', False, None])
     @patch.object(Templar, 'template', side_effect=[{'item1': 'test', 'list_item': ['test1']},
                                                     ['item2', 'item3']])
     def test_merge_list_and_dict(self, mock_set_options, mock_get_option, mock_template):
@@ -133,3 +133,94 @@ class TestMergeVariablesLookup(unittest.TestCase):
                 },
                 'testdict__merge_var': ['item2', 'item3']
             })
+
+    @patch.object(AnsiblePlugin, 'set_options')
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix', True, None])
+    @patch.object(Templar, 'template', side_effect=[
+        {'var': [{'item1': 'value1', 'item2': 'value2'}]},
+        {'var': [{'item5': 'value5', 'item6': 'value6'}]},
+    ])
+    def test_merge_all_hosts_dict_implicit_target(self, mock_set_options, mock_get_option, mock_template):
+        results = self.merge_vars_lookup.run(['__merge_var'], {
+            'inventory_hostname': 'host1',
+            'hostvars': {
+                'host1': {
+                    'inventory_hostname': 'host1',
+                    '1testlist__merge_var': {
+                        'var': [{'item1': 'value1', 'item2': 'value2'}]
+                    },
+                    '2otherlist__merge_var': {
+                        'var': [{'item5': 'value5', 'item6': 'value6'}]
+                    }
+                }
+            }
+        })
+
+        self.assertEqual(results, [
+            {'var': [
+                {'item1': 'value1', 'item2': 'value2'},
+                {'item5': 'value5', 'item6': 'value6'}
+            ]}
+        ])
+
+    @patch.object(AnsiblePlugin, 'set_options')
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix', True, None])
+    @patch.object(Templar, 'template', side_effect=[
+        {'var': [{'item1': 'value1', 'item2': 'value2'}]},
+        {'var': [{'item5': 'value5', 'item6': 'value6'}]},
+    ])
+    def test_merge_all_hosts_dict_explicit_target(self, mock_set_options, mock_get_option, mock_template):
+        results = self.merge_vars_lookup.run(['__merge_var'], {
+            'inventory_hostname': 'host1',
+            'hostvars': {
+                'host1': {
+                    'inventory_hostname': 'host1',
+                    '1testlist__merge_var': {
+                        'target_inventory_hostname': 'host1',
+                        'var': [{'item1': 'value1', 'item2': 'value2'}]
+                    },
+                    '2otherlist__merge_var': {
+                        'target_inventory_hostname': 'host1',
+                        'var': [{'item5': 'value5', 'item6': 'value6'}]
+                    }
+                }
+            }
+        })
+
+        self.assertEqual(results, [
+            {'var': [
+                {'item1': 'value1', 'item2': 'value2'},
+                {'item5': 'value5', 'item6': 'value6'}
+            ]}
+        ])
+
+    @patch.object(AnsiblePlugin, 'set_options')
+    @patch.object(AnsiblePlugin, 'get_option', side_effect=[None, 'ignore', 'suffix', True, 'target'])
+    @patch.object(Templar, 'template', side_effect=[
+        {'var': [{'item1': 'value1', 'item2': 'value2'}]},
+        {'var': [{'item5': 'value5', 'item6': 'value6'}]},
+    ])
+    def test_merge_all_hosts_dict_explicit_target_renamed(self, mock_set_options, mock_get_option, mock_template):
+        results = self.merge_vars_lookup.run(['__merge_var'], {
+            'inventory_hostname': 'host1',
+            'hostvars': {
+                'host1': {
+                    'inventory_hostname': 'host1',
+                    '1testlist__merge_var': {
+                        'target': 'host1',
+                        'var': [{'item1': 'value1', 'item2': 'value2'}]
+                    },
+                    '2otherlist__merge_var': {
+                        'target': 'host1',
+                        'var': [{'item5': 'value5', 'item6': 'value6'}]
+                    }
+                }
+            }
+        })
+
+        self.assertEqual(results, [
+            {'var': [
+                {'item1': 'value1', 'item2': 'value2'},
+                {'item5': 'value5', 'item6': 'value6'}
+            ]}
+        ])
