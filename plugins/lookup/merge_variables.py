@@ -125,7 +125,6 @@ import re
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
-from ansible.module_utils.common.collections import is_string
 
 display = Display()
 
@@ -145,7 +144,6 @@ class LookupModule(LookupBase):
         initial_value = self.get_option("initial_value", None)
         self._override = self.get_option('override', 'error')
         self._pattern_type = self.get_option('pattern_type', 'regex')
-
         self._groups = self.get_option('groups', None)
 
         ret = []
@@ -157,24 +155,29 @@ class LookupModule(LookupBase):
                 ret.append(self._merge_vars(term, initial_value, variables))
             else:  # consider variables of hosts in given groups
                 cross_host_merge_result = None
+                cross_host_var_type = ""
                 for host in variables["hostvars"]:
-                    if self._host_in_allowed_groups(variables["hostvars"][host]['group_names']):
+                    if self._is_host_in_allowed_groups(variables["hostvars"][host]['group_names']):
                         host_result = self._merge_vars(term, initial_value, variables["hostvars"][host])
 
                         if cross_host_merge_result is None:
                             cross_host_merge_result = host_result
+                            cross_host_var_type = _verify_and_get_type(cross_host_merge_result)
                         else:
                             if host_result:
-                                cross_host_merge_result = self._merge_dict(host_result, cross_host_merge_result, [""])
+                                if cross_host_var_type == "dict":
+                                    cross_host_merge_result = self._merge_dict(host_result, cross_host_merge_result, [""])
+                                else:
+                                    cross_host_merge_result += host_result
 
                 ret.append(cross_host_merge_result)
 
         return ret
 
-    def _host_in_allowed_groups(self, host_groups):
+    def _is_host_in_allowed_groups(self, host_groups):
         if 'all' in self._groups:
             return True
-
+        
         group_intersection = [host_group_name for host_group_name in host_groups if host_group_name in self._groups]
         if group_intersection:
             return True
