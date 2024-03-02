@@ -149,7 +149,6 @@ class TestMergeVariablesLookup(unittest.TestCase):
                     'inventory_hostname': 'host1',
                     '1testlist__merge_var': {
                         'var': [{'item1': 'value1', 'item2': 'value2'}]
-                        
                     }
                 },
                 'host2': {
@@ -184,7 +183,6 @@ class TestMergeVariablesLookup(unittest.TestCase):
                     'inventory_hostname': 'host1',
                     '1testlist__merge_var': {
                         'var': [{'item1': 'value1', 'item2': 'value2'}]
-                        
                     }
                 },
                 'host2': {
@@ -226,7 +224,6 @@ class TestMergeVariablesLookup(unittest.TestCase):
                     'inventory_hostname': 'host1',
                     '1testlist__merge_var': {
                         'var': [{'item1': 'value1', 'item2': 'value2'}]
-                        
                     }
                 },
                 'host2': {
