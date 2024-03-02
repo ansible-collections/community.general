@@ -264,7 +264,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
                 'host1': {
                     'group_names': ['dummy1'],
                     'inventory_hostname': 'host1',
-                    '1testlist__merge_var': ['item1']                        
+                    '1testlist__merge_var': ['item1']
                 },
                 'host2': {
                     'group_names': ['dummy2'],
