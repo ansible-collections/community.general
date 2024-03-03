@@ -65,7 +65,7 @@ DOCUMENTATION = """
       groups:
         description:
           - Search for variables accross hosts that belong to the given groups. This allows to collect configuration pieces
-             accross different hosts (for example a service on a host with its database on another host).
+            accross different hosts (for example a service on a host with its database on another host).
         type: list
         elements: str
         version_added: 8.4.0
