@@ -157,7 +157,7 @@ class LookupModule(LookupBase):
                 cross_host_merge_result = None
                 cross_host_var_type = ""
                 for host in variables["hostvars"]:
-                    if self._is_host_in_allowed_groups(variables["hostvars"][host]['group_names']):
+                    if self._is_host_in_allowed_groups(variables["hostvars"][host]["group_names"]):
                         host_result = self._merge_vars(term, initial_value, variables["hostvars"][host])
 
                         if cross_host_merge_result is None:
