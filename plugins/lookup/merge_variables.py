@@ -68,7 +68,7 @@ DOCUMENTATION = """
             accross different hosts (for example a service on a host with its database on another host).
         type: list
         elements: str
-        version_added: 8.4.0
+        version_added: 8.5.0
 """
 
 EXAMPLES = """
