@@ -38,8 +38,8 @@ options:
     type: list
     elements: str
     default:
-      - agblksize='4096'
-      - isnapshot='no'
+      - agblksize=4096
+      - isnapshot=no
   auto_mount:
     description:
       - File system is automatically mounted at system restart.
