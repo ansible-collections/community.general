@@ -366,46 +366,46 @@ def create_fs(
         crfs_cmd = module.get_bin_path('crfs', True)
         if not module.check_mode:
             cmd = [crfs_cmd]
-          
+
             cmd.append("-v")
             cmd.append(fs_type)
- 
+
             if vg:
                 (flag, value) = vg.split()
                 cmd.append(flag)
                 cmd.append(value)
- 
+
             if device:
                 (flag, value) = device.split()
                 cmd.append(flag)
                 cmd.append(value)
- 
+
             cmd.append("-m")
             cmd.append(filesystem)
- 
+
             if mount_group:
                 (flag, value) = mount_group.split()
                 cmd.append(flag)
                 cmd.append(value)
- 
+
             if auto_mount:
                 (flag, value) = auto_mount.split()
                 cmd.append(flag)
                 cmd.append(value)
- 
+
             if account_subsystem:
                 (flag, value) = account_subsystem.split()
                 cmd.append(flag)
                 cmd.append(value)
- 
+
             cmd.append("-p")
             cmd.append(permissions)
- 
+
             if size:
                 (flag, value) = size.split()
                 cmd.append(flag)
                 cmd.append(value)
- 
+
             if attributes:
                 splitted_attributes = attributes.split()
                 cmd.append("-a")
