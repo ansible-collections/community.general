@@ -12,12 +12,13 @@ all:
         item1: value1
         list_item:
           - test1
+
       testdict2__merge_dict_ex:
         item2: value2
         list_item:
           - test2
 
-      testdict1__merge_dict_in:
+      testdict__merge_dict_in:
         item1: value1
         list_item:
           - test1
@@ -27,12 +28,13 @@ all:
         list_item:
           - test3
 
-      testdict3__merge_dict_in:
+      testdict__merge_dict_in:
         item2: value2
         list_item:
           - test2
+
     host3:
-      testdict3__merge_dict_in:
+      testdict__merge_dict_in:
         item3: value3
         list_item:
           - test3

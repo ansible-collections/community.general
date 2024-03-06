@@ -43,3 +43,22 @@
               - "'item2' in merged_dict"
               - "'list_item' in merged_dict"
               - "merged_dict.list_item | length == 2"
+    - name: Test merge dicts via two of three groups with inital value
+      delegate_to: localhost
+      vars:
+        initial_dict:
+          initial: initial_value
+        merged_dict: "{{ lookup('community.general.merge_variables', '__merge_dict_in', initial_value=initial_dict, pattern_type='suffix', groups=['dummy1', 'dummy2']) }}"
+      block:
+        - name: Test merge dicts via two of three groups with inital value - Print the merged dict
+          ansible.builtin.debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Test merge dicts via two of three groups with inital value - Validate that the dict is complete
+          ansible.builtin.assert:
+            that:
+              - "(merged_dict.keys() | list | length) == 4"
+              - "'item1' in merged_dict"
+              - "'item2' in merged_dict"
+              - "'list_item' in merged_dict"
+              - "merged_dict.list_item | length == 2"

@@ -154,23 +154,10 @@ class LookupModule(LookupBase):
             if not self._groups:  # consider only own variables
                 ret.append(self._merge_vars(term, initial_value, variables))
             else:  # consider variables of hosts in given groups
-                cross_host_merge_result = None
-                cross_host_var_type = ""
+                cross_host_merge_result = initial_value
                 for host in variables["hostvars"]:
                     if self._is_host_in_allowed_groups(variables["hostvars"][host]["group_names"]):
-                        host_result = self._merge_vars(term, initial_value, variables["hostvars"][host])
-
-                        if cross_host_merge_result is None:
-                            if host_result:
-                                cross_host_merge_result = host_result
-                                cross_host_var_type = _verify_and_get_type(cross_host_merge_result)
-                        else:
-                            if host_result:
-                                if cross_host_var_type == "dict":
-                                    cross_host_merge_result = self._merge_dict(host_result, cross_host_merge_result, [""])
-                                else:
-                                    cross_host_merge_result += host_result
-
+                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, variables["hostvars"][host])
                 ret.append(cross_host_merge_result)
 
         return ret
