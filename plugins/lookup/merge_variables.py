@@ -15,7 +15,7 @@ DOCUMENTATION = """
     short_description: merge variables with a certain suffix
     description:
         - This lookup returns the merged result of all variables in scope that match the given prefixes, suffixes, or
-         regular expressions, optionally.
+          regular expressions, optionally.
     version_added: 6.5.0
     options:
       _terms:
