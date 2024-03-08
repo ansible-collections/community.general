@@ -1,0 +1,52 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+all:
+  hosts:
+    host0:
+    host1:
+      testdict1__merge_dict_ex:
+        item1: value1
+        list_item:
+          - test1
+
+      testdict2__merge_dict_ex:
+        item2: value2
+        list_item:
+          - test2
+
+      testdict__merge_dict_in:
+        item1: value1
+        list_item:
+          - test1
+    host2:
+      testdict3__merge_dict_ex:
+        item3: value3
+        list_item:
+          - test3
+
+      testdict__merge_dict_in:
+        item2: value2
+        list_item:
+          - test2
+
+    host3:
+      testdict__merge_dict_in:
+        item3: value3
+        list_item:
+          - test3
+
+dummy1:
+  hosts:
+    host1:
+
+dummy2:
+  hosts:
+    host2:
+
+dummy3:
+  hosts:
+    host3:
