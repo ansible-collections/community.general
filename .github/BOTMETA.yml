@@ -265,7 +265,7 @@ files:
     labels: manifold
     maintainers: galanoff
   $lookups/merge_variables.py:
-    maintainers: rlenferink m-a-r-k-e
+    maintainers: rlenferink m-a-r-k-e alpex8
   $lookups/onepass:
     labels: onepassword
     maintainers: samdoran

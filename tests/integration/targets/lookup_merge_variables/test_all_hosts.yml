@@ -1,0 +1,64 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test merge_variables lookup plugin (multiple hosts)
+  hosts: host0
+  gather_facts: false
+  tasks:
+    - name: Test merge dicts via all group
+      delegate_to: localhost
+      vars:
+        merged_dict: "{{ lookup('community.general.merge_variables', '__merge_dict_ex', pattern_type='suffix', groups=['all']) }}"
+      block:
+        - name: Test merge dicts via all group - Print the merged dict
+          ansible.builtin.debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Test merge dicts via all group - Validate that the dict is complete
+          ansible.builtin.assert:
+            that:
+              - "(merged_dict.keys() | list | length) == 4"
+              - "'item1' in merged_dict"
+              - "'item2' in merged_dict"
+              - "'item3' in merged_dict"
+              - "'list_item' in merged_dict"
+              - "merged_dict.list_item | length == 3"
+    - name: Test merge dicts via two of three groups
+      delegate_to: localhost
+      vars:
+        merged_dict: "{{ lookup('community.general.merge_variables', '__merge_dict_in', pattern_type='suffix', groups=['dummy1', 'dummy2']) }}"
+      block:
+        - name: Test merge dicts via two of three groups - Print the merged dict
+          ansible.builtin.debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Test merge dicts via two of three groups - Validate that the dict is complete
+          ansible.builtin.assert:
+            that:
+              - "(merged_dict.keys() | list | length) == 3"
+              - "'item1' in merged_dict"
+              - "'item2' in merged_dict"
+              - "'list_item' in merged_dict"
+              - "merged_dict.list_item | length == 2"
+    - name: Test merge dicts via two of three groups with inital value
+      delegate_to: localhost
+      vars:
+        initial_dict:
+          initial: initial_value
+        merged_dict: "{{ lookup('community.general.merge_variables', '__merge_dict_in', initial_value=initial_dict, pattern_type='suffix', groups=['dummy1', 'dummy2']) }}"
+      block:
+        - name: Test merge dicts via two of three groups with inital value - Print the merged dict
+          ansible.builtin.debug:
+            msg: "{{ merged_dict }}"
+
+        - name: Test merge dicts via two of three groups with inital value - Validate that the dict is complete
+          ansible.builtin.assert:
+            that:
+              - "(merged_dict.keys() | list | length) == 4"
+              - "'item1' in merged_dict"
+              - "'item2' in merged_dict"
+              - "'list_item' in merged_dict"
+              - "merged_dict.list_item | length == 2"
