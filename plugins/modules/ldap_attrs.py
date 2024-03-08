@@ -44,7 +44,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
 options:
   state:
     required: false
