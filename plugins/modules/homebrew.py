@@ -488,6 +488,10 @@ class Homebrew(object):
             self.current_package,
         ]
         rc, out, err = self.module.run_command(cmd)
+        if err:
+            self.failed = True
+            self.message = err.strip()
+            raise HomebrewException(self.message)
         data = json.loads(out)
 
         return _check_package_in_json(data, "formulae") or _check_package_in_json(data, "casks")
