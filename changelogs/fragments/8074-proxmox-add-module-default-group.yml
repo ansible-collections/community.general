@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_* - Added proxmox module default group (https://github.com/ansible-collections/community.general/pull/8074).
