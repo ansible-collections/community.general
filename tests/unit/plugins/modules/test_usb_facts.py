@@ -56,9 +56,9 @@ class TestUsbFacts(unittest.TestCase):
 
     def setUp(self):
         self.mock_module_helper = mock.patch.multiple(basic.AnsibleModule,
-                                                        exit_json=exit_json,
-                                                        fail_json=fail_json,
-                                                        get_bin_path=get_bin_path)
+                                                      exit_json=exit_json,
+                                                      fail_json=fail_json,
+                                                      get_bin_path=get_bin_path)
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
         self.testing_data = [
