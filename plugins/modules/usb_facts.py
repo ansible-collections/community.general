@@ -17,7 +17,7 @@ short_description: Allows listing information about usb devices
 description:
   - Allows retrieving information about available usb devices through lsusb
 author: 
-  - Max Maxopoly (max@dermax.org)
+  - Max Maxopoly (@maxopoly)
 extends_documentation_fragment:
   - community.general.attributes
 requirements:
