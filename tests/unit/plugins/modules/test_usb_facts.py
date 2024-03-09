@@ -13,10 +13,12 @@ from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible_collections.community.general.plugins.modules import usb_facts
 
+
 def set_module_args(args):
     """prepare arguments so that they will be picked up during module creation"""
     args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
     basic._ANSIBLE_ARGS = to_bytes(args)
+
 
 class AnsibleExitJson(Exception):
     """Exception class to be raised by module.exit_json and caught by the test case"""
@@ -49,13 +51,14 @@ def get_bin_path(self, arg, required=False):
         if required:
             fail_json(msg='%r not found !' % arg)
 
+
 class TestUsbFacts(unittest.TestCase):
 
     def setUp(self):
         self.mock_module_helper = mock.patch.multiple(basic.AnsibleModule,
-                                                 exit_json=exit_json,
-                                                 fail_json=fail_json,
-                                                 get_bin_path=get_bin_path)
+                                                    exit_json=exit_json,
+                                                    fail_json=fail_json,
+                                                    get_bin_path=get_bin_path)
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
         self.testing_data = [
@@ -79,7 +82,7 @@ class TestUsbFacts(unittest.TestCase):
     def test_parsing_single_line(self):
         for data in self.testing_data:
             with mock.patch.object(basic.AnsibleModule, 'run_command') as mock_run_command:
-                command_output = data ["input"]
+                command_output = data["input"]
                 mock_run_command.return_value = 0, command_output, None
                 with self.assertRaises(AnsibleExitJson) as result:
                     set_module_args({})
@@ -98,5 +101,5 @@ class TestUsbFacts(unittest.TestCase):
                 usb_facts.main()
             for index in range(0, len(self.testing_data)):
                 for output_field in self.output_fields:
-                    self.assertEqual(result.exception.args[0]["ansible_facts"]["devices"][index][output_field], 
+                    self.assertEqual(result.exception.args[0]["ansible_facts"]["devices"][index][output_field],
                                      self.testing_data[index][output_field])

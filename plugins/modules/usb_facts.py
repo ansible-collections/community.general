@@ -16,7 +16,8 @@ module: usb_facts
 short_description: Allows listing information about usb devices
 description:
   - Allows retrieving information about available usb devices through lsusb
-author: "Max Maxopoly (max@dermax.org)"
+author: 
+  - Max Maxopoly (max@dermax.org)
 extends_documentation_fragment:
   - community.general.attributes
 requirements:
