@@ -20,7 +20,7 @@ author: "Max Maxopoly (max@dermax.org)"
 extends_documentation_fragment:
   - community.general.attributes
 requirements:
-  - lsusb binary (usually installed through the package usbutils)
+  - lsusb binary on PATH (usually installed through the package usbutils and preinstalled on many systems)
 attributes:
   check_mode:
     support: full
@@ -46,7 +46,7 @@ ansible_facts:
       type: list
       contains:
         bus:
-          description: The bus the usb devices is connected to.
+          description: The bus the usb device is connected to.
           returned: always
           type: str
           sample: "001"
@@ -72,13 +72,12 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def parse_lsusb(module):
-    rc, stdout, stderr = module.run_command(LSUSB_PATH, check_rc=True)
+def parse_lsusb(module, lsusb_path):
+    rc, stdout, stderr = module.run_command(lsusb_path, check_rc=True)
     regex = re.compile(r'^Bus (\d{3}) Device (\d{3}): ID ([0-9a-f]{4}:[0-9a-f]{4}) (.*)$')
     devices = []
     for line in stdout.splitlines(keepends=False):
         match = re.match(regex, line)
-        print(line)
         if not match:
             module.fail_json(msg="failed to parse unknown lsusb output %s" % (line), stdout=stdout, stderr=stderr)
         current_device = {
@@ -88,7 +87,10 @@ def parse_lsusb(module):
             'name': match.group(4)
         }
         devices.append(current_device)
-    module.exit_json(msg="parsed %s usb devices" % (len(devices)), stdout=stdout, stderr=stderr, devices=devices)
+    return_value = {
+        "devices": devices
+    }
+    module.exit_json(msg="parsed %s usb devices" % (len(devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
 
 
 def main():
@@ -100,10 +102,8 @@ def main():
     # Set LANG env since we parse stdout
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
-    global LSUSB_PATH
-    LSUSB_PATH = module.get_bin_path('lsusb', required=True)
-
-    parse_lsusb(module)
+    lsusb_path = module.get_bin_path('lsusb', required=True)
+    parse_lsusb(module, lsusb_path)
 
 
 if __name__ == '__main__':
