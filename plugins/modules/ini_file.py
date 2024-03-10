@@ -51,14 +51,20 @@ options:
     suboptions:
       option:
         type: str
-        description: The option to look for within the section.
+        description: Matching O(section) must contain this option.
         required: true
       value:
         type: str
-        description: Locate the section with this specific value.
-        required: true
+        description: Matching O(option) must have this specific value.
+      values:
+        description:
+          - The string value to be associated with an O(option).
+          - Mutually exclusive with O(value).
+          - O(value=v) is equivalent to O(values=[v]).
+        type: list
+        elements: str
     description:
-      - Among possibly multiple sections of the same name, select the one that contains these values.
+      - Among possibly multiple sections of the same name, select the first one that contains matching options and values.
       - With O(state=present), if a suitable section is not found, a new section will be added, including the required options.
       - With O(state=absent), at most one O(section) is removed if it contains the values.
     version_added: 8.5.0
@@ -205,7 +211,7 @@ EXAMPLES = r'''
   community.general.ini_file:
     path: /etc/wireguard/wg0.conf
     section: Peer
-    section_has:
+    section_has_values:
       - option: AllowedIps
         value: 10.128.0.11/32
     mode: '0600'
@@ -296,14 +302,14 @@ def check_section_has_values(condition, section_lines):
         for check in condition:
             for line in section_lines:
                 match = match_opt(check["option"], line)
-                if match and match.group(7) == check["value"]:
+                if match and (len(check["values"]) == 0 or match.group(7) in check["values"]):
                     break
             else:
                 return False
     return True
 
 
-def do_ini(module, filename, section=None, option=None, values=None,
+def do_ini(module, filename, section=None, section_has_values=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
            ignore_spaces=False, create=True, allow_no_value=False, modify_inactive_option=True, follow=False):
 
@@ -391,7 +397,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # end of section:
         if within_section and line.startswith(u'['):
             if check_section_has_values(
-                module.params['section_has_values'], ini_lines[section_start:index]
+                section_has_values, ini_lines[section_start:index]
             ):
                 section_end = index
                 break
@@ -524,9 +530,18 @@ def do_ini(module, filename, section=None, option=None, values=None,
     if not within_section and state == 'present':
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
-        if module.params.get('section_has_values'):
-            for check in module.params['section_has_values']:
-                ini_lines.append(assignment_format % (check['option'], check['value']))
+        if section_has_values:
+            for check in section_has_values:
+                if check['option'] != option:
+                    if len(check['values']) > 0:
+                        for value in check['values']:
+                            ini_lines.append(assignment_format % (check['option'], value))
+                    elif allow_no_value:
+                        ini_lines.append(u'%s\n' % check['option'])
+                elif not exclusive:
+                    for value in check['values']:
+                        if value not in values:
+                            values.append(value)
         if option and values:
             for value in values:
                 ini_lines.append(assignment_format % (option, value))
@@ -570,8 +585,9 @@ def main():
             section=dict(type='str'),
             section_has_values=dict(type='list', elements='dict', options=dict(
                 option=dict(type='str', required=True),
-                value=dict(type='str', required=True)
-            ), default=None),
+                value=dict(type='str'),
+                values=dict(type='list', elements='str')
+            ), default=None, mutually_exclusive=['value', 'values']),
             option=dict(type='str'),
             value=dict(type='str'),
             values=dict(type='list', elements='str'),
@@ -594,6 +610,7 @@ def main():
 
     path = module.params['path']
     section = module.params['section']
+    section_has_values = module.params['section_has_values']
     option = module.params['option']
     value = module.params['value']
     values = module.params['values']
@@ -615,8 +632,16 @@ def main():
     elif values is None:
         values = []
 
+    if section_has_values:
+        for condition in section_has_values:
+            if condition['value'] is not None:
+                condition['values'] = [condition['value']]
+            elif condition['values'] is None:
+                condition['values'] = []
+#        raise Exception("section_has_values: {}".format(section_has_values))
+
     (changed, backup_file, diff, msg) = do_ini(
-        module, path, section, option, values, state, exclusive, backup,
+        module, path, section, section_has_values, option, values, state, exclusive, backup,
         no_extra_spaces, ignore_spaces, create, allow_no_value, modify_inactive_option, follow)
 
     if not module.check_mode and os.path.exists(path):

@@ -18,7 +18,7 @@
 
     dest: "{{ output_file }}"
 
-- name: test-section 1 - Create ini file
+- name: test-section 1 - Modify starting ini file
   ini_file:
     dest: "{{ output_file }}"
     section: drinks
@@ -27,12 +27,12 @@
     state: present
   register: result1
 
-- name: test-section 1 - read content from output file
+- name: test-section 1 - Read modified file
   slurp:
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-section 1 - Create expected ini file
+- name: test-section 1 - Create expected result
   set_fact:
     expected1: |
       [drinks]
@@ -45,7 +45,7 @@
       beverage = pineapple juice
     output1: "{{ output_content.content | b64decode }}"
 
-- name: test-section 1 - Option was adde to first section
+- name: test-section 1 - Option was added to first section
   assert:
     that:
       - result1 is changed
@@ -67,7 +67,7 @@
 
     dest: "{{ output_file }}"
 
-- name: test-section 2 - Create ini file
+- name: test-section 2 - Modify starting ini file
   ini_file:
     dest: "{{ output_file }}"
     section: drinks
@@ -79,12 +79,12 @@
     state: present
   register: result1
 
-- name: test-section 2 - read content from output file
+- name: test-section 2 - Read modified file
   slurp:
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-section 2 - Create expected ini file
+- name: test-section 2 - Create expected result
   set_fact:
     expected1: |
       [drinks]
@@ -119,7 +119,7 @@
 
     dest: "{{ output_file }}"
 
-- name: test-section 3 - Create ini file
+- name: test-section 3 - Modify starting ini file
   ini_file:
     dest: "{{ output_file }}"
     section: drinks
@@ -131,12 +131,12 @@
     state: absent
   register: result1
 
-- name: test-section 3 - read content from output file
+- name: test-section 3 - Read modified file
   slurp:
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-section 3 - Create expected ini file
+- name: test-section 3 - Create expected result
   set_fact:
     expected1: |
       [drinks]
@@ -169,7 +169,7 @@
 
     dest: "{{ output_file }}"
 
-- name: test-section 4 - Create ini file
+- name: test-section 4 - Modify starting ini file
   ini_file:
     dest: "{{ output_file }}"
     section: drinks
@@ -181,12 +181,12 @@
     state: present
   register: result1
 
-- name: test-section 4 - read content from output file
+- name: test-section 4 - Read modified file
   slurp:
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-section 4 - Create expected ini file
+- name: test-section 4 - Create expected result
   set_fact:
     expected1: |
       [drinks]
@@ -210,7 +210,7 @@
 
 # ----------------
 
-- name: test-section 5 - modify the result of test-section 4
+- name: test-section 5 - Modify test-section 4 result file
   ini_file:
     dest: "{{ output_file }}"
     section: drinks
@@ -222,12 +222,12 @@
     state: absent
   register: result1
 
-- name: test-section 5 - read content from output file
+- name: test-section 5 - Read modified file
   slurp:
     src: "{{ output_file }}"
   register: output_content
 
-- name: test-section 5 - Create expected ini file
+- name: test-section 5 - Create expected result
   set_fact:
     expected1: |
       [drinks]
@@ -244,4 +244,98 @@
     that:
       - result1 is changed
       - result1.msg == 'section removed'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 6 - Modify test-section 5 result file with multiple values
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: fav
+        values:
+          - cherry
+          - lemon
+          - vanilla
+      - option: beverage
+        value: pineapple juice
+    state: present
+    option: fav
+    values:
+      - vanilla
+      - grape
+    exclusive: false
+  register: result1
+
+- name: test-section 6 - Read modified file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 6 - Create expected result
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      beverage = alligator slime
+      fav = tea
+      [drinks]
+      beverage = pineapple juice
+      fav = vanilla
+      fav = grape
+      fav = cherry
+      fav = lemon
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 6 - New section added
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'section and option added'
+      - output1 == expected1
+
+# ----------------
+
+- name: test-section 7 - Modify test-section 6 result file with exclusive value
+  ini_file:
+    dest: "{{ output_file }}"
+    section: drinks
+    section_has_values:
+      - option: fav
+        value: vanilla
+    state: present
+    option: fav
+    value: cherry
+    exclusive: true
+  register: result1
+
+- name: test-section 7 - Read modified file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-section 7 - Create expected result
+  set_fact:
+    expected1: |
+      [drinks]
+      fav = lemonade
+      beverage = orange juice
+
+      [drinks]
+      beverage = alligator slime
+      fav = tea
+      [drinks]
+      beverage = pineapple juice
+      fav = cherry
+    output1: "{{ output_content.content | b64decode }}"
+
+- name: test-section 7 - Option changed
+  assert:
+    that:
+      - result1 is changed
+      - result1.msg == 'option changed'
       - output1 == expected1
