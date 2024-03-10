@@ -211,11 +211,11 @@ def main():
                     module.exit_json(changed=True, out=cluster_state)
 
     if state in ['restart']:
+        if module.check_mode:
+            module.exit_json(changed=True)
         set_cluster(module, 'offline', timeout, force)
         cluster_state = get_cluster_status(module)
         if cluster_state == 'offline':
-            if module.check_mode:
-                module.exit_json(changed=True)
             set_cluster(module, 'online', timeout, force)
             cluster_state = get_cluster_status(module)
             if cluster_state == 'online':
