@@ -108,14 +108,14 @@ class CallbackModule(CallbackModule_default):
         name = play.get_name().strip()
         if play.check_mode and self.get_option('check_mode_markers'):
             if name and play.hosts:
-                msg = u"\n- %s (in check mode) on hosts: %s -" % (name, ",".join(play.hosts))
+                msg = "\n- %s (in check mode) on hosts: %s -" % (name, ",".join(play.hosts))
             else:
-                msg = u"- check mode -"
+                msg = "- check mode -"
         else:
             if name and play.hosts:
-                msg = u"\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
+                msg = "\n- %s on hosts: %s -" % (name, ",".join(play.hosts))
             else:
-                msg = u"---"
+                msg = "---"
 
         self._display.display(msg)
 
@@ -195,7 +195,7 @@ class CallbackModule(CallbackModule_default):
             # TODO how else can we display these?
             t = stats.summarize(h)
 
-            self._display.display(u"  %s : %s %s %s %s %s %s" % (
+            self._display.display("  %s : %s %s %s %s %s %s" % (
                 hostcolor(h, t),
                 colorize('ok', t['ok'], C.COLOR_OK),
                 colorize('changed', t['changed'], C.COLOR_CHANGED),
@@ -206,7 +206,7 @@ class CallbackModule(CallbackModule_default):
                 screen_only=True
             )
 
-            self._display.display(u"  %s : %s %s %s %s %s %s" % (
+            self._display.display("  %s : %s %s %s %s %s %s" % (
                 hostcolor(h, t, False),
                 colorize('ok', t['ok'], None),
                 colorize('changed', t['changed'], None),

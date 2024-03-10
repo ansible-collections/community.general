@@ -137,7 +137,7 @@ class LookupModule(LookupBase):
                 if path == "":
                     raise AnsibleOptionsError("Invalid secret path: %s" % term)
 
-                display.vvv(u"DevOps Secrets Vault GET /secrets/%s" % path)
+                display.vvv("DevOps Secrets Vault GET /secrets/%s" % path)
                 result.append(vault.get_secret_json(path))
             except SecretsVaultError as error:
                 raise AnsibleError(

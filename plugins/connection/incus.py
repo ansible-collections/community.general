@@ -76,7 +76,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(u"ESTABLISH Incus CONNECTION FOR USER: root",
+            self._display.vvv("ESTABLISH Incus CONNECTION FOR USER: root",
                               host=self._instance())
             self._connected = True
 
@@ -89,7 +89,7 @@ class Connection(ConnectionBase):
         """ execute a command on the Incus host """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        self._display.vvv(u"EXEC {0}".format(cmd),
+        self._display.vvv("EXEC {0}".format(cmd),
                           host=self._instance())
 
         local_cmd = [
@@ -123,7 +123,7 @@ class Connection(ConnectionBase):
         """ put a file from local to Incus """
         super(Connection, self).put_file(in_path, out_path)
 
-        self._display.vvv(u"PUT {0} TO {1}".format(in_path, out_path),
+        self._display.vvv("PUT {0} TO {1}".format(in_path, out_path),
                           host=self._instance())
 
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
@@ -146,7 +146,7 @@ class Connection(ConnectionBase):
         """ fetch a file from Incus to local """
         super(Connection, self).fetch_file(in_path, out_path)
 
-        self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path),
+        self._display.vvv("FETCH {0} TO {1}".format(in_path, out_path),
                           host=self._instance())
 
         local_cmd = [

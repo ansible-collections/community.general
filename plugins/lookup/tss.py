@@ -302,10 +302,10 @@ class TSSClient(object):
         secret_id = self._term_to_secret_id(term)
         if secret_id == 0 and secret_path:
             fetch_secret_by_path = True
-            display.vvv(u"Secret Server lookup of Secret with path %s" % secret_path)
+            display.vvv("Secret Server lookup of Secret with path %s" % secret_path)
         else:
             fetch_secret_by_path = False
-            display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
+            display.vvv("Secret Server lookup of Secret with ID %d" % secret_id)
 
         if fetch_file_attachments:
             if fetch_secret_by_path:
@@ -337,7 +337,7 @@ class TSSClient(object):
     def get_secret_ids_by_folderid(self, term):
         display.debug("tss_lookup term: %s" % term)
         folder_id = self._term_to_folder_id(term)
-        display.vvv(u"Secret Server lookup of Secret id's with Folder ID %d" % folder_id)
+        display.vvv("Secret Server lookup of Secret id's with Folder ID %d" % folder_id)
 
         return self._client.get_secret_ids_by_folderid(folder_id)
 

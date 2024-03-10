@@ -149,7 +149,7 @@ class PlainTextSocketAppender(object):
                 self.open_connection()
                 return
             except Exception as e:
-                self._display.vvvv(u"Unable to connect to Logentries: %s" % to_text(e))
+                self._display.vvvv("Unable to connect to Logentries: %s" % to_text(e))
 
             root_delay *= 2
             if root_delay > self.MAX_DELAY:
@@ -172,7 +172,7 @@ class PlainTextSocketAppender(object):
         # for multi-line events
         data = to_text(data, errors='surrogate_or_strict')
         multiline = data.replace('\n', self.LINE_SEP)
-        multiline += u"\n"
+        multiline += "\n"
         # Send data, reconnect if needed
         while True:
             try:
@@ -245,7 +245,7 @@ class CallbackModule(CallbackBase):
             self.use_tls = self.get_option('use_tls')
             self.flatten = self.get_option('flatten')
         except KeyError as e:
-            self._display.warning(u"Missing option for Logentries callback plugin: %s" % to_text(e))
+            self._display.warning("Missing option for Logentries callback plugin: %s" % to_text(e))
             self.disabled = True
 
         try:

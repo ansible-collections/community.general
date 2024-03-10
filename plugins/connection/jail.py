@@ -95,7 +95,7 @@ class Connection(ConnectionBase):
         """ connect to the jail; nothing to do here """
         super(Connection, self)._connect()
         if not self._connected:
-            display.vvv(u"ESTABLISH JAIL CONNECTION FOR USER: {0}".format(self._play_context.remote_user), host=self.jail)
+            display.vvv("ESTABLISH JAIL CONNECTION FOR USER: {0}".format(self._play_context.remote_user), host=self.jail)
             self._connected = True
 
     def _buffered_exec_command(self, cmd, stdin=subprocess.PIPE):

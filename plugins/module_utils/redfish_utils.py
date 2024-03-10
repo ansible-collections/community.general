@@ -700,13 +700,8 @@ class RedfishUtils(object):
             _data = response['data']
             # Check to make sure option is available, otherwise error is ugly
             if "Actions" in _data:
-<<<<<<< HEAD
-                if "#LogService.ClearLog" in _data[u"Actions"]:
-                    self.post_request(self.root_uri + _data[u"Actions"]["#LogService.ClearLog"]["target"], {})
-=======
-                if "#LogService.ClearLog" in _data[ "Actions"]:
+                if "#LogService.ClearLog" in _data["Actions"]:
                     self.post_request(self.root_uri + _data["Actions"]["#LogService.ClearLog"]["target"], {})
->>>>>>> 202c28f96 (remove unicode-prefix from single-quoted strings)
                     if response['ret'] is False:
                         return response
         return {'ret': True}

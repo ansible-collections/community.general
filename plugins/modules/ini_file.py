@@ -269,7 +269,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         ini_lines.append('\n')
 
     # last line of file may not contain a trailing newline
-    if ini_lines[-1] == u"" or ini_lines[-1][-1] != '\n':
+    if ini_lines[-1] == "" or ini_lines[-1][-1] != '\n':
         ini_lines[-1] += '\n'
         changed = True
 
@@ -277,7 +277,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
     # At top:
     # Fake random section to do not match any other in the file
     # Using commit hash as fake section name
-    fake_section_name = u"ad01e11446efb704fcdbdb21f2c43757423d91c5"
+    fake_section_name = "ad01e11446efb704fcdbdb21f2c43757423d91c5"
 
     # Insert it at the beginning
     ini_lines.insert(0, '[%s]' % fake_section_name)

@@ -58,7 +58,7 @@ def mapping_profile(string):
             else:
                 tmp.append(c)
 
-    return u"".join(tmp)
+    return "".join(tmp)
 
 
 def is_ral_string(string):

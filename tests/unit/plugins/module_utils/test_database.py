@@ -106,12 +106,12 @@ IS_STRINGS_DANGEROUS = (
     ('\' EXCEPT select', True),
     (';ALTER TABLE prices', True),
     (';alter table prices', True),
-    (u"; UPDATE products SET price = '0'", True),
-    (u";update products SET price = '0'", True),
-    (u"; DELETE FROM products", True),
-    (u"; delete FROM products", True),
-    (u"; SELECT * FROM products", True),
-    (u" ; select * from products", True),
+    ("; UPDATE products SET price = '0'", True),
+    (";update products SET price = '0'", True),
+    ("; DELETE FROM products", True),
+    ("; delete FROM products", True),
+    ("; SELECT * FROM products", True),
+    (" ; select * from products", True),
 )
 
 

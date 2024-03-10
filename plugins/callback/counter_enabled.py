@@ -69,9 +69,9 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         name = play.get_name().strip()
         if not name:
-            msg = u"play"
+            msg = "play"
         else:
-            msg = u"PLAY [%s]" % name
+            msg = "PLAY [%s]" % name
 
         self._play = play
 
@@ -91,7 +91,7 @@ class CallbackModule(CallbackBase):
         for host in hosts:
             stat = stats.summarize(host)
 
-            self._display.display(u"%s : %s %s %s %s %s %s" % (
+            self._display.display("%s : %s %s %s %s %s %s" % (
                 hostcolor(host, stat),
                 colorize('ok', stat['ok'], C.COLOR_OK),
                 colorize('changed', stat['changed'], C.COLOR_CHANGED),
@@ -102,7 +102,7 @@ class CallbackModule(CallbackBase):
                 screen_only=True
             )
 
-            self._display.display(u"%s : %s %s %s %s %s %s" % (
+            self._display.display("%s : %s %s %s %s %s %s" % (
                 hostcolor(host, stat, False),
                 colorize('ok', stat['ok'], None),
                 colorize('changed', stat['changed'], None),
