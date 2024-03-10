@@ -343,8 +343,8 @@ class XCCRedfishUtils(RedfishUtils):
             return response
         data = response['data']
         virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
+        for member in data['Members']:
+            virt_media_list.append(member['@odata.id'])
         resources, headers = self._read_virt_media_resources(virt_media_list)
 
         # find the VirtualMedia resource to eject
@@ -417,8 +417,8 @@ class XCCRedfishUtils(RedfishUtils):
             return response
         data = response['data']
         virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
+        for member in data['Members']:
+            virt_media_list.append(member['@odata.id'])
         resources, headers = self._read_virt_media_resources(virt_media_list)
 
         # eject all inserted media one by one
@@ -472,8 +472,8 @@ class XCCRedfishUtils(RedfishUtils):
             return response
         data = response['data']
         virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
+        for member in data['Members']:
+            virt_media_list.append(member['@odata.id'])
         resources, headers = self._read_virt_media_resources(virt_media_list)
 
         # see if image already inserted; if so, nothing to do

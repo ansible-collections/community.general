@@ -135,7 +135,7 @@ class CallbackModule(CallbackBase):
                                 headers=headers)
             return response.read()
         except Exception as e:
-            self._display.warning(u'Could not submit message to Slack: %s' %
+            self._display.warning('Could not submit message to Slack: %s' %
                                   to_text(e))
 
     def v2_playbook_on_start(self, playbook):

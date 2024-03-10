@@ -15,7 +15,7 @@ def pass_function(*args, **kwargs):
     pass
 
 
-GITHUB_DATA = {"url": u'https://api.github.com/repos/ansible/ansible',
+GITHUB_DATA = {"url": 'https://api.github.com/repos/ansible/ansible',
                "response": b"""
 {
   "id": 3638964,

@@ -381,13 +381,13 @@ def response_to_hash(module, response):
         This is for doing comparisons with Ansible's current parameters.
     """
     return {
-        u'id': response.get(u'id'),
-        u'name': response.get(u'name'),
-        u'cidr': response.get(u'cidr'),
-        u'status': response.get(u'status'),
-        u'routes': VpcRoutesArray(
-            response.get(u'routes', []), module).from_response(),
-        u'enable_shared_snat': response.get(u'enable_shared_snat')
+        'id': response.get('id'),
+        'name': response.get('name'),
+        'cidr': response.get('cidr'),
+        'status': response.get('status'),
+        'routes': VpcRoutesArray(
+            response.get('routes', []), module).from_response(),
+        'enable_shared_snat': response.get('enable_shared_snat')
     }
 
 
@@ -485,14 +485,14 @@ class VpcRoutesArray(object):
 
     def _request_for_item(self, item):
         return {
-            u'destination': item.get('destination'),
-            u'nexthop': item.get('next_hop')
+            'destination': item.get('destination'),
+            'nexthop': item.get('next_hop')
         }
 
     def _response_from_item(self, item):
         return {
-            u'destination': item.get(u'destination'),
-            u'next_hop': item.get(u'nexthop')
+            'destination': item.get('destination'),
+            'next_hop': item.get('nexthop')
         }
 
 

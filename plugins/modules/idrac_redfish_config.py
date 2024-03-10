@@ -203,14 +203,14 @@ class IdracRedfishUtils(RedfishUtils):
 
         for attr_name, attr_value in attributes.items():
             # Check if attribute exists
-            if attr_name not in data[u'Attributes']:
+            if attr_name not in data['Attributes']:
                 # Skip and proceed to next attribute if this isn't valid
                 attrs_bad.update({attr_name: attr_value})
                 continue
 
             # Find out if value is already set to what we want. If yes, exclude
             # those attributes
-            if data[u'Attributes'][attr_name] == attr_value:
+            if data['Attributes'][attr_name] == attr_value:
                 attrs_skipped.update({attr_name: attr_value})
             else:
                 attrs_to_patch.update({attr_name: attr_value})

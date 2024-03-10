@@ -485,12 +485,12 @@ class CallbackModule(CallbackModule_default):
             self._display.display(
                 u"%s : %s %s %s %s %s %s" % (
                     hostcolor(h, t),
-                    colorize(u'ok', t['ok'], C.COLOR_OK),
-                    colorize(u'changed', t['changed'], C.COLOR_CHANGED),
-                    colorize(u'unreachable', t['unreachable'], C.COLOR_UNREACHABLE),
-                    colorize(u'failed', t['failures'], C.COLOR_ERROR),
-                    colorize(u'rescued', t['rescued'], C.COLOR_OK),
-                    colorize(u'ignored', t['ignored'], C.COLOR_WARN),
+                    colorize('ok', t['ok'], C.COLOR_OK),
+                    colorize('changed', t['changed'], C.COLOR_CHANGED),
+                    colorize('unreachable', t['unreachable'], C.COLOR_UNREACHABLE),
+                    colorize('failed', t['failures'], C.COLOR_ERROR),
+                    colorize('rescued', t['rescued'], C.COLOR_OK),
+                    colorize('ignored', t['ignored'], C.COLOR_WARN),
                 ),
                 screen_only=True
             )

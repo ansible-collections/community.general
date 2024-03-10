@@ -145,8 +145,8 @@ class IdracRedfishUtils(RedfishUtils):
         # Manager attributes are supported as part of iDRAC OEM extension
         # Attributes are supported only on iDRAC9
         try:
-            for members in data[u'Links'][u'Oem'][u'Dell'][u'DellAttributes']:
-                attributes_uri = members[u'@odata.id']
+            for members in data['Links']['Oem']['Dell']['DellAttributes']:
+                attributes_uri = members['@odata.id']
 
                 response = self.get_request(self.root_uri + attributes_uri)
                 if response['ret'] is False:

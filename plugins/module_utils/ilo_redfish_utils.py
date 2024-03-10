@@ -33,9 +33,9 @@ class iLORedfishUtils(RedfishUtils):
             if data["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"]:
                 current_session = data["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"]
 
-        for sessions in data[u'Members']:
+        for sessions in data['Members']:
             # session_list[] are URIs
-            session_list.append(sessions[u'@odata.id'])
+            session_list.append(sessions['@odata.id'])
         # for each session, get details
         for uri in session_list:
             session = {}

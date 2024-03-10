@@ -323,13 +323,13 @@ def response_to_hash(module, response):
        This is for doing comparisons with Ansible's current parameters.
     """
     return {
-        u'create_time': response.get(u'create_time'),
-        u'display_name': response.get(u'display_name'),
-        u'name': response.get(u'name'),
-        u'push_policy': _push_policy_convert_from_response(
+        'create_time': response.get('create_time'),
+        'display_name': response.get('display_name'),
+        'name': response.get('name'),
+        'push_policy': _push_policy_convert_from_response(
             response.get('push_policy')),
-        u'topic_urn': response.get(u'topic_urn'),
-        u'update_time': response.get(u'update_time')
+        'topic_urn': response.get('topic_urn'),
+        'update_time': response.get('update_time')
     }
 
 

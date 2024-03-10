@@ -92,7 +92,7 @@ class TestCirconusAnnotation(ModuleTestCase):
                 '_last_modified': 1502236928,
                 '_last_modified_by': '/user/1000',
                 # use res['annotation']['category'].encode('latin1').decode('utf8')
-                'category': u'new cat\xc3\xa9gor\xc3\xbf',
+                'category': 'new cat\xc3\xa9gor\xc3\xbf',
                 'description': 'test description',
                 'rel_metrics': [],
                 'start': 1502236927,

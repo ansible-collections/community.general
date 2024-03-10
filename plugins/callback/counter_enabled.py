@@ -93,23 +93,23 @@ class CallbackModule(CallbackBase):
 
             self._display.display(u"%s : %s %s %s %s %s %s" % (
                 hostcolor(host, stat),
-                colorize(u'ok', stat['ok'], C.COLOR_OK),
-                colorize(u'changed', stat['changed'], C.COLOR_CHANGED),
-                colorize(u'unreachable', stat['unreachable'], C.COLOR_UNREACHABLE),
-                colorize(u'failed', stat['failures'], C.COLOR_ERROR),
-                colorize(u'rescued', stat['rescued'], C.COLOR_OK),
-                colorize(u'ignored', stat['ignored'], C.COLOR_WARN)),
+                colorize('ok', stat['ok'], C.COLOR_OK),
+                colorize('changed', stat['changed'], C.COLOR_CHANGED),
+                colorize('unreachable', stat['unreachable'], C.COLOR_UNREACHABLE),
+                colorize('failed', stat['failures'], C.COLOR_ERROR),
+                colorize('rescued', stat['rescued'], C.COLOR_OK),
+                colorize('ignored', stat['ignored'], C.COLOR_WARN)),
                 screen_only=True
             )
 
             self._display.display(u"%s : %s %s %s %s %s %s" % (
                 hostcolor(host, stat, False),
-                colorize(u'ok', stat['ok'], None),
-                colorize(u'changed', stat['changed'], None),
-                colorize(u'unreachable', stat['unreachable'], None),
-                colorize(u'failed', stat['failures'], None),
-                colorize(u'rescued', stat['rescued'], None),
-                colorize(u'ignored', stat['ignored'], None)),
+                colorize('ok', stat['ok'], None),
+                colorize('changed', stat['changed'], None),
+                colorize('unreachable', stat['unreachable'], None),
+                colorize('failed', stat['failures'], None),
+                colorize('rescued', stat['rescued'], None),
+                colorize('ignored', stat['ignored'], None)),
                 log_only=True
             )
 

@@ -54,7 +54,7 @@ def mapping_profile(string):
             if in_table_c12(c):
                 # map non-ASCII space characters
                 # (that can be mapped) to Unicode space
-                tmp.append(u' ')
+                tmp.append(' ')
             else:
                 tmp.append(c)
 
@@ -169,7 +169,7 @@ def saslprep(string):
     # "This profile specifies using Unicode normalization form KC."
     string = normalize('NFKC', string)
     if not string:
-        return u''
+        return ''
 
     # RFC4013: 2.3. Prohibited Output.
     # RFC4013: 2.4. Bidirectional Characters.

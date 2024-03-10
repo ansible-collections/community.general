@@ -131,7 +131,7 @@ class PlainTextSocketAppender(object):
         # Error message displayed when an incorrect Token has been detected
         self.INVALID_TOKEN = "\n\nIt appears the LOGENTRIES_TOKEN parameter you entered is incorrect!\n\n"
         # Unicode Line separator character   \u2028
-        self.LINE_SEP = u'\u2028'
+        self.LINE_SEP = '\u2028'
 
         self._display = display
         self._conn = None
@@ -171,7 +171,7 @@ class PlainTextSocketAppender(object):
         # Replace newlines with Unicode line separator
         # for multi-line events
         data = to_text(data, errors='surrogate_or_strict')
-        multiline = data.replace(u'\n', self.LINE_SEP)
+        multiline = data.replace('\n', self.LINE_SEP)
         multiline += u"\n"
         # Send data, reconnect if needed
         while True:
