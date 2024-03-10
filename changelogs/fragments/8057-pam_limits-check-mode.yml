@@ -1,0 +1,2 @@
+bugfixes:
+  - "pam_limits - when the file does not exist, do not create it in check mode (https://github.com/ansible-collections/community.general/issues/8050, https://github.com/ansible-collections/community.general/pull/8057)."
