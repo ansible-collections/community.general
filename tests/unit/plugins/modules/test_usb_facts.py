@@ -88,7 +88,7 @@ class TestUsbFacts(unittest.TestCase):
                     set_module_args({})
                     usb_facts.main()
                 for output_field in self.output_fields:
-                    self.assertEqual(result.exception.args[0]["ansible_facts"]["devices"][0][output_field], data[output_field])
+                    self.assertEqual(result.exception.args[0]["ansible_facts"]["usb_devices"][0][output_field], data[output_field])
 
     def test_parsing_multiple_lines(self):
         input = ""
@@ -101,5 +101,5 @@ class TestUsbFacts(unittest.TestCase):
                 usb_facts.main()
             for index in range(0, len(self.testing_data)):
                 for output_field in self.output_fields:
-                    self.assertEqual(result.exception.args[0]["ansible_facts"]["devices"][index][output_field],
+                    self.assertEqual(result.exception.args[0]["ansible_facts"]["usb_devices"][index][output_field],
                                      self.testing_data[index][output_field])

@@ -36,7 +36,7 @@ ansible_facts:
   returned: always
   type: complex
   contains:
-    devices:
+    usb_devices:
       description: A list of usb devices available
       returned: always
       type: list
@@ -64,14 +64,13 @@ ansible_facts:
 '''
 
 import re
-# Import module snippets.
 from ansible.module_utils.basic import AnsibleModule
 
 
 def parse_lsusb(module, lsusb_path):
     rc, stdout, stderr = module.run_command(lsusb_path, check_rc=True)
     regex = re.compile(r'^Bus (\d{3}) Device (\d{3}): ID ([0-9a-f]{4}:[0-9a-f]{4}) (.*)$')
-    devices = []
+    usb_devices = []
     for line in stdout.splitlines():
         match = re.match(regex, line)
         if not match:
@@ -82,11 +81,11 @@ def parse_lsusb(module, lsusb_path):
             'id': match.group(3),
             'name': match.group(4)
         }
-        devices.append(current_device)
+        usb_devices.append(current_device)
     return_value = {
-        "devices": devices
+        "usb_devices": usb_devices
     }
-    module.exit_json(msg="parsed %s usb devices" % (len(devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
+    module.exit_json(msg="parsed %s usb devices" % (len(usb_devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
 
 
 def main():
@@ -96,7 +95,7 @@ def main():
     )
 
     # Set LANG env since we parse stdout
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
 
     lsusb_path = module.get_bin_path('lsusb', required=True)
     parse_lsusb(module, lsusb_path)
