@@ -45,6 +45,7 @@ attributes:
     support: full
   diff_mode:
     support: full
+    version_added: 8.5.0
 options:
   state:
     required: false
