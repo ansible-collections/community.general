@@ -21,6 +21,7 @@ author:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.attributes.facts
+  - community.general.attributes.facts_module
 requirements:
   - lsusb binary on PATH (usually installed through the package usbutils and preinstalled on many systems)
 '''
@@ -28,6 +29,11 @@ requirements:
 EXAMPLES = '''
 - name: Get information about USB devices
   community.general.usb_facts:
+
+- name: Print information about USB devices
+  ansible.builtin.debug:
+    msg: "On bus {{ item.bus }} device {{ item.device }} with id {{ item.id }} is {{ item.name }}"
+  loop: "{{ ansible_facts.usb_devices }}"
 '''
 
 RETURN = r'''
