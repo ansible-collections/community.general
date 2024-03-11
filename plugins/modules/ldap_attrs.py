@@ -235,7 +235,7 @@ class LdapAttrs(LdapGeneric):
 
     def add(self):
         modlist = []
-        new_diff = {}
+        new_attrs = {}
         for name, values in self.module.params['attributes'].items():
             norm_values = self._normalize_values(values)
             added_values = []
@@ -244,13 +244,13 @@ class LdapAttrs(LdapGeneric):
                     modlist.append((ldap.MOD_ADD, name, value))
                     added_values.append(value)
             if added_values:
-                new_diff[name] = norm_values
-        return modlist, {}, new_diff
+                new_attrs[name] = norm_values
+        return modlist, {}, new_attrs
 
     def delete(self):
         modlist = []
-        old_diff = {}
-        new_diff = {}
+        old_attrs = {}
+        new_attrs = {}
         for name, values in self.module.params['attributes'].items():
             norm_values = self._normalize_values(values)
             removed_values = []
@@ -259,14 +259,14 @@ class LdapAttrs(LdapGeneric):
                     removed_values.append(value)
                     modlist.append((ldap.MOD_DELETE, name, value))
             if removed_values:
-                old_diff[name] = norm_values
-                new_diff[name] = [value for value in norm_values if value not in removed_values]
-        return modlist, old_diff, new_diff
+                old_attrs[name] = norm_values
+                new_attrs[name] = [value for value in norm_values if value not in removed_values]
+        return modlist, old_attrs, new_attrs
 
     def exact(self):
         modlist = []
-        old_diff = {}
-        new_diff = {}
+        old_attrs = {}
+        new_attrs = {}
         for name, values in self.module.params['attributes'].items():
             norm_values = self._normalize_values(values)
             try:
@@ -284,13 +284,13 @@ class LdapAttrs(LdapGeneric):
                     modlist.append((ldap.MOD_DELETE, name, None))
                 else:
                     modlist.append((ldap.MOD_REPLACE, name, norm_values))
-                old_diff[name] = current
-                new_diff[name] = norm_values
+                old_attrs[name] = current
+                new_attrs[name] = norm_values
                 if len(current) == 1 and len(norm_values) == 1:
-                    old_diff[name] = current[0]
-                    new_diff[name] = norm_values[0]
+                    old_attrs[name] = current[0]
+                    new_attrs[name] = norm_values[0]
 
-        return modlist, old_diff, new_diff
+        return modlist, old_attrs, new_attrs
 
     def _is_value_present(self, name, value):
         """ True if the target attribute has the given value. """
@@ -326,18 +326,18 @@ def main():
 
     # Instantiate the LdapAttr object
     ldap = LdapAttrs(module)
-    old = None
-    new = None
+    old_attrs = None
+    new_attrs = None
 
     state = module.params['state']
 
     # Perform action
     if state == 'present':
-        modlist, old, new = ldap.add()
+        modlist, old_attrs, new_attrs = ldap.add()
     elif state == 'absent':
-        modlist, old, new = ldap.delete()
+        modlist, old_attrs, new_attrs = ldap.delete()
     elif state == 'exact':
-        modlist, old, new = ldap.exact()
+        modlist, old_attrs, new_attrs = ldap.exact()
 
     changed = False
 
@@ -350,7 +350,7 @@ def main():
             except Exception as e:
                 module.fail_json(msg="Attribute action failed.", details=to_native(e))
 
-    module.exit_json(changed=changed, modlist=modlist, diff={"before": old, "after": new})
+    module.exit_json(changed=changed, modlist=modlist, diff={"before": old_attrs, "after": new_attrs})
 
 
 if __name__ == '__main__':
