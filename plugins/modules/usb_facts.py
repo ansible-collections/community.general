@@ -23,11 +23,6 @@ extends_documentation_fragment:
   - community.general.attributes.facts
 requirements:
   - lsusb binary on PATH (usually installed through the package usbutils and preinstalled on many systems)
-attributes:
-  check_mode:
-    support: full
-  diff_mode:
-    support: none
 '''
 
 EXAMPLES = '''
