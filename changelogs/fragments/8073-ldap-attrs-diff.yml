@@ -1,0 +1,2 @@
+minor_changes:
+  - ldap_attrs - Module now supports diff mode, showing which attributes are changed within an operation
