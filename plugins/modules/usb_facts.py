@@ -13,9 +13,9 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: usb_facts
-short_description: Allows listing information about usb devices
+short_description: Allows listing information about USB devices
 description:
-  - Allows retrieving information about available usb devices through lsusb
+  - Allows retrieving information about available USB devices through C(lsusb).
 author:
   - Max Maxopoly (@maxopoly)
 extends_documentation_fragment:
@@ -28,7 +28,6 @@ requirements:
 EXAMPLES = '''
 - name: Get information about USB devices
   community.general.usb_facts:
-  register: usb_facts
 '''
 
 RETURN = r'''
