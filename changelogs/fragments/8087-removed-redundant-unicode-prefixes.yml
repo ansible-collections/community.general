@@ -1,0 +1,2 @@
+minor_changes:
+  - "revbitspss - Removed a redundant unicode prefix in the revbitspss.py lookup plugin. The prefix was not necessary for Python 3 and has been cleaned up to streamline the code. (https://github.com/ansible-collections/community.general/pull/8087)."
