@@ -237,6 +237,12 @@ class ConsulTokenModule(_ConsulModule):
 
     create_only_fields = {"expiration_ttl"}
 
+    def read_object(self):
+        # if `accessor_id` is not supplied we can only create objects and are not idempotent
+        if not self.params.get(self.unique_identifier):
+            return
+        return super(ConsulTokenModule, self).read_object()
+
     def needs_update(self, api_obj, module_obj):
         # SecretID is usually not supplied
         if "SecretID" not in module_obj and "SecretID" in api_obj:
