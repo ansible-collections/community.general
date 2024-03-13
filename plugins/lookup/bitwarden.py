@@ -50,7 +50,7 @@ DOCUMENTATION = """
           - The value of this option is passed to 'bw generate', set to '' to use defaults.
           - This option is mutually exclusive with O(set).
           - Only V(username), V(password) and V(uris) can be set as defined fields.
-            For any other field-name, a custom-field of that name will be created.
+            For any other field name, a custom field of that name will be created.
         type: str
         version_added: 8.5.0
       set:
