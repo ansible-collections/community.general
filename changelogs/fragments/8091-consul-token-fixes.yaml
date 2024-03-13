@@ -1,2 +1,2 @@
 bugfixes:
-  - "consul_token - Fix token creation without accessor_id (https://github.com/ansible-collections/community.general/pull/8091)"
+  - "consul_token - fix token creation without ``accessor_id`` (https://github.com/ansible-collections/community.general/pull/8091)."
