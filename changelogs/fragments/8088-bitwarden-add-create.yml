@@ -1,2 +1,2 @@
 minor_changes:
-  - bitwarden - Add support to create passwords.
+  - bitwarden lookup plugin - add support to create passwords (https://github.com/ansible-collections/community.general/pull/8088).
