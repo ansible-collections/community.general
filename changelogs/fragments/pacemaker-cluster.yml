@@ -1,0 +1,3 @@
+bugfixes:
+  - "pacemaker_cluster - actually implement check mode, which the module claims to support. This means that until now the module
+     also did changes in check mode (https://github.com/ansible-collections/community.general/pull/8081)."
