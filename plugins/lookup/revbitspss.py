@@ -100,7 +100,7 @@ class LookupModule(LookupBase):
         result = []
         for term in terms:
             try:
-                display.vvv(u"Secret Server lookup of Secret with ID %s" % term)
+                display.vvv("Secret Server lookup of Secret with ID %s" % term)
                 result.append({term: secret_server.get_pam_secret(term)})
             except Exception as error:
                 raise AnsibleError("Secret Server lookup failure: %s" % error.message)
