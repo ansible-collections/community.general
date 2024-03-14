@@ -96,6 +96,7 @@ from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable):
@@ -233,15 +234,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         """Convert Icinga2 API data to JSON format for Ansible"""
         groups_dict = {"_meta": {"hostvars": {}}}
         for entry in json_data:
-            host_attrs = entry['attrs']
+            host_attrs = make_unsafe(entry['attrs'])
             if self.inventory_attr == "name":
-                host_name = entry.get('name')
+                host_name = make_unsafe(entry.get('name'))
             if self.inventory_attr == "address":
                 # When looking for address for inventory, if missing fallback to object name
                 if host_attrs.get('address', '') != '':
-                    host_name = host_attrs.get('address')
+                    host_name = make_unsafe(host_attrs.get('address'))
                 else:
-                    host_name = entry.get('name')
+                    host_name = make_unsafe(entry.get('name'))
             if self.inventory_attr == "display_name":
                 host_name = host_attrs.get('display_name')
             if host_attrs['state'] == 0:
@@ -257,7 +258,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             # If the address attribute is populated, override ansible_host with the value
             if host_attrs.get('address') != '':
                 self.inventory.set_variable(host_name, 'ansible_host', host_attrs.get('address'))
-            self.inventory.set_variable(host_name, 'hostname', entry.get('name'))
+            self.inventory.set_variable(host_name, 'hostname', make_unsafe(entry.get('name')))
             self.inventory.set_variable(host_name, 'display_name', host_attrs.get('display_name'))
             self.inventory.set_variable(host_name, 'state',
                                         host_attrs['state'])
