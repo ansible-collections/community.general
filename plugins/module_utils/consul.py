@@ -277,7 +277,7 @@ class _ConsulModule:
             headers["X-Consul-Token"] = token
 
         try:
-            if data:
+            if data is not None:
                 data = json.dumps(data)
                 headers["Content-Type"] = "application/json"
             if params:
