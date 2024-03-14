@@ -14,6 +14,17 @@
     - foo-access
     - foo-access2
 
+- name: Create token without accessor
+  community.general.consul_token:
+    state: present
+  register: simple_create_result
+
+- assert:
+    that:
+      - simple_create_result is changed
+      - simple_create_result.token.AccessorID
+      - simple_create_result.operation == 'create'
+
 - name: Create token
   community.general.consul_token:
     state: present
