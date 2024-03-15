@@ -65,21 +65,6 @@
       - result.check.Type == 'http'
       - result.check.Notes == 'New Nginx Check'
 
-#- name: Update check for service not changed when updating again without changes
-#  community.general.consul_agent_check:
-#    name: "{{ nginx_service_check.Name }}"
-#    id: "{{ nginx_service_check.CheckID }}"
-#    interval: 60s
-#    http: https://local-host.de/morestatus
-#    notes: "New Nginx Check"
-#    service_id: "{{ nginx_service.ID }}"
-#  register: result
-#
-#- assert:
-#    that:
-#      - result is not changed
-#      - result.operation is not defined
-
 - name: Remove check
   community.general.consul_agent_check:
     id: "{{ nginx_service_check.Name }}"
