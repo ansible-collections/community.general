@@ -183,7 +183,7 @@ class ConsulAgentCheckModule(_ConsulModule):
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:
-            return 'agent/checks'
+            return "agent/checks"
         if operation in [OPERATION_CREATE, OPERATION_UPDATE]:
             return "/".join([self.api_endpoint, "register"])
         if operation == OPERATION_DELETE:
