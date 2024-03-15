@@ -17,11 +17,6 @@ description:
  - Allows the addition, modification and deletion of services in a consul
    cluster via the agent. For more details on using and configuring Checks,
    see U(https://developer.hashicorp.com/consul/api-docs/agent/service).
- - "Checks may also be registered per node e.g. disk usage, or cpu usage and
-   notify the health of the entire node to the cluster.
-   Service level checks do not require a check name or id as these are derived
-   by Consul from the Service name and id respectively by appending 'service:'
-   Node level checks require a O(checks[].name) and optionally a O(checks[].check_id)."
  - Currently, there is no complete way to retrieve the script, interval or TTL
    metadata for a registered check. Without this metadata it is not possible to
    tell if the data supplied with ansible represents a change to a check. As a
@@ -75,82 +70,36 @@ options:
   meta:
     description:
       - Optional meta data used for filtering.
-        For key are the characters "A-Z, a-z, 0-9, _, -" allowed
-             Not allowed characters are replaced with underscores
+        For keys, the characters C(A-Z), C(a-z), C(0-9), C(_), C(-) are allowed.
+        Not allowed characters are replaced with underscores.
     type: dict
   service_port:
     description:
       - The port on which the service is listening. Can optionally be supplied for
         registration of a service, that is if O(name) or O(id) is set.
     type: int
-  checks:
+  enable_tag_override:
     description:
-      - Checks to
-    type: list
-    elements: dict
+      - Specifies to disable the anti-entropy feature for this service's tags.
+        If EnableTagOverride is set to true then external agents can update this service in the catalog and modify the tags.
+    type: bool
+    default: False
+  weights:
+    description:
+      - Specifies weights for the service
+    type: dict
     suboptions:
-      name:
+      passing:
         description:
-        - Required name for the service check.
-        type: str
-      check_id:
+        - Weights for passing.
+        type: int
+        default: 1
+      warning:
         description:
-          - An unique ID for the service check.
-        type: str
-      interval:
-        description:
-          - The interval at which the service check will be run.
-            This is a number with a V(s) or V(m) suffix to signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-          - Required if one of the parameters O(checks[].args), O(checks[].http), or O(checks[].tcp) is specified.
-        type: str
-      notes:
-        description:
-          - Notes to attach to check when registering it.
-        type: str
-      args:
-        description:
-          - Specifies command arguments to run to update the status of the check.
-          - Requires O(checks[].interval) to be provided.
-          - Mutually exclusive with O(checks[].ttl), O(checks[].tcp) and O(checks[].http).
-          - "There is an issue with args. It throws an 'Invalid check: TTL must be > 0 for TTL checks'"
-          - See U(https://github.com/hashicorp/consul/issues/6923#issuecomment-564476529) for more details
-        type: list
-        elements: str
-      ttl:
-        description:
-          - Checks can be registered with a TTL instead of a O(checks[].args) and O(checks[].interval)
-            this means that the service will check in with the agent before the
-            TTL expires. If it doesn't the check will be considered failed.
-            Required if registering a check and the script an interval are missing
-            Similar to the interval this is a number with a V(s) or V(m) suffix to
-            signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-          - Mutually exclusive with O(checks[].args), O(checks[].tcp) and O(checks[].http).
-        type: str
-      tcp:
-        description:
-          - Checks can be registered with a TCP port. This means that consul
-            will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
-            The format is V(host:port), for example V(localhost:80).
-          - Requires O(checks[].interval) to be provided.
-          - Mutually exclusive with O(checks[].args), O(checks[].ttl) and O(checks[].http).
-        type: str
-        version_added: '1.3.0'
-      http:
-        description:
-          - Checks can be registered with an HTTP endpoint. This means that consul
-            will check that the http endpoint returns a successful HTTP status.
-          - Requires O(checks[].interval) to be provided.
-          - Mutually exclusive with O(checks[].args), O(checks[].ttl) and O(checks[].tcp).
-        type: str
-      timeout:
-        description:
-          - A custom HTTP check timeout. The consul default is 10 seconds.
-            Similar to the interval this is a number with a V(s) or V(m) suffix to
-            signify the units of seconds or minutes, for example V(15s) or V(1m).
-            If no suffix is supplied V(s) will be used by default, for example V(10) will be V(10s).
-        type: str
+          - Weights for warning.
+        type: int
+        default: 1
+    default: {"passing": 1, "warning": 1}
 '''
 
 EXAMPLES = '''
@@ -167,10 +116,6 @@ EXAMPLES = '''
     token: some_management_acl
     name: nginx
     service_port: 80
-    checks:
-      - name: nginx-check2
-        interval: 60s
-        tcp: localhost:80
 
 - name: Register nginx with an http check
   community.general.consul_agent_service:
@@ -178,10 +123,6 @@ EXAMPLES = '''
     token: some_management_acl
     name: nginx
     service_port: 80
-    checks:
-      - name: nginx-check2
-        interval: 60s
-        http: http://localhost:80/status
 
 - name: Register external service nginx available at 10.1.5.23
   community.general.consul_agent_service:
@@ -279,23 +220,11 @@ _ARGUMENT_SPEC = {
     "address": dict(type='str'),
     "meta": dict(type='dict'),
     "service_port": dict(type='int'),
-    "checks": dict(
-        type='list',
-        elements='dict',
-        options=dict(
-            name=dict(type='str'),
-            check_id=dict(type='str'),
-            interval=dict(type='str'),
-            notes=dict(type='str'),
-            args=dict(type='list', elements='str'),
-            http=dict(type='str'),
-            tcp=dict(type='str'),
-            ttl=dict(type='str'),
-            timeout=dict(type='str'),
-        ),
-        mutually_exclusive=_CHECK_MUTUALLY_EXCLUSIVE,
-        required_by=_CHECK_REQUIRED_BY
-    ),
+    "enable_tag_override": dict(type='bool', default=False),
+    "weights": dict(type='dict', options=dict(
+        passing=dict(type='int', default=1, no_log=False),
+        warning=dict(type='int', default=1)
+    ), default={"passing": 1, "warning": 1})
 }
 
 _REQUIRED_IF = [
@@ -325,11 +254,27 @@ class ConsulAgentServiceModule(_ConsulModule):
         if "ServicePort" in existing:
             existing["Port"] = existing.pop("ServicePort")
 
+        if "ID" not in existing:
+            existing["ID"] = existing["Name"]
+
         if "Checks" in existing:
             for check in existing["Checks"]:
                 validate_check(check)
 
         return existing
+
+    def needs_update(self, api_obj, module_obj):
+        obj = {}
+        if "Service" in api_obj:
+            obj["Service"] = api_obj["Service"]
+        api_obj = self.prepare_object(api_obj, obj)
+
+        if "Name" in module_obj:
+            module_obj["Service"] = module_obj.pop("Name")
+        if "ServicePort" in module_obj:
+            module_obj["Port"] = module_obj.pop("ServicePort")
+
+        return super(ConsulAgentServiceModule, self).needs_update(api_obj, module_obj)
 
     def delete_object(self, obj):
         if not self._module.check_mode:

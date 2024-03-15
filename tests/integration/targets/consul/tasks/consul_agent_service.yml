@@ -12,10 +12,6 @@
       - http
     meta:
       nginx_version: 1.25.3
-    checks:
-      - interval: 60s
-        notes: "My Note"
-        http: http://localhost:80/morestatus
   register: result
 
 - set_fact:
@@ -45,12 +41,6 @@
     meta:
       nginx_version: 1.0.0
       nginx: 1.25.3
-    checks:
-      - name: nginx-check2
-        check_id: nginx-check2
-        interval: 30s
-        notes: "New Note"
-        http: http://127.0.0.1:80/
   register: result
 - assert:
     that:
@@ -67,30 +57,24 @@
       - result.service.Meta.nginx == '1.25.3'
       - result.service.ContentHash is defined
 
-#- name: Update service not changed when updating again without changes
-#  community.general.consul_agent_service:
-#    id: "{{ nginx_service.ID }}"
-#    name: "{{ nginx_service.Service }}"
-#    service_port: 8080
-#    address: 127.0.0.1
-#    tags:
-#      - http
-#      - new_tag
-#    meta:
-#      nginx_version: 1.0.0
-#      nginx: 1.25.3
-#    checks:
-#      - name: nginx-check2
-#        check_id: nginx-check2
-#        interval: 30s
-#        notes: "New Note"
-#        http: http://127.0.0.1:80/
-#  register: result
-#
-#- assert:
-#    that:
-#      - result is not changed
-#      - result.operation is not defined
+- name: Update service not changed when updating again without changes
+  community.general.consul_agent_service:
+    id: "{{ nginx_service.ID }}"
+    name: "{{ nginx_service.Service }}"
+    service_port: 8080
+    address: 127.0.0.1
+    tags:
+      - http
+      - new_tag
+    meta:
+      nginx_version: 1.0.0
+      nginx: 1.25.3
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.operation is not defined
 
 - name: Remove service
   community.general.consul_agent_service:
@@ -103,36 +87,3 @@
       - result is changed
       - result is not failed
       - result.operation == 'remove'
-
-
-- name: Register nginx with a tcp check
-  community.general.consul_agent_service:
-    name: nginx-with-tcp-check
-    service_port: 80
-    checks:
-      - name: nginx-check2
-        interval: 60s
-        tcp: localhost:80
-  register: result
-
-- assert:
-    that:
-      - result is changed
-      - result.service.ID is defined
-      - result.service.Service == 'nginx-with-tcp-check'
-
-- name: Register nginx with an http check
-  community.general.consul_agent_service:
-    name: nginx-with-http
-    service_port: 80
-    checks:
-      - name: nginx-check2
-        interval: 60s
-        http: http://localhost:80/status
-  register: result
-
-- assert:
-    that:
-      - result is changed
-      - result.service.ID is defined
-      - result.service.Service == 'nginx-with-http'
