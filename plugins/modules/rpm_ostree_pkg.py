@@ -40,9 +40,20 @@ options:
       choices: [ 'absent', 'present' ]
       default: 'present'
       type: str
+    apply_live:
+        description:
+        - Apply changes to the live filesystem.
+        type: bool
+        default: false
+    force_replacefiles:
+        description:
+        - Force replace files.
+        type: bool
+        default: false
 author:
     - Dusty Mabe (@dustymabe)
     - Abhijeet Kasurde (@Akasurde)
+    - Sebastian Lübke (@luebke-dev)
 '''
 
 EXAMPLES = r'''
@@ -55,6 +66,19 @@ EXAMPLES = r'''
   community.general.rpm_ostree_pkg:
     name: nfs-utils
     state: absent
+
+- name: Install overlay package and apply changes to the live filesystem
+  community.general.rpm_ostree_pkg:
+    name: nfs-utils
+    state: present
+    apply_live: true
+
+- name: Install overlay package and apply changes to the live filesystem with force replace files
+  community.general.rpm_ostree_pkg:
+    name: nfs-utils
+    state: present
+    apply_live: true
+    force_replacefiles: true
 '''
 
 RETURN = r'''
@@ -126,8 +150,21 @@ class RpmOstreePkg:
             results['action'] = 'uninstall'
             cmd.append('uninstall')
 
+        if self.allow_inactive:
+            cmd.append('--allow-inactive')
+        
+        if self.idempotent:
+            cmd.append('--idempotent')
+
+        if self.apply_live:
+            cmd.append('--apply-live')
+
+        if self.force_replacefiles:
+            cmd.append('--force-replacefiles')
+
+
         # Additional parameters
-        cmd.extend(['--allow-inactive', '--idempotent', '--unchanged-exit-77'])
+        cmd.extend(['--unchanged-exit-77'])
         for pkg in self.params['name']:
             cmd.append(pkg)
             results['packages'].append(pkg)
@@ -168,6 +205,22 @@ def main():
                 required=True,
                 type='list',
                 elements='str',
+            ),
+            allow_inactive=dict(
+                type='bool',
+                default=True,
+            ),
+            indepotent=dict(
+                type='bool',
+                default=True,
+            ),
+            apply_live=dict(
+                type='bool',
+                default=False,
+            ),
+            force_replacefiles=dict(
+                type='bool',
+                default=False,
             ),
         ),
     )
