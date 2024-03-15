@@ -3,6 +3,7 @@
 # Copyright (c) 2018, Dusty Mabe <dusty@dustymabe.com>
 # Copyright (c) 2018, Ansible Project
 # Copyright (c) 2021, Abhijeet Kasurde <akasurde@redhat.com>
+# Copyright (c) 2024, Sebastian Lübke <sebastian@luebke.dev>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -40,16 +41,26 @@ options:
       choices: [ 'absent', 'present' ]
       default: 'present'
       type: str
+    allow_inactive:
+      description:
+        - Allow inactive packages.
+      type: bool
+      default: true
+    idempotent:
+      description:
+        - Idempotent operation.
+      type: bool
+      default: true
     apply_live:
-        description:
+      description:
         - Apply changes to the live filesystem.
-        type: bool
-        default: false
+      type: bool
+      default: false
     force_replacefiles:
-        description:
+      description:
         - Force replace files.
-        type: bool
-        default: false
+      type: bool
+      default: false
 author:
     - Dusty Mabe (@dustymabe)
     - Abhijeet Kasurde (@Akasurde)
