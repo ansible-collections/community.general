@@ -8,7 +8,9 @@
 - name: Test-section_name_spaces 1 (does legacy workaround still work) - create test file
   ansible.builtin.copy:  # noqa risky-file-permissions
     dest: "{{ output_file }}"
-    content: "[ foo ]\n; bar=baz\n"
+    content: |
+      [ foo ]
+      ; bar=baz
 
 - name: Test-section_name_spaces 1 - update with optional spaces specified
   community.general.ini_file:  # noqa risky-file-permissions
@@ -26,7 +28,9 @@
 - name: Test-section_name_spaces 1 - verify results
   vars:
     actual_content: "{{ output_content.content | b64decode }}"
-    expected_content: "[ foo ]\nbar = frelt\n"
+    expected_content: |
+      [ foo ]
+      bar = frelt
   ansible.builtin.assert:
     that:
       - actual_content == expected_content
@@ -37,7 +41,9 @@
 - name: Test-section_name_spaces 2 (optional spaces omitted) - create test file
   ansible.builtin.copy:  # noqa risky-file-permissions
     dest: "{{ output_file }}"
-    content: "[ foo ]\nbar=baz\n"
+    content: |
+      [ foo ]
+      bar=baz"
 
 - name: Test-section_name_spaces 2 - update without optional spaces
   community.general.ini_file:  # noqa risky-file-permissions
@@ -67,7 +73,9 @@
 - name: Test-section_name_spaces 3 (legacy workaround when not required) - create test file
   ansible.builtin.copy:  # noqa risky-file-permissions
     dest: "{{ output_file }}"
-    content: "[foo]\n; bar=baz\n"
+    content: |
+      [foo]
+      ; bar=baz
 
 - name: Test-section_name_spaces 3 - update with optional spaces specified
   community.general.ini_file:  # noqa risky-file-permissions
@@ -85,7 +93,9 @@
 - name: Test-section_name_spaces 3 - verify results
   vars:
     actual_content: "{{ output_content.content | b64decode }}"
-    expected_content: "[foo]\nbar = frelt\n"
+    expected_content: |
+      [foo]
+      bar = frelt
   ansible.builtin.assert:
     that:
       - actual_content == expected_content
