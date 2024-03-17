@@ -8,6 +8,14 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Help debugging
+  debug:
+    msg: >-
+      distribution={{ ansible_distribution }},
+      distribution major version={{ ansible_distribution_major_version }},
+      os_family={{ ansible_os_family }},
+      Python version={{ ansible_python.version.major }}
+
 - name: test cloud-init
   # TODO: check for a workaround
   # install 'cloud-init'' failed: dpkg-divert: error: `diversion of /etc/init/ureadahead.conf
@@ -15,10 +23,11 @@
   # /etc/init/ureadahead.conf to /etc/init/ureadahead.conf.distrib
   # https://bugs.launchpad.net/ubuntu/+source/ureadahead/+bug/997838
   # Will also have to skip on OpenSUSE when running on Python 2 on newer Leap versions
-  # (!= 42 and >= 15) ascloud-init will install the Python 3 package, breaking our build on py2.
+  # (!= 42 and >= 15) as cloud-init will install the Python 3 package, breaking our build on py2.
   when:
   - not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int == 14)
   - not (ansible_os_family == "Suse" and ansible_distribution_major_version|int != 42 and ansible_python.version.major != 3)
+  - not (ansible_os_family == "Suse" and ansible_distribution_major_version|int == 15)
   - not (ansible_distribution == "CentOS" and ansible_distribution_major_version|int == 8)  # TODO: cannot start service
   - not (ansible_distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
   - not (ansible_distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
