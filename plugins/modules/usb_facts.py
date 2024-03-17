@@ -14,6 +14,7 @@ DOCUMENTATION = '''
 ---
 module: usb_facts
 short_description: Allows listing information about USB devices
+version_added: 8.5.0
 description:
   - Allows retrieving information about available USB devices through C(lsusb).
 author:
@@ -38,14 +39,15 @@ EXAMPLES = '''
 
 RETURN = r'''
 ansible_facts:
-  description: Dictionary containing details of connected usb devices
+  description: Dictionary containing details of connected USB devices.
   returned: always
-  type: complex
+  type: dict
   contains:
     usb_devices:
-      description: A list of usb devices available
+      description: A list of USB devices available.
       returned: always
       type: list
+      elements: dict
       contains:
         bus:
           description: The bus the usb device is connected to.
@@ -53,17 +55,17 @@ ansible_facts:
           type: str
           sample: "001"
         device:
-          description: The device number occupied on the bus
+          description: The device number occupied on the bus.
           returned: always
           type: str
           sample: "002"
         id:
-          description: Id of the usb device
+          description: ID of the USB device.
           returned: always
           type: str
           sample: "1d6b:0002"
         name:
-          description: Human readable name of the device
+          description: Human readable name of the device.
           returned: always
           type: str
           sample: Linux Foundation 2.0 root hub
@@ -91,7 +93,7 @@ def parse_lsusb(module, lsusb_path):
     return_value = {
         "usb_devices": usb_devices
     }
-    module.exit_json(msg="parsed %s usb devices" % (len(usb_devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
+    module.exit_json(msg="parsed %s USB devices" % (len(usb_devices)), stdout=stdout, stderr=stderr, ansible_facts=return_value)
 
 
 def main():
