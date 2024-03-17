@@ -38,8 +38,8 @@ options:
     type: list
     elements: str
     default:
-      - agblksize='4096'
-      - isnapshot='no'
+      - agblksize=4096
+      - isnapshot=no
   auto_mount:
     description:
       - File system is automatically mounted at system restart.
@@ -365,7 +365,53 @@ def create_fs(
         # Creates a LVM file system.
         crfs_cmd = module.get_bin_path('crfs', True)
         if not module.check_mode:
-            cmd = [crfs_cmd, "-v", fs_type, "-m", filesystem, vg, device, mount_group, auto_mount, account_subsystem, "-p", permissions, size, "-a", attributes]
+            cmd = [crfs_cmd]
+
+            cmd.append("-v")
+            cmd.append(fs_type)
+
+            if vg:
+                (flag, value) = vg.split()
+                cmd.append(flag)
+                cmd.append(value)
+
+            if device:
+                (flag, value) = device.split()
+                cmd.append(flag)
+                cmd.append(value)
+
+            cmd.append("-m")
+            cmd.append(filesystem)
+
+            if mount_group:
+                (flag, value) = mount_group.split()
+                cmd.append(flag)
+                cmd.append(value)
+
+            if auto_mount:
+                (flag, value) = auto_mount.split()
+                cmd.append(flag)
+                cmd.append(value)
+
+            if account_subsystem:
+                (flag, value) = account_subsystem.split()
+                cmd.append(flag)
+                cmd.append(value)
+
+            cmd.append("-p")
+            cmd.append(permissions)
+
+            if size:
+                (flag, value) = size.split()
+                cmd.append(flag)
+                cmd.append(value)
+
+            if attributes:
+                splitted_attributes = attributes.split()
+                cmd.append("-a")
+                for value in splitted_attributes:
+                    cmd.append(value)
+
             rc, crfs_out, err = module.run_command(cmd)
 
             if rc == 10:
@@ -461,7 +507,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             account_subsystem=dict(type='bool', default=False),
-            attributes=dict(type='list', elements='str', default=["agblksize='4096'", "isnapshot='no'"]),
+            attributes=dict(type='list', elements='str', default=["agblksize=4096", "isnapshot=no"]),
             auto_mount=dict(type='bool', default=True),
             device=dict(type='str'),
             filesystem=dict(type='str', required=True),
