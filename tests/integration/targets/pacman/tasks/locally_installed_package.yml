@@ -7,11 +7,12 @@
     package_name: ansible-test-foo
     username: ansible-regular-user
   block:
-    - name: Install fakeroot
+    - name: Install dependencies
       pacman:
         state: present
         name:
           - fakeroot
+          - debugedit
 
     - name: Create user
       user:
