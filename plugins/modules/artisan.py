@@ -162,11 +162,7 @@ def has_changed(message):
         'No changes'
     ]
 
-    for info in artisan_messages:
-        if info in message:
-            return False
-
-    return True
+    return all(info not in message for info in artisan_messages)
 
 
 def get_help(module, command):
