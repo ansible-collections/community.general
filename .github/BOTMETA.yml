@@ -1354,6 +1354,8 @@ files:
     maintainers: nate-kingsley
   $modules/urpmi.py:
     maintainers: pmakowski
+  $modules/usb_facts.py:
+    maintainers: maxopoly
   $modules/utm_:
     keywords: sophos utm
     maintainers: $team_e_spirit
