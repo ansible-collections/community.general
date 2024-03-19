@@ -307,11 +307,11 @@ class Bitwarden(object):
                 if generate is not None and not match['login'].get(field):
                     match['login'][field] = self._generate_password(generate)
                     self._edit_record(match['id'], match)
-                    display.v("  generated login.%s=%s" % (field, match['login'][field]))
+                    display.v("  generated login.%s" % field)
                 if set_ is not None and match['login'].get(field) != set_:
                     match['login'][field] = set_
                     self._edit_record(match['id'], match)
-                    display.v("  set login.%s=%s" % (field, match['login'][field]))
+                    display.v("  set login.%s" % field)
             return match['login'][field]
         else:
             for custom_field in match.get('fields', []):
@@ -319,12 +319,12 @@ class Bitwarden(object):
                     if set_ and custom_field['value'] != set_:
                         custom_field['value'] = set_
                         self._edit_record(match['id'], match)
-                        display.v("  set custom-field %s=%s" % (field, set_))
+                        display.v("  edited custom-field %s" % field)
                     return custom_field['value']
             value = self._generate_password(generate) if set_ is None else set_
             match['fields'] = match.get('fields', []) + [{'name': field, 'value': value, 'type': 0}]
             self._edit_record(match['id'], match)
-            display.v("  added custom-field %s=%s" % (field, value))
+            display.v("  added custom-field %s" % field)
             return value
 
 
