@@ -18,6 +18,7 @@ description:
     and optionally private keys to a given java keystore, or remove them from it.
 extends_documentation_fragment:
   - community.general.attributes
+  - ansible.builtin.files
 attributes:
   check_mode:
     support: full
