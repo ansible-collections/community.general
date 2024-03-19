@@ -90,6 +90,18 @@ options:
       - Path to keytool binary if not used we search in PATH for it.
     type: str
     default: keytool
+  owner:
+    description:
+      - Name of the user that should own keystore file.
+    required: false
+  group:
+    description:
+      - Name of the group that should own keystore file.
+    required: false
+  mode:
+    description:
+      - Mode the file should be.
+    required: false
   state:
     description:
       - Defines action which can be either certificate import or removal.
@@ -331,6 +343,12 @@ def build_proxy_options():
     return proxy_opts
 
 
+def _update_permissions(module, keystore_path):
+    """ Updates keystore file attributes as necessary """
+    file_args = module.load_file_common_arguments(module.params, path=keystore_path)
+    return module.set_fs_attributes_if_different(file_args, False)
+
+
 def _download_cert_url(module, executable, url, port):
     """ Fetches the certificate from the remote URL using `keytool -printcert...`
           The PEM formatted string is returned """
@@ -378,6 +396,7 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
 
     diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
     if import_rc == 0 and os.path.exists(keystore_path):
+        _update_permissions(module, keystore_path)
         module.exit_json(changed=True, msg=import_out,
                          rc=import_rc, cmd=import_cmd, stdout=import_out,
                          error=import_err, diff=diff)
@@ -411,6 +430,7 @@ def import_cert_path(module, executable, path, keystore_path, keystore_pass, ali
 
     diff = {'before': '\n', 'after': '%s\n' % alias}
     if import_rc == 0:
+        _update_permissions(module, keystore_path)
         module.exit_json(changed=True, msg=import_out,
                          rc=import_rc, cmd=import_cmd, stdout=import_out,
                          error=import_err, diff=diff)
@@ -485,6 +505,7 @@ def main():
             ['cert_url', 'cert_path', 'pkcs12_path']
         ],
         supports_check_mode=True,
+        add_file_common_args=True,
     )
 
     url = module.params.get('cert_url')
