@@ -91,18 +91,6 @@ options:
       - Path to keytool binary if not used we search in PATH for it.
     type: str
     default: keytool
-  owner:
-    description:
-      - Name of the user that should own keystore file.
-    required: false
-  group:
-    description:
-      - Name of the group that should own keystore file.
-    required: false
-  mode:
-    description:
-      - Mode the file should be.
-    required: false
   state:
     description:
       - Defines action which can be either certificate import or removal.
