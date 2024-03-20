@@ -126,7 +126,6 @@ class _ConsulModule:
     """
 
     api_endpoint = None  # type: str
-    unique_identifier = None  # type: str
     unique_identifiers = None  # type: list
     result_key = None  # type: str
     create_only_fields = set()
@@ -143,9 +142,6 @@ class _ConsulModule:
         }
 
         self.operational_attributes.update({"CreateIndex", "CreateTime", "Hash", "ModifyIndex"})
-
-        if self.unique_identifier:
-            self.unique_identifiers = [self.unique_identifier]
 
     def execute(self):
         obj = self.read_object()
