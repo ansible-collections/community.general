@@ -5,3 +5,5 @@
 azp/posix/2
 skip/python2.6  # filters are controller only, and we no longer support Python 2.6 on the controller
 skip/python2.7  # jc only supports python3.x
+skip/freebsd13.3  # FIXME - ruyaml compilation fails
+skip/freebsd14.0  # FIXME - ruyaml compilation fails
