@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox - adds ``startup`` parameters to configure startup order, startup delay and shutdown delay. (https://github.com/ansible-collections/community.general/pull/8038).
