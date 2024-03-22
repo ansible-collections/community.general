@@ -6,6 +6,9 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import re
+import base64
+
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
@@ -13,7 +16,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden
-
+from ansible.parsing.ajson import AnsibleJSONEncoder, AnsibleJSONDecoder
 
 MOCK_RECORDS = [
     {
@@ -111,8 +114,51 @@ class MockBitwarden(Bitwarden):
 
     unlocked = True
 
-    def _get_matches(self, search_value, search_field="name", collection_id=None):
-        return list(filter(lambda record: record[search_field] == search_value, MOCK_RECORDS))
+    def _run(self, args, stdin=None, expected_rc=0):
+        try:
+            collection_id = args[args.index('--collectionid') + 1]
+        except ValueError:
+            collection_id = None
+
+        if args[0] == 'get':
+            if args[1] == 'item':
+                for item in MOCK_RECORDS:
+                    if collection_id and collection_id not in item.get('collectionIds', []):
+                        continue
+                    if item.get('id') == args[2]:
+                        return AnsibleJSONEncoder().encode(item), ''
+            if args[1] == 'template':
+                if args[2] == 'item':
+                    return AnsibleJSONEncoder().encode({"passwordHistory": [], "revisionDate": None,
+                                                        "creationDate": None, "deletedDate": None,
+                                                        "organizationId": None, "collectionIds": None,
+                                                        "folderId": None, "type": 1, "name": "Item name",
+                                                        "notes": "Some notes about this item.", "favorite": False,
+                                                        "fields": [], "login": None, "secureNote": None, "card": None,
+                                                        "identity": None, "reprompt": 0}
+                                                       ), ''
+        if args[0] == 'list':
+            if args[1] == 'items':
+                return AnsibleJSONEncoder().encode(
+                    [item for item in MOCK_RECORDS
+                     if (collection_id is None or collection_id in item.get('collectionIds', [])) and
+                        re.search(args[3], item.get('name'))
+                     ]
+                ), ''
+        if args[0] == 'generate':
+            return 'random_password', ''
+        if args[0] == 'create':
+            if args[1] == 'item':
+                new_record = AnsibleJSONDecoder().decode(base64.b64decode(stdin).decode('UTF-8'))
+                MOCK_RECORDS.append(new_record)
+        if args[0] == 'edit':
+            if args[1] == 'item':
+                for record in MOCK_RECORDS:
+                    if record.get('id') == args[2]:
+                        record.update(AnsibleJSONDecoder().decode(base64.b64decode(stdin).decode('UTF-8')))
+                        return AnsibleJSONEncoder().encode(record), ''
+
+        return '[]', ''
 
 
 class LoggedOutMockBitwarden(MockBitwarden):
@@ -178,3 +224,60 @@ class TestLookupModule(unittest.TestCase):
 
             self.lookup.run([record_name], field=None, bw_session=session)
             self.assertEqual(mock_bitwarden.session, session)
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_create_record_with_generate(self):
+        mock_records_length_before = len(MOCK_RECORDS)
+
+        self.lookup.run(['b_test'], field='password', generate_if_missing='')
+        self.assertEqual(len(MOCK_RECORDS), mock_records_length_before + 1)
+        self.assertEqual(MOCK_RECORDS[-1].get('login', {}).get('password'), 'random_password')
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_create_record_with_set(self):
+        mock_records_length_before = len(MOCK_RECORDS)
+
+        self.lookup.run(['b_test'], field='username', set='admin')
+        self.assertEqual(len(MOCK_RECORDS), mock_records_length_before + 1)
+        self.assertEqual(MOCK_RECORDS[-1].get('login', {}).get('username'), 'admin')
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_update_record_with_new_customfield_generate(self):
+        self.lookup.run(['a_test'], field='custom_field', generate_if_missing='--length 32')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('name'), 'custom_field')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('value'), 'random_password')
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_update_record_with_new_customfield_set(self):
+        self.lookup.run(['a_test'], field='custom_field', set='custom_value')
+        custom_fields = dict([(field.get('name'), field.get('value')) for field in MOCK_RECORDS[0].get('fields', [])])
+        self.assertIn('custom_field', custom_fields.keys())
+        self.assertEqual(custom_fields['custom_field'], 'custom_value')
+
+        self.lookup.run(['a_test'], field='another_custom_field', set='custom_value')
+        custom_fields = dict([(field.get('name'), field.get('value')) for field in MOCK_RECORDS[0].get('fields', [])])
+        self.assertIn('another_custom_field', custom_fields.keys())
+        self.assertEqual(custom_fields['another_custom_field'], 'custom_value')
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_update_record_with_existing_field_generate(self):
+        mock_records_value_before = MOCK_RECORDS[0].get('login', {}).get('password')
+
+        self.lookup.run(['a_test'], field='password', generate_if_missing='--length 32')
+        self.assertEqual(MOCK_RECORDS[0].get('login', {}).get('password'), mock_records_value_before)
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_generate_does_not_overwrite_existing_values(self):
+        self.lookup.run(['a_test'], field='custom_field', set='fixed_value')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('name'), 'custom_field')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('value'), 'fixed_value')
+        self.lookup.run(['a_test'], field='custom_field', generate_if_missing='--length 32')
+        self.assertNotEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('value'), 'random_value')
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_set_does_overwrite_existing_values(self):
+        self.lookup.run(['a_test'], field='custom_field', set='fixed_value')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('name'), 'custom_field')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('value'), 'fixed_value')
+        self.lookup.run(['a_test'], field='custom_field', set='different_value')
+        self.assertEqual(MOCK_RECORDS[0].get('fields', [{}])[-1].get('value'), 'different_value')
