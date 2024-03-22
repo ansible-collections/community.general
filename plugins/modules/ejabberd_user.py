@@ -86,7 +86,7 @@ class EjabberdUser(object):
     object manages user creation and deletion using ejabberdctl.  The following
     commands are currently supported:
         * ejabberdctl register
-        * ejabberdctl deregister
+        * ejabberdctl unregister
     """
 
     def __init__(self, module):

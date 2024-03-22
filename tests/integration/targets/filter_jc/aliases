@@ -4,3 +4,5 @@
 
 azp/posix/2
 skip/python2.7  # jc only supports python3.x
+skip/freebsd13.3  # FIXME - ruyaml compilation fails
+skip/freebsd14.0  # FIXME - ruyaml compilation fails

@@ -14,10 +14,6 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 )
 
 
-def single_lambda_2star(x, y, z):
-    return ["piggies=[{0},{1},{2}]".format(x, y, z)]
-
-
 def test_dependency_ctxmgr():
     ctx = DependencyCtxMgr("POTATOES", "Potatoes must be installed")
     with ctx:
