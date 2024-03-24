@@ -207,7 +207,9 @@ saved:
       "# Completed"
     ]
 tables:
-  description: The iptables we have interest for when module starts.
+  description:
+    - The iptables on the system before the module has run, separated by table.
+    - If the option O(table) is used, only this table is included.
   type: dict
   contains:
     table:
@@ -346,20 +348,27 @@ def filter_and_format_state(string):
     return lines
 
 
-def per_table_state(command, state):
+def parse_per_table_state(all_states_dump):
     '''
     Convert raw iptables-save output into usable datastructure, for reliable
     comparisons between initial and final states.
     '''
+    lines = filter_and_format_state(all_states_dump)
     tables = dict()
-    for t in TABLES:
-        COMMAND = list(command)
-        if '*%s' % t in state.splitlines():
-            COMMAND.extend(['--table', t])
-            dummy, out, dummy = module.run_command(COMMAND, check_rc=True)
-            out = re.sub(r'(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, r'', out)
-            out = re.sub(r' *\[[0-9]+:[0-9]+\] *', r'', out)
-            tables[t] = [tt for tt in out.splitlines() if tt != '']
+    current_table = ''
+    current_list = list()
+    for line in lines:
+        if re.match(r'^[*](filter|mangle|nat|raw|security)$', line):
+            current_table = line[1:]
+            continue
+        if line == 'COMMIT':
+            tables[current_table] = current_list
+            current_table = ''
+            current_list = list()
+            continue
+        if line.startswith('# '):
+            continue
+        current_list.append(line)
     return tables
 
 
@@ -486,7 +495,7 @@ def main():
     # Depending on the value of 'table', initref_state may differ from
     # initial_state.
     (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
-    tables_before = per_table_state(SAVECOMMAND, stdout)
+    tables_before = parse_per_table_state(stdout)
     initref_state = filter_and_format_state(stdout)
 
     if state == 'saved':
@@ -583,14 +592,17 @@ def main():
 
         (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
         restored_state = filter_and_format_state(stdout)
-
+    tables_after = parse_per_table_state('\n'.join(restored_state))
     if restored_state not in (initref_state, initial_state):
-        if module.check_mode:
-            changed = True
-        else:
-            tables_after = per_table_state(SAVECOMMAND, stdout)
-            if tables_after != tables_before:
+        for table_name, table_content in tables_after.items():
+            if table_name not in tables_before:
+                # Would initialize a table, which doesn't exist yet
                 changed = True
+                break
+            if tables_before[table_name] != table_content:
+                # Content of some table changes
+                changed = True
+                break
 
     if _back is None or module.check_mode:
         module.exit_json(
@@ -633,7 +645,7 @@ def main():
     os.remove(b_back)
 
     (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
-    tables_rollback = per_table_state(SAVECOMMAND, stdout)
+    tables_rollback = parse_per_table_state(stdout)
 
     msg = (
         "Failed to confirm state restored from %s after %ss. "
