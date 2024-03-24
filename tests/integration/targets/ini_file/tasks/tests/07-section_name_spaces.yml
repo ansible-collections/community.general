@@ -1,0 +1,103 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## testing support for optional spaces between brackets and section names
+
+- name: Test-section_name_spaces 1 (does legacy workaround still work) - create test file
+  ansible.builtin.copy:  # noqa risky-file-permissions
+    dest: "{{ output_file }}"
+    content: |
+      [ foo ]
+      ; bar=baz
+
+- name: Test-section_name_spaces 1 - update with optional spaces specified
+  community.general.ini_file:  # noqa risky-file-permissions
+    path: "{{ output_file }}"
+    section: ' foo '
+    option: bar
+    value: frelt
+  register: result
+
+- name: Test-section_name_spaces 1 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: Test-section_name_spaces 1 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: |
+      [ foo ]
+      bar = frelt
+  ansible.builtin.assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'option changed'
+
+
+- name: Test-section_name_spaces 2 (optional spaces omitted) - create test file
+  ansible.builtin.copy:  # noqa risky-file-permissions
+    dest: "{{ output_file }}"
+    content: |
+      [ foo ]
+      bar=baz"
+
+- name: Test-section_name_spaces 2 - update without optional spaces
+  community.general.ini_file:  # noqa risky-file-permissions
+    path: "{{ output_file }}"
+    section: foo
+    option: bar
+    value: frelt
+    ignore_spaces: true
+  register: result
+
+- name: Test-section_name_spaces 2 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: Test-section_name_spaces 2 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: "[ foo ]\nbar = frelt\n"
+  ansible.builtin.assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'option changed'
+
+
+- name: Test-section_name_spaces 3 (legacy workaround when not required) - create test file
+  ansible.builtin.copy:  # noqa risky-file-permissions
+    dest: "{{ output_file }}"
+    content: |
+      [foo]
+      ; bar=baz
+
+- name: Test-section_name_spaces 3 - update with optional spaces specified
+  community.general.ini_file:  # noqa risky-file-permissions
+    path: "{{ output_file }}"
+    section: ' foo '
+    option: bar
+    value: frelt
+  register: result
+
+- name: Test-section_name_spaces 3 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: Test-section_name_spaces 3 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: |
+      [foo]
+      bar = frelt
+  ansible.builtin.assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'option changed'
