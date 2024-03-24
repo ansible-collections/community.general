@@ -14,10 +14,13 @@ from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden
 
+MOCK_COLLECTION_ID = "3b12a9da-7c49-40b8-ad33-aede017a7ead"
 
 MOCK_RECORDS = [
     {
-        "collectionIds": [],
+        "collectionIds": [
+            MOCK_COLLECTION_ID
+        ],
         "deletedDate": None,
         "favorite": False,
         "fields": [
@@ -65,7 +68,9 @@ MOCK_RECORDS = [
         "type": 1
     },
     {
-        "collectionIds": [],
+        "collectionIds": [
+            MOCK_COLLECTION_ID
+        ],
         "deletedDate": None,
         "favorite": False,
         "folderId": None,
@@ -85,7 +90,9 @@ MOCK_RECORDS = [
         "type": 1
     },
     {
-        "collectionIds": [],
+        "collectionIds": [
+            MOCK_COLLECTION_ID
+        ],
         "deletedDate": None,
         "favorite": False,
         "folderId": None,
@@ -111,7 +118,10 @@ class MockBitwarden(Bitwarden):
 
     unlocked = True
 
-    def _get_matches(self, search_value, search_field="name", collection_id=None):
+    def _get_matches(self, search_value=None, search_field="name", collection_id=None):
+        if not search_value and collection_id:
+            return list(filter(lambda record: collection_id in record['collectionIds'], MOCK_RECORDS))
+
         return list(filter(lambda record: record[search_field] == search_value, MOCK_RECORDS))
 
 
@@ -156,8 +166,10 @@ class TestLookupModule(unittest.TestCase):
     def test_bitwarden_plugin_unlocked(self):
         record = MOCK_RECORDS[0]
         record_name = record['name']
-        with self.assertRaises(AnsibleError):
+        with self.assertRaises(AnsibleError) as raised_error:
             self.lookup.run([record_name], field='password')
+
+        self.assertEqual("Bitwarden Vault locked. Run 'bw unlock'.", str(raised_error.exception))
 
     def test_bitwarden_plugin_without_session_option(self):
         mock_bitwarden = MockBitwarden()
@@ -178,3 +190,8 @@ class TestLookupModule(unittest.TestCase):
 
             self.lookup.run([record_name], field=None, bw_session=session)
             self.assertEqual(mock_bitwarden.session, session)
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_full_collection(self):
+        # Try to retrieve the full records of the given collection.
+        self.assertEqual(MOCK_RECORDS, self.lookup.run(None, collection_id=MOCK_COLLECTION_ID)[0])
