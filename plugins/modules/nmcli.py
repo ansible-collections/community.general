@@ -1952,6 +1952,7 @@ class Nmcli(object):
     def mtu_conn_type(self):
         return self.type in (
             'bond',
+            'bond-slave',
             'dummy',
             'ethernet',
             'infiniband',
