@@ -47,3 +47,6 @@
 
     - name: include tasks to test modify_inactive_option
       include_tasks: tests/06-modify_inactive_option.yml
+
+    - name: include tasks to test optional spaces in section headings
+      include_tasks: tests/07-section_name_spaces.yml

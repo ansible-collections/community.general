@@ -304,9 +304,11 @@ def do_ini(module, filename, section=None, option=None, values=None,
     before = after = []
     section_lines = []
 
+    section_pattern = re.compile(to_text(r'^\[\s*%s\s*]' % re.escape(section.strip())))
+
     for index, line in enumerate(ini_lines):
         # find start and end of section
-        if line.startswith(u'[%s]' % section):
+        if section_pattern.match(line):
             within_section = True
             section_start = index
         elif line.startswith(u'['):
