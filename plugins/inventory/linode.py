@@ -272,12 +272,25 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 strict=strict)
 
     def verify_file(self, path):
-        """Verify the Linode configuration file."""
+        """Verify the Linode configuration file.
+
+        Return true/false if the config-file is valid for this plugin
+
+        Args:
+            str(path): path to the config
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            bool(valid): is valid config file"""
+        valid = False
         if super(InventoryModule, self).verify_file(path):
-            endings = ('linode.yaml', 'linode.yml')
-            if any((path.endswith(ending) for ending in endings)):
-                return True
-        return False
+            if path.endswith(("linode.yaml", "linode.yml")):
+                valid = True
+            else:
+                self.display.vvv('Inventory source not ending in "linode.yaml" or "linode.yml"')
+        return valid
 
     def parse(self, inventory, loader, path, cache=True):
         """Dynamically parse Linode the cloud inventory."""
