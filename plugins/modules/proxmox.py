@@ -89,6 +89,7 @@ options:
       - Use C(down=#) where C(#) is in seconds, to specify a delay to wait before the next VM is stopped.
     type: list
     elements: str
+    version_added: 8.5.0
   mounts:
     description:
       - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points
