@@ -1,0 +1,3 @@
+bugfixes:
+  - linode inventory plugin - add descriptive error message for linode inventory plugin (https://github.com/ansible-collections/community.general/pull/8133).
+    
