@@ -1,0 +1,3 @@
+bugfixes:
+  - Add descriptive error message for linode inventory plugin
+    
