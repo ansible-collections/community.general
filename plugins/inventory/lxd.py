@@ -161,6 +161,7 @@ from ansible.module_utils.six import raise_from
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 try:
     import ipaddress
@@ -656,7 +657,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         if self._get_data_entry('inventory/{0}/network_interfaces'.format(instance_name)):  # instance have network interfaces
             self.inventory.set_variable(instance_name, 'ansible_connection', 'ssh')
-            self.inventory.set_variable(instance_name, 'ansible_host', interface_selection(instance_name))
+            self.inventory.set_variable(instance_name, 'ansible_host', make_unsafe(interface_selection(instance_name)))
         else:
             self.inventory.set_variable(instance_name, 'ansible_connection', 'local')
 
@@ -682,31 +683,39 @@ class InventoryModule(BaseInventoryPlugin):
                 if self.filter.lower() != instance_state:
                     continue
             # add instance
+            instance_name = make_unsafe(instance_name)
             self.inventory.add_host(instance_name)
             # add network informations
             self.build_inventory_network(instance_name)
             # add os
             v = self._get_data_entry('inventory/{0}/os'.format(instance_name))
             if v:
-                self.inventory.set_variable(instance_name, 'ansible_lxd_os', v.lower())
+                self.inventory.set_variable(instance_name, 'ansible_lxd_os', make_unsafe(v.lower()))
             # add release
             v = self._get_data_entry('inventory/{0}/release'.format(instance_name))
             if v:
-                self.inventory.set_variable(instance_name, 'ansible_lxd_release', v.lower())
+                self.inventory.set_variable(
+                    instance_name, 'ansible_lxd_release', make_unsafe(v.lower()))
             # add profile
-            self.inventory.set_variable(instance_name, 'ansible_lxd_profile', self._get_data_entry('inventory/{0}/profile'.format(instance_name)))
+            self.inventory.set_variable(
+                instance_name, 'ansible_lxd_profile', make_unsafe(self._get_data_entry('inventory/{0}/profile'.format(instance_name))))
             # add state
-            self.inventory.set_variable(instance_name, 'ansible_lxd_state', instance_state)
+            self.inventory.set_variable(
+                instance_name, 'ansible_lxd_state', make_unsafe(instance_state))
             # add type
-            self.inventory.set_variable(instance_name, 'ansible_lxd_type', self._get_data_entry('inventory/{0}/type'.format(instance_name)))
+            self.inventory.set_variable(
+                instance_name, 'ansible_lxd_type', make_unsafe(self._get_data_entry('inventory/{0}/type'.format(instance_name))))
             # add location information
             if self._get_data_entry('inventory/{0}/location'.format(instance_name)) != "none":  # wrong type by lxd 'none' != 'None'
-                self.inventory.set_variable(instance_name, 'ansible_lxd_location', self._get_data_entry('inventory/{0}/location'.format(instance_name)))
+                self.inventory.set_variable(
+                    instance_name, 'ansible_lxd_location', make_unsafe(self._get_data_entry('inventory/{0}/location'.format(instance_name))))
             # add VLAN_ID information
             if self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name)):
-                self.inventory.set_variable(instance_name, 'ansible_lxd_vlan_ids', self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name)))
+                self.inventory.set_variable(
+                    instance_name, 'ansible_lxd_vlan_ids', make_unsafe(self._get_data_entry('inventory/{0}/vlan_ids'.format(instance_name))))
             # add project
-            self.inventory.set_variable(instance_name, 'ansible_lxd_project', self._get_data_entry('inventory/{0}/project'.format(instance_name)))
+            self.inventory.set_variable(
+                instance_name, 'ansible_lxd_project', make_unsafe(self._get_data_entry('inventory/{0}/project'.format(instance_name))))
 
     def build_inventory_groups_location(self, group_name):
         """create group by attribute: location
@@ -979,7 +988,7 @@ class InventoryModule(BaseInventoryPlugin):
             for group_name in self.groupby:
                 if not group_name.isalnum():
                     raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
-                group_type(group_name)
+                group_type(make_unsafe(group_name))
 
     def build_inventory(self):
         """Build dynamic inventory

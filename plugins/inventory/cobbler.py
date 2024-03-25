@@ -88,6 +88,7 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six import iteritems
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 from ansible.module_utils.six import text_type
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 # xmlrpc
 try:
@@ -239,7 +240,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
         for host in self._get_systems():
             # Get the FQDN for the host and add it to the right groups
-            hostname = host['hostname']  # None
+            hostname = make_unsafe(host['hostname'])  # None
             interfaces = host['interfaces']
 
             if self._exclude_profile(host['profile']):
@@ -252,7 +253,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     if ivalue['management'] or not ivalue['static']:
                         this_dns_name = ivalue.get('dns_name', None)
                         if this_dns_name is not None and this_dns_name != "":
-                            hostname = this_dns_name
+                            hostname = make_unsafe(this_dns_name)
                             self.display.vvvv('Set hostname to %s from %s\n' % (hostname, iname))
 
             if hostname == '':
@@ -283,6 +284,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             # Add host variables
             if self.get_option('want_facts'):
                 try:
-                    self.inventory.set_variable(hostname, 'cobbler', host)
+                    self.inventory.set_variable(hostname, 'cobbler', make_unsafe(host))
                 except ValueError as e:
                     self.display.warning("Could not set host info for %s: %s" % (hostname, to_text(e)))
