@@ -86,6 +86,12 @@ EXAMPLES = '''
     room: notif
     msg: Ansible task finished
 
+- name: Send an HTML-formatted message to a Hipchat room
+  community.general.hipchat:
+    room: notif
+    msg: '<strong>Ansible task finished</strong>'
+    msg_format: html    
+
 - name: Send a message to a Hipchat room using Hipchat API version 2
   community.general.hipchat:
     api: https://api.hipchat.com/v2/
