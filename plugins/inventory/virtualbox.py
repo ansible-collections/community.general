@@ -62,6 +62,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native, to_
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -116,6 +117,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'), hostvars[host], host, strict=strict)
 
     def _populate_from_cache(self, source_data):
+        source_data = make_unsafe(source_data)
         hostvars = source_data.pop('_meta', {}).get('hostvars', {})
         for group in source_data:
             if group == 'all':
@@ -162,7 +164,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             v = v.strip()
             # found host
             if k.startswith('Name') and ',' not in v:  # some setting strings appear in Name
-                current_host = v
+                current_host = make_unsafe(v)
                 if current_host not in hostvars:
                     hostvars[current_host] = {}
                     self.inventory.add_host(current_host)
@@ -170,12 +172,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # try to get network info
                 netdata = self._query_vbox_data(current_host, netinfo)
                 if netdata:
-                    self.inventory.set_variable(current_host, 'ansible_host', netdata)
+                    self.inventory.set_variable(current_host, 'ansible_host', make_unsafe(netdata))
 
             # found groups
             elif k == 'Groups':
                 for group in v.split('/'):
                     if group:
+                        group = make_unsafe(group)
                         group = self.inventory.add_group(group)
                         self.inventory.add_child(group, current_host)
                         if group not in cacheable_results:
@@ -185,17 +188,17 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             else:
                 # found vars, accumulate in hostvars for clean inventory set
-                pref_k = 'vbox_' + k.strip().replace(' ', '_')
+                pref_k = make_unsafe('vbox_' + k.strip().replace(' ', '_'))
                 leading_spaces = len(k) - len(k.lstrip(' '))
                 if 0 < leading_spaces <= 2:
                     if prevkey not in hostvars[current_host] or not isinstance(hostvars[current_host][prevkey], dict):
                         hostvars[current_host][prevkey] = {}
-                    hostvars[current_host][prevkey][pref_k] = v
+                    hostvars[current_host][prevkey][pref_k] = make_unsafe(v)
                 elif leading_spaces > 2:
                     continue
                 else:
                     if v != '':
-                        hostvars[current_host][pref_k] = v
+                        hostvars[current_host][pref_k] = make_unsafe(v)
                 if self._ungrouped_host(current_host, cacheable_results):
                     if 'ungrouped' not in cacheable_results:
                         cacheable_results['ungrouped'] = {'hosts': []}
