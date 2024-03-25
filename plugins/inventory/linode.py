@@ -123,6 +123,7 @@ compose:
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 
 try:
@@ -199,20 +200,21 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _add_instances_to_groups(self):
         """Add instance names to their dynamic inventory groups."""
         for instance in self.instances:
-            self.inventory.add_host(instance.label, group=instance.group)
+            self.inventory.add_host(make_unsafe(instance.label), group=instance.group)
 
     def _add_hostvars_for_instances(self):
         """Add hostvars for instances in the dynamic inventory."""
         ip_style = self.get_option('ip_style')
         for instance in self.instances:
             hostvars = instance._raw_json
+            hostname = make_unsafe(instance.label)
             for hostvar_key in hostvars:
                 if ip_style == 'api' and hostvar_key in ['ipv4', 'ipv6']:
                     continue
                 self.inventory.set_variable(
-                    instance.label,
+                    hostname,
                     hostvar_key,
-                    hostvars[hostvar_key]
+                    make_unsafe(hostvars[hostvar_key])
                 )
             if ip_style == 'api':
                 ips = instance.ips.ipv4.public + instance.ips.ipv4.private
@@ -221,9 +223,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
                 for ip_type in set(ip.type for ip in ips):
                     self.inventory.set_variable(
-                        instance.label,
+                        hostname,
                         ip_type,
-                        self._ip_data([ip for ip in ips if ip.type == ip_type])
+                        make_unsafe(self._ip_data([ip for ip in ips if ip.type == ip_type]))
                     )
 
     def _ip_data(self, ip_list):
@@ -254,21 +256,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._add_instances_to_groups()
         self._add_hostvars_for_instances()
         for instance in self.instances:
-            variables = self.inventory.get_host(instance.label).get_vars()
+            hostname = make_unsafe(instance.label)
+            variables = self.inventory.get_host(hostname).get_vars()
             self._add_host_to_composed_groups(
                 self.get_option('groups'),
                 variables,
-                instance.label,
+                hostname,
                 strict=strict)
             self._add_host_to_keyed_groups(
                 self.get_option('keyed_groups'),
                 variables,
-                instance.label,
+                hostname,
                 strict=strict)
             self._set_composite_vars(
                 self.get_option('compose'),
                 variables,
-                instance.label,
+                hostname,
                 strict=strict)
 
     def verify_file(self, path):
