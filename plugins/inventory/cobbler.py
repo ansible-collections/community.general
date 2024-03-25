@@ -117,6 +117,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 from ansible.module_utils.six import text_type
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 # xmlrpc
 try:
@@ -274,9 +275,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         for host in self._get_systems():
             # Get the FQDN for the host and add it to the right groups
             if self.inventory_hostname == 'system':
-                hostname = host['name']  # None
+                hostname = make_unsafe(host['name'])  # None
             else:
-                hostname = host['hostname']  # None
+                hostname = make_unsafe(host['hostname'])  # None
             interfaces = host['interfaces']
 
             if set(host['mgmt_classes']) & set(self.include_mgmt_classes):
@@ -296,7 +297,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     if ivalue['management'] or not ivalue['static']:
                         this_dns_name = ivalue.get('dns_name', None)
                         if this_dns_name is not None and this_dns_name != "":
-                            hostname = this_dns_name
+                            hostname = make_unsafe(this_dns_name)
                             self.display.vvvv('Set hostname to %s from %s\n' % (hostname, iname))
 
             if hostname == '':
@@ -361,18 +362,18 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             if ip_address is None and ip_address_first is not None:
                 ip_address = ip_address_first
             if ip_address is not None:
-                self.inventory.set_variable(hostname, 'cobbler_ipv4_address', ip_address)
+                self.inventory.set_variable(hostname, 'cobbler_ipv4_address', make_unsafe(ip_address))
             if ipv6_address is None and ipv6_address_first is not None:
                 ipv6_address = ipv6_address_first
             if ipv6_address is not None:
-                self.inventory.set_variable(hostname, 'cobbler_ipv6_address', ipv6_address)
+                self.inventory.set_variable(hostname, 'cobbler_ipv6_address', make_unsafe(ipv6_address))
 
             if self.get_option('want_facts'):
                 try:
-                    self.inventory.set_variable(hostname, 'cobbler', host)
+                    self.inventory.set_variable(hostname, 'cobbler', make_unsafe(host))
                 except ValueError as e:
                     self.display.warning("Could not set host info for %s: %s" % (hostname, to_text(e)))
 
         if self.get_option('want_ip_addresses'):
-            self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', ip_addresses)
-            self.inventory.set_variable(self.group, 'cobbler_ipv6_addresses', ipv6_addresses)
+            self.inventory.set_variable(self.group, 'cobbler_ipv4_addresses', make_unsafe(ip_addresses))
+            self.inventory.set_variable(self.group, 'cobbler_ipv6_addresses', make_unsafe(ipv6_addresses))

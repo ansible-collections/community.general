@@ -83,6 +83,7 @@ keyed_groups:
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 try:
     import gitlab
@@ -105,11 +106,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             else:
                 runners = gl.runners.all()
             for runner in runners:
-                host = str(runner['id'])
+                host = make_unsafe(str(runner['id']))
                 ip_address = runner['ip_address']
-                host_attrs = vars(gl.runners.get(runner['id']))['_attrs']
+                host_attrs = make_unsafe(vars(gl.runners.get(runner['id']))['_attrs'])
                 self.inventory.add_host(host, group='gitlab_runners')
-                self.inventory.set_variable(host, 'ansible_host', ip_address)
+                self.inventory.set_variable(host, 'ansible_host', make_unsafe(ip_address))
                 if self.get_option('verbose_output', True):
                     self.inventory.set_variable(host, 'gitlab_runner_attributes', host_attrs)
 
