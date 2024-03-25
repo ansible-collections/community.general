@@ -16,8 +16,9 @@
     # TODO: Find better package to install from a channel - microk8s installation takes multiple minutes, and even removal takes one minute!
     # - name: Include test_channel
     #   ansible.builtin.include_tasks: test_channel.yml
-    - name: Include test_dangerous
-      ansible.builtin.include_tasks: test_dangerous.yml
+    # TODO: Find bettter package to download and install from sources - cider 1.6.0 takes over 35 seconds to install
+    # - name: Include test_dangerous
+    #   ansible.builtin.include_tasks: test_dangerous.yml
     - name: Include test_3dash
       ansible.builtin.include_tasks: test_3dash.yml
     - name: Include test_empty_list
