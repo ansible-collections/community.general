@@ -1,6 +1,0 @@
-security_fixes:
-  - "cobbler, gitlab_runners, icinga2, linode, lxd, nmap, online, opennebula, proxmox, scaleway, stackpath_compute, virtualbox,
-     and xen_orchestra inventory plugin - make sure all data received from the remote servers is marked as unsafe, so remote
-     code execution by obtaining texts that can be evaluated as templates is not possible
-     (https://www.die-welt.net/2024/03/remote-code-execution-in-ansible-dynamic-inventory-plugins/,
-      https://github.com/ansible-collections/community.general/pull/8098)."
