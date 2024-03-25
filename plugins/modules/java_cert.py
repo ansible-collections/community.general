@@ -384,7 +384,7 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
     (import_rc, import_out, import_err) = module.run_command(import_cmd, data=secret_data, check_rc=False)
     diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
 
-    if import_rc != 0:
+    if import_rc != 0 or not os.path.exists(keystore_path):
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
     return dict(changed=True, msg=import_out,
