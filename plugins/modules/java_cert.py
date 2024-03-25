@@ -99,6 +99,24 @@ options:
     type: str
     choices: [ absent, present ]
     default: present
+  mode:
+    version_added: 8.5.0
+  owner:
+    version_added: 8.5.0
+  group:
+    version_added: 8.5.0
+  seuser:
+    version_added: 8.5.0
+  serole:
+    version_added: 8.5.0
+  setype:
+    version_added: 8.5.0
+  selevel:
+    version_added: 8.5.0
+  unsafe_writes:
+    version_added: 8.5.0
+  attributes:
+    version_added: 8.5.0
 requirements: [openssl, keytool]
 author:
 - Adam Hamsik (@haad)
@@ -589,7 +607,7 @@ def main():
                                           keystore_pass, cert_alias, keystore_type, trust_cacert)
 
     if os.path.exists(keystore_path):
-        changed_permissions =_update_permissions(module, keystore_path)
+        changed_permissions = _update_permissions(module, keystore_path)
         result['changed'] = result.get('changed', False) or changed_permissions
 
     module.exit_json(**result)
