@@ -110,10 +110,11 @@ EXAMPLES = r'''
 #   dag;500;500
 #   jeroen;501;500
 
-# Read a CSV file without headers
+# Read a CSV file without headers and handle potential issues with the CSV file
 - name: Read users from CSV file and return a list
   community.general.read_csv:
     path: users.csv
+    strict: true
     fieldnames: name,uid,gid
     delimiter: ';'
   register: users
