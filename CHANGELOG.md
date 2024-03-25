@@ -1,80 +1,111 @@
 # Community General Release Notes
 
 **Topics**
+
+- <a href="#v7-5-6">v7\.5\.6</a>
+    - <a href="#release-summary">Release Summary</a>
+    - <a href="#security-fixes">Security Fixes</a>
+    - <a href="#bugfixes">Bugfixes</a>
 - <a href="#v7-5-5">v7\.5\.5</a>
-  - <a href="#release-summary">Release Summary</a>
-  - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
 - <a href="#v7-5-4">v7\.5\.4</a>
-  - <a href="#release-summary-1">Release Summary</a>
-  - <a href="#bugfixes-1">Bugfixes</a>
+    - <a href="#release-summary-2">Release Summary</a>
+    - <a href="#bugfixes-2">Bugfixes</a>
 - <a href="#v7-5-3">v7\.5\.3</a>
-  - <a href="#release-summary-2">Release Summary</a>
-  - <a href="#bugfixes-2">Bugfixes</a>
+    - <a href="#release-summary-3">Release Summary</a>
+    - <a href="#bugfixes-3">Bugfixes</a>
 - <a href="#v7-5-2">v7\.5\.2</a>
-  - <a href="#release-summary-3">Release Summary</a>
-  - <a href="#minor-changes">Minor Changes</a>
-  - <a href="#bugfixes-3">Bugfixes</a>
+    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
 - <a href="#v7-5-1">v7\.5\.1</a>
-  - <a href="#release-summary-4">Release Summary</a>
-  - <a href="#bugfixes-4">Bugfixes</a>
+    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#bugfixes-5">Bugfixes</a>
 - <a href="#v7-5-0">v7\.5\.0</a>
-  - <a href="#release-summary-5">Release Summary</a>
-  - <a href="#minor-changes-1">Minor Changes</a>
-  - <a href="#deprecated-features">Deprecated Features</a>
-  - <a href="#bugfixes-5">Bugfixes</a>
-  - <a href="#new-modules">New Modules</a>
+    - <a href="#release-summary-6">Release Summary</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
+    - <a href="#deprecated-features">Deprecated Features</a>
+    - <a href="#bugfixes-6">Bugfixes</a>
+    - <a href="#new-modules">New Modules</a>
 - <a href="#v7-4-0">v7\.4\.0</a>
-  - <a href="#release-summary-6">Release Summary</a>
-  - <a href="#minor-changes-2">Minor Changes</a>
-  - <a href="#bugfixes-6">Bugfixes</a>
-  - <a href="#new-modules-1">New Modules</a>
+    - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#minor-changes-2">Minor Changes</a>
+    - <a href="#bugfixes-7">Bugfixes</a>
+    - <a href="#new-modules-1">New Modules</a>
 - <a href="#v7-3-0">v7\.3\.0</a>
-  - <a href="#release-summary-7">Release Summary</a>
-  - <a href="#minor-changes-3">Minor Changes</a>
-  - <a href="#deprecated-features-1">Deprecated Features</a>
-  - <a href="#bugfixes-7">Bugfixes</a>
+    - <a href="#release-summary-8">Release Summary</a>
+    - <a href="#minor-changes-3">Minor Changes</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
+    - <a href="#bugfixes-8">Bugfixes</a>
 - <a href="#v7-2-1">v7\.2\.1</a>
-  - <a href="#release-summary-8">Release Summary</a>
-  - <a href="#bugfixes-8">Bugfixes</a>
+    - <a href="#release-summary-9">Release Summary</a>
+    - <a href="#bugfixes-9">Bugfixes</a>
 - <a href="#v7-2-0">v7\.2\.0</a>
-  - <a href="#release-summary-9">Release Summary</a>
-  - <a href="#minor-changes-4">Minor Changes</a>
-  - <a href="#deprecated-features-2">Deprecated Features</a>
-  - <a href="#bugfixes-9">Bugfixes</a>
-  - <a href="#new-plugins">New Plugins</a>
-    - <a href="#lookup">Lookup</a>
-  - <a href="#new-modules-2">New Modules</a>
+    - <a href="#release-summary-10">Release Summary</a>
+    - <a href="#minor-changes-4">Minor Changes</a>
+    - <a href="#deprecated-features-2">Deprecated Features</a>
+    - <a href="#bugfixes-10">Bugfixes</a>
+    - <a href="#new-plugins">New Plugins</a>
+        - <a href="#lookup">Lookup</a>
+    - <a href="#new-modules-2">New Modules</a>
 - <a href="#v7-1-0">v7\.1\.0</a>
-  - <a href="#release-summary-10">Release Summary</a>
-  - <a href="#minor-changes-5">Minor Changes</a>
-  - <a href="#deprecated-features-3">Deprecated Features</a>
-  - <a href="#bugfixes-10">Bugfixes</a>
-  - <a href="#known-issues">Known Issues</a>
-  - <a href="#new-modules-3">New Modules</a>
+    - <a href="#release-summary-11">Release Summary</a>
+    - <a href="#minor-changes-5">Minor Changes</a>
+    - <a href="#deprecated-features-3">Deprecated Features</a>
+    - <a href="#bugfixes-11">Bugfixes</a>
+    - <a href="#known-issues">Known Issues</a>
+    - <a href="#new-modules-3">New Modules</a>
 - <a href="#v7-0-1">v7\.0\.1</a>
-  - <a href="#release-summary-11">Release Summary</a>
-  - <a href="#bugfixes-11">Bugfixes</a>
+    - <a href="#release-summary-12">Release Summary</a>
+    - <a href="#bugfixes-12">Bugfixes</a>
 - <a href="#v7-0-0">v7\.0\.0</a>
-  - <a href="#release-summary-12">Release Summary</a>
-  - <a href="#minor-changes-6">Minor Changes</a>
-  - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
-  - <a href="#deprecated-features-4">Deprecated Features</a>
-  - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-  - <a href="#bugfixes-12">Bugfixes</a>
-  - <a href="#new-plugins-1">New Plugins</a>
-    - <a href="#lookup-1">Lookup</a>
-  - <a href="#new-modules-4">New Modules</a>
+    - <a href="#release-summary-13">Release Summary</a>
+    - <a href="#minor-changes-6">Minor Changes</a>
+    - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
+    - <a href="#deprecated-features-4">Deprecated Features</a>
+    - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
+    - <a href="#bugfixes-13">Bugfixes</a>
+    - <a href="#new-plugins-1">New Plugins</a>
+        - <a href="#lookup-1">Lookup</a>
+    - <a href="#new-modules-4">New Modules</a>
 This changelog describes changes after version 6\.0\.0\.
 
-<a id="v7-5-5"></a>
-## v7\.5\.5
+<a id="v7-5-6"></a>
+## v7\.5\.6
 
 <a id="release-summary"></a>
 ### Release Summary
 
-Regular bugfix release\.
+Regular bugfix release with security fixes\.
+
+<a id="security-fixes"></a>
+### Security Fixes
+
+* cobbler\, gitlab\_runners\, icinga2\, linode\, lxd\, nmap\, online\, opennebula\, proxmox\, scaleway\, stackpath\_compute\, virtualbox\, and xen\_orchestra inventory plugin \- make sure all data received from the remote servers is marked as unsafe\, so remote code execution by obtaining texts that can be evaluated as templates is not possible \([https\://www\.die\-welt\.net/2024/03/remote\-code\-execution\-in\-ansible\-dynamic\-inventory\-plugins/](https\://www\.die\-welt\.net/2024/03/remote\-code\-execution\-in\-ansible\-dynamic\-inventory\-plugins/)\, [https\://github\.com/ansible\-collections/community\.general/pull/8098](https\://github\.com/ansible\-collections/community\.general/pull/8098)\)\.
 
 <a id="bugfixes"></a>
+### Bugfixes
+
+* aix\_filesystem \- fix issue with empty list items in crfs logic and option order \([https\://github\.com/ansible\-collections/community\.general/pull/8052](https\://github\.com/ansible\-collections/community\.general/pull/8052)\)\.
+* homebrew \- error returned from brew command was ignored and tried to parse empty JSON\. Fix now checks for an error and raises it to give accurate error message to users \([https\://github\.com/ansible\-collections/community\.general/issues/8047](https\://github\.com/ansible\-collections/community\.general/issues/8047)\)\.
+* ipa\_hbacrule \- the module uses a string for <code>ipaenabledflag</code> for new FreeIPA versions while the returned value is a boolean \([https\://github\.com/ansible\-collections/community\.general/pull/7880](https\://github\.com/ansible\-collections/community\.general/pull/7880)\)\.
+* ipa\_sudorule \- the module uses a string for <code>ipaenabledflag</code> for new FreeIPA versions while the returned value is a boolean \([https\://github\.com/ansible\-collections/community\.general/pull/7880](https\://github\.com/ansible\-collections/community\.general/pull/7880)\)\.
+* iptables\_state \- fix idempotency issues when restoring incomplete iptables dumps \([https\://github\.com/ansible\-collections/community\.general/issues/8029](https\://github\.com/ansible\-collections/community\.general/issues/8029)\)\.
+* linode inventory plugin \- add descriptive error message for linode inventory plugin \([https\://github\.com/ansible\-collections/community\.general/pull/8133](https\://github\.com/ansible\-collections/community\.general/pull/8133)\)\.
+* pacemaker\_cluster \- actually implement check mode\, which the module claims to support\. This means that until now the module also did changes in check mode \([https\://github\.com/ansible\-collections/community\.general/pull/8081](https\://github\.com/ansible\-collections/community\.general/pull/8081)\)\.
+* pam\_limits \- when the file does not exist\, do not create it in check mode \([https\://github\.com/ansible\-collections/community\.general/issues/8050](https\://github\.com/ansible\-collections/community\.general/issues/8050)\, [https\://github\.com/ansible\-collections/community\.general/pull/8057](https\://github\.com/ansible\-collections/community\.general/pull/8057)\)\.
+* proxmox\_kvm \- fixed status check getting from node\-specific API endpoint \([https\://github\.com/ansible\-collections/community\.general/issues/7817](https\://github\.com/ansible\-collections/community\.general/issues/7817)\)\.
+
+<a id="v7-5-5"></a>
+## v7\.5\.5
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Regular bugfix release\.
+
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * cargo \- fix idempotency issues when using a custom installation path for packages \(using the <code>\-\-path</code> parameter\)\. The initial installation runs fine\, but subsequent runs use the <code>get\_installed\(\)</code> function which did not check the given installation location\, before running <code>cargo install</code>\. This resulted in a false <code>changed</code> state\. Also the removal of packeges using <code>state\: absent</code> failed\, as the installation check did not use the given parameter \([https\://github\.com/ansible\-collections/community\.general/pull/7970](https\://github\.com/ansible\-collections/community\.general/pull/7970)\)\.
@@ -88,12 +119,12 @@ Regular bugfix release\.
 <a id="v7-5-4"></a>
 ## v7\.5\.4
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * homebrew \- detect already installed formulae and casks using JSON output from <code>brew info</code> \([https\://github\.com/ansible\-collections/community\.general/issues/864](https\://github\.com/ansible\-collections/community\.general/issues/864)\)\.
@@ -105,12 +136,12 @@ Regular bugfix release\.
 <a id="v7-5-3"></a>
 ## v7\.5\.3
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * keycloak\_identity\_provider \- <code>mappers</code> processing was not idempotent if the mappers configuration list had not been sorted by name \(in ascending order\)\. Fix resolves the issue by sorting mappers in the desired state using the same key which is used for obtaining existing state \([https\://github\.com/ansible\-collections/community\.general/pull/7418](https\://github\.com/ansible\-collections/community\.general/pull/7418)\)\.
@@ -121,7 +152,7 @@ Regular bugfix release\.
 <a id="v7-5-2"></a>
 ## v7\.5\.2
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Regular bugfix release\.
@@ -131,7 +162,7 @@ Regular bugfix release\.
 
 * elastic callback plugin \- close elastic client to not leak resources \([https\://github\.com/ansible\-collections/community\.general/pull/7517](https\://github\.com/ansible\-collections/community\.general/pull/7517)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * cloudflare\_dns \- fix Cloudflare lookup of SHFP records \([https\://github\.com/ansible\-collections/community\.general/issues/7652](https\://github\.com/ansible\-collections/community\.general/issues/7652)\)\.
@@ -153,12 +184,12 @@ Regular bugfix release\.
 <a id="v7-5-1"></a>
 ## v7\.5\.1
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * composer \- fix impossible to run <code>working\_dir</code> dependent commands\. The module was throwing an error when trying to run a <code>working\_dir</code> dependent command\, because it tried to get the command help without passing the <code>working\_dir</code> \([https\://github\.com/ansible\-collections/community\.general/issues/3787](https\://github\.com/ansible\-collections/community\.general/issues/3787)\)\.
@@ -180,7 +211,7 @@ Regular bugfix release\.
 <a id="v7-5-0"></a>
 ## v7\.5\.0
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -217,7 +248,7 @@ with major version 7 will be bugfix releases 7\.5\.y\.
 * The next major release\, community\.general 8\.0\.0\, will drop support for ansible\-core 2\.11 and 2\.12\, which have been End of Life for some time now\. This means that this collection no longer supports Python 2\.6 on the target\. Individual content might still work with unsupported ansible\-core versions\, but that can change at any time\. Also please note that from now on\, for every new major community\.general release\, we will drop support for all ansible\-core versions that have been End of Life for more than a few weeks on the date of the major release \([https\://github\.com/ansible\-community/community\-topics/discussions/271](https\://github\.com/ansible\-community/community\-topics/discussions/271)\, [https\://github\.com/ansible\-collections/community\.general/pull/7259](https\://github\.com/ansible\-collections/community\.general/pull/7259)\)\.
 * redfish\_info\, redfish\_config\, redfish\_command \- the default value <code>10</code> for the <code>timeout</code> option is deprecated and will change to <code>60</code> in community\.general 9\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/7295](https\://github\.com/ansible\-collections/community\.general/pull/7295)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * gitlab\_group\_variable \- deleted all variables when used with <code>purge\=true</code> due to missing <code>raw</code> property in KNOWN attributes \([https\://github\.com/ansible\-collections/community\.general/issues/7250](https\://github\.com/ansible\-collections/community\.general/issues/7250)\)\.
@@ -242,7 +273,7 @@ with major version 7 will be bugfix releases 7\.5\.y\.
 <a id="v7-4-0"></a>
 ## v7\.4\.0
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Bugfix and feature release\.
@@ -264,7 +295,7 @@ Bugfix and feature release\.
 * redfish\_utils module utils \- support <code>Volumes</code> in response for <code>GetDiskInventory</code> \([https\://github\.com/ansible\-collections/community\.general/pull/6819](https\://github\.com/ansible\-collections/community\.general/pull/6819)\)\.
 * unixy callback plugin \- add support for <code>check\_mode\_markers</code> option \([https\://github\.com/ansible\-collections/community\.general/pull/7179](https\://github\.com/ansible\-collections/community\.general/pull/7179)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * CmdRunner module utils \- does not attempt to resolve path if executable is a relative or absolute path \([https\://github\.com/ansible\-collections/community\.general/pull/7200](https\://github\.com/ansible\-collections/community\.general/pull/7200)\)\.
@@ -283,7 +314,7 @@ Bugfix and feature release\.
 <a id="v7-3-0"></a>
 ## v7\.3\.0
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Feature and bugfix release\.
@@ -311,7 +342,7 @@ Feature and bugfix release\.
 
 * ejabberd\_user \- deprecate the parameter <code>logging</code> in favour of producing more detailed information in the module output \([https\://github\.com/ansible\-collections/community\.general/pull/7043](https\://github\.com/ansible\-collections/community\.general/pull/7043)\)\.
 
-<a id="bugfixes-7"></a>
+<a id="bugfixes-8"></a>
 ### Bugfixes
 
 * bitwarden lookup plugin \- the plugin made assumptions about the structure of a Bitwarden JSON object which may have been broken by an update in the Bitwarden API\. Remove assumptions\, and allow queries for general fields such as <code>notes</code> \([https\://github\.com/ansible\-collections/community\.general/pull/7061](https\://github\.com/ansible\-collections/community\.general/pull/7061)\)\.
@@ -330,12 +361,12 @@ Feature and bugfix release\.
 <a id="v7-2-1"></a>
 ## v7\.2\.1
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Bugfix release\.
 
-<a id="bugfixes-8"></a>
+<a id="bugfixes-9"></a>
 ### Bugfixes
 
 * cmd\_runner module utils \- when a parameter in <code>argument\_spec</code> has no type\, meaning it is implicitly a <code>str</code>\, <code>CmdRunner</code> would fail trying to find the <code>type</code> key in that dictionary \([https\://github\.com/ansible\-collections/community\.general/pull/6968](https\://github\.com/ansible\-collections/community\.general/pull/6968)\)\.
@@ -347,7 +378,7 @@ Bugfix release\.
 <a id="v7-2-0"></a>
 ## v7\.2\.0
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -398,7 +429,7 @@ Regular bugfix and feature release\.
 * webfaction\_mailbox \- module relies entirely on no longer existent API endpoints\, and it will be removed in community\.general 9\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/6909](https\://github\.com/ansible\-collections/community\.general/pull/6909)\)\.
 * webfaction\_site \- module relies entirely on no longer existent API endpoints\, and it will be removed in community\.general 9\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/6909](https\://github\.com/ansible\-collections/community\.general/pull/6909)\)\.
 
-<a id="bugfixes-9"></a>
+<a id="bugfixes-10"></a>
 ### Bugfixes
 
 * cobbler inventory plugin \- fix calculation of cobbler\_ipv4/6\_address \([https\://github\.com/ansible\-collections/community\.general/pull/6925](https\://github\.com/ansible\-collections/community\.general/pull/6925)\)\.
@@ -440,7 +471,7 @@ Regular bugfix and feature release\.
 <a id="v7-1-0"></a>
 ## v7\.1\.0
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
@@ -522,7 +553,7 @@ for the rendered HTML version of the documentation of the latest release\.
   for removal in community\.general 10\.0\.0
   \([https\://github\.com/ansible\-collections/community\.general/pull/6673](https\://github\.com/ansible\-collections/community\.general/pull/6673)\)\.
 
-<a id="bugfixes-10"></a>
+<a id="bugfixes-11"></a>
 ### Bugfixes
 
 * MH DependencyMixin module utils \- deprecation notice was popping up for modules not using dependencies \([https\://github\.com/ansible\-collections/community\.general/pull/6644](https\://github\.com/ansible\-collections/community\.general/pull/6644)\, [https\://github\.com/ansible\-collections/community\.general/issues/6639](https\://github\.com/ansible\-collections/community\.general/issues/6639)\)\.
@@ -559,12 +590,12 @@ for the rendered HTML version of the documentation of the latest release\.
 <a id="v7-0-1"></a>
 ## v7\.0\.1
 
-<a id="release-summary-11"></a>
+<a id="release-summary-12"></a>
 ### Release Summary
 
 Bugfix release for Ansible 8\.0\.0rc1\.
 
-<a id="bugfixes-11"></a>
+<a id="bugfixes-12"></a>
 ### Bugfixes
 
 * nmcli \- fix bond option <code>xmit\_hash\_policy</code> \([https\://github\.com/ansible\-collections/community\.general/pull/6527](https\://github\.com/ansible\-collections/community\.general/pull/6527)\)\.
@@ -575,7 +606,7 @@ Bugfix release for Ansible 8\.0\.0rc1\.
 <a id="v7-0-0"></a>
 ## v7\.0\.0
 
-<a id="release-summary-12"></a>
+<a id="release-summary-13"></a>
 ### Release Summary
 
 This is release 7\.0\.0 of <code>community\.general</code>\, released on 2023\-05\-09\.
@@ -760,7 +791,7 @@ This is release 7\.0\.0 of <code>community\.general</code>\, released on 2023\-0
 * xfconf \- generating facts was deprecated in community\.general 3\.0\.0\, however three factoids\, <code>property</code>\, <code>channel</code> and <code>value</code> continued to be generated by mistake\. This behaviour has been removed and <code>xfconf</code> generate no facts whatsoever \([https\://github\.com/ansible\-collections/community\.general/pull/5502](https\://github\.com/ansible\-collections/community\.general/pull/5502)\)\.
 * xfconf \- generating facts was deprecated in community\.general 3\.0\.0\, however two factoids\, <code>previous\_value</code> and <code>type</code> continued to be generated by mistake\. This behaviour has been removed and <code>xfconf</code> generate no facts whatsoever \([https\://github\.com/ansible\-collections/community\.general/pull/5502](https\://github\.com/ansible\-collections/community\.general/pull/5502)\)\.
 
-<a id="bugfixes-12"></a>
+<a id="bugfixes-13"></a>
 ### Bugfixes
 
 * ModuleHelper \- fix bug when adjusting the name of reserved output variables \([https\://github\.com/ansible\-collections/community\.general/pull/5755](https\://github\.com/ansible\-collections/community\.general/pull/5755)\)\.
