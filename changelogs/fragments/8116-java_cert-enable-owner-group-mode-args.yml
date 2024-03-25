@@ -1,2 +1,2 @@
 minor_changes:
-  - java_cert - enable owner, group, mode arguments (https://github.com/ansible-collections/community.general/pull/8116)
+  - java_cert - enable ``owner``, ``group``, ``mode``, and other generic file arguments (https://github.com/ansible-collections/community.general/pull/8116).
