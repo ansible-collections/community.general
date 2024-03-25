@@ -168,7 +168,7 @@ def normalize_ttl(ttl):
 class ConsulAuthMethodModule(_ConsulModule):
     api_endpoint = "acl/auth-method"
     result_key = "auth_method"
-    unique_identifiers = ["name"]
+    unique_identifier = "name"
 
     def map_param(self, k, v, is_update):
         if k == "config" and v:

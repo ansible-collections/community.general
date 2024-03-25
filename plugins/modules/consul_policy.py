@@ -145,7 +145,7 @@ _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
 class ConsulPolicyModule(_ConsulModule):
     api_endpoint = "acl/policy"
     result_key = "policy"
-    unique_identifiers = ["id"]
+    unique_identifier = "id"
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:

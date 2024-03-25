@@ -212,7 +212,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
 class ConsulRoleModule(_ConsulModule):
     api_endpoint = "acl/role"
     result_key = "role"
-    unique_identifiers = ["id"]
+    unique_identifier = "id"
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:

@@ -124,7 +124,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
 class ConsulBindingRuleModule(_ConsulModule):
     api_endpoint = "acl/binding-rule"
     result_key = "binding_rule"
-    unique_identifiers = ["id"]
+    unique_identifier = "id"
 
     def read_object(self):
         url = "acl/binding-rules?authmethod={0}".format(self.params["auth_method"])
