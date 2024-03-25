@@ -116,6 +116,11 @@ options:
     required: false
     default: false
     type: bool
+  http_proxy:
+    description:
+      - perform through a proxy. Relevant only when state is set to 'present' or 'latest'.
+    required: false
+    type: str
 author:
     - "Ansible Core Team"
     - "Johan Wiren (@johanwiren)"
@@ -138,6 +143,13 @@ EXAMPLES = '''
     name: rake
     gem_source: /path/to/gems/rake-1.0.gem
     state: present
+
+- name: Install gem through a proxy
+  gem:
+    name: gist
+    state: present
+    http_proxy: 'http://localhost:8888'
+
 '''
 
 import re
@@ -290,6 +302,8 @@ def install(module):
         cmd.extend(['--', module.params['build_flags']])
     if module.params['force']:
         cmd.append('--force')
+    if module.params['http_proxy']:
+        cmd.extend(['--http-proxy', module.params['http_proxy']])
     module.run_command(cmd, check_rc=True)
 
 
@@ -313,9 +327,10 @@ def main():
             version=dict(required=False, type='str'),
             build_flags=dict(required=False, type='str'),
             force=dict(required=False, default=False, type='bool'),
+            http_proxy=dict(required=False, type='str'),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[['gem_source', 'repository'], ['gem_source', 'version']],
+        mutually_exclusive=[['gem_source', 'repository'], ['gem_source', 'version'], ['gem_source', 'http_proxy']],
     )
 
     if module.params['version'] and module.params['state'] == 'latest':
