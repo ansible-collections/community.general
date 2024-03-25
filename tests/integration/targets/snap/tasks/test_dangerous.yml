@@ -3,6 +3,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# NOTE This is currently disabled for performance reasons!
+
 - name: Make sure package is not installed (cider)
   community.general.snap:
     name: cider
