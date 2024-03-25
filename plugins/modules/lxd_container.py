@@ -436,12 +436,12 @@ ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
-    'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source', 'type'
+    'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
 ]
 
 # CONFIG_CREATION_PARAMS is a list of attribute names that are only applied
 # on instance creation.
-CONFIG_CREATION_PARAMS = ['source', 'type']
+CONFIG_CREATION_PARAMS = ['source']
 
 
 class LXDContainerManagement(object):
@@ -466,6 +466,13 @@ class LXDContainerManagement(object):
         self.wait_for_container = self.module.params['wait_for_container']
 
         self.type = self.module.params['type']
+
+        # LXD Rest API provides additional endpoints for creating containers and virtual-machines.
+        self.api_endpoint = None
+        if self.type == 'container':
+            self.api_endpoint = '/1.0/containers'
+        elif self.type == 'virtual-machine':
+            self.api_endpoint = '/1.0/virtual-machines'
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
@@ -492,18 +499,6 @@ class LXDContainerManagement(object):
             )
         except LXDClientException as e:
             self.module.fail_json(msg=e.msg)
-
-        # LXD (3.19) Rest API provides instances endpoint, failback to containers and virtual-machines
-        # https://documentation.ubuntu.com/lxd/en/latest/rest-api/#instances-containers-and-virtual-machines
-        self.api_endpoint = '/1.0/instances'
-        check_api_endpoint = self.client.do('GET', '{0}?project='.format(self.api_endpoint), ok_error_codes=[404])
-
-        if check_api_endpoint['error_code'] == 404:
-            if self.type == 'container':
-                self.api_endpoint = '/1.0/containers'
-            elif self.type == 'virtual-machine':
-                self.api_endpoint = '/1.0/virtual-machines'
-
         self.trust_password = self.module.params.get('trust_password', None)
         self.actions = []
         self.diff = {'before': {}, 'after': {}}
@@ -556,8 +551,6 @@ class LXDContainerManagement(object):
             url = '{0}?{1}'.format(url, urlencode(url_params))
         config = self.config.copy()
         config['name'] = self.name
-        if self.type not in self.api_endpoint:
-            config['type'] = self.type
         if not self.module.check_mode:
             self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
         self.actions.append('create')
