@@ -84,6 +84,12 @@ EXAMPLES = '''
   community.general.easy_install:
     name: bottle
     virtualenv: /webapps/myapp/venv
+
+- name: Install or update pip
+  community.general.easy_install:
+    name: pip
+    state: latest
+    executable: /path/to/your/easy_install
 '''
 
 import os
