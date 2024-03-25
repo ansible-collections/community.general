@@ -589,10 +589,8 @@ def main():
                                           keystore_pass, cert_alias, keystore_type, trust_cacert)
 
     if os.path.exists(keystore_path):
-        if 'changed' in result:
-            result['changed'] = result['changed'] or _update_permissions(module, keystore_path)
-        else:
-            result['changed'] = _update_permissions(module, keystore_path)
+        changed_permissions =_update_permissions(module, keystore_path)
+        result['changed'] = result.get('changed', False) or changed_permissions
 
     module.exit_json(**result)
 
