@@ -28,7 +28,7 @@ options:
   cert_url:
     description:
       - Basic URL to fetch SSL certificate from.
-      - Exactly one of O(cert_url), O(cert_path), or O(pkcs12_path) is required to load certificate.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: str
   cert_port:
     description:
@@ -39,8 +39,13 @@ options:
   cert_path:
     description:
       - Local path to load certificate from.
-      - Exactly one of O(cert_url), O(cert_path), or O(pkcs12_path) is required to load certificate.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: path
+  cert_content:
+    description:
+      - Content of the certificate used to create the keystore.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
+    type: str
   cert_alias:
     description:
       - Imported certificate alias.
@@ -55,10 +60,10 @@ options:
   pkcs12_path:
     description:
       - Local path to load PKCS12 keystore from.
-      - Unlike O(cert_url) and O(cert_path), the PKCS12 keystore embeds the private key matching
+      - Unlike O(cert_url), O(cert_path) and O(cert_content), the PKCS12 keystore embeds the private key matching
         the certificate, and is used to import both the certificate and its private key into the
         java keystore.
-      - Exactly one of O(cert_url), O(cert_path), or O(pkcs12_path) is required to load certificate.
+      - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: path
   pkcs12_password:
     description:
@@ -142,6 +147,19 @@ EXAMPLES = r'''
 - name: Import trusted CA from SSL certificate
   community.general.java_cert:
     cert_path: /opt/certs/rootca.crt
+    keystore_path: /tmp/cacerts
+    keystore_pass: changeit
+    keystore_create: true
+    state: present
+    cert_alias: LE_RootCA
+    trust_cacert: true
+
+- name: Import trusted CA from the SSL certificate stored in the cert_content variable
+  community.general.java_cert:
+    cert_content: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
     keystore_create: true
@@ -487,6 +505,7 @@ def main():
     argument_spec = dict(
         cert_url=dict(type='str'),
         cert_path=dict(type='path'),
+        cert_content=dict(type='str'),
         pkcs12_path=dict(type='path'),
         pkcs12_password=dict(type='str', no_log=True),
         pkcs12_alias=dict(type='str'),
@@ -503,11 +522,11 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=[['state', 'present', ('cert_path', 'cert_url', 'pkcs12_path'), True],
+        required_if=[['state', 'present', ('cert_path', 'cert_url', 'cert_content', 'pkcs12_path'), True],
                      ['state', 'absent', ('cert_url', 'cert_alias'), True]],
         required_together=[['keystore_path', 'keystore_pass']],
         mutually_exclusive=[
-            ['cert_url', 'cert_path', 'pkcs12_path']
+            ['cert_url', 'cert_path', 'cert_content', 'pkcs12_path']
         ],
         supports_check_mode=True,
         add_file_common_args=True,
@@ -515,6 +534,7 @@ def main():
 
     url = module.params.get('cert_url')
     path = module.params.get('cert_path')
+    content = module.params.get('cert_content')
     port = module.params.get('cert_port')
 
     pkcs12_path = module.params.get('pkcs12_path')
@@ -581,6 +601,10 @@ def main():
             # Extracting the X509 digest is a bit easier. Keytool will print the PEM
             # certificate to stdout so we don't need to do any transformations.
             new_certificate = path
+
+        elif content:
+            with open(new_certificate, "w") as f:
+                f.write(content)
 
         elif url:
             # Getting the X509 digest from a URL is the same as from a path, we just have
