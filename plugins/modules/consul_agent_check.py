@@ -44,7 +44,8 @@ options:
     type: str
   id:
     description:
-      - An unique ID for the service check.
+      - Specifies a unique ID for this check on the node. This defaults to the "Name" parameter, but it may be necessary to provide 
+        an ID for uniqueness. This value will return in the response as "CheckId".
     type: str
   interval:
     description:

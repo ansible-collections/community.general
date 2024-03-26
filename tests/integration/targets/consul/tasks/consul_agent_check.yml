@@ -50,7 +50,7 @@
     name: "{{ nginx_service_check.Name }}"
     id: "{{ nginx_service_check.CheckID }}"
     interval: 60s
-    http: https://local-host.de/morestatus
+    http: http://localhost:80/morestatus
     notes: "New Nginx Check"
     service_id: "{{ nginx_service.ID }}"
   register: result
