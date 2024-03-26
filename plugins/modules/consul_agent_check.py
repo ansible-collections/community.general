@@ -35,7 +35,8 @@ attributes:
     support: full
     details:
       - The result is the object as it is defined in the module options and not the object structure of the consul API.
-        For a better overview of what the object structure looks like, take a look at U(https://developer.hashicorp.com/consul/api-docs/agent/check#list-checks).
+        For a better overview of what the object structure looks like,
+        take a look at U(https://developer.hashicorp.com/consul/api-docs/agent/check#list-checks).
   diff_mode:
     support: partial
     details:
