@@ -17,6 +17,12 @@ description:
  - Allows the addition, modification and deletion of checks in a consul
    cluster via the agent. For more details on using and configuring Checks,
    see U(https://developer.hashicorp.com/consul/api-docs/agent/check).
+ - Currently, there is no complete way to retrieve the script, interval or TTL
+   metadata for a registered check. Without this metadata it is not possible to
+   tell if the data supplied with ansible represents a change to a check. As a
+   result this does not attempt to determine changes and will always report a
+   changed occurred. An API method is planned to supply this metadata so at that
+   stage change management will be added.
 author:
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
@@ -28,11 +34,12 @@ attributes:
   check_mode:
     support: full
     details:
-      - The result is the object as it is defined in the module params and not the object structure of the consul API.
+      - The result is the object as it is defined in the module options and not the object structure of the consul API.
+        For a better overview of what the object structure looks like, take a look at U(https://developer.hashicorp.com/consul/api-docs/agent/check#list-checks).
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will show the object as it is defined in the module params and not the object structure of the consul API.
+      - In check mode the diff will show the object as it is defined in the module options and not the object structure of the consul API.
 options:
   state:
     description:
