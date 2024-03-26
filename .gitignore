@@ -512,3 +512,7 @@ $RECYCLE.BIN/
 
 # Integration tests cloud configs
 tests/integration/cloud-config-*.ini
+
+
+# VSCode specific extensions
+.vscode/settings.json
