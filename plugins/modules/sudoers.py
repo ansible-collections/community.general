@@ -215,9 +215,9 @@ class Sudoers(object):
         return content_matches and mode_matches
 
     def content(self):
-        if self.user:
+        if self.user is not None:
             owner = self.user
-        elif self.group:
+        elif self.group is not None:
             owner = '%{group}'.format(group=self.group)
 
         commands_str = ', '.join(self.commands)
@@ -314,6 +314,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[['user', 'group']],
+        required_one_of=[['user', 'group']],
         supports_check_mode=True,
         required_if=[('state', 'present', ['commands'])],
     )
