@@ -15,14 +15,7 @@ short_description: Add, modify and delete services within a consul cluster
 version_added: 8.5.0
 description:
  - Allows the addition, modification and deletion of services in a consul
-   cluster via the agent. For more details on using and configuring Checks,
-   see U(https://developer.hashicorp.com/consul/api-docs/agent/service).
- - Currently, there is no complete way to retrieve the script, interval or TTL
-   metadata for a registered check. Without this metadata it is not possible to
-   tell if the data supplied with ansible represents a change to a check. As a
-   result this does not attempt to determine changes and will always report a
-   changed occurred. An API method is planned to supply this metadata so at that
-   stage change management will be added.
+   cluster via the agent.
 author:
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
@@ -47,13 +40,12 @@ options:
   name:
     description:
       - Unique name for the service on a node, must be unique per node,
-        required if registering a service. May be omitted if registering
-        a node level check.
+        required if registering a service.
     type: str
   id:
     description:
-      - The ID for the service, must be unique per node. If O(state=absent),
-        defaults to the service name if supplied.
+      - Specifies a unique ID for this service. This must be unique per agent. This defaults to the Name parameter if not provided.
+        If O(state=absent), defaults to the service name if supplied.
     type: str
   tags:
     description:
@@ -256,10 +248,6 @@ class ConsulAgentServiceModule(_ConsulModule):
 
         if "ID" not in existing:
             existing["ID"] = existing["Name"]
-
-        if "Checks" in existing:
-            for check in existing["Checks"]:
-                validate_check(check)
 
         return existing
 
