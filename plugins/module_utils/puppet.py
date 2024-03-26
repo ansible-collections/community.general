@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
 import os
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
-
 
 _PUPPET_PATH_PREFIX = ["/opt/puppetlabs/bin"]
 
@@ -107,5 +107,6 @@ def puppet_runner(module):
             verbose=cmd_runner_fmt.as_bool("--verbose"),
         ),
         check_rc=False,
+        force_lang=module.params["environment_lang"],
     )
     return runner

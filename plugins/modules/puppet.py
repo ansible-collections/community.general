@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -116,6 +117,12 @@ options:
       - Whether to print file changes details
     type: bool
     default: false
+  environment_lang:
+    description:
+      - The lang environment to use when running the puppet agent
+    type: str
+    default: C
+    version_added: 8.4.0
 requirements:
 - puppet
 author:
@@ -166,7 +173,6 @@ import os
 import stat
 
 import ansible_collections.community.general.plugins.module_utils.puppet as puppet_utils
-
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -208,6 +214,7 @@ def main():
             debug=dict(type='bool', default=False),
             verbose=dict(type='bool', default=False),
             use_srv_records=dict(type='bool'),
+            environment_lang=dict(type='str', default='C'),
         ),
         supports_check_mode=True,
         mutually_exclusive=[
