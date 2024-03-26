@@ -193,8 +193,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
     OPERATION_CREATE,
     OPERATION_UPDATE,
     OPERATION_DELETE,
-    _ConsulModule,
-    validate_check,
+    _ConsulModule
 )
 
 _CHECK_MUTUALLY_EXCLUSIVE = [('args', 'ttl', 'tcp', 'http')]
