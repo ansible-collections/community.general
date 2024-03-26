@@ -327,9 +327,9 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     elif rc in [0, 102, 103, 106]:
         # zypper exit codes
         # 0: success
-        # 106: signature verification failed
-        # 102: ZYPPER_EXIT_INF_REBOOT_NEEDED - Returned after a successful installation of a patch which requires reboot of computer.
-        # 103: zypper was upgraded, run same command again
+        # 102: ZYPPER_EXIT_INF_REBOOT_NEEDED - returned after a successful installation of a patch which requires reboot of computer.
+        # 103: ZYPPER_EXIT_INF_RESTART_NEEDED - zypper was upgraded, run same command again
+        # 106: ZYPPER_EXIT_INF_REPOS_SKIPPED - signature verification failed
         if packages is None:
             firstrun = True
             packages = {}
@@ -504,7 +504,7 @@ def package_absent(m, name):
     cmd.extend([p.name + p.version for p in packages])
 
     retvals['cmd'] = cmd
-    result, retvals['rc'], retvals['stdout'], retvals['stderr'] = parse_zypper_xml(m, cmd)
+    result, retvals['rc'], retvals['stdout'], retvals['stderr'] = parse_zypper_xml(m, cmd, fail_not_found=False)
     return result, retvals
 
 
