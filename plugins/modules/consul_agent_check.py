@@ -27,10 +27,12 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
+    details:
+      - The result is the object as it is defined in the module params and not the object structure of the consul API.
   diff_mode:
     support: partial
     details:
-      - In check mode the diff will miss operational attributes.
+      - In check mode the diff will show the object as it is defined in the module params and not the object structure of the consul API.
 options:
   state:
     description:
