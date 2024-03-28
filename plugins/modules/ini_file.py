@@ -587,7 +587,7 @@ def main():
                 option=dict(type='str', required=True),
                 value=dict(type='str'),
                 values=dict(type='list', elements='str')
-            ), default=None, mutually_exclusive=['value', 'values']),
+            ), default=None, mutually_exclusive=[['value', 'values']]),
             option=dict(type='str'),
             value=dict(type='str'),
             values=dict(type='list', elements='str'),
