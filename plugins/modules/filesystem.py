@@ -538,7 +538,7 @@ class LVM(Filesystem):
 
 class Swap(Filesystem):
     MKFS = 'mkswap'
-    MKFS_FORCE_FLAGS = ['-f']
+    MKFS_FORCE_FLAGS = []
 
 
 class UFS(Filesystem):
