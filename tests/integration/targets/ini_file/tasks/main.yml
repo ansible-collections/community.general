@@ -51,4 +51,4 @@
       include_tasks: tests/07-section_name_spaces.yml
 
     - name: include tasks to test section_has_values
-      include_tasks: tests/07-section.yml
+      include_tasks: tests/08-section.yml
