@@ -297,12 +297,12 @@ def update_section_line(option, changed, section_lines, index, changed_lines, ig
     return (changed, msg)
 
 
-def check_section_has_values(condition, section_lines):
-    if condition:
-        for check in condition:
+def check_section_has_values(section_has_values, section_lines):
+    if section_has_values is not None:
+        for condition in section_has_values:
             for line in section_lines:
-                match = match_opt(check["option"], line)
-                if match and (len(check["values"]) == 0 or match.group(7) in check["values"]):
+                match = match_opt(condition["option"], line)
+                if match and (len(condition["values"]) == 0 or match.group(7) in condition["values"]):
                     break
             else:
                 return False
@@ -531,15 +531,15 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
         if section_has_values:
-            for check in section_has_values:
-                if check['option'] != option:
-                    if len(check['values']) > 0:
-                        for value in check['values']:
-                            ini_lines.append(assignment_format % (check['option'], value))
+            for condition in section_has_values:
+                if condition['option'] != option:
+                    if len(condition['values']) > 0:
+                        for value in condition['values']:
+                            ini_lines.append(assignment_format % (condition['option'], value))
                     elif allow_no_value:
-                        ini_lines.append(u'%s\n' % check['option'])
+                        ini_lines.append(u'%s\n' % condition['option'])
                 elif not exclusive:
-                    for value in check['values']:
+                    for value in condition['values']:
                         if value not in values:
                             values.append(value)
         if option and values:
