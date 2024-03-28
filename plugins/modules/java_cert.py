@@ -46,6 +46,7 @@ options:
       - Content of the certificate used to create the keystore.
       - Exactly one of O(cert_url), O(cert_path), O(cert_content), or O(pkcs12_path) is required to load certificate.
     type: str
+    version_added: 8.6.0
   cert_alias:
     description:
       - Imported certificate alias.
