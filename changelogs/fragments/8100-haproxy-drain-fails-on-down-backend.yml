@@ -1,0 +1,2 @@
+bugfixes:
+  - "haproxy - fix an issue where HAProxy could get stuck in DRAIN mode when the backend was unreachable (https://github.com/ansible-collections/community.general/issues/8092)."
