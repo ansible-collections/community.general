@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli adds OpenvSwitch command support with commands such as 'ovs-port', 'ovs-interface', and 'ovs-bridge'.
