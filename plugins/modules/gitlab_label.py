@@ -222,9 +222,8 @@ labels_obj:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
-    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_group, find_project, gitlab
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package, find_group, find_project
 )
 
 
@@ -450,14 +449,7 @@ def main():
     label_list = module.params['labels']
     state = module.params['state']
 
-    gitlab_version = gitlab.__version__
-    _min_gitlab = '3.2.0'
-    if LooseVersion(gitlab_version) < LooseVersion(_min_gitlab):
-        module.fail_json(msg="community.general.gitlab_label requires python-gitlab Python module >= %s "
-                             "(installed version: [%s]). Please upgrade "
-                             "python-gitlab to version %s or above." % (_min_gitlab, gitlab_version, _min_gitlab))
-
-    gitlab_instance = gitlab_authentication(module)
+    gitlab_instance = gitlab_authentication(module, min_version='3.2.0')
 
     # find_project can return None, but the other must exist
     gitlab_project_id = find_project(gitlab_instance, gitlab_project)
