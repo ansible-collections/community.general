@@ -116,6 +116,7 @@ URL_AUTHZ_POLICY = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resourc
 URL_AUTHZ_PERMISSION = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/permission/{permission_type}/{id}"
 URL_AUTHZ_PERMISSIONS = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/permission/{permission_type}"
 
+URL_AUTHZ_RESOURCE = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/resource/{id}"
 URL_AUTHZ_RESOURCES = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/resource"
 
 URL_AUTHZ_CUSTOM_POLICY = "{url}/admin/realms/{realm}/clients/{client_id}/authz/resource-server/policy/{policy_type}"
@@ -3025,6 +3026,16 @@ class KeycloakAPI(object):
         except Exception as e:
             self.fail_open_url(e, msg='Could not create update permission %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
 
+    def create_authz_resource(self, payload, client_id, realm):
+        """Create an authorization resource for a Keycloak client"""
+        url = URL_AUTHZ_RESOURCES.format(url=self.baseurl, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not create resource %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+
     def get_authz_resource_by_name(self, name, client_id, realm):
         """Get authorization resource by name"""
         url = URL_AUTHZ_RESOURCES.format(url=self.baseurl, client_id=client_id, realm=realm)
@@ -3036,6 +3047,26 @@ class KeycloakAPI(object):
                                                  validate_certs=self.validate_certs).read()))
         except Exception:
             return False
+
+    def remove_authz_permission(self, id, client_id, realm):
+        """Remove an authorization resource for a Keycloak client"""
+        url = URL_AUTHZ_RESOURCE.format(url=self.baseurl, id=id, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not delete permission %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
+
+    def update_authz_resource(self, payload, id, client_id, realm):
+        """Update a resource for a Keycloak client"""
+        url = URL_AUTHZ_RESOURCE.format(url=self.baseurl, id=id, client_id=client_id, realm=realm)
+
+        try:
+            return open_url(url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(payload), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not create update permission %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
 
     def get_authz_policy_by_name(self, name, client_id, realm):
         """Get authorization policy by name"""
