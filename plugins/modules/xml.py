@@ -436,11 +436,16 @@ def is_attribute(tree, xpath, namespaces):
     """ Test if a given xpath matches and that match is an attribute
 
     An xpath attribute search will only match one item"""
+
+    # lxml 5.1.1 removed etree._ElementStringResult, so we can no longer simply assume it's there
+    # (https://github.com/lxml/lxml/commit/eba79343d0e7ad1ce40169f60460cdd4caa29eb3)
+    ElementStringResult = getattr(etree, '_ElementStringResult', None)
+
     if xpath_matches(tree, xpath, namespaces):
         match = tree.xpath(xpath, namespaces=namespaces)
-        if isinstance(match[0], etree._ElementStringResult):
+        if isinstance(match[0], etree._ElementUnicodeResult):
             return True
-        elif isinstance(match[0], etree._ElementUnicodeResult):
+        elif ElementStringResult is not None and isinstance(match[0], ElementStringResult):
             return True
     return False
 
