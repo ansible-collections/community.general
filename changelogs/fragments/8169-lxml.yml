@@ -1,0 +1,2 @@
+bugfixes:
+  - "xml - make module work with lxml 5.1.1, which removed some internals that the module was relying on (https://github.com/ansible-collections/community.general/pull/8169)."
