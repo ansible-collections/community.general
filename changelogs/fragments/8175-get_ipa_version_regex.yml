@@ -1,0 +1,2 @@
+bugfixes:
+  - ipa - fix get version regex im ipa module_utils (https://github.com/ansible-collections/community.general/pull/8175)
