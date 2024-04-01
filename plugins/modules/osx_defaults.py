@@ -56,6 +56,7 @@ options:
       - If the types do not match, raises an error.
     type: bool
     default: true
+    version_added: 8.6.0
   array_add:
     description:
       - Add new elements to the array for a key which has an array as its value.
