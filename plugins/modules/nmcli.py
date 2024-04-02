@@ -89,6 +89,7 @@ options:
     slave_type:
         description:
             - Type of the device of this slave's master connection (for example V(bond)).
+            - Type V(ovs-port) is added in community.general 8.6.0.
         type: str
         choices: [ 'bond', 'bridge', 'team', 'ovs-port' ]
         version_added: 7.0.0
