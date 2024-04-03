@@ -30,6 +30,7 @@ jobs:
       matrix:
         ansible:
           - '2.13'
+          - '2.14'
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
     # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
     # image for these stable branches. The list of branches where this is necessary will
@@ -72,6 +73,8 @@ jobs:
             python: '2.7'
           - ansible: '2.13'
             python: '3.8'
+          - ansible: '2.14'
+            python: '3.9'
 
     steps:
       - name: >-
@@ -148,10 +151,28 @@ jobs:
             docker: alpine3
             python: ''
             target: azp/posix/3/
+          # 2.14
+          - ansible: '2.14'
+            docker: alpine3
+            python: ''
+            target: azp/posix/1/
+          - ansible: '2.14'
+            docker: alpine3
+            python: ''
+            target: azp/posix/2/
+          - ansible: '2.14'
+            docker: alpine3
+            python: ''
+            target: azp/posix/3/
           # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
           # - ansible: '2.13'
           #   docker: default
           #   python: '3.9'
+          #   target: azp/generic/1/
+          # Right now all generic tests are disabled. Uncomment when at least one of them is re-enabled.
+          # - ansible: '2.14'
+          #   docker: default
+          #   python: '3.10'
           #   target: azp/generic/1/
 
     steps:
