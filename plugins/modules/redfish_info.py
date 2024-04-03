@@ -588,9 +588,9 @@ def main():
                 elif command == "GetVirtualMedia":
                     result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
                 elif command == "GetLogs":
-                    result["log"] = rf_utils.get_logs()
+                    result["log"] = rf_utils.get_multi_logs()
                 elif command == "GetNetworkProtocols":
-                    result["network_protocols"] = rf_utils.get_network_protocols()
+                    result["network_protocols"] = rf_utils.get_multi_network_protocols()
                 elif command == "GetHealthReport":
                     result["health_report"] = rf_utils.get_multi_manager_health_report()
                 elif command == "GetHostInterfaces":

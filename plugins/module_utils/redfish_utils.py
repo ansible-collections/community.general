@@ -624,14 +624,17 @@ class RedfishUtils(object):
             allowable_values = default_values
         return allowable_values
 
-    def get_logs(self):
+    def get_multi_logs(self):
+        return self.aggregate_managers(self.get_logs)
+
+    def get_logs(self, manager_uri):
         log_svcs_uri_list = []
         list_of_logs = []
         properties = ['Severity', 'Created', 'EntryType', 'OemRecordFormat',
                       'Message', 'MessageId', 'MessageArgs']
 
         # Find LogService
-        response = self.get_request(self.root_uri + self.manager_uri)
+        response = self.get_request(self.root_uri + manager_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -2983,11 +2986,14 @@ class RedfishUtils(object):
     def get_multi_system_inventory(self):
         return self.aggregate_systems(self.get_system_inventory)
 
-    def get_network_protocols(self):
+    def get_multi_network_protocols(self):
+        return self.aggregate_managers(self.get_network_protocols)
+
+    def get_network_protocols(self, manager_uri):
         result = {}
         service_result = {}
         # Find NetworkProtocol
-        response = self.get_request(self.root_uri + self.manager_uri)
+        response = self.get_request(self.root_uri + manager_uri)
         if response['ret'] is False:
             return response
         data = response['data']
