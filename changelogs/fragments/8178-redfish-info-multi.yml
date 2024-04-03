@@ -1,2 +1,2 @@
-breaking_changes:
-  - redfish_info - modify ``GetLogs`` and ``GetNetworkProtocols`` commands to support multi-manager node types. These commands will return a list of dictionaries similar to the ``GetManagerInventory`` and ``GetSystemInventory`` commands instead of a single dictionary (https://github.com/ansible-collections/community.general/issues/6764).
+minor_changes:
+  - redfish_info - modify ``GetLogs`` and ``GetNetworkProtocols`` commands to support multi-manager node types. These commands will return a list of dictionaries similar to the ``GetManagerInventory`` and ``GetSystemInventory`` commands instead of a single dictionary when multiple managers are present, otherwise existing output is unchanged (https://github.com/ansible-collections/community.general/issues/6764).

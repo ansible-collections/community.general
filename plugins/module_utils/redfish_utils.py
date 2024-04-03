@@ -625,7 +625,10 @@ class RedfishUtils(object):
         return allowable_values
 
     def get_multi_logs(self):
-        return self.aggregate_managers(self.get_logs)
+        if len(self.manager_uris) > 1:
+            return self.aggregate_managers(self.get_logs)
+        else:
+            return self.get_logs(self.manager_uri)
 
     def get_logs(self, manager_uri):
         log_svcs_uri_list = []
@@ -2987,7 +2990,10 @@ class RedfishUtils(object):
         return self.aggregate_systems(self.get_system_inventory)
 
     def get_multi_network_protocols(self):
-        return self.aggregate_managers(self.get_network_protocols)
+        if len(self.manager_uris) > 1:
+            return self.aggregate_managers(self.get_network_protocols)
+        else:
+            return self.get_network_protocols(self.manager_uri)
 
     def get_network_protocols(self, manager_uri):
         result = {}
