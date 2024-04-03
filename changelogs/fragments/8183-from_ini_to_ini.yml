@@ -1,3 +1,3 @@
 bugfixes:
-  - "to_ini - Disabling interpolation of ConfigParser to allow converting values with a %-sign"
-  - "from_ini - Disabling interpolation of ConfigParser to allow converting values with a %-sign"
+  - "to_ini - Disabling interpolation of ConfigParser to allow converting values with a %-sign (https://github.com/ansible-collections/community.general/issues/8183)"
+  - "from_ini - Disabling interpolation of ConfigParser to allow converting values with a %-sign (https://github.com/ansible-collections/community.general/issues/8183)"
