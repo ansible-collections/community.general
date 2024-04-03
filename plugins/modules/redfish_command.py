@@ -281,6 +281,12 @@ options:
       - BIOS attributes that needs to be verified in the given server.
     type: dict
     version_added: 6.4.0
+  reset_to_defaults_mode:
+    description:
+      - Mode to apply when reseting to default.
+    type: str
+    choices: [ ResetAll, PreserveNetworkAndUsers, PreserveNetwork ]
+    version_added: 8.6.0
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
@@ -714,6 +720,13 @@ EXAMPLES = '''
       command: PowerReboot
       resource_id: BMC
 
+  - name: Factory reset manager to defaults
+    community.general.redfish_command:
+      category: Manager
+      command: ResetToDefaults
+      resource_id: BMC
+      reset_to_defaults_mode: ResetAll
+
   - name: Verify BIOS attributes
     community.general.redfish_command:
       category: Systems
@@ -764,6 +777,7 @@ CATEGORY_COMMANDS_ALL = {
                  "UpdateAccountServiceProperties"],
     "Sessions": ["ClearSessions", "CreateSession", "DeleteSession"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
+                "ResetToDefaults",
                 "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
                 "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
     "Update": ["SimpleUpdate", "MultipartHTTPPushUpdate", "PerformRequestedOperations"],
@@ -825,6 +839,7 @@ def main():
                 )
             ),
             strip_etag_quotes=dict(type='bool', default=False),
+            reset_to_defaults_mode=dict(choices=['ResetAll', 'PreserveNetworkAndUsers', 'PreserveNetwork']),
             bios_attributes=dict(type="dict")
         ),
         required_together=[
@@ -1017,6 +1032,8 @@ def main():
                 result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
                 result = rf_utils.virtual_media_eject(virtual_media, category)
+            elif command == 'ResetToDefaults':
+                result = rf_utils.manager_reset_to_defaults(module.params['reset_to_defaults_mode'])
 
     elif category == "Update":
         # execute only if we find UpdateService resources
