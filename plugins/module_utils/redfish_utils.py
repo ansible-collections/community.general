@@ -1149,6 +1149,54 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True}
 
+    def manager_reset_to_defaults(self, command):
+        return self.reset_to_defaults(command, self.manager_uri,
+                                      '#Manager.ResetToDefaults')
+
+    def reset_to_defaults(self, command, resource_uri, action_name):
+        key = "Actions"
+        reset_type_values = ['ResetAll',
+                             'PreserveNetworkAndUsers',
+                             'PreserveNetwork']
+
+        if command not in reset_type_values:
+            return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
+
+        # read the resource and get the current power state
+        response = self.get_request(self.root_uri + resource_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # get the reset Action and target URI
+        if key not in data or action_name not in data[key]:
+            return {'ret': False, 'msg': 'Action %s not found' % action_name}
+        reset_action = data[key][action_name]
+        if 'target' not in reset_action:
+            return {'ret': False,
+                    'msg': 'target URI missing from Action %s' % action_name}
+        action_uri = reset_action['target']
+
+        # get AllowableValues
+        ai = self._get_all_action_info_values(reset_action)
+        allowable_values = ai.get('ResetType', {}).get('AllowableValues', [])
+
+        # map ResetType to an allowable value if needed
+        if allowable_values and command not in allowable_values:
+            return {'ret': False,
+                    'msg': 'Specified reset type (%s) not supported '
+                           'by service. Supported types: %s' %
+                           (command, allowable_values)}
+
+        # define payload
+        payload = {'ResetType': command}
+
+        # POST to Action URI
+        response = self.post_request(self.root_uri + action_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True}
+
     def _find_account_uri(self, username=None, acct_id=None):
         if not any((username, acct_id)):
             return {'ret': False, 'msg':
