@@ -222,7 +222,7 @@ class Zfs(object):
             # to avoids errors when the dataset already exists and the property is not changed
             # this scenario is most likely when the same playbook is run more than once
             if source in ('local', 'received', '-'):
-                properties += [prop]
+                properties.append(prop)
         return properties
 
     def get_property(self, name, list_of_properties):
