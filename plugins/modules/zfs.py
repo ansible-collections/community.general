@@ -98,10 +98,10 @@ from ansible.module_utils.basic import AnsibleModule
 
 class Zfs(object):
 
-    def __init__(self, module, name, properties):
+    def __init__(self, module, name, extra_zfs_properties):
         self.module = module
         self.name = name
-        self.properties = properties
+        self.extra_zfs_properties = extra_zfs_properties
         self.changed = False
         self.zfs_cmd = module.get_bin_path('zfs', True)
         self.zpool_cmd = module.get_bin_path('zpool', True)
@@ -142,7 +142,7 @@ class Zfs(object):
         if self.module.check_mode:
             self.changed = True
             return
-        properties = self.properties
+        extra_zfs_properties = self.extra_zfs_properties
         origin = self.module.params.get('origin')
         cmd = [self.zfs_cmd]
 
@@ -158,8 +158,8 @@ class Zfs(object):
         if action in ['create', 'clone']:
             cmd += ['-p']
 
-        if properties:
-            for prop, value in properties.items():
+        if extra_zfs_properties:
+            for prop, value in extra_zfs_properties.items():
                 if prop == 'volsize':
                     cmd += ['-V', value]
                 elif prop == 'volblocksize':
@@ -190,7 +190,7 @@ class Zfs(object):
     def set_properties_if_changed(self):
         diff = {'before': {'extra_zfs_properties': {}}, 'after': {'extra_zfs_properties': {}}}
         current_properties = self.list_properties()
-        for prop, value in self.properties.items():
+        for prop, value in self.extra_zfs_properties.items():
             current_value = self.get_property(prop, current_properties)
             if current_value != value:
                 self.set_property(prop, value)
@@ -199,7 +199,7 @@ class Zfs(object):
         if self.module.check_mode:
             return diff
         updated_properties = self.list_properties()
-        for prop in self.properties:
+        for prop in self.extra_zfs_properties:
             value = self.get_property(prop, updated_properties)
             if value is None:
                 self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
@@ -299,7 +299,7 @@ def main():
     result['diff']['before_header'] = name
     result['diff']['after_header'] = name
 
-    result.update(zfs.properties)
+    result.update(zfs.extra_zfs_properties)
     result['changed'] = zfs.changed
     module.exit_json(**result)
 
