@@ -131,11 +131,6 @@ options:
           - Only available for service checks and metric alerts.
           - Because each of them can have multiple thresholds, we do not define them directly in the query.
           - "If not specified, it defaults to: V({'ok': 1, 'critical': 1, 'warning': 1})."
-    locked:
-        description:
-          - Whether changes to this monitor should be restricted to the creator or admins.
-        type: bool
-        default: false
     require_full_window:
         description:
           - Whether this monitor needs a full window of data before it gets evaluated.
@@ -192,6 +187,14 @@ options:
         type: list
         elements: str
         version_added: 7.1.0
+    restricted_roles:
+        description:
+          - An array listing the UUIDs of the roles allowed to edit the monitor.
+          - Monitor editing includes updates to the monitor configuration, deleting the monitor, and muting of the monitor for any amount of time.
+          - Role UUIDs can be pulled from the Roles API - https://docs.datadoghq.com/api/latest/roles/.
+        type: list
+        elements: str
+        version_added: 8.6.0
 
 '''
 
@@ -207,6 +210,18 @@ EXAMPLES = '''
     notification_preset_name: "show_all"
     query: "datadog.agent.up.over('host:host1').last(2).count_by_status()"
     notification_message: "Host [[host.name]] with IP [[host.ip]] is failing to report to datadog."
+    api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
+    app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
+
+- name: Create a metric monitor with restricted edit capabilities
+  community.general.datadog_monitor:
+    type: "metric alert"
+    name: "Test monitor"
+    state: "present"
+    query: "datadog.agent.up.over('host:host1').last(2).count_by_status()"
+    notification_message: "Host [[host.name]] with IP [[host.ip]] is failing to report to datadog."
+    restricted_roles:
+      - "12395123-e140-s212-ab64-123534"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
@@ -277,7 +292,7 @@ def main():
             notify_audit=dict(default=False, type='bool'),
             thresholds=dict(type='dict', default=None),
             tags=dict(type='list', elements='str', default=None),
-            locked=dict(default=False, type='bool'),
+            restricted_roles=dict(type='list', elements='str', default=None),
             require_full_window=dict(type='bool'),
             new_host_delay=dict(),
             evaluation_delay=dict(),
@@ -350,6 +365,8 @@ def _post_monitor(module, options):
                       options=options)
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']
+        if module.params['restricted_roles'] is not None:
+            kwargs['restricted_roles'] = module.params['restricted_roles']
         msg = api.Monitor.create(**kwargs)
         if 'errors' in msg:
             module.fail_json(msg=str(msg['errors']))
@@ -375,6 +392,8 @@ def _update_monitor(module, monitor, options):
                       options=options)
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']
+        if module.params['restricted_roles'] is not None:
+            kwargs['restricted_roles'] = module.params['restricted_roles']
         msg = api.Monitor.update(**kwargs)
 
         if 'errors' in msg:
@@ -396,7 +415,6 @@ def install_monitor(module):
         "renotify_interval": module.params['renotify_interval'],
         "escalation_message": module.params['escalation_message'],
         "notify_audit": module.boolean(module.params['notify_audit']),
-        "locked": module.boolean(module.params['locked']),
         "require_full_window": module.params['require_full_window'],
         "new_host_delay": module.params['new_host_delay'],
         "evaluation_delay": module.params['evaluation_delay'],
