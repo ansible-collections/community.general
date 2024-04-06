@@ -191,7 +191,7 @@ options:
         description:
           - An array listing the UUIDs of the roles allowed to edit the monitor.
           - Monitor editing includes updates to the monitor configuration, deleting the monitor, and muting of the monitor for any amount of time.
-          - Role UUIDs can be pulled from the Roles API - https://docs.datadoghq.com/api/latest/roles/.
+          - Role UUIDs can be pulled from the Roles API - see U(https://docs.datadoghq.com/api/latest/roles/) for details.
         type: list
         elements: str
         version_added: 8.6.0
