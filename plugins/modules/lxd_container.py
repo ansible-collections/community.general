@@ -86,8 +86,8 @@ options:
     source:
         description:
           - 'The source for the instance
-            (for example V({ "type": "image", "mode": "pull", "server": "https://images.linuxcontainers.org",
-            "protocol": "lxd", "alias": "ubuntu/xenial/amd64" })).'
+            (for example V({ "type": "image", "mode": "pull", "server": "https://cloud-images.ubuntu.com/releases/",
+            "protocol": "simplestreams", "alias": "22.04" })).'
           - 'See U(https://documentation.ubuntu.com/lxd/en/latest/api/) for complete API documentation.'
           - 'Note that C(protocol) accepts two choices: V(lxd) or V(simplestreams).'
         required: false
@@ -205,6 +205,9 @@ notes:
   - You can copy a file in the created instance to the localhost
     with C(command=lxc file pull instance_name/dir/filename filename).
     See the first example below.
+  - linuxcontainers.org has phased out LXC/LXD support with March 2024
+    (U(https://discuss.linuxcontainers.org/t/important-notice-for-lxd-users-image-server/18479)).
+    Currently only Ubuntu is still providing images.
 '''
 
 EXAMPLES = '''
@@ -220,9 +223,9 @@ EXAMPLES = '''
         source:
           type: image
           mode: pull
-          server: https://images.linuxcontainers.org
-          protocol: lxd # if you get a 404, try setting protocol: simplestreams
-          alias: ubuntu/xenial/amd64
+          server: https://cloud-images.ubuntu.com/releases/
+          protocol: simplestreams
+          alias: "22.04"
         profiles: ["default"]
         wait_for_ipv4_addresses: true
         timeout: 600
@@ -264,6 +267,26 @@ EXAMPLES = '''
         wait_for_ipv4_addresses: true
         timeout: 600
 
+# An example of creating a ubuntu-minial container
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create a started container
+      community.general.lxd_container:
+        name: mycontainer
+        ignore_volatile_options: true
+        state: started
+        source:
+          type: image
+          mode: pull
+          # Provides Ubuntu minimal images
+          server: https://cloud-images.ubuntu.com/minimal/releases/
+          protocol: simplestreams
+          alias: "22.04"
+        profiles: ["default"]
+        wait_for_ipv4_addresses: true
+        timeout: 600
+
 # An example for creating container in project other than default
 - hosts: localhost
   connection: local
@@ -278,8 +301,8 @@ EXAMPLES = '''
           protocol: simplestreams
           type: image
           mode: pull
-          server: https://images.linuxcontainers.org
-          alias: ubuntu/20.04/cloud
+          server: https://cloud-images.ubuntu.com/releases/
+          alias: "22.04"
         profiles: ["default"]
         wait_for_ipv4_addresses: true
         timeout: 600
@@ -347,7 +370,7 @@ EXAMPLES = '''
         source:
           type: image
           mode: pull
-          alias: ubuntu/xenial/amd64
+          alias: "22.04"
         target: node01
 
     - name: Create container on another node
@@ -358,7 +381,7 @@ EXAMPLES = '''
         source:
           type: image
           mode: pull
-          alias: ubuntu/xenial/amd64
+          alias: "22.04"
         target: node02
 
 # An example for creating a virtual machine
