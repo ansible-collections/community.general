@@ -109,7 +109,7 @@ options:
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
-      - The default value for this parameter changed from C(10) to C(60)
+      - The default value for this parameter changed from V(10) to V(60)
         in community.general 9.0.0.
     type: int
     default: 60
