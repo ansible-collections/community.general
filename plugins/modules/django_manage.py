@@ -61,6 +61,7 @@ options:
   virtualenv:
     description:
       - An optional path to a C(virtualenv) installation to use while running the manage application.
+      - The virtual environment must exist, otherwise the module will fail.
     type: path
     aliases: [virtual_env]
   apps:
@@ -124,12 +125,8 @@ options:
     aliases: [test_runner]
   ack_venv_creation_deprecation:
     description:
-      - >-
-        When a O(virtualenv) is set but the virtual environment does not exist, the current behavior is
-        to create a new virtual environment. That behavior is deprecated and if that case happens it will
-        generate a deprecation warning. Set this flag to V(true) to suppress the deprecation warning.
-      - Please note that you will receive no further warning about this being removed until the module
-        will start failing in such cases from community.general 9.0.0 on.
+      - This option no longer has any effect since community.general 9.0.0.
+      - It will be removed from community.general 11.0.0.
     type: bool
     version_added: 5.8.0
 
@@ -138,12 +135,9 @@ notes:
     B(ATTENTION - DEPRECATION): Support for Django releases older than 4.1 will be removed in
     community.general version 9.0.0 (estimated to be released in May 2024).
     Please notice that Django 4.1 requires Python 3.8 or greater.
-  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the O(virtualenv) parameter
-    is specified. This requirement is deprecated and will be removed in community.general version 9.0.0.
-  - This module will create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not already
-    exist at the given location. This behavior is deprecated and will be removed in community.general version 9.0.0.
-  - The parameter O(virtualenv) will remain in use, but it will require the specified virtualenv to exist.
-    The recommended way to create one in Ansible is by using M(ansible.builtin.pip).
+  - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment
+    does not already exist at the given location. This behavior changed in community.general version 9.0.0.
+  - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
   - This module assumes English error messages for the V(createcachetable) command to detect table existence,
     unfortunately.
   - To be able to use the V(migrate) command with django versions < 1.7, you must have C(south) installed and added
@@ -161,7 +155,7 @@ seealso:
   - name: What Python version can I use with Django?
     description: From the Django FAQ, the response to Python requirements for the framework.
     link: https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
-requirements: [ "virtualenv", "django" ]
+requirements: [ "django" ]
 author:
   - Alexei Znamensky (@russoz)
   - Scott Anderson (@tastychutney)
@@ -225,22 +219,7 @@ def _ensure_virtualenv(module):
     activate = os.path.join(vbin, 'activate')
 
     if not os.path.exists(activate):
-        # In version 9.0.0, if the venv is not found, it should fail_json() here.
-        if not module.params['ack_venv_creation_deprecation']:
-            module.deprecate(
-                'The behavior of "creating the virtual environment when missing" is being '
-                'deprecated and will be removed in community.general version 9.0.0. '
-                'Set the module parameter `ack_venv_creation_deprecation: true` to '
-                'prevent this message from showing up when creating a virtualenv.',
-                version='9.0.0',
-                collection_name='community.general',
-            )
-
-        virtualenv = module.get_bin_path('virtualenv', True)
-        vcmd = [virtualenv, venv_param]
-        rc, out_venv, err_venv = module.run_command(vcmd)
-        if rc != 0:
-            _fail(module, vcmd, out_venv, err_venv)
+        module.fail_json(msg='%s does not point to a valid virtual environment' % venv_param)
 
     os.environ["PATH"] = "%s:%s" % (vbin, os.environ["PATH"])
     os.environ["VIRTUAL_ENV"] = venv_param
@@ -316,7 +295,7 @@ def main():
             skip=dict(type='bool'),
             merge=dict(type='bool'),
             link=dict(type='bool'),
-            ack_venv_creation_deprecation=dict(type='bool'),
+            ack_venv_creation_deprecation=dict(type='bool', removed_in_version='11.0.0', removed_from_collection='community.general'),
         ),
     )
 
