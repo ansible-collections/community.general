@@ -15,3 +15,4 @@ breaking_changes:
   - "redfish_command, redfish_config, redfish_info - change the default for ``timeout`` from 10 to 60 (https://github.com/ansible-collections/community.general/pull/8198)."
   - "cpanm - the default of the ``mode`` option changed from ``compatibility`` to ``new`` (https://github.com/ansible-collections/community.general/pull/8198)."
   - "django_manage - the module will now fail if ``virtualenv`` is specified but no virtual environment exists at that location (https://github.com/ansible-collections/community.general/pull/8198)."
+  - "django_manage - the module now requires Django >= 4.1 (https://github.com/ansible-collections/community.general/pull/8198)."

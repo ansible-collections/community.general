@@ -131,10 +131,6 @@ options:
     version_added: 5.8.0
 
 notes:
-  - >
-    B(ATTENTION - DEPRECATION): Support for Django releases older than 4.1 will be removed in
-    community.general version 9.0.0 (estimated to be released in May 2024).
-    Please notice that Django 4.1 requires Python 3.8 or greater.
   - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment
     does not already exist at the given location. This behavior changed in community.general version 9.0.0.
   - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
@@ -155,7 +151,7 @@ seealso:
   - name: What Python version can I use with Django?
     description: From the Django FAQ, the response to Python requirements for the framework.
     link: https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
-requirements: [ "django" ]
+requirements: [ "django >= 4.1" ]
 author:
   - Alexei Znamensky (@russoz)
   - Scott Anderson (@tastychutney)
