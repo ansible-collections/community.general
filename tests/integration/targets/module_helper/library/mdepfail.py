@@ -30,10 +30,10 @@ EXAMPLES = ""
 
 RETURN = ""
 
+from ansible_collections.community.general.plugins.module_utils import deps
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible.module_utils.basic import missing_required_lib
 
-with ModuleHelper.dependency("nopackagewiththisname", missing_required_lib("nopackagewiththisname")):
+with deps.declare("nopackagewiththisname"):
     import nopackagewiththisname  # noqa: F401, pylint: disable=unused-import
 
 
@@ -50,6 +50,7 @@ class MSimple(ModuleHelper):
     def __init_module__(self):
         self.vars.set('value', None)
         self.vars.set('abc', "abc", diff=True)
+        deps.validate(self.module)
 
     def __run__(self):
         if (0 if self.vars.a is None else self.vars.a) >= 100:
