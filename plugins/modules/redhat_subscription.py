@@ -123,7 +123,7 @@ options:
         description:
             - Upon successful registration, auto-consume available subscriptions
             - |
-              Please note that the alias O(autosubscribe) was removed in
+              Please note that the alias O(ignore:autosubscribe) was removed in
               community.general 9.0.0.
         type: bool
     activationkey:

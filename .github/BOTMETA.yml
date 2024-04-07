@@ -532,8 +532,6 @@ files:
     maintainers: $team_flatpak
   $modules/flatpak_remote.py:
     maintainers: $team_flatpak
-  $modules/flowdock.py:
-    ignore: mcodd
   $modules/gandi_livedns.py:
     maintainers: gthiemonge
   $modules/gconftool2.py:

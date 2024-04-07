@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import traceback
-
-from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
-from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
-
 
 class DependencyCtxMgr(object):
     def __init__(self, name, msg=None):

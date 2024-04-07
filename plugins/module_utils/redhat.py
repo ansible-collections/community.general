@@ -15,10 +15,8 @@ __metaclass__ = type
 
 
 import os
-import re
 import shutil
 import tempfile
-import types
 
 from ansible.module_utils.six.moves import configparser
 
