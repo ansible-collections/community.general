@@ -237,9 +237,9 @@ plugin_routing:
     docker_volume_info:
       redirect: community.docker.docker_volume_info
     flowdock:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     foreman:
       tombstone:

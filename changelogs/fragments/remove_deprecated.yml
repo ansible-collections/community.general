@@ -2,6 +2,7 @@ removed_features:
   - "rax* modules, rax module utils, rax docs fragment - the Rackspace modules relied on the deprecated package ``pyrax`` and were thus removed (https://github.com/ansible-collections/community.general/pull/8198)."
   - "stackdriver - this module relied on HTTPS APIs that do not exist anymore and was thus removed (https://github.com/ansible-collections/community.general/pull/8198)."
   - "webfaction_* modules - these modules relied on HTTPS APIs that do not exist anymore and were thus removed (https://github.com/ansible-collections/community.general/pull/8198)."
+  - "flowdock - this module relied on HTTPS APIs that do not exist anymore and was thus removed (https://github.com/ansible-collections/community.general/pull/8198)."
   - "redhat_subscription - the alias ``autosubscribe`` of the ``auto_attach`` option was removed (https://github.com/ansible-collections/community.general/pull/8198)."
   - "redhat module utils - the classes ``Rhsm``, ``RhsmPool``, and ``RhsmPools`` have been removed (https://github.com/ansible-collections/community.general/pull/8198)."
   - "mh.mixins.deps module utils - the ``DependencyMixin`` has been removed. Use the ``deps`` module utils instead (https://github.com/ansible-collections/community.general/pull/8198)."
