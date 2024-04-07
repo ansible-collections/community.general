@@ -28,23 +28,15 @@ options:
   command:
     description:
       - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
-      - >
-        V(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
-        removed in community.general 9.0.0. Use V(clearsessions) instead.
       - V(collectstatic) - Collects the static files into C(STATIC_ROOT).
       - V(createcachetable) - Creates the cache tables for use with the database cache backend.
       - V(flush) - Removes all data from the database.
       - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
       - V(migrate) - Synchronizes the database state with models and migrations.
-      - >
-        V(syncdb) - Synchronizes the database state with models and migrations (deprecated in Django 1.7).
-        This parameter will be removed in community.general 9.0.0. Use V(migrate) instead.
       - V(test) - Runs tests for all installed apps.
-      - >
-        V(validate) - Validates all installed models (deprecated in Django 1.7). This parameter will be
-        removed in community.general 9.0.0. Use V(check) instead.
       - Other commands can be entered, but will fail if they are unknown to Django.  Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
+      - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0.
     type: str
     required: true
   project_path:
@@ -178,7 +170,7 @@ author:
 EXAMPLES = """
 - name: Run cleanup on the application installed in django_dir
   community.general.django_manage:
-    command: cleanup
+    command: clearsessions
     project_path: "{{ django_dir }}"
 
 - name: Load the initial_data fixture into the application
@@ -189,7 +181,7 @@ EXAMPLES = """
 
 - name: Run syncdb on the application
   community.general.django_manage:
-    command: syncdb
+    command: migrate
     project_path: "{{ django_dir }}"
     settings: "{{ settings_app_name }}"
     pythonpath: "{{ settings_dir }}"
@@ -266,11 +258,6 @@ def loaddata_filter_output(line):
     return "Installed" in line and "Installed 0 object" not in line
 
 
-def syncdb_filter_output(line):
-    return ("Creating table " in line) \
-        or ("Installed" in line and "Installed 0 object" not in line)
-
-
 def migrate_filter_output(line):
     return ("Migrating forwards " in line) \
         or ("Installed" in line and "Installed 0 object" not in line) \
@@ -283,13 +270,10 @@ def collectstatic_filter_output(line):
 
 def main():
     command_allowed_param_map = dict(
-        cleanup=(),
         createcachetable=('cache_table', 'database', ),
         flush=('database', ),
         loaddata=('database', 'fixtures', ),
-        syncdb=('database', ),
         test=('failfast', 'testrunner', 'apps', ),
-        validate=(),
         migrate=('apps', 'skip', 'merge', 'database',),
         collectstatic=('clear', 'link', ),
     )
@@ -301,7 +285,6 @@ def main():
     # forces --noinput on every command that needs it
     noinput_commands = (
         'flush',
-        'syncdb',
         'migrate',
         'test',
         'collectstatic',
@@ -341,21 +324,6 @@ def main():
     command_bin = command_split[0]
     project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
-
-    try:
-        _deprecation = dict(
-            cleanup="clearsessions",
-            syncdb="migrate",
-            validate="check",
-        )
-        module.deprecate(
-            'The command {0} has been deprecated as it is no longer supported in recent Django versions.'
-            'Please use the command {1} instead that provide similar capability.'.format(command_bin, _deprecation[command_bin]),
-            version='9.0.0',
-            collection_name='community.general'
-        )
-    except KeyError:
-        pass
 
     for param in specific_params:
         value = module.params[param]
