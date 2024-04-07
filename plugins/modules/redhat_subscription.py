@@ -123,10 +123,9 @@ options:
         description:
             - Upon successful registration, auto-consume available subscriptions
             - |
-              Please note that the alias O(autosubscribe) will be removed in
+              Please note that the alias O(autosubscribe) was removed in
               community.general 9.0.0.
         type: bool
-        aliases: [autosubscribe]
     activationkey:
         description:
             - supply an activation key for use with registration
@@ -1106,17 +1105,7 @@ def main():
             'server_port': {},
             'rhsm_baseurl': {},
             'rhsm_repo_ca_cert': {},
-            'auto_attach': {
-                'type': 'bool',
-                'aliases': ['autosubscribe'],
-                'deprecated_aliases': [
-                    {
-                        'name': 'autosubscribe',
-                        'version': '9.0.0',
-                        'collection_name': 'community.general',
-                    },
-                ],
-            },
+            'auto_attach': {'type': 'bool'},
             'activationkey': {'no_log': True},
             'org_id': {},
             'environment': {},
