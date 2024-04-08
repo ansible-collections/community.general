@@ -1,0 +1,2 @@
+bugfixes:
+  - module_utils/ipa.py - fix regex parsing FreeIPA version only matches single digits.
