@@ -1,0 +1,2 @@
+bugfixes:
+  - module_utils/ipa.py - fix FreeIPA version parsing supporting only single digits (https://github.com/ansible-collections/community.general/pull/8201).
