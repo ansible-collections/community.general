@@ -141,7 +141,7 @@ DOCUMENTATION = '''
         version_added: 8.1.0
       missing_subkey:
         description:
-          - List of preference about what to do if the password subkey is missing
+          - Preference about what to do if the password subkey is missing.
           - If set to V(error), the lookup will error out if the subkey does not exist.
           - If set to V(empty) or V(warn), will return a V(none) in case the subkey does not exist.
         version_added: 8.6.0
@@ -450,7 +450,7 @@ class LookupModule(LookupBase):
             else:
                 if self.paramvals["missing_subkey"] == "error":
                     raise AnsibleError(
-                        "passwordstore: subkey {0} for passname {1} not found and missing=error is set".format(
+                        "passwordstore: subkey {0} for passname {1} not found and missing_subkey=error is set".format(
                             self.paramvals["subkey"], self.passname
                         )
                     )
