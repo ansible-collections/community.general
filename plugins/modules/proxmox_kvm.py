@@ -1091,7 +1091,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             )
 
         # Convert all dict in kwargs to elements.
-        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
+        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n], usb[n]
         for k in list(kwargs.keys()):
             if isinstance(kwargs[k], dict):
                 kwargs.update(kwargs[k])
@@ -1308,6 +1308,7 @@ def main():
                            storage=dict(type='str', required=True),
                            version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
                        )),
+        usb=dict(type='dict'),
         update=dict(type='bool', default=False),
         update_unsafe=dict(type='bool', default=False),
         vcpus=dict(type='int'),
@@ -1513,6 +1514,7 @@ def main():
                               tdf=module.params['tdf'],
                               template=module.params['template'],
                               tpmstate0=module.params['tpmstate0'],
+                              usb=module.params['usb'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
                               virtio=module.params['virtio'],
