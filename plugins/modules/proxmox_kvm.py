@@ -517,6 +517,15 @@ options:
         default: '2.0'
     type: dict
     version_added: 7.1.0
+  usb:
+    description:
+      - A hash/dictionary of usb devices for the VM. O(net='{"key":"value", "key":"value"}').
+      - Keys allowed are - C(net[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - C(host="value|spice",mapping="value",usb3="1|0").
+      - Model is either C(spice) or the USB id/port.
+      - Option C(mapping) is the mapped USB device name.
+      - Option C(usb3) enables usb3 support.
+    type: dict
   update:
     description:
       - If V(true), the VM will be updated with new value.
