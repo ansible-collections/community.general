@@ -1,0 +1,2 @@
+bugfixes:
+  - "support riak admin sub-command in newer riak kv versions beside the legacy riak-admin main command"
