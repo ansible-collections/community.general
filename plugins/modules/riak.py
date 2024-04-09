@@ -126,7 +126,7 @@ def main():
 
     # make sure riak commands are on the path
     riak_bin = module.get_bin_path('riak')
-    riak_admin_bin = module.get_bin_path('riak-admin')
+    riak_admin_bin = module.get_bin_path('riak-admin') or riak_bin + ' admin'
 
     timeout = time.time() + 120
     while True:
@@ -216,7 +216,7 @@ def main():
                 module.fail_json(msg='Timeout waiting for handoffs.')
 
     if wait_for_service:
-        cmd = [riak_admin_bin, 'wait_for_service', 'riak_%s' % wait_for_service, node_name]
+        cmd = riak_admin_bin.split() + ['wait_for_service', 'riak_%s' % wait_for_service, node_name]
         rc, out, err = module.run_command(cmd)
         result['service'] = out
 
