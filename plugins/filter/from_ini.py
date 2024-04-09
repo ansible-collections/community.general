@@ -57,7 +57,7 @@ class IniParser(ConfigParser):
     ''' Implements a configparser which is able to return a dict '''
 
     def __init__(self):
-        super().__init__()
+        super().__init__(interpolation=None)
         self.optionxform = str
 
     def as_dict(self):
