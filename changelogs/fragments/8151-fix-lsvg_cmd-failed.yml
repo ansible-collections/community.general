@@ -1,0 +1,2 @@
+bugfixes:
+  - aix_filesystem - fix ``_validate_vg`` not passing VG name to ``lsvg_cmd`` (https://github.com/ansible-collections/community.general/issues/8151).
