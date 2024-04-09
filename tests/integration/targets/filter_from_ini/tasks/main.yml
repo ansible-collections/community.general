@@ -12,15 +12,21 @@
       another_section:
         connection: 'ssh'
 
+      interpolate_test:
+        interpolate_test_key: '%'
+
 - name: 'Write INI file that reflects ini_test_dict to {{ ini_test_file }}'
   ansible.builtin.copy:
     dest: '{{ ini_test_file }}'
     content: |
       [section_name]
-      key_name=key value
+      key_name = key value
 
       [another_section]
-      connection=ssh
+      connection = ssh
+
+      [interpolate_test]
+      interpolate_test_key = %
 
 - name: 'Slurp the test file: {{ ini_test_file }}'
   ansible.builtin.slurp:
