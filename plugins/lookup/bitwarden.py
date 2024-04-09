@@ -29,7 +29,7 @@ DOCUMENTATION = """
           - Field to retrieve, for example V(name) or V(id).
           - If set to V(id), only zero or one element can be returned.
             Use the Jinja C(first) filter to get the only list element.
-          - When this field is undefined, retrieves the whole records (filtered by O(collection_id) and O(organization_id) if set).
+          - If set to V(None) or V(''), or if O(_terms) is empty, records are not filtered by fields.
         type: str
         default: name
         version_added: 5.7.0
