@@ -1,3 +1,2 @@
 bugfixes:
   - "riak - support ``riak admin`` sub-command in newer Riak KV versions beside the legacy ``riak-admin`` main command (https://github.com/ansible-collections/community.general/pull/8211)."
-  
