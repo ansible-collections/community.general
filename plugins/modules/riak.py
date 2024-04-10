@@ -93,7 +93,7 @@ from ansible.module_utils.urls import fetch_url
 
 
 def ring_check(module, riak_admin_bin):
-    cmd = '%s ringready' % riak_admin_bin
+    cmd = riak_admin_bin + ['ringready']
     rc, out, err = module.run_command(cmd)
     if rc == 0 and 'TRUE All nodes agree on the ring' in out:
         return True
@@ -127,7 +127,7 @@ def main():
     # make sure riak commands are on the path
     riak_bin = module.get_bin_path('riak')
     riak_admin_bin = module.get_bin_path('riak-admin')
-    riak_admin_bin = [riak_admin_bin] if riak_admin_bin is not None else [riak_bin, ' admin']
+    riak_admin_bin = [riak_admin_bin] if riak_admin_bin is not None else [riak_bin, 'admin']
 
     timeout = time.time() + 120
     while True:
@@ -165,7 +165,7 @@ def main():
             module.fail_json(msg=out)
 
     elif command == 'kv_test':
-        cmd = '%s test' % riak_admin_bin
+        cmd = riak_admin_bin + ['test']
         rc, out, err = module.run_command(cmd)
         if rc == 0:
             result['kv_test'] = out
@@ -176,7 +176,7 @@ def main():
         if nodes.count(node_name) == 1 and len(nodes) > 1:
             result['join'] = 'Node is already in cluster or staged to be in cluster.'
         else:
-            cmd = '%s cluster join %s' % (riak_admin_bin, target_node)
+            cmd = riak_admin_bin + ['cluster', 'join', target_node]
             rc, out, err = module.run_command(cmd)
             if rc == 0:
                 result['join'] = out
@@ -185,7 +185,7 @@ def main():
                 module.fail_json(msg=out)
 
     elif command == 'plan':
-        cmd = '%s cluster plan' % riak_admin_bin
+        cmd = riak_admin_bin + ['cluster', 'plan']
         rc, out, err = module.run_command(cmd)
         if rc == 0:
             result['plan'] = out
@@ -195,7 +195,7 @@ def main():
             module.fail_json(msg=out)
 
     elif command == 'commit':
-        cmd = '%s cluster commit' % riak_admin_bin
+        cmd = riak_admin_bin + ['cluster', 'commit']
         rc, out, err = module.run_command(cmd)
         if rc == 0:
             result['commit'] = out
@@ -207,7 +207,7 @@ def main():
     if wait_for_handoffs:
         timeout = time.time() + wait_for_handoffs
         while True:
-            cmd = '%s transfers' % riak_admin_bin
+            cmd = riak_admin_bin + ['transfers']
             rc, out, err = module.run_command(cmd)
             if 'No transfers active' in out:
                 result['handoffs'] = 'No transfers active.'
