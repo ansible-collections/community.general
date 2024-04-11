@@ -89,4 +89,4 @@ class BecomeModule(BecomeBase):
         if user:
             user = '%s' % (user)
 
-        return ' '.join([becomecmd, flags, prompt, 'su -l', user, self._build_success_command(cmd, shell)])
+        return ' '.join([becomecmd, flags, prompt, "su -l", user, "-c", self._build_success_command(cmd, shell, True)])
