@@ -724,7 +724,7 @@ import copy
 
 PROTOCOL_OPENID_CONNECT = 'openid-connect'
 PROTOCOL_SAML = 'saml'
-PROTOCOL_DOCKER_V2= 'docker_v2'
+PROTOCOL_DOCKER_V2= 'docker-v2'
 CLIENT_META_DATA = ['authorizationServicesEnabled']
 
 
