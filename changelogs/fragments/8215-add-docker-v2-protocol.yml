@@ -1,0 +1,2 @@
+minor_changes:
+  - Added `docker-v2` protocol support to `keycloak_client`, `keycloak_clientscope`, `keycloak_clienttemplate`, enhancing alignment with Keycloak's protocol options.
