@@ -249,7 +249,7 @@ options:
             - Type of client.
             - At creation only, default value will be V(openid-connect) if O(protocol) is omitted.
         type: str
-        choices: ['openid-connect', 'saml']
+        choices: ['openid-connect', 'saml', 'docker-v2']
 
     full_scope_allowed:
         description:
@@ -393,7 +393,7 @@ options:
             protocol:
                 description:
                     - This specifies for which protocol this protocol mapper is active.
-                choices: ['openid-connect', 'saml']
+                choices: ['openid-connect', 'saml', 'docker-v2']
                 type: str
 
             protocolMapper:
