@@ -16,6 +16,10 @@ version_added: 8.5.0
 description:
  - Allows the addition, modification and deletion of services in a consul
    cluster via the agent.
+ - There are currently no plans to create services and checks in one. 
+   This is because the Consul API does not provide checks for a service and
+   the checks themselves do not match the module parameters. 
+   Therefore, only a service without checks can be created in this module. 
 author:
   - Michael Ilg (@Ilgmi)
 extends_documentation_fragment:
