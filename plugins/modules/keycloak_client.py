@@ -724,6 +724,7 @@ import copy
 
 PROTOCOL_OPENID_CONNECT = 'openid-connect'
 PROTOCOL_SAML = 'saml'
+PROTOCOL_DOCKER_V2= 'docker_v2'
 CLIENT_META_DATA = ['authorizationServicesEnabled']
 
 
@@ -785,7 +786,7 @@ def main():
         consentText=dict(type='str'),
         id=dict(type='str'),
         name=dict(type='str'),
-        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML]),
+        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
         protocolMapper=dict(type='str'),
         config=dict(type='dict'),
     )
@@ -819,7 +820,7 @@ def main():
         authorization_services_enabled=dict(type='bool', aliases=['authorizationServicesEnabled']),
         public_client=dict(type='bool', aliases=['publicClient']),
         frontchannel_logout=dict(type='bool', aliases=['frontchannelLogout']),
-        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML]),
+        protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
         attributes=dict(type='dict'),
         full_scope_allowed=dict(type='bool', aliases=['fullScopeAllowed']),
         node_re_registration_timeout=dict(type='int', aliases=['nodeReRegistrationTimeout']),

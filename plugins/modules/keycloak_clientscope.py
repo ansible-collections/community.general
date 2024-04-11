@@ -79,7 +79,7 @@ options:
     protocol:
         description:
             - Type of client.
-        choices: ['openid-connect', 'saml', 'wsfed']
+        choices: ['openid-connect', 'saml', 'wsfed', 'docker_v2']
         type: str
 
     protocol_mappers:
@@ -95,7 +95,7 @@ options:
                 description:
                     - This specifies for which protocol this protocol mapper.
                     - is active.
-                choices: ['openid-connect', 'saml', 'wsfed']
+                choices: ['openid-connect', 'saml', 'wsfed', 'docker_v2']
                 type: str
 
             protocolMapper:
@@ -330,7 +330,7 @@ def main():
     protmapper_spec = dict(
         id=dict(type='str'),
         name=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed', 'docker_v2']),
         protocolMapper=dict(type='str'),
         config=dict(type='dict'),
     )
@@ -341,7 +341,7 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         description=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed', 'docker_v2']),
         attributes=dict(type='dict'),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
     )
