@@ -248,6 +248,7 @@ options:
         description:
             - Type of client.
             - At creation only, default value will be V(openid-connect) if O(protocol) is omitted.
+            - The V(docker-v2) value was added in community.general 8.6.0.
         type: str
         choices: ['openid-connect', 'saml', 'docker-v2']
 

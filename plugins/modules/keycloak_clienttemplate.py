@@ -68,6 +68,7 @@ options:
     protocol:
         description:
             - Type of client template.
+            - The V(docker-v2) value was added in community.general 8.6.0.
         choices: ['openid-connect', 'saml', 'docker-v2']
         type: str
 

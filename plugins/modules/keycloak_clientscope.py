@@ -79,6 +79,7 @@ options:
     protocol:
         description:
             - Type of client.
+            - The V(docker-v2) value was added in community.general 8.6.0.
         choices: ['openid-connect', 'saml', 'wsfed', 'docker-v2']
         type: str
 
