@@ -1597,6 +1597,8 @@ class RedfishUtils(object):
 
         data = response['data']
 
+        result['multipart_supported'] = 'MultipartHttpPushUri' in data
+
         if "Actions" in data:
             actions = data['Actions']
             if len(actions) > 0:
