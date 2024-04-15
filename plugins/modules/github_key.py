@@ -91,11 +91,16 @@ EXAMPLES = '''
     pubkey: "{{ lookup('ansible.builtin.file', '/home/foo/.ssh/id_rsa.pub') }}"
 '''
 
+import datetime
 import json
 import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 API_BASE = 'https://api.github.com'
@@ -151,14 +156,13 @@ def get_all_keys(session):
 
 def create_key(session, name, pubkey, check_mode):
     if check_mode:
-        from datetime import datetime
-        now = datetime.utcnow()
+        now_t = now()
         return {
             'id': 0,
             'key': pubkey,
             'title': name,
             'url': 'http://example.com/CHECK_MODE_GITHUB_KEY',
-            'created_at': datetime.strftime(now, '%Y-%m-%dT%H:%M:%SZ'),
+            'created_at': datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
             'read_only': False,
             'verified': False
         }
