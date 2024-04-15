@@ -154,7 +154,14 @@ class Bitwarden(object):
         if search_field == 'id':
             params = ['get', 'item', search_value]
         else:
-            params = ['list', 'items', '--search', search_value if search_value else '']
+            params = ['list', 'items']
+            if search_value:
+                params.extend(['--search', search_value])
+
+        if collection_id:
+            params.extend(['--collectionid', collection_id])
+        if organization_id:
+            params.extend(['--organizationid', organization_id])
 
         out, err = self._run(params)
 
@@ -167,17 +174,8 @@ class Bitwarden(object):
             else:
                 initial_matches = [initial_matches]
 
-        matches = []
-        for item in initial_matches:
-            if search_value and item[search_field] != search_value:
-                continue
-            # filter collection_id and organization_id manually since bitwarden CLI cannot filter both at the same time
-            if collection_id and collection_id not in item['collectionIds']:
-                continue
-            if organization_id and item['organizationId'] != organization_id:
-                continue
-            matches.append(item)
-        return matches
+        # Filter to only include results from the right field.
+        return [item for item in initial_matches if not search_value or item[search_field] == search_value]
 
     def get_field(self, field, search_value, search_field="name", collection_id=None, organization_id=None):
         """Return a list of the specified field for records whose search_field match search_value
