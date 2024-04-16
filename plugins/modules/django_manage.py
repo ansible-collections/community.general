@@ -143,7 +143,7 @@ notes:
   - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
   - This module assumes English error messages for the V(createcachetable) command to detect table existence,
     unfortunately.
-  - To be able to use the V(collectstatic) command, you must have enabled staticfiles in your settings.
+  - To be able to use the V(collectstatic) command, you must have enabled C(staticfiles) in your settings.
   - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang,
     for example C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
 seealso:
