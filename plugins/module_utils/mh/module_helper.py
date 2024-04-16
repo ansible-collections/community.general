@@ -10,11 +10,12 @@ __metaclass__ = type
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.vardict import VarDict as NewVarDict
+from ansible_collections.community.general.plugins.module_utils.vardict import VarDict as NewVarDict  # remove "as NewVarDictt" in 11.0.0
 # (TODO: remove AnsibleModule!) pylint: disable-next=unused-import
-from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase, AnsibleModule  # noqa: F401
+from ansible_collections.community.general.plugins.module_utils.mh.base import AnsibleModule          # noqa: F401   DEPRECATED, remove in 11.0.0
+from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarDict as OldVarDict
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarDict         # remove in 11.0.0
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
 
@@ -24,20 +25,23 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
     diff_params = ()
     change_params = ()
     facts_params = ()
-    use_old_vardict = True
+    use_old_vardict = True      # remove in 11.0.0
+    mute_vardict_deprecation = False
 
     def __init__(self, module=None):
-        super(ModuleHelper, self).__init__(module)
-        if self.use_old_vardict:
-            self.vars = OldVarDict()
-            self.module.deprecate(
-                "This class is using the old VarDict from ModuleHelper, which is deprecated. "
-                "Set the class variable use_old_vardict to False and make the necessary adjustments."
-                "The old VarDict class will be removed in community.general 11.0.0",
-                version="11.0.0", collection_name="community.general"
-            )
+        if self.use_old_vardict:  # remove first half of the if in 11.0.0
+            self.vars = VarDict()
+            super(ModuleHelper, self).__init__(module)
+            if not self.mute_vardict_deprecation:
+                self.module.deprecate(
+                    "This class is using the old VarDict from ModuleHelper, which is deprecated. "
+                    "Set the class variable use_old_vardict to False and make the necessary adjustments."
+                    "The old VarDict class will be removed in community.general 11.0.0",
+                    version="11.0.0", collection_name="community.general"
+                )
         else:
             self.vars = NewVarDict()
+            super(ModuleHelper, self).__init__(module)
 
         for name, value in self.module.params.items():
             self.vars.set(
