@@ -81,12 +81,16 @@ options:
 notes:
   - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
   - "This module now comes with a choice of execution O(mode): V(compatibility) or V(new)."
-  - "O(mode=compatibility): When using V(compatibility) mode, the module will keep backward compatibility. This is the default mode.
+  - >
+    O(mode=compatibility): When using V(compatibility) mode, the module will keep backward compatibility.
+    This was the default mode before community.general 9.0.0.
     O(name) must be either a module name or a distribution file. If the perl module given by O(name) is installed (at the exact O(version)
     when specified), then nothing happens. Otherwise, it will be installed using the C(cpanm) executable. O(name) cannot be an URL, or a git URL.
-    C(cpanm) version specifiers do not work in this mode."
-  - "O(mode=new): When using V(new) mode, the module will behave differently. The O(name) parameter may refer to a module name, a distribution file,
-    a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version specifiers are recognized."
+    C(cpanm) version specifiers do not work in this mode.
+  - >
+    O(mode=new): When using V(new) mode, the module will behave differently. The O(name) parameter may refer to a module name, a distribution file,
+    a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version specifiers are recognized.
+    This is the default mode from community.general 9.0.0 onwards.
 author:
   - "Franck Cuny (@fcuny)"
   - "Alexei Znamensky (@russoz)"
