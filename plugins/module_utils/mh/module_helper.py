@@ -10,6 +10,7 @@ __metaclass__ = type
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
+from ansible_collections.community.general.plugins.module_utils.vardict import VarDict
 # (TODO: remove AnsibleModule!) pylint: disable-next=unused-import
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase, AnsibleModule  # noqa: F401
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
@@ -25,7 +26,7 @@ class ModuleHelper(DeprecateAttrsMixin, VarsMixin, ModuleHelperBase):
     facts_params = ()
 
     def __init__(self, module=None):
-        super(ModuleHelper, self).__init__(module)
+        self.vars = VarDict()
         for name, value in self.module.params.items():
             self.vars.set(
                 name, value,
