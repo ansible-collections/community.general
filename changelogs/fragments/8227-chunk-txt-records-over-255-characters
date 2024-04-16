@@ -1,0 +1,2 @@
+bugfixes:
+  - nsupdate - Fix bug causes by TXT records over 255 characters (https://github.com/ansible-collections/community.general/pull/8227).
