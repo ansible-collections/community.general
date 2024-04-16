@@ -18,7 +18,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars i
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
 
-class ModuleHelper(DeprecateAttrsMixin, VarsMixin, ModuleHelperBase):
+class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
     facts_name = None
     output_params = ()
     diff_params = ()
