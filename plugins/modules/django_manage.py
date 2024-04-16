@@ -34,9 +34,10 @@ options:
       - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
       - V(migrate) - Synchronizes the database state with models and migrations.
       - V(test) - Runs tests for all installed apps.
-      - Other commands can be entered, but will fail if they are unknown to Django.  Other commands that may
+      - Other commands can be entered, but will fail if they are unknown to Django. Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
       - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0.
+        See note about supported versions of Django.
     type: str
     required: true
   project_path:
@@ -131,13 +132,17 @@ options:
     version_added: 5.8.0
 
 notes:
+  - >
+    B(ATTENTION): Support for Django releases older than 4.1 has been removed in
+    community.general version 9.0.0. While the module allows for free-form commands
+    does not verify the version of Django being used, it is B(strongly recommended)
+    to use a more recent version of Django.
+  - Please notice that Django 4.1 requires Python 3.8 or greater.
   - This module will not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment
     does not already exist at the given location. This behavior changed in community.general version 9.0.0.
   - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
   - This module assumes English error messages for the V(createcachetable) command to detect table existence,
     unfortunately.
-  - To be able to use the V(migrate) command with django versions < 1.7, you must have C(south) installed and added
-    as an app in your settings.
   - To be able to use the V(collectstatic) command, you must have enabled staticfiles in your settings.
   - Your C(manage.py) application must be executable (C(rwxr-xr-x)), and must have a valid shebang,
     for example C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
