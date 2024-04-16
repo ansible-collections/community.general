@@ -254,7 +254,7 @@ class RecordManager(object):
 
     def txt_helper(self, entry):
         if len(entry) > 255:
-            entry = [entry[i:i+255] for i in range(0, len(record), 255)]
+            entry = [entry[i:i+255] for i in range(0, len(entry), 255)]
             entry = '" "'.join(entry)
         if entry[0] == '"' and entry[-1] == '"':
             return entry
