@@ -10,12 +10,14 @@ __metaclass__ = type
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 
-from ansible_collections.community.general.plugins.module_utils.vardict import VarDict as NewVarDict  # remove "as NewVarDictt" in 11.0.0
+from ansible_collections.community.general.plugins.module_utils.vardict import VarDict as _NewVarDict  # remove "as NewVarDict" in 11.0.0
 # (TODO: remove AnsibleModule!) pylint: disable-next=unused-import
-from ansible_collections.community.general.plugins.module_utils.mh.base import AnsibleModule          # noqa: F401   DEPRECATED, remove in 11.0.0
+from ansible_collections.community.general.plugins.module_utils.mh.base import AnsibleModule  # noqa: F401 DEPRECATED, remove in 11.0.0
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarDict         # remove in 11.0.0
+# (TODO: remove mh.mixins.vars!) pylint: disable-next=unused-import
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin, VarDict as _OldVarDict  # noqa: F401 remove in 11.0.0
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
 
@@ -30,7 +32,7 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
 
     def __init__(self, module=None):
         if self.use_old_vardict:  # remove first half of the if in 11.0.0
-            self.vars = VarDict()
+            self.vars = _OldVarDict()
             super(ModuleHelper, self).__init__(module)
             if not self.mute_vardict_deprecation:
                 self.module.deprecate(
@@ -40,7 +42,7 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
                     version="11.0.0", collection_name="community.general"
                 )
         else:
-            self.vars = NewVarDict()
+            self.vars = _NewVarDict()
             super(ModuleHelper, self).__init__(module)
 
         for name, value in self.module.params.items():
