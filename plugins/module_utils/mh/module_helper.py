@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# (c) 2020, Alexei Znamensky <russoz@gmail.com>
-# Copyright (c) 2020, Ansible Project
+# (c) 2020-2024, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2020-2024, Ansible Project
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause
 
@@ -67,7 +67,10 @@ class ModuleHelper(DeprecateAttrsMixin, ModuleHelperBase):
         self.update_vars(meta={"fact": True}, **kwargs)
 
     def _vars_changed(self):
-        return any(self.vars.has_changed(v) for v in self.vars.change_vars())
+        if self.use_old_vardict:
+            return any(self.vars.has_changed(v) for v in self.vars.change_vars())
+
+        return self.vars.has_changed
 
     def has_changed(self):
         return self.changed or self._vars_changed()
