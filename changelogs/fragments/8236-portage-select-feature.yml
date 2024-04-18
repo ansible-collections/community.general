@@ -1,0 +1,2 @@
+minor_changes:
+  - portage - adds the possibility to explicitely tell portage to write packages to world file.
