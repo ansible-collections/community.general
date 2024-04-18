@@ -123,9 +123,12 @@ options:
 
   select:
     description:
-      - Explicitely add the package to the world file
+      - If set to V(true), explicitely add the package to the world file.
+      - Please note that this option is not used for idempotency, it is only used
+        when actually installing a package.
     type: bool
     default: false
+    version_added: 8.6.0
 
   sync:
     description:
