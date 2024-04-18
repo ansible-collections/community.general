@@ -127,7 +127,6 @@ options:
       - Please note that this option is not used for idempotency, it is only used
         when actually installing a package.
     type: bool
-    default: false
     version_added: 8.6.0
 
   sync:
@@ -533,7 +532,7 @@ def main():
             nodeps=dict(default=False, type='bool'),
             onlydeps=dict(default=False, type='bool'),
             depclean=dict(default=False, type='bool'),
-            select=dict(default=False, type='bool'),
+            select=dict(default=None, type='bool'),
             quiet=dict(default=False, type='bool'),
             verbose=dict(default=False, type='bool'),
             sync=dict(default=None, choices=['yes', 'web', 'no']),
