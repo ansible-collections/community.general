@@ -121,6 +121,12 @@ options:
     type: bool
     default: false
 
+  select:
+    description:
+      - Explicitely add the package to the world file
+    type: bool
+    default: false
+
   sync:
     description:
       - Sync package repositories first
@@ -374,6 +380,7 @@ def emerge_packages(module, packages):
         'loadavg': '--load-average',
         'backtrack': '--backtrack',
         'withbdeps': '--with-bdeps',
+        'select': '--select',
     }
 
     for flag, arg in emerge_flags.items():
@@ -523,6 +530,7 @@ def main():
             nodeps=dict(default=False, type='bool'),
             onlydeps=dict(default=False, type='bool'),
             depclean=dict(default=False, type='bool'),
+            select=dict(default=False, type='bool'),
             quiet=dict(default=False, type='bool'),
             verbose=dict(default=False, type='bool'),
             sync=dict(default=None, choices=['yes', 'web', 'no']),
@@ -543,6 +551,7 @@ def main():
             ['quiet', 'verbose'],
             ['quietbuild', 'verbose'],
             ['quietfail', 'verbose'],
+            ['oneshot', 'select'],
         ],
         supports_check_mode=True,
     )
