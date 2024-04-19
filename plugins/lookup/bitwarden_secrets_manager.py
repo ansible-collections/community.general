@@ -93,12 +93,12 @@ class BitwardenSecretsManager(object):
         return self._cli_path
 
     def _run_with_retry(self, args, stdin=None, retries=0):
-        if retries > self._max_retries:
-            raise BitwardenSecretsManagerException("Max retries exceeded. Unable to retrieve secret.")
-
         out, err, rc = self._run(args, stdin)
 
         if rc != 0:
+            if retries >= self._max_retries:
+                raise BitwardenSecretsManagerException("Max retries exceeded. Unable to retrieve secret.")
+
             if "Too many requests" in err:
                 delay = self._retry_delay * (2 ** retries)
                 sleep(delay)
