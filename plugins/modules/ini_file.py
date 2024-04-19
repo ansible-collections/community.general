@@ -55,19 +55,19 @@ options:
         required: true
       value:
         type: str
-        description: Matching O(option) must have this specific value.
+        description: Matching O(section_has_values[].option) must have this specific value.
       values:
         description:
-          - The string value to be associated with an O(option).
-          - Mutually exclusive with O(value).
-          - O(value=v) is equivalent to O(values=[v]).
+          - The string value to be associated with an O(section_has_values[].option).
+          - Mutually exclusive with O(section_has_values[].value).
+          - O(section_has_values[].value=v) is equivalent to O(section_has_values[].values=[v]).
         type: list
         elements: str
     description:
       - Among possibly multiple sections of the same name, select the first one that contains matching options and values.
       - With O(state=present), if a suitable section is not found, a new section will be added, including the required options.
       - With O(state=absent), at most one O(section) is removed if it contains the values.
-    version_added: 8.5.0
+    version_added: 8.6.0
   option:
     description:
       - If set (required for changing a O(value)), this is the name of the option.
@@ -207,7 +207,7 @@ EXAMPLES = r'''
     value: lemon juice
     state: present
 
-- name: remove the peer configuration for 10.128.0.11/32
+- name: Remove the peer configuration for 10.128.0.11/32
   community.general.ini_file:
     path: /etc/wireguard/wg0.conf
     section: Peer
@@ -236,7 +236,7 @@ EXAMPLES = r'''
     mode: '0600'
     state: present
 
-- name: remove the peer configuration for 10.128.0.11/32
+- name: Remove the peer configuration for 10.128.0.11/32
   community.general.ini_file:
     path: /etc/wireguard/wg0.conf
     section: Peer
