@@ -98,12 +98,13 @@ class BitwardenSecretsManager(object):
 
         out, err, rc = self._run(args, stdin)
 
-        if "Too many requests" in err:
-            delay = self._retry_delay * (2 ** retries)
-            sleep(delay)
-            return self._run_with_retry(args, stdin, retries + 1)
-        elif rc != 0:
-            raise BitwardenSecretsManagerException(f"Command failed with return code {rc}: {err}")
+        if rc != 0:
+            if "Too many requests" in err:
+                delay = self._retry_delay * (2 ** retries)
+                sleep(delay)
+                return self._run_with_retry(args, stdin, retries + 1)
+            else:
+                raise BitwardenSecretsManagerException(f"Command failed with return code {rc}: {err}")
 
         return out, err, rc
 
