@@ -742,6 +742,12 @@ def normalise_cr(clientrep, remove_ids=False):
     if 'attributes' in clientrep:
         clientrep['attributes'] = list(sorted(clientrep['attributes']))
 
+    if 'defaultClientScopes' in clientrep:
+        clientrep['defaultClientScopes'] = list(sorted(clientrep['defaultClientScopes']))
+
+    if 'optionalClientScopes' in clientrep:
+        clientrep['optionalClientScopes'] = list(sorted(clientrep['optionalClientScopes']))
+
     if 'redirectUris' in clientrep:
         clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
 
