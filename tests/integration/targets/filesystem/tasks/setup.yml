@@ -16,6 +16,16 @@
     - e2fsprogs
     - xfsprogs
 
+- name: "Install bcachefs tools"
+  ansible.builtin.package:
+    name: bcachefs-tools
+    state: present
+  when:
+    # bcachefs only on Alpine > 3.18 and Arch Linux for now
+    # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
+    - ansible_distribution == "Alpine" and ansible_distribution_version is version("3.18", ">")
+    - ansible_distribution == "Archlinux"
+
 - name: "Install btrfs progs"
   ansible.builtin.package:
     name: btrfs-progs
