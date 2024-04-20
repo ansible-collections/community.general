@@ -188,6 +188,10 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import open_url
 
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
+
 
 def get_api_auth_headers(api_id, api_key, url, statuspage):
 
@@ -270,11 +274,11 @@ def get_date_time(start_date, start_time, minutes):
         except (NameError, ValueError):
             return 1, None, "Couldn't work out a valid date"
     else:
-        now = datetime.datetime.utcnow()
-        delta = now + datetime.timedelta(minutes=minutes)
+        now_t = now()
+        delta = now_t + datetime.timedelta(minutes=minutes)
         # start_date
-        returned_date.append(now.strftime("%m/%d/%Y"))
-        returned_date.append(now.strftime("%H:%M"))
+        returned_date.append(now_t.strftime("%m/%d/%Y"))
+        returned_date.append(now_t.strftime("%H:%M"))
         # end_date
         returned_date.append(delta.strftime("%m/%d/%Y"))
         returned_date.append(delta.strftime("%H:%M"))
