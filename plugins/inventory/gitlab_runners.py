@@ -84,7 +84,8 @@ keyed_groups:
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.common.text.converters import to_native
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 try:
     import gitlab
