@@ -1,0 +1,4 @@
+deprecated_features:
+  - "hipchat callback plugin - the hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
+     The callback plugin is therefore deprecated and will be removed from community.general 10.0.0 if nobody provides compelling reasons to still keep it
+     (https://github.com/ansible-collections/community.general/issues/8184, https://github.com/ansible-collections/community.general/pull/8189)."
