@@ -183,6 +183,7 @@ import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 
 SCALEWAY_SERVER_STATES = (
@@ -235,9 +236,9 @@ def wait_to_complete_state_transition(compute_api, server, wait=None):
     wait_timeout = compute_api.module.params["wait_timeout"]
     wait_sleep_time = compute_api.module.params["wait_sleep_time"]
 
-    start = datetime.datetime.utcnow()
+    start = now()
     end = start + datetime.timedelta(seconds=wait_timeout)
-    while datetime.datetime.utcnow() < end:
+    while now() < end:
         compute_api.module.debug("We are going to wait for the server to finish its transition")
         if fetch_state(compute_api, server) not in SCALEWAY_TRANSITIONS_STATES:
             compute_api.module.debug("It seems that the server is not in transition anymore.")

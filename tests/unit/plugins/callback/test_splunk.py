@@ -27,10 +27,10 @@ class TestSplunkClient(unittest.TestCase):
         self.mock_host = Mock('MockHost')
         self.mock_host.name = 'myhost'
 
-    @patch('ansible_collections.community.general.plugins.callback.splunk.datetime')
+    @patch('ansible_collections.community.general.plugins.callback.splunk.now')
     @patch('ansible_collections.community.general.plugins.callback.splunk.open_url')
-    def test_timestamp_with_milliseconds(self, open_url_mock, mock_datetime):
-        mock_datetime.utcnow.return_value = datetime(2020, 12, 1)
+    def test_timestamp_with_milliseconds(self, open_url_mock, mock_now):
+        mock_now.return_value = datetime(2020, 12, 1)
         result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
 
         self.splunk.send_event(
@@ -45,10 +45,10 @@ class TestSplunkClient(unittest.TestCase):
         self.assertEqual(sent_data['event']['host'], 'my-host')
         self.assertEqual(sent_data['event']['ip_address'], '1.2.3.4')
 
-    @patch('ansible_collections.community.general.plugins.callback.splunk.datetime')
+    @patch('ansible_collections.community.general.plugins.callback.splunk.now')
     @patch('ansible_collections.community.general.plugins.callback.splunk.open_url')
-    def test_timestamp_without_milliseconds(self, open_url_mock, mock_datetime):
-        mock_datetime.utcnow.return_value = datetime(2020, 12, 1)
+    def test_timestamp_without_milliseconds(self, open_url_mock, mock_now):
+        mock_now.return_value = datetime(2020, 12, 1)
         result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
 
         self.splunk.send_event(
