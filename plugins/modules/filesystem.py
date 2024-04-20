@@ -40,11 +40,12 @@ options:
     default: present
     version_added: 1.3.0
   fstype:
-    choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
+    choices: [ bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
     description:
       - Filesystem type to be created. This option is required with
         O(state=present) (or if O(state) is omitted).
       - ufs support has been added in community.general 3.4.0.
+      - bcachefs support has been added in community.general 8.6.0.
     type: str
     aliases: [type]
   dev:
@@ -67,7 +68,7 @@ options:
   resizefs:
     description:
       - If V(true), if the block device and filesystem size differ, grow the filesystem into the space.
-      - Supported for C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
+      - Supported for C(bcachefs), C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
         Attempts to resize other filesystem types will fail.
       - XFS Will only grow if mounted. Currently, the module is based on commands
         from C(util-linux) package to perform operations, so resizing of XFS is
@@ -86,7 +87,7 @@ options:
       - The UUID options specified in O(opts) take precedence over this value.
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
-      - Supported for O(fstype) being one of C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
+      - Supported for O(fstype) being one of C(bcachefs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(lvm), or C(xfs).
       - This is B(not idempotent). Specifying this option will always result in a change.
       - Mutually exclusive with O(resizefs).
     type: str
@@ -405,6 +406,48 @@ class Reiserfs(Filesystem):
     MKFS_FORCE_FLAGS = ['-q']
 
 
+class Bcachefs(Filesystem):
+    MKFS = 'mkfs.bcachefs'
+    MKFS_FORCE_FLAGS = ['--force']
+    MKFS_SET_UUID_OPTIONS = ['-U', '--uuid']
+    INFO = 'bcachefs'
+    GROW = 'bcachefs'
+    GROW_MAX_SPACE_FLAGS = ['device', 'resize']
+
+    def get_fs_size(self, dev):
+        """Return size in bytes of filesystem on device (integer)."""
+        dummy, stdout, dummy = self.module.run_command([self.module.get_bin_path(self.INFO),
+                                                        'show-super', str(dev)], check_rc=True)
+
+        for line in stdout.splitlines():
+            if "Size: " in line:
+                parts = line.split()
+                unit = parts[2]
+
+                base = None
+                exp = None
+
+                units_2 = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
+                units_10 = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+                try:
+                    exp = units_2.index(unit)
+                    base = 1024
+                except ValueError:
+                    exp = units_10.index(unit)
+                    base = 1000
+
+                if exp == 0:
+                    value = int(parts[1])
+                else:
+                    value = float(parts[1])
+
+                if base is not None and exp is not None:
+                    return int(value * pow(base, exp))
+
+        raise ValueError(repr(stdout))
+
+
 class Btrfs(Filesystem):
     MKFS = 'mkfs.btrfs'
     INFO = 'btrfs'
@@ -567,6 +610,7 @@ class UFS(Filesystem):
 
 
 FILESYSTEMS = {
+    'bcachefs': Bcachefs,
     'ext2': Ext2,
     'ext3': Ext3,
     'ext4': Ext4,
