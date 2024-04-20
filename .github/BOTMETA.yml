@@ -1360,6 +1360,8 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
+  $plugin_utils/unsafe.py:
+    maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
 #########################
@@ -1379,7 +1381,6 @@ macros:
   becomes: plugins/become
   caches: plugins/cache
   callbacks: plugins/callback
-  cliconfs: plugins/cliconf
   connections: plugins/connection
   doc_fragments: plugins/doc_fragments
   filters: plugins/filter
@@ -1387,7 +1388,7 @@ macros:
   lookups: plugins/lookup
   module_utils: plugins/module_utils
   modules: plugins/modules
-  terminals: plugins/terminal
+  plugin_utils: plugins/plugin_utils
   tests: plugins/test
   team_ansible_core:
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
