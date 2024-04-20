@@ -29,7 +29,7 @@ DOCUMENTATION = """
           - Field to retrieve, for example V(name) or V(id).
           - If set to V(id), only zero or one element can be returned.
             Use the Jinja C(first) filter to get the only list element.
-          - When O(collection_id) is set, this field can be undefined to retrieve the whole collection records.
+          - If set to V(None) or V(''), or if O(_terms) is empty, records are not filtered by fields.
         type: str
         default: name
         version_added: 5.7.0
@@ -40,6 +40,10 @@ DOCUMENTATION = """
         description: Collection ID to filter results by collection. Leave unset to skip filtering.
         type: str
         version_added: 6.3.0
+      organization_id:
+        description: Organization ID to filter results by organization. Leave unset to skip filtering.
+        type: str
+        version_added: 8.5.0
       bw_session:
         description: Pass session key instead of reading from env.
         type: str
@@ -142,45 +146,44 @@ class Bitwarden(object):
             raise BitwardenException(err)
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
-    def _get_matches(self, search_value, search_field, collection_id=None):
+    def _get_matches(self, search_value, search_field, collection_id=None, organization_id=None):
         """Return matching records whose search_field is equal to key.
         """
 
         # Prepare set of params for Bitwarden CLI
-        if search_value:
-            if search_field == 'id':
-                params = ['get', 'item', search_value]
-            else:
-                params = ['list', 'items', '--search', search_value]
-            if collection_id:
-                params.extend(['--collectionid', collection_id])
+        if search_field == 'id':
+            params = ['get', 'item', search_value]
         else:
-            if not collection_id:
-                raise AnsibleError("search_value is required if collection_id is not set.")
+            params = ['list', 'items']
+            if search_value:
+                params.extend(['--search', search_value])
 
-            params = ['list', 'items', '--collectionid', collection_id]
+        if collection_id:
+            params.extend(['--collectionid', collection_id])
+        if organization_id:
+            params.extend(['--organizationid', organization_id])
 
         out, err = self._run(params)
 
         # This includes things that matched in different fields.
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
 
-        if search_field == 'id' or not search_value:
+        if search_field == 'id':
             if initial_matches is None:
                 initial_matches = []
             else:
                 initial_matches = [initial_matches]
 
         # Filter to only include results from the right field.
-        return [item for item in initial_matches if item[search_field] == search_value]
+        return [item for item in initial_matches if not search_value or item[search_field] == search_value]
 
-    def get_field(self, field, search_value=None, search_field="name", collection_id=None):
+    def get_field(self, field, search_value, search_field="name", collection_id=None, organization_id=None):
         """Return a list of the specified field for records whose search_field match search_value
         and filtered by collection if collection has been provided.
 
         If field is None, return the whole record for each match.
         """
-        matches = self._get_matches(search_value, search_field, collection_id)
+        matches = self._get_matches(search_value, search_field, collection_id, organization_id)
         if not field:
             return matches
         field_matches = []
@@ -215,15 +218,16 @@ class LookupModule(LookupBase):
         field = self.get_option('field')
         search_field = self.get_option('search')
         collection_id = self.get_option('collection_id')
+        organization_id = self.get_option('organization_id')
         _bitwarden.session = self.get_option('bw_session')
 
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
 
         if not terms:
-            return [_bitwarden.get_field(field, None, search_field, collection_id)]
+            terms = [None]
 
-        return [_bitwarden.get_field(field, term, search_field, collection_id) for term in terms]
+        return [_bitwarden.get_field(field, term, search_field, collection_id, organization_id) for term in terms]
 
 
 _bitwarden = Bitwarden()
