@@ -17,6 +17,10 @@ from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
+
 SCALEWAY_SECRET_IMP_ERR = None
 try:
     from passlib.hash import argon2
@@ -306,10 +310,10 @@ class Scaleway(object):
         # Prevent requesting the resource status too soon
         time.sleep(wait_sleep_time)
 
-        start = datetime.datetime.utcnow()
+        start = now()
         end = start + datetime.timedelta(seconds=wait_timeout)
 
-        while datetime.datetime.utcnow() < end:
+        while now() < end:
             self.module.debug("We are going to wait for the resource to finish its transition")
 
             state = self.fetch_state(resource)

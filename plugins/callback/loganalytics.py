@@ -59,12 +59,15 @@ import uuid
 import socket
 import getpass
 
-from datetime import datetime
 from os.path import basename
 
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 class AzureLogAnalyticsSource(object):
@@ -93,7 +96,7 @@ class AzureLogAnalyticsSource(object):
         return "https://{0}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01".format(workspace_id)
 
     def __rfc1123date(self):
-        return datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+        return now().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     def send_event(self, workspace_id, shared_key, state, result, runtime):
         if result._task_fields['args'].get('_ansible_check_mode') is True:
@@ -167,7 +170,7 @@ class CallbackModule(CallbackBase):
 
     def _seconds_since_start(self, result):
         return (
-            datetime.utcnow() -
+            now() -
             self.start_datetimes[result._task._uuid]
         ).total_seconds()
 
@@ -185,10 +188,10 @@ class CallbackModule(CallbackBase):
         self.loganalytics.ansible_playbook = basename(playbook._file_name)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_playbook_on_handler_task_start(self, task):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_runner_on_ok(self, result, **kwargs):
         self.loganalytics.send_event(

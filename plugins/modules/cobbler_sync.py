@@ -75,12 +75,15 @@ RETURN = r'''
 # Default return values
 '''
 
-import datetime
 import ssl
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import xmlrpc_client
 from ansible.module_utils.common.text.converters import to_text
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 def main():
@@ -110,7 +113,7 @@ def main():
         changed=True,
     )
 
-    start = datetime.datetime.utcnow()
+    start = now()
 
     ssl_context = None
     if not validate_certs:
@@ -142,7 +145,7 @@ def main():
         except Exception as e:
             module.fail_json(msg="Failed to sync Cobbler. {error}".format(error=to_text(e)))
 
-    elapsed = datetime.datetime.utcnow() - start
+    elapsed = now() - start
     module.exit_json(elapsed=elapsed.seconds, **result)
 
 
