@@ -68,7 +68,8 @@ options:
     protocol:
         description:
             - Type of client template.
-        choices: ['openid-connect', 'saml']
+            - The V(docker-v2) value was added in community.general 8.6.0.
+        choices: ['openid-connect', 'saml', 'docker-v2']
         type: str
 
     full_scope_allowed:
@@ -107,7 +108,7 @@ options:
             protocol:
                 description:
                     - This specifies for which protocol this protocol mapper is active.
-                choices: ['openid-connect', 'saml']
+                choices: ['openid-connect', 'saml', 'docker-v2']
                 type: str
 
             protocolMapper:
@@ -292,7 +293,7 @@ def main():
         consentText=dict(type='str'),
         id=dict(type='str'),
         name=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'docker-v2']),
         protocolMapper=dict(type='str'),
         config=dict(type='dict'),
     )
@@ -304,7 +305,7 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         description=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'docker-v2']),
         attributes=dict(type='dict'),
         full_scope_allowed=dict(type='bool'),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec),
