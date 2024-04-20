@@ -315,5 +315,3 @@
     that:
     - result is not changed
     - result.end_state | length == 0
-
-
