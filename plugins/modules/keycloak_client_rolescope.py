@@ -23,7 +23,7 @@ description:
       and an admin user would work, as would a separate client definition with the scope tailored
       to your needs and a user having the expected roles.
 
-    - Client O(client_id) must have full_scope_allowed set to V(false).
+    - Client O(client_id) must have O(community.general.keycloak_client#module:full_scope_allowed) set to V(false).
 
     - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
       be returned that way by this module. You may pass single values for attributes when calling the module,
