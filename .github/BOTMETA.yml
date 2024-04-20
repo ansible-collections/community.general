@@ -780,6 +780,8 @@ files:
     maintainers: laurpaum
   $modules/keycloak_component_info.py:
     maintainers: desand01
+  $modules/keycloak_client_rolescope.py:
+    maintainers: desand01
   $modules/keycloak_user_rolemapping.py:
     maintainers: bratwurzt
   $modules/keycloak_realm_rolemapping.py:

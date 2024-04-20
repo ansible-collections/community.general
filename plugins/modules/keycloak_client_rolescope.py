@@ -14,7 +14,7 @@ module: keycloak_client_rolescope
 
 short_description: Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other specific client applications.
 
-version_added: 3.4.0
+version_added: 8.6.0
 
 description:
     - This module allows you to add or remove Keycloak roles from clients scope via the Keycloak REST API.
