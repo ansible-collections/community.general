@@ -107,5 +107,6 @@ def puppet_runner(module):
             verbose=cmd_runner_fmt.as_bool("--verbose"),
         ),
         check_rc=False,
+        force_lang=module.params["environment_lang"],
     )
     return runner
