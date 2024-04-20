@@ -62,7 +62,7 @@ options:
     client_scope_id:
         type: str
         description:
-            - If the O(role_names) are client role, the client id under which it resides.
+            - If the O(role_names) are client role, the client ID under which it resides.
             - If this parameter is absent, the roles are considered a realm role.
     role_names:
         required: true
