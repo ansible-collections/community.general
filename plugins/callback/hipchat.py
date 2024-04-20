@@ -18,6 +18,10 @@ DOCUMENTATION = '''
     description:
       - This callback plugin sends status updates to a HipChat channel during playbook execution.
       - Before 2.4 only environment variables were available for configuring this plugin.
+    deprecated:
+      removed_in: 10.0.0
+      why: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
+      alternative: There is none.
     options:
       token:
         description: HipChat API token for v1 or v2 API.
