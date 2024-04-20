@@ -161,6 +161,7 @@ RETURNS = '''
 import datetime
 import time
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_REGIONS, SCALEWAY_ENDPOINT, scaleway_argument_spec, Scaleway
 
 STABLE_STATES = (
@@ -208,9 +209,9 @@ def wait_to_complete_state_transition(api, lb, force_wait=False):
     wait_timeout = api.module.params["wait_timeout"]
     wait_sleep_time = api.module.params["wait_sleep_time"]
 
-    start = datetime.datetime.utcnow()
+    start = now()
     end = start + datetime.timedelta(seconds=wait_timeout)
-    while datetime.datetime.utcnow() < end:
+    while now() < end:
         api.module.debug("We are going to wait for the load-balancer to finish its transition")
         state = fetch_state(api, lb)
         if state in STABLE_STATES:
