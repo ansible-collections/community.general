@@ -38,7 +38,8 @@ options:
     description:
       - Indicates the desired package state.
       - Please note that V(present) and V(installed) are equivalent to V(latest) right now.
-        This will change in the future.
+        This will change in the future. To simply ensure that a package is installed, without upgrading
+        it, use the V(present_not_latest) state.
       - The states V(latest) and V(present_not_latest) have been added in community.general 8.6.0.
     choices:
       - absent
