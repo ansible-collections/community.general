@@ -1,0 +1,2 @@
+minor_changes:
+  - java_cert - add ``cert_content`` argument (https://github.com/ansible-collections/community.general/pull/8153).
