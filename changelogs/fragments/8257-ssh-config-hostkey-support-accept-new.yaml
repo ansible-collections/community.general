@@ -1,2 +1,2 @@
 minor_changes:
-  - ssh_config - allow accept-new as valid value for strict_host_key_checking (https://github.com/ansible-collections/community.general/pull/8257).
+  - ssh_config - allow ``accept-new`` as valid value for ``strict_host_key_checking`` (https://github.com/ansible-collections/community.general/pull/8257).
