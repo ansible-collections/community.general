@@ -104,7 +104,7 @@ class BitwardenSecretsManager(object):
                 sleep(delay)
                 return self._run_with_retry(args, stdin, retries + 1)
             else:
-                raise BitwardenSecretsManagerException(f"Command failed with return code {rc}: {err}")
+                raise BitwardenSecretsManagerException("Command failed with return code {rc}: {err}".format(rc=rc, err=err))
 
         return out, err, rc
 
