@@ -111,7 +111,7 @@ from ansible.module_utils.basic import AnsibleModule
 def selfupdate(module, port_path):
     """ Update Macports and the ports tree. """
 
-    rc, out, err = module.run_command("%s -v selfupdate" % port_path)
+    rc, out, err = module.run_command([port_path, "-v", "selfupdate"])
 
     if rc == 0:
         updated = any(
@@ -135,7 +135,7 @@ def selfupdate(module, port_path):
 def upgrade(module, port_path):
     """ Upgrade outdated ports. """
 
-    rc, out, err = module.run_command("%s upgrade outdated" % port_path)
+    rc, out, err = module.run_command([port_path, "upgrade", "outdated"])
 
     # rc is 1 when nothing to upgrade so check stdout first.
     if out.strip() == "Nothing to upgrade.":
@@ -182,7 +182,7 @@ def remove_ports(module, port_path, ports, stdout, stderr):
         if not query_port(module, port_path, port):
             continue
 
-        rc, out, err = module.run_command("%s uninstall %s" % (port_path, port))
+        rc, out, err = module.run_command([port_path, "uninstall", port])
         stdout += out
         stderr += err
         if query_port(module, port_path, port):
@@ -206,7 +206,7 @@ def install_ports(module, port_path, ports, variant, stdout, stderr):
         if query_port(module, port_path, port):
             continue
 
-        rc, out, err = module.run_command("%s install %s %s" % (port_path, port, variant))
+        rc, out, err = module.run_command([port_path, "install", port, variant])
         stdout += out
         stderr += err
         if not query_port(module, port_path, port):
@@ -232,7 +232,7 @@ def activate_ports(module, port_path, ports, stdout, stderr):
         if query_port(module, port_path, port, state="active"):
             continue
 
-        rc, out, err = module.run_command("%s activate %s" % (port_path, port))
+        rc, out, err = module.run_command([port_path, "activate", port])
         stdout += out
         stderr += err
 
@@ -259,7 +259,7 @@ def deactivate_ports(module, port_path, ports, stdout, stderr):
         if not query_port(module, port_path, port, state="active"):
             continue
 
-        rc, out, err = module.run_command("%s deactivate %s" % (port_path, port))
+        rc, out, err = module.run_command([port_path, "deactivate", port])
         stdout += out
         stderr += err
         if query_port(module, port_path, port, state="active"):

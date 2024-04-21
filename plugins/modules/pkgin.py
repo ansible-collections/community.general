@@ -145,18 +145,18 @@ def query_package(module, name):
     """
 
     # test whether '-p' (parsable) flag is supported.
-    rc, out, err = module.run_command("%s -p -v" % PKGIN_PATH)
+    rc, out, err = module.run_command([PKGIN_PATH, "-p", "-v"])
 
     if rc == 0:
-        pflag = '-p'
+        pflag = ['-p']
         splitchar = ';'
     else:
-        pflag = ''
+        pflag = []
         splitchar = ' '
 
     # Use "pkgin search" to find the package. The regular expression will
     # only match on the complete name.
-    rc, out, err = module.run_command("%s %s search \"^%s$\"" % (PKGIN_PATH, pflag, name))
+    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", "^%s$" % (name, )])
 
     # rc will not be 0 unless the search was a success
     if rc == 0:
@@ -234,22 +234,19 @@ def format_pkgin_command(module, command, package=None):
     # an empty string. Some commands (e.g. 'update') will ignore extra
     # arguments, however this behaviour cannot be relied on for others.
     if package is None:
-        package = ""
+        packages = []
+    else:
+        packages = [package]
 
     if module.params["force"]:
-        force = "-F"
+        force = ["-F"]
     else:
-        force = ""
-
-    vars = {"pkgin": PKGIN_PATH,
-            "command": command,
-            "package": package,
-            "force": force}
+        force = []
 
     if module.check_mode:
-        return "%(pkgin)s -n %(command)s %(package)s" % vars
+        return [PKGIN_PATH, "-n", command] + packages
     else:
-        return "%(pkgin)s -y %(force)s %(command)s %(package)s" % vars
+        return [PKGIN_PATH, "-y"] + force + [command] + packages
 
 
 def remove_packages(module, packages):

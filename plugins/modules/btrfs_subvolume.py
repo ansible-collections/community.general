@@ -572,10 +572,7 @@ class BtrfsSubvolumeModule(object):
         self.__temporary_mounts[cache_key] = mountpoint
 
         mount = self.module.get_bin_path("mount", required=True)
-        command = "%s -o noatime,subvolid=%d %s %s " % (mount,
-                                                        subvolid,
-                                                        device,
-                                                        mountpoint)
+        command = [mount, "-o", "noatime,subvolid=%d" % (subvolid, ), device, mountpoint]
         result = self.module.run_command(command, check_rc=True)
 
         return mountpoint
@@ -586,10 +583,10 @@ class BtrfsSubvolumeModule(object):
 
     def __cleanup_mount(self, mountpoint):
         umount = self.module.get_bin_path("umount", required=True)
-        result = self.module.run_command("%s %s" % (umount, mountpoint))
+        result = self.module.run_command([umount, mountpoint])
         if result[0] == 0:
             rmdir = self.module.get_bin_path("rmdir", required=True)
-            self.module.run_command("%s %s" % (rmdir, mountpoint))
+            self.module.run_command([rmdir, mountpoint])
 
     # Format and return results
     def get_results(self):

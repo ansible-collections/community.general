@@ -96,9 +96,11 @@ def query_package(module, name, depot=None):
 
     cmd_list = '/usr/sbin/swlist -a revision -l product'
     if depot:
+        # TODO: convert run_comand() argument to list!
         rc, stdout, stderr = module.run_command("%s -s %s %s | grep %s" % (cmd_list, shlex_quote(depot), shlex_quote(name), shlex_quote(name)),
                                                 use_unsafe_shell=True)
     else:
+        # TODO: convert run_comand() argument to list!
         rc, stdout, stderr = module.run_command("%s %s | grep %s" % (cmd_list, shlex_quote(name), shlex_quote(name)), use_unsafe_shell=True)
     if rc == 0:
         version = re.sub(r"\s\s+|\t", " ", stdout).strip().split()[1]
@@ -112,7 +114,7 @@ def remove_package(module, name):
     """ Uninstall package if installed. """
 
     cmd_remove = '/usr/sbin/swremove'
-    rc, stdout, stderr = module.run_command("%s %s" % (cmd_remove, name))
+    rc, stdout, stderr = module.run_command([cmd_remove, name])
 
     if rc == 0:
         return rc, stdout
@@ -123,8 +125,8 @@ def remove_package(module, name):
 def install_package(module, depot, name):
     """ Install package if not already installed """
 
-    cmd_install = '/usr/sbin/swinstall -x mount_all_filesystems=false'
-    rc, stdout, stderr = module.run_command("%s -s %s %s" % (cmd_install, depot, name))
+    cmd_install = ['/usr/sbin/swinstall', '-x', 'mount_all_filesystems=false']
+    rc, stdout, stderr = module.run_command(cmd_install + ["-s", depot, name])
     if rc == 0:
         return rc, stdout
     else:
