@@ -121,6 +121,14 @@ options:
     type: bool
     default: false
 
+  select:
+    description:
+      - If set to V(true), explicitely add the package to the world file.
+      - Please note that this option is not used for idempotency, it is only used
+        when actually installing a package.
+    type: bool
+    version_added: 8.6.0
+
   sync:
     description:
       - Sync package repositories first
@@ -374,6 +382,7 @@ def emerge_packages(module, packages):
         'loadavg': '--load-average',
         'backtrack': '--backtrack',
         'withbdeps': '--with-bdeps',
+        'select': '--select',
     }
 
     for flag, arg in emerge_flags.items():
@@ -523,6 +532,7 @@ def main():
             nodeps=dict(default=False, type='bool'),
             onlydeps=dict(default=False, type='bool'),
             depclean=dict(default=False, type='bool'),
+            select=dict(default=None, type='bool'),
             quiet=dict(default=False, type='bool'),
             verbose=dict(default=False, type='bool'),
             sync=dict(default=None, choices=['yes', 'web', 'no']),
@@ -543,6 +553,7 @@ def main():
             ['quiet', 'verbose'],
             ['quietbuild', 'verbose'],
             ['quietfail', 'verbose'],
+            ['oneshot', 'select'],
         ],
         supports_check_mode=True,
     )
