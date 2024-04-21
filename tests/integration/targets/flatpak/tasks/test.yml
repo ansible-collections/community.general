@@ -65,6 +65,45 @@
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
 
+# state=latest
+
+- name: Test state=latest - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: latest_result
+
+- name: Verify state=latest test result - {{ method }}
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=latest shall add flatpak when absent"
+
+- name: Test idempotency of state=latest - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_latest_result
+
+- name: Verify idempotency of state=latest test result - {{ method }}
+  assert:
+    that:
+      - double_latest_result is not changed
+    msg: "state=latest shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present test - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
 # state=present with url as name
 
 - name: Test addition with url - {{ method }}
@@ -146,6 +185,45 @@
       msg: "state=absent with url as name shall not do anything when flatpak is not present"
 
 - name: Make sure flatpak is really gone - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# state=latest with url as name
+
+- name: Test state=latest with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: url_latest_result
+
+- name: Verify state=latest test result - {{ method }}
+  assert:
+    that:
+      - url_latest_result is changed
+    msg: "state=present with url as name shall add flatpak when absent"
+
+- name: Test idempotency of state=latest with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_url_latest_result
+
+- name: Verify idempotency of state=latest with url test result - {{ method }}
+  assert:
+    that:
+      - double_url_latest_result is not changed
+    msg: "state=present with url as name shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present with url test - {{ method }}
   flatpak:
     name: com.dummy.App1
     state: absent
@@ -287,3 +365,84 @@
     that:
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
+
+# state=latest with list of packages
+
+- name: Test state=latest with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: latest_result
+
+- name: Verify state=latest with list test result - {{ method }}
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of state=latest with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_latest_result
+
+- name: Verify idempotency of state=latest with list test result - {{ method }}
+  assert:
+    that:
+      - double_latest_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Test state=latest with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: latest_result
+
+- name: Verify state=latest with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of state=latest with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_latest_result
+
+- name: Verify idempotency of state=latest with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - double_latest_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present with list test - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+      - com.dummy.App3
+    state: absent
+    method: "{{ method }}"
