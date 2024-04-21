@@ -28,6 +28,9 @@ URL_CLIENT_ROLES = "{url}/admin/realms/{realm}/clients/{id}/roles"
 URL_CLIENT_ROLE = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}"
 URL_CLIENT_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}/composites"
 
+URL_CLIENT_ROLE_SCOPE_CLIENTS = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{scopeid}"
+URL_CLIENT_ROLE_SCOPE_REALM = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/realm"
+
 URL_REALM_ROLES = "{url}/admin/realms/{realm}/roles"
 URL_REALM_ROLE = "{url}/admin/realms/{realm}/roles/{name}"
 URL_REALM_ROLEMAPPINGS = "{url}/admin/realms/{realm}/users/{id}/role-mappings/realm"
@@ -3048,6 +3051,105 @@ class KeycloakAPI(object):
                                                  validate_certs=self.validate_certs).read()))
         except Exception:
             return False
+
+    def get_client_role_scope_from_client(self, clientid, clientscopeid, realm="master"):
+        """ Fetch the roles associated with the client's scope for a specific client on the Keycloak server.
+        :param clientid: ID of the client from which to obtain the associated roles.
+        :param clientscopeid: ID of the client who owns the roles.
+        :param realm: Realm from which to obtain the scope.
+        :return: The client scope of roles from specified client.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
+        try:
+            return json.loads(to_native(open_url(client_role_scope_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not fetch roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+    def update_client_role_scope_from_client(self, payload, clientid, clientscopeid, realm="master"):
+        """ Update and fetch the roles associated with the client's scope on the Keycloak server.
+        :param payload: List of roles to be added to the scope.
+        :param clientid: ID of the client to update scope.
+        :param clientscopeid: ID of the client who owns the roles.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client scope of roles from specified client.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
+        try:
+            open_url(client_role_scope_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not update roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_client(clientid, clientscopeid, realm)
+
+    def delete_client_role_scope_from_client(self, payload, clientid, clientscopeid, realm="master"):
+        """ Delete the roles contains in the payload from the client's scope on the Keycloak server.
+        :param payload: List of roles to be deleted.
+        :param clientid: ID of the client to delete roles from scope.
+        :param clientscopeid: ID of the client who owns the roles.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client scope of roles from specified client.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_CLIENTS.format(url=self.baseurl, realm=realm, id=clientid, scopeid=clientscopeid)
+        try:
+            open_url(client_role_scope_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not delete roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_client(clientid, clientscopeid, realm)
+
+    def get_client_role_scope_from_realm(self, clientid, realm="master"):
+        """ Fetch the realm roles from the client's scope on the Keycloak server.
+        :param clientid: ID of the client from which to obtain the associated realm roles.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client realm roles scope.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
+        try:
+            return json.loads(to_native(open_url(client_role_scope_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not fetch roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+    def update_client_role_scope_from_realm(self, payload, clientid, realm="master"):
+        """ Update and fetch the realm roles from the client's scope on the Keycloak server.
+        :param payload: List of realm roles to add.
+        :param clientid: ID of the client to update scope.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client realm roles scope.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
+        try:
+            open_url(client_role_scope_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not update roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_realm(clientid, realm)
+
+    def delete_client_role_scope_from_realm(self, payload, clientid, realm="master"):
+        """ Delete the realm roles contains in the payload from the client's scope on the Keycloak server.
+        :param payload: List of realm roles to delete.
+        :param clientid: ID of the client to delete roles from scope.
+        :param realm: Realm from which to obtain the clients.
+        :return: The client realm roles scope.
+        """
+        client_role_scope_url = URL_CLIENT_ROLE_SCOPE_REALM.format(url=self.baseurl, realm=realm, id=clientid)
+        try:
+            open_url(client_role_scope_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                     data=json.dumps(payload), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.fail_open_url(e, msg='Could not delete roles scope for client %s in realm %s: %s' % (clientid, realm, str(e)))
+
+        return self.get_client_role_scope_from_realm(clientid, realm)
 
     def fail_open_url(self, e, msg, **kwargs):
         try:
