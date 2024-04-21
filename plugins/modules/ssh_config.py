@@ -88,7 +88,7 @@ options:
   strict_host_key_checking:
     description:
       - Whether to strictly check the host key when doing connections to the remote host.
-    choices: [ 'yes', 'no', 'ask' ]
+    choices: [ 'yes', 'no', 'ask', 'accept-new' ]
     type: str
   proxycommand:
     description:
@@ -370,7 +370,7 @@ def main():
             strict_host_key_checking=dict(
                 type='str',
                 default=None,
-                choices=['yes', 'no', 'ask']
+                choices=['yes', 'no', 'ask', 'accept-new']
             ),
             controlmaster=dict(type='str', default=None, choices=['yes', 'no', 'ask', 'auto', 'autoask']),
             controlpath=dict(type='str', default=None),
