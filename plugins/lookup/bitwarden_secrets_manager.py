@@ -70,6 +70,7 @@ RETURN = """
 """
 
 from subprocess import Popen, PIPE
+from time import sleep
 
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_text
@@ -84,10 +85,28 @@ class BitwardenSecretsManagerException(AnsibleLookupError):
 class BitwardenSecretsManager(object):
     def __init__(self, path='bws'):
         self._cli_path = path
+        self._max_retries = 3
+        self._retry_delay = 1
 
     @property
     def cli_path(self):
         return self._cli_path
+
+    def _run_with_retry(self, args, stdin=None, retries=0):
+        out, err, rc = self._run(args, stdin)
+
+        if rc != 0:
+            if retries >= self._max_retries:
+                raise BitwardenSecretsManagerException("Max retries exceeded. Unable to retrieve secret.")
+
+            if "Too many requests" in err:
+                delay = self._retry_delay * (2 ** retries)
+                sleep(delay)
+                return self._run_with_retry(args, stdin, retries + 1)
+            else:
+                raise BitwardenSecretsManagerException("Command failed with return code {rc}: {err}".format(rc=rc, err=err))
+
+        return out, err, rc
 
     def _run(self, args, stdin=None):
         p = Popen([self.cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
@@ -107,7 +126,7 @@ class BitwardenSecretsManager(object):
             'get', 'secret', secret_id
         ]
 
-        out, err, rc = self._run(params)
+        out, err, rc = self._run_with_retry(params)
         if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
 
