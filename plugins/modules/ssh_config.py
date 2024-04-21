@@ -66,6 +66,13 @@ options:
     description:
       - Specifies the user to log in as.
     type: str
+  identity_agent:
+    description:
+      - Path to the UNIX-domain socket used to communicate with the
+        authentication agent.
+      - Setting the socket name to none disables the use of an
+        authentication agent.
+    type: path
   identity_file:
     description:
       - The path to an identity file (SSH private key) that will be used
@@ -258,6 +265,7 @@ class SSHConfig(object):
         args = dict(
             hostname=self.params.get('hostname'),
             port=self.params.get('port'),
+            identity_agent=self.params.get('identity_agent'),
             identity_file=self.params.get('identity_file'),
             identities_only=convert_bool(self.params.get('identities_only')),
             user=self.params.get('remote_user'),
@@ -357,6 +365,7 @@ def main():
             host=dict(type='str', required=True),
             hostname=dict(type='str'),
             host_key_algorithms=dict(type='str', no_log=False),
+            identity_agent=dict(type='path'),
             identity_file=dict(type='path'),
             identities_only=dict(type='bool'),
             port=dict(type='str'),
