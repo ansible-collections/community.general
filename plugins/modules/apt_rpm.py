@@ -204,7 +204,7 @@ def install_packages(module, pkgspec):
         rc, out, err = module.run_command("%s -y install %s" % (APT_PATH, packages), environ_update={"LANG": "C"})
 
         installed = True
-        for packages in pkgspec:
+        for package in pkgspec:
             if not query_package_provides(module, package):
                 installed = False
 
