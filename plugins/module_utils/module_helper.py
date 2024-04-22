@@ -14,7 +14,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.module_helper
     ModuleHelper, StateModuleHelper, AnsibleModule
 )
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin  # noqa: F401
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyCtxMgr, DependencyMixin  # noqa: F401
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyCtxMgr  # noqa: F401
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException  # noqa: F401
 from ansible_collections.community.general.plugins.module_utils.mh.deco import (
     cause_changes, module_fails_on_exception, check_mode_skip, check_mode_skip_returns,

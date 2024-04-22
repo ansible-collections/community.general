@@ -15,7 +15,7 @@ short_description: Management of instances in Proxmox VE cluster
 description:
   - Allows you to create/delete/stop instances in Proxmox VE cluster.
   - The module automatically detects containerization type (lxc for PVE 4, openvz for older).
-  - Since community.general 4.0.0 on, there are no more default values, see O(proxmox_default_behavior).
+  - Since community.general 4.0.0 on, there are no more default values.
 attributes:
   check_mode:
     support: none
@@ -47,28 +47,23 @@ options:
         comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
         [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(3).
       - Should not be used in conjunction with O(storage).
     type: str
   cores:
     description:
       - Specify number of cores per socket.
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1).
     type: int
   memory:
     description:
       - memory size in MB for instance
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(512).
     type: int
   swap:
     description:
       - swap memory size in MB for instance
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(0).
     type: int
   netif:
     description:
@@ -101,7 +96,6 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
     type: bool
   storage:
     description:
@@ -120,7 +114,6 @@ options:
   cpuunits:
     description:
       - CPU weight for a VM
-      - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(1000).
     type: int
   nameserver:
     description:
@@ -200,25 +193,6 @@ options:
       - The special value V(host) configures the same timezone used by Proxmox host.
     type: str
     version_added: '7.1.0'
-  proxmox_default_behavior:
-    description:
-      - As of community.general 4.0.0, various options no longer have default values.
-        These default values caused problems when users expected different behavior from Proxmox
-        by default or filled options which caused problems when set.
-      - The value V(compatibility) (default before community.general 4.0.0) will ensure that the default values
-        are used when the values are not explicitly specified by the user. The new default is V(no_defaults),
-        which makes sure these options have no defaults.
-      - This affects the O(disk), O(cores), O(cpus), O(memory), O(onboot), O(swap), and O(cpuunits) options.
-      - >
-        This parameter is now B(deprecated) and it will be removed in community.general 10.0.0.
-        By then, the module's behavior should be to not set default values, equivalent to V(no_defaults).
-        If a consistent set of defaults is needed, the playbook or role should be responsible for setting it.
-    type: str
-    default: no_defaults
-    choices:
-      - compatibility
-      - no_defaults
-    version_added: "1.3.0"
   clone:
     description:
       - ID of the container to be cloned.
@@ -785,8 +759,6 @@ def main():
         description=dict(type='str'),
         hookscript=dict(type='str'),
         timezone=dict(type='str'),
-        proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults'],
-                                      removed_in_version='9.0.0', removed_from_collection='community.general'),
         clone=dict(type='int'),
         clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
         tags=dict(type='list', elements='str')
@@ -826,20 +798,6 @@ def main():
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
     clone = module.params['clone']
-
-    if module.params['proxmox_default_behavior'] == 'compatibility':
-        old_default_values = dict(
-            disk="3",
-            cores=1,
-            cpus=1,
-            memory=512,
-            swap=0,
-            onboot=False,
-            cpuunits=1000,
-        )
-        for param, value in old_default_values.items():
-            if module.params[param] is None:
-                module.params[param] = value
 
     # If vmid not set get the Next VM id from ProxmoxAPI
     # If hostname is set get the VM id from ProxmoxAPI

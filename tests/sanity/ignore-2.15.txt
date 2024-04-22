@@ -5,9 +5,6 @@ plugins/modules/iptables_state.py validate-modules:undocumented-parameter       
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
-plugins/modules/rax_files_objects.py use-argspec-type-path                            # module deprecated - removed in 9.0.0
-plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice          # module deprecated - removed in 9.0.0
-plugins/modules/rax.py use-argspec-type-path                                          # module deprecated - removed in 9.0.0
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/xfconf.py validate-modules:return-syntax-error
