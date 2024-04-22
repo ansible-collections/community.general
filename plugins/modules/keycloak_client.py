@@ -754,7 +754,18 @@ def normalise_cr(clientrep, remove_ids=False):
         clientrep["defaultClientScopes"] = list(sorted(clientrep["defaultClientScopes"]))
     if "optionalClientScopes" in clientrep:
         clientrep["optionalClientScopes"] = list(sorted(clientrep["optionalClientScopes"]))
-        
+
+    # keycloak flow overrides, collapse "browser: '', direct_grant: ''" to "{}"
+    if "authenticationFlowBindingOverrides" in clientrep:
+        flows = clientrep["authenticationFlowBindingOverrides"]
+        flowOverrides_repr = {}
+        for binding in ["browser", "direct_grant"]:
+            if binding in flows:
+                if flows[binding] != "":
+                    flowOverrides_repr[binding] = flows[binding]
+
+        clientrep["authenticationFlowBindingOverrides"] = flowOverrides_repr
+
     return clientrep
 
 
@@ -944,14 +955,19 @@ def main():
         # translate flow alias to flow id
         if client_param == "authentication_flow_binding_overrides":
             final_param_value = {}
-            for binding in new_param_value:
-                flow_id = kc.get_authentication_flow_by_alias(
-                    alias=new_param_value[binding], realm=realm, case_sensitive=False
-                ).get("id")
-                if flow_id:
-                    final_param_value[binding] = flow_id
+            for binding in ["browser", "direct_grant"]:
+                if binding in new_param_value:
+                  flow_id = kc.get_authentication_flow_by_alias(
+                      alias=new_param_value[binding], realm=realm, case_sensitive=False
+                  ).get("id")
+                  if flow_id:
+                      final_param_value[binding] = flow_id
+                  else:
+                      final_param_value[binding] = new_param_value[binding]
                 else:
-                    final_param_value[binding] = new_param_value[binding]
+                    # hardcode missing flows as being empty for better api calls to keycloak
+                    final_param_value[binding] = ""
+
             new_param_value = final_param_value
 
         changeset[camel(client_param)] = new_param_value
