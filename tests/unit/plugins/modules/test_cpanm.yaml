@@ -7,6 +7,7 @@
 - id: install_dancer_compatibility
   input:
     name: Dancer
+    mode: compatibility
   output:
     changed: true
   run_command_calls:
@@ -23,6 +24,7 @@
 - id: install_dancer_already_installed_compatibility
   input:
     name: Dancer
+    mode: compatibility
   output:
     changed: false
   run_command_calls:
@@ -34,7 +36,6 @@
 - id: install_dancer
   input:
     name: Dancer
-    mode: new
   output:
     changed: true
   run_command_calls:
@@ -46,6 +47,7 @@
 - id: install_distribution_file_compatibility
   input:
     name: MIYAGAWA/Plack-0.99_05.tar.gz
+    mode: compatibility
   output:
     changed: true
   run_command_calls:
@@ -57,7 +59,6 @@
 - id: install_distribution_file
   input:
     name: MIYAGAWA/Plack-0.99_05.tar.gz
-    mode: new
   output:
     changed: true
   run_command_calls:

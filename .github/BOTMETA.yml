@@ -532,8 +532,6 @@ files:
     maintainers: $team_flatpak
   $modules/flatpak_remote.py:
     maintainers: $team_flatpak
-  $modules/flowdock.py:
-    ignore: mcodd
   $modules/gandi_livedns.py:
     maintainers: gthiemonge
   $modules/gconftool2.py:
@@ -1096,46 +1094,6 @@ files:
   $modules/python_requirements_info.py:
     ignore: ryansb
     maintainers: willthames
-  $modules/rax:
-    ignore: ryansb sivel
-  $modules/rax.py:
-    maintainers: omgjlk sivel
-  $modules/rax_cbs.py:
-    maintainers: claco
-  $modules/rax_cbs_attachments.py:
-    maintainers: claco
-  $modules/rax_cdb.py:
-    maintainers: jails
-  $modules/rax_cdb_database.py:
-    maintainers: jails
-  $modules/rax_cdb_user.py:
-    maintainers: jails
-  $modules/rax_clb.py:
-    maintainers: claco
-  $modules/rax_clb_nodes.py:
-    maintainers: neuroid
-  $modules/rax_clb_ssl.py:
-    maintainers: smashwilson
-  $modules/rax_files.py:
-    maintainers: angstwad
-  $modules/rax_files_objects.py:
-    maintainers: angstwad
-  $modules/rax_identity.py:
-    maintainers: claco
-  $modules/rax_mon_alarm.py:
-    maintainers: smashwilson
-  $modules/rax_mon_check.py:
-    maintainers: smashwilson
-  $modules/rax_mon_entity.py:
-    maintainers: smashwilson
-  $modules/rax_mon_notification.py:
-    maintainers: smashwilson
-  $modules/rax_mon_notification_plan.py:
-    maintainers: smashwilson
-  $modules/rax_network.py:
-    maintainers: claco omgjlk
-  $modules/rax_queue.py:
-    maintainers: claco
   $modules/read_csv.py:
     maintainers: dagwieers
   $modules/redfish_:
@@ -1300,8 +1258,6 @@ files:
     maintainers: farhan7500 gautamphegde
   $modules/ssh_config.py:
     maintainers: gaqzi Akasurde
-  $modules/stackdriver.py:
-    maintainers: bwhaley
   $modules/stacki_host.py:
     labels: stacki_host
     maintainers: bsanders bbyhuy
@@ -1394,8 +1350,6 @@ files:
     maintainers: $team_wdc
   $modules/wdc_redfish_info.py:
     maintainers: $team_wdc
-  $modules/webfaction_:
-    maintainers: quentinsf
   $modules/xattr.py:
     labels: xattr
     maintainers: bcoca

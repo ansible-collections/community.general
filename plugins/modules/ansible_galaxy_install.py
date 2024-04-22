@@ -73,16 +73,6 @@ options:
       - Using O(force=true) is mandatory when downgrading.
     type: bool
     default: false
-  ack_ansible29:
-    description:
-      - This option has no longer any effect and will be removed in community.general 9.0.0.
-    type: bool
-    default: false
-  ack_min_ansiblecore211:
-    description:
-      - This option has no longer any effect and will be removed in community.general 9.0.0.
-    type: bool
-    default: false
 """
 
 EXAMPLES = """
@@ -202,18 +192,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
             dest=dict(type='path'),
             force=dict(type='bool', default=False),
             no_deps=dict(type='bool', default=False),
-            ack_ansible29=dict(
-                type='bool',
-                default=False,
-                removed_in_version='9.0.0',
-                removed_from_collection='community.general',
-            ),
-            ack_min_ansiblecore211=dict(
-                type='bool',
-                default=False,
-                removed_in_version='9.0.0',
-                removed_from_collection='community.general',
-            ),
         ),
         mutually_exclusive=[('name', 'requirements_file')],
         required_one_of=[('name', 'requirements_file')],

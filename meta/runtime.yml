@@ -57,109 +57,109 @@ plugin_routing:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
     rax_cbs_attachments:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_cbs:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_cdb_database:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_cdb_user:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_cdb:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_clb_nodes:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_clb_ssl:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_clb:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_dns_record:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_dns:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_facts:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_files_objects:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_files:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_identity:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_keypair:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_meta:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_alarm:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_check:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_entity:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_notification_plan:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_mon_notification:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_network:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_queue:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_scaling_group:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rax_scaling_policy:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on the deprecated package pyrax.
+        warning_text: This module relied on the deprecated package pyrax.
     rhn_channel:
       deprecation:
         removal_version: 10.0.0
@@ -171,9 +171,9 @@ plugin_routing:
         warning_text: RHN is EOL, please contact the community.general maintainers
           if still using this; see the module documentation for more details.
     stackdriver:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore,
+        warning_text: This module relied on HTTPS APIs that do not exist anymore,
           and any new development in the direction of providing an alternative should
           happen in the context of the google.cloud collection.
     ali_instance_facts:
@@ -237,9 +237,9 @@ plugin_routing:
     docker_volume_info:
       redirect: community.docker.docker_volume_info
     flowdock:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     foreman:
       tombstone:
@@ -727,29 +727,29 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.vertica_info instead.
     webfaction_app:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     webfaction_db:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     webfaction_domain:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     webfaction_mailbox:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     webfaction_site:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module relies on HTTPS APIs that do not exist anymore and
+        warning_text: This module relied on HTTPS APIs that do not exist anymore and
           there is no clear path to update.
     xenserver_guest_facts:
       tombstone:
@@ -757,9 +757,9 @@ plugin_routing:
         warning_text: Use community.general.xenserver_guest_info instead.
   doc_fragments:
     rackspace:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This doc fragment is used by rax modules, that rely on the deprecated
+        warning_text: This doc fragment was used by rax modules, that relied on the deprecated
           package pyrax.
     _gcp:
       redirect: community.google._gcp
@@ -777,9 +777,9 @@ plugin_routing:
       redirect: community.postgresql.postgresql
   module_utils:
     rax:
-      deprecation:
+      tombstone:
         removal_version: 9.0.0
-        warning_text: This module util relies on the deprecated package pyrax.
+        warning_text: This module util relied on the deprecated package pyrax.
     docker.common:
       redirect: community.docker.common
     docker.swarm:
