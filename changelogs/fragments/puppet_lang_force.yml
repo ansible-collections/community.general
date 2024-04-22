@@ -1,3 +1,0 @@
-bugfixes:
-  - puppet - add option ``environment_lang`` to set the environment language encoding. Defaults to lang ``C``. It is recommended
-     to set it to ``C.UTF-8`` or ``en_US.UTF-8`` depending on what is available on your system. (https://github.com/ansible-collections/community.general/issues/8000)

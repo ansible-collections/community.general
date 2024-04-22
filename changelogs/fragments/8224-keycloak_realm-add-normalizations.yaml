@@ -1,2 +1,0 @@
-bugfixes:
-  - keycloak_realm - add normalizations for ``enabledEventTypes`` and ``supportedLocales`` (https://github.com/ansible-collections/community.general/pull/8224).
