@@ -563,7 +563,7 @@ class Cargo(object):
             cmd.append(self.rev)
         if len(self.features) > 0:
             cmd.append("--features")
-            cmd.append('"%s"' % (",".join(self.features)))
+            cmd.append(",".join(self.features))
         if self.all_features:
             cmd.append("--all-features")
         if self.force:
