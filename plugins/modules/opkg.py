@@ -127,6 +127,7 @@ class Opkg(StateModuleHelper):
             executable=dict(type="path"),
         ),
     )
+    use_old_vardict = False
 
     def __init_module__(self):
         self.vars.set("install_c", 0, output=False, change=True)
