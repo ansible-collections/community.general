@@ -17,7 +17,6 @@ from ansible_collections.community.general.plugins.module_utils.mh.base import M
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 # (TODO: remove mh.mixins.vars!) pylint: disable-next=unused-import
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin, VarDict as _OldVarDict  # noqa: F401 remove in 11.0.0
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
 
