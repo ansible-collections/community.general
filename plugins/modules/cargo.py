@@ -65,7 +65,7 @@ options:
     type: bool
     default: false
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   state:
     description:
       - The state of the Rust package.
@@ -82,7 +82,7 @@ options:
     elements: str
     required: false
     default: []
-    version_added: 8.4.0
+    version_added: 8.6.0
   all_features:
     description:
       - Enable all features for a package.
@@ -91,54 +91,56 @@ options:
     type: bool
     default: false
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   directory:
     description:
       - Path to install the package(s) from.
     type: path
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   registry:
     description:
       - Registry to install the package(s) from.
+      - If O(registry) is not mentioned and O(state) is latest, versions will be
+        matched from the current default registry.
     type: str
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   git:
     description:
       - Git URL to install the package(s) from.
       - Can optionally either be used with O(branch), O(tag) or O(rev).
     type: str
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   branch:
     description:
       - Git branch to install the package(s) from.
       - C(git) option must be specified.
     type: str
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   tag:
     description:
       - Git tag to install the package(s) from.
       - C(git) option must be specified.
     type: str
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   rev:
     description:
       - Git commit to install the package(s) from.
       - C(git) option must be specified.
     type: str
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
   debug:
     description:
       - Specify whether to install package(s) in debug mode.
     type: bool
     default: false
     required: false
-    version_added: 8.4.0
+    version_added: 8.6.0
 requirements:
     - cargo and git installed
     - optionally, toml or tomli library present, if Python version is less than 3.11 and TOML support is needed
@@ -363,19 +365,23 @@ class Cargo(object):
         if version is not None and version != metadata["ver"]:
             return False
 
+        if self.registry is None and self.state == "present":
+            return True
+
         DEFAULT_SPARSE = "sparse+https://index.crates.io"
         DEFAULT_GIT = "https://github.com/rust-lang/crates.io-index"
 
-        if metadata["reg"] in [DEFAULT_SPARSE, DEFAULT_GIT]:
-            metadata["reg"] = "default"
+        metadata["reg"] = (
+            "default"
+            if metadata["reg"] in [DEFAULT_SPARSE, DEFAULT_GIT]
+            else metadata["reg"]
+        )
 
         if self.registry_url is not None:
-            if self.registry_url == metadata["reg"] or (
+            return self.registry_url == metadata["reg"] or (
                 metadata["reg"] == "default"
                 and self.registry_url in [DEFAULT_SPARSE, DEFAULT_GIT]
-            ):
-                return True
-            return False
+            )
 
         if HAS_TOMLI or HAS_TOML:
             config = os.path.join(self.cargo_dir, "config.toml")
@@ -437,7 +443,7 @@ class Cargo(object):
 
     def is_outdated(self, name):
         # NOTE: If features differed, or all_features had been different this time,
-        # those differences would have been caught in is_present_exact. So, this
+        # those differences would have been caught in is_present. So, this
         # time, we have to check for only a subset.
 
         version = self.version
