@@ -14,7 +14,7 @@ class VarMeta(object):
     """
     DEPRECATION WARNING
 
-    This class is deprecated and will be removed in community.general 10.0.0
+    This class is deprecated and will be removed in community.general 11.0.0
     Modules should use the VarDict from plugins/module_utils/vardict.py instead.
     """
 
@@ -70,7 +70,7 @@ class VarDict(object):
     """
     DEPRECATION WARNING
 
-    This class is deprecated and will be removed in community.general 10.0.0
+    This class is deprecated and will be removed in community.general 11.0.0
     Modules should use the VarDict from plugins/module_utils/vardict.py instead.
     """
     def __init__(self):
@@ -139,7 +139,7 @@ class VarsMixin(object):
     """
     DEPRECATION WARNING
 
-    This class is deprecated and will be removed in community.general 10.0.0
+    This class is deprecated and will be removed in community.general 11.0.0
     Modules should use the VarDict from plugins/module_utils/vardict.py instead.
     """
     def __init__(self, module=None):
