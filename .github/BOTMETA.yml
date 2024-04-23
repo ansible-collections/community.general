@@ -561,6 +561,8 @@ files:
     ignore: erydo
     labels: github_key
     maintainers: erydo
+  $modules/github_gpg_key.py:
+    maintainers: austinlucaslake
   $modules/github_release.py:
     maintainers: adrianmoisey
   $modules/github_repo.py:
