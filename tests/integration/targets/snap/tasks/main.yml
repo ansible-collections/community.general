@@ -15,6 +15,7 @@
       ansible.builtin.include_tasks: test.yml
     - name: Include test_channel
       ansible.builtin.include_tasks: test_channel.yml
+    # TODO: Find bettter package to download and install from sources - cider 1.6.0 takes over 35 seconds to install
     # - name: Include test_dangerous
     #   ansible.builtin.include_tasks: test_dangerous.yml
     - name: Include test_3dash
