@@ -34,7 +34,7 @@ options:
       - GPG key name
     required: true
     type: str
-  armored_pubkey:
+  armored_public_key:
     description:
       - ASCII-armored GPG public key value. Required when O(state=present).
     type: str
@@ -61,63 +61,111 @@ deleted_keys:
     type: list
     returned: When state=absent
     sample: [{
-        "id": 1,
-        "name": "EXAMPLE_NAME",
-        "primary_key_id": 0,
-        "key_id": "EXAMPLE_KEY_ID",
-        "public_key": "EXAMPLE_PUBLIC_KEY",
-        "emails": [{ "email": "example@email.com", "verified": True }],
-        "subkeys": [],
+        "id": 3,
+        "name": "Octocat's GPG Key",
+        "primary_key_id": 2,
+        "key_id": "3262EFF25BA0D270",
+        "public_key": "xsBNBFayYZ...",
+        "emails": [{
+            "email": "octocat@users.noreply.github.com",
+            "verified": True
+        }],
+        "subkeys": [{
+            "id": 4,
+            "primary_key_id": 3,
+            "key_id": "4A595D4C72EE49C7",
+            "public_key": "zsBNBFayYZ...",
+            "emails": [],
+            "can_sign": False,
+            "can_encrypt_comms": True,
+            "can_encrypt_storage": True,
+            "can_certify": False,
+            "created_at": "2016-03-24T11:31:04-06:00",
+            "expires_at": "2016-03-24T11:31:04-07:00",
+            "revoked": False
+        }],
         "can_sign": True,
         "can_encrypt_comms": False,
         "can_encrypt_storage": False,
         "can_certify": True,
-        "created_at": "%Y-%m-%dT%H:%M:%SZ",
-        "expires_at": "%Y-%m-%dT%H:%M:%SZ",
+        "created_at": "2016-03-24T11:31:04-06:00",
+        "expires_at": "2016-03-24T11:31:04-07:00",
         "revoked": False,
-        "raw_key": "ASCII-armored GPG public key"
+        "raw_key": "string"
     }]
 matching_keys:
     description: An array of keys matching the specified name. Only present on state=present
     type: list
     returned: When state=present
     sample: [{
-        "id": 1,
-        "name": "EXAMPLE_NAME",
-        "primary_key_id": 0,
-        "key_id": "EXAMPLE_KEY_ID",
-        "public_key": "EXAMPLE_PUBLIC_KEY",
-        "emails": [{ "email": "example@email.com", "verified": True }],
-        "subkeys": [],
+        "id": 3,
+        "name": "Octocat's GPG Key",
+        "primary_key_id": 2,
+        "key_id": "3262EFF25BA0D270",
+        "public_key": "xsBNBFayYZ...",
+        "emails": [{
+            "email": "octocat@users.noreply.github.com",
+            "verified": True
+        }],
+        "subkeys": [{
+            "id": 4,
+            "primary_key_id": 3,
+            "key_id": "4A595D4C72EE49C7",
+            "public_key": "zsBNBFayYZ...",
+            "emails": [],
+            "can_sign": False,
+            "can_encrypt_comms": True,
+            "can_encrypt_storage": True,
+            "can_certify": False,
+            "created_at": "2016-03-24T11:31:04-06:00",
+            "expires_at": "2016-03-24T11:31:04-07:00",
+            "revoked": False
+        }],
         "can_sign": True,
         "can_encrypt_comms": False,
         "can_encrypt_storage": False,
         "can_certify": True,
-        "created_at": "%Y-%m-%dT%H:%M:%SZ",
-        "expires_at": "%Y-%m-%dT%H:%M:%SZ",
+        "created_at": "2016-03-24T11:31:04-06:00",
+        "expires_at": "2016-03-24T11:31:04-07:00",
         "revoked": False,
-        "raw_key": "ASCII-armored GPG public key"
+        "raw_key": "string"
     }]
 key:
     description: Metadata about the key just created. Only present on state=present
     type: dict
     returned: success
     sample: {
-        "id": 1,
-        "name": "EXAMPLE_NAME",
-        "primary_key_id": 0,
-        "key_id": "EXAMPLE_KEY_ID",
-        "public_key": "EXAMPLE_PUBLIC_KEY",
-        "emails": [{ "email": "example@email.com", "verified": True }],
-        "subkeys": [],
+        "id": 3,
+        "name": "Octocat's GPG Key",
+        "primary_key_id": 2,
+        "key_id": "3262EFF25BA0D270",
+        "public_key": "xsBNBFayYZ...",
+        "emails": [{
+            "email": "octocat@users.noreply.github.com",
+            "verified": True
+        }],
+        "subkeys": [{
+            "id": 4,
+            "primary_key_id": 3,
+            "key_id": "4A595D4C72EE49C7",
+            "public_key": "zsBNBFayYZ...",
+            "emails": [],
+            "can_sign": False,
+            "can_encrypt_comms": True,
+            "can_encrypt_storage": True,
+            "can_certify": False,
+            "created_at": "2016-03-24T11:31:04-06:00",
+            "expires_at": "2016-03-24T11:31:04-07:00",
+            "revoked": False
+        }],
         "can_sign": True,
         "can_encrypt_comms": False,
         "can_encrypt_storage": False,
         "can_certify": True,
-        "created_at": "%Y-%m-%dT%H:%M:%SZ",
-        "expires_at": "%Y-%m-%dT%H:%M:%SZ",
+        "created_at": "2016-03-24T11:31:04-06:00",
+        "expires_at": "2016-03-24T11:31:04-07:00",
         "revoked": False,
-        "raw_key": "ASCII-armored GPG public key"
+        "raw_key": "string"
     }
 '''
 
@@ -131,7 +179,7 @@ EXAMPLES = '''
   community.general.github_gpg_key:
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
-    armored_pubkey: '{{ gpg_public_key.stdout }}'
+    armored_public_key: '{{ gpg_public_key.stdout }}'
 '''
 
 import datetime
@@ -176,7 +224,7 @@ class GitHubSession(object):
         headers = {
             'Authorization': 'token %s' % self.token,
             'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github+json',
+            'Accept': 'application/vnd.github.v3+json',
         }
         response, info = fetch_url(
             self.module, url, method=method, data=data, headers=headers)
@@ -188,7 +236,7 @@ class GitHubSession(object):
 
 
 def get_all_keys(session):
-    url = API_BASE + '/user/gpg_keys'
+    url = API_BASE
     result = []
     while url:
         r = session.request('GET', url)
@@ -197,37 +245,47 @@ def get_all_keys(session):
     return result
 
 
-def create_key(session, name, armored_pubkey, check_mode):
+def create_key(session, name, armored_public_key, check_mode):
     if check_mode:
         now_t = datetime.datetime.now()
         return {
-            "id": 1,
+            "id": 3,
             "name": name,
-            "primary_key_id": 0,
-            "key_id": "EXAMPLE_KEY_ID",
-            "public_key": "EXAMPLE_PUBLIC_KEY",
-            "emails": [
-                {
-                  "email": "example@email.com",
-                  "verified": True
-                }
-            ],
-            "subkeys": [],
+            "primary_key_id": 2,
+            "key_id": "3262EFF25BA0D270",
+            "public_key": "xsBNBFayYZ...",
+            "emails": [{
+                "email": "octocat@users.noreply.github.com",
+                "verified": True
+            }],
+            "subkeys": [{
+                "id": 4,
+                "primary_key_id": 3,
+                "key_id": "4A595D4C72EE49C7",
+                "public_key": "zsBNBFayYZ...",
+                "emails": [],
+                "can_sign": False,
+                "can_encrypt_comms": True,
+                "can_encrypt_storage": True,
+                "can_certify": False,
+                "created_at": datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+                "expires_at": None,
+                "revoked": False
+            }],
             "can_sign": True,
             "can_encrypt_comms": False,
             "can_encrypt_storage": False,
             "can_certify": True,
-            "created_at": datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
-            "expires_at": datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
+            "created_at": datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+            "expires_at": None,
             "revoked": False,
-            "raw_key": armored_pubkey
-          }
-
+            "raw_key": armored_public_key
+        }
     else:
         return session.request(
             'POST',
             API_BASE + '/user/gpg_keys',
-            data=json.dumps({'name': name, 'raw_key': armored_pubkey})).json()
+            data=json.dumps({'name': name, 'raw_key': armored_public_key})).json()
 
 
 def delete_keys(session, to_delete, check_mode):
@@ -235,7 +293,7 @@ def delete_keys(session, to_delete, check_mode):
         return
 
     for key in to_delete:
-        session.request('DELETE', API_BASE + '/user/gpg_keys/%s' % key["id"])
+        session.request('DELETE', API_BASE + '/user/keys/%s' % key["id"])
 
 
 def ensure_key_absent(session, name, check_mode):
@@ -246,25 +304,25 @@ def ensure_key_absent(session, name, check_mode):
             'deleted_keys': to_delete}
 
 
-def ensure_key_present(module, session, name, armored_pubkey, force, check_mode):
+def ensure_key_present(module, session, name, armored_public_key, force, check_mode):
     all_keys = get_all_keys(session)
     matching_keys = [k for k in all_keys if k['name'] == name]
     deleted_keys = []
 
-    new_signature = armored_pubkey
+    new_signature = armored_public_key
     for key in all_keys:
         existing_signature = key['raw_key']
         if new_signature == existing_signature and key['name'] != name:
             module.fail_json(msg=(
                 "another key with the same content is already registered "
-                "under the name |{0}|").format(key['name']))
+                "under the name |{0}|").format(key['title']))
 
     if matching_keys and force and matching_keys[0]['raw_key'] != new_signature:
         delete_keys(session, matching_keys, check_mode=check_mode)
         (deleted_keys, matching_keys) = (matching_keys, [])
 
     if not matching_keys:
-        key = create_key(session, name, armored_pubkey, check_mode=check_mode)
+        key = create_key(session, name, armored_public_key, check_mode=check_mode)
     else:
         key = matching_keys[0]
 
@@ -276,11 +334,22 @@ def ensure_key_present(module, session, name, armored_pubkey, force, check_mode)
     }
 
 
+def run_module(module, token, name, armored_public_key, state, force, check_mode)
+    session = GitHubSession(module, token)
+    if state == 'present':
+        ensure_key_present(module, session, name, armored_public_key, force=force,
+                           check_mode=check_mode)
+    elif state == 'absent':
+        result = ensure_key_absent(session, name, check_mode=check_mode)
+    
+    return result
+
+
 def main():
     argument_spec = {
         'token': {'required': True, 'no_log': True},
         'name': {'required': True},
-        'armored_pubkey': {},
+        'armored_public_key': {},
         'state': {'choices': ['present', 'absent'], 'default': 'present'},
         'force': {'default': True, 'type': 'bool'},
     }
@@ -289,30 +358,28 @@ def main():
         supports_check_mode=True,
     )
 
-    token = module.params['token']
-    name = module.params['name']
-    state = module.params['state']
-    force = module.params['force']
-    armored_pubkey = module.params.get('armored_pubkey')
+    armored_public_key = module.params.get('armored_public_key')
 
-    if armored_pubkey:
-        armored_pubkey_parts = armored_pubkey.split('\r\n')
-        armored_pubkey_start = '-----BEGIN PGP PUBLIC KEY BLOCK-----'
-        armored_pubkey_end = '-----END PGP PUBLIC KEY BLOCK-----'
-        if armored_pubkey_parts[0] != armored_pubkey_start or \
-            armored_pubkey_parts[-1] != armored_pubkey_end:
-            module.fail_json(msg='"armored_pubkey" parameter has an invalid format')
-    elif state == 'present':
-        module.fail_json(msg='"armored_pubkey" is required when state=present')
+    if armored_public_key:
+        armored_public_key_parts = armored_public_key.split("\r\n")
+        armored_public_key_start = "-----BEGIN PGP PUBLIC KEY BLOCK-----"
+        armored_public_key_end = "-----END PGP PUBLIC KEY BLOCK-----"
+        if armored_public_key_parts[0] != armored_public_key_start or \
+            armored_public_key_parts[-1] != armored_public_key_end:
+            module.fail_json(msg='"armored_public_key" parameter has an invalid format')
+    elif state == "present":
+        module.fail_json(msg='"armored_public_key" is required when state=present')
 
-    session = GitHubSession(module, token)
-    if state == 'present':
-        result = ensure_key_present(module, session, name, armored_pubkey, force=force, check_mode=module.check_mode)
-    elif state == 'absent':
-        result = ensure_key_absent(session, name, check_mode=module.check_mode)
-
+    result = run_module(
+        module=module,
+        token=module.params["token"],
+        name=module.params["name"],
+        armored_public_key=armored_public_key,
+        state=module.params["state"],
+        force=module.params["force"],
+        check_mode=check_mode
+    )
     module.exit_json(**result)
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
