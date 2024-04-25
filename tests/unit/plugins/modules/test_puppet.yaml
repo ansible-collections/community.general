@@ -190,3 +190,35 @@
       rc: 0
       out: ""
       err: ""
+- id: puppet_agent_waitforlock
+  input:
+    waitforlock: 30
+  output:
+    changed: false
+  run_command_calls:
+    - command: [/testbin/puppet, config, print, agent_disabled_lockfile]
+      environ: *env-def
+      rc: 0
+      out: "blah, anything"
+      err: ""
+    - command:
+        - /testbin/timeout
+        - -s
+        - "9"
+        - 30m
+        - /testbin/puppet
+        - agent
+        - --onetime
+        - --no-daemonize
+        - --no-usecacheonfailure
+        - --no-splay
+        - --detailed-exitcodes
+        - --verbose
+        - --color
+        - "0"
+        - --waitforlock
+        - "30"
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
