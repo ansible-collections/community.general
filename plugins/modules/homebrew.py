@@ -78,9 +78,10 @@ options:
         version_added: '0.2.0'
     force_formula:
         description:
-            - Force the package(s) to be treated as a formula (equivalent to brew --formula).
+            - Force the package(s) to be treated as a formula (equivalent to C(brew --formula)).
         type: bool
         default: false
+        version_added: 9.0.0
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the O(name) option.
