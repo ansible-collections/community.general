@@ -79,6 +79,7 @@ options:
     force_formula:
         description:
             - Force the package(s) to be treated as a formula (equivalent to C(brew --formula)).
+            - To install a cask, use the M(community.general.homebrew_cask) module.
         type: bool
         default: false
         version_added: 9.0.0
