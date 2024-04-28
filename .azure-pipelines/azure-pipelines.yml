@@ -280,7 +280,7 @@ stages:
             - name: Debian Bullseye
               test: debian-bullseye/3.9
             - name: ArchLinux
-              test: archlinux/3.11
+              test: archlinux/3.12
             - name: CentOS Stream 8
               test: centos-stream8/3.9
           groups:
