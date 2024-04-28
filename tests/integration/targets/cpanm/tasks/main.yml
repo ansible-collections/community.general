@@ -50,16 +50,22 @@
       - install_same_perl_package_result is not changed
       - install_same_perl_package_result is not failed
 
-# - name: install a Perl package with version operator
-#   cpanm:
-#     name: JSON
-#     version: "@4.01"
-#     notest: true
-#     mode: new
-#   register: install_perl_package_with_version_op_result
+#
+# The following test is failing in CentOS 7.
+#
+- name: Not for CentOS 7
+  when: not (ansible_distribution == 'CentOS' and ansible_distribution_major_version < '8')
+  block:
+    - name: install a Perl package with version operator
+      cpanm:
+        name: JSON
+        version: "@4.01"
+        notest: true
+        mode: new
+      register: install_perl_package_with_version_op_result
 
-# - name: assert package with version operator is installed
-#   assert:
-#     that:
-#       - install_perl_package_with_version_op_result is changed
-#       - install_perl_package_with_version_op_result is not failed
+    - name: assert package with version operator is installed
+      assert:
+        that:
+          - install_perl_package_with_version_op_result is changed
+          - install_perl_package_with_version_op_result is not failed
