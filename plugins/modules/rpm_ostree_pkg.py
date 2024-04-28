@@ -46,11 +46,6 @@ options:
         - Allow inactive packages.
       type: bool
       default: true
-    idempotent:
-      description:
-        - Idempotent operation.
-      type: bool
-      default: true
     apply_live:
       description:
         - Apply changes to the live filesystem.
@@ -175,7 +170,7 @@ class RpmOstreePkg:
 
 
         # Additional parameters
-        cmd.extend(['--unchanged-exit-77'])
+        cmd.extend(['--idempotent','--unchanged-exit-77'])
         for pkg in self.params['name']:
             cmd.append(pkg)
             results['packages'].append(pkg)
@@ -218,10 +213,6 @@ def main():
                 elements='str',
             ),
             allow_inactive=dict(
-                type='bool',
-                default=True,
-            ),
-            indepotent=dict(
                 type='bool',
                 default=True,
             ),
