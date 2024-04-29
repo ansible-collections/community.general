@@ -1,0 +1,2 @@
+minor_changes:
+  - PythonRunner module utils - specialisation of ``CmdRunner`` to execute python scripts (https://github.com/ansible-collections/community.general/pull/8289).
