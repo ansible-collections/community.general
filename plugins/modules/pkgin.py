@@ -156,7 +156,7 @@ def query_package(module, name):
 
     # Use "pkgin search" to find the package. The regular expression will
     # only match on the complete name.
-    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", "^%s$" % (name, )])
+    rc, out, err = module.run_command([PKGIN_PATH] + pflag + ["search", "^%s$" % name])
 
     # rc will not be 0 unless the search was a success
     if rc == 0:

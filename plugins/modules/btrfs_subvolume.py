@@ -572,7 +572,7 @@ class BtrfsSubvolumeModule(object):
         self.__temporary_mounts[cache_key] = mountpoint
 
         mount = self.module.get_bin_path("mount", required=True)
-        command = [mount, "-o", "noatime,subvolid=%d" % (subvolid, ), device, mountpoint]
+        command = [mount, "-o", "noatime,subvolid=%d" % subvolid, device, mountpoint]
         result = self.module.run_command(command, check_rc=True)
 
         return mountpoint
