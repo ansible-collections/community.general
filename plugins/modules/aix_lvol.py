@@ -240,8 +240,6 @@ def main():
     state = module.params['state']
     pvs = module.params['pvs']
 
-    pv_list = ' '.join(pvs)
-
     if policy == 'maximum':
         lv_policy = 'x'
     else:
@@ -249,16 +247,16 @@ def main():
 
     # Add echo command when running in check-mode
     if module.check_mode:
-        test_opt = 'echo '
+        test_opt = [module.get_bin_path("echo", required=True)]
     else:
-        test_opt = ''
+        test_opt = []
 
     # check if system commands are available
     lsvg_cmd = module.get_bin_path("lsvg", required=True)
     lslv_cmd = module.get_bin_path("lslv", required=True)
 
     # Get information on volume group requested
-    rc, vg_info, err = module.run_command("%s %s" % (lsvg_cmd, vg))
+    rc, vg_info, err = module.run_command([lsvg_cmd, vg])
 
     if rc != 0:
         if state == 'absent':
@@ -273,8 +271,7 @@ def main():
         lv_size = round_ppsize(convert_size(module, size), base=this_vg['pp_size'])
 
     # Get information on logical volume requested
-    rc, lv_info, err = module.run_command(
-        "%s %s" % (lslv_cmd, lv))
+    rc, lv_info, err = module.run_command([lslv_cmd, lv])
 
     if rc != 0:
         if state == 'absent':
@@ -296,7 +293,7 @@ def main():
             # create LV
             mklv_cmd = module.get_bin_path("mklv", required=True)
 
-            cmd = "%s %s -t %s -y %s -c %s  -e %s %s %s %sM %s" % (test_opt, mklv_cmd, lv_type, lv, copies, lv_policy, opts, vg, lv_size, pv_list)
+            cmd = test_opt + [mklv_cmd, "-t", lv_type, "-y", lv, "-c", copies, "-e", lv_policy, opts, vg, "%sM" % (lv_size, )] + pvs
             rc, out, err = module.run_command(cmd)
             if rc == 0:
                 module.exit_json(changed=True, msg="Logical volume %s created." % lv)
@@ -306,7 +303,7 @@ def main():
         if state == 'absent':
             # remove LV
             rmlv_cmd = module.get_bin_path("rmlv", required=True)
-            rc, out, err = module.run_command("%s %s -f %s" % (test_opt, rmlv_cmd, this_lv['name']))
+            rc, out, err = module.run_command(test_opt + [rmlv_cmd, "-f", this_lv['name']])
             if rc == 0:
                 module.exit_json(changed=True, msg="Logical volume %s deleted." % lv)
             else:
@@ -315,7 +312,7 @@ def main():
             if this_lv['policy'] != policy:
                 # change lv allocation policy
                 chlv_cmd = module.get_bin_path("chlv", required=True)
-                rc, out, err = module.run_command("%s %s -e %s %s" % (test_opt, chlv_cmd, lv_policy, this_lv['name']))
+                rc, out, err = module.run_command(test_opt + [chlv_cmd, "-e", lv_policy, this_lv['name']])
                 if rc == 0:
                     module.exit_json(changed=True, msg="Logical volume %s policy changed: %s." % (lv, policy))
                 else:
@@ -331,7 +328,7 @@ def main():
             # resize LV based on absolute values
             if int(lv_size) > this_lv['size']:
                 extendlv_cmd = module.get_bin_path("extendlv", required=True)
-                cmd = "%s %s %s %sM" % (test_opt, extendlv_cmd, lv, lv_size - this_lv['size'])
+                cmd = test_opt + [extendlv_cmd, lv, "%sM" % (lv_size - this_lv['size'], )]
                 rc, out, err = module.run_command(cmd)
                 if rc == 0:
                     module.exit_json(changed=True, msg="Logical volume %s size extended to %sMB." % (lv, lv_size))

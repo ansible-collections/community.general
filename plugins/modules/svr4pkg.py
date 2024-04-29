@@ -120,7 +120,7 @@ def package_installed(module, name, category):
     if category:
         cmd.append('-c')
     cmd.append(name)
-    rc, out, err = module.run_command(' '.join(cmd))
+    rc, out, err = module.run_command(cmd)
     if rc == 0:
         return True
     else:
