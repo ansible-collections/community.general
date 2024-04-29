@@ -129,7 +129,7 @@ class _Format(object):
         return _ArgFormat(lambda value: ["{0}={1}".format(arg, value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_list(ignore_none=None, min_len=1, max_len=None):
+    def as_list(ignore_none=None, min_len=0, max_len=None):
         def func(value):
             value = _ensure_list(value)
             if len(value) < min_len:
