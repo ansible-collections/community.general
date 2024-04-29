@@ -129,8 +129,15 @@ class _Format(object):
         return _ArgFormat(lambda value: ["{0}={1}".format(arg, value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_list(ignore_none=None):
-        return _ArgFormat(_ensure_list, ignore_none=ignore_none)
+    def as_list(ignore_none=None, min_len=0, max_len=None):
+        def func(value):
+            value = _ensure_list(value)
+            if len(value) < min_len:
+                raise ValueError("Parameter must have at least {0} element(s)".format(min_len))
+            if max_len is not None and len(value) > max_len:
+                raise ValueError("Parameter must have at most {0} element(s)".format(max_len))
+            return value
+        return _ArgFormat(func, ignore_none=ignore_none)
 
     @staticmethod
     def as_fixed(args):
