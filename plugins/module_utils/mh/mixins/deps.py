@@ -9,6 +9,12 @@ __metaclass__ = type
 
 
 class DependencyCtxMgr(object):
+    """
+    DEPRECATION WARNING
+
+    This class is deprecated and will be removed in community.general 11.0.0
+    Modules should use plugins/module_utils/deps.py instead.
+    """
     def __init__(self, name, msg=None):
         self.name = name
         self.msg = msg
