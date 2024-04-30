@@ -2,6 +2,6 @@ deprecated_features:
   - "apt_rpm - the behavior of ``state=present`` and ``state=installed`` is deprecated and will change in community.general 11.0.0.
      Right now the module will upgrade a package to the latest version if one of these two states is used. You should explicitly
      use ``state=latest`` if you want this behavior, and switch to ``state=present_not_latest`` if you do not want to upgrade the
-     package if it is already installed. In community.general 11.0.0 the behavior of ``state=present`` and ``state=latest`` will
+     package if it is already installed. In community.general 11.0.0 the behavior of ``state=present`` and ``state=installed`` will
      change to that of ``state=present_not_latest`` (https://github.com/ansible-collections/community.general/issues/8217,
      https://github.com/ansible-collections/community.general/pull/8285)."
