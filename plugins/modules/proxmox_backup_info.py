@@ -57,7 +57,7 @@ proxmox_backups:
       returned: on success
       type: str
     notes-template:
-      description: Template string for generating notes for the backup(s).  
+      description: Template string for generating notes for the backup(s).
       returned: on success
       type: str
     mailto:
@@ -116,13 +116,14 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
             backups = [ProxmoxBackup(backup) for backup in backups]
             return backups
 
+
 class ProxmoxBackup:
     def __init__(self, backups):
         self.backups = backups
         # Convert proxmox representation of lists, dicts and boolean for easier
         # manipulation within ansible.
         if 'mailnotification' in self.backups:
-            self.backups['mailnotification'] =  self.backups['mailnotification']
+            self.backups['mailnotification'] = self.backups['mailnotification']
         if 'storage' in self.backups:
             self.backups['storage'] = self.backups['storage']
         if 'notes-template' in self.backups:
@@ -184,4 +185,5 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()
