@@ -310,6 +310,18 @@ def main():
         module.fail_json(msg="cannot find /usr/bin/apt-get and/or /usr/bin/rpm")
 
     p = module.params
+    if p['state'] in ['installed', 'present']:
+        module.deprecate(
+            'state=%s currently behaves unexpectedly by always upgrading to the latest version if'
+            ' the package is already installed. This behavior is deprecated and will change in'
+            ' community.general 11.0.0. You can use state=latest to explicitly request this behavior'
+            ' or state=present_not_latest to explicitly request the behavior that state=%s will have'
+            ' in community.general 11.0.0, namely that the package will not be upgraded if it is'
+            ' already installed.' % (p['state'], p['state']),
+            version='11.0.0',
+            collection_name='community.general',
+        )
+
     modified = False
     output = ""
 
