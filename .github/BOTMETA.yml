@@ -611,6 +611,8 @@ files:
     maintainers: stpierre
   $modules/github_deploy_key.py:
     maintainers: bincyber
+  $modules/github_gpg_key.py:
+    maintainers: austinlucaslake
   $modules/github_issue.py:
     maintainers: Akasurde
   $modules/github_key.py:
