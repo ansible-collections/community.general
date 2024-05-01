@@ -7,3 +7,4 @@ proxmox_domain_info
 proxmox_group_info
 proxmox_user_info
 proxmox_storage_info
+proxmox_backup_info
