@@ -130,14 +130,14 @@
     - results_storage.proxmox_storages[0].storage == "{{ storage }}"
 
 - name: Retrieve info about backup job
-    proxmox_backup_info:
-      api_host: helldorado
-      api_user: root@pam
-      api_password: "{{ password | default(omit) }}"
-      api_token_id: "{{ token_id | default(omit) }}"
-      api_token_secret: "{{ token_secret | default(omit) }}"
-      validate_certs: "{{ validate_certs }}"
-      id: "{{ id }}"
+  proxmox_backup_info:
+    api_host: helldorado
+    api_user: root@pam
+    api_password: "{{ password | default(omit) }}"
+    api_token_id: "{{ token_id | default(omit) }}"
+    api_token_secret: "{{ token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    id: "{{ id }}"
   register: results_backup
 
 - assert:
