@@ -13,9 +13,9 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: github_gpg_key
-short_description: Manage GitHub access keys
+short_description: Manage GitHub GPG keys
 description:
-  - Creates, removes, or updates GitHub GPG keys.
+  - Creates, removes, or list GitHub GPG keys.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
@@ -224,7 +224,7 @@ class GitHubSession(object):
         headers = {
             'Authorization': 'token %s' % self.token,
             'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json',
+            'Accept': 'application/vnd.github.v3+json'
         }
         response, info = fetch_url(
             self.module, url, method=method, data=data, headers=headers)
@@ -268,7 +268,7 @@ def create_key(session, name, armored_public_key, check_mode):
                 "can_encrypt_comms": True,
                 "can_encrypt_storage": True,
                 "can_certify": False,
-                "created_at": datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+                "created_at": now_t.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "expires_at": None,
                 "revoked": False
             }],
@@ -276,7 +276,7 @@ def create_key(session, name, armored_public_key, check_mode):
             "can_encrypt_comms": False,
             "can_encrypt_storage": False,
             "can_certify": True,
-            "created_at": datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+            "created_at": now_t.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "expires_at": None,
             "revoked": False,
             "raw_key": armored_public_key
@@ -334,14 +334,14 @@ def ensure_key_present(module, session, name, armored_public_key, force, check_m
     }
 
 
-def run_module(module, token, name, armored_public_key, state, force, check_mode)
+def run_module(module, token, name, armored_public_key, state, force, check_mode):
     session = GitHubSession(module, token)
     if state == 'present':
         ensure_key_present(module, session, name, armored_public_key, force=force,
                            check_mode=check_mode)
     elif state == 'absent':
         result = ensure_key_absent(session, name, check_mode=check_mode)
-    
+
     return result
 
 
@@ -355,7 +355,7 @@ def main():
     }
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True,
+        supports_check_mode=True
     )
 
     armored_public_key = module.params.get('armored_public_key')
@@ -365,7 +365,7 @@ def main():
         armored_public_key_start = "-----BEGIN PGP PUBLIC KEY BLOCK-----"
         armored_public_key_end = "-----END PGP PUBLIC KEY BLOCK-----"
         if armored_public_key_parts[0] != armored_public_key_start or \
-            armored_public_key_parts[-1] != armored_public_key_end:
+        armored_public_key_parts[-1] != armored_public_key_end:
             module.fail_json(msg='"armored_public_key" parameter has an invalid format')
     elif state == "present":
         module.fail_json(msg='"armored_public_key" is required when state=present')
@@ -380,6 +380,7 @@ def main():
         check_mode=check_mode
     )
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()

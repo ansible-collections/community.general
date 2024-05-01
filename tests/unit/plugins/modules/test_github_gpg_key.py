@@ -68,7 +68,7 @@ def create_gpg_key_mock(url, request):
     gpg_key = json.loads(request.body)
 
     now_t = datetime.datetime.now()
-    
+
     headers = {'content-type': 'application/json'}
     # https://docs.github.com/en/rest/reference/repos#create-a-repository-for-the-authenticated-user
     content = {
@@ -91,7 +91,7 @@ def create_gpg_key_mock(url, request):
             "can_encrypt_comms": True,
             "can_encrypt_storage": True,
             "can_certify": False,
-            "created_at": datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+            "created_at": now_t.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "expires_at": None,
             "revoked": False
         }],
@@ -99,7 +99,7 @@ def create_gpg_key_mock(url, request):
         "can_encrypt_comms": False,
         "can_encrypt_storage": False,
         "can_certify": True,
-        "created_at": datetime.strftime(now_t, "%Y-%m-%dT%H:%M:%SZ"),
+        "created_at": now_T.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "expires_at": None,
         "revoked": False,
         "raw_key": gpg_key.get("armored_public_key")
@@ -127,7 +127,7 @@ class TestGithubRepo(unittest.TestCase):
             'name': {'required': True},
             'armored_public_key': {},
             'state': {'choices': ['present', 'absent'], 'default': 'present'},
-            'force': {'default': True, 'type': 'bool'},
+            'force': {'default': True, 'type': 'bool'}
         }
         self.module = AnsibleModule(
             argument_spec=argument_spec,
@@ -138,7 +138,7 @@ class TestGithubRepo(unittest.TestCase):
     @with_httmock(create_gpg_key_mock)
     def test_create_gpg_key_repo(self):
         result = github_gpg_key.run_module(
-            module=self.module
+            module=self.module,
             token="github_access_token",
             name="GPG public key",
             armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
