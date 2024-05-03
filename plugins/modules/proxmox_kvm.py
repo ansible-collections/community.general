@@ -526,6 +526,7 @@ options:
       - Option C(mapping) is the mapped USB device name.
       - Option C(usb3) enables USB 3 support.
     type: dict
+    version_added: 9.0.0
   update:
     description:
       - If V(true), the VM will be updated with new value.
