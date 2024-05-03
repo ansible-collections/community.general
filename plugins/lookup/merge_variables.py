@@ -159,7 +159,7 @@ class LookupModule(LookupBase):
                     if self._is_host_in_allowed_groups(variables["hostvars"][host]["group_names"]):
                         host_variables = dict(variables["hostvars"].raw_get(host))
                         host_variables["hostvars"] = variables["hostvars"]  # re-add hostvars
-                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, host_variables)  
+                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, host_variables)
                 ret.append(cross_host_merge_result)
 
         return ret
