@@ -18,6 +18,17 @@ from ansible_collections.community.general.plugins.lookup import merge_variables
 
 
 class TestMergeVariablesLookup(unittest.TestCase):
+    class _HostVars(dict):
+
+        def __getattr__(self, item):
+            return super().__getitem__(item)
+
+        def __setattr__(self, item, value):
+            return super().__setitem__(item, value)
+
+        def raw_get(self, host):
+            return super().__getitem__(host)
+
     def setUp(self):
         self.loader = DictDataLoader({})
         self.templar = Templar(loader=self.loader, variables={})
@@ -141,25 +152,28 @@ class TestMergeVariablesLookup(unittest.TestCase):
         {'var': [{'item5': 'value5', 'item6': 'value6'}]},
     ])
     def test_merge_dict_group_all(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(['__merge_var'], {
-            'inventory_hostname': 'host1',
-            'hostvars': {
-                'host1': {
-                    'group_names': ['dummy1'],
-                    'inventory_hostname': 'host1',
-                    '1testlist__merge_var': {
-                        'var': [{'item1': 'value1', 'item2': 'value2'}]
-                    }
-                },
-                'host2': {
-                    'group_names': ['dummy1'],
-                    'inventory_hostname': 'host2',
-                    '2otherlist__merge_var': {
-                        'var': [{'item5': 'value5', 'item6': 'value6'}]
-                    }
+        hostvars = self._HostVars({
+            'host1': {
+                'group_names': ['dummy1'],
+                'inventory_hostname': 'host1',
+                '1testlist__merge_var': {
+                    'var': [{'item1': 'value1', 'item2': 'value2'}]
+                }
+            },
+            'host2': {
+                'group_names': ['dummy1'],
+                'inventory_hostname': 'host2',
+                '2otherlist__merge_var': {
+                    'var': [{'item5': 'value5', 'item6': 'value6'}]
                 }
             }
         })
+        variables = {
+            'inventory_hostname': 'host1',
+            'hostvars': hostvars
+        }
+
+        results = self.merge_vars_lookup.run(['__merge_var'], variables)
 
         self.assertEqual(results, [
             {'var': [
@@ -175,32 +189,35 @@ class TestMergeVariablesLookup(unittest.TestCase):
         {'var': [{'item5': 'value5', 'item6': 'value6'}]},
     ])
     def test_merge_dict_group_single(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(['__merge_var'], {
-            'inventory_hostname': 'host1',
-            'hostvars': {
-                'host1': {
-                    'group_names': ['dummy1'],
-                    'inventory_hostname': 'host1',
-                    '1testlist__merge_var': {
-                        'var': [{'item1': 'value1', 'item2': 'value2'}]
-                    }
-                },
-                'host2': {
-                    'group_names': ['dummy1'],
-                    'inventory_hostname': 'host2',
-                    '2otherlist__merge_var': {
-                        'var': [{'item5': 'value5', 'item6': 'value6'}]
-                    }
-                },
-                'host3': {
-                    'group_names': ['dummy2'],
-                    'inventory_hostname': 'host3',
-                    '3otherlist__merge_var': {
-                        'var': [{'item3': 'value3', 'item4': 'value4'}]
-                    }
+        hostvars = self._HostVars({
+            'host1': {
+                'group_names': ['dummy1'],
+                'inventory_hostname': 'host1',
+                '1testlist__merge_var': {
+                    'var': [{'item1': 'value1', 'item2': 'value2'}]
+                }
+            },
+            'host2': {
+                'group_names': ['dummy1'],
+                'inventory_hostname': 'host2',
+                '2otherlist__merge_var': {
+                    'var': [{'item5': 'value5', 'item6': 'value6'}]
+                }
+            },
+            'host3': {
+                'group_names': ['dummy2'],
+                'inventory_hostname': 'host3',
+                '3otherlist__merge_var': {
+                    'var': [{'item3': 'value3', 'item4': 'value4'}]
                 }
             }
         })
+        variables = {
+            'inventory_hostname': 'host1',
+            'hostvars': hostvars
+        }
+        
+        results = self.merge_vars_lookup.run(['__merge_var'], variables)
 
         self.assertEqual(results, [
             {'var': [
@@ -216,32 +233,34 @@ class TestMergeVariablesLookup(unittest.TestCase):
         {'var': [{'item5': 'value5', 'item6': 'value6'}]},
     ])
     def test_merge_dict_group_multiple(self, mock_set_options, mock_get_option, mock_template):
-        results = self.merge_vars_lookup.run(['__merge_var'], {
-            'inventory_hostname': 'host1',
-            'hostvars': {
-                'host1': {
-                    'group_names': ['dummy1'],
-                    'inventory_hostname': 'host1',
-                    '1testlist__merge_var': {
-                        'var': [{'item1': 'value1', 'item2': 'value2'}]
-                    }
-                },
-                'host2': {
-                    'group_names': ['dummy2'],
-                    'inventory_hostname': 'host2',
-                    '2otherlist__merge_var': {
-                        'var': [{'item5': 'value5', 'item6': 'value6'}]
-                    }
-                },
-                'host3': {
-                    'group_names': ['dummy3'],
-                    'inventory_hostname': 'host3',
-                    '3otherlist__merge_var': {
-                        'var': [{'item3': 'value3', 'item4': 'value4'}]
-                    }
+        hostvars = self._HostVars({
+            'host1': {
+                'group_names': ['dummy1'],
+                'inventory_hostname': 'host1',
+                '1testlist__merge_var': {
+                    'var': [{'item1': 'value1', 'item2': 'value2'}]
+                }
+            },
+            'host2': {
+                'group_names': ['dummy2'],
+                'inventory_hostname': 'host2',
+                '2otherlist__merge_var': {
+                    'var': [{'item5': 'value5', 'item6': 'value6'}]
+                }
+            },
+            'host3': {
+                'group_names': ['dummy3'],
+                'inventory_hostname': 'host3',
+                '3otherlist__merge_var': {
+                    'var': [{'item3': 'value3', 'item4': 'value4'}]
                 }
             }
         })
+        variables = {
+            'inventory_hostname': 'host1',
+            'hostvars': hostvars
+        }
+        results = self.merge_vars_lookup.run(['__merge_var'], variables)
 
         self.assertEqual(results, [
             {'var': [
@@ -257,26 +276,27 @@ class TestMergeVariablesLookup(unittest.TestCase):
         ['item5'],
     ])
     def test_merge_list_group_multiple(self, mock_set_options, mock_get_option, mock_template):
-        print()
-        results = self.merge_vars_lookup.run(['__merge_var'], {
-            'inventory_hostname': 'host1',
-            'hostvars': {
-                'host1': {
-                    'group_names': ['dummy1'],
-                    'inventory_hostname': 'host1',
-                    '1testlist__merge_var': ['item1']
-                },
-                'host2': {
-                    'group_names': ['dummy2'],
-                    'inventory_hostname': 'host2',
-                    '2otherlist__merge_var': ['item5']
-                },
-                'host3': {
-                    'group_names': ['dummy3'],
-                    'inventory_hostname': 'host3',
-                    '3otherlist__merge_var': ['item3']
-                }
+        hostvars = self._HostVars({
+            'host1': {
+                'group_names': ['dummy1'],
+                'inventory_hostname': 'host1',
+                '1testlist__merge_var': ['item1']
+            },
+            'host2': {
+                'group_names': ['dummy2'],
+                'inventory_hostname': 'host2',
+                '2otherlist__merge_var': ['item5']
+            },
+            'host3': {
+                'group_names': ['dummy3'],
+                'inventory_hostname': 'host3',
+                '3otherlist__merge_var': ['item3']
             }
         })
+        variables = {
+            'inventory_hostname': 'host1',
+            'hostvars': hostvars
+        }
+        results = self.merge_vars_lookup.run(['__merge_var'], variables)
 
         self.assertEqual(results, [['item1', 'item5']])
