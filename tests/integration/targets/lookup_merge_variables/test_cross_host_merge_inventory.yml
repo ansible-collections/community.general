@@ -1,0 +1,28 @@
+---
+common:
+  vars:
+    provider_instances:
+      servicedata1:
+        host: "{{ hostvars[groups['provider'] | first].inventory_hostname }}"
+        user: usr
+        pass: pwd
+      servicedata2:
+        host: down
+        user: usr2
+        pass: pwd2
+  hosts:
+    host1:
+    host2:
+
+consumer:
+  vars:
+    service_data: "{{ provider_instances.servicedata1 }}"
+    merge2__1: "{{ service_data }}"  # fails for host1; would work if using provider_instances directly here, as it is a variable host1 owns
+  hosts:
+    host2:
+
+provider:
+  vars:
+    merge1: "{{ lookup('community.general.merge_variables', 'merge2__', pattern_type='prefix', groups=['consumer']) }}"
+  hosts:
+    host1:
