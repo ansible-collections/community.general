@@ -101,6 +101,12 @@ options:
       - Whether to print a transaction summary.
     type: bool
     default: false
+  waitforlock:
+    description:
+     - The maximum amount of time C(puppet) should wait for an already running C(puppet) agent to finish before starting.
+     - If a number without unit is provided, it is assumed to be a number of seconds. Allowed units are V(m) for minutes and V(h) for hours.
+    type: str
+    version_added: 9.0.0
   verbose:
     description:
       - Print extra information.
@@ -159,6 +165,14 @@ EXAMPLES = r'''
     skip_tags:
     - service
 
+- name: Wait 30 seconds for any current puppet runs to finish
+  community.general.puppet:
+    waitforlock: 30
+
+- name: Wait 5 minutes for any current puppet runs to finish
+  community.general.puppet:
+    waitforlock: 5m
+
 - name: Run puppet agent in noop mode
   community.general.puppet:
     noop: true
@@ -214,6 +228,7 @@ def main():
             skip_tags=dict(type='list', elements='str'),
             execute=dict(type='str'),
             summarize=dict(type='bool', default=False),
+            waitforlock=dict(type='str'),
             debug=dict(type='bool', default=False),
             verbose=dict(type='bool', default=False),
             use_srv_records=dict(type='bool'),
@@ -247,11 +262,11 @@ def main():
     runner = puppet_utils.puppet_runner(module)
 
     if not p['manifest'] and not p['execute']:
-        args_order = "_agent_fixed puppetmaster show_diff confdir environment tags skip_tags certname noop use_srv_records"
+        args_order = "_agent_fixed puppetmaster show_diff confdir environment tags skip_tags certname noop use_srv_records waitforlock"
         with runner(args_order) as ctx:
             rc, stdout, stderr = ctx.run()
     else:
-        args_order = "_apply_fixed logdest modulepath environment certname tags skip_tags noop _execute summarize debug verbose"
+        args_order = "_apply_fixed logdest modulepath environment certname tags skip_tags noop _execute summarize debug verbose waitforlock"
         with runner(args_order) as ctx:
             rc, stdout, stderr = ctx.run(_execute=[p['execute'], p['manifest']])
 
