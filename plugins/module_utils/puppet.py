@@ -103,6 +103,7 @@ def puppet_runner(module):
             modulepath=cmd_runner_fmt.as_opt_eq_val("--modulepath"),
             _execute=cmd_runner_fmt.as_func(execute_func),
             summarize=cmd_runner_fmt.as_bool("--summarize"),
+            waitforlock=cmd_runner_fmt.as_opt_val("--waitforlock"),
             debug=cmd_runner_fmt.as_bool("--debug"),
             verbose=cmd_runner_fmt.as_bool("--verbose"),
         ),
