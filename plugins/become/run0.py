@@ -34,6 +34,7 @@ DOCUMENTATION = """
             env:
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_RUN0_USER
+            type: string
         become_exe:
             description: The C(run0) executable.
             default: run0
@@ -48,6 +49,7 @@ DOCUMENTATION = """
             env:
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_RUN0_EXE
+            type: string
         become_flags:
             description: Options to pass to run0.
             default: ''
@@ -62,6 +64,7 @@ DOCUMENTATION = """
             env:
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_RUN0_FLAGS
+            type: string
     notes:
       - This plugin will only work when a polkit rule is in place.
 """
