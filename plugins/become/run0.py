@@ -4,10 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-from re import compile as re_compile
-
-from ansible.plugins.become import BecomeBase
-from ansible.module_utils._text import to_bytes
 
 __metaclass__ = type
 
@@ -81,6 +77,11 @@ EXAMPLES = r"""
       }
     });
 """
+
+from re import compile as re_compile
+
+from ansible.plugins.become import BecomeBase
+from ansible.module_utils._text import to_bytes
 
 ansi_color_codes = re_compile(to_bytes(r"\x1B\[[0-9;]+m"))
 
