@@ -21,7 +21,7 @@ DOCUMENTATION = """
     version_added: '9.0.0'
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
             default: root
             ini:
               - section: privilege_escalation
@@ -35,7 +35,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_RUN0_USER
         become_exe:
-            description: run0 executable
+            description: The C(run0) executable.
             default: run0
             ini:
               - section: privilege_escalation
@@ -49,7 +49,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_RUN0_EXE
         become_flags:
-            description: Options to pass to run0
+            description: Options to pass to run0.
             default: ''
             ini:
               - section: privilege_escalation
@@ -67,7 +67,7 @@ DOCUMENTATION = """
 """
 
 EXAMPLES = r"""
-# An example polkit rule that allows the user C(ansible) in the C(wheel) group
+# An example polkit rule that allows the user 'ansible' in the 'wheel' group
 # to execute commands using run0 without authentication.
 /etc/polkit-1/rules.d/60-run0-fast-user-auth.rules: |
     polkit.addRule(function(action, subject) {
