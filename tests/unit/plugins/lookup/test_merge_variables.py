@@ -216,7 +216,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
             'inventory_hostname': 'host1',
             'hostvars': hostvars
         }
-        
+
         results = self.merge_vars_lookup.run(['__merge_var'], variables)
 
         self.assertEqual(results, [
