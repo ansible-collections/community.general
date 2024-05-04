@@ -18,7 +18,7 @@ DOCUMENTATION = """
         - This become plugins allows your remote/login user to execute commands as another user via the C(run0) utility.
     author:
         - Thomas Sjögren (@konstruktoid)
-    version_added: '8.7.0'
+    version_added: '9.0.0'
     options:
         become_user:
             description: User you 'become' to execute the task
