@@ -1,17 +1,12 @@
-from proxmoxer import ProxmoxAPI
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
-
-import urllib3
-
-urllib3.disable_warnings()
 
 DOCUMENTATION = '''
 ---
 module: proxmox_backup_info
 short_description: Retrieve information about one or more Proxmox VE backups
-version_added: 2.2.0
+version_added: 9.0.0
 description:
   - Retrieve information about one or more Proxmox VE backups.
 options:
@@ -37,7 +32,6 @@ EXAMPLES = '''
     api_token_id: "{{ token_id | default(omit) }}"
     api_token_secret: "{{ token_secret | default(omit) }}"
     validate_certs: "{{ validate_certs | default(omit) }}"
-    id: "{{ id | default(omit) }}"
   register: proxmox_backups
 '''
 
@@ -49,11 +43,11 @@ proxmox_backups:
   elements: dict
   contains:
     mailnotification:
-      description: Notification event type
+      description: Notification event type.
       returned: on success
       type: str
     storage:
-      description: Storage used in backup job
+      description: Storage used in backup job.
       returned: on success
       type: str
     notes-template:
@@ -69,11 +63,11 @@ proxmox_backups:
       returned: on success
       type: str
     mode:
-      description: Backup mode
+      description: Backup mode.
       returned: on success
       type: str
     next-run:
-      description: Timestamp of next run
+      description: Timestamp of next run.
       returned: on success
       type: str
     repeat-missed:
@@ -81,7 +75,7 @@ proxmox_backups:
       returned: on success
       type: bool
     type:
-      description: Type of backup
+      description: Type of backup.
       returned: on success
       type: str
     enabled:
@@ -93,7 +87,7 @@ proxmox_backups:
       returned: on success
       type: bool
     pool:
-      description: Backup mode
+      description: Backup mode.
       returned: on success
       type: str
     vmid:
@@ -104,50 +98,72 @@ proxmox_backups:
 
 
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
+    def __init__(self, module):
+        self.module = module
+        self.api_host = module.params['api_host']
+        self.api_user = module.params['api_user']
+        self.api_password = module.params.get('api_password')
+        self.api_token_id = module.params.get('api_token_id')
+        self.api_token_secret = module.params.get('api_token_secret')
+        self.validate_certs = module.params['validate_certs']
+
+    def fetch_backup_data(self, endpoint):
+        headers = {
+            'Authorization': f'PVEAPIToken={self.api_user}!{self.api_token_id}={self.api_token_secret}'
+        } if self.api_token_id and self.api_token_secret else None
+
+        url = f'https://{self.api_host}:8006/api2/json/{endpoint}'
+        response, info = fetch_url(self.module, url, headers=headers)
+
+        if info['status'] != 200:
+            self.module.fail_json(msg=f"Failed to fetch data from Proxmox API: {info}")
+
+        return response.read()
+
     def get_backup(self, id):
         if id:
             try:
-                backup = self.proxmox_api.cluster.backup.get(id)
+                backup = self.fetch_backup_data(f'cluster/backup/{id}')
             except Exception:
                 self.module.fail_json(msg="Backup with id '%s' does not exist" % id)
             return ProxmoxBackup(backup)
         else:
-            backups = self.proxmox_api.cluster.backup.get()
+            backups = self.fetch_backup_data('cluster/backup')
             backups = [ProxmoxBackup(backup) for backup in backups]
             return backups
 
 
-class ProxmoxBackup:
-    def __init__(self, backups):
-        self.backups = backups
+class ProxmoxBackup(object):
+    def __init__(self, backup):
+        self.backup = backup
         # Convert proxmox representation of lists, dicts and boolean for easier
         # manipulation within ansible.
-        if 'mailnotification' in self.backups:
-            self.backups['mailnotification'] = self.backups['mailnotification']
-        if 'storage' in self.backups:
-            self.backups['storage'] = self.backups['storage']
-        if 'notes-template' in self.backups:
-            self.backups['notes-template'] = self.backups['notes-template']
-        if 'mailto' in self.backups:
-            self.backups['mailto'] = self.backups['mailto']
-        if 'id' in self.backups:
-            self.backups['id'] = self.backups['id']
-        if 'mode' in self.backups:
-            self.backups['mode'] = self.backups['mode']
-        if 'next-run' in self.backups:
-            self.backups['next-run'] = self.backups['next-run']
-        if 'repeat-missed' in self.backups:
-            self.backups['repeat-missed'] = proxmox_to_ansible_bool(self.backups['repeat-missed'])
-        if 'type' in self.backups:
-            self.backups['type'] = self.backups['type']
-        if 'enabled' in self.backups:
-            self.backups['enabled'] = proxmox_to_ansible_bool(self.backups['enabled'])
-        if 'all' in self.backups:
-            self.backups['all'] = proxmox_to_ansible_bool(self.backups['all'])
-        if 'pool' in self.backups:
-            self.backups['pool'] = self.backups['pool']
-        if 'vmid' in self.backups:
-            self.backups['vmid'] = self.backups['vmid']
+        if 'mailnotification' in self.backup:
+            self.backup['mailnotification'] = self.backup['mailnotification']
+        if 'storage' in self.backup:
+            self.backup['storage'] = self.backup['storage']
+        if 'notes-template' in backup:
+            self.backup['notes-template'] = self.backup['notes-template']
+        if 'mailto' in self.backup:
+            self.backup['mailto'] = self.backup['mailto']
+        if 'id' in self.backup:
+            self.backup['id'] = self.backup['id']
+        if 'mode' in self.backup:
+            self.backup['mode'] = self.backup['mode']
+        if 'next-run' in self.backup:
+            self.backup['next-run'] = self.backup['next-run']
+        if 'repeat-missed' in self.backup:
+            self.backup['repeat-missed'] = proxmox_to_ansible_bool(self.backup['repeat-missed'])
+        if 'type' in self.backup:
+            self.backup['type'] = self.backup['type']
+        if 'enabled' in self.backup:
+            self.backup['enabled'] = proxmox_to_ansible_bool(self.backup['enabled'])
+        if 'all' in self.backup:
+            self.backup['all'] = proxmox_to_ansible_bool(self.backup['all'])
+        if 'pool' in self.backup:
+            self.backup['pool'] = self.backup['pool']
+        if 'vmid' in self.backup:
+            self.backup['vmid'] = self.backup['vmid']
 
 
 def proxmox_backup_info_argument_spec():
@@ -157,7 +173,7 @@ def proxmox_backup_info_argument_spec():
 
 
 def main():
-    module_args = proxmox_auth_argument_spec()
+    module_args = url_argument_spec()
     backup_info_args = proxmox_backup_info_argument_spec()
     module_args.update(backup_info_args)
 
@@ -165,7 +181,6 @@ def main():
         argument_spec=module_args,
         required_one_of=[('api_password', 'api_token_id')],
         required_together=[('api_token_id', 'api_token_secret')],
-        mutually_exclusive=[('id')],
         supports_check_mode=True
     )
     result = dict(
