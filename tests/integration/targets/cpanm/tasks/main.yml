@@ -6,7 +6,8 @@
 - name: bail out for non-supported platforms
   meta: end_play
   when:
-    - (ansible_os_family != "RedHat" or ansible_distribution_major_version|int < 7)
+    - (ansible_os_family != "RedHat" or ansible_distribution_major_version|int < 8)  # TODO: bump back to 7
+    - (ansible_distribution != 'CentOS' or ansible_distribution_major_version|int < 8)  # TODO: remove
     - ansible_os_family != "Debian"
 
 - name: install perl development package for Red Hat family
