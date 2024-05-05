@@ -19,9 +19,8 @@ def test_run0_basic(mocker, parser, reset_cli_args):
     context._init_global_context(options)
 
     default_cmd = "/bin/foo"
-    default_exe = "/bin/bash"
+    default_exe = "/bin/sh"
     run0_exe = "run0"
-    run0_flags = "--user=root"
 
     success = "BECOME-SUCCESS-.+?"
 
@@ -30,10 +29,35 @@ def test_run0_basic(mocker, parser, reset_cli_args):
     }
     var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
-    print(cmd)
     assert (
         re.match(
-            """%s %s  'echo %s; %s'""" % (run0_exe, run0_flags, success, default_cmd),
+            f"{run0_exe} --user=root  {default_exe} -c 'echo {success}; {default_cmd}'",
+            cmd,
+        )
+        is not None
+    )
+
+
+def test_run0_flags(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/sh"
+    run0_exe = "run0"
+    run0_flags = "--nice=15"
+
+    success = "BECOME-SUCCESS-.+?"
+
+    task = {
+        "become_method": "community.general.run0",
+        "become_flags": run0_flags,
+    }
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    assert (
+        re.match(
+            f"{run0_exe} --user=root --nice=15 {default_exe} -c 'echo {success}; {default_cmd}'",
             cmd,
         )
         is not None
