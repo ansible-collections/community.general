@@ -57,7 +57,7 @@ def get_datetime_now(tz):
     return datetime.now(tz=tz)
 
 
-def banner(self, msg: str, color: str | None = None, cows: bool = True) -> None:
+def banner(self, msg, color=None, cows=True):
     """
     Prints a header-looking line with cowsay or stars with length depending on terminal width (3 minimum) with trailing timestamp
 
