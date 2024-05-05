@@ -16,7 +16,7 @@ django_std_args = dict(
     # environmental options
     venv=dict(type="path"),
     # default options of django-admin
-    settings=dict(type="str"),
+    settings=dict(type="str", required=True),
     pythonpath=dict(type="path"),
     traceback=dict(type="bool"),
     verbosity=dict(type="int", choices=[0, 1 , 2, 3]),
@@ -42,8 +42,9 @@ class DjangoRunner(PythonRunner):
         super(DjangoRunner, self).__init__(module, ["-m", "django"], arg_formats=arg_fmts, **kwargs)
 
     def __call__(self, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
-        args_order = ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
-
+        args_order = (
+            ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
+        )
         return super(DjangoRunner, self).__call__(args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs)
 
 

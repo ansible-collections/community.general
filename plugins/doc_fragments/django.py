@@ -20,6 +20,7 @@ options:
       - Specifies the settings module to use.
       - The value will be passed as is to the C(--settings) argument in C(django-admin).
     type: str
+    required: true
   pythonpath:
     description:
       - Adds the given filesystem path to the Python import search path.
