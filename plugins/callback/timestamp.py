@@ -41,6 +41,12 @@ DOCUMENTATION = r"""
         - name: ANSIBLE_CALLBACK_TIMESTAMP_FORMAT_STRING
       default: "%H:%M:%S"
       type: string
+  seealso:
+    - plugin: ansible.posix.profile_tasks
+      plugin_type: callback
+      description: >
+        You can use ansible.posix.profile_tasks callback plugin to time individual tasks and overall execution time
+        with detailed timestamps.
   extends_documentation_fragment:
     - ansible.builtin.default_callback
     - ansible.builtin.result_format_callback
