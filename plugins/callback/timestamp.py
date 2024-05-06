@@ -14,7 +14,7 @@ DOCUMENTATION = r"""
   short_description: Adds simple timestamp for each header
   version_added: 9.0.0
   description:
-    - This callback adds simple timestamp for each header
+    - This callback adds simple timestamp for each header.
   author: kurokobo (@kurokobo)
   options:
     timezone:
