@@ -29,7 +29,8 @@ DOCUMENTATION = r"""
       type: string
     format_string:
       description:
-        - Format of the string shown to user.
+        - Format of the timestamp shown to user in 1989 C standard format.
+        - Refer to U(the Python documentation,https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) for the available format codes.
       ini:
         - section: callback_timestamp
           key: format_string
