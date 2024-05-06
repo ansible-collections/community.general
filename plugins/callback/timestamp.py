@@ -35,6 +35,7 @@ DOCUMENTATION = r"""
       env:
         - name: ANSIBLE_CALLBACK_TIMESTAMP_FORMAT_STRING
       default: "%H:%M:%S"
+      type: string
   extends_documentation_fragment:
     - ansible.builtin.default_callback
     - ansible.builtin.result_format_callback
