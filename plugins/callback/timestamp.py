@@ -18,7 +18,9 @@ DOCUMENTATION = r"""
   author: kurokobo (@kurokobo)
   options:
     timezone:
-      description: timezone to use for the timestamp in IANA time zone format (for example C(America/New_York), C(Asia/Tokyo)). Ignored on Python < 3.9
+      description:
+        - Timezone to use for the timestamp in IANA time zone format.
+        - For example C(America/New_York), C(Asia/Tokyo)). Ignored on Python < 3.9.
       ini:
         - section: callback_timestamp
           key: timezone
