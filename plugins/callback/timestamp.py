@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, kurokobo <kurokobo@protonmail.com>
+# Copyright (c) 2014, Michael DeHaan <michael.dehaan@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -67,6 +68,8 @@ def banner(self, msg, color=None, cows=True):
     Prints a header-looking line with cowsay or stars with length depending on terminal width (3 minimum) with trailing timestamp
 
     Based on the banner method of Display class from ansible.utils.display
+
+    https://github.com/ansible/ansible/blob/4403519afe89138042108e237aef317fd5f09c33/lib/ansible/utils/display.py#L511
     """
     timestamp = get_datetime_now(self.timestamp_tzinfo).strftime(self.timestamp_format_string)
     timestamp_len = get_text_width(timestamp) + 1  # +1 for leading space
