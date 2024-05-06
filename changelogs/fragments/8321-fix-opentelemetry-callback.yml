@@ -1,0 +1,2 @@
+minor_changes:
+  - opentelemetry - add support for HTTP trace_exporter and configures the behavior via ``OTEL_EXPORTER_OTLP_TRACES_PROTOCOL``

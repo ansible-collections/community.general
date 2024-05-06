@@ -84,6 +84,19 @@ DOCUMENTATION = '''
           - section: callback_opentelemetry
             key: disable_attributes_in_logs
         version_added: 7.1.0
+      otel_exporter_otlp_traces_protocol:
+        default: grpc
+        type: str
+        description:
+          - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL represents the the transport protocol for spans.
+          - See
+            U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#envvar-OTEL_EXPORTER_OTLP_TRACES_PROTOCOL).
+        env:
+          - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
+        ini:
+          - section: callback_opentelemetry
+            key: otel_exporter_otlp_traces_protocol
+        version_added: 8.7.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
@@ -124,7 +137,8 @@ from ansible.plugins.callback import CallbackBase
 try:
     from opentelemetry import trace
     from opentelemetry.trace import SpanKind
-    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter as grpcOTLPSpanExporter
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter as httpOTLPSpanExporter
     from opentelemetry.sdk.resources import SERVICE_NAME, Resource
     from opentelemetry.trace.status import Status, StatusCode
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
@@ -255,7 +269,15 @@ class OpenTelemetrySource(object):
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs, disable_attributes_in_logs):
+    def generate_distributed_traces(self,
+                                    otel_service_name,
+                                    ansible_playbook,
+                                    tasks_data,
+                                    status,
+                                    traceparent,
+                                    disable_logs,
+                                    disable_attributes_in_logs,
+                                    otel_exporter_otlp_traces_protocol):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -271,7 +293,11 @@ class OpenTelemetrySource(object):
             )
         )
 
-        processor = BatchSpanProcessor(OTLPSpanExporter())
+        processor = None
+        if otel_exporter_otlp_traces_protocol == 'grpc':
+            processor = BatchSpanProcessor(grpcOTLPSpanExporter())
+        else:
+            processor = BatchSpanProcessor(httpOTLPSpanExporter())
 
         trace.get_tracer_provider().add_span_processor(processor)
 
@@ -462,6 +488,7 @@ class CallbackModule(CallbackBase):
         self.errors = 0
         self.disabled = False
         self.traceparent = False
+        self.otel_exporter_otlp_traces_protocol = None
 
         if OTEL_LIBRARY_IMPORT_ERROR:
             raise_from(
@@ -496,6 +523,16 @@ class CallbackModule(CallbackBase):
 
         # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
         self.traceparent = self.get_option('traceparent')
+
+        self.otel_exporter_otlp_traces_protocol = self.get_option('otel_exporter_otlp_traces_protocol')
+        if not self.otel_exporter_otlp_traces_protocol:
+            self.otel_exporter_otlp_traces_protocol = 'grpc'
+        elif self.otel_exporter_otlp_traces_protocol not in ['grpc', 'http/protobuf']:
+            self.disabled = True
+            self._display.warning(
+                "The `otel_exporter_otlp_traces_protocol` option has been set with an unsupported value `{0}`. "
+                "Disabling the `opentelemetry` callback plugin.".format(self.otel_exporter_otlp_traces_protocol)
+            )
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -585,7 +622,8 @@ class CallbackModule(CallbackBase):
             status,
             self.traceparent,
             self.disable_logs,
-            self.disable_attributes_in_logs
+            self.disable_attributes_in_logs,
+            self.otel_exporter_otlp_traces_protocol
         )
 
     def v2_runner_on_async_failed(self, result, **kwargs):
