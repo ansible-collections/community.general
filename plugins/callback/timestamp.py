@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
   name: timestamp
   type: stdout
   short_description: Adds simple timestamp for each header
-  version_added: 9.0.0  # for collections, use the collection version, not the Ansible version
+  version_added: 9.0.0
   description:
     - This callback adds simple timestamp for each header
   author: kurokobo (@kurokobo)
