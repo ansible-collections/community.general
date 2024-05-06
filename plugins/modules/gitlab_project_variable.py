@@ -227,7 +227,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import (
     auth_argument_spec, gitlab_authentication, ensure_gitlab_package, filter_returned_variables, vars_to_variables,
-    HAS_GITLAB_PACKAGE, GITLAB_IMP_ERR
+    list_all_kwargs, HAS_GITLAB_PACKAGE, GITLAB_IMP_ERR
 )
 
 
@@ -242,14 +242,7 @@ class GitlabProjectVariables(object):
         return self.repo.projects.get(project_name)
 
     def list_all_project_variables(self):
-        page_nb = 1
-        variables = []
-        vars_page = self.project.variables.list(page=page_nb)
-        while len(vars_page) > 0:
-            variables += vars_page
-            page_nb += 1
-            vars_page = self.project.variables.list(page=page_nb)
-        return variables
+        return list(self.project.variables.list(**list_all_kwargs))
 
     def create_variable(self, var_obj):
         if self._module.check_mode:
