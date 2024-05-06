@@ -26,7 +26,7 @@ DOCUMENTATION = r"""
           key: timezone
       env:
         - name: ANSIBLE_CALLBACK_TIMESTAMP_TIMEZONE
-      default: ""
+      type: string
     format_string:
       description: format of the string shown to user
       ini:
