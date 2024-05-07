@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) 2024, zerchevack <leverrierd@gmail.com>
+# Copyright (c) 2024, Leverrier Dylan leverrierd@gmail.com
 #
 # This file is part of Ansible
 #
@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Ansible. If not, see <http://www.gnu.org/licenses/>.
+
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
