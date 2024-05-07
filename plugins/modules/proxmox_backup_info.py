@@ -123,7 +123,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
             headers = {
                 'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.api_user, self.api_token_id, self.api_token_secret)
             }
-            url ='https://{0}:8006/api2/json/{1}'.format(self.api_host, endpoint)
+            url = 'https://{0}:8006/api2/json/{1}'.format(self.api_host, endpoint)
             response = fetch_url(self.module, url, headers=headers)
 
             if response['status'] != 200:
