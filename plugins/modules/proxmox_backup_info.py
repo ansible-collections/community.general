@@ -1,6 +1,22 @@
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
+# -*- coding: utf-8 -*-
+#
+# (c) 2024, zerchevack <leverrierd@gmail.com>
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible. If not, see <http://www.gnu.org/licenses/>.
+
 
 DOCUMENTATION = '''
 ---
@@ -96,6 +112,13 @@ proxmox_backups:
       type: str
 '''
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
+
 
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     def __init__(self, module):
@@ -108,17 +131,19 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         self.validate_certs = module.params['validate_certs']
 
     def fetch_backup_data(self, endpoint):
-        headers = {
-            'Authorization': f'PVEAPIToken={self.api_user}!{self.api_token_id}={self.api_token_secret}'
-        } if self.api_token_id and self.api_token_secret else None
+        if self.api_token_id and self.api_token_secret:
+            headers = {
+                'Authorization': f'PVEAPIToken={self.api_user}!{self.api_token_id}={self.api_token_secret}'
+            }
+            url = f'https://{self.api_host}:8006/api2/json/{endpoint}'
+            response = fetch_url(self.module, url, headers=headers)
+    
+            if response['status'] != 200:
+                self.module.fail_json(msg=f"Failed to fetch data from Proxmox API: {response}")
+            return response.read()
+        else:
+            return "Error : please define api_token_id and api_token_secret"
 
-        url = f'https://{self.api_host}:8006/api2/json/{endpoint}'
-        response, info = fetch_url(self.module, url, headers=headers)
-
-        if info['status'] != 200:
-            self.module.fail_json(msg=f"Failed to fetch data from Proxmox API: {info}")
-
-        return response.read()
 
     def get_backup(self, id):
         if id:
@@ -173,7 +198,7 @@ def proxmox_backup_info_argument_spec():
 
 
 def main():
-    module_args = url_argument_spec()
+    module_args = proxmox_auth_argument_spec()
     backup_info_args = proxmox_backup_info_argument_spec()
     module_args.update(backup_info_args)
 
