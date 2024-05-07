@@ -191,7 +191,7 @@ class ProxmoxBackup(object):
 
 def proxmox_backup_info_argument_spec():
     return dict(
-        id=dict(type='str', aliases=['id']),
+        id=dict(type='str'),
     )
 
 
