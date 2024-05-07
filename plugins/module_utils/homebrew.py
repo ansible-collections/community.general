@@ -113,3 +113,27 @@ class HomebrewValidate(object):
         return isinstance(
             package, string_types
         ) and not cls.INVALID_PACKAGE_REGEX.search(package)
+
+
+def parse_brew_path(module) -> str:
+    """Attempt to find the Homebrew executable path.
+
+    Requires:
+        - module has a `path` parameter
+        - path is a valid path string for the target OS. Otherwise, module.fail_json()
+          is called with msg="Invalid_path: <path>".
+    """
+    path = module.params["path"]
+    if not HomebrewValidate.valid_path(path):
+        module.fail_json(msg="Invalid path: {}".format(path))
+
+    if isinstance(path, string_types):
+        paths = path.split(":")
+    else:
+        paths = path
+
+    brew_path = module.get_bin_path("brew", required=True, opt_dirs=paths)
+    if not HomebrewValidate.valid_brew_path(brew_path):
+        module.fail_json(msg="Invalid brew path: {}".format(brew_path))
+    
+    return brew_path

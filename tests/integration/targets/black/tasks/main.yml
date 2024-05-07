@@ -1,0 +1,69 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- when: ansible_facts.distribution == 'MacOSX'
+  block:
+    - name: MACOS | Find brew binary
+      command: which brew
+      register: brew_which
+
+    - name: MACOS | Get owner of brew binary
+      stat:
+        path: "{{ brew_which.stdout }}"
+      register: brew_stat
+
+    - name: MACOS | Install black
+      community.general.homebrew:
+        name: black
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: install_result
+
+    - name: Check the black service is installed
+      assert:
+        that:
+          - install_result is success
+
+    - name: Start the black service
+      community.general.homebrew_services:
+        name: black
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: start_result
+
+    - name: Check the black service is running
+      assert:
+        that:
+          - start_result is success
+
+    - name: Restart the black service
+      community.general.homebrew_services:
+        name: black
+        state: restarted
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: restart_result
+
+    - name: Check the black service is restarted
+      assert:
+        that:
+          - restart_result is success
+    
+    - name: Stop the black service
+      community.general.homebrew_services:
+        name: black
+        state: present
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      register: stop_result
+
+    - name: Check the black service is stopped
+      assert:
+        that:
+          - stop_result is success
+      notify:
+        - uninstall black
