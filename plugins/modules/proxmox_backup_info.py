@@ -121,13 +121,13 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     def fetch_backup_data(self, endpoint):
         if self.api_token_id and self.api_token_secret:
             headers = {
-                'Authorization': f'PVEAPIToken={self.api_user}!{self.api_token_id}={self.api_token_secret}'
+                'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.api_user, self.api_token_id, self.api_token_secret)
             }
-            url = f'https://{self.api_host}:8006/api2/json/{endpoint}'
+            url ='https://{0}:8006/api2/json/{1}'.format(self.api_host, endpoint)
             response = fetch_url(self.module, url, headers=headers)
 
             if response['status'] != 200:
-                self.module.fail_json(msg=f"Failed to fetch data from Proxmox API: {response}")
+                self.module.fail_json(msg='Failed to fetch data from Proxmox API: {0}'.format(response))
             return response.read()
         else:
             return "Error : please define api_token_id and api_token_secret"
@@ -135,9 +135,9 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     def get_backup(self, id):
         if id:
             try:
-                backup = self.fetch_backup_data(f'cluster/backup/{id}')
+                backup = self.fetch_backup_data('cluster/backup/{0}'.format(id))
             except Exception:
-                self.module.fail_json(msg="Backup with id '%s' does not exist" % id)
+                self.module.fail_json(msg='Backup with id "{0}" does not exist'.format(id))
             return ProxmoxBackup(backup)
         else:
             backups = self.fetch_backup_data('cluster/backup')
