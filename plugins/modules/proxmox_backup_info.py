@@ -16,7 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Ansible. If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 DOCUMENTATION = '''
 ---
@@ -112,8 +113,6 @@ proxmox_backups:
       type: str
 '''
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
@@ -137,13 +136,12 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
             }
             url = f'https://{self.api_host}:8006/api2/json/{endpoint}'
             response = fetch_url(self.module, url, headers=headers)
-    
+
             if response['status'] != 200:
                 self.module.fail_json(msg=f"Failed to fetch data from Proxmox API: {response}")
             return response.read()
         else:
             return "Error : please define api_token_id and api_token_secret"
-
 
     def get_backup(self, id):
         if id:
