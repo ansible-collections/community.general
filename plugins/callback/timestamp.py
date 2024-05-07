@@ -45,7 +45,7 @@ DOCUMENTATION = r"""
     - plugin: ansible.posix.profile_tasks
       plugin_type: callback
       description: >
-        You can use ansible.posix.profile_tasks callback plugin to time individual tasks and overall execution time
+        You can use P(ansible.posix.profile_tasks#callback) callback plugin to time individual tasks and overall execution time
         with detailed timestamps.
   extends_documentation_fragment:
     - ansible.builtin.default_callback
