@@ -4,10 +4,8 @@
 # Copyright Leverrier Dylan <leverrierd@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
 DOCUMENTATION = '''
 ---
 module: proxmox_backup_info
@@ -28,7 +26,6 @@ extends_documentation_fragment:
 notes:
   - Backup specific options can be returned by this module, please look at the documentation at U(https://pve.proxmox.com/wiki/Backup_and_Restore).
 '''
-
 EXAMPLES = '''
 - name: List existing backups
   community.general.proxmox_backup_info:
@@ -40,7 +37,6 @@ EXAMPLES = '''
     validate_certs: "{{ validate_certs | default(omit) }}"
   register: proxmox_backups
 '''
-
 RETURN = '''
 proxmox_backups:
   description: List of backup job.
@@ -101,12 +97,11 @@ proxmox_backups:
       returned: on success
       type: str
 '''
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
-
+import json
 
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     def __init__(self, module):
@@ -119,18 +114,16 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         self.validate_certs = module.params['validate_certs']
 
     def fetch_backup_data(self, endpoint):
-        if self.api_token_id and self.api_token_secret:
-            headers = {
-                'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.api_user, self.api_token_id, self.api_token_secret)
-            }
-            url = 'https://{0}:8006/api2/json/{1}'.format(self.api_host, endpoint)
-            response = fetch_url(self.module, url, headers=headers)
-
-            if response['status'] != 200:
-                self.module.fail_json(msg='Failed to fetch data from Proxmox API: {0}'.format(response))
-            return response.read()
-        else:
-            return "Error : please define api_token_id and api_token_secret"
+        headers = {
+            'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.api_user, self.api_token_id, self.api_token_secret)
+        }
+        url = 'https://{0}:8006/api2/json/{1}'.format(self.api_host, endpoint)
+        response, info = fetch_url(self.module, url, headers=headers)
+        if info['status'] != 200:
+            self.module.fail_json(msg='Failed to fetch data from Proxmox API: {0}'.format(info))
+        data = json.loads(response.read())
+        print("Parsed JSON:", data)  # Check the parsed JSON
+        return data['data']
 
     def get_backup(self, id):
         if id:
@@ -143,7 +136,6 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
             backups = self.fetch_backup_data('cluster/backup')
             backups = [ProxmoxBackup(backup) for backup in backups]
             return backups
-
 
 class ProxmoxBackup(object):
     def __init__(self, backup):
@@ -176,19 +168,15 @@ class ProxmoxBackup(object):
             self.backup['pool'] = self.backup['pool']
         if 'vmid' in self.backup:
             self.backup['vmid'] = self.backup['vmid']
-
-
 def proxmox_backup_info_argument_spec():
     return dict(
         id=dict(type='str'),
     )
 
-
 def main():
     module_args = proxmox_auth_argument_spec()
     backup_info_args = proxmox_backup_info_argument_spec()
     module_args.update(backup_info_args)
-
     module = AnsibleModule(
         argument_spec=module_args,
         required_one_of=[('api_password', 'api_token_id')],
@@ -198,19 +186,13 @@ def main():
     result = dict(
         changed=False
     )
-
     proxmox = ProxmoxBackupInfoAnsible(module)
     backup = module.params['id']
-
     if backup:
         backups = [proxmox.get_backup(backup)]
     else:
         backups = proxmox.get_backup(id=None)
-    result['proxmox_backups'] = [backups.backups for backups in backups]
-
+    result['proxmox_backups'] = [backup.backup for backup in backups]
     module.exit_json(**result)
-
-
 if __name__ == '__main__':
-
     main()
