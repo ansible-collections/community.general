@@ -101,7 +101,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
-import json
+
 
 class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
     def __init__(self, module):
@@ -121,7 +121,7 @@ class ProxmoxBackupInfoAnsible(ProxmoxAnsible):
         response, info = fetch_url(self.module, url, headers=headers)
         if info['status'] != 200:
             self.module.fail_json(msg='Failed to fetch data from Proxmox API: {0}'.format(info))
-        data = json.loads(response.read())
+        data = response.json() if callable(getattr(response, 'json', None)) else self.module.from_json(response.read())
         print("Parsed JSON:", data)  # Check the parsed JSON
         return data['data']
 
