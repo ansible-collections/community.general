@@ -122,16 +122,18 @@ def delete_gpg_key_notfound_mock(url, request):
 
 class TestGithubRepo(unittest.TestCase):
     def setUp(self):
-        argument_spec = {
-            'token': {'required': True, 'no_log': True},
-            'name': {'required': True},
-            'armored_public_key': {},
-            'state': {'choices': ['present', 'absent'], 'default': 'present'},
-            'force': {'default': True, 'type': 'bool'}
-        }
         self.module = AnsibleModule(
-            argument_spec=argument_spec,
-            support_check_mode=True
+            argument_spec=dict(
+                state=dict(type='str', default='present', choice=['present', 'absent']),
+                token=dict(type='str', required=True, no_log=True),
+                name=dict(type='str', required=True),
+                armored_public_key=dict(type='str', no_log=True),
+                force=dict(type='bool', default=True)
+            ),
+            supports_check_mode=True,
+            required_if=[
+                ['state', 'present', ['armored_public_key']],
+            ]
         )
 
     @with_httmock(list_gpg_keys_mock)
@@ -139,11 +141,13 @@ class TestGithubRepo(unittest.TestCase):
     def test_create_gpg_key_repo(self):
         result = github_gpg_key.run_module(
             module=self.module,
-            token="github_access_token",
-            name="GPG public key",
-            armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
-            state="present",
-            force=True
+            params=dict(
+                token="github_access_token",
+                name="GPG public key",
+                armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
+                state="present",
+                force=True
+            )
         )
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['key']['name'], 'GPG public key')
@@ -153,11 +157,13 @@ class TestGithubRepo(unittest.TestCase):
     def test_delete_user_repo(self):
         result = github_gpg_key.run_module(
             module=self.module
-            token="github_access_token",
-            name="GPG public key",
-            armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
-            state="present",
-            force=True
+            params=dict(
+                token="github_access_token",
+                name="GPG public key",
+                armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
+                state="absent",
+                force=True
+            )
         )
         self.assertEqual(result['changed'], True)
 
@@ -166,11 +172,13 @@ class TestGithubRepo(unittest.TestCase):
     def test_delete_gpg_key_notfound(self):
         result = github_gpg_key.run_module(
             module=self.module
-            token="github_access_token",
-            name="GPG public key",
-            armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
-            state="present",
-            force=True
+            params=dict(
+                token="github_access_token",
+                name="GPG public key",
+                armored_public_key="-----BEGIN PGP PUBLIC KEY BLOCK-----\r\n\n\nMy ASCII-armored GPG public key\r\n-----END PGP PUBLIC KEY BLOCK-----",
+                state="absent",
+                force=True
+            )
         )
         self.assertEqual(result['changed'], False)
 
