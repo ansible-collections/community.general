@@ -12,7 +12,7 @@
     - name: Merge Cross Group Variables
       ansible.builtin.set_fact:
         merge_result: "{{ merge1 }}"
-    - name: Show Merge Result
+    - name: Print merge result
       ansible.builtin.debug:
         msg: "{{ merge_result }}"
     - name: Validate Merge Result
