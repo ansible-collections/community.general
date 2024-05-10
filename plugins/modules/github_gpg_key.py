@@ -26,7 +26,7 @@ attributes:
 options:
   token:
     description:
-      - GitHub OAuth or personal access token (classic) with the read:gpg_key, write:gpg_key, and admin:gpg_key scopes needed to manage GPG keys.
+      - GitHub OAuth or personal access token (classic) with the C(read:gpg_key), C(write:gpg_key), and C(admin:gpg_key) scopes needed to manage GPG keys.
     required: true
     type: str
   name:
