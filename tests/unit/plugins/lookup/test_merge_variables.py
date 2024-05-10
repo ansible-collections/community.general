@@ -18,7 +18,7 @@ from ansible_collections.community.general.plugins.lookup import merge_variables
 
 
 class TestMergeVariablesLookup(unittest.TestCase):
-    class _HostVars(dict):
+    class HostVarsMock(dict):
 
         def __getattr__(self, item):
             return super().__getitem__(item)
@@ -152,7 +152,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         {'var': [{'item5': 'value5', 'item6': 'value6'}]},
     ])
     def test_merge_dict_group_all(self, mock_set_options, mock_get_option, mock_template):
-        hostvars = self._HostVars({
+        hostvars = self.HostVarsMock({
             'host1': {
                 'group_names': ['dummy1'],
                 'inventory_hostname': 'host1',
@@ -189,7 +189,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         {'var': [{'item5': 'value5', 'item6': 'value6'}]},
     ])
     def test_merge_dict_group_single(self, mock_set_options, mock_get_option, mock_template):
-        hostvars = self._HostVars({
+        hostvars = self.HostVarsMock({
             'host1': {
                 'group_names': ['dummy1'],
                 'inventory_hostname': 'host1',
@@ -233,7 +233,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         {'var': [{'item5': 'value5', 'item6': 'value6'}]},
     ])
     def test_merge_dict_group_multiple(self, mock_set_options, mock_get_option, mock_template):
-        hostvars = self._HostVars({
+        hostvars = self.HostVarsMock({
             'host1': {
                 'group_names': ['dummy1'],
                 'inventory_hostname': 'host1',
@@ -276,7 +276,7 @@ class TestMergeVariablesLookup(unittest.TestCase):
         ['item5'],
     ])
     def test_merge_list_group_multiple(self, mock_set_options, mock_get_option, mock_template):
-        hostvars = self._HostVars({
+        hostvars = self.HostVarsMock({
             'host1': {
                 'group_names': ['dummy1'],
                 'inventory_hostname': 'host1',
