@@ -21,6 +21,8 @@ attributes:
     support: full
   diff_mode:
     support: none
+  action_group:
+    version_added: 9.0.0
 options:
   poolid:
     description:
@@ -42,8 +44,9 @@ options:
     type: str
 
 extends_documentation_fragment:
-    - community.general.proxmox.documentation
-    - community.general.attributes
+  - community.general.proxmox.actiongroup_proxmox
+  - community.general.proxmox.documentation
+  - community.general.attributes
 """
 
 EXAMPLES = """

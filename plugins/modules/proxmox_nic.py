@@ -21,6 +21,8 @@ attributes:
     support: full
   diff_mode:
     support: none
+  action_group:
+    version_added: 9.0.0
 options:
   bridge:
     description:
@@ -94,6 +96,7 @@ options:
       - Specifies the instance ID.
     type: int
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
 '''

@@ -12,6 +12,23 @@ action_groups:
     - consul_role
     - consul_session
     - consul_token
+  proxmox:
+    - proxmox
+    - proxmox_disk
+    - proxmox_domain_info
+    - proxmox_group_info
+    - proxmox_kvm
+    - proxmox_nic
+    - proxmox_node_info
+    - proxmox_pool
+    - proxmox_pool_member
+    - proxmox_snap
+    - proxmox_storage_contents_info
+    - proxmox_storage_info
+    - proxmox_tasks_info
+    - proxmox_template
+    - proxmox_user_info
+    - proxmox_vm_info
 plugin_routing:
   callback:
     actionable:
