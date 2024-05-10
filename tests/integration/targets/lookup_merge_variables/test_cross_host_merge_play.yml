@@ -9,9 +9,6 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: Merge Cross Group Variables
-      ansible.builtin.set_fact:
-        merge_result: "{{ merge1 }}"
     - name: Print merge result
       ansible.builtin.debug:
         msg: "{{ merge_result }}"

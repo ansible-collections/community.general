@@ -22,12 +22,12 @@ common:
 consumer:
   vars:
     service_data: "{{ provider_instances.servicedata1 }}"
-    merge2__1: "{{ service_data }}"  # fails for host1; would work if using provider_instances directly here, as it is a variable host1 owns
+    merge2__1: "{{ service_data }}"  # service_data is a variable only known to host2, so normally it´s not available for host1 that is performing the merge
   hosts:
     host2:
 
 provider:
   vars:
-    merge1: "{{ lookup('community.general.merge_variables', 'merge2__', pattern_type='prefix', groups=['consumer']) }}"
+    merge_result: "{{ lookup('community.general.merge_variables', 'merge2__', pattern_type='prefix', groups=['consumer']) }}"
   hosts:
     host1:
