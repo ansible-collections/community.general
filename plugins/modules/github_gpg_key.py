@@ -14,6 +14,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: github_gpg_key
 short_description: Manage GitHub GPG keys
+version_added: 9.0.0
 description:
   - Creates, removes, or list GitHub GPG keys.
 extends_documentation_fragment:
