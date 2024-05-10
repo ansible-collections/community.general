@@ -15,7 +15,7 @@
     - name: Print merge result
       ansible.builtin.debug:
         msg: "{{ merge_result }}"
-    - name: Validate Merge Result
+    - name: Validate merge result
       ansible.builtin.assert:
         that:
           - "merge_result | length == 3"
