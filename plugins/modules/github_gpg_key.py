@@ -355,7 +355,10 @@ def main():
     }
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[
+            ('state', 'present', ['armored_public_key']),
+        ],
     )
 
     armored_public_key = module.params.get('armored_public_key')
