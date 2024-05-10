@@ -78,7 +78,7 @@ deleted_keys:
             "public_key": "zsBNBFayYZ...",
             "emails": [],
             "can_sign": False,
-            "can_encrypt_comms": True,
+            "can_encrypt_comms": true,
             "can_encrypt_storage": True,
             "can_certify": False,
             "created_at": "2016-03-24T11:31:04-06:00",
