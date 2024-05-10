@@ -59,6 +59,7 @@ RETURN = '''
 deleted_keys:
     description: An array of key objects that were deleted. Only present on state=absent
     type: list
+    elements: dict
     returned: When state=absent
     sample: [{
         "id": 3,
