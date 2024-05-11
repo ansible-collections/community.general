@@ -42,6 +42,7 @@ jobs:
         uses: felixfontein/ansible-test-gh-action@main
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: sanity
@@ -83,6 +84,7 @@ jobs:
         uses: felixfontein/ansible-test-gh-action@main
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pre-test-cmd: >-
             mkdir -p ../../ansible
@@ -183,6 +185,7 @@ jobs:
         uses: felixfontein/ansible-test-gh-action@main
         with:
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           docker-image: ${{ matrix.docker }}
           integration-continue-on-error: 'false'
