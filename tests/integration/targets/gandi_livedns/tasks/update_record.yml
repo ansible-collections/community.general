@@ -17,10 +17,10 @@
   assert:
     that:
     - result is changed
-    - result.record['values'] == {{ item.update_values | default(item['values']) }}
-    - result.record.record == "{{ item.record }}"
-    - result.record.type == "{{ item.type }}"
-    - result.record.ttl == {{ item.update_ttl | default(item.ttl) }}
+    - result.record['values'] == (item.update_values | default(item['values']))
+    - result.record.record == item.record
+    - result.record.type == item.type
+    - result.record.ttl == (item.update_ttl | default(item.ttl))
 
 - name: test update or add another dns record
   community.general.gandi_livedns:
@@ -35,10 +35,10 @@
   assert:
     that:
     - result is changed
-    - result.record['values'] == {{ item.update_values | default(item['values']) }}
-    - result.record.record == "{{ item.record }}"
-    - result.record.ttl == {{ item.update_ttl | default(item.ttl) }}
-    - result.record.type == "{{ item.type }}"
+    - result.record['values'] == (item.update_values | default(item['values']))
+    - result.record.record == item.record
+    - result.record.ttl == (item.update_ttl | default(item.ttl))
+    - result.record.type == item.type
 
 - name: test update or add another dns record idempotence
   community.general.gandi_livedns:
@@ -53,7 +53,7 @@
   assert:
     that:
     - result is not changed
-    - result.record['values'] == {{ item.update_values | default(item['values']) }}
-    - result.record.record == "{{ item.record }}"
-    - result.record.ttl == {{ item.update_ttl | default(item.ttl) }}
-    - result.record.type == "{{ item.type }}"
+    - result.record['values'] == (item.update_values | default(item['values']))
+    - result.record.record == item.record
+    - result.record.ttl == (item.update_ttl | default(item.ttl))
+    - result.record.type == item.type

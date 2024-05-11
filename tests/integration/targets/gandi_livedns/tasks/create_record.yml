@@ -45,10 +45,10 @@
   assert:
     that:
     - result is changed
-    - result.record['values'] == {{ item['values'] }}
-    - result.record.record == "{{ item.record }}"
-    - result.record.type == "{{ item.type }}"
-    - result.record.ttl == {{ item.ttl }}
+    - result.record['values'] == item['values']
+    - result.record.record == item.record
+    - result.record.type == item.type
+    - result.record.ttl == item.ttl
 
 - name: test create a dns record idempotence
   community.general.gandi_livedns:
@@ -63,7 +63,7 @@
   assert:
     that:
     - result is not changed
-    - result.record['values'] == {{ item['values'] }}
-    - result.record.record == "{{ item.record }}"
-    - result.record.type == "{{ item.type }}"
-    - result.record.ttl == {{ item.ttl }}
+    - result.record['values'] == item['values']
+    - result.record.record == item.record
+    - result.record.type == item.type
+    - result.record.ttl == item.ttl
