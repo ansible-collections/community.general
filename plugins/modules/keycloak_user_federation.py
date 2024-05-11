@@ -712,6 +712,9 @@ def sanitize(comp):
         compcopy['config'] = dict((k, v[0]) for k, v in compcopy['config'].items())
         if 'bindCredential' in compcopy['config']:
             compcopy['config']['bindCredential'] = '**********'
+        # an empty string is valid for krbPrincipalAttribute but is filtered out in diff
+        if 'krbPrincipalAttribute' not in compcopy['config']:
+            compcopy['config']['krbPrincipalAttribute'] = ''
     if 'mappers' in compcopy:
         for mapper in compcopy['mappers']:
             if 'config' in mapper:
