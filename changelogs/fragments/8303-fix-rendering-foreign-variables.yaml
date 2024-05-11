@@ -1,0 +1,2 @@
+bugfixes:
+  - "merge_variables lookup plugin - fixing cross host merge: providing access to foreign hosts variables to the perspective of the host that is performing the merge (https://github.com/ansible-collections/community.general/pull/8303)."
