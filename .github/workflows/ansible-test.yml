@@ -48,6 +48,7 @@ jobs:
         with:
           ansible-core-github-repository-slug: ${{ contains(fromJson('["2.10", "2.11"]'), matrix.ansible) && 'felixfontein/ansible' || 'ansible/ansible' }}
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: sanity
@@ -97,6 +98,7 @@ jobs:
         with:
           ansible-core-github-repository-slug: ${{ contains(fromJson('["2.10", "2.11"]'), matrix.ansible) && 'felixfontein/ansible' || 'ansible/ansible' }}
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pre-test-cmd: >-
             mkdir -p ../../ansible
@@ -289,6 +291,7 @@ jobs:
         with:
           ansible-core-github-repository-slug: ${{ contains(fromJson('["2.10", "2.11"]'), matrix.ansible) && 'felixfontein/ansible' || 'ansible/ansible' }}
           ansible-core-version: stable-${{ matrix.ansible }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           docker-image: ${{ matrix.docker }}
           integration-continue-on-error: 'false'
