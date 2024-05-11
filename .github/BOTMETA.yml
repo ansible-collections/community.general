@@ -33,6 +33,8 @@ files:
     maintainers: $team_ansible_core
   $becomes/pmrun.py:
     maintainers: $team_ansible_core
+  $becomes/run0.py:
+    maintainers: konstruktoid
   $becomes/sesu.py:
     maintainers: nekonyuu
   $becomes/sudosu.py:
