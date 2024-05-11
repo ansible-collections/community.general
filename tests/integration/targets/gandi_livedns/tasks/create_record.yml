@@ -67,3 +67,12 @@
     - result.record.record == item.record
     - result.record.type == item.type
     - result.record.ttl == item.ttl
+
+- name: test create a DNS record with personal access token
+  community.general.gandi_livedns:
+    personal_access_token: "{{ gandi_personal_access_token }}"
+    record: "{{ item.record }}"
+    domain: "{{ gandi_livedns_domain_name }}"
+    values: "{{ item['values'] }}"
+    ttl: "{{ item.ttl }}"
+    type: "{{ item.type }}"
