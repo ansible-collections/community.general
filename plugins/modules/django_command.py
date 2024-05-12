@@ -35,17 +35,9 @@ EXAMPLES = """
     command: check
     settings: myproject.settings
 
-- name: Check the project in specified python path
+- name: Check the project in specified python path, using virtual environment
   community.general.django_command:
     command: check
-    settings: fancysite.settings
-    pythonpath: /home/joedoe/project/fancysite
-
-- name: Run the development web server, using virtual environemnt
-  community.general.django_command:
-    command:
-      - runserver
-      - 0.0.0.0:8000
     settings: fancysite.settings
     pythonpath: /home/joedoe/project/fancysite
     venv: /home/joedoe/project/fancysite/venv
@@ -58,11 +50,11 @@ run_info:
   returned: success
 """
 
-from ansible_collections.community.general.plugins.module_utils.django import DjangoBase
+from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
 
-class DjangoCommand(DjangoBase):
+class DjangoCommand(DjangoModuleHelper):
     module = dict(
         argument_spec=dict(
             command=dict(type="str", required=True),

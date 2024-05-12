@@ -34,22 +34,22 @@ _django_std_arg_fmts = dict(
 )
 
 
-class DjangoRunner(PythonRunner):
+class _DjangoRunner(PythonRunner):
     def __init__(self, module, arg_formats=None, **kwargs):
         arg_fmts = dict(arg_formats) if arg_formats else {}
         arg_fmts.update(_django_std_arg_fmts)
 
-        super(DjangoRunner, self).__init__(module, ["-m", "django"], arg_formats=arg_fmts, **kwargs)
+        super(_DjangoRunner, self).__init__(module, ["-m", "django"], arg_formats=arg_fmts, **kwargs)
 
     def __call__(self, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
         args_order = (
             ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
         )
-        return super(DjangoRunner, self).__call__(args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs)
+        return super(_DjangoRunner, self).__call__(args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs)
 
 
-class DjangoBase(ModuleHelper):
-    module = None
+class DjangoModuleHelper(ModuleHelper):
+    module = {}
     use_old_vardict = False
     django_admin_cmd = None
     arg_formats = {}
@@ -59,16 +59,16 @@ class DjangoBase(ModuleHelper):
         argument_spec = dict(django_std_args)
         argument_spec.update(self.module.get("argument_spec", {}))
         self.module["argument_spec"] = argument_spec
-        super(DjangoBase, self).__init__(self.module)
+        super(DjangoModuleHelper, self).__init__(self.module)
         if self.django_admin_cmd is not None:
             self.vars.command = self.django_admin_cmd
 
     def __run__(self):
-        runner = DjangoRunner(self.module,
-                              default_args_order=self.django_admin_arg_order,
-                              arg_formats=self.arg_formats,
-                              venv=self.vars.venv,
-                              check_rc=True)
+        runner = _DjangoRunner(self.module,
+                               default_args_order=self.django_admin_arg_order,
+                               arg_formats=self.arg_formats,
+                               venv=self.vars.venv,
+                               check_rc=True)
         with runner() as ctx:
             results = ctx.run()
             self.vars.stdout = ctx.results_out

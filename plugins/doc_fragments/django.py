@@ -42,5 +42,6 @@ options:
 
 
 notes:
+  - The C(django-admin) command is always executed using the C(C) locale, and the option C(--no-color) is always passed.
   - Please refer to U(https://docs.djangoproject.com/en/5.0/ref/django-admin/) for the builtin commands and options of C(django-admin).
 '''
