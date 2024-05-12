@@ -19,7 +19,7 @@ django_std_args = dict(
     settings=dict(type="str", required=True),
     pythonpath=dict(type="path"),
     traceback=dict(type="bool"),
-    verbosity=dict(type="int", choices=[0, 1 , 2, 3]),
+    verbosity=dict(type="int", choices=[0, 1, 2, 3]),
     skip_checks=dict(type="bool"),
 )
 
