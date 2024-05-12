@@ -21,7 +21,7 @@ requirements:
     - homebrew must already be installed on the target system
 short_description: Services manager for Homebrew
 description:
-    - Manages daemons and services via Homebrew
+    - Manages daemons and services via Homebrew.
 extends_documentation_fragment:
     - community.general.attributes
 options:
@@ -46,23 +46,23 @@ options:
 """
 
 EXAMPLES = """
-# Install foo package
-- community.general.homebrew:
+- name: Install foo package
+  community.general.homebrew:
     name: foo
     state: present
 
-# Start the foo service (equivalent to `brew services start foo`)
-- community.general.homebrew_service:
+- name: Start the foo service (equivalent to `brew services start foo`)
+  community.general.homebrew_service:
     name: foo
     state: present
 
-# Restart the foo service (equivalent to `brew services restart foo`)
-- community.general.homebrew_service:
+- name: Restart the foo service (equivalent to `brew services restart foo`)
+  community.general.homebrew_service:
     name: foo
     state: restarted
 
-# Remove the foo service (equivalent to `brew services stop foo`)
-- community.general.homebrew_service:
+- name: Remove the foo service (equivalent to `brew services stop foo`)
+  community.general.homebrew_service:
     name: foo
     service_state: absent
 """
