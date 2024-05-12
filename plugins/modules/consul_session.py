@@ -29,6 +29,8 @@ attributes:
         support: none
     diff_mode:
         support: none
+    action_group:
+        version_added: 8.3.0
 options:
     id:
         description:
