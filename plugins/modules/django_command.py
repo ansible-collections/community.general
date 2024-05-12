@@ -52,9 +52,9 @@ EXAMPLES = """
 
 RETURN = """
 run_info:
-  description: Command-line execution information (when verbosity >= 3)
+  description: Command-line execution information.
   type: dict
-  returned: success
+  returned: success and O(verbosity) >= 3
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
