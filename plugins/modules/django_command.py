@@ -12,6 +12,7 @@ module: django_command
 author:
   - Alexei Znamensky (@russoz)
 short_description: Run Django admin commands
+version_added: 9.0.0
 description:
   - This module allows the execution of arbitrary Django admin commands.
 extends_documentation_fragment:
