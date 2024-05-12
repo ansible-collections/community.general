@@ -51,17 +51,17 @@ EXAMPLES = """
     name: foo
     state: present
 
-# Start the foo service (equivalent to C(brew services start foo))
+# Start the foo service (equivalent to `brew services start foo`)
 - community.general.homebrew_service:
     name: foo
     state: present
 
-# Restart the foo service (equivalent to C(brew services restart foo))
+# Restart the foo service (equivalent to `brew services restart foo`)
 - community.general.homebrew_service:
     name: foo
     state: restarted
 
-# Remove the foo service (equivalent to C(brew services stop foo))
+# Remove the foo service (equivalent to `brew services stop foo`)
 - community.general.homebrew_service:
     name: foo
     service_state: absent
@@ -95,36 +95,43 @@ changed:
     sample: false
 """
 
-from dataclasses import dataclass
-from typing import Callable, Optional
+import sys
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.homebrew import (
-    HomebrewValidate, parse_brew_path
+    HomebrewValidate,
+    parse_brew_path,
 )
 
+if sys.version_info < (3, 5):
+    from collections import namedtuple
 
-@dataclass
-class HomebrewServiceArgs:
-    """Stores validated arguments for an instance of an action.
+    # Stores validated arguments for an instance of an action.
+    # See DOCUMENTATION string for argument-specific information.
+    HomebrewServiceArgs = namedtuple(
+        "HomebrewServiceArgs", ["name", "state", "brew_path"]
+    )
 
-    See DOCUMENTATION string for argument-specific information.
-    """
+    # Stores the state of a Homebrew service.
+    HomebrewServiceState = namedtuple("HomebrewServiceState", ["running", "pid"])
 
-    name: str
-    state: str
-    brew_path: str
+else:
+    from typing import NamedTuple, Optional
+
+    # Stores validated arguments for an instance of an action.
+    # See DOCUMENTATION string for argument-specific information.
+    HomebrewServiceArgs = NamedTuple(
+        "HomebrewServiceArgs", [("name", str), ("state", str), ("brew_path", str)]
+    )
+
+    # Stores the state of a Homebrew service.
+    HomebrewServiceState = NamedTuple(
+        "HomebrewServiceState", [("running", bool), ("pid", Optional[int])]
+    )
 
 
-@dataclass
-class HomebrewServiceState:
-    """Stores the state of a Homebrew service."""
-
-    running: bool
-    pid: Optional[int]
-
-
-def _brew_service_state(args: HomebrewServiceArgs, module: AnsibleModule):
+def _brew_service_state(args, module):
+    # type: (HomebrewServiceArgs, AnsibleModule) -> HomebrewServiceState
     cmd = [args.brew_path, "services", "info", args.name, "--json"]
     rc, stdout, stderr = module.run_command(cmd)
 
@@ -135,9 +142,8 @@ def _brew_service_state(args: HomebrewServiceArgs, module: AnsibleModule):
     return HomebrewServiceState(running=data["status"] == "started", pid=data["pid"])
 
 
-def _exit_with_state(
-    args: HomebrewServiceArgs, module: AnsibleModule, changed=False, message=None
-):
+def _exit_with_state(args, module, changed=False, message=None):
+    # type: (HomebrewServiceArgs, AnsibleModule, bool, Optional[str]) -> None
     state = _brew_service_state(args, module)
     if message is None:
         message = (
@@ -146,7 +152,8 @@ def _exit_with_state(
     module.exit_json(msg=message, pid=state.pid, running=state.running, changed=changed)
 
 
-def validate_and_load_arguments(module: AnsibleModule):
+def validate_and_load_arguments(module):
+    # type: (AnsibleModule) -> HomebrewServiceArgs
     """Reuse the Homebrew module's validation logic to validate these arguments."""
     package = module.params["name"]  # type: ignore
     if not HomebrewValidate.valid_package(package):
@@ -157,17 +164,18 @@ def validate_and_load_arguments(module: AnsibleModule):
         module.fail_json(msg="Invalid state: {}".format(state))
 
     brew_path = parse_brew_path(module)
-    
+
     return HomebrewServiceArgs(name=package, state=state, brew_path=brew_path)
 
 
-def start_service(args: HomebrewServiceArgs, module: AnsibleModule):
+def start_service(args, module):
+    # type: (HomebrewServiceArgs, AnsibleModule) -> None
     """Start the requested brew service if it is not already running."""
     state = _brew_service_state(args, module)
     if state.running:
         # Nothing to do, return early.
         _exit_with_state(args, module, changed=False, message="Service already running")
-    
+
     if module.check_mode:
         _exit_with_state(args, module, changed=True, message="Service would be started")
 
@@ -179,13 +187,14 @@ def start_service(args: HomebrewServiceArgs, module: AnsibleModule):
     _exit_with_state(args, module, changed=True)
 
 
-def stop_service(args: HomebrewServiceArgs, module: AnsibleModule):
+def stop_service(args, module):
+    # type: (HomebrewServiceArgs, AnsibleModule) -> None
     """Stop the requested brew service if it is running."""
     state = _brew_service_state(args, module)
     if not state.running:
         # Nothing to do, return early.
         _exit_with_state(args, module, changed=False, message="Service already stopped")
-    
+
     if module.check_mode:
         _exit_with_state(args, module, changed=True, message="Service would be stopped")
 
@@ -197,7 +206,8 @@ def stop_service(args: HomebrewServiceArgs, module: AnsibleModule):
     _exit_with_state(args, module, changed=True)
 
 
-def restart_service(args: HomebrewServiceArgs, module: AnsibleModule):
+def restart_service(args, module):
+    # type: (HomebrewServiceArgs, AnsibleModule) -> None
     """Restart the requested brew service. This always results in a change."""
     if module.check_mode:
         _exit_with_state(
