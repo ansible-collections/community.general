@@ -17,7 +17,11 @@ version_added: 8.2.0
 description:
   - Retrieve information about one or more Proxmox VE nodes.
 author: John Berninger (@jwbernin)
+attributes:
+  action_group:
+    version_added: 9.0.0
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module

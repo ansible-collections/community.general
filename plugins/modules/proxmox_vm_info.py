@@ -17,6 +17,9 @@ version_added: 7.2.0
 description:
   - Retrieve information about one or more Proxmox VE virtual machines.
 author: 'Sergei Antipov (@UnderGreen) <greendayonfire at gmail dot com>'
+attributes:
+  action_group:
+    version_added: 9.0.0
 options:
   node:
     description:
@@ -55,9 +58,10 @@ options:
     default: none
     version_added: 8.1.0
 extends_documentation_fragment:
-    - community.general.proxmox.documentation
-    - community.general.attributes
-    - community.general.attributes.info_module
+  - community.general.proxmox.actiongroup_proxmox
+  - community.general.proxmox.documentation
+  - community.general.attributes
+  - community.general.attributes.info_module
 """
 
 EXAMPLES = """

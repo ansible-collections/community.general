@@ -65,3 +65,13 @@ options:
       - Add the new VM to the specified pool.
     type: str
 '''
+
+    ACTIONGROUP_PROXMOX = r"""
+options: {}
+attributes:
+  action_group:
+    description: Use C(group/community.general.proxmox) in C(module_defaults) to set defaults for this module.
+    support: full
+    membership:
+      - community.general.proxmox
+"""

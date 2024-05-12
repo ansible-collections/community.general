@@ -17,6 +17,9 @@ short_description: List content from a Proxmox VE storage
 version_added: 8.2.0
 description:
   - Retrieves information about stored objects on a specific storage attached to a node.
+attributes:
+  action_group:
+    version_added: 9.0.0
 options:
   storage:
     description:
@@ -41,6 +44,7 @@ options:
     type: int
 author: Julian Vanden Broeck (@l00ptr)
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module

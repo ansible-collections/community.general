@@ -21,6 +21,8 @@ attributes:
     support: none
   diff_mode:
     support: none
+  action_group:
+    version_added: 9.0.0
 options:
   password:
     description:
@@ -216,6 +218,7 @@ author: Sergei Antipov (@UnderGreen)
 seealso:
   - module: community.general.proxmox_vm_info
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
