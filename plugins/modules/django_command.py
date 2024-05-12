@@ -15,7 +15,13 @@ short_description: Run Django admin commands
 description:
   - This module allows the execution of arbitrary Django admin commands.
 extends_documentation_fragment:
+  - community.general.attributes
   - community.general.django
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   command:
     description:
