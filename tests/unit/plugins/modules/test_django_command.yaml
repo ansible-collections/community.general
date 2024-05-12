@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
-- id: simple_command
+- id: command_success
   input:
     command: check
     extra_args:
@@ -17,5 +17,24 @@
     - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, babaloo, yaba, daba, doo]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
+      out: "whatever\n"
+      err: ""
+- id: command_fail
+  input:
+    command: check
+    extra_args:
+      - babaloo
+      - yaba
+      - daba
+      - doo
+    settings: whatever.settings
+  output:
+    failed: true
+  flags:
+    xfail: not seem to be failing as it should
+  run_command_calls:
+    - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, babaloo, yaba, daba, doo]
+      environ: *env-def
+      rc: 1
       out: "whatever\n"
       err: ""
