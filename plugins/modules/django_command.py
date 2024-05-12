@@ -30,9 +30,32 @@ options:
 """
 
 EXAMPLES = """
+- name: Check the project
+  community.general.django_command:
+    command: check
+    settings: myproject.settings
+
+- name: Check the project in specified python path
+  community.general.django_command:
+    command: check
+    settings: fancysite.settings
+    pythonpath: /home/joedoe/project/fancysite
+
+- name: Run the development web server, using virtual environemnt
+  community.general.django_command:
+    command:
+      - runserver
+      - 0.0.0.0:8000
+    settings: fancysite.settings
+    pythonpath: /home/joedoe/project/fancysite
+    venv: /home/joedoe/project/fancysite/venv
 """
 
 RETURN = """
+run_info:
+  description: Command-line execution information (when verbosity >= 3)
+  type: dict
+  returned: success
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoBase
