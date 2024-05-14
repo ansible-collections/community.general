@@ -1072,6 +1072,8 @@ files:
     maintainers: UnderGreen krauthosting
   $modules/proxmox_disk.py:
     maintainers: castorsky krauthosting
+  $modules/proxmox_backup.py:
+    maintainers: zerchevack
   $modules/proxmox_kvm.py:
     ignore: skvidal
     maintainers: helldorado krauthosting
