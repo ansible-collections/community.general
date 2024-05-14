@@ -84,6 +84,15 @@ DOCUMENTATION = '''
           - section: callback_opentelemetry
             key: disable_attributes_in_logs
         version_added: 7.1.0
+      test_generate_output_file:
+        default: false
+        type: bool
+        description:
+          - This is only for running the UTs for this plugin.
+          - For such, it will generate a json file called otel-output.json that contains all the traces
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_TEST_GENERATE_OUTPUT_FILE
+        version_added: 7.1.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
@@ -130,9 +139,12 @@ try:
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import (
-        BatchSpanProcessor
+        BatchSpanProcessor,
+        SimpleSpanProcessor
     )
-
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+        InMemorySpanExporter
+    )
     # Support for opentelemetry-api <= 1.12
     try:
         from opentelemetry.util._time import _time_ns
@@ -255,7 +267,7 @@ class OpenTelemetrySource(object):
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs, disable_attributes_in_logs):
+    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs, disable_attributes_in_logs, in_memory_span_exporter):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -271,7 +283,14 @@ class OpenTelemetrySource(object):
             )
         )
 
-        processor = BatchSpanProcessor(OTLPSpanExporter())
+        otel_exporter = None
+        # Only to support running the UTs
+        if in_memory_span_exporter:
+            otel_exporter = InMemorySpanExporter()
+            processor = SimpleSpanProcessor(otel_exporter)
+        else:
+            otel_exporter = OTLPSpanExporter()
+            processor = BatchSpanProcessor(otel_exporter)
 
         trace.get_tracer_provider().add_span_processor(processor)
 
@@ -292,6 +311,8 @@ class OpenTelemetrySource(object):
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
                         self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
+
+        return otel_exporter
 
     def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
         """ update the span with the given TaskData and HostData """
@@ -462,6 +483,7 @@ class CallbackModule(CallbackBase):
         self.errors = 0
         self.disabled = False
         self.traceparent = False
+        self.test_generate_output_file = False
 
         if OTEL_LIBRARY_IMPORT_ERROR:
             raise_from(
@@ -488,6 +510,8 @@ class CallbackModule(CallbackBase):
         self.disable_attributes_in_logs = self.get_option('disable_attributes_in_logs')
 
         self.disable_logs = self.get_option('disable_logs')
+
+        self.test_generate_output_file = self.get_option('test_generate_output_file')
 
         self.otel_service_name = self.get_option('otel_service_name')
 
@@ -578,15 +602,27 @@ class CallbackModule(CallbackBase):
             status = Status(status_code=StatusCode.OK)
         else:
             status = Status(status_code=StatusCode.ERROR)
-        self.opentelemetry.generate_distributed_traces(
+        otel_exporter = self.opentelemetry.generate_distributed_traces(
             self.otel_service_name,
             self.ansible_playbook,
             self.tasks_data,
             status,
             self.traceparent,
             self.disable_logs,
-            self.disable_attributes_in_logs
+            self.disable_attributes_in_logs,
+            self.test_generate_output_file
         )
+
+        if self.test_generate_output_file:
+            span_list = otel_exporter.get_finished_spans()
+            json = "[\n"
+            for i in range(len(span_list)):
+                if i > 0:
+                    json += ","
+                json += span_list[i].to_json()
+            json += "\n]\n"
+            with open("otel-output.json", "w", encoding="utf-8") as output:
+                output.write(json)
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
