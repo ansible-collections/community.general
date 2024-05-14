@@ -613,3 +613,59 @@
     - results.proxmox_nodes is defined
     - results.proxmox_nodes|length >= 1
     - results.proxmox_nodes[0].type == 'node'
+
+- name: List all backup jobs
+  community.general.proxmox_backup:
+  api_host: "node1"
+  api_user: user@realm
+  api_password: password
+  validate_certs: false
+  state: list
+  register: backup_result
+
+- name: Show current backup job
+  ansible.builtin.debug:
+  var: backup_result
+
+- name: Create backup with id backup-20bad73a-d245
+  community.general.proxmox_backup:
+  api_host: "node1"
+  api_token_id: "token_id"
+  api_token_secret: "token_secret"
+  validate_certs: false
+  id: "backup-20bad73a-d245"
+  vmid: "103"
+  mode: "snapshot"
+  mailnotification: "always"
+  mailto: "preprod@idnow.io"
+  repeat_missed: 0
+  enabled: 1
+  prune_backups:
+      keep_yearly: "6"
+      keep_weekly: "5"
+      keep_hourly: "4"
+      keep_daily: "2"
+      keep_last: "1"
+      keep_monthly: "3"
+  storage: "backup-idcheck-preprod-0"
+  schedule: "*-*-* 22:00:00"
+  state: present
+
+- name: Delete backup job
+  community.general.proxmox_backup:
+  api_host: "node1"
+  api_token_id: "token_id"
+  api_token_secret: "token_secret"
+  validate_certs: false
+  id: "backup-20bad73a-d245"
+  state: absent
+
+- name: Update backup with id backup-20bad73a-d245 (Change VM ID backuped)
+  community.general.proxmox_backup:
+  api_host: "node1"
+  api_token_id: "token_id"
+  api_token_secret: "token_secret"
+  validate_certs: false
+  id: "backup-20bad73a-d245"
+  vmid: "111"
+  state: present
