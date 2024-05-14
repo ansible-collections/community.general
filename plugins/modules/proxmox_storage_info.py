@@ -16,6 +16,9 @@ short_description: Retrieve information about one or more Proxmox VE storages
 version_added: 2.2.0
 description:
   - Retrieve information about one or more Proxmox VE storages.
+attributes:
+  action_group:
+    version_added: 9.0.0
 options:
   storage:
     description:
@@ -28,6 +31,7 @@ options:
     type: str
 author: Tristan Le Guern (@tleguern)
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
   - community.general.attributes.info_module

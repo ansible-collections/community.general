@@ -28,7 +28,7 @@ def api_argument_spec():
     return api_argument_spec
 
 
-def api_request(module, endpoint, data=None, method="GET"):
+def api_request(module, endpoint, data=None, method="GET", content_type="application/json"):
     """Manages Rundeck API requests via HTTP(S)
 
     :arg module:   The AnsibleModule (used to get url, api_version, api_token, etc).
@@ -63,7 +63,7 @@ def api_request(module, endpoint, data=None, method="GET"):
         data=json.dumps(data),
         method=method,
         headers={
-            "Content-Type": "application/json",
+            "Content-Type": content_type,
             "Accept": "application/json",
             "X-Rundeck-Auth-Token": module.params["api_token"]
         }

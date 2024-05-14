@@ -157,7 +157,9 @@ class LookupModule(LookupBase):
                 cross_host_merge_result = initial_value
                 for host in variables["hostvars"]:
                     if self._is_host_in_allowed_groups(variables["hostvars"][host]["group_names"]):
-                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, variables["hostvars"][host])
+                        host_variables = dict(variables["hostvars"].raw_get(host))
+                        host_variables["hostvars"] = variables["hostvars"]  # re-add hostvars
+                        cross_host_merge_result = self._merge_vars(term, cross_host_merge_result, host_variables)
                 ret.append(cross_host_merge_result)
 
         return ret
@@ -195,7 +197,8 @@ class LookupModule(LookupBase):
             result = initial_value
 
         for var_name in var_merge_names:
-            var_value = self._templar.template(variables[var_name])  # Render jinja2 templates
+            with self._templar.set_temporary_context(available_variables=variables):  # tmp. switch renderer to context of current variables
+                var_value = self._templar.template(variables[var_name])  # Render jinja2 templates
             var_type = _verify_and_get_type(var_value)
 
             if prev_var_type is None:
