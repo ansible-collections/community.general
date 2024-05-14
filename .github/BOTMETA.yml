@@ -1081,6 +1081,8 @@ files:
     maintainers: jwbernin krauthosting
   $modules/proxmox_storage_contents_info.py:
     maintainers: l00ptr krauthosting
+  $modules/proxmox_backup_info.py:
+    maintainers: zerchevack krauthosting
   $modules/proxmox_tasks_info:
     maintainers: paginabianca krauthosting
   $modules/proxmox_template.py:
