@@ -542,27 +542,42 @@ class CallbackModule(CallbackBase):
             status = 'failed'
             self.errors += 1
 
+        # avoid storing task results if it's logs are disabled
+        dump = ""
+        if not self.disable_logs
+            dump = self._dump_results(result._result)
+
         self.opentelemetry.finish_task(
             self.tasks_data,
             status,
             result,
-            self._dump_results(result._result)
+            dump
         )
 
     def v2_runner_on_ok(self, result):
+        # avoid storing task results if it's logs are disabled
+        dump = ""
+        if not self.disable_logs
+            dump = self._dump_results(result._result)
+
         self.opentelemetry.finish_task(
             self.tasks_data,
             'ok',
             result,
-            self._dump_results(result._result)
+            dump
         )
 
     def v2_runner_on_skipped(self, result):
+        # avoid storing task results if it's logs are disabled
+        dump = ""
+        if not self.disable_logs
+            dump = self._dump_results(result._result)
+
         self.opentelemetry.finish_task(
             self.tasks_data,
             'skipped',
             result,
-            self._dump_results(result._result)
+            dump
         )
 
     def v2_playbook_on_include(self, included_file):
