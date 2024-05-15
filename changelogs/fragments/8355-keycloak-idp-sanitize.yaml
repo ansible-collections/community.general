@@ -1,2 +1,2 @@
-minor_changes:
-  - keycloak_identity_provider - fix sanitization of client secret (https://github.com/ansible-collections/community.general/pull/8355).
+security_fixes:
+  - keycloak_identity_provider - the client secret was not correctly sanitized by the module. The return values ``proposed``, ``existing``, and ``end_state``, as well as the diff, did contain the client secret unmasked (https://github.com/ansible-collections/community.general/pull/8355).
