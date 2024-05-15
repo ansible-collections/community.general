@@ -15,6 +15,7 @@ action_groups:
   proxmox:
     - proxmox
     - proxmox_disk
+    - proxmox_backup
     - proxmox_domain_info
     - proxmox_group_info
     - proxmox_kvm
