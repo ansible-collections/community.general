@@ -774,9 +774,6 @@ def main():
     proxmox = ProxmoxBackupAnsible(module)
 
     try:
-        #if module.params['state'] == 'list':
-        #    backups = proxmox.get_backups(module.params.get('id'))
-        #    result['backups'] = backups
         if module.params['state'] == 'absent':
             proxmox.delete_backup(module.params['id'])
         elif module.params['state'] == 'present':
