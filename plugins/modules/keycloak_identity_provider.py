@@ -436,7 +436,7 @@ def sanitize(idp):
     idpcopy = deepcopy(idp)
     if 'config' in idpcopy:
         if 'clientSecret' in idpcopy['config']:
-            idpcopy['clientSecret'] = '**********'
+            idpcopy['config']['clientSecret'] = '**********'
     return idpcopy
 
 
