@@ -62,6 +62,7 @@
       - result.existing == {}
       - result.end_state.alias == "{{ idp }}"
       - result.end_state.mappers != []
+      - result.end_state.config.client_secret = "**********"
 
 - name: Update existing identity provider (no change)
   community.general.keycloak_identity_provider:
