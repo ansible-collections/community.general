@@ -529,7 +529,7 @@ class CallbackModule(CallbackBase):
 
         self.otel_exporter_otlp_traces_protocol = self.get_option('otel_exporter_otlp_traces_protocol')
 
-    def dump_results(result):
+    def dump_results(self, result):
         """ dump the results if disable_logs is not enabled """
         if self.disable_logs:
             return ""
