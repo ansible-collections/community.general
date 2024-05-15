@@ -119,6 +119,8 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
+  $doc_fragments/django.py:
+    maintainers: russoz
   $doc_fragments/hpe3par.py:
     labels: hpe3par
     maintainers: farhan7500 gautamphegde
@@ -299,6 +301,8 @@ files:
   $module_utils/cmd_runner.py:
     maintainers: russoz
   $module_utils/deps.py:
+    maintainers: russoz
+  $module_utils/django.py:
     maintainers: russoz
   $module_utils/gconftool2.py:
     labels: gconftool2
@@ -499,6 +503,8 @@ files:
   $modules/django_manage.py:
     ignore: scottanderson42 tastychutney
     labels: django_manage
+    maintainers: russoz
+  $modules/django_command.py:
     maintainers: russoz
   $modules/dnf_versionlock.py:
     maintainers: moreda
