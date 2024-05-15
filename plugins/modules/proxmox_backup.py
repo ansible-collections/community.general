@@ -8,8 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: proxmox_backup
 short_description: Get, delete, create or update Proxmox VE backup jobs.
@@ -27,12 +26,11 @@ attributes:
 options:
   state:
     description:
-      - Indicate desired state of the job.
-      - Set to list to get one or all jobs.
       - Set to present to create or update job.
       - Set to absent to delete job.
-    choices: ['list', 'present', 'absent']
+    choices: ['present', 'absent']
     type: str
+    required: true
   all:
     description:
       - Backup all known guest systems on this host.
@@ -42,24 +40,23 @@ options:
   bwlimit:
     description:
       - Limit I/O bandwidth (in KiB/s).
-    format: <integer> (0 - N)
     type: int
     default: 0
   comment:
     description:
       - Description for the Job.
-    choices: ['0', '1', 'gzip', 'lzo', 'zstd']
     type: str
   compress:
     description:
       - Compress dump file.
+    choices: ['0', '1', 'gzip', 'lzo', 'zstd']
     type: str
-    default: 0
+    default: "0"
   dow:
     description:
       - Day of week selection.
     type: str
-    default: mon,tue,wed,thu,fri,sat,sun
+    default: "mon,tue,wed,thu,fri,sat,sun"
   dumpdir:
     description:
       - Store resulting files to specified directory.
@@ -75,15 +72,15 @@ options:
     type: str
   exclude_path:
     description:
-      - Exclude certain files/directories (shell globs).
-      - Paths starting with '/' are anchored to the container's root,
-      - other paths match relative to each subdirectory.
-    format: [<string>, ...]
-    type: list
+      - >
+        Exclude certain files/directories (shell globs).
+        Paths starting with '/' are anchored to the container's root,
+        other paths match relative to each subdirectory.
+    choices: ['ignore', 'on']
+    type: str
   fleecing:
     description:
       - Options for backup fleecing (VM only).
-    format: "[enabled=<1|0>][,storage=<storage ID>]"
     type: str
   id:
     description:
@@ -100,13 +97,11 @@ options:
       - For snapshot and suspend mode backups of VMs, this only affects the compressor.
       - A value of 8 means the idle priority is used,
       - otherwise the best-effort priority is used with the specified value.
-    format: <integer> (0 - 8)
     type: int
     default: 7
   lockwait:
     description:
       - Maximal time to wait for the global lock (minutes).
-    format: <integer> (0 - N)
     type: int
     default: 180
   mailnotification:
@@ -122,7 +117,6 @@ options:
   maxfiles:
     description:
       - Maximal number of backup files per guest system.
-    format: <integer> (1 - N)
     type: int
   mode:
     description:
@@ -144,7 +138,6 @@ options:
   performance:
     description:
       - Other performance-related settings.
-    format: (Possible values [max-workers=<integer>] [,pbs-entries-max=<integer>])
     type: str
   pigz:
     description:
@@ -164,7 +157,6 @@ options:
   prune_backups:
     description:
       - Use these retention options instead of those from the storage configuration.
-    Format: "[keep-all=<1|0>], [keep-daily=<N>], [keep-hourly=<N>], [keep-last=<N>], [keep-monthly=<N>], [keep-weekly=<N>], [keep-yearly=<N>]"
     type: str
     default: keep-all=1
   quiet:
@@ -185,7 +177,6 @@ options:
   schedule:
     description:
       - Backup schedule. The format is a subset of `systemd` calendar events.
-    example: "*-*-* 22:00:00"
     type: str
   script:
     description:
@@ -194,13 +185,12 @@ options:
   starttime:
     description:
       - Job Start time.
-    format: "HH:MM"
     type: str
   stdexcludes:
     description:
       - Exclude temporary files and logs.
     type: bool
-    default: 0
+    default: 1
   stop:
     description:
       - Stop running backup jobs on this host.
@@ -209,13 +199,11 @@ options:
   stopwait:
     description:
       - Maximal time to wait until a guest system is stopped (minutes).
-    format: "<integer> (0 - N)"
     type: int
     default: 10
   storage:
     description:
       - Store resulting file to this storage.
-    format: "<storage ID>"
     type: str
   tmpdir:
     description:
@@ -238,7 +226,6 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.attributes
 '''
-
 
 EXAMPLES = '''
 - name: List all backup jobs
@@ -298,7 +285,6 @@ EXAMPLES = '''
   state: present
 '''
 
-
 RETURN = '''
 proxmox_backup:
     description: List of Proxmox VE backup.
@@ -340,9 +326,9 @@ proxmox_backup:
         type: str
       exclude_path:
         description:
-          - Exclude certain files/directories (shell globs).
-          - Paths starting with '/' are anchored to the container's root,
-          - other paths match relative to each subdirectory.
+          - >
+            Exclude certain files/directories (shell globs).
+            Paths starting with '/' are anchored to the container's root, other paths match relative to each subdirectory.
         returned: on success
         type: list
       fleecing:
@@ -355,11 +341,11 @@ proxmox_backup:
         type: str
       ionice:
         description:
-          - Set IO priority when using the BFQ scheduler.
-          - For snapshot and suspend mode backups of VMs,
-          - this only affects the compressor.
-          - A value of 8 means the idle priority is used,
-          - otherwise the best-effort priority is used with the specified value.
+          - >
+            Set IO priority when using the BFQ scheduler.
+            For snapshot and suspend mode backups of VMs, this only affects the compressor.
+          - >
+            A value of 8 means the idle priority is used, otherwise the best-effort priority is used with the specified value.
         returned: on success
         type: int
       lockwait:
@@ -372,8 +358,8 @@ proxmox_backup:
         type: str
       mailto:
         description:
-          - Comma-separated list of email addresses or users
-          - that should receive email notifications.
+          - >
+            Comma-separated list of email addresses or users that should receive email notifications.
         returned: on success
         type: str
       maxfiles:
@@ -392,21 +378,22 @@ proxmox_backup:
         description:
           - Template string for generating notes for the backup(s).
           - It can contain variables which will be replaced by their values.
-          - Currently supported are {{cluster}}, {{guestname}}, {{node}},
-          - and {{vmid}}, but more might be added in the future.
-          - Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.
+          - Currently supported are {{cluster}}, {{guestname}}, {{node}} and {{vmid}}, but more might be added in the future.
+          - Needs to be a single line, newline and backslash need to be escaped.
         returned: on success
         type: str
       performance:
         description:
-          - Other performance-related settings.
-          - (Possible values [max-workers=<integer>] [,pbs-entries-max=<integer>])
+          - >
+            Other performance-related settings.
+            (Possible values [max-workers=<integer>] [,pbs-entries-max=<integer>])
         returned: on success
         type: str
       pigz:
         description:
-          - Use pigz instead of gzip when N>0. N=1 uses half of cores,
-          - N>1 uses N as thread count.
+          - >
+            Use pigz instead of gzip when N>0. N=1 uses half of cores,
+            N>1 uses N as thread count.
         returned: on success
         type: int
       pool:
@@ -420,9 +407,9 @@ proxmox_backup:
         type: bool
       prune_backups:
         description:
-          - Use these retention options instead of those from the storage configuration.
-          - (Format [keep-all=<1|0>] [,keep-daily=<N>] [,keep-hourly=<N>]
-          - [,keep-last=<N>] [,keep-monthly=<N>] [,keep-weekly=<N>] [,keep-yearly=<N>])
+          - >
+            Use these retention options instead of those from the storage configuration.
+            (Format [keep-all=<1|0>] [,keep-daily=<N>] [,keep-hourly=<N>] [,keep-last=<N>] [,keep-monthly=<N>] [,keep-weekly=<N>] [,keep-yearly=<N>])
         returned: on success
         type: str
       quiet:
@@ -435,14 +422,16 @@ proxmox_backup:
         type: bool
       repeat_missed:
         description:
-          - If true, the job will be run as soon as possible
-          - if it was missed while the scheduler was not running.
+          - >
+            If true, the job will be run as soon as possible
+            if it was missed while the scheduler was not running.
         returned: on success
         type: bool
       schedule:
         description:
-          - Backup schedule.
-          - The format is a subset of `systemd` calendar events.
+          - >
+            Backup schedule.
+            The format is a subset of `systemd` calendar events.
         returned: on success
         type: str
       script:
@@ -480,8 +469,9 @@ proxmox_backup:
         type: str
       zstd:
         description:
-          - Zstd threads. N=0 uses half of the available cores,
-          - if N is set to a value bigger than 0, N is used as thread count.
+          - >
+            Zstd threads. N=0 uses half of the available cores,
+            if N is set to a value bigger than 0, N is used as thread count.
         returned: on success
         type: int
 '''
@@ -628,7 +618,7 @@ def proxmox_backup_argument_spec():
         },
         'state': {
             'type': 'str',
-            'choices': ['list', 'present', 'absent'],
+            'choices': ['present', 'absent'],
             'required': True
         },
         'all': {
@@ -645,10 +635,11 @@ def proxmox_backup_argument_spec():
         'compress': {
             'type': 'str',
             'choices': ['0', '1', 'gzip', 'lzo', 'zstd'],
-            'default': '0'
+            'default': "0"
         },
         'dow': {
-            'type': 'str'
+            'type': 'str',
+            'default': "mon,tue,wed,thu,fri,sat,sun"
         },
         'dumpdir': {
             'type': 'str'
@@ -661,24 +652,22 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'exclude_path': {
-            'type': 'list',
-            'choices': ['ignore', 'on'],
-            'format': '[<string>, ...]'
+            'type': 'str',
+            'choices': ['ignore', 'on']
         },
         'fleecing': {
-            'type': 'str',
-            'format': '[[enabled:]<1|0>] [,storage:<storage ID>]'
+            'type': 'str'
         },
         'id': {
             'type': 'str'
         },
         'ionice': {
             'type': 'int',
-            'default': 8,
-            'format': '<integer> (0 - 8)'
+            'default': 7
         },
         'lockwait': {
-            'type': 'int'
+            'type': 'int',
+            'default': 180
         },
         'mailnotification': {
             'type': 'str',
@@ -689,8 +678,7 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'maxfiles': {
-            'type': 'int',
-            'format': '<integer> (1 - N)'
+            'type': 'int'
         },
         'mode': {
             'type': 'str',
@@ -701,9 +689,6 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'notes_template': {
-            'type': 'str'
-        },
-        'notification_target': {
             'type': 'str'
         },
         'performance': {
@@ -721,9 +706,7 @@ def proxmox_backup_argument_spec():
         },
         'prune_backups': {
             'type': 'str',
-            'format': '''[keep-all:<1|0>] [,keep-daily:<N>] [,keep-hourly:<N>]
-                        [,keep-last:<N>] [,keep-monthly:<N>] [,keep-weekly:<N>]
-                        [,keep-yearly:<N>]'''
+            'default': 'keep-all=1'
         },
         'quiet': {
             'type': 'bool',
@@ -738,15 +721,13 @@ def proxmox_backup_argument_spec():
             'default': 0
         },
         'schedule': {
-            'type': 'str',
-            'format': '*-*-* 22:00'
+            'type': 'str'
         },
         'script': {
             'type': 'str'
         },
         'starttime': {
-            'type': 'str',
-            'format': 'HH:MM'
+            'type': 'str'
         },
         'stdexcludes': {
             'type': 'bool',
@@ -758,8 +739,7 @@ def proxmox_backup_argument_spec():
         },
         'stopwait': {
             'type': 'int',
-            'default': 10,
-            'format': '<integer> (0 - N)'
+            'default': 10
         },
         'storage': {
             'type': 'str'
@@ -787,17 +767,17 @@ def main():
         argument_spec=module_args,
         required_one_of=[('api_password', 'api_token_id')],
         required_together=[('api_token_id', 'api_token_secret')],
-        mutually_exclusive=[('all', 'pool', 'wmid')],
+        mutually_exclusive=[('all', 'vmid', 'pool')],
         supports_check_mode=True,
     )
 
     proxmox = ProxmoxBackupAnsible(module)
 
     try:
-        if module.params['state'] == 'list':
-            backups = proxmox.get_backups(module.params.get('id'))
-            result['backups'] = backups
-        elif module.params['state'] == 'absent':
+        #if module.params['state'] == 'list':
+        #    backups = proxmox.get_backups(module.params.get('id'))
+        #    result['backups'] = backups
+        if module.params['state'] == 'absent':
             proxmox.delete_backup(module.params['id'])
         elif module.params['state'] == 'present':
             if module.params['id']:
