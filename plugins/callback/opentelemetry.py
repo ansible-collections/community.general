@@ -544,7 +544,7 @@ class CallbackModule(CallbackBase):
 
         # avoid storing task results if it's logs are disabled
         dump = ""
-        if not self.disable_logs
+        if not self.disable_logs:
             dump = self._dump_results(result._result)
 
         self.opentelemetry.finish_task(
@@ -557,7 +557,7 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_ok(self, result):
         # avoid storing task results if it's logs are disabled
         dump = ""
-        if not self.disable_logs
+        if not self.disable_logs:
             dump = self._dump_results(result._result)
 
         self.opentelemetry.finish_task(
@@ -570,7 +570,7 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_skipped(self, result):
         # avoid storing task results if it's logs are disabled
         dump = ""
-        if not self.disable_logs
+        if not self.disable_logs:
             dump = self._dump_results(result._result)
 
         self.opentelemetry.finish_task(
