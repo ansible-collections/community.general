@@ -27,10 +27,10 @@ attributes:
 options:
   state:
     description:
-     - Indicate desired state of the job.
-     - Set to list to get one or all jobs.
-     - Set to present to create or update job.
-     - Set to absent to delete job.
+      - Indicate desired state of the job.
+      - Set to list to get one or all jobs.
+      - Set to present to create or update job.
+      - Set to absent to delete job.
     choices: ['list', 'present', 'absent']
     type: str
   all:
@@ -83,7 +83,7 @@ options:
   fleecing:
     description:
       - Options for backup fleecing (VM only).
-    format: [[enabled=]<1|0>] [,storage=<storage ID>]
+    format: "[enabled=<1|0>][,storage=<storage ID>]"
     type: str
   id:
     description:
@@ -164,66 +164,67 @@ options:
   prune_backups:
     description:
       - Use these retention options instead of those from the storage configuration.
-    Format: [keep-all=<1|0>] [,keep-daily=<N>] [,keep-hourly=<N>] [,keep-last=<N>] [,keep-monthly=<N>] [,keep-weekly=<N>] [,keep-yearly=<N>])
+    Format: "[keep-all=<1|0>], [keep-daily=<N>], [keep-hourly=<N>], [keep-last=<N>], [keep-monthly=<N>], [keep-weekly=<N>], [keep-yearly=<N>]"
     type: str
     default: keep-all=1
   quiet:
     description:
-     - Be quiet.
+      - Be quiet.
     type: bool
     default: 0
   remove:
     description:
-     - Prune older backups according to 'prune-backups'.
+      - Prune older backups according to 'prune-backups'.
     type: bool
     default: 1
   repeat_missed:
     description:
-     - If true, the job will be run as soon as possible if it was missed while the scheduler was not running.
+      - If true, the job will be run as soon as possible if it was missed while the scheduler was not running.
     type: bool
     default: 0
   schedule:
     description:
-     - Backup schedule. The format is a subset of `systemd` calendar events.
+      - Backup schedule. The format is a subset of `systemd` calendar events.
+    example: "*-*-* 22:00:00"
     type: str
   script:
     description:
-     - Use specified hook script.
+      - Use specified hook script.
     type: str
   starttime:
     description:
-     - Job Start time.
-    format: HH:MM
+      - Job Start time.
+    format: "HH:MM"
     type: str
   stdexcludes:
     description:
-     - Exclude temporary files and logs.
+      - Exclude temporary files and logs.
     type: bool
     default: 0
   stop:
     description:
-     - Stop running backup jobs on this host.
+      - Stop running backup jobs on this host.
     type: bool
     default: 0
   stopwait:
     description:
-     - Maximal time to wait until a guest system is stopped (minutes).
-    format: <integer> (0 - N)
+      - Maximal time to wait until a guest system is stopped (minutes).
+    format: "<integer> (0 - N)"
     type: int
     default: 10
   storage:
     description:
-     - Store resulting file to this storage.
-    format: <storage ID>
+      - Store resulting file to this storage.
+    format: "<storage ID>"
     type: str
   tmpdir:
     description:
-     - Store temporary files to specified directory.
+      - Store temporary files to specified directory.
     type: str
   vmid:
     description:
-     - The ID of the guest system you want to backup.
-     - Can not be use with vmid and pool in same job
+      - The ID of the guest system you want to backup.
+      - Can not be use with vmid and pool in same job
     type: str
   zstd:
     description:
