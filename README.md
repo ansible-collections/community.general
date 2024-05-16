@@ -11,6 +11,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.general)](https://api.reuse.software/info/github.com/ansible-collections/community.general)
 
+test.
+
 This repository contains the `community.general` Ansible Collection. The collection is a part of the Ansible package and includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
 
 You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
