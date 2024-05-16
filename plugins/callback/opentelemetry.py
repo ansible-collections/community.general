@@ -93,6 +93,22 @@ DOCUMENTATION = '''
         env:
           - name: ANSIBLE_OPENTELEMETRY_TEST_GENERATE_OUTPUT_FILE
         version_added: 7.1.0
+      otel_exporter_otlp_traces_protocol:
+        type: str
+        description:
+          - E(OTEL_EXPORTER_OTLP_TRACES_PROTOCOL) represents the the transport protocol for spans.
+          - See
+            U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#envvar-OTEL_EXPORTER_OTLP_TRACES_PROTOCOL).
+        default: grpc
+        choices:
+          - grpc
+          - http/protobuf
+        env:
+          - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
+        ini:
+          - section: callback_opentelemetry
+            key: otel_exporter_otlp_traces_protocol
+        version_added: 9.0.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
@@ -133,7 +149,8 @@ from ansible.plugins.callback import CallbackBase
 try:
     from opentelemetry import trace
     from opentelemetry.trace import SpanKind
-    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter as GRPCOTLPSpanExporter
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter as HTTPOTLPSpanExporter
     from opentelemetry.sdk.resources import SERVICE_NAME, Resource
     from opentelemetry.trace.status import Status, StatusCode
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
@@ -267,7 +284,16 @@ class OpenTelemetrySource(object):
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs, disable_attributes_in_logs, in_memory_span_exporter):
+    def generate_distributed_traces(self,
+                                    otel_service_name,
+                                    ansible_playbook,
+                                    tasks_data,
+                                    status,
+                                    traceparent,
+                                    disable_logs,
+                                    disable_attributes_in_logs,
+                                    otel_exporter_otlp_traces_protocol,
+                                    in_memory_span_exporter):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -289,7 +315,10 @@ class OpenTelemetrySource(object):
             otel_exporter = InMemorySpanExporter()
             processor = SimpleSpanProcessor(otel_exporter)
         else:
-            otel_exporter = OTLPSpanExporter()
+            if otel_exporter_otlp_traces_protocol == 'grpc':
+                otel_exporter = GRPCOTLPSpanExporter()
+            else:
+                otel_exporter = HTTPOTLPSpanExporter()
             processor = BatchSpanProcessor(otel_exporter)
 
         trace.get_tracer_provider().add_span_processor(processor)
@@ -484,6 +513,7 @@ class CallbackModule(CallbackBase):
         self.disabled = False
         self.traceparent = False
         self.test_generate_output_file = False
+        self.otel_exporter_otlp_traces_protocol = None
 
         if OTEL_LIBRARY_IMPORT_ERROR:
             raise_from(
@@ -520,6 +550,8 @@ class CallbackModule(CallbackBase):
 
         # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
         self.traceparent = self.get_option('traceparent')
+
+        self.otel_exporter_otlp_traces_protocol = self.get_option('otel_exporter_otlp_traces_protocol')
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -610,6 +642,7 @@ class CallbackModule(CallbackBase):
             self.traceparent,
             self.disable_logs,
             self.disable_attributes_in_logs,
+            self.otel_exporter_otlp_traces_protocol,
             self.test_generate_output_file
         )
 

@@ -52,9 +52,9 @@ class _BaseContext(object):
 
         test_flags = self.test_flags()
         if test_flags.get("skip"):
-            pytest.skip()
+            pytest.skip(test_flags.get("skip"))
         if test_flags.get("xfail"):
-            pytest.xfail()
+            pytest.xfail(test_flags.get("xfail"))
 
         func()
 
