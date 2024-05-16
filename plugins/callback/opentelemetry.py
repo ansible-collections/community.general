@@ -134,6 +134,7 @@ examples: |
 '''
 
 import getpass
+import json
 import os
 import socket
 import sys
@@ -651,7 +652,6 @@ class CallbackModule(CallbackBase):
             spans = [json.loads(span.to_json()) for span in otel_exporter.get_finished_spans()]
             with open(self.store_spans_in_file, "w", encoding="utf-8") as output:
                 json.dump({"spans": spans}, output, indent=4)
-
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
