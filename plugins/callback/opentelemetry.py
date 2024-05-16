@@ -295,7 +295,7 @@ class OpenTelemetrySource(object):
                                     disable_logs,
                                     disable_attributes_in_logs,
                                     otel_exporter_otlp_traces_protocol,
-                                    in_memory_span_exporter):
+                                    store_spans_in_file):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -312,8 +312,7 @@ class OpenTelemetrySource(object):
         )
 
         otel_exporter = None
-        # Only to support running the UTs
-        if in_memory_span_exporter:
+        if store_spans_in_file:
             otel_exporter = InMemorySpanExporter()
             processor = SimpleSpanProcessor(otel_exporter)
         else:
