@@ -1,0 +1,3 @@
+bugfixes:
+  - machinectl - lint polkit rule example
+  - run0 - lint and fix polkit rule example
