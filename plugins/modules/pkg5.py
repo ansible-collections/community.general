@@ -169,7 +169,8 @@ def ensure(module, state, packages, params):
 
     to_modify = list(filter(behaviour[state]['filter'], packages))
     if to_modify:
-        rc, out, err = module.run_command(['pkg', behaviour[state]['subcommand']] + dry_run + accept_licenses + beadm + no_refresh + verbosity + ['--'] + to_modify)
+        rc, out, err = module.run_command(
+            ['pkg', behaviour[state]['subcommand']] + dry_run + accept_licenses + beadm + no_refresh + verbosity + ['--'] + to_modify)
         response['rc'] = rc
         response['results'].append(out)
         response['msg'] += err
