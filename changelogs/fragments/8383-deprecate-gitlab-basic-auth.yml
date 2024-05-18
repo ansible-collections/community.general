@@ -1,0 +1,2 @@
+deprecated_features:
+  - "gitlab modules - the basic auth method on GitLab API have been deprecated and will be removed in community.general 10.0.0 (https://github.com/ansible-collections/community.general/pull/8383)."
