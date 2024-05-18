@@ -1,0 +1,5 @@
+release_summary: |
+  Regular bugfix release.
+
+  Note that this is the last regular bugfix release. From now on, the 7.x.y release train
+  will only receive major and security bugfixes.
