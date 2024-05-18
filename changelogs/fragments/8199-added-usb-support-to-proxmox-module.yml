@@ -1,0 +1,2 @@
+minor_changes:
+  - "proxmox_kvm - adds``usb`` parameter for setting usb devices on proxmox kvm vms (https://github.com/ansible-collections/community.general/pull/8199)"
