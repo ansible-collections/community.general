@@ -1,0 +1,66 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2024, kurokobo <kurokobo@protonmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run tests
+  include_role:
+    name: callback
+  vars:
+    tests:
+      - name: Enable timestamp in the default length
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.timestamp
+          ANSIBLE_CALLBACK_TIMESTAMP_FORMAT_STRING: "15:04:05"
+        playbook: |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: Sample task name
+                debug:
+                  msg: sample debug msg
+        expected_output: [
+          "",
+          "PLAY [testhost] ******************************************************* 15:04:05",
+          "",
+          "TASK [Sample task name] *********************************************** 15:04:05",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
+          "",
+          "PLAY RECAP ************************************************************ 15:04:05",
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+        ]
+
+      - name: Enable timestamp in the longer length
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.timestamp
+          ANSIBLE_CALLBACK_TIMESTAMP_FORMAT_STRING: "2006-01-02T15:04:05"
+        playbook: |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: Sample task name
+                debug:
+                  msg: sample debug msg
+        expected_output: [
+          "",
+          "PLAY [testhost] ******************************************** 2006-01-02T15:04:05",
+          "",
+          "TASK [Sample task name] ************************************ 2006-01-02T15:04:05",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
+          "",
+          "PLAY RECAP ************************************************* 2006-01-02T15:04:05",
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+        ]

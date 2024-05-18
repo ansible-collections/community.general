@@ -91,6 +91,8 @@ files:
     maintainers: ryancurrah
   $callbacks/syslog_json.py:
     maintainers: imjoseangel
+  $callbacks/timestamp.py:
+    maintainers: kurokobo
   $callbacks/unixy.py:
     labels: unixy
     maintainers: akatch
