@@ -56,9 +56,10 @@ options:
     default: true
   verbose:
     description:
-      - Toggles quiet execution on or off
+      - Set to true to disable quiet execution.
     type: bool
     default: false
+    version_added: 9.0.0
 '''
 EXAMPLES = '''
 - name: Install Vim
