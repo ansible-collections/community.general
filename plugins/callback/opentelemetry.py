@@ -84,6 +84,17 @@ DOCUMENTATION = '''
           - section: callback_opentelemetry
             key: disable_attributes_in_logs
         version_added: 7.1.0
+      store_spans_in_file:
+        default: None
+        type: str
+        description:
+          -  It stores the exported spans in the given file
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_STORE_SPANS_IN_FILE
+        ini:
+          - section: callback_opentelemetry
+            key: store_spans_in_file
+        version_added: 9.0.0
       otel_exporter_otlp_traces_protocol:
         type: str
         description:
@@ -123,6 +134,7 @@ examples: |
 '''
 
 import getpass
+import json
 import os
 import socket
 import sys
@@ -147,9 +159,12 @@ try:
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import (
-        BatchSpanProcessor
+        BatchSpanProcessor,
+        SimpleSpanProcessor
     )
-
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+        InMemorySpanExporter
+    )
     # Support for opentelemetry-api <= 1.12
     try:
         from opentelemetry.util._time import _time_ns
@@ -280,7 +295,8 @@ class OpenTelemetrySource(object):
                                     traceparent,
                                     disable_logs,
                                     disable_attributes_in_logs,
-                                    otel_exporter_otlp_traces_protocol):
+                                    otel_exporter_otlp_traces_protocol,
+                                    store_spans_in_file):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -296,11 +312,16 @@ class OpenTelemetrySource(object):
             )
         )
 
-        processor = None
-        if otel_exporter_otlp_traces_protocol == 'grpc':
-            processor = BatchSpanProcessor(GRPCOTLPSpanExporter())
+        otel_exporter = None
+        if store_spans_in_file:
+            otel_exporter = InMemorySpanExporter()
+            processor = SimpleSpanProcessor(otel_exporter)
         else:
-            processor = BatchSpanProcessor(HTTPOTLPSpanExporter())
+            if otel_exporter_otlp_traces_protocol == 'grpc':
+                otel_exporter = GRPCOTLPSpanExporter()
+            else:
+                otel_exporter = HTTPOTLPSpanExporter()
+            processor = BatchSpanProcessor(otel_exporter)
 
         trace.get_tracer_provider().add_span_processor(processor)
 
@@ -321,6 +342,8 @@ class OpenTelemetrySource(object):
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
                         self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
+
+        return otel_exporter
 
     def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
         """ update the span with the given TaskData and HostData """
@@ -491,6 +514,7 @@ class CallbackModule(CallbackBase):
         self.errors = 0
         self.disabled = False
         self.traceparent = False
+        self.store_spans_in_file = False
         self.otel_exporter_otlp_traces_protocol = None
 
         if OTEL_LIBRARY_IMPORT_ERROR:
@@ -518,6 +542,8 @@ class CallbackModule(CallbackBase):
         self.disable_attributes_in_logs = self.get_option('disable_attributes_in_logs')
 
         self.disable_logs = self.get_option('disable_logs')
+
+        self.store_spans_in_file = self.get_option('store_spans_in_file')
 
         self.otel_service_name = self.get_option('otel_service_name')
 
@@ -610,7 +636,7 @@ class CallbackModule(CallbackBase):
             status = Status(status_code=StatusCode.OK)
         else:
             status = Status(status_code=StatusCode.ERROR)
-        self.opentelemetry.generate_distributed_traces(
+        otel_exporter = self.opentelemetry.generate_distributed_traces(
             self.otel_service_name,
             self.ansible_playbook,
             self.tasks_data,
@@ -619,7 +645,13 @@ class CallbackModule(CallbackBase):
             self.disable_logs,
             self.disable_attributes_in_logs,
             self.otel_exporter_otlp_traces_protocol,
+            self.store_spans_in_file
         )
+
+        if self.store_spans_in_file:
+            spans = [json.loads(span.to_json()) for span in otel_exporter.get_finished_spans()]
+            with open(self.store_spans_in_file, "w", encoding="utf-8") as output:
+                json.dump({"spans": spans}, output, indent=4)
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
