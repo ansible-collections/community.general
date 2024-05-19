@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
@@ -33,6 +34,18 @@ _django_std_arg_fmts = dict(
     skip_checks=cmd_runner_fmt.as_bool("--skip-checks"),
 )
 
+_django_database_args = dict(
+    database=dict(type="str", default="default"),
+)
+
+_args_menu = dict(
+    std=(django_std_args, _django_std_arg_fmts),
+    database=(_django_database_args, {"database": cmd_runner_fmt.as_opt_eq_val("--database")}),
+    noinput=({}, {"noinput": cmd_runner_fmt.as_fixed("--noinput")}),
+    dry_run=({}, {"dry_run": cmd_runner_fmt.as_bool("--dry-run")}),
+    check=({}, {"check": cmd_runner_fmt.as_bool("--check")}),
+)
+
 
 class _DjangoRunner(PythonRunner):
     def __init__(self, module, arg_formats=None, **kwargs):
@@ -55,14 +68,29 @@ class DjangoModuleHelper(ModuleHelper):
     arg_formats = {}
     django_admin_arg_order = ()
     use_old_vardict = False
+    _django_args = []
+    _check_mode_arg = ""
 
     def __init__(self):
-        argument_spec = dict(django_std_args)
-        argument_spec.update(self.module.get("argument_spec", {}))
-        self.module["argument_spec"] = argument_spec
+        self.module["argument_spec"], self.arg_formats = self._build_args(self.module.get("argument_spec", {}),
+                                                                          self.arg_formats,
+                                                                          *(["std"] + self._django_args))
         super(DjangoModuleHelper, self).__init__(self.module)
         if self.django_admin_cmd is not None:
             self.vars.command = self.django_admin_cmd
+
+    @staticmethod
+    def _build_args(arg_spec, arg_format, *names):
+        res_arg_spec = {}
+        res_arg_fmts = {}
+        for name in names:
+            args, fmts = _args_menu[name]
+            res_arg_spec = dict_merge(res_arg_spec, args)
+            res_arg_fmts = dict_merge(res_arg_fmts, fmts)
+        res_arg_spec = dict_merge(res_arg_spec, arg_spec)
+        res_arg_fmts = dict_merge(res_arg_fmts, arg_format)
+
+        return res_arg_spec, res_arg_fmts
 
     def __run__(self):
         runner = _DjangoRunner(self.module,
@@ -71,7 +99,10 @@ class DjangoModuleHelper(ModuleHelper):
                                venv=self.vars.venv,
                                check_rc=True)
         with runner() as ctx:
-            results = ctx.run()
+            run_params = self.vars.as_dict()
+            if self._check_mode_arg:
+                run_params.update({self._check_mode_arg: self.check_mode})
+            results = ctx.run(**run_params)
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
