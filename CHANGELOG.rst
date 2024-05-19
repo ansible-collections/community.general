@@ -6,6 +6,28 @@ Community General Release Notes
 
 This changelog describes changes after version 5.0.0.
 
+v6.6.9
+======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+This is the last 6.x.y release. The 6.x.y release train is now effectively End of Life.
+Thanks to everyone who contributed to the community.general 6.x.y releases!
+
+Security Fixes
+--------------
+
+- keycloak_identity_provider - the client secret was not correctly sanitized by the module. The return values ``proposed``, ``existing``, and ``end_state``, as well as the diff, did contain the client secret unmasked (https://github.com/ansible-collections/community.general/pull/8355).
+
+Bugfixes
+--------
+
+- inventory plugins - add unsafe wrapper to avoid marking strings that do not contain ``{`` or ``}`` as unsafe, to work around a bug in AWX ((https://github.com/ansible-collections/community.general/issues/8212, https://github.com/ansible-collections/community.general/pull/8225).
+- xml - make module work with lxml 5.1.1, which removed some internals that the module was relying on (https://github.com/ansible-collections/community.general/pull/8169).
+
 v6.6.8
 ======
 
