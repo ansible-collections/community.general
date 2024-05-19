@@ -69,13 +69,13 @@ EXAMPLES = r"""
 # An example polkit rule that allows the user 'ansible' in the 'wheel' group
 # to execute commands using run0 without authentication.
 /etc/polkit-1/rules.d/60-run0-fast-user-auth.rules: |
-    polkit.addRule(function(action, subject) {
-      if(action.id == "org.freedesktop.systemd1.manage-units" &&
-        subject.isInGroup("wheel")
-        subject.user == "ansible") {
+  polkit.addRule(function(action, subject) {
+    if(action.id == "org.freedesktop.systemd1.manage-units" &&
+      subject.isInGroup("wheel") &&
+      subject.user == "ansible") {
         return polkit.Result.YES;
-      }
-    });
+    }
+  });
 """
 
 from re import compile as re_compile

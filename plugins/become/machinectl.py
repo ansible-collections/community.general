@@ -78,12 +78,13 @@ DOCUMENTATION = '''
 EXAMPLES = r'''
 # A polkit rule needed to use the module with a non-root user.
 # See the Notes section for details.
-60-machinectl-fast-user-auth.rules: |
-    polkit.addRule(function(action, subject) {
-        if(action.id == "org.freedesktop.machine1.host-shell" && subject.isInGroup("wheel")) {
-            return polkit.Result.AUTH_SELF_KEEP;
-        }
-    });
+/etc/polkit-1/rules.d/60-machinectl-fast-user-auth.rules: |
+  polkit.addRule(function(action, subject) {
+    if(action.id == "org.freedesktop.machine1.host-shell" &&
+      subject.isInGroup("wheel")) {
+        return polkit.Result.AUTH_SELF_KEEP;
+    }
+  });
 '''
 
 from re import compile as re_compile
