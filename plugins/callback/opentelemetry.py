@@ -498,6 +498,12 @@ class CallbackModule(CallbackBase):
         # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
         self.traceparent = self.get_option('traceparent')
 
+    def dump_results(self, result):
+        """ dump the results if disable_logs is not enabled """
+        if self.disable_logs:
+            return ""
+        return self._dump_results(result._result)
+
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
 
@@ -547,7 +553,7 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             status,
             result,
-            self._dump_results(result._result)
+            self.dump_results(result)
         )
 
     def v2_runner_on_ok(self, result):
@@ -555,7 +561,7 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             'ok',
             result,
-            self._dump_results(result._result)
+            self.dump_results(result)
         )
 
     def v2_runner_on_skipped(self, result):
@@ -563,7 +569,7 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             'skipped',
             result,
-            self._dump_results(result._result)
+            self.dump_results(result)
         )
 
     def v2_playbook_on_include(self, included_file):
