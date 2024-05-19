@@ -56,7 +56,7 @@ options:
     default: true
   verbose:
     description:
-      - Set to true to disable quiet execution.
+      - Set to V(true) to disable quiet execution.
     type: bool
     default: false
     version_added: 9.0.0
