@@ -402,7 +402,8 @@ class OpenTelemetrySource(object):
         if not disable_logs:
             # This will avoid populating span attributes to the logs
             span.add_event(task_data.dump, attributes={} if disable_attributes_in_logs else attributes)
-            span.end(end_time=host_data.finish)
+        # Close span always
+        span.end(end_time=host_data.finish)
 
     def set_span_attributes(self, span, attributes):
         """ update the span attributes with the given attributes if not None """
