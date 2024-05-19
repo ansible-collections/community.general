@@ -115,6 +115,11 @@ def gitlab_authentication(module, min_version=None):
         # Changelog : https://github.com/python-gitlab/python-gitlab/releases/tag/v1.13.0
         # This condition allow to still support older version of the python-gitlab library
         if LooseVersion(gitlab.__version__) < LooseVersion("1.13.0"):
+            module.deprecate(
+                "GitLab basic auth is deprecated and will be removed in next major version, "
+                "using another auth method (API token or OAuth) is strongly recommended.",
+                version='10.0.0',
+                collection_name='community.general')
             gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, email=gitlab_user, password=gitlab_password,
                                             private_token=gitlab_token, api_version=4)
         else:
