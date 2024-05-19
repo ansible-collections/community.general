@@ -30,8 +30,6 @@
     settings: whatever.settings
   output:
     failed: true
-  flags:
-    xfail: not seem to be failing as it should
   run_command_calls:
     - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, babaloo, yaba, daba, doo]
       environ: *env-def
