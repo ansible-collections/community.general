@@ -23,9 +23,9 @@ DOCUMENTATION = '''
       - plugin: ansible.builtin.default
         plugin_type: callback
         description: >
-          There is a parameter C(result_format) in P(ansible.builtin.default#callback) that allows you to change the output format to YAML.
+          There is a parameter O(ansible.builtin.default#callback:result_format) in P(ansible.builtin.default#callback) that allows you to change the output format to YAML.
     notes:
-      - With ansible-core 2.13 or newer, you can instead specify C(yaml) for the parameter C(result_format) in P(ansible.builtin.default#callback).
+      - With ansible-core 2.13 or newer, you can instead specify V(yaml) for the parameter O(ansible.builtin.default#callback:result_format) in P(ansible.builtin.default#callback).
 '''
 
 import yaml
