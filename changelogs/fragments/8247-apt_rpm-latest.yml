@@ -1,6 +1,0 @@
-minor_changes:
-  - "apt_rpm - add new states ``latest`` and ``present_not_latest``. The value ``latest`` is equivalent to the current behavior of
-     ``present``, which will upgrade a package if a newer version exists. ``present_not_latest`` does what most users would expect ``present``
-     to do: it does not upgrade if the package is already installed. The current behavior of ``present`` will be deprecated in a later version,
-     and eventually changed to that of ``present_not_latest``
-     (https://github.com/ansible-collections/community.general/issues/8217, https://github.com/ansible-collections/community.general/pull/8247)."

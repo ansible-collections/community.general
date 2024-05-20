@@ -1,2 +1,0 @@
-minor_changes:
-  - "homebrew - adds ``force_formula`` parameter to disambiguate a formula from a cask of the same name (https://github.com/ansible-collections/community.general/issues/8274)."

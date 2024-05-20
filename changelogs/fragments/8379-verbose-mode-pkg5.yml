@@ -1,2 +1,0 @@
-minor_changes:
-  - pkg5 - add support for non-silent execution (https://github.com/ansible-collections/community.general/issues/8379, https://github.com/ansible-collections/community.general/pull/8382).

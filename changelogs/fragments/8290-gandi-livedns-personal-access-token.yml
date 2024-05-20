@@ -1,2 +1,0 @@
-minor_changes:
-  - gandi_livedns - adds support for personal access tokens (https://github.com/ansible-collections/community.general/issues/7639, https://github.com/ansible-collections/community.general/pull/8337).

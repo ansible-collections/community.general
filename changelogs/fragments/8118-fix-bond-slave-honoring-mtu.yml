@@ -1,2 +1,0 @@
-minor_changes:
-  - nmcli - allow setting ``MTU`` for ``bond-slave`` interface types (https://github.com/ansible-collections/community.general/pull/8118).

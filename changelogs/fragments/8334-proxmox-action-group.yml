@@ -1,2 +1,0 @@
-minor_changes:
-  - "proxmox* modules - there is now a ``community.general.proxmox`` module defaults group that can be used to set default options for all Proxmox modules (https://github.com/ansible-collections/community.general/pull/8334)."
