@@ -116,7 +116,7 @@ Regular bugfix and features release\.
 <a id="new-modules"></a>
 ### New Modules
 
-* keycloak\_client\_rolescope \- Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other specific client applications\.
+* community\.general\.keycloak\_client\_rolescope \- Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other specific client applications\.
 
 <a id="v8-5-0"></a>
 ## v8\.5\.0
@@ -161,7 +161,7 @@ Regular feature and bugfix release with security fixes\.
 <a id="new-modules-1"></a>
 ### New Modules
 
-* usb\_facts \- Allows listing information about USB devices
+* community\.general\.usb\_facts \- Allows listing information about USB devices
 
 <a id="v8-4-0"></a>
 ## v8\.4\.0
@@ -203,21 +203,21 @@ Regular bugfix and feature release\.
 <a id="callback"></a>
 #### Callback
 
-* default\_without\_diff \- The default ansible callback without diff output
+* community\.general\.default\_without\_diff \- The default ansible callback without diff output
 
 <a id="filter"></a>
 #### Filter
 
-* lists\_difference \- Difference of lists with a predictive order
-* lists\_intersect \- Intersection of lists with a predictive order
-* lists\_symmetric\_difference \- Symmetric Difference of lists with a predictive order
-* lists\_union \- Union of lists with a predictive order
+* community\.general\.lists\_difference \- Difference of lists with a predictive order
+* community\.general\.lists\_intersect \- Intersection of lists with a predictive order
+* community\.general\.lists\_symmetric\_difference \- Symmetric Difference of lists with a predictive order
+* community\.general\.lists\_union \- Union of lists with a predictive order
 
 <a id="new-modules-2"></a>
 ### New Modules
 
-* gitlab\_group\_access\_token \- Manages GitLab group access tokens
-* gitlab\_project\_access\_token \- Manages GitLab project access tokens
+* community\.general\.gitlab\_group\_access\_token \- Manages GitLab group access tokens
+* community\.general\.gitlab\_project\_access\_token \- Manages GitLab project access tokens
 
 <a id="v8-3-0"></a>
 ## v8\.3\.0
@@ -259,12 +259,12 @@ Regular bugfix and feature release\.
 <a id="new-modules-3"></a>
 ### New Modules
 
-* consul\_acl\_bootstrap \- Bootstrap ACLs in Consul
-* consul\_auth\_method \- Manipulate Consul auth methods
-* consul\_binding\_rule \- Manipulate Consul binding rules
-* consul\_token \- Manipulate Consul tokens
-* gitlab\_label \- Creates/updates/deletes GitLab Labels belonging to project or group\.
-* gitlab\_milestone \- Creates/updates/deletes GitLab Milestones belonging to project or group
+* community\.general\.consul\_acl\_bootstrap \- Bootstrap ACLs in Consul
+* community\.general\.consul\_auth\_method \- Manipulate Consul auth methods
+* community\.general\.consul\_binding\_rule \- Manipulate Consul binding rules
+* community\.general\.consul\_token \- Manipulate Consul tokens
+* community\.general\.gitlab\_label \- Creates/updates/deletes GitLab Labels belonging to project or group\.
+* community\.general\.gitlab\_milestone \- Creates/updates/deletes GitLab Milestones belonging to project or group
 
 <a id="v8-2-0"></a>
 ## v8\.2\.0
@@ -305,27 +305,27 @@ Regular bugfix and feature release\.
 <a id="connection"></a>
 #### Connection
 
-* incus \- Run tasks in Incus instances via the Incus CLI\.
+* community\.general\.incus \- Run tasks in Incus instances via the Incus CLI\.
 
 <a id="filter-1"></a>
 #### Filter
 
-* from\_ini \- Converts INI text input into a dictionary
-* to\_ini \- Converts a dictionary to the INI file format
+* community\.general\.from\_ini \- Converts INI text input into a dictionary
+* community\.general\.to\_ini \- Converts a dictionary to the INI file format
 
 <a id="lookup"></a>
 #### Lookup
 
-* github\_app\_access\_token \- Obtain short\-lived Github App Access tokens
+* community\.general\.github\_app\_access\_token \- Obtain short\-lived Github App Access tokens
 
 <a id="new-modules-4"></a>
 ### New Modules
 
-* dnf\_config\_manager \- Enable or disable dnf repositories using config\-manager
-* keycloak\_component\_info \- Retrive component info in Keycloak
-* keycloak\_realm\_rolemapping \- Allows administration of Keycloak realm role mappings into groups with the Keycloak API
-* proxmox\_node\_info \- Retrieve information about one or more Proxmox VE nodes
-* proxmox\_storage\_contents\_info \- List content from a Proxmox VE storage
+* community\.general\.dnf\_config\_manager \- Enable or disable dnf repositories using config\-manager
+* community\.general\.keycloak\_component\_info \- Retrive component info in Keycloak
+* community\.general\.keycloak\_realm\_rolemapping \- Allows administration of Keycloak realm role mappings into groups with the Keycloak API
+* community\.general\.proxmox\_node\_info \- Retrieve information about one or more Proxmox VE nodes
+* community\.general\.proxmox\_storage\_contents\_info \- List content from a Proxmox VE storage
 
 <a id="v8-1-0"></a>
 ## v8\.1\.0
@@ -396,19 +396,19 @@ Regular bugfix and feature release\.
 <a id="lookup-1"></a>
 #### Lookup
 
-* onepassword\_doc \- Fetch documents stored in 1Password
+* community\.general\.onepassword\_doc \- Fetch documents stored in 1Password
 
 <a id="test"></a>
 #### Test
 
-* fqdn\_valid \- Validates fully\-qualified domain names against RFC 1123
+* community\.general\.fqdn\_valid \- Validates fully\-qualified domain names against RFC 1123
 
 <a id="new-modules-5"></a>
 ### New Modules
 
-* git\_config\_info \- Read git configuration
-* gitlab\_issue \- Create\, update\, or delete GitLab issues
-* nomad\_token \- Manage Nomad ACL tokens
+* community\.general\.git\_config\_info \- Read git configuration
+* community\.general\.gitlab\_issue \- Create\, update\, or delete GitLab issues
+* community\.general\.nomad\_token \- Manage Nomad ACL tokens
 
 <a id="v8-0-2"></a>
 ## v8\.0\.2
@@ -742,27 +742,27 @@ This is release 8\.0\.0 of <code>community\.general</code>\, released on 2023\-1
 <a id="lookup-2"></a>
 #### Lookup
 
-* bitwarden\_secrets\_manager \- Retrieve secrets from Bitwarden Secrets Manager
+* community\.general\.bitwarden\_secrets\_manager \- Retrieve secrets from Bitwarden Secrets Manager
 
 <a id="new-modules-6"></a>
 ### New Modules
 
-* consul\_policy \- Manipulate Consul policies
-* consul\_role \- Manipulate Consul roles
-* facter\_facts \- Runs the discovery program C\(facter\) on the remote system and return Ansible facts
-* gio\_mime \- Set default handler for MIME type\, for applications using Gnome GIO
-* gitlab\_instance\_variable \- Creates\, updates\, or deletes GitLab instance variables
-* gitlab\_merge\_request \- Create\, update\, or delete GitLab merge requests
-* jenkins\_build\_info \- Get information about Jenkins builds
-* keycloak\_authentication\_required\_actions \- Allows administration of Keycloak authentication required actions
-* keycloak\_authz\_custom\_policy \- Allows administration of Keycloak client custom Javascript policies via Keycloak API
-* keycloak\_authz\_permission \- Allows administration of Keycloak client authorization permissions via Keycloak API
-* keycloak\_authz\_permission\_info \- Query Keycloak client authorization permissions information
-* keycloak\_realm\_key \- Allows administration of Keycloak realm keys via Keycloak API
-* keycloak\_user \- Create and configure a user in Keycloak
-* lvg\_rename \- Renames LVM volume groups
-* pnpm \- Manage node\.js packages with pnpm
-* proxmox\_pool \- Pool management for Proxmox VE cluster
-* proxmox\_pool\_member \- Add or delete members from Proxmox VE cluster pools
-* proxmox\_vm\_info \- Retrieve information about one or more Proxmox VE virtual machines
-* simpleinit\_msb \- Manage services on Source Mage GNU/Linux
+* community\.general\.consul\_policy \- Manipulate Consul policies
+* community\.general\.consul\_role \- Manipulate Consul roles
+* community\.general\.facter\_facts \- Runs the discovery program C\(facter\) on the remote system and return Ansible facts
+* community\.general\.gio\_mime \- Set default handler for MIME type\, for applications using Gnome GIO
+* community\.general\.gitlab\_instance\_variable \- Creates\, updates\, or deletes GitLab instance variables
+* community\.general\.gitlab\_merge\_request \- Create\, update\, or delete GitLab merge requests
+* community\.general\.jenkins\_build\_info \- Get information about Jenkins builds
+* community\.general\.keycloak\_authentication\_required\_actions \- Allows administration of Keycloak authentication required actions
+* community\.general\.keycloak\_authz\_custom\_policy \- Allows administration of Keycloak client custom Javascript policies via Keycloak API
+* community\.general\.keycloak\_authz\_permission \- Allows administration of Keycloak client authorization permissions via Keycloak API
+* community\.general\.keycloak\_authz\_permission\_info \- Query Keycloak client authorization permissions information
+* community\.general\.keycloak\_realm\_key \- Allows administration of Keycloak realm keys via Keycloak API
+* community\.general\.keycloak\_user \- Create and configure a user in Keycloak
+* community\.general\.lvg\_rename \- Renames LVM volume groups
+* community\.general\.pnpm \- Manage node\.js packages with pnpm
+* community\.general\.proxmox\_pool \- Pool management for Proxmox VE cluster
+* community\.general\.proxmox\_pool\_member \- Add or delete members from Proxmox VE cluster pools
+* community\.general\.proxmox\_vm\_info \- Retrieve information about one or more Proxmox VE virtual machines
+* community\.general\.simpleinit\_msb \- Manage services on Source Mage GNU/Linux
