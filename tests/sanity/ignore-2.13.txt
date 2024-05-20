@@ -1,4 +1,5 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
+plugins/callback/yaml.py validate-modules:invalid-documentation
 plugins/lookup/etcd.py validate-modules:invalid-documentation
 plugins/lookup/etcd3.py validate-modules:invalid-documentation
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
