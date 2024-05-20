@@ -19,6 +19,16 @@ DOCUMENTATION = '''
       - default_callback
     requirements:
       - set as stdout in configuration
+    seealso:
+      - plugin: ansible.builtin.default
+        plugin_type: callback
+        description: >
+          There is a parameter O(ansible.builtin.default#callback:result_format) in P(ansible.builtin.default#callback)
+          that allows you to change the output format to YAML.
+    notes:
+      - >
+        With ansible-core 2.13 or newer, you can instead specify V(yaml) for the parameter O(ansible.builtin.default#callback:result_format)
+        in P(ansible.builtin.default#callback).
 '''
 
 import yaml
