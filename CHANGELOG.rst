@@ -58,7 +58,7 @@ Bugfixes
 New Modules
 -----------
 
-- keycloak_client_rolescope - Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other specific client applications.
+- community.general.keycloak_client_rolescope - Allows administration of Keycloak client roles scope to restrict the usage of certain roles to a other specific client applications.
 
 v8.5.0
 ======
@@ -103,7 +103,7 @@ Bugfixes
 New Modules
 -----------
 
-- usb_facts - Allows listing information about USB devices
+- community.general.usb_facts - Allows listing information about USB devices
 
 v8.4.0
 ======
@@ -145,21 +145,21 @@ New Plugins
 Callback
 ~~~~~~~~
 
-- default_without_diff - The default ansible callback without diff output
+- community.general.default_without_diff - The default ansible callback without diff output
 
 Filter
 ~~~~~~
 
-- lists_difference - Difference of lists with a predictive order
-- lists_intersect - Intersection of lists with a predictive order
-- lists_symmetric_difference - Symmetric Difference of lists with a predictive order
-- lists_union - Union of lists with a predictive order
+- community.general.lists_difference - Difference of lists with a predictive order
+- community.general.lists_intersect - Intersection of lists with a predictive order
+- community.general.lists_symmetric_difference - Symmetric Difference of lists with a predictive order
+- community.general.lists_union - Union of lists with a predictive order
 
 New Modules
 -----------
 
-- gitlab_group_access_token - Manages GitLab group access tokens
-- gitlab_project_access_token - Manages GitLab project access tokens
+- community.general.gitlab_group_access_token - Manages GitLab group access tokens
+- community.general.gitlab_project_access_token - Manages GitLab project access tokens
 
 v8.3.0
 ======
@@ -201,12 +201,12 @@ Bugfixes
 New Modules
 -----------
 
-- consul_acl_bootstrap - Bootstrap ACLs in Consul
-- consul_auth_method - Manipulate Consul auth methods
-- consul_binding_rule - Manipulate Consul binding rules
-- consul_token - Manipulate Consul tokens
-- gitlab_label - Creates/updates/deletes GitLab Labels belonging to project or group.
-- gitlab_milestone - Creates/updates/deletes GitLab Milestones belonging to project or group
+- community.general.consul_acl_bootstrap - Bootstrap ACLs in Consul
+- community.general.consul_auth_method - Manipulate Consul auth methods
+- community.general.consul_binding_rule - Manipulate Consul binding rules
+- community.general.consul_token - Manipulate Consul tokens
+- community.general.gitlab_label - Creates/updates/deletes GitLab Labels belonging to project or group.
+- community.general.gitlab_milestone - Creates/updates/deletes GitLab Milestones belonging to project or group
 
 v8.2.0
 ======
@@ -247,27 +247,27 @@ New Plugins
 Connection
 ~~~~~~~~~~
 
-- incus - Run tasks in Incus instances via the Incus CLI.
+- community.general.incus - Run tasks in Incus instances via the Incus CLI.
 
 Filter
 ~~~~~~
 
-- from_ini - Converts INI text input into a dictionary
-- to_ini - Converts a dictionary to the INI file format
+- community.general.from_ini - Converts INI text input into a dictionary
+- community.general.to_ini - Converts a dictionary to the INI file format
 
 Lookup
 ~~~~~~
 
-- github_app_access_token - Obtain short-lived Github App Access tokens
+- community.general.github_app_access_token - Obtain short-lived Github App Access tokens
 
 New Modules
 -----------
 
-- dnf_config_manager - Enable or disable dnf repositories using config-manager
-- keycloak_component_info - Retrive component info in Keycloak
-- keycloak_realm_rolemapping - Allows administration of Keycloak realm role mappings into groups with the Keycloak API
-- proxmox_node_info - Retrieve information about one or more Proxmox VE nodes
-- proxmox_storage_contents_info - List content from a Proxmox VE storage
+- community.general.dnf_config_manager - Enable or disable dnf repositories using config-manager
+- community.general.keycloak_component_info - Retrive component info in Keycloak
+- community.general.keycloak_realm_rolemapping - Allows administration of Keycloak realm role mappings into groups with the Keycloak API
+- community.general.proxmox_node_info - Retrieve information about one or more Proxmox VE nodes
+- community.general.proxmox_storage_contents_info - List content from a Proxmox VE storage
 
 v8.1.0
 ======
@@ -338,19 +338,19 @@ New Plugins
 Lookup
 ~~~~~~
 
-- onepassword_doc - Fetch documents stored in 1Password
+- community.general.onepassword_doc - Fetch documents stored in 1Password
 
 Test
 ~~~~
 
-- fqdn_valid - Validates fully-qualified domain names against RFC 1123
+- community.general.fqdn_valid - Validates fully-qualified domain names against RFC 1123
 
 New Modules
 -----------
 
-- git_config_info - Read git configuration
-- gitlab_issue - Create, update, or delete GitLab issues
-- nomad_token - Manage Nomad ACL tokens
+- community.general.git_config_info - Read git configuration
+- community.general.gitlab_issue - Create, update, or delete GitLab issues
+- community.general.nomad_token - Manage Nomad ACL tokens
 
 v8.0.2
 ======
@@ -684,27 +684,27 @@ New Plugins
 Lookup
 ~~~~~~
 
-- bitwarden_secrets_manager - Retrieve secrets from Bitwarden Secrets Manager
+- community.general.bitwarden_secrets_manager - Retrieve secrets from Bitwarden Secrets Manager
 
 New Modules
 -----------
 
-- consul_policy - Manipulate Consul policies
-- consul_role - Manipulate Consul roles
-- facter_facts - Runs the discovery program C(facter) on the remote system and return Ansible facts
-- gio_mime - Set default handler for MIME type, for applications using Gnome GIO
-- gitlab_instance_variable - Creates, updates, or deletes GitLab instance variables
-- gitlab_merge_request - Create, update, or delete GitLab merge requests
-- jenkins_build_info - Get information about Jenkins builds
-- keycloak_authentication_required_actions - Allows administration of Keycloak authentication required actions
-- keycloak_authz_custom_policy - Allows administration of Keycloak client custom Javascript policies via Keycloak API
-- keycloak_authz_permission - Allows administration of Keycloak client authorization permissions via Keycloak API
-- keycloak_authz_permission_info - Query Keycloak client authorization permissions information
-- keycloak_realm_key - Allows administration of Keycloak realm keys via Keycloak API
-- keycloak_user - Create and configure a user in Keycloak
-- lvg_rename - Renames LVM volume groups
-- pnpm - Manage node.js packages with pnpm
-- proxmox_pool - Pool management for Proxmox VE cluster
-- proxmox_pool_member - Add or delete members from Proxmox VE cluster pools
-- proxmox_vm_info - Retrieve information about one or more Proxmox VE virtual machines
-- simpleinit_msb - Manage services on Source Mage GNU/Linux
+- community.general.consul_policy - Manipulate Consul policies
+- community.general.consul_role - Manipulate Consul roles
+- community.general.facter_facts - Runs the discovery program C(facter) on the remote system and return Ansible facts
+- community.general.gio_mime - Set default handler for MIME type, for applications using Gnome GIO
+- community.general.gitlab_instance_variable - Creates, updates, or deletes GitLab instance variables
+- community.general.gitlab_merge_request - Create, update, or delete GitLab merge requests
+- community.general.jenkins_build_info - Get information about Jenkins builds
+- community.general.keycloak_authentication_required_actions - Allows administration of Keycloak authentication required actions
+- community.general.keycloak_authz_custom_policy - Allows administration of Keycloak client custom Javascript policies via Keycloak API
+- community.general.keycloak_authz_permission - Allows administration of Keycloak client authorization permissions via Keycloak API
+- community.general.keycloak_authz_permission_info - Query Keycloak client authorization permissions information
+- community.general.keycloak_realm_key - Allows administration of Keycloak realm keys via Keycloak API
+- community.general.keycloak_user - Create and configure a user in Keycloak
+- community.general.lvg_rename - Renames LVM volume groups
+- community.general.pnpm - Manage node.js packages with pnpm
+- community.general.proxmox_pool - Pool management for Proxmox VE cluster
+- community.general.proxmox_pool_member - Add or delete members from Proxmox VE cluster pools
+- community.general.proxmox_vm_info - Retrieve information about one or more Proxmox VE virtual machines
+- community.general.simpleinit_msb - Manage services on Source Mage GNU/Linux
