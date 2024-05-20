@@ -54,6 +54,12 @@ options:
       - Refresh publishers before execution.
     type: bool
     default: true
+  verbose:
+    description:
+      - Set to V(true) to disable quiet execution.
+    type: bool
+    default: false
+    version_added: 9.0.0
 '''
 EXAMPLES = '''
 - name: Install Vim
@@ -90,6 +96,7 @@ def main():
             accept_licenses=dict(type='bool', default=False, aliases=['accept', 'accept_licences']),
             be_name=dict(type='str'),
             refresh=dict(type='bool', default=True),
+            verbose=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -156,9 +163,15 @@ def ensure(module, state, packages, params):
     else:
         no_refresh = ['--no-refresh']
 
+    if params['verbose']:
+        verbosity = []
+    else:
+        verbosity = ['-q']
+
     to_modify = list(filter(behaviour[state]['filter'], packages))
     if to_modify:
-        rc, out, err = module.run_command(['pkg', behaviour[state]['subcommand']] + dry_run + accept_licenses + beadm + no_refresh + ['-q', '--'] + to_modify)
+        rc, out, err = module.run_command(
+            ['pkg', behaviour[state]['subcommand']] + dry_run + accept_licenses + beadm + no_refresh + verbosity + ['--'] + to_modify)
         response['rc'] = rc
         response['results'].append(out)
         response['msg'] += err
