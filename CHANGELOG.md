@@ -290,11 +290,11 @@ with major version 7 will be bugfix releases 7\.5\.y\.
 <a id="new-modules"></a>
 ### New Modules
 
-* consul\_role \- Manipulate Consul roles
-* gio\_mime \- Set default handler for MIME type\, for applications using Gnome GIO
-* keycloak\_authz\_custom\_policy \- Allows administration of Keycloak client custom Javascript policies via Keycloak API
-* keycloak\_realm\_key \- Allows administration of Keycloak realm keys via Keycloak API
-* simpleinit\_msb \- Manage services on Source Mage GNU/Linux
+* community\.general\.consul\_role \- Manipulate Consul roles
+* community\.general\.gio\_mime \- Set default handler for MIME type\, for applications using Gnome GIO
+* community\.general\.keycloak\_authz\_custom\_policy \- Allows administration of Keycloak client custom Javascript policies via Keycloak API
+* community\.general\.keycloak\_realm\_key \- Allows administration of Keycloak realm keys via Keycloak API
+* community\.general\.simpleinit\_msb \- Manage services on Source Mage GNU/Linux
 
 <a id="v7-4-0"></a>
 ## v7\.4\.0
@@ -334,8 +334,8 @@ Bugfix and feature release\.
 <a id="new-modules-1"></a>
 ### New Modules
 
-* jenkins\_build\_info \- Get information about Jenkins builds
-* pnpm \- Manage node\.js packages with pnpm
+* community\.general\.jenkins\_build\_info \- Get information about Jenkins builds
+* community\.general\.pnpm \- Manage node\.js packages with pnpm
 
 <a id="v7-3-0"></a>
 ## v7\.3\.0
@@ -484,15 +484,15 @@ Regular bugfix and feature release\.
 <a id="lookup"></a>
 #### Lookup
 
-* bitwarden\_secrets\_manager \- Retrieve secrets from Bitwarden Secrets Manager
+* community\.general\.bitwarden\_secrets\_manager \- Retrieve secrets from Bitwarden Secrets Manager
 
 <a id="new-modules-2"></a>
 ### New Modules
 
-* consul\_policy \- Manipulate Consul policies
-* keycloak\_authz\_permission \- Allows administration of Keycloak client authorization permissions via Keycloak API
-* keycloak\_authz\_permission\_info \- Query Keycloak client authorization permissions information
-* proxmox\_vm\_info \- Retrieve information about one or more Proxmox VE virtual machines
+* community\.general\.consul\_policy \- Manipulate Consul policies
+* community\.general\.keycloak\_authz\_permission \- Allows administration of Keycloak client authorization permissions via Keycloak API
+* community\.general\.keycloak\_authz\_permission\_info \- Query Keycloak client authorization permissions information
+* community\.general\.proxmox\_vm\_info \- Retrieve information about one or more Proxmox VE virtual machines
 
 <a id="v7-1-0"></a>
 ## v7\.1\.0
@@ -605,13 +605,13 @@ for the rendered HTML version of the documentation of the latest release\.
 <a id="new-modules-3"></a>
 ### New Modules
 
-* gitlab\_instance\_variable \- Creates\, updates\, or deletes GitLab instance variables
-* gitlab\_merge\_request \- Create\, update\, or delete GitLab merge requests
-* keycloak\_authentication\_required\_actions \- Allows administration of Keycloak authentication required actions
-* keycloak\_user \- Create and configure a user in Keycloak
-* lvg\_rename \- Renames LVM volume groups
-* proxmox\_pool \- Pool management for Proxmox VE cluster
-* proxmox\_pool\_member \- Add or delete members from Proxmox VE cluster pools
+* community\.general\.gitlab\_instance\_variable \- Creates\, updates\, or deletes GitLab instance variables
+* community\.general\.gitlab\_merge\_request \- Create\, update\, or delete GitLab merge requests
+* community\.general\.keycloak\_authentication\_required\_actions \- Allows administration of Keycloak authentication required actions
+* community\.general\.keycloak\_user \- Create and configure a user in Keycloak
+* community\.general\.lvg\_rename \- Renames LVM volume groups
+* community\.general\.proxmox\_pool \- Pool management for Proxmox VE cluster
+* community\.general\.proxmox\_pool\_member \- Add or delete members from Proxmox VE cluster pools
 
 <a id="v7-0-1"></a>
 ## v7\.0\.1
@@ -933,20 +933,20 @@ This is release 7\.0\.0 of <code>community\.general</code>\, released on 2023\-0
 <a id="lookup-1"></a>
 #### Lookup
 
-* merge\_variables \- merge variables with a certain suffix
+* community\.general\.merge\_variables \- merge variables with a certain suffix
 
 <a id="new-modules-4"></a>
 ### New Modules
 
-* btrfs\_info \- Query btrfs filesystem info
-* btrfs\_subvolume \- Manage btrfs subvolumes
-* gitlab\_project\_badge \- Manage project badges on GitLab Server
-* ilo\_redfish\_command \- Manages Out\-Of\-Band controllers using Redfish APIs
-* ipbase\_info \- Retrieve IP geolocation and other facts of a host\'s IP address using the ipbase\.com API
-* kdeconfig \- Manage KDE configuration files
-* keycloak\_authz\_authorization\_scope \- Allows administration of Keycloak client authorization scopes via Keycloak API
-* keycloak\_clientscope\_type \- Set the type of aclientscope in realm or client via Keycloak API
-* keycloak\_clientsecret\_info \- Retrieve client secret via Keycloak API
-* keycloak\_clientsecret\_regenerate \- Regenerate Keycloak client secret via Keycloak API
-* ocapi\_command \- Manages Out\-Of\-Band controllers using Open Composable API \(OCAPI\)
-* ocapi\_info \- Manages Out\-Of\-Band controllers using Open Composable API \(OCAPI\)
+* community\.general\.btrfs\_info \- Query btrfs filesystem info
+* community\.general\.btrfs\_subvolume \- Manage btrfs subvolumes
+* community\.general\.gitlab\_project\_badge \- Manage project badges on GitLab Server
+* community\.general\.ilo\_redfish\_command \- Manages Out\-Of\-Band controllers using Redfish APIs
+* community\.general\.ipbase\_info \- Retrieve IP geolocation and other facts of a host\'s IP address using the ipbase\.com API
+* community\.general\.kdeconfig \- Manage KDE configuration files
+* community\.general\.keycloak\_authz\_authorization\_scope \- Allows administration of Keycloak client authorization scopes via Keycloak API
+* community\.general\.keycloak\_clientscope\_type \- Set the type of aclientscope in realm or client via Keycloak API
+* community\.general\.keycloak\_clientsecret\_info \- Retrieve client secret via Keycloak API
+* community\.general\.keycloak\_clientsecret\_regenerate \- Regenerate Keycloak client secret via Keycloak API
+* community\.general\.ocapi\_command \- Manages Out\-Of\-Band controllers using Open Composable API \(OCAPI\)
+* community\.general\.ocapi\_info \- Manages Out\-Of\-Band controllers using Open Composable API \(OCAPI\)
