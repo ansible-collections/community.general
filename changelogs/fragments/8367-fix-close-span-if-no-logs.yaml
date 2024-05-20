@@ -1,2 +1,0 @@
-bugfixes:
-  - "opentelemetry callback plugin - close spans always (https://github.com/ansible-collections/community.general/pull/8367)."

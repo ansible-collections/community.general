@@ -6,6 +6,27 @@ Community General Release Notes
 
 This changelog describes changes after version 7.0.0.
 
+v8.6.1
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Security Fixes
+--------------
+
+- keycloak_identity_provider - the client secret was not correctly sanitized by the module. The return values ``proposed``, ``existing``, and ``end_state``, as well as the diff, did contain the client secret unmasked (https://github.com/ansible-collections/community.general/pull/8355).
+
+Bugfixes
+--------
+
+- keycloak_user_federation - fix diff of empty ``krbPrincipalAttribute`` (https://github.com/ansible-collections/community.general/pull/8320).
+- merge_variables lookup plugin - fixing cross host merge: providing access to foreign hosts variables to the perspective of the host that is performing the merge (https://github.com/ansible-collections/community.general/pull/8303).
+- opentelemetry callback plugin - close spans always (https://github.com/ansible-collections/community.general/pull/8367).
+- opentelemetry callback plugin - honour the ``disable_logs`` option to avoid storing task results since they are not used regardless (https://github.com/ansible-collections/community.general/pull/8373).
+
 v8.6.0
 ======
 
