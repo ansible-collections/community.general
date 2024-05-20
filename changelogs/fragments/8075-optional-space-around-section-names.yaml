@@ -1,2 +1,0 @@
-minor_changes:
-  - "ini_file - support optional spaces between section names and their surrounding brackets (https://github.com/ansible-collections/community.general/pull/8075)."

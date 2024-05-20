@@ -1,2 +1,0 @@
-minor_changes:
-  - terraform - add support for ``diff_mode`` for terraform resource_changes (https://github.com/ansible-collections/community.general/pull/7896).

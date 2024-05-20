@@ -1,2 +1,0 @@
-minor_changes:
-  - gitlab_runner - add support for new runner creation workflow (https://github.com/ansible-collections/community.general/pull/7199).

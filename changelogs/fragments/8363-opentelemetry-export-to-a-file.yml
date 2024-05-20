@@ -1,2 +1,0 @@
-minor_changes:
-  - opentelemetry - add support for exporting spans in a file via ``ANSIBLE_OPENTELEMETRY_STORE_SPANS_IN_FILE`` (https://github.com/ansible-collections/community.general/issues/7888, https://github.com/ansible-collections/community.general/pull/8363).

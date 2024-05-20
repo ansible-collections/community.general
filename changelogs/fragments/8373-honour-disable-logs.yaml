@@ -1,3 +1,0 @@
-bugfixes:
-  - opentelemetry callback plugin - honour the ``disable_logs`` option to avoid storing task results since they are not used regardless (https://github.com/ansible-collections/community.general/pull/8373).
-    

@@ -1,2 +1,0 @@
-bugfixes:
-  - "apt_rpm - when checking whether packages were installed after running ``apt-get -y install <packages>``, only the last package name was checked (https://github.com/ansible-collections/community.general/pull/8263)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - rundeck module utils - allow to pass ``Content-Type`` to API requests (https://github.com/ansible-collections/community.general/pull/7684).

@@ -1,3 +1,0 @@
-minor_changes:
-  - "Use offset-aware ``datetime.datetime`` objects (with timezone UTC) instead of offset-naive UTC timestamps,
-     which are deprecated in Python 3.12 (https://github.com/ansible-collections/community.general/pull/8222)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_command - add command ``ResetToDefaults`` to reset manager to default state (https://github.com/ansible-collections/community.general/issues/8163).

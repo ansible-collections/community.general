@@ -1,2 +1,0 @@
-bugfixes:
-  - "gitlab_issue, gitlab_label, gitlab_milestone - avoid crash during version comparison when the python-gitlab Python module is not installed (https://github.com/ansible-collections/community.general/pull/8158)."

@@ -1,2 +1,0 @@
-bugfixes:
-  - keycloak_user_federation - fix diff of empty ``krbPrincipalAttribute`` (https://github.com/ansible-collections/community.general/pull/8320).

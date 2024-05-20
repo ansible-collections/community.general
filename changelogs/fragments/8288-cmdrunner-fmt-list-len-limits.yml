@@ -1,2 +1,0 @@
-minor_changes:
-  - cmd_runner module_utils - add validation for minimum and maximum length in the value passed to ``cmd_runner_fmt.as_list()`` (https://github.com/ansible-collections/community.general/pull/8288).

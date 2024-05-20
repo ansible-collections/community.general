@@ -1,2 +1,0 @@
-minor_changes:
-  - puppet - new feature to set ``--waitforlock`` option (https://github.com/ansible-collections/community.general/pull/8282).
