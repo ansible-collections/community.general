@@ -222,11 +222,11 @@ Bugfixes
 New Modules
 -----------
 
-- consul_role - Manipulate Consul roles
-- gio_mime - Set default handler for MIME type, for applications using Gnome GIO
-- keycloak_authz_custom_policy - Allows administration of Keycloak client custom Javascript policies via Keycloak API
-- keycloak_realm_key - Allows administration of Keycloak realm keys via Keycloak API
-- simpleinit_msb - Manage services on Source Mage GNU/Linux
+- community.general.consul_role - Manipulate Consul roles
+- community.general.gio_mime - Set default handler for MIME type, for applications using Gnome GIO
+- community.general.keycloak_authz_custom_policy - Allows administration of Keycloak client custom Javascript policies via Keycloak API
+- community.general.keycloak_realm_key - Allows administration of Keycloak realm keys via Keycloak API
+- community.general.simpleinit_msb - Manage services on Source Mage GNU/Linux
 
 v7.4.0
 ======
@@ -266,8 +266,8 @@ Bugfixes
 New Modules
 -----------
 
-- jenkins_build_info - Get information about Jenkins builds
-- pnpm - Manage node.js packages with pnpm
+- community.general.jenkins_build_info - Get information about Jenkins builds
+- community.general.pnpm - Manage node.js packages with pnpm
 
 v7.3.0
 ======
@@ -416,15 +416,15 @@ New Plugins
 Lookup
 ~~~~~~
 
-- bitwarden_secrets_manager - Retrieve secrets from Bitwarden Secrets Manager
+- community.general.bitwarden_secrets_manager - Retrieve secrets from Bitwarden Secrets Manager
 
 New Modules
 -----------
 
-- consul_policy - Manipulate Consul policies
-- keycloak_authz_permission - Allows administration of Keycloak client authorization permissions via Keycloak API
-- keycloak_authz_permission_info - Query Keycloak client authorization permissions information
-- proxmox_vm_info - Retrieve information about one or more Proxmox VE virtual machines
+- community.general.consul_policy - Manipulate Consul policies
+- community.general.keycloak_authz_permission - Allows administration of Keycloak client authorization permissions via Keycloak API
+- community.general.keycloak_authz_permission_info - Query Keycloak client authorization permissions information
+- community.general.proxmox_vm_info - Retrieve information about one or more Proxmox VE virtual machines
 
 v7.1.0
 ======
@@ -538,13 +538,13 @@ Known Issues
 New Modules
 -----------
 
-- gitlab_instance_variable - Creates, updates, or deletes GitLab instance variables
-- gitlab_merge_request - Create, update, or delete GitLab merge requests
-- keycloak_authentication_required_actions - Allows administration of Keycloak authentication required actions
-- keycloak_user - Create and configure a user in Keycloak
-- lvg_rename - Renames LVM volume groups
-- proxmox_pool - Pool management for Proxmox VE cluster
-- proxmox_pool_member - Add or delete members from Proxmox VE cluster pools
+- community.general.gitlab_instance_variable - Creates, updates, or deletes GitLab instance variables
+- community.general.gitlab_merge_request - Create, update, or delete GitLab merge requests
+- community.general.keycloak_authentication_required_actions - Allows administration of Keycloak authentication required actions
+- community.general.keycloak_user - Create and configure a user in Keycloak
+- community.general.lvg_rename - Renames LVM volume groups
+- community.general.proxmox_pool - Pool management for Proxmox VE cluster
+- community.general.proxmox_pool_member - Add or delete members from Proxmox VE cluster pools
 
 v7.0.1
 ======
@@ -866,20 +866,20 @@ New Plugins
 Lookup
 ~~~~~~
 
-- merge_variables - merge variables with a certain suffix
+- community.general.merge_variables - merge variables with a certain suffix
 
 New Modules
 -----------
 
-- btrfs_info - Query btrfs filesystem info
-- btrfs_subvolume - Manage btrfs subvolumes
-- gitlab_project_badge - Manage project badges on GitLab Server
-- ilo_redfish_command - Manages Out-Of-Band controllers using Redfish APIs
-- ipbase_info - Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API
-- kdeconfig - Manage KDE configuration files
-- keycloak_authz_authorization_scope - Allows administration of Keycloak client authorization scopes via Keycloak API
-- keycloak_clientscope_type - Set the type of aclientscope in realm or client via Keycloak API
-- keycloak_clientsecret_info - Retrieve client secret via Keycloak API
-- keycloak_clientsecret_regenerate - Regenerate Keycloak client secret via Keycloak API
-- ocapi_command - Manages Out-Of-Band controllers using Open Composable API (OCAPI)
-- ocapi_info - Manages Out-Of-Band controllers using Open Composable API (OCAPI)
+- community.general.btrfs_info - Query btrfs filesystem info
+- community.general.btrfs_subvolume - Manage btrfs subvolumes
+- community.general.gitlab_project_badge - Manage project badges on GitLab Server
+- community.general.ilo_redfish_command - Manages Out-Of-Band controllers using Redfish APIs
+- community.general.ipbase_info - Retrieve IP geolocation and other facts of a host's IP address using the ipbase.com API
+- community.general.kdeconfig - Manage KDE configuration files
+- community.general.keycloak_authz_authorization_scope - Allows administration of Keycloak client authorization scopes via Keycloak API
+- community.general.keycloak_clientscope_type - Set the type of aclientscope in realm or client via Keycloak API
+- community.general.keycloak_clientsecret_info - Retrieve client secret via Keycloak API
+- community.general.keycloak_clientsecret_regenerate - Regenerate Keycloak client secret via Keycloak API
+- community.general.ocapi_command - Manages Out-Of-Band controllers using Open Composable API (OCAPI)
+- community.general.ocapi_info - Manages Out-Of-Band controllers using Open Composable API (OCAPI)
