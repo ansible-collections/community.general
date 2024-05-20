@@ -6,6 +6,35 @@ Community General Release Notes
 
 This changelog describes changes after version 6.0.0.
 
+v7.5.8
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Note that this is the last regular bugfix release. From now on, the 7.x.y release train
+will only receive major and security bugfixes.
+
+Minor Changes
+-------------
+
+- gitlab_deploy_key, gitlab_group_members, gitlab_group_variable, gitlab_hook, gitlab_instance_variable, gitlab_project_badge, gitlab_project_variable, gitlab_user - improve API pagination and compatibility with different versions of ``python-gitlab`` (https://github.com/ansible-collections/community.general/pull/7790).
+
+Security Fixes
+--------------
+
+- keycloak_identity_provider - the client secret was not correctly sanitized by the module. The return values ``proposed``, ``existing``, and ``end_state``, as well as the diff, did contain the client secret unmasked (https://github.com/ansible-collections/community.general/pull/8355).
+
+Bugfixes
+--------
+
+- gitlab_runner - fix pagination when checking for existing runners (https://github.com/ansible-collections/community.general/pull/7790).
+- keycloak_user_federation - fix diff of empty ``krbPrincipalAttribute`` (https://github.com/ansible-collections/community.general/pull/8320).
+- opentelemetry callback plugin - close spans always (https://github.com/ansible-collections/community.general/pull/8367).
+- opentelemetry callback plugin - honour the ``disable_logs`` option to avoid storing task results since they are not used regardless (https://github.com/ansible-collections/community.general/pull/8373).
+
 v7.5.7
 ======
 
