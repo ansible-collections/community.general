@@ -24,7 +24,7 @@ attributes:
     check_mode:
         support: full
     diff_mode:
-        support: none
+        support: partial
 options:
     name:
         description:
@@ -78,6 +78,7 @@ options:
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the O(name) option.
+  - Diff mode is not supported in check mode
 '''
 
 EXAMPLES = '''
@@ -157,6 +158,20 @@ def execute_command(cmd, module):
     # ansible is using a TERM that the managed machine does not know about,
     # e.g.: "No progress meter: failed termcap lookup on xterm-kitty".
     return module.run_command(cmd_args, environ_update={'TERM': 'dumb'})
+
+
+def get_all_installed(module):
+    """
+    Get all installed packaged. Used to support diff mode
+    """
+    command = 'pkg_info -Iq'
+
+    rc, stdout, stderr = execute_command(command, module)
+
+    if stderr:
+       module.fail_json(msg="failed in get_all_installed(): " + stderr)
+
+    return stdout
 
 
 # Function used to find out if a package is currently installed.
@@ -573,9 +588,12 @@ def main():
     result['name'] = name
     result['state'] = state
     result['build'] = build
+    result['diff'] = {}
 
     # The data structure used to keep track of package information.
     pkg_spec = {}
+
+    new_package_list = original_package_list = get_all_installed(module)
 
     if build is True:
         if not os.path.isdir(ports_dir):
@@ -660,6 +678,10 @@ def main():
         module.fail_json(msg=combined_error_message, **result)
 
     result['changed'] = combined_changed
+
+    if result['changed'] and not module.check_mode:
+        new_package_list = get_all_installed(module)
+        result['diff'] = dict(before=original_package_list, after=new_package_list)
 
     module.exit_json(**result)
 
