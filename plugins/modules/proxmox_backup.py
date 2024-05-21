@@ -156,6 +156,7 @@ options:
   repeat_missed:
     description:
       - If V(true), the job will be run as soon as possible if it was missed while the scheduler was not running.
+    type: bool
   schedule:
     description:
       - Backup schedule. The format is a subset of `systemd` calendar events.
@@ -600,12 +601,10 @@ def proxmox_backup_argument_spec():
             'required': True
         },
         'all': {
-            'type': 'bool',
-            'default': False
+            'type': 'bool'
         },
         'bwlimit': {
-            'type': 'int',
-            'default': 0
+            'type': 'int'
         },
         'comment': {
             'type': 'str'
@@ -615,15 +614,13 @@ def proxmox_backup_argument_spec():
             'choices': ['gzip', 'lzo', 'zstd']
         },
         'dow': {
-            'type': 'str',
-            'default': "mon,tue,wed,thu,fri,sat,sun"
+            'type': 'str'
         },
         'dumpdir': {
             'type': 'str'
         },
         'enabled': {
-            'type': 'bool',
-            'default': True
+            'type': 'bool'
         },
         'exclude': {
             'type': 'str'
@@ -639,17 +636,14 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'ionice': {
-            'type': 'int',
-            'default': 7
+            'type': 'int'
         },
         'lockwait': {
-            'type': 'int',
-            'default': 180
+            'type': 'int'
         },
         'mailnotification': {
             'type': 'str',
-            'choices': ['always', 'failure'],
-            'default': 'always'
+            'choices': ['always', 'failure']
         },
         'mailto': {
             'type': 'str'
@@ -659,8 +653,7 @@ def proxmox_backup_argument_spec():
         },
         'mode': {
             'type': 'str',
-            'choices': ['snapshot', 'suspend', 'stop'],
-            'default': 'snapshot'
+            'choices': ['snapshot', 'suspend', 'stop']
         },
         'node': {
             'type': 'str'
@@ -672,8 +665,7 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'pigz': {
-            'type': 'int',
-            'default': 0
+            'type': 'int'
         },
         'pool': {
             'type': 'str'
@@ -682,20 +674,16 @@ def proxmox_backup_argument_spec():
             'type': 'bool'
         },
         'prune_backups': {
-            'type': 'str',
-            'default': 'keep-all=1'
+            'type': 'str'
         },
         'quiet': {
-            'type': 'bool',
-            'default': False
+            'type': 'bool'
         },
         'remove': {
-            'type': 'bool',
-            'default': True
+            'type': 'bool'
         },
         'repeat_missed': {
-            'type': 'bool',
-            'default': False
+            'type': 'bool'
         },
         'schedule': {
             'type': 'str'
@@ -707,16 +695,13 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'stdexcludes': {
-            'type': 'bool',
-            'default': True
+            'type': 'bool'
         },
         'stop': {
-            'type': 'bool',
-            'default': False
+            'type': 'bool'
         },
         'stopwait': {
-            'type': 'int',
-            'default': 10
+            'type': 'int'
         },
         'storage': {
             'type': 'str'
@@ -728,8 +713,7 @@ def proxmox_backup_argument_spec():
             'type': 'str'
         },
         'zstd': {
-            'type': 'int',
-            'default': 1
+            'type': 'int'
         }
     }
 
