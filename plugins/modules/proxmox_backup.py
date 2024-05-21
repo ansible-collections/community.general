@@ -11,8 +11,8 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: proxmox_backup
-short_description: Get, delete, create or update Proxmox VE backup jobs.
-version_added: 8.2.0
+short_description: Create, delete, or update Proxmox VE backup jobs
+version_added: 9.1.0
 description:
   - Allows you to perform some supported operations on a backup job in a Proxmox VE cluster.
 author: Dylan Leverrier (@zerchevack)
@@ -21,42 +21,38 @@ attributes:
     support: full
   diff_mode:
     support: full
-  action_group:
-    version_added: 9.0.0
 options:
   state:
     description:
-      - Set to present to create or update job.
-      - Set to absent to delete job.
+      - Set to V(present) to create or update job.
+      - Set to V(absent) to delete job.
     choices: ['present', 'absent']
     type: str
     required: true
   all:
     description:
       - Backup all known guest systems on this host.
-      - Can not be use with vmid and pool in same job
+      - Can not be use with O(vmid) and O(pool) in same job
     type: bool
-    default: 0
   bwlimit:
     description:
       - Limit I/O bandwidth (in KiB/s).
     type: int
-    default: 0
   comment:
     description:
       - Description for the Job.
     type: str
   compress:
     description:
-      - Compress dump file.
-    choices: ['0', '1', 'gzip', 'lzo', 'zstd']
+      - >
+        If you choice a renote storage (like Proxmox Backup Server storage) the V(zstd) will be set automatically and this the only available value.
+        If you choice a local storage you can choice between V(gzip), V(lzo) and V(zstd).
+    choices: ['gzip', 'lzo', 'zstd']
     type: str
-    default: "0"
   dow:
     description:
       - Day of week selection.
     type: str
-    default: "mon,tue,wed,thu,fri,sat,sun"
   dumpdir:
     description:
       - Store resulting files to specified directory.
@@ -65,7 +61,6 @@ options:
     description:
       - Enable or disable the job.
     type: bool
-    default: 1
   exclude:
     description:
       - Exclude specified guest systems (assumes --all)
@@ -84,12 +79,9 @@ options:
     type: str
   id:
     description:
-      - If state if list and you want to get properties of one job it needed,
-      - if it not set all jobs will be return.
-      - It needed if you state is delete.
-      - If state is present, it allow you to set a pattern of id,
-      - (Example backup-12345678-9123) if it not set an ID will be generate automaticly.
-      - If state is present and you want to update a existing job, it needed.
+      - Required if O(state=absent).
+      - If O(state=present), it allow you to set a pattern of id (Example 0(backup-12345678-9123)) if it not set an ID will be generate automaticly.
+      - Rerquired if O(state=present) and you want to update a existing job.
     type: str
   ionice:
     description:
@@ -98,18 +90,15 @@ options:
       - A value of 8 means the idle priority is used,
       - otherwise the best-effort priority is used with the specified value.
     type: int
-    default: 7
   lockwait:
     description:
       - Maximal time to wait for the global lock (minutes).
     type: int
-    default: 180
   mailnotification:
     description:
       - Specify when to send a notification mail
     choices: ['always', 'failure']
     type: str
-    default: always
   mailto:
     description:
       - Comma-separated list of email addresses or users that should receive email notifications.
@@ -123,7 +112,6 @@ options:
       - Backup mode.
     choices: ['snapshot', 'suspend', 'stop']
     type: str
-    default: snapshot
   node:
     description:
       - Only run if executed on this node.
@@ -132,8 +120,8 @@ options:
     description:
       - Template string for generating notes for the backup(s).
       - It can contain variables which will be replaced by their values.
-      - Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}},but more might be added in the future.
-      - Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.
+      - Currently supported are V({{cluster}}), V{({guestname}}), V({{node}}), and V({{vmid}}),but more might be added in the future.
+      - Needs to be a single line, newline and backslash need to be escaped.
     type: str
   performance:
     description:
@@ -141,10 +129,9 @@ options:
     type: str
   pigz:
     description:
-      - Use pigz instead of gzip when N>0.
-      - N=1 uses half of cores, N>1 uses N as thread count.
+      - Use pigz instead of gzip when V(N>0).
+      - V(N=1) uses half of cores, V(N>1) uses N as thread count.
     type: int
-    default: 0
   pool:
     description:
       - Backup all known guest systems included in the specified pool.
@@ -158,22 +145,17 @@ options:
     description:
       - Use these retention options instead of those from the storage configuration.
     type: str
-    default: keep-all=1
   quiet:
     description:
       - Be quiet.
     type: bool
-    default: 0
   remove:
     description:
       - Prune older backups according to 'prune-backups'.
     type: bool
-    default: 1
   repeat_missed:
     description:
-      - If true, the job will be run as soon as possible if it was missed while the scheduler was not running.
-    type: bool
-    default: 0
+      - If V(true), the job will be run as soon as possible if it was missed while the scheduler was not running.
   schedule:
     description:
       - Backup schedule. The format is a subset of `systemd` calendar events.
@@ -190,17 +172,14 @@ options:
     description:
       - Exclude temporary files and logs.
     type: bool
-    default: 1
   stop:
     description:
       - Stop running backup jobs on this host.
     type: bool
-    default: 0
   stopwait:
     description:
       - Maximal time to wait until a guest system is stopped (minutes).
     type: int
-    default: 10
   storage:
     description:
       - Store resulting file to this storage.
@@ -216,10 +195,9 @@ options:
     type: str
   zstd:
     description:
-      - Zstd threads. N=0 uses half of the available cores,
-      - if N is set to a value bigger than 0, N is used as thread count.
+      - Zstd threads. V(N=0) uses half of the available cores,
+      - if V(N) is set to a value bigger than V(0), V(N) is used as thread count.
     type: int
-    default: 1
 
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
@@ -230,65 +208,65 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: List all backup jobs
   community.general.proxmox_backup:
-  api_host: "node1"
-  api_user: user@realm
-  api_password: password
-  validate_certs: false
-  state: list
+    api_host: "node1"
+    api_user: user@realm
+    api_password: password
+    validate_certs: false
+    state: list
   register: backup_result
 
 - name: Show current backup job
   ansible.builtin.debug:
-  var: backup_result
+    var: backup_result
 
 - name: Create backup with id backup-20bad73a-d245
   community.general.proxmox_backup:
-  api_host: "node1"
-  api_token_id: "token_id"
-  api_token_secret: "token_secret"
-  validate_certs: false
-  id: "backup-20bad73a-d245"
-  vmid: "103"
-  mode: "snapshot"
-  mailnotification: "always"
-  mailto: "preprod@idnow.io"
-  repeat_missed: 0
-  enabled: 1
-  prune_backups:
-      keep_yearly: "6"
-      keep_weekly: "5"
-      keep_hourly: "4"
-      keep_daily: "2"
-      keep_last: "1"
-      keep_monthly: "3"
-  storage: "backup-idcheck-preprod-0"
-  schedule: "*-*-* 22:00:00"
-  state: present
+    api_host: "node1"
+    api_token_id: "token_id"
+    api_token_secret: "token_secret"
+    validate_certs: false
+    id: "backup-20bad73a-d245"
+    vmid: "103"
+    mode: "snapshot"
+    mailnotification: "always"
+    mailto: "preprod@idnow.io"
+    repeat_missed: 0
+    enabled: 1
+    prune_backups:
+        keep_yearly: "6"
+        keep_weekly: "5"
+        keep_hourly: "4"
+        keep_daily: "2"
+        keep_last: "1"
+        keep_monthly: "3"
+    storage: "backup-idcheck-preprod-0"
+    schedule: "*-*-* 22:00:00"
+    state: present
 
 - name: Delete backup job
   community.general.proxmox_backup:
-  api_host: "node1"
-  api_token_id: "token_id"
-  api_token_secret: "token_secret"
-  validate_certs: false
-  id: "backup-20bad73a-d245"
-  state: absent
+    api_host: "node1"
+    api_token_id: "token_id"
+    api_token_secret: "token_secret"
+    validate_certs: false
+    id: "backup-20bad73a-d245"
+    state: absent
 
 - name: Update backup with id backup-20bad73a-d245 (Change VM ID backuped)
   community.general.proxmox_backup:
-  api_host: "node1"
-  api_token_id: "token_id"
-  api_token_secret: "token_secret"
-  validate_certs: false
-  id: "backup-20bad73a-d245"
-  vmid: "111"
-  state: present
+    api_host: "node1"
+    api_token_id: "token_id"
+    api_token_secret: "token_secret"
+    validate_certs: false
+    id: "backup-20bad73a-d245"
+    vmid: "111"
+    state: present
 '''
 
 RETURN = '''
 proxmox_backup:
     description: List of Proxmox VE backup.
-    returned: always
+    returned: on success
     type: list
     elements: dict
     contains:
@@ -378,7 +356,7 @@ proxmox_backup:
         description:
           - Template string for generating notes for the backup(s).
           - It can contain variables which will be replaced by their values.
-          - Currently supported are {{cluster}}, {{guestname}}, {{node}} and {{vmid}}, but more might be added in the future.
+          - Currently supported are V({{cluster}}), V({{guestname}}), V({{node}}) and V({{vmid}}), but more might be added in the future.
           - Needs to be a single line, newline and backslash need to be escaped.
         returned: on success
         type: str
@@ -392,8 +370,8 @@ proxmox_backup:
       pigz:
         description:
           - >
-            Use pigz instead of gzip when N>0. N=1 uses half of cores,
-            N>1 uses N as thread count.
+            Use pigz instead of gzip when V(N>0). V(N=1) uses half of cores,
+            V(N>1) uses V(N) as thread count.
         returned: on success
         type: int
       pool:
@@ -623,7 +601,7 @@ def proxmox_backup_argument_spec():
         },
         'all': {
             'type': 'bool',
-            'default': 0
+            'default': False
         },
         'bwlimit': {
             'type': 'int',
@@ -634,8 +612,7 @@ def proxmox_backup_argument_spec():
         },
         'compress': {
             'type': 'str',
-            'choices': ['0', '1', 'gzip', 'lzo', 'zstd'],
-            'default': "0"
+            'choices': ['gzip', 'lzo', 'zstd']
         },
         'dow': {
             'type': 'str',
@@ -646,7 +623,7 @@ def proxmox_backup_argument_spec():
         },
         'enabled': {
             'type': 'bool',
-            'default': 1
+            'default': True
         },
         'exclude': {
             'type': 'str'
@@ -710,15 +687,15 @@ def proxmox_backup_argument_spec():
         },
         'quiet': {
             'type': 'bool',
-            'default': 0
+            'default': False
         },
         'remove': {
             'type': 'bool',
-            'default': 1
+            'default': True
         },
         'repeat_missed': {
             'type': 'bool',
-            'default': 0
+            'default': False
         },
         'schedule': {
             'type': 'str'
@@ -731,11 +708,11 @@ def proxmox_backup_argument_spec():
         },
         'stdexcludes': {
             'type': 'bool',
-            'default': 1
+            'default': True
         },
         'stop': {
             'type': 'bool',
-            'default': 0
+            'default': False
         },
         'stopwait': {
             'type': 'int',

@@ -14,6 +14,10 @@ action_groups:
     - consul_token
   proxmox:
     - proxmox
+<<<<<<< Updated upstream
+=======
+    - proxmox_backup
+>>>>>>> Stashed changes
     - proxmox_disk
     - proxmox_backup
     - proxmox_domain_info
