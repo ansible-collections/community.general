@@ -1,0 +1,2 @@
+minor_changes:
+    - openbsd_pkg - Adds diff support to show changes in installed package list
