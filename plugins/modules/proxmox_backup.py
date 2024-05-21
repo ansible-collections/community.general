@@ -685,6 +685,13 @@ def proxmox_backup_argument_spec():
         'repeat_missed': {
             'type': 'bool'
         },
+        'remove': {
+            'type': 'bool',
+            'default': True
+        },
+        'repeat_missed': {
+            'type': 'bool',
+        },
         'schedule': {
             'type': 'str'
         },
@@ -699,6 +706,9 @@ def proxmox_backup_argument_spec():
         },
         'stop': {
             'type': 'bool'
+        },
+        'stop': {
+            'type': 'bool',
         },
         'stopwait': {
             'type': 'int'
