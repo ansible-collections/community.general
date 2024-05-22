@@ -81,11 +81,17 @@ class _RunCmdContext(_BaseContext):
                               "OUT: testcase has not enough run_command calls",
                               "ERR: testcase has not enough run_command calls")
 
-        def side_effect(**kwargs):
+        def _results():
             for result in chain(call_results, repeat(error_call_results)):
-                if kwargs.get("check_rc", False) and result["rc"] != 0:
-                    raise Exception("rc = {0}".format(result["rc"]))
                 yield result
+
+        results = _results()
+
+        def side_effect(**kwargs):
+            result = next(results)
+            if kwargs.get("check_rc", False) and result["rc"] != 0:
+                raise Exception("rc = {0}".format(result["rc"]))
+            return result
 
         mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command',
                                              side_effect=side_effect)
