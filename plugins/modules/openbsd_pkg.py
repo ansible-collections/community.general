@@ -172,7 +172,7 @@ def get_all_installed(module):
     rc, stdout, stderr = execute_command(command, module)
 
     if stderr:
-        module.fail_json(msg="failed in get_all_installed(): " + stderr)
+        module.fail_json(msg="failed in get_all_installed(): %s" % stderr)
 
     return stdout
 
