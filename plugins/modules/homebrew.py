@@ -415,9 +415,9 @@ class Homebrew(object):
         if self.force_formula:
             cmd.append("--formula")
         rc, out, err = self.module.run_command(cmd)
-        if err:
+        if rc != 0:
             self.failed = True
-            self.message = err.strip()
+            self.message = err.strip() or ("Unknown failure with exit code %d" % rc)
             raise HomebrewException(self.message)
         data = json.loads(out)
 
