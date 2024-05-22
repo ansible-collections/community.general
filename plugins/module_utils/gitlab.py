@@ -111,29 +111,16 @@ def gitlab_authentication(module, min_version=None):
     verify = ca_path if validate_certs and ca_path else validate_certs
 
     try:
-        # python-gitlab library remove support for username/password authentication since 1.13.0
-        # Changelog : https://github.com/python-gitlab/python-gitlab/releases/tag/v1.13.0
-        # This condition allow to still support older version of the python-gitlab library
-        if LooseVersion(gitlab.__version__) < LooseVersion("1.13.0"):
-            module.deprecate(
-                "GitLab basic auth is deprecated and will be removed in next major version, "
-                "using another auth method (API token or OAuth) is strongly recommended.",
-                version='10.0.0',
-                collection_name='community.general')
-            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, email=gitlab_user, password=gitlab_password,
-                                            private_token=gitlab_token, api_version=4)
-        else:
-            # We can create an oauth_token using a username and password
-            # https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
-            if gitlab_user:
-                data = {'grant_type': 'password', 'username': gitlab_user, 'password': gitlab_password}
-                resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data, verify=verify)
-                resp_data = resp.json()
-                gitlab_oauth_token = resp_data["access_token"]
+        # We can create an oauth_token using a username and password
+        # https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
+        if gitlab_user:
+            data = {'grant_type': 'password', 'username': gitlab_user, 'password': gitlab_password}
+            resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data, verify=verify)
+            resp_data = resp.json()
+            gitlab_oauth_token = resp_data["access_token"]
 
-            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, private_token=gitlab_token,
-                                            oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
-
+        gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=verify, private_token=gitlab_token,
+                                        oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
         module.fail_json(msg="Failed to connect to GitLab server: %s" % to_native(e))
