@@ -25,6 +25,9 @@ attributes:
         support: full
     diff_mode:
         support: partial
+        version_added: 9.1.0
+        details:
+          - Only works when check mode is not enabled.
 options:
     name:
         description:
