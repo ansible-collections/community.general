@@ -81,7 +81,6 @@ options:
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the O(name) option.
-  - Diff mode is not supported in check mode
 '''
 
 EXAMPLES = '''
