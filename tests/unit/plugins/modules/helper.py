@@ -88,8 +88,8 @@ class _RunCmdContext(_BaseContext):
 
         def side_effect(self_, **kwargs):
             result = next(results)
-            if kwargs.get("check_rc", False) and result["rc"] != 0:
-                raise Exception("rc = {0}".format(result["rc"]))
+            if kwargs.get("check_rc", False) and result[0] != 0:
+                raise Exception("rc = {0}".format(result[0]))
             return result
 
         mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command',
