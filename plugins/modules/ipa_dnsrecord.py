@@ -184,7 +184,7 @@ EXAMPLES = r'''
   register: ssh_hostkeys
 
 - name: Update the SSHFP records in DNS
-  community,general.ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     name: "{{ inventory_hostname}}"
     zone_name: example.com
     record_type: 'SSHFP'
