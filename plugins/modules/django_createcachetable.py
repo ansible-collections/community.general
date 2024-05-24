@@ -27,14 +27,13 @@ attributes:
 """
 
 EXAMPLES = """
-- name: Check the project
-  community.general.django_command:
-    command: check
+- name: Create cache table in the default database
+  community.general.django_createcachetable:
     settings: myproject.settings
 
-- name: Check the project in specified python path, using virtual environment
-  community.general.django_command:
-    command: check
+- name: Create cache table in the other database
+  community.general.django_createcachetable:
+    database: myotherdb
     settings: fancysite.settings
     pythonpath: /home/joedoe/project/fancysite
     venv: /home/joedoe/project/fancysite/venv
