@@ -12,7 +12,7 @@ module: django_createcachetable
 author:
   - Alexei Znamensky (@russoz)
 short_description: Wrapper for C(django-admin createcachetable)
-version_added: 9.0.0
+version_added: 9.1.0
 description:
   - This module is a wrapper for the execution of C(django-admin createcachetable).
 extends_documentation_fragment:
