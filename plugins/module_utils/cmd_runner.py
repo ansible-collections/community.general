@@ -111,6 +111,7 @@ class _ArgFormat(object):
     def __repr__(self):
         return str(self)
 
+
 class _Format(object):
     @staticmethod
     def as_bool(args_true, args_false=None, ignore_none=None):
