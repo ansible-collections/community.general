@@ -1,0 +1,2 @@
+bugfixes:
+  - locale_gen - use new `VarDict` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410, https://github.com/ansible-collections/community.general/pull/8411).
