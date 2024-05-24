@@ -47,15 +47,11 @@ run_info:
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
 
 class DjangoCreateCacheTable(DjangoModuleHelper):
     module = dict(
         supports_check_mode=True,
-    )
-    arg_formats = dict(
-        extra_args=cmd_runner_fmt.as_list(),
     )
     django_admin_cmd = "createcachetable"
     django_admin_arg_order = "noinput database dry_run"
