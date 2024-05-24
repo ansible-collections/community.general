@@ -241,7 +241,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 return runner, ctx.run()
 
     def __init_module__(self):
-        # self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
         self.runner, self.ansible_version = self._get_ansible_galaxy_version()
         if self.ansible_version < (2, 11):
             self.module.fail_json(
