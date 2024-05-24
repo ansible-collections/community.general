@@ -77,12 +77,9 @@ class _RunCmdContext(_BaseContext):
 
     def _make_mock_run_cmd(self):
         def _results():
-            call_results = [(x.rc, x.out, x.err) for x in self.run_cmd_calls]
-            error_call_results = (123,
-                                  "OUT: testcase has not enough run_command calls",
-                                  "ERR: testcase has not enough run_command calls")
-            for result in chain(call_results, repeat(error_call_results)):
+            for result in [(x.rc, x.out, x.err) for x in self.run_cmd_calls]:
                 yield result
+            raise Exception("testcase has not enough run_command calls")
 
         results = _results()
 
