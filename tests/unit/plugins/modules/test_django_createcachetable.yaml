@@ -8,7 +8,7 @@
   input:
     settings: whatever.settings
   run_command_calls:
-    - command: [/testbin/python, -m, django, createcachetable, --no-color, --settings=whatever.settings, --database=default]
+    - command: [/testbin/python, -m, django, createcachetable, --no-color, --settings=whatever.settings, --noinput, --database=default]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: "whatever\n"
