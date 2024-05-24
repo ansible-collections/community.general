@@ -9,7 +9,6 @@ __metaclass__ = type
 import sys
 import json
 from collections import namedtuple
-from itertools import chain, repeat
 
 import pytest
 import yaml
@@ -76,12 +75,21 @@ class _RunCmdContext(_BaseContext):
         self.mock_run_cmd = self._make_mock_run_cmd()
 
     def _make_mock_run_cmd(self):
-        call_results = [(x.rc, x.out, x.err) for x in self.run_cmd_calls]
-        error_call_results = (123,
-                              "OUT: testcase has not enough run_command calls",
-                              "ERR: testcase has not enough run_command calls")
+        def _results():
+            for result in [(x.rc, x.out, x.err) for x in self.run_cmd_calls]:
+                yield result
+            raise Exception("testcase has not enough run_command calls")
+
+        results = _results()
+
+        def side_effect(self_, **kwargs):
+            result = next(results)
+            if kwargs.get("check_rc", False) and result[0] != 0:
+                raise Exception("rc = {0}".format(result[0]))
+            return result
+
         mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command',
-                                             side_effect=chain(call_results, repeat(error_call_results)))
+                                             side_effect=side_effect)
         return mock_run_command
 
     def check_results(self, results):
