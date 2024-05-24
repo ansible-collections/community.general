@@ -9,7 +9,6 @@ __metaclass__ = type
 import sys
 import json
 from collections import namedtuple
-from itertools import chain, repeat
 
 import pytest
 import yaml
