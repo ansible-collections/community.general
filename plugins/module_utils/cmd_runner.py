@@ -102,7 +102,7 @@ class _ArgFormat(object):
         return [str(x) for x in f(value)]
 
     def __str__(self):
-        return "<_ArgFormat: func={0}, ignore_none={1}, ignore_missing_value={2}>".format(
+        return "<ArgFormat: func={0}, ignore_none={1}, ignore_missing_value={2}>".format(
             self.func,
             self.ignore_none,
             self.ignore_missing_value,
