@@ -51,7 +51,7 @@ from ansible_collections.community.general.plugins.module_utils.django import Dj
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
 
-class DjangoCommand(DjangoModuleHelper):
+class DjangoCreateCacheTable(DjangoModuleHelper):
     module = dict(
         supports_check_mode=True,
     )
@@ -65,7 +65,7 @@ class DjangoCommand(DjangoModuleHelper):
 
 
 def main():
-    DjangoCommand.execute()
+    DjangoCreateCacheTable.execute()
 
 
 if __name__ == '__main__':
