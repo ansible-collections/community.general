@@ -54,6 +54,7 @@ class DjangoModuleHelper(ModuleHelper):
     django_admin_cmd = None
     arg_formats = {}
     django_admin_arg_order = ()
+    use_old_vardict = False
 
     def __init__(self):
         argument_spec = dict(django_std_args)
