@@ -200,6 +200,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
         required_if=[('type', 'both', ['requirements_file'])],
         supports_check_mode=False,
     )
+    use_old_vardict = False
 
     command = 'ansible-galaxy'
     command_args_formats = dict(
