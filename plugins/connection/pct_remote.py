@@ -218,45 +218,46 @@ DOCUMENTATION = r"""
 
 EXAMPLES = r"""
 # Static inventory file
----
-all:
-  children:
-    lxc:
-      hosts:
-        container-1:
-          ansible_host: 10.0.0.10
-          proxmox_vmid: 100
-          ansible_connection: community.general.pct_remote
-        container-2:
-          ansible_host: 10.0.0.10
-          proxmox_vmid: 200
-          ansible_connection: community.general.pct_remote
-    proxmox:
-      hosts:
-        proxmox-1:
-          ansible_host: 10.0.0.10
+# hosts.yml
+# all:
+#   children:
+#     lxc:
+#       hosts:
+#         container-1:
+#           ansible_host: 10.0.0.10
+#           proxmox_vmid: 100
+#           ansible_connection: community.general.pct_remote
+#         container-2:
+#           ansible_host: 10.0.0.10
+#           proxmox_vmid: 200
+#           ansible_connection: community.general.pct_remote
+#     proxmox:
+#       hosts:
+#         proxmox-1:
+#           ansible_host: 10.0.0.10
 
 # Dynamic inventory file
----
-plugin: community.general.proxmox
-url: https://10.0.0.10:8006
-validate_certs: false
-user: ansible@pam
-token_id: ansible
-token_secret: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          ...
+# inventory.proxmox.yml
+# plugin: community.general.proxmox
+# url: https://10.0.0.10:8006
+# validate_certs: false
+# user: ansible@pam
+# token_id: ansible
+# token_secret: !vault |
+#           $ANSIBLE_VAULT;1.1;AES256
+#           ...
 
-want_facts: true
-exclude_nodes: true
-filters:
-  - proxmox_vmtype == "lxc"
-want_proxmox_nodes_ansible_host: false
-compose:
-  ansible_host: "'10.0.0.10'"
-  ansible_connection: "'pct_remote'"
+# want_facts: true
+# exclude_nodes: true
+# filters:
+#   - proxmox_vmtype == "lxc"
+# want_proxmox_nodes_ansible_host: false
+# compose:
+#   ansible_host: "'10.0.0.10'"
+#   ansible_connection: "'pct_remote'"
 
 # Playbook
+# playbook.yml
 ---
 - hosts: lxc
   tasks:
