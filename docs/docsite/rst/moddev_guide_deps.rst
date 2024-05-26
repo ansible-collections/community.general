@@ -8,7 +8,7 @@ Using ``deps`` module util for handling import errors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``community.general.plugins.module_utils.deps`` module util simplifies the importing of code as described in
-`Importing and using shared code <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html#importing-and-using-shared-code>`_.
+:ref:`Importing and using shared code <shared_code>`.
 Please notice that ``deps`` is meant to be used specifically with Ansible modules, and not other types of plugins.
 
 The same example from the Developer Guide would become:
