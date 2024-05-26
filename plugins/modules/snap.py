@@ -194,6 +194,7 @@ class Snap(StateModuleHelper):
         },
         supports_check_mode=True,
     )
+    use_old_vardict = False
 
     @staticmethod
     def _first_non_zero(a):
@@ -405,8 +406,8 @@ class Snap(StateModuleHelper):
 
     def state_present(self):
 
-        self.vars.meta('classic').set(output=True)
-        self.vars.meta('channel').set(output=True)
+        self.vars.set_meta('classic', output=True)
+        self.vars.set_meta('channel', output=True)
 
         actionable_refresh = [snap for snap in self.vars.name if self.vars.snap_status_map[snap] == Snap.CHANNEL_MISMATCH]
         if actionable_refresh:
