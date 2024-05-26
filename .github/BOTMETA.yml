@@ -1454,6 +1454,10 @@ files:
     maintainers: baldwinSPC nurfet-becirevic t0mk teebes
   docs/docsite/rst/guide_scaleway.rst:
     maintainers: $team_scaleway
+  docs/docsite/rst/moddev_guide_deps.rst:
+    maintainers: russoz
+  docs/docsite/rst/moddev_guide.rst:
+    maintainers: russoz
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
 #########################
