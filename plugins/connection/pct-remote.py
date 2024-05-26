@@ -8,19 +8,15 @@
 from __future__ import (annotations, absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
     author: Nils Stein (@mietzen) <github.nstein@mailbox.org>
     name: pct-remote
-    short_description: Run tasks in Proxmox LXC container instances via pct CLI
+    short_description: Run tasks in Proxmox LXC container instances using pct CLI via ssh
+    requirements:
+        - paramiko
     description:
-        - Run commands or put/fetch files to an existing Proxmox LXC container instance using pct CLI.
-        - Use the Python SSH implementation (Paramiko) to connect to targets
-        - The paramiko transport is provided because many distributions, in particular EL6 and before do not support ControlPersist
-          in their SSH implementations.
-        - This is needed on the Ansible control machine to be reasonably efficient with connections.
-          Thus paramiko is faster for most users on these platforms.
-          Users with ControlPersist capability can consider using -c ssh or configuring the transport in the configuration file.
-        - This plugin also borrows a lot of settings from the ssh plugin as they both cover the same protocol.
+        - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via ssh.
+        - Use the Python SSH implementation (Paramiko) to connect to Proxmox
     version_added: "0.1"
     options:
       remote_addr:
@@ -298,6 +294,54 @@ DOCUMENTATION = """
             - name: proxmox_vmid
 """
 
+EXAMPLES = r"""
+# Static inventory file
+---
+all:
+  children:
+    lxc:
+      hosts:
+        container-1:
+          ansible_host: 10.0.0.10
+          proxmox_vmid: 100
+          ansible_connection: community.general.pct-remote
+        container-2:
+          ansible_host: 10.0.0.10
+          proxmox_vmid: 200
+          ansible_connection: community.general.pct-remote
+    proxmox:
+      hosts:
+        proxmox-1:
+          ansible_host: 10.0.0.10
+
+# Dynamic inventory file
+---
+plugin: community.general.proxmox
+url: https://10.0.0.10:8006
+validate_certs: false
+user: ansible@pam
+token_id: ansible
+token_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          ...
+
+want_facts: true
+exclude_nodes: true
+filters:
+  - proxmox_vmtype == "lxc"
+want_proxmox_nodes_ansible_host: false
+compose:
+  ansible_host: "'10.0.0.10'"
+  ansible_connection: "'pct-remote'"
+
+# Playbook
+---
+- hosts: lxc
+  tasks:
+    - debug:
+        msg: "This is coming from pct environment"
+"""
+
 import uuid
 import os
 from ansible.errors import AnsibleError
@@ -312,19 +356,9 @@ class Connection(SSH_Connection):
     ''' SSH based connections (paramiko) to Proxmox pct '''
     transport = 'community.general.pct-remote'
 
-    def __init__(self):
-        try:
-            self._pct_cmd = get_bin_path("pct")
-        except ValueError:
-            raise AnsibleError("pct command not found in PATH")
-        try:
-            self._pvesh_cmd = get_bin_path("pvesh")
-        except ValueError:
-            raise AnsibleError("pvesh command not found in PATH")
-
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
-        cmd = ' '.join([self._pct_cmd, "exec", self.get_option('vmid'), "--", cmd])
+        cmd = ' '.join(['/usr/bin/sudo', '/usr/sbin/pct', 'exec', self.get_option('vmid'), '--', cmd])
         return super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
     def put_file(self, in_path: str, out_path: str) -> None:
@@ -333,10 +367,10 @@ class Connection(SSH_Connection):
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
             super().exec_command(f'mkdir -p {temp_dir}')
-            super().put_file(in_path, temp_dir)
-            super().exec_command(f'{self._pct_cmd} push {self.get_option('vmid')} {temp_file_path} {out_path}')
+            super().put_file(in_path, temp_file_path)
+            super().exec_command(f'/usr/bin/sudo /usr/sbin/pct push {self.get_option('vmid')} {temp_file_path} {out_path}')
         except Exception as e:
-            raise AnsibleError("failed to transfer file to %s!\n%s" % out_path, e)
+            raise AnsibleError('failed to transfer file to %s!\n%s' % (out_path, e))
         finally:
             super().exec_command(f'rm -rf {temp_dir}')
 
@@ -346,9 +380,9 @@ class Connection(SSH_Connection):
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
             super().exec_command(f'mkdir -p {temp_dir}')
-            super().exec_command(f'{self._pct_cmd} pull {self.get_option('vmid')} {in_path} {temp_dir}')
+            super().exec_command(f'/usr/bin/sudo /usr/sbin/pct pull {self.get_option('vmid')} {in_path} {temp_file_path}')
             super().fetch_file(temp_file_path, out_path)
         except Exception as e:
-            raise AnsibleError("failed to transfer file from %s!\n%s" % in_path, e)
+            raise AnsibleError('failed to transfer file from %s!\n%s' % (in_path, e))
         finally:
             super().exec_command(f'rm -rf {temp_dir}')
