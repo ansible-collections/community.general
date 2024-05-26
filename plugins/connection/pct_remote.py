@@ -114,6 +114,55 @@ DOCUMENTATION = r"""
           - {key: proxy_command, section: paramiko_connection}
         vars:
           - name: ansible_paramiko_proxy_command
+      ssh_args:
+        description: Only used in parsing ProxyCommand for use in this plugin.
+        default: ''
+        type: string
+        ini:
+            - section: 'ssh_connection'
+              key: 'ssh_args'
+        env:
+            - name: ANSIBLE_SSH_ARGS
+        vars:
+            - name: ansible_ssh_args
+        deprecated:
+            why: In favor of the "proxy_command" option.
+            version: "0.1.0"
+            alternatives: proxy_command
+      ssh_common_args:
+        description: Only used in parsing ProxyCommand for use in this plugin.
+        type: string
+        ini:
+            - section: 'ssh_connection'
+              key: 'ssh_common_args'
+        env:
+            - name: ANSIBLE_SSH_COMMON_ARGS
+        vars:
+            - name: ansible_ssh_common_args
+        cli:
+            - name: ssh_common_args
+        default: ''
+        deprecated:
+            why: In favor of the "proxy_command" option.
+            version: "0.1.0"
+            alternatives: proxy_command
+      ssh_extra_args:
+        description: Only used in parsing ProxyCommand for use in this plugin.
+        type: string
+        vars:
+            - name: ansible_ssh_extra_args
+        env:
+          - name: ANSIBLE_SSH_EXTRA_ARGS
+        ini:
+          - key: ssh_extra_args
+            section: ssh_connection
+        cli:
+          - name: ssh_extra_args
+        default: ''
+        deprecated:
+            why: In favor of the "proxy_command" option.
+            version: "0.1.0"
+            alternatives: proxy_command
       pty:
         default: True
         description: 'SUDO usually requires a PTY, True to give a PTY and False to not give a PTY.'
@@ -254,7 +303,7 @@ EXAMPLES = r"""
 # want_proxmox_nodes_ansible_host: false
 # compose:
 #   ansible_host: "'10.0.0.10'"
-#   ansible_connection: "'pct_remote'"
+#   ansible_connection: "'community.general.pct_remote'"
 
 # Playbook
 # playbook.yml
