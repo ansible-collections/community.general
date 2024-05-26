@@ -35,7 +35,7 @@ and so does ``deps```:
     with deps.declare("foo", reason="foo is needed to properly bar", url="https://foo.bar.io"):
         import foo
 
-If you would rather write a custom message, then use:
+If you would rather write a custom message instead of using ``missing_required_lib`` then do:
 
 .. code-block:: python
 
