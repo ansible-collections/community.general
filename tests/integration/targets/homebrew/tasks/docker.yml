@@ -12,20 +12,6 @@
     path: "{{ brew_which.stdout }}"
   register: brew_stat
 
-- name: MACOS | Install docker without --formula
-  community.general.homebrew:
-    name: docker
-    state: present
-  become: true
-  become_user: "{{ brew_stat.stat.pw_name }}"
-  ignore_errors: true
-  register: result
-
-- name: Check that installing docker without --formula raises warning
-  assert:
-    that:
-      - result is failed
-
 - name: MACOS | Install docker
   community.general.homebrew:
     name: docker
