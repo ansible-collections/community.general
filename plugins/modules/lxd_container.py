@@ -400,7 +400,7 @@ EXAMPLES = '''
           protocol: simplestreams
           type: image
           mode: pull
-          server: https://images.linuxcontainers.org
+          server: [...] # URL to the image server
           alias: debian/11
         timeout: 600
 '''
