@@ -67,7 +67,7 @@ class Blacklist(StateModuleHelper):
         ),
         supports_check_mode=True,
     )
-    mute_vardict_deprecation = True
+    use_old_vardict = False
 
     def __init_module__(self):
         self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))

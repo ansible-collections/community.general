@@ -170,6 +170,7 @@ class CPANMinus(ModuleHelper):
         installdeps=cmd_runner_fmt.as_bool("--installdeps"),
         pkg_spec=cmd_runner_fmt.as_list(),
     )
+    use_old_vardict = False
 
     def __init_module__(self):
         v = self.vars

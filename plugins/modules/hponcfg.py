@@ -98,6 +98,7 @@ class HPOnCfg(ModuleHelper):
         verbose=cmd_runner_fmt.as_bool("-v"),
         minfw=cmd_runner_fmt.as_opt_val("-m"),
     )
+    use_old_vardict = False
 
     def __run__(self):
         runner = CmdRunner(
