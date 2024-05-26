@@ -14,4 +14,4 @@ utilities to assist module development.
 .. toctree::
    :maxdepth: 2
 
-   modedev_guide_deps
+   moddev_guide_deps
