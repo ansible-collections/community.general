@@ -1,0 +1,2 @@
+bugfixes:
+  - homebrew - do not fail when brew prints warnings (https://github.com/ansible-collections/community.general/pull/8406, https://github.com/ansible-collections/community.general/issues/7044).
