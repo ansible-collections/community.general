@@ -17,7 +17,7 @@ DOCUMENTATION = r"""
     description:
         - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via ssh.
         - Use the Python SSH implementation (Paramiko) to connect to Proxmox
-    version_added: "0.1"
+    version_added: "0.1.0"
     options:
       remote_addr:
         description:
@@ -38,16 +38,13 @@ DOCUMENTATION = r"""
               key: remote_port
             - section: paramiko_connection
               key: remote_port
-              version_added: '2.15'
           env:
             - name: ANSIBLE_REMOTE_PORT
             - name: ANSIBLE_REMOTE_PARAMIKO_PORT
-              version_added: '2.15'
           vars:
             - name: ansible_port
             - name: ansible_ssh_port
             - name: ansible_paramiko_port
-              version_added: '2.15'
           keyword:
             - name: port
       remote_user:
@@ -62,13 +59,11 @@ DOCUMENTATION = r"""
         env:
             - name: ANSIBLE_REMOTE_USER
             - name: ANSIBLE_PARAMIKO_REMOTE_USER
-              version_added: '2.5'
         ini:
             - section: defaults
               key: remote_user
             - section: paramiko_connection
               key: remote_user
-              version_added: '2.5'
         keyword:
             - name: remote_user
       password:
@@ -82,7 +77,6 @@ DOCUMENTATION = r"""
             - name: ansible_ssh_password
             - name: ansible_paramiko_pass
             - name: ansible_paramiko_password
-              version_added: '2.5'
       use_rsa_sha2_algorithms:
         description:
             - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys
@@ -96,7 +90,6 @@ DOCUMENTATION = r"""
             - {name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS}
         default: True
         type: boolean
-        version_added: '2.14'
       host_key_auto_add:
         description: 'Automatically add host keys'
         env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
@@ -121,61 +114,6 @@ DOCUMENTATION = r"""
           - {key: proxy_command, section: paramiko_connection}
         vars:
           - name: ansible_paramiko_proxy_command
-            version_added: '2.15'
-      ssh_args:
-          description: Only used in parsing ProxyCommand for use in this plugin.
-          default: ''
-          type: string
-          ini:
-              - section: 'ssh_connection'
-                key: 'ssh_args'
-          env:
-              - name: ANSIBLE_SSH_ARGS
-          vars:
-              - name: ansible_ssh_args
-                version_added: '2.7'
-          deprecated:
-              why: In favor of the "proxy_command" option.
-              version: "2.18"
-              alternatives: proxy_command
-      ssh_common_args:
-          description: Only used in parsing ProxyCommand for use in this plugin.
-          type: string
-          ini:
-              - section: 'ssh_connection'
-                key: 'ssh_common_args'
-                version_added: '2.7'
-          env:
-              - name: ANSIBLE_SSH_COMMON_ARGS
-                version_added: '2.7'
-          vars:
-              - name: ansible_ssh_common_args
-          cli:
-              - name: ssh_common_args
-          default: ''
-          deprecated:
-              why: In favor of the "proxy_command" option.
-              version: "2.18"
-              alternatives: proxy_command
-      ssh_extra_args:
-          description: Only used in parsing ProxyCommand for use in this plugin.
-          type: string
-          vars:
-              - name: ansible_ssh_extra_args
-          env:
-            - name: ANSIBLE_SSH_EXTRA_ARGS
-              version_added: '2.7'
-          ini:
-            - key: ssh_extra_args
-              section: ssh_connection
-              version_added: '2.7'
-          cli:
-            - name: ssh_extra_args
-          default: ''
-          deprecated:
-              why: In favor of the "proxy_command" option.
-              version: "2.18"
-              alternatives: proxy_command
       pty:
         default: True
         description: 'SUDO usually requires a PTY, True to give a PTY and False to not give a PTY.'
@@ -200,22 +138,16 @@ DOCUMENTATION = r"""
         env:
           - name: ANSIBLE_HOST_KEY_CHECKING
           - name: ANSIBLE_SSH_HOST_KEY_CHECKING
-            version_added: '2.5'
           - name: ANSIBLE_PARAMIKO_HOST_KEY_CHECKING
-            version_added: '2.5'
         ini:
           - section: defaults
             key: host_key_checking
           - section: paramiko_connection
             key: host_key_checking
-            version_added: '2.5'
         vars:
           - name: ansible_host_key_checking
-            version_added: '2.5'
           - name: ansible_ssh_host_key_checking
-            version_added: '2.5'
           - name: ansible_paramiko_host_key_checking
-            version_added: '2.5'
       use_persistent_connections:
         description: 'Toggles the use of persistence for connections'
         type: boolean
@@ -228,7 +160,6 @@ DOCUMENTATION = r"""
       banner_timeout:
         type: float
         default: 30
-        version_added: '2.14'
         description:
           - Configures, in seconds, the amount of time to wait for the SSH
             banner to be presented. This option is supported by paramiko
@@ -247,21 +178,15 @@ DOCUMENTATION = r"""
             key: timeout
           - section: ssh_connection
             key: timeout
-            version_added: '2.11'
           - section: paramiko_connection
             key: timeout
-            version_added: '2.15'
         env:
           - name: ANSIBLE_TIMEOUT
           - name: ANSIBLE_SSH_TIMEOUT
-            version_added: '2.11'
           - name: ANSIBLE_PARAMIKO_TIMEOUT
-            version_added: '2.15'
         vars:
           - name: ansible_ssh_timeout
-            version_added: '2.11'
           - name: ansible_paramiko_timeout
-            version_added: '2.15'
         cli:
           - name: timeout
       private_key_file:
@@ -273,16 +198,13 @@ DOCUMENTATION = r"""
               key: private_key_file
             - section: paramiko_connection
               key: private_key_file
-              version_added: '2.15'
           env:
             - name: ANSIBLE_PRIVATE_KEY_FILE
             - name: ANSIBLE_PARAMIKO_PRIVATE_KEY_FILE
-              version_added: '2.15'
           vars:
             - name: ansible_private_key_file
             - name: ansible_ssh_private_key_file
             - name: ansible_paramiko_private_key_file
-              version_added: '2.15'
           cli:
             - name: private_key_file
               option: '--private-key'
@@ -342,15 +264,15 @@ compose:
         msg: "This is coming from pct environment"
 """
 
-import uuid
 import os
-from ansible.errors import AnsibleError
-from ansible.module_utils.common.process import get_bin_path
-from ansible.plugins.connection.paramiko_ssh import Connection as SSH_Connection
-from ansible.utils.display import Display
+import uuid
 
+from ansible.utils.display import Display
+from ansible.plugins.connection.paramiko_ssh import Connection as SSH_Connection
+from ansible.errors import AnsibleError
 
 display = Display()
+
 
 class Connection(SSH_Connection):
     ''' SSH based connections (paramiko) to Proxmox pct '''
@@ -358,31 +280,38 @@ class Connection(SSH_Connection):
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
-        cmd = ' '.join(['/usr/bin/sudo', '/usr/sbin/pct', 'exec', self.get_option('vmid'), '--', cmd])
+        cmd = ' '.join(['/usr/bin/sudo', '/usr/sbin/pct',
+                       'exec', self.get_option('vmid'), '--', cmd])
         return super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
     def put_file(self, in_path: str, out_path: str) -> None:
         ''' transfer a file from local to remote '''
-        temp_dir = f'/tmp/ansible_pct_{str(uuid.uuid4()).replace('-', '')[:6]}'
+        temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
             super().exec_command(f'mkdir -p {temp_dir}')
             super().put_file(in_path, temp_file_path)
-            super().exec_command(f'/usr/bin/sudo /usr/sbin/pct push {self.get_option('vmid')} {temp_file_path} {out_path}')
+            cmd = ' '.join(['/usr/bin/sudo', '/usr/sbin/pct', 'push',
+                           self.get_option('vmid'), temp_file_path, out_path])
+            super().exec_command(cmd)
         except Exception as e:
-            raise AnsibleError('failed to transfer file to %s!\n%s' % (out_path, e))
+            raise AnsibleError(
+                'failed to transfer file to %s!\n%s' % (out_path, e))
         finally:
             super().exec_command(f'rm -rf {temp_dir}')
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
         ''' save a remote file to the specified path '''
-        temp_dir = f'/tmp/ansible_pct_{str(uuid.uuid4()).replace('-', '')[:6]}'
+        temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
             super().exec_command(f'mkdir -p {temp_dir}')
-            super().exec_command(f'/usr/bin/sudo /usr/sbin/pct pull {self.get_option('vmid')} {in_path} {temp_file_path}')
+            cmd = ' '.join(['/usr/bin/sudo', '/usr/sbin/pct', 'pull',
+                           self.get_option('vmid'), in_path, temp_file_path])
+            super().exec_command(cmd)
             super().fetch_file(temp_file_path, out_path)
         except Exception as e:
-            raise AnsibleError('failed to transfer file from %s!\n%s' % (in_path, e))
+            raise AnsibleError(
+                'failed to transfer file from %s!\n%s' % (in_path, e))
         finally:
             super().exec_command(f'rm -rf {temp_dir}')
