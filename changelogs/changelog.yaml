@@ -445,7 +445,8 @@ releases:
         in ``category=Raw``) without a specific action info (https://github.com/ansible-collections/community.general/pull/7746).
       - xfconf - use ``ModuleHelper`` with ``VarDict`` (https://github.com/ansible-collections/community.general/pull/8226).
       - xfconf_info - use ``ModuleHelper`` with ``VarDict`` (https://github.com/ansible-collections/community.general/pull/8226).
-      release_summary: This is release 9.0.0 of ``community.general``, released on 2024-05-20.
+      release_summary: This is release 9.0.0 of ``community.general``, released on
+        2024-05-20.
       removed_features:
       - The deprecated redirects for internal module names have been removed. These
         internal redirects were extra-long FQCNs like ``community.general.packaging.os.apt_rpm``
@@ -755,3 +756,41 @@ releases:
         name: fqdn_valid
         namespace: null
     release_date: '2024-05-20'
+  9.0.1:
+    changes:
+      bugfixes:
+      - cpanm - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - django module utils - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - gconftool2_info - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - homebrew - do not fail when brew prints warnings (https://github.com/ansible-collections/community.general/pull/8406,
+        https://github.com/ansible-collections/community.general/issues/7044).
+      - hponcfg - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - kernel_blacklist - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - keycloak_client - fix TypeError when sanitizing the ``saml.signing.private.key``
+        attribute in the module's diff or state output. The ``sanitize_cr`` function
+        expected a dict where in some cases a list might occur (https://github.com/ansible-collections/community.general/pull/8403).
+      - locale_gen - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - mksysb - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - pipx_info - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - snap - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      - snap_alias - use new ``VarDict`` to prevent deprecation warning (https://github.com/ansible-collections/community.general/issues/8410,
+        https://github.com/ansible-collections/community.general/pull/8411).
+      minor_changes:
+      - ansible_galaxy_install - minor refactor in the module (https://github.com/ansible-collections/community.general/pull/8413).
+      release_summary: Bugfix release for inclusion in Ansible 10.0.0rc1.
+    fragments:
+    - 8403-fix-typeerror-in-keycloak-client.yaml
+    - 8406-fix-homebrew-cask-warning.yaml
+    - 8411-locale-gen-vardict.yml
+    - 8413-galaxy-refactor.yml
+    - 9.0.1.yml
+    release_date: '2024-05-27'
