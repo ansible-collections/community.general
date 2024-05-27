@@ -560,7 +560,12 @@ class CallbackModule(CallbackBase):
         """ dump the results if disable_logs is not enabled """
         if self.disable_logs:
             return ""
-        return self._dump_results(result._result)
+        # ansible.builtin.uri contains the response in json format
+        # let's remove the json field to avoid issues when the response is huge.
+        save = result._result
+        if "json" in save:
+            save.pop("json")
+        return self._dump_results(save)
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
