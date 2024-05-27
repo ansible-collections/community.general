@@ -263,11 +263,20 @@ DOCUMENTATION = r"""
         default: proxmox_vmid
         vars:
             - name: proxmox_vmid
+    notes:
+      - When NOT using this plugin as root, you need to have sudo installed on proxmox and setup so we can run it without prompting for the password.
 """
 
 EXAMPLES = r"""
-# Static inventory file
-# hosts.yml
+# --------------------------------------------------------------
+# Setup sudo with passwordless access to pct for user 'ansible':
+# --------------------------------------------------------------
+# $ echo 'ansible ALL = (root) NOPASSWD: /usr/sbin/pct' > /etc/sudoers.d/ansible_pct
+#
+#
+# --------------------------------
+# Static inventory file: hosts.yml
+# --------------------------------
 # all:
 #   children:
 #     lxc:
@@ -276,17 +285,21 @@ EXAMPLES = r"""
 #           ansible_host: 10.0.0.10
 #           proxmox_vmid: 100
 #           ansible_connection: community.general.pct_remote
+#           remote_user: ansible
 #         container-2:
 #           ansible_host: 10.0.0.10
 #           proxmox_vmid: 200
 #           ansible_connection: community.general.pct_remote
+#           remote_user: ansible
 #     proxmox:
 #       hosts:
 #         proxmox-1:
 #           ansible_host: 10.0.0.10
-
-# Dynamic inventory file
-# inventory.proxmox.yml
+#
+#
+# ---------------------------------------------
+# Dynamic inventory file: inventory.proxmox.yml
+# ---------------------------------------------
 # plugin: community.general.proxmox
 # url: https://10.0.0.10:8006
 # validate_certs: false
@@ -304,9 +317,12 @@ EXAMPLES = r"""
 # compose:
 #   ansible_host: "'10.0.0.10'"
 #   ansible_connection: "'community.general.pct_remote'"
-
-# Playbook
-# playbook.yml
+#   remote_user: "'ansible'"
+#
+#
+# ----------------------
+# Playbook: playbook.yml
+# ----------------------
 ---
 - hosts: lxc
   tasks:
@@ -314,12 +330,13 @@ EXAMPLES = r"""
         msg: "This is coming from pct environment"
 """
 
-from ansible import constants as C
-from ansible.errors import AnsibleError
-from ansible.plugins.connection.paramiko_ssh import Connection as SSH_Connection
-from ansible.utils.display import Display
-import uuid
+
 import os
+import uuid
+from ansible.utils.display import Display
+from ansible.plugins.connection.paramiko_ssh import Connection as SSH_Connection
+from ansible.errors import AnsibleError
+from ansible import constants as C
 
 
 display = Display()
