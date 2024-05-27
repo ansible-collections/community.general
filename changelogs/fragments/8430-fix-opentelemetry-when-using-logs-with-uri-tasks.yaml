@@ -1,0 +1,2 @@
+bugfixes:
+  - opentelemetry callback - do not save the json response when using the ``ansible.builtin.uri`` module (https://github.com/ansible-collections/community.general/issues/8430).
