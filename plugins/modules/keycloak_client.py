@@ -340,6 +340,36 @@ options:
         description:
             - Override realm authentication flow bindings.
         type: dict
+        suboptions:
+            browser:
+                description:
+                    - Flow ID of the browser authentication flow.
+                    - O(browser) and O(browser_name) are mutually exclusive.
+                type: str
+
+            browser_name:
+                description:
+                    - Flow name of the browser authentication flow.
+                    - O(browser) and O(browser_name) are mutually exclusive.
+                aliases:
+                    - browserName
+                type: str
+
+            direct_grant:
+                description:
+                    - Flow ID of the direct grant authentication flow.
+                    - O(direct_grant) and O(direct_grant_name) are mutually exclusive.
+                aliases:
+                    - directGrant
+                type: str
+
+            direct_grant_name:
+                description:
+                    - Flow name of the direct grant authentication flow.
+                    - O(direct_grant) and O(direct_grant_name) are mutually exclusive.
+                aliases:
+                    - directGrantName
+                type: str
         aliases:
             - authenticationFlowBindingOverrides
         version_added: 3.4.0
@@ -781,6 +811,66 @@ def sanitize_cr(clientrep):
     return normalise_cr(result)
 
 
+def get_authentication_flow_id(flow_name, realm, kc):
+    """ Get the authentication flow ID based on the flow name, realm, and Keycloak client.
+
+    Args:
+        flow_name (str): The name of the authentication flow.
+        realm (str): The name of the realm.
+        kc (KeycloakClient): The Keycloak client instance.
+
+    Returns:
+        str: The ID of the authentication flow.
+
+    Raises:
+        KeycloakAPIException: If the authentication flow with the given name is not found in the realm.
+    """
+    flow = kc.get_authentication_flow_by_alias(flow_name, realm)
+    if flow:
+        return flow["id"]
+    kc.module.fail_json(msg='Authentification flow %s not found in realm %s' % (flow_name, realm))
+
+
+def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
+    """ Convert a dictionary representing client flow bindings to a model representation.
+
+    Args:
+        newClientFlowBinding (dict): A dictionary containing client flow bindings.
+        realm (str): The name of the realm.
+        kc (KeycloakClient): An instance of the KeycloakClient class.
+
+    Returns:
+        dict: A dictionary representing the model flow bindings. The dictionary has two keys:
+            - "browser" (str or None): The ID of the browser authentication flow binding, or None if not provided.
+            - "direct_grant" (str or None): The ID of the direct grant authentication flow binding, or None if not provided.
+
+    Raises:
+        KeycloakAPIException: If the authentication flow with the given name is not found in the realm.
+
+    """
+
+    modelFlow = {
+        "browser": None,
+        "direct_grant": None
+    }
+
+    for k, v in newClientFlowBinding.items():
+        if not v:
+            continue
+        if k == "browser":
+            modelFlow["browser"] = v
+        elif k == "browser_name" or k == "browserName":
+            if not modelFlow["browser"]:
+                modelFlow["browser"] = get_authentication_flow_id(v, realm, kc)
+        elif k == "direct_grant":
+            modelFlow["direct_grant"] = v
+        elif k == "direct_grant_name" or k == "directGrantName":
+            if not modelFlow["direct_grant"]:
+                modelFlow["direct_grant"] = get_authentication_flow_id(v, realm, kc)
+
+    return modelFlow
+
+
 def main():
     """
     Module execution
@@ -797,6 +887,13 @@ def main():
         protocol=dict(type='str', choices=[PROTOCOL_OPENID_CONNECT, PROTOCOL_SAML, PROTOCOL_DOCKER_V2]),
         protocolMapper=dict(type='str'),
         config=dict(type='dict'),
+    )
+
+    authentication_flow_spec = dict(
+        browser=dict(type='str'),
+        browser_name=dict(type='str', aliases=['browserName']),
+        direct_grant=dict(type='str', aliases=['directGrant']),
+        direct_grant_name=dict(type='str', aliases=['directGrantName']),
     )
 
     meta_args = dict(
@@ -838,7 +935,13 @@ def main():
         use_template_scope=dict(type='bool', aliases=['useTemplateScope']),
         use_template_mappers=dict(type='bool', aliases=['useTemplateMappers']),
         always_display_in_console=dict(type='bool', aliases=['alwaysDisplayInConsole']),
-        authentication_flow_binding_overrides=dict(type='dict', aliases=['authenticationFlowBindingOverrides']),
+        authentication_flow_binding_overrides=dict(
+            type='dict',
+            aliases=['authenticationFlowBindingOverrides'],
+            options=authentication_flow_spec,
+            required_one_of=[['browser', 'direct_grant', 'browser_name', 'direct_grant_name']],
+            mutually_exclusive=[['browser', 'browser_name'], ['direct_grant', 'direct_grant_name']],
+        ),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
         authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
         default_client_scopes=dict(type='list', elements='str', aliases=['defaultClientScopes']),
@@ -900,6 +1003,8 @@ def main():
         # they are not specified
         if client_param == 'protocol_mappers':
             new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
+        elif client_param == 'authentication_flow_binding_overrides' or client_param == 'authenticationFlowBindingOverrides':
+            new_param_value = flow_binding_from_dict_to_model(new_param_value, realm, kc)
 
         changeset[camel(client_param)] = new_param_value
 

@@ -103,3 +103,106 @@
   assert:
     that:
       - check_client_when_present_and_changed is changed
+
+- name: Desire client with flow binding overrides
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authentication_flow_binding_overrides:
+      browser_name: browser
+      direct_grant_name: direct grant
+  register: desire_client_with_flow_binding_overrides
+
+- name: Assert flows are set
+  assert:
+    that:
+      - desire_client_with_flow_binding_overrides is changed
+      - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
+      - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.browser | length > 0
+      - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant | length > 0
+
+- name: Backup flow UUIDs
+  set_fact:
+    flow_browser_uuid: "{{ desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.browser }}"
+    flow_direct_grant_uuid: "{{ desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant }}"
+
+- name: Desire client with flow binding overrides remove direct_grant_name
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authentication_flow_binding_overrides:
+      browser_name: browser
+  register: desire_client_with_flow_binding_overrides
+
+- name: Assert flows are updated
+  assert:
+    that:
+      - desire_client_with_flow_binding_overrides is changed
+      - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
+      - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.browser | length > 0
+      - "'direct_grant' not in desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides"
+
+- name: Desire client with flow binding overrides remove browser add direct_grant
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authentication_flow_binding_overrides:
+      direct_grant_name: direct grant
+  register: desire_client_with_flow_binding_overrides
+
+- name: Assert flows are updated
+  assert:
+    that:
+      - desire_client_with_flow_binding_overrides is changed
+      - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
+      - "'browser' not in desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides"
+      - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant | length > 0
+
+- name: Desire client with flow binding overrides with UUIDs
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authentication_flow_binding_overrides:
+      browser: "{{ flow_browser_uuid }}"
+      direct_grant: "{{ flow_direct_grant_uuid }}"
+  register: desire_client_with_flow_binding_overrides
+
+- name: Assert flows are updated
+  assert:
+    that:
+      - desire_client_with_flow_binding_overrides is changed
+      - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
+      - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.browser == flow_browser_uuid
+      - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant == flow_direct_grant_uuid
