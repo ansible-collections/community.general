@@ -344,13 +344,13 @@ options:
             browser:
                 description:
                     - Flow ID of the browser authentication flow.
-                    - O(browser) and O(browser_name) are mutually exclusive.
+                    - O(authentication_flow_binding_overrides.browser) and O(authentication_flow_binding_overrides.browser_name) are mutually exclusive.
                 type: str
 
             browser_name:
                 description:
                     - Flow name of the browser authentication flow.
-                    - O(browser) and O(browser_name) are mutually exclusive.
+                    - O(authentication_flow_binding_overrides.browser) and O(authentication_flow_binding_overrides.browser_name) are mutually exclusive.
                 aliases:
                     - browserName
                 type: str
@@ -358,7 +358,7 @@ options:
             direct_grant:
                 description:
                     - Flow ID of the direct grant authentication flow.
-                    - O(direct_grant) and O(direct_grant_name) are mutually exclusive.
+                    - O(authentication_flow_binding_overrides.direct_grant) and O(authentication_flow_binding_overrides.direct_grant_name) are mutually exclusive.
                 aliases:
                     - directGrant
                 type: str
@@ -366,7 +366,7 @@ options:
             direct_grant_name:
                 description:
                     - Flow name of the direct grant authentication flow.
-                    - O(direct_grant) and O(direct_grant_name) are mutually exclusive.
+                    - O(authentication_flow_binding_overrides.direct_grant) and O(authentication_flow_binding_overrides.direct_grant_name) are mutually exclusive.
                 aliases:
                     - directGrantName
                 type: str
