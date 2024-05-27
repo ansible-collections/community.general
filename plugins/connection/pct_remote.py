@@ -336,9 +336,11 @@ class Connection(SSH_Connection):
 
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
-        cmd = ' '.join([become_command(), '/usr/sbin/pct',
-                       'exec', self.get_option('vmid'), '--', cmd])
-        return super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
+        cmd = ['/usr/sbin/pct', 'exec',
+               self.get_option('vmid'), '--', cmd]
+        if self.get_option('remote_user') != 'root':
+            cmd = [become_command()] + cmd
+        return super().exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
 
     def put_file(self, in_path: str, out_path: str) -> None:
         ''' transfer a file from local to remote '''
@@ -347,9 +349,11 @@ class Connection(SSH_Connection):
         try:
             super().exec_command(f'mkdir -p {temp_dir}')
             super().put_file(in_path, temp_file_path)
-            cmd = ' '.join([become_command(), '/usr/sbin/pct', 'push',
-                           self.get_option('vmid'), temp_file_path, out_path])
-            super().exec_command(cmd)
+            cmd = ['/usr/sbin/pct', 'push',
+                   self.get_option('vmid'), temp_file_path, out_path]
+            if self.get_option('remote_user') != 'root':
+                cmd = [become_command()] + cmd
+            super().exec_command(' '.join(cmd))
         except Exception as e:
             raise AnsibleError(
                 'failed to transfer file to %s!\n%s' % (out_path, e))
@@ -362,9 +366,11 @@ class Connection(SSH_Connection):
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
             super().exec_command(f'mkdir -p {temp_dir}')
-            cmd = ' '.join([become_command(), '/usr/sbin/pct', 'pull',
-                           self.get_option('vmid'), in_path, temp_file_path])
-            super().exec_command(cmd)
+            cmd = ['/usr/sbin/pct', 'pull',
+                   self.get_option('vmid'), in_path, temp_file_path]
+            if self.get_option('remote_user') != 'root':
+                cmd = [become_command()] + cmd
+            super().exec_command(' '.join(cmd))
             super().fetch_file(temp_file_path, out_path)
         except Exception as e:
             raise AnsibleError(
