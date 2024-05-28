@@ -11,6 +11,7 @@ import os
 import random
 import string
 import gzip
+import time
 from io import BytesIO
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
@@ -624,6 +625,27 @@ class RedfishUtils(object):
             allowable_values = default_values
         return allowable_values
 
+    def check_service_availability(self):
+        """
+        Checks if the service is accessible.
+
+        :return: dict containing the status of the service
+        """
+
+        # Get the service root
+        # Override the timeout since the service root is expected to be readily
+        # available.
+        original_timeout = self.timeout
+        self.timeout = 10
+        service_root = self.get_request(self.root_uri + self.service_root)
+        self.timeout = original_timeout
+        if service_root['ret'] is False:
+            # Failed, either due to a timeout or HTTP error; not available
+            return {'ret': True, 'available': False}
+
+        # Successfully accessed the service root; available
+        return {'ret': True, 'available': True}
+
     def get_logs(self):
         log_svcs_uri_list = []
         list_of_logs = []
@@ -1083,11 +1105,12 @@ class RedfishUtils(object):
         return self.manage_power(command, self.systems_uri,
                                  '#ComputerSystem.Reset')
 
-    def manage_manager_power(self, command):
+    def manage_manager_power(self, command, wait=False, wait_timeout=120):
         return self.manage_power(command, self.manager_uri,
-                                 '#Manager.Reset')
+                                 '#Manager.Reset', wait, wait_timeout)
 
-    def manage_power(self, command, resource_uri, action_name):
+    def manage_power(self, command, resource_uri, action_name, wait=False,
+                     wait_timeout=120):
         key = "Actions"
         reset_type_values = ['On', 'ForceOff', 'GracefulShutdown',
                              'GracefulRestart', 'ForceRestart', 'Nmi',
@@ -1147,6 +1170,26 @@ class RedfishUtils(object):
         response = self.post_request(self.root_uri + action_uri, payload)
         if response['ret'] is False:
             return response
+
+        # If requested to wait for the service to be available again, block
+        # until it's ready
+        if wait:
+            start_time = time.time()
+            # Start with a large enough sleep.  Some services will process new
+            # requests while in the middle of shutting down, thus breaking out
+            # early.
+            time.sleep(30)
+
+            # Periodically check for the service's availability.
+            # Even if the timeout is exhausted, we still want to return success
+            # since the power/reset operation was successful.
+            while wait_timeout > 0:
+                status = self.check_service_availability()
+                if status['available']:
+                    # It's available; we're done
+                    break
+                time.sleep(5)
+                wait_timeout = wait_timeout - (time.time() - start_time)
         return {'ret': True, 'changed': True}
 
     def manager_reset_to_defaults(self, command):

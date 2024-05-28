@@ -288,6 +288,20 @@ options:
     type: str
     choices: [ ResetAll, PreserveNetworkAndUsers, PreserveNetwork ]
     version_added: 8.6.0
+  wait:
+    required: false
+    description:
+      - Block until the service is ready again
+    type: bool
+    default: false
+    version_added: 9.2.0
+  wait_timeout:
+    required: false
+    description:
+      - How long to block until the service is ready again before giving up
+    type: int
+    default: 120
+    version_added: 9.2.0
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
@@ -685,6 +699,16 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Restart manager power gracefully and wait for it to be available
+    community.general.redfish_command:
+      category: Manager
+      command: GracefulRestart
+      resource_id: BMC
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      wait: True
+
   - name: Restart manager power gracefully
     community.general.redfish_command:
       category: Manager
@@ -841,7 +865,9 @@ def main():
             ),
             strip_etag_quotes=dict(type='bool', default=False),
             reset_to_defaults_mode=dict(choices=['ResetAll', 'PreserveNetworkAndUsers', 'PreserveNetwork']),
-            bios_attributes=dict(type="dict")
+            bios_attributes=dict(type="dict"),
+            wait=dict(type='bool', default=False),
+            wait_timeout=dict(type='int', default=120),
         ),
         required_together=[
             ('username', 'password'),
@@ -1016,7 +1042,7 @@ def main():
                 command = 'PowerGracefulRestart'
 
             if command.startswith('Power'):
-                result = rf_utils.manage_manager_power(command)
+                result = rf_utils.manage_manager_power(command, module.params['wait'], module.params['wait_timeout'])
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
