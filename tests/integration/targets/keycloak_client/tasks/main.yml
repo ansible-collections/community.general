@@ -206,3 +206,28 @@
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
       - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.browser == flow_browser_uuid
       - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant == flow_direct_grant_uuid
+
+- name: Unset flow binding overrides
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    redirect_uris: '{{redirect_uris1}}'
+    attributes: '{{client_attributes1}}'
+    protocol_mappers: '{{protocol_mappers1}}'
+    authentication_flow_binding_overrides:
+      browser: "{{ None }}"
+      direct_grant: null
+  register: desire_client_with_flow_binding_overrides
+
+- name: Assert flows are removed
+  assert:
+    that:
+      - desire_client_with_flow_binding_overrides is changed
+      - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
+      - "'browser' not in desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides"
+      - "'direct_grant' not in desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides"
