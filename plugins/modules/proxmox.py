@@ -6,9 +6,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: proxmox
 short_description: Management of instances in Proxmox VE cluster
@@ -222,9 +223,9 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create new container with minimal options
   community.general.proxmox:
     vmid: 100
@@ -468,31 +469,40 @@ EXAMPLES = r'''
     api_password: 1q2w3e
     api_host: node1
     state: absent
-'''
+"""
 
 import re
 import time
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
+    ProxmoxAnsible,
+    ansible_to_proxmox_bool,
+    proxmox_auth_argument_spec,
+)
+from ansible_collections.community.general.plugins.module_utils.version import (
+    LooseVersion,
+)
 
 VZ_TYPE = None
 
 
 class ProxmoxLxcAnsible(ProxmoxAnsible):
     def content_check(self, node, ostemplate, template_store):
-        return [True for cnt in self.proxmox_api.nodes(node).storage(template_store).content.get() if cnt['volid'] == ostemplate]
+        return [
+            True
+            for cnt in self.proxmox_api.nodes(node)
+            .storage(template_store)
+            .content.get()
+            if cnt["volid"] == ostemplate
+        ]
 
     def is_template_container(self, node, vmid):
         """Check if the specified container is a template."""
         proxmox_node = self.proxmox_api.nodes(node)
         config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
-        return config.get('template', False)
+        return config.get("template", False)
 
     def update_config(self, vmid, node, disk, cpus, memory, swap, **kwargs):
         if VZ_TYPE != "lxc":
@@ -547,7 +557,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         # compare the requested config against the current
         update_config = False
-        for (arg, value) in kwargs.items():
+        for arg, value in kwargs.items():
             # if the arg isn't in the current config, it needs to be updated
             if arg not in current_config:
                 update_config = True
@@ -568,17 +578,20 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     break
 
         if update_config:
-            getattr(proxmox_node, VZ_TYPE)(vmid).config.put(vmid=vmid, node=node, **kwargs)
+            getattr(proxmox_node, VZ_TYPE)(vmid).config.put(
+                vmid=vmid, node=node, **kwargs
+            )
         else:
-            self.module.exit_json(changed=False, msg="Container config is already up to date")
+            self.module.exit_json(
+                changed=False, msg="Container config is already up to date"
+            )
 
-    def create_instance(self, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
+    def create_instance(
+        self, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs
+    ):
 
         # Version limited features
-        minimum_version = {
-            'tags': '6.1',
-            'timezone': '6.3'
-        }
+        minimum_version = {"tags": "6.1", "timezone": "6.3"}
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Remove all empty kwarg entries
@@ -589,40 +602,47 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         # Fail on unsupported features
         for option, version in minimum_version.items():
             if pve_version < LooseVersion(version) and option in kwargs:
-                self.module.fail_json(changed=False, msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_version}".
-                                      format(option=option, version=version, pve_version=pve_version))
+                self.module.fail_json(
+                    changed=False,
+                    msg="Feature {option} is only supported in PVE {version}+, and you're using PVE {pve_version}".format(
+                        option=option, version=version, pve_version=pve_version
+                    ),
+                )
 
-        if VZ_TYPE == 'lxc':
-            kwargs['cpulimit'] = cpus
-            kwargs['rootfs'] = disk
-            if 'netif' in kwargs:
-                kwargs.update(kwargs['netif'])
-                del kwargs['netif']
-            if 'mounts' in kwargs:
-                kwargs.update(kwargs['mounts'])
-                del kwargs['mounts']
-            if 'pubkey' in kwargs:
-                if self.version() >= LooseVersion('4.2'):
-                    kwargs['ssh-public-keys'] = kwargs['pubkey']
-                del kwargs['pubkey']
+        if VZ_TYPE == "lxc":
+            kwargs["cpulimit"] = cpus
+            kwargs["rootfs"] = disk
+            if "netif" in kwargs:
+                kwargs.update(kwargs["netif"])
+                del kwargs["netif"]
+            if "mounts" in kwargs:
+                kwargs.update(kwargs["mounts"])
+                del kwargs["mounts"]
+            if "pubkey" in kwargs:
+                if self.version() >= LooseVersion("4.2"):
+                    kwargs["ssh-public-keys"] = kwargs["pubkey"]
+                del kwargs["pubkey"]
         else:
-            kwargs['cpus'] = cpus
-            kwargs['disk'] = disk
+            kwargs["cpus"] = cpus
+            kwargs["disk"] = disk
 
         # LXC tags are expected to be valid and presented as a comma/semi-colon delimited string
-        if 'tags' in kwargs:
-            re_tag = re.compile(r'^[a-z0-9_][a-z0-9_\-\+\.]*$')
-            for tag in kwargs['tags']:
+        if "tags" in kwargs:
+            re_tag = re.compile(r"^[a-z0-9_][a-z0-9_\-\+\.]*$")
+            for tag in kwargs["tags"]:
                 if not re_tag.match(tag):
-                    self.module.fail_json(msg='%s is not a valid tag' % tag)
-            kwargs['tags'] = ",".join(kwargs['tags'])
+                    self.module.fail_json(msg="%s is not a valid tag" % tag)
+            kwargs["tags"] = ",".join(kwargs["tags"])
 
-        if kwargs.get('ostype') == 'auto':
-            kwargs.pop('ostype')
+        if kwargs.get("ostype") == "auto":
+            kwargs.pop("ostype")
 
         if clone is not None:
-            if VZ_TYPE != 'lxc':
-                self.module.fail_json(changed=False, msg="Clone operator is only supported for LXC enabled proxmox clusters.")
+            if VZ_TYPE != "lxc":
+                self.module.fail_json(
+                    changed=False,
+                    msg="Clone operator is only supported for LXC enabled proxmox clusters.",
+                )
 
             clone_is_template = self.is_template_container(node, clone)
 
@@ -630,96 +650,136 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             create_full_copy = not clone_is_template
 
             # Only accept parameters that are compatible with the clone endpoint.
-            valid_clone_parameters = ['hostname', 'pool', 'description']
-            if self.module.params['storage'] is not None and clone_is_template:
+            valid_clone_parameters = ["hostname", "pool", "description"]
+            if self.module.params["storage"] is not None and clone_is_template:
                 # Cloning a template, so create a full copy instead of a linked copy
                 create_full_copy = True
-            elif self.module.params['storage'] is None and not clone_is_template:
+            elif self.module.params["storage"] is None and not clone_is_template:
                 # Not cloning a template, but also no defined storage. This isn't possible.
-                self.module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Cloned container is not a template, storage needs to be specified.",
+                )
 
-            if self.module.params['clone_type'] == 'linked':
+            if self.module.params["clone_type"] == "linked":
                 if not clone_is_template:
-                    self.module.fail_json(changed=False, msg="'linked' clone type is specified, but cloned container is not a template container.")
+                    self.module.fail_json(
+                        changed=False,
+                        msg="'linked' clone type is specified, but cloned container is not a template container.",
+                    )
                 # Don't need to do more, by default create_full_copy is set to false already
-            elif self.module.params['clone_type'] == 'opportunistic':
+            elif self.module.params["clone_type"] == "opportunistic":
                 if not clone_is_template:
                     # Cloned container is not a template, so we need our 'storage' parameter
-                    valid_clone_parameters.append('storage')
-            elif self.module.params['clone_type'] == 'full':
+                    valid_clone_parameters.append("storage")
+            elif self.module.params["clone_type"] == "full":
                 create_full_copy = True
-                valid_clone_parameters.append('storage')
+                valid_clone_parameters.append("storage")
 
             clone_parameters = {}
 
             if create_full_copy:
-                clone_parameters['full'] = '1'
+                clone_parameters["full"] = "1"
             else:
-                clone_parameters['full'] = '0'
+                clone_parameters["full"] = "0"
             for param in valid_clone_parameters:
                 if self.module.params[param] is not None:
                     clone_parameters[param] = self.module.params[param]
 
-            taskid = getattr(proxmox_node, VZ_TYPE)(clone).clone.post(newid=vmid, **clone_parameters)
+            taskid = getattr(proxmox_node, VZ_TYPE)(clone).clone.post(
+                newid=vmid, **clone_parameters
+            )
         else:
-            taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
+            taskid = getattr(proxmox_node, VZ_TYPE).create(
+                vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs
+            )
 
         while timeout:
             if self.api_task_ok(node, taskid):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(vmid=vmid, node=node, msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
-                                      proxmox_node.tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    vmid=vmid,
+                    node=node,
+                    msg="Reached timeout while waiting for creating VM. Last line in task before timeout: %s"
+                    % proxmox_node.tasks(taskid).log.get()[:1],
+                )
 
             time.sleep(1)
         return False
 
     def start_instance(self, vm, vmid, timeout):
-        taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.start.post()
+        taskid = getattr(self.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+            vmid
+        ).status.start.post()
         while timeout:
-            if self.api_task_ok(vm['node'], taskid):
+            if self.api_task_ok(vm["node"], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(vmid=vmid, taskid=taskid, msg='Reached timeout while waiting for starting VM. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    vmid=vmid,
+                    taskid=taskid,
+                    msg="Reached timeout while waiting for starting VM. Last line in task before timeout: %s"
+                    % self.proxmox_api.nodes(vm["node"]).tasks(taskid).log.get()[:1],
+                )
 
             time.sleep(1)
         return False
 
     def stop_instance(self, vm, vmid, timeout, force):
         if force:
-            taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.shutdown.post(forceStop=1)
+            taskid = getattr(self.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                vmid
+            ).status.shutdown.post(forceStop=1)
         else:
-            taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.shutdown.post()
+            taskid = getattr(self.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                vmid
+            ).status.shutdown.post()
         while timeout:
-            if self.api_task_ok(vm['node'], taskid):
+            if self.api_task_ok(vm["node"], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(vmid=vmid, taskid=taskid, msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    vmid=vmid,
+                    taskid=taskid,
+                    msg="Reached timeout while waiting for stopping VM. Last line in task before timeout: %s"
+                    % self.proxmox_api.nodes(vm["node"]).tasks(taskid).log.get()[:1],
+                )
 
             time.sleep(1)
         return False
 
     def convert_to_template(self, vm, vmid, timeout, force):
-        if getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running' and force:
+        if (
+            getattr(self.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                vmid
+            ).status.current.get()["status"]
+            == "running"
+            and force
+        ):
             self.stop_instance(vm, vmid, timeout, force)
         # not sure why, but templating a container doesn't return a taskid
-        getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).template.post()
+        getattr(self.proxmox_api.nodes(vm["node"]), VZ_TYPE)(vmid).template.post()
         return True
 
     def umount_instance(self, vm, vmid, timeout):
-        taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.umount.post()
+        taskid = getattr(self.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+            vmid
+        ).status.umount.post()
         while timeout:
-            if self.api_task_ok(vm['node'], taskid):
+            if self.api_task_ok(vm["node"], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(vmid=vmid, taskid=taskid, msg='Reached timeout while waiting for unmounting VM. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    vmid=vmid,
+                    taskid=taskid,
+                    msg="Reached timeout while waiting for unmounting VM. Last line in task before timeout: %s"
+                    % self.proxmox_api.nodes(vm["node"]).tasks(taskid).log.get()[:1],
+                )
 
             time.sleep(1)
         return False
@@ -728,115 +788,155 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 def main():
     module_args = proxmox_auth_argument_spec()
     proxmox_args = dict(
-        vmid=dict(type='int', required=False),
+        vmid=dict(type="int", required=False),
         node=dict(),
         pool=dict(),
         password=dict(no_log=True),
         hostname=dict(),
         ostemplate=dict(),
-        disk=dict(type='str'),
-        cores=dict(type='int'),
-        cpus=dict(type='int'),
-        memory=dict(type='int'),
-        swap=dict(type='int'),
-        netif=dict(type='dict'),
-        mounts=dict(type='dict'),
+        disk=dict(type="str"),
+        cores=dict(type="int"),
+        cpus=dict(type="int"),
+        memory=dict(type="int"),
+        swap=dict(type="int"),
+        netif=dict(type="dict"),
+        mounts=dict(type="dict"),
         ip_address=dict(),
-        ostype=dict(default='auto', choices=[
-            'auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged'
-        ]),
-        onboot=dict(type='bool'),
-        features=dict(type='list', elements='str'),
-        startup=dict(type='list', elements='str'),
-        storage=dict(default='local'),
-        cpuunits=dict(type='int'),
+        ostype=dict(
+            default="auto",
+            choices=[
+                "auto",
+                "debian",
+                "devuan",
+                "ubuntu",
+                "centos",
+                "fedora",
+                "opensuse",
+                "archlinux",
+                "alpine",
+                "gentoo",
+                "nixos",
+                "unmanaged",
+            ],
+        ),
+        onboot=dict(type="bool"),
+        features=dict(type="list", elements="str"),
+        startup=dict(type="list", elements="str"),
+        storage=dict(default="local"),
+        cpuunits=dict(type="int"),
         nameserver=dict(),
         searchdomain=dict(),
-        timeout=dict(type='int', default=30),
-        update=dict(type='bool', default=False),
-        force=dict(type='bool', default=False),
-        purge=dict(type='bool', default=False),
-        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'template']),
-        pubkey=dict(type='str'),
-        unprivileged=dict(type='bool', default=True),
-        description=dict(type='str'),
-        hookscript=dict(type='str'),
-        timezone=dict(type='str'),
-        clone=dict(type='int'),
-        clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
-        tags=dict(type='list', elements='str')
+        timeout=dict(type="int", default=30),
+        update=dict(type="bool", default=False),
+        force=dict(type="bool", default=False),
+        purge=dict(type="bool", default=False),
+        state=dict(
+            default="present",
+            choices=[
+                "present",
+                "absent",
+                "stopped",
+                "started",
+                "restarted",
+                "template",
+            ],
+        ),
+        pubkey=dict(type="str"),
+        unprivileged=dict(type="bool", default=True),
+        description=dict(type="str"),
+        hookscript=dict(type="str"),
+        timezone=dict(type="str"),
+        clone=dict(type="int"),
+        clone_type=dict(
+            default="opportunistic", choices=["full", "linked", "opportunistic"]
+        ),
+        tags=dict(type="list", elements="str"),
     )
     module_args.update(proxmox_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
         required_if=[
-            ('state', 'present', ['node', 'hostname']),
+            ("state", "present", ["node", "hostname"]),
             # Require one of clone, ostemplate, or update. Together with mutually_exclusive this ensures that we
             # either clone a container or create a new one from a template file.
-            ('state', 'present', ('clone', 'ostemplate', 'update'), True),
+            ("state", "present", ("clone", "ostemplate", "update"), True),
         ],
-        required_together=[
-            ('api_token_id', 'api_token_secret')
-        ],
-        required_one_of=[('api_password', 'api_token_id')],
-        mutually_exclusive=[('clone', 'ostemplate', 'update')],  # Creating a new container is done either by cloning an existing one, or based on a template.
+        required_together=[("api_token_id", "api_token_secret")],
+        required_one_of=[("api_password", "api_token_id")],
+        mutually_exclusive=[
+            ("clone", "ostemplate", "update")
+        ],  # Creating a new container is done either by cloning an existing one, or based on a template.
     )
 
     proxmox = ProxmoxLxcAnsible(module)
 
     global VZ_TYPE
-    VZ_TYPE = 'openvz' if proxmox.version() < LooseVersion('4.0') else 'lxc'
+    VZ_TYPE = "openvz" if proxmox.version() < LooseVersion("4.0") else "lxc"
 
-    state = module.params['state']
-    vmid = module.params['vmid']
-    node = module.params['node']
-    disk = module.params['disk']
-    cpus = module.params['cpus']
-    memory = module.params['memory']
-    swap = module.params['swap']
-    storage = module.params['storage']
-    hostname = module.params['hostname']
-    if module.params['ostemplate'] is not None:
-        template_store = module.params['ostemplate'].split(":")[0]
-    timeout = module.params['timeout']
-    clone = module.params['clone']
+    state = module.params["state"]
+    vmid = module.params["vmid"]
+    node = module.params["node"]
+    disk = module.params["disk"]
+    cpus = module.params["cpus"]
+    memory = module.params["memory"]
+    swap = module.params["swap"]
+    storage = module.params["storage"]
+    hostname = module.params["hostname"]
+    if module.params["ostemplate"] is not None:
+        template_store = module.params["ostemplate"].split(":")[0]
+    timeout = module.params["timeout"]
+    clone = module.params["clone"]
 
     # If vmid not set get the Next VM id from ProxmoxAPI
     # If hostname is set get the VM id from ProxmoxAPI
-    if not vmid and state == 'present':
+    if not vmid and state == "present":
         vmid = proxmox.get_nextvmid()
     elif not vmid and hostname:
         vmid = proxmox.get_vmid(hostname)
     elif not vmid:
-        module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
+        module.exit_json(
+            changed=False,
+            msg="Vmid could not be fetched for the following action: %s" % state,
+        )
 
     # Create a new container
-    if state == 'present' and clone is None:
+    if state == "present" and clone is None:
         try:
             if proxmox.get_vm(vmid, ignore_missing=True):
                 if module.params["update"]:
                     try:
-                        proxmox.update_config(vmid, node, disk, cpus, memory, swap,
-                                              cores=module.params["cores"],
-                                              hostname=module.params["hostname"],
-                                              netif=module.params["netif"],
-                                              mounts=module.params["mounts"],
-                                              ip_address=module.params["ip_address"],
-                                              onboot=ansible_to_proxmox_bool(module.params["onboot"]),
-                                              cpuunits=module.params["cpuunits"],
-                                              nameserver=module.params["nameserver"],
-                                              searchdomain=module.params["searchdomain"],
-                                              features=",".join(module.params["features"])
-                                              if module.params["features"] is not None
-                                              else None,
-                                              startup=",".join(module.params["startup"])
-                                              if module.params["startup"] is not None
-                                              else None,
-                                              description=module.params["description"],
-                                              hookscript=module.params["hookscript"],
-                                              timezone=module.params["timezone"],
-                                              tags=module.params["tags"])
+                        proxmox.update_config(
+                            vmid,
+                            node,
+                            disk,
+                            cpus,
+                            memory,
+                            swap,
+                            cores=module.params["cores"],
+                            hostname=module.params["hostname"],
+                            netif=module.params["netif"],
+                            mounts=module.params["mounts"],
+                            ip_address=module.params["ip_address"],
+                            onboot=ansible_to_proxmox_bool(module.params["onboot"]),
+                            cpuunits=module.params["cpuunits"],
+                            nameserver=module.params["nameserver"],
+                            searchdomain=module.params["searchdomain"],
+                            features=(
+                                ",".join(module.params["features"])
+                                if module.params["features"] is not None
+                                else None
+                            ),
+                            startup=(
+                                ",".join(module.params["startup"])
+                                if module.params["startup"] is not None
+                                else None
+                            ),
+                            description=module.params["description"],
+                            hookscript=module.params["hookscript"],
+                            timezone=module.params["timezone"],
+                            tags=module.params["tags"],
+                        )
                         module.exit_json(
                             changed=True,
                             vmid=vmid,
@@ -855,159 +955,313 @@ def main():
                         msg="VM with vmid = %s is already exists" % vmid,
                     )
             # If no vmid was passed, there cannot be another VM named 'hostname'
-            if (not module.params['vmid'] and
-                    proxmox.get_vmid(hostname, ignore_missing=True) and
-                    not module.params['force']):
+            if (
+                not module.params["vmid"]
+                and proxmox.get_vmid(hostname, ignore_missing=True)
+                and not module.params["force"]
+            ):
                 vmid = proxmox.get_vmid(hostname)
-                module.exit_json(changed=False, vmid=vmid, msg="VM with hostname %s already exists and has ID number %s" % (hostname, vmid))
+                module.exit_json(
+                    changed=False,
+                    vmid=vmid,
+                    msg="VM with hostname %s already exists and has ID number %s"
+                    % (hostname, vmid),
+                )
             elif not proxmox.get_node(node):
-                module.fail_json(vmid=vmid, msg="node '%s' not exists in cluster" % node)
-            elif not proxmox.content_check(node, module.params['ostemplate'], template_store):
-                module.fail_json(vmid=vmid, msg="ostemplate '%s' not exists on node %s and storage %s"
-                                 % (module.params['ostemplate'], node, template_store))
+                module.fail_json(
+                    vmid=vmid, msg="node '%s' not exists in cluster" % node
+                )
+            elif not proxmox.content_check(
+                node, module.params["ostemplate"], template_store
+            ):
+                module.fail_json(
+                    vmid=vmid,
+                    msg="ostemplate '%s' not exists on node %s and storage %s"
+                    % (module.params["ostemplate"], node, template_store),
+                )
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(
+                vmid=vmid,
+                msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(
+                    VZ_TYPE=VZ_TYPE, vmid=vmid, e=e
+                ),
+            )
 
         try:
-            proxmox.create_instance(vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
-                                    cores=module.params['cores'],
-                                    pool=module.params['pool'],
-                                    password=module.params['password'],
-                                    hostname=module.params['hostname'],
-                                    ostemplate=module.params['ostemplate'],
-                                    netif=module.params['netif'],
-                                    mounts=module.params['mounts'],
-                                    ostype=module.params['ostype'],
-                                    ip_address=module.params['ip_address'],
-                                    onboot=ansible_to_proxmox_bool(module.params['onboot']),
-                                    cpuunits=module.params['cpuunits'],
-                                    nameserver=module.params['nameserver'],
-                                    searchdomain=module.params['searchdomain'],
-                                    force=ansible_to_proxmox_bool(module.params['force']),
-                                    pubkey=module.params['pubkey'],
-                                    features=",".join(module.params['features']) if module.params['features'] is not None else None,
-                                    startup=",".join(module.params['startup']) if module.params['startup'] is not None else None,
-                                    unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
-                                    description=module.params['description'],
-                                    hookscript=module.params['hookscript'],
-                                    timezone=module.params['timezone'],
-                                    tags=module.params['tags'])
+            proxmox.create_instance(
+                vmid,
+                node,
+                disk,
+                storage,
+                cpus,
+                memory,
+                swap,
+                timeout,
+                clone,
+                cores=module.params["cores"],
+                pool=module.params["pool"],
+                password=module.params["password"],
+                hostname=module.params["hostname"],
+                ostemplate=module.params["ostemplate"],
+                netif=module.params["netif"],
+                mounts=module.params["mounts"],
+                ostype=module.params["ostype"],
+                ip_address=module.params["ip_address"],
+                onboot=ansible_to_proxmox_bool(module.params["onboot"]),
+                cpuunits=module.params["cpuunits"],
+                nameserver=module.params["nameserver"],
+                searchdomain=module.params["searchdomain"],
+                force=ansible_to_proxmox_bool(module.params["force"]),
+                pubkey=module.params["pubkey"],
+                features=(
+                    ",".join(module.params["features"])
+                    if module.params["features"] is not None
+                    else None
+                ),
+                startup=(
+                    ",".join(module.params["startup"])
+                    if module.params["startup"] is not None
+                    else None
+                ),
+                unprivileged=ansible_to_proxmox_bool(module.params["unprivileged"]),
+                description=module.params["description"],
+                hookscript=module.params["hookscript"],
+                timezone=module.params["timezone"],
+                tags=module.params["tags"],
+            )
 
-            module.exit_json(changed=True, vmid=vmid, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
+            module.exit_json(
+                changed=True,
+                vmid=vmid,
+                msg="Deployed VM %s from template %s"
+                % (vmid, module.params["ostemplate"]),
+            )
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="Creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+            module.fail_json(
+                vmid=vmid,
+                msg="Creation of %s VM %s failed with exception: %s"
+                % (VZ_TYPE, vmid, e),
+            )
 
     # Clone a container
-    elif state == 'present' and clone is not None:
+    elif state == "present" and clone is not None:
         try:
-            if proxmox.get_vm(vmid, ignore_missing=True) and not module.params['force']:
-                module.exit_json(changed=False, vmid=vmid, msg="VM with vmid = %s is already exists" % vmid)
+            if proxmox.get_vm(vmid, ignore_missing=True) and not module.params["force"]:
+                module.exit_json(
+                    changed=False,
+                    vmid=vmid,
+                    msg="VM with vmid = %s is already exists" % vmid,
+                )
             # If no vmid was passed, there cannot be another VM named 'hostname'
-            if (not module.params['vmid'] and
-                    proxmox.get_vmid(hostname, ignore_missing=True) and
-                    not module.params['force']):
+            if (
+                not module.params["vmid"]
+                and proxmox.get_vmid(hostname, ignore_missing=True)
+                and not module.params["force"]
+            ):
                 vmid = proxmox.get_vmid(hostname)
-                module.exit_json(changed=False, vmid=vmid, msg="VM with hostname %s already exists and has ID number %s" % (hostname, vmid))
+                module.exit_json(
+                    changed=False,
+                    vmid=vmid,
+                    msg="VM with hostname %s already exists and has ID number %s"
+                    % (hostname, vmid),
+                )
             if not proxmox.get_vm(clone, ignore_missing=True):
-                module.exit_json(changed=False, vmid=vmid, msg="Container to be cloned does not exist")
+                module.exit_json(
+                    changed=False,
+                    vmid=vmid,
+                    msg="Container to be cloned does not exist",
+                )
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(
+                vmid=vmid,
+                msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(
+                    VZ_TYPE=VZ_TYPE, vmid=vmid, e=e
+                ),
+            )
 
         try:
-            proxmox.create_instance(vmid, node, disk, storage, cpus, memory, swap, timeout, clone)
+            proxmox.create_instance(
+                vmid, node, disk, storage, cpus, memory, swap, timeout, clone
+            )
 
-            module.exit_json(changed=True, vmid=vmid, msg="Cloned VM %s from %s" % (vmid, clone))
+            module.exit_json(
+                changed=True, vmid=vmid, msg="Cloned VM %s from %s" % (vmid, clone)
+            )
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="Cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+            module.fail_json(
+                vmid=vmid,
+                msg="Cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e),
+            )
 
-    elif state == 'started':
+    elif state == "started":
         try:
             vm = proxmox.get_vm(vmid)
-            if getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
-                module.exit_json(changed=False, vmid=vmid, msg="VM %s is already running" % vmid)
+            if (
+                getattr(proxmox.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                    vmid
+                ).status.current.get()["status"]
+                == "running"
+            ):
+                module.exit_json(
+                    changed=False, vmid=vmid, msg="VM %s is already running" % vmid
+                )
 
             if proxmox.start_instance(vm, vmid, timeout):
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s started" % vmid)
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="starting of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(
+                vmid=vmid, msg="starting of VM %s failed with exception: %s" % (vmid, e)
+            )
 
-    elif state == 'stopped':
+    elif state == "stopped":
         try:
             vm = proxmox.get_vm(vmid)
 
-            if getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted':
-                if module.params['force']:
+            if (
+                getattr(proxmox.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                    vmid
+                ).status.current.get()["status"]
+                == "mounted"
+            ):
+                if module.params["force"]:
                     if proxmox.umount_instance(vm, vmid, timeout):
-                        module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid)
+                        module.exit_json(
+                            changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid
+                        )
                 else:
-                    module.exit_json(changed=False, vmid=vmid,
-                                     msg=("VM %s is already shutdown, but mounted. You can use force option to umount it.") % vmid)
+                    module.exit_json(
+                        changed=False,
+                        vmid=vmid,
+                        msg=(
+                            "VM %s is already shutdown, but mounted. You can use force option to umount it."
+                        )
+                        % vmid,
+                    )
 
-            if getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
-                module.exit_json(changed=False, vmid=vmid, msg="VM %s is already shutdown" % vmid)
+            if (
+                getattr(proxmox.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                    vmid
+                ).status.current.get()["status"]
+                == "stopped"
+            ):
+                module.exit_json(
+                    changed=False, vmid=vmid, msg="VM %s is already shutdown" % vmid
+                )
 
-            if proxmox.stop_instance(vm, vmid, timeout, force=module.params['force']):
-                module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid)
+            if proxmox.stop_instance(vm, vmid, timeout, force=module.params["force"]):
+                module.exit_json(
+                    changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid
+                )
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(
+                vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e)
+            )
 
-    elif state == 'template':
+    elif state == "template":
         try:
             vm = proxmox.get_vm(vmid)
 
-            proxmox.convert_to_template(vm, vmid, timeout, force=module.params['force'])
+            proxmox.convert_to_template(vm, vmid, timeout, force=module.params["force"])
             module.exit_json(changed=True, msg="VM %s is converted to template" % vmid)
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="conversion of VM %s to template failed with exception: %s" % (vmid, e))
+            module.fail_json(
+                vmid=vmid,
+                msg="conversion of VM %s to template failed with exception: %s"
+                % (vmid, e),
+            )
 
-    elif state == 'restarted':
+    elif state == "restarted":
         try:
             vm = proxmox.get_vm(vmid)
 
-            vm_status = getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status']
-            if vm_status in ['stopped', 'mounted']:
-                module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid)
+            vm_status = getattr(proxmox.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                vmid
+            ).status.current.get()["status"]
+            if vm_status in ["stopped", "mounted"]:
+                module.exit_json(
+                    changed=False, vmid=vmid, msg="VM %s is not running" % vmid
+                )
 
-            if (proxmox.stop_instance(vm, vmid, timeout, force=module.params['force']) and
-                    proxmox.start_instance(vm, vmid, timeout)):
-                module.exit_json(changed=True, vmid=vmid, msg="VM %s is restarted" % vmid)
+            if proxmox.stop_instance(
+                vm, vmid, timeout, force=module.params["force"]
+            ) and proxmox.start_instance(vm, vmid, timeout):
+                module.exit_json(
+                    changed=True, vmid=vmid, msg="VM %s is restarted" % vmid
+                )
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="restarting of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(
+                vmid=vmid,
+                msg="restarting of VM %s failed with exception: %s" % (vmid, e),
+            )
 
-    elif state == 'absent':
+    elif state == "absent":
         if not vmid:
-            module.exit_json(changed=False, vmid=vmid, msg='VM with hostname = %s is already absent' % hostname)
+            module.exit_json(
+                changed=False,
+                vmid=vmid,
+                msg="VM with hostname = %s is already absent" % hostname,
+            )
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:
-                module.exit_json(changed=False, vmid=vmid, msg="VM %s does not exist" % vmid)
+                module.exit_json(
+                    changed=False, vmid=vmid, msg="VM %s does not exist" % vmid
+                )
 
-            vm_status = getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.current.get()['status']
-            if vm_status == 'running':
-                module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion." % vmid)
+            vm_status = getattr(proxmox.proxmox_api.nodes(vm["node"]), VZ_TYPE)(
+                vmid
+            ).status.current.get()["status"]
+            if vm_status == "running":
+                module.exit_json(
+                    changed=False,
+                    vmid=vmid,
+                    msg="VM %s is running. Stop it before deletion." % vmid,
+                )
 
-            if vm_status == 'mounted':
-                module.exit_json(changed=False, vmid=vmid, msg="VM %s is mounted. Stop it with force option before deletion." % vmid)
+            if vm_status == "mounted":
+                module.exit_json(
+                    changed=False,
+                    vmid=vmid,
+                    msg="VM %s is mounted. Stop it with force option before deletion."
+                    % vmid,
+                )
 
             delete_params = {}
 
-            if module.params['purge']:
-                delete_params['purge'] = 1
+            if module.params["purge"]:
+                delete_params["purge"] = 1
 
-            taskid = getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE).delete(vmid, **delete_params)
+            taskid = getattr(proxmox.proxmox_api.nodes(vm["node"]), VZ_TYPE).delete(
+                vmid, **delete_params
+            )
 
             while timeout:
-                if proxmox.api_task_ok(vm['node'], taskid):
-                    module.exit_json(changed=True, vmid=vmid, taskid=taskid, msg="VM %s removed" % vmid)
+                if proxmox.api_task_ok(vm["node"], taskid):
+                    module.exit_json(
+                        changed=True,
+                        vmid=vmid,
+                        taskid=taskid,
+                        msg="VM %s removed" % vmid,
+                    )
                 timeout -= 1
                 if timeout == 0:
-                    module.fail_json(vmid=vmid, taskid=taskid, msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s'
-                                     % proxmox.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                    module.fail_json(
+                        vmid=vmid,
+                        taskid=taskid,
+                        msg="Reached timeout while waiting for removing VM. Last line in task before timeout: %s"
+                        % proxmox.proxmox_api.nodes(vm["node"])
+                        .tasks(taskid)
+                        .log.get()[:1],
+                    )
 
                 time.sleep(1)
         except Exception as e:
-            module.fail_json(vmid=vmid, msg="deletion of VM %s failed with exception: %s" % (vmid, to_native(e)))
+            module.fail_json(
+                vmid=vmid,
+                msg="deletion of VM %s failed with exception: %s"
+                % (vmid, to_native(e)),
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
