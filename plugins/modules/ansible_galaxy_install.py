@@ -32,6 +32,19 @@ attributes:
   diff_mode:
     support: none
 options:
+  state:
+    description:
+      - >
+        If O(state=present) then the collection or role will be installed.
+        Note that the collections and roles are not updated with this option.
+      - >
+        Currently the O(state=latest) is ignored unless O(type=collection), and it will
+        ensure the collection is installed and updated to the latest available version.
+      - Please note that using O(force=true) can be used to perform upgrade regardless of O(type).
+    type: str
+    choices: [ present, latest ]
+    default: present
+    version_added: 9.1.0
   type:
     description:
       - The type of installation performed by C(ansible-galaxy).
@@ -69,7 +82,8 @@ options:
     default: false
   force:
     description:
-      - Force overwriting an existing role or collection.
+      - Force overwriting existing roles and/or collections.
+      - It can be used for upgrading, but the module output will always report C(changed=true).
       - Using O(force=true) is mandatory when downgrading.
     type: bool
     default: false
@@ -188,6 +202,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
     module = dict(
         argument_spec=dict(
+            state=dict(type='str', choices=['present', 'latest'], default="present"),
             type=dict(type='str', choices=('collection', 'role', 'both'), required=True),
             name=dict(type='str'),
             requirements_file=dict(type='path'),
@@ -206,6 +221,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
     command_args_formats = dict(
         type=cmd_runner_fmt.as_func(lambda v: [] if v == 'both' else [v]),
         galaxy_cmd=cmd_runner_fmt.as_list(),
+        upgrade=cmd_runner_fmt.as_bool("--upgrade"),
         requirements_file=cmd_runner_fmt.as_opt_val('-r'),
         dest=cmd_runner_fmt.as_opt_val('-p'),
         force=cmd_runner_fmt.as_bool("--force"),
@@ -244,9 +260,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
     def __init_module__(self):
         self.runner, self.ansible_version = self._get_ansible_galaxy_version()
         if self.ansible_version < (2, 11):
-            self.module.fail_json(
-                msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed."
-            )
+            self.module.fail_json(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
@@ -299,8 +313,9 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 elif match.group("role"):
                     self.vars.new_roles[match.group("role")] = match.group("rversion")
 
-        with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
-            ctx.run(galaxy_cmd="install")
+        upgrade = (self.vars.type == "collection" and self.vars.state == "latest")
+        with self.runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
+            ctx.run(galaxy_cmd="install", upgrade=upgrade)
             if self.verbosity > 2:
                 self.vars.set("run_info", ctx.run_info)
 
