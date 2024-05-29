@@ -556,15 +556,17 @@ class CallbackModule(CallbackBase):
 
         self.otel_exporter_otlp_traces_protocol = self.get_option('otel_exporter_otlp_traces_protocol')
 
-    def dump_results(self, result):
+    def dump_results(self, task, result):
         """ dump the results if disable_logs is not enabled """
         if self.disable_logs:
             return ""
-        # ansible.builtin.uri contains the response in json format
-        # let's remove the json field to avoid issues when the response is huge.
+        # ansible.builtin.uri contains the response in the json field
         save = result._result
-        if "json" in save:
+        if "json" in save and "ansible.builtin.uri" in task.action:
             save.pop("json")
+        # ansible.builtin.slurp contains the response in the content field
+        if "content" in save and "ansible.builtin.slurp" in task.action:
+            save.pop("content")
         return self._dump_results(save)
 
     def v2_playbook_on_start(self, playbook):
@@ -616,7 +618,7 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             status,
             result,
-            self.dump_results(result)
+            self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_runner_on_ok(self, result):
@@ -624,7 +626,7 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             'ok',
             result,
-            self.dump_results(result)
+            self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_runner_on_skipped(self, result):
@@ -632,7 +634,7 @@ class CallbackModule(CallbackBase):
             self.tasks_data,
             'skipped',
             result,
-            self.dump_results(result)
+            self.dump_results(self.tasks_data[result._task._uuid], result)
         )
 
     def v2_playbook_on_include(self, included_file):
