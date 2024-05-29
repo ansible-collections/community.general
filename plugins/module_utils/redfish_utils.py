@@ -1181,8 +1181,6 @@ class RedfishUtils(object):
             time.sleep(30)
 
             # Periodically check for the service's availability.
-            # Even if the timeout is exhausted, we still want to return success
-            # since the power/reset operation was successful.
             while elapsed_time <= wait_timeout:
                 status = self.check_service_availability()
                 if status['available']:
