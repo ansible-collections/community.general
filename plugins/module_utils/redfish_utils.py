@@ -133,11 +133,13 @@ class RedfishUtils(object):
         return resp
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri, override_headers=None, allow_no_resp=False):
+    def get_request(self, uri, override_headers=None, allow_no_resp=False, timeout=None):
         req_headers = dict(GET_HEADERS)
         if override_headers:
             req_headers.update(override_headers)
         username, password, basic_auth = self._auth_params(req_headers)
+        if timeout is None:
+            timeout = self.timeout
         try:
             # Service root is an unauthenticated resource; remove credentials
             # in case the caller will be using sessions later.
@@ -147,7 +149,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=timeout)
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
             try:
                 if headers.get('content-encoding') == 'gzip' and LooseVersion(ansible_version) < LooseVersion('2.14'):
@@ -635,10 +637,7 @@ class RedfishUtils(object):
         # Get the service root
         # Override the timeout since the service root is expected to be readily
         # available.
-        original_timeout = self.timeout
-        self.timeout = 10
-        service_root = self.get_request(self.root_uri + self.service_root)
-        self.timeout = original_timeout
+        service_root = self.get_request(self.root_uri + self.service_root, timeout=10)
         if service_root['ret'] is False:
             # Failed, either due to a timeout or HTTP error; not available
             return {'ret': True, 'available': False}
@@ -1174,6 +1173,7 @@ class RedfishUtils(object):
         # If requested to wait for the service to be available again, block
         # until it's ready
         if wait:
+            elapsed_time = 0
             start_time = time.time()
             # Start with a large enough sleep.  Some services will process new
             # requests while in the middle of shutting down, thus breaking out
@@ -1183,13 +1183,18 @@ class RedfishUtils(object):
             # Periodically check for the service's availability.
             # Even if the timeout is exhausted, we still want to return success
             # since the power/reset operation was successful.
-            while wait_timeout > 0:
+            while elapsed_time <= wait_timeout:
                 status = self.check_service_availability()
                 if status['available']:
                     # It's available; we're done
                     break
                 time.sleep(5)
-                wait_timeout = wait_timeout - (time.time() - start_time)
+                elapsed_time = time.time() - start_time
+
+            if elapsed_time > wait_timeout:
+                # Exhausted the wait timer; error
+                return {'ret': False, 'changed': True,
+                        'msg': 'The service did not become available after %d seconds' % wait_timeout}
         return {'ret': True, 'changed': True}
 
     def manager_reset_to_defaults(self, command):
