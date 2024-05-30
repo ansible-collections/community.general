@@ -752,6 +752,8 @@ files:
     maintainers: mattock
   $modules/keycloak_authz_permission_info.py:
     maintainers: mattock
+  $modules/keycloak_authz_resource.py:
+    maintainers: maximilianpohle
   $modules/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
   $modules/keycloak_clientscope.py:
