@@ -82,7 +82,7 @@ from ansible.module_utils.common._collections_compat import Mapping, Sequence
 import re
 
 
-def keep_keys(data, target=[], matching_parameter='equal'):
+def keep_keys(data, target=None, matching_parameter='equal'):
     """keep specific keys from dictionaries in a list"""
 
     ld = data
