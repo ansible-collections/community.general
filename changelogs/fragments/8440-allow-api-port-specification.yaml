@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox - allow specification of the API Port when using proxmox_* (https://github.com/ansible-collections/community.general/issues/8440).
