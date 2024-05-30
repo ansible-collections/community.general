@@ -1,0 +1,2 @@
+major_changes:
+  - New filter keep_keys. https://github.com/ansible-collections/community.general/pull/8439
