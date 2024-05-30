@@ -1,0 +1,2 @@
+minor_changes:
+  - minor changes to xml module to support adding value of children when creating with subnodes.
