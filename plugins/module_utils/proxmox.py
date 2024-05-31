@@ -29,7 +29,7 @@ def proxmox_auth_argument_spec():
                       required=True,
                       fallback=(env_fallback, ['PROXMOX_HOST'])
                       ),
-        api_port=dict(type='str',
+        api_port=dict(type='int',
                       fallback=(env_fallback, ['PROXMOX_PORT'])
                       ),
         api_user=dict(type='str',
@@ -95,7 +95,7 @@ class ProxmoxAnsible(object):
         auth_args = {'user': api_user}
 
         if api_port:
-            auth_args['port'] =  api_port
+            auth_args['port'] = api_port
 
         if api_password:
             auth_args['password'] = api_password

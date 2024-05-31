@@ -16,6 +16,11 @@ options:
       - Specify the target host of the Proxmox VE cluster.
     type: str
     required: true
+  api_port:
+    description:
+      - Specify the target port of the Proxmox VE cluster.
+    type: int
+    required: false
   api_user:
     description:
       - Specify the user to authenticate with.
