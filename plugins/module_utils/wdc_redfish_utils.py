@@ -11,6 +11,7 @@ import datetime
 import re
 import time
 import tarfile
+import os
 
 from ansible.module_utils.urls import fetch_file
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
@@ -79,19 +80,25 @@ class WdcRedfishUtils(RedfishUtils):
             return response
         return self._find_updateservice_additional_uris()
 
-    def _is_enclosure_multi_tenant(self):
+    def _is_enclosure_multi_tenant_and_fetch_gen(self):
         """Determine if the enclosure is multi-tenant.
 
         The serial number of a multi-tenant enclosure will end in "-A" or "-B".
+        Fetching enclsoure generation.
 
-        :return: True/False if the enclosure is multi-tenant or not; None if unable to determine.
+        :return: True/False if the enclosure is multi-tenant or not and return enclosure generation;
+        None if unable to determine.
         """
         response = self.get_request(self.root_uri + self.service_root + "Chassis/Enclosure")
         if response['ret'] is False:
             return None
         pattern = r".*-[A,B]"
         data = response['data']
-        return re.match(pattern, data['SerialNumber']) is not None
+        if 'EnclVersion' not in data:
+            enc_version = 'G1'
+        else:
+            enc_version = data['EnclVersion']
+        return re.match(pattern, data['SerialNumber']) is not None, enc_version
 
     def _find_updateservice_additional_uris(self):
         """Find & set WDC-specific update service URIs"""
@@ -180,33 +187,60 @@ class WdcRedfishUtils(RedfishUtils):
         To determine if the bundle is multi-tenant or not, it looks inside the .bin file within the tarfile,
         and checks the appropriate byte in the file.
 
+        If not tarfile, the bundle is checked for 2048th byte to determine whether it is Gen2 bundle.
+        Gen2 is always single tenant at this time.
+
         :param str bundle_uri:  HTTP URI of the firmware bundle.
-        :return: Firmware version number contained in the bundle, and whether or not the bundle is multi-tenant.
-        Either value will be None if unable to determine.
+        :return: Firmware version number contained in the bundle, whether or not the bundle is multi-tenant
+        and bundle generation. Either value will be None if unable to determine.
         :rtype: str or None, bool or None
         """
         bundle_temp_filename = fetch_file(module=self.module,
                                           url=bundle_uri)
-        if not tarfile.is_tarfile(bundle_temp_filename):
-            return None, None
-        tf = tarfile.open(bundle_temp_filename)
-        pattern_pkg = r"oobm-(.+)\.pkg"
-        pattern_bin = r"(.*\.bin)"
         bundle_version = None
         is_multi_tenant = None
-        for filename in tf.getnames():
-            match_pkg = re.match(pattern_pkg, filename)
-            if match_pkg is not None:
-                bundle_version = match_pkg.group(1)
-            match_bin = re.match(pattern_bin, filename)
-            if match_bin is not None:
-                bin_filename = match_bin.group(1)
-                bin_file = tf.extractfile(bin_filename)
-                bin_file.seek(11)
-                byte_11 = bin_file.read(1)
-                is_multi_tenant = byte_11 == b'\x80'
+        gen = None
 
-        return bundle_version, is_multi_tenant
+        # If not tarfile, then if the file has "MMG2" or "DPG2" at 2048th byte
+        # then the bundle is for MM or DP G2
+        if not tarfile.is_tarfile(bundle_temp_filename):
+            bundle_file = open(bundle_temp_filename, "rb")
+            bundle_file.seek(2048)
+            cookie1 = bundle_file.read(4)
+            # It is anticipated that DP firmware bundle will be having the value "DPG2"
+            # for cookie1 in the header
+            if cookie1.decode("utf8") == "MMG2" or cookie1.decode("utf8") == "DPG2":
+                file_name, _ = os.path.splitext(str(bundle_uri.rsplit('/', 1)[1]))
+                # G2 bundle file name: Ultrastar-Data102_3000_SEP_1010-032_2.1.12.fwdl
+                parsedFileName = file_name.split('_')
+                if len(parsedFileName) == 5:
+                    bundle_version = parsedFileName[4]
+                    # MM G2 is always single tanant
+                    is_multi_tenant = False
+                    gen = "G2"
+
+            return bundle_version, is_multi_tenant, gen
+        else:
+            # Bundle is for MM or DP G1
+            tf = tarfile.open(bundle_temp_filename)
+            pattern_pkg = r"oobm-(.+)\.pkg"
+            pattern_bin = r"(.*\.bin)"
+            bundle_version = None
+            is_multi_tenant = None
+            for filename in tf.getnames():
+                match_pkg = re.match(pattern_pkg, filename)
+                if match_pkg is not None:
+                    bundle_version = match_pkg.group(1)
+                match_bin = re.match(pattern_bin, filename)
+                if match_bin is not None:
+                    bin_filename = match_bin.group(1)
+                    bin_file = tf.extractfile(bin_filename)
+                    bin_file.seek(11)
+                    byte_11 = bin_file.read(1)
+                    is_multi_tenant = byte_11 == b'\x80'
+                    gen = "G1"
+
+            return bundle_version, is_multi_tenant, gen
 
     @staticmethod
     def uri_is_http(uri):
@@ -267,21 +301,32 @@ class WdcRedfishUtils(RedfishUtils):
         # Check the FW version in the bundle file, and compare it to what is already on the IOMs
 
         # Bundle version number
-        bundle_firmware_version, is_bundle_multi_tenant = self._get_bundle_version(bundle_uri)
-        if bundle_firmware_version is None or is_bundle_multi_tenant is None:
+        bundle_firmware_version, is_bundle_multi_tenant, bundle_gen = self._get_bundle_version(bundle_uri)
+        if bundle_firmware_version is None or is_bundle_multi_tenant is None or bundle_gen is None:
             return {
                 'ret': False,
-                'msg': 'Unable to extract bundle version or multi-tenant status from update image tarfile'
+                'msg': 'Unable to extract bundle version or multi-tenant status or generation from update image file'
             }
 
+        is_enclosure_multi_tenant, enclosure_gen = self._is_enclosure_multi_tenant_and_fetch_gen()
+
         # Verify that the bundle is correctly multi-tenant or not
-        is_enclosure_multi_tenant = self._is_enclosure_multi_tenant()
         if is_enclosure_multi_tenant != is_bundle_multi_tenant:
             return {
                 'ret': False,
                 'msg': 'Enclosure multi-tenant is {0} but bundle multi-tenant is {1}'.format(
                     is_enclosure_multi_tenant,
                     is_bundle_multi_tenant,
+                )
+            }
+
+        # Verify that the bundle is compliant with the target enclosure
+        if enclosure_gen != bundle_gen:
+            return {
+                'ret': False,
+                'msg': 'Enclosure generation is {0} but bundle is of {1}'.format(
+                    enclosure_gen,
+                    bundle_gen,
                 )
             }
 
