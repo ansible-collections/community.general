@@ -16,4 +16,4 @@ sections:
       - guide_scaleway
   - title: Developer Guides
     toctree:
-      - moddev_guide_deps
+      - guide_deps
