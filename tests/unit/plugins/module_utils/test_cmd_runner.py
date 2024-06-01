@@ -47,6 +47,9 @@ TC_FORMATS = dict(
     simple_fixed_false=(partial(cmd_runner_fmt.as_fixed, ["--always-here", "--forever"]), False, ["--always-here", "--forever"], None),
     simple_fixed_none=(partial(cmd_runner_fmt.as_fixed, ["--always-here", "--forever"]), None, ["--always-here", "--forever"], None),
     simple_fixed_str=(partial(cmd_runner_fmt.as_fixed, ["--always-here", "--forever"]), "something", ["--always-here", "--forever"], None),
+    stack_optval__str=(partial(cmd_runner_fmt.stack(cmd_runner_fmt.as_optval), "-t"), ["potatoes", "bananas"], ["-tpotatoes", "-tbananas"], None),
+    stack_opt_val__str=(partial(cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val), "-t"), ["potatoes", "bananas"], ["-t", "potatoes", "-t", "bananas"], None),
+    stack_opt_eq_val__int=(partial(cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_eq_val), "--answer"), [42, 17], ["--answer=42", "--answer=17"], None),
 )
 if tuple(version_info) >= (3, 1):
     from collections import OrderedDict
@@ -67,7 +70,7 @@ TC_FORMATS_IDS = sorted(TC_FORMATS.keys())
 def test_arg_format(func, value, expected, exception):
     fmt_func = func()
     try:
-        actual = fmt_func(value, ctx_ignore_none=True)
+        actual = fmt_func(value)
         print("formatted string = {0}".format(actual))
         assert actual == expected, "actual = {0}".format(actual)
     except Exception as e:

@@ -94,12 +94,22 @@ class _ArgFormat(object):
         self.ignore_none = ignore_none
         self.ignore_missing_value = ignore_missing_value
 
-    def __call__(self, value, ctx_ignore_none):
+    def __call__(self, value, ctx_ignore_none=True):
         ignore_none = self.ignore_none if self.ignore_none is not None else ctx_ignore_none
         if value is None and ignore_none:
             return []
         f = self.func
         return [str(x) for x in f(value)]
+
+    def __str__(self):
+        return "<ArgFormat: func={0}, ignore_none={1}, ignore_missing_value={2}>".format(
+            self.func,
+            self.ignore_none,
+            self.ignore_missing_value,
+        )
+
+    def __repr__(self):
+        return str(self)
 
 
 class _Format(object):
@@ -182,6 +192,19 @@ class _Format(object):
         @wraps(func)
         def wrapper(v):
             return func(**v)
+        return wrapper
+
+    @staticmethod
+    def stack(fmt):
+        @wraps(fmt)
+        def wrapper(*args, **kwargs):
+            new_func = fmt(ignore_none=True, *args, **kwargs)
+
+            def stacking(value):
+                stack = [new_func(v) for v in value if v]
+                stack = [x for args in stack for x in args]
+                return stack
+            return _ArgFormat(stacking, ignore_none=True)
         return wrapper
 
 
