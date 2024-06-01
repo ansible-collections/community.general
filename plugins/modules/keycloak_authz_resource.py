@@ -231,6 +231,8 @@ def main():
     # filter. This returns False if it is not found.
     resource = kc.get_authz_resource_by_name(
         name=name, client_id=cid, realm=realm)
+    if resource and resource != {}:
+        resource['uris'].sort()
 
     # Generate a JSON payload for Keycloak Admin API. This is needed for
     # "create" and "update" operations.

@@ -1,0 +1,209 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Remove keycloak client to avoid failures from previous failed runs
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent
+
+- name: Create keycloak client with authorization services enabled
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    enabled: true
+    public_client: false
+    service_accounts_enabled: true
+    authorization_services_enabled: true
+
+- name: Create keycloak resource
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    displayName: "{{ displayName }}"
+    icon_uri: "{{ icon_uri }}"
+    uris: "{{ uris }}"
+    state: present
+  register: result
+
+- name: Assert that resource was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+
+- name: Create keycloak resource (test for idempotency)
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    displayName: "{{ displayName }}"
+    icon_uri: "{{ icon_uri }}"
+    uris: "{{ uris }}"
+    state: present
+  check_mode: true
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+
+- name: Update keycloak resource
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    displayName: "{{ displayName }} changed"
+    icon_uri: "{{ icon_uri }}"
+    uris: "{{ uris }}"
+    state: present
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+
+- name: Update keycloak resource (test for idempotency)
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    displayName: "{{ displayName }} changed"
+    icon_uri: "{{ icon_uri }}"
+    uris: "{{ uris }}"
+    state: present
+  check_mode: true
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+
+- name: Remove keycloak resource
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    displayName: "{{ displayName }} changed"
+    icon_uri: "{{ icon_uri }}"
+    uris: "{{ uris }}"
+    state: absent
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Remove keycloak resource (test for idempotency)
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    displayName: "{{ displayName }} changed"
+    icon_uri: "{{ icon_uri }}"
+    uris: "{{ uris }}"
+    state: absent
+  check_mode: true
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Create keycloak resource (minimal)
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    state: present
+  register: result
+
+- name: Assert that resource was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+
+- name: Create keycloak resource (minimal) (test for idempotency)
+  community.general.keycloak_authz_resource:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ resource_name }}"
+    state: present
+  check_mode: true
+  diff: true
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+
+- name: Remove keycloak client to avoid failures from previous failed runs
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent
