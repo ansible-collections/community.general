@@ -86,7 +86,7 @@ EXAMPLES = '''
     - {before: "^.*_x.*$", after: X}
   r: "{{ l | replace_keys(target=t, matching_parameter='regex') }}"
 
-  gives
+  # gives
 
   r:
     - X: foo
@@ -98,7 +98,7 @@ EXAMPLES = '''
     - {before: "^.*_x.*$", after: Y}
   r: "{{ l | replace_keys(target=t, matching_parameter='regex') }}"
 
-  gives
+  # gives
 
   r:
     - Y: foo
