@@ -44,3 +44,13 @@
   vars:
     rr: "{{ list1 | community.general.replace_keys(target=item.value, matching_parameter=item.key) }}"
   tags: targets1
+
+- name: Test replace keys targetsX
+  include_tasks:
+    file: fn-test-replace_keys.yml
+    apply:
+      tags: targetsX
+  loop: "{{ targets2 }}"
+  loop_control:
+    label: "{{ item.label }}"
+  tags: targetsX

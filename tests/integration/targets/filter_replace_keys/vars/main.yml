@@ -24,3 +24,22 @@ list1:
 result1:
   - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
   - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
+
+targets2:
+  - label: Override keys matching regex. Last match wins.
+    match: regex
+    target:
+      - {before: "^.*_x.*$", after: X}
+    data: "{{ list1 }}"
+    result:
+      - X: foo
+      - X: bar
+  - label: Override equal attributes 'before'. Last match wins.
+    match: regex
+    target:
+      - {before: "^.*_x.*$", after: X}
+      - {before: "^.*_x.*$", after: Y}
+    data: "{{ list1 }}"
+    result:
+      - Y: foo
+      - Y: bar

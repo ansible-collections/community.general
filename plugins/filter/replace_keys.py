@@ -27,7 +27,7 @@ DOCUMENTATION = '''
         required: true
         suboptions:
           before:
-            description: before attribute key [to change]
+            description: before attribute key [to change]. Last match wins.
             type: str
           after:
             description: after attribute key [change to]
@@ -35,7 +35,7 @@ DOCUMENTATION = '''
       matching_parameter:
         description:
           - Specify the matching option of target keys.
-          - If there are more matches the first one will be used.
+          - If there are more matches the last one will be used.
         type: str
         default: equal
         choices:
@@ -46,30 +46,63 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+
+  # Given the list of dictionaries
   l:
     - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
     - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
 
-  # By default replace keys that are equal to the attribute C(before).
-  t: [{before: k0_x0, after: a0}, {before: k1_x1, after: a1}]
+  # 1) By C(default) replace keys that are C(equal) to the attribute C(before).
+  t:
+    - {before: k0_x0, after: a0}
+    - {before: k1_x1, after: a1}
   r: "{{ l | replace_keys(target=t) }}"
 
-  # Replace keys that starts with the attribute C(before).
-  t: [{before: k0, after: a0}, {before: k1, after: a1}]
+  # 2) Replace keys that C(starts) with the attribute C(before).
+  t:
+    - {before: k0, after: a0}
+    - {before: k1, after: a1}
   r: "{{ l | replace_keys(target=t, matching_parameter='starts_with') }}"
 
-  # Replace keys that ends with the attribute C(before).
-  t: [{before: x0, after: a0}, {before: x1, after: a1}]
+  # 3) Replace keys that C(ends) with the attribute C(before).
+  t:
+    - {before: x0, after: a0}
+    - {before: x1, after: a1}
   r: "{{ l | replace_keys(target=t, matching_parameter='ends_with') }}"
 
-  # Replace keys by the regex in the attribute C(before).
-  t: [{before: "^.*0_x.*$", after: a0}, {before: "^.*1_x.*$", after: a1}]
+  # 4) Replace keys by the C(regex) in the attribute C(before).
+  t:
+    - {before: "^.*0_x.*$", after: a0}
+    - {before: "^.*1_x.*$", after: a1}
   r: "{{ l | replace_keys(target=t, matching_parameter='regex') }}"
 
-  # The results of all examples are all the same.
+  # C(RESULTS). The results of above examples are all the same.
   r:
     - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
     - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
+
+  # 5) C(Override) keys matching C(regex). Last match wins.
+  t:
+    - {before: "^.*_x.*$", after: X}
+  r: "{{ l | replace_keys(target=t, matching_parameter='regex') }}"
+
+  gives
+
+  r:
+    - X: foo
+    - X: bar
+
+  # 6) C(Override) C(equal) attributes 'before'. Last match wins.
+  t:
+    - {before: "^.*_x.*$", after: X}
+    - {before: "^.*_x.*$", after: Y}
+  r: "{{ l | replace_keys(target=t, matching_parameter='regex') }}"
+
+  gives
+
+  r:
+    - Y: foo
+    - Y: bar
 '''
 
 RETURN = '''
