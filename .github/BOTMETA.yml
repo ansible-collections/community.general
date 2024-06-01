@@ -165,6 +165,8 @@ files:
     maintainers: cfiehe
   $filters/lists_intersect.yml:
     maintainers: cfiehe
+  $filters/replace_keys.py:
+    maintainers: vbotka
   $filters/lists_mergeby.py:
     maintainers: vbotka
   $filters/lists_symmetric_difference.yml:
