@@ -15,7 +15,7 @@
       [ERR] {{ item.label }}
       result:
         {{ rr | to_nice_yaml(indent=2) | indent(2) }}
-    quiet: "{{ quite_test | d(true) | bool }}"
+    quiet: "{{ quiet_test | d(true) | bool }}"
   vars:
     rr: "{{ item.data |
             community.general.replace_keys(target=item.target, matching_parameter=item.match) }}"

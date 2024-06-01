@@ -19,7 +19,7 @@
     fail_msg: |
       [ERR] result:
       {{ rr | to_yaml }}
-    quiet: "{{ quite_test | d(true) | bool }}"
+    quiet: "{{ quiet_test | d(true) | bool }}"
   vars:
     rr: "{{ list1 | community.general.replace_keys(target=tt) }}"
     tt:
@@ -37,7 +37,7 @@
     fail_msg: |
       [ERR] result:
       {{ rr | to_yaml }}
-    quiet: "{{ quite_test | d(true) | bool }}"
+    quiet: "{{ quiet_test | d(true) | bool }}"
   loop: "{{ targets1 | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
