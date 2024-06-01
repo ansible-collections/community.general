@@ -3,9 +3,15 @@
   GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
   SPDX-License-Identifier: GPL-3.0-or-later
 
+.. _ansible_collections.community.general.docsite.guide_deps:
 
-Using ``deps`` module util for handling import errors
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**********************************
+``deps`` Guide
+**********************************
+
+
+Using ``deps``
+==============
 
 The ``community.general.plugins.module_utils.deps`` module util simplifies the importing of code as described in
 :ref:`Importing and using shared code <shared_code>`.
