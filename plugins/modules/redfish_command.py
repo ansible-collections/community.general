@@ -298,7 +298,7 @@ options:
   wait_timeout:
     required: false
     description:
-      - How long to block until the service is ready again before giving up
+      - How long to block until the service is ready again before giving up.
     type: int
     default: 120
     version_added: 9.2.0
