@@ -51,3 +51,12 @@ seealso:
       Please make sure that you select the right version of Django in the version selector on that page.
     link: https://docs.djangoproject.com/en/5.0/ref/django-admin/
 '''
+
+    DATABASE = r'''
+options:
+  database:
+    description:
+      - Specify the database to be used.
+    type: str
+    default: default
+'''
