@@ -16,8 +16,8 @@ DOCUMENTATION = r"""
         - paramiko
     description:
         - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via ssh.
-        - Use the Python SSH implementation (Paramiko) to connect to Proxmox
-    version_added: "0.1.0"
+        - Use the Python SSH implementation (Paramiko) to connect to Proxmox.
+    version_added: "9.1.0"
     options:
       remote_addr:
         description:
@@ -49,8 +49,8 @@ DOCUMENTATION = r"""
             - name: port
       remote_user:
         description:
-            - User to login/authenticate as
-            - Can be set from the CLI via the C(--user) or C(-u) options.
+            - User to login/authenticate as.
+            - It can be set from the CLI via the C(--user) or C(-u) options.
         type: string
         vars:
             - name: ansible_user
@@ -68,8 +68,8 @@ DOCUMENTATION = r"""
             - name: remote_user
       password:
         description:
-          - Secret used to either login the ssh server or as a passphrase for ssh keys that require it
-          - Can be set from the CLI via the C(--ask-pass) option.
+          - Secret used to either login the ssh server or as a passphrase for ssh keys that require it.
+          - It can be set from the CLI via the C(--ask-pass) option.
         type: string
         vars:
             - name: ansible_password
@@ -79,9 +79,9 @@ DOCUMENTATION = r"""
             - name: ansible_paramiko_password
       use_rsa_sha2_algorithms:
         description:
-            - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys
-            - On paramiko versions older than 2.9, this only affects hostkeys
-            - For behavior matching paramiko<2.9 set this to V(False)
+            - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.
+            - On paramiko versions older than 2.9, this only affects hostkeys.
+            - For behavior matching paramiko<2.9 set this to V(False).
         vars:
             - name: ansible_paramiko_use_rsa_sha2_algorithms
         ini:
@@ -91,14 +91,14 @@ DOCUMENTATION = r"""
         default: True
         type: boolean
       host_key_auto_add:
-        description: 'Automatically add host keys'
+        description: Automatically add host keys.
         env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
         ini:
           - {key: host_key_auto_add, section: paramiko_connection}
         type: boolean
       look_for_keys:
         default: True
-        description: 'False to disable searching for private key files in ~/.ssh/'
+        description: 'False to disable searching for private key files in ~/.ssh/.'
         env: [{name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS}]
         ini:
         - {key: look_for_keys, section: paramiko_connection}
@@ -106,7 +106,7 @@ DOCUMENTATION = r"""
       proxy_command:
         default: ''
         description:
-            - Proxy information for running the connection via a jumphost
+            - Proxy information for running the connection via a jumphost.
             - Also this plugin will scan 'ssh_args', 'ssh_extra_args' and 'ssh_common_args' from the 'ssh' plugin settings for proxy information if set.
         type: string
         env: [{name: ANSIBLE_PARAMIKO_PROXY_COMMAND}]
@@ -175,13 +175,14 @@ DOCUMENTATION = r"""
       record_host_keys:
         default: True
         description: 'Save the host keys to a file'
-        env: [{name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS}]
+        env: 
+          - name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS
         ini:
           - section: paramiko_connection
             key: record_host_keys
         type: boolean
       host_key_checking:
-        description: 'Set this to "False" if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host'
+        description: 'Set this to V(False) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host.'
         type: boolean
         default: True
         env:
