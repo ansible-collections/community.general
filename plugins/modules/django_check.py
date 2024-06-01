@@ -18,8 +18,13 @@ description:
 extends_documentation_fragment:
   - community.general.attributes
   - community.general.django
-  - community.general.django.database
 options:
+  database:
+    description:
+      - Specify databases to run checks against.
+      - If not specified, Django will not run database tests.
+    type: list
+    elements: str
   deploy:
     description:
       - Include additional checks relevant in a deployment setting.
@@ -50,11 +55,11 @@ attributes:
 """
 
 EXAMPLES = """
-- name: Create cache table in the default database
+- name: Check the entire project
   community.general.django_check:
     settings: myproject.settings
 
-- name: Create cache table in the other database
+- name: Create the project using specific databases
   community.general.django_check:
     database:
       - somedb
@@ -77,16 +82,10 @@ from ansible_collections.community.general.plugins.module_utils.django import Dj
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
 
-def stack_format(param):
-    def tags_format(tags):
-        zippit = zip_longest([], tags, fillvalue=param)
-        return [item for pair in zippit for item in pair]
-    return tags_format
-
-
 class DjangoCheck(DjangoModuleHelper):
     module = dict(
         argument_spec=dict(
+            database=dict(type="list", elements="str"),
             deploy=dict(type="bool", default=False),
             fail_level=dict(type="str", choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]),
             tags=dict(type="list", elements="str"),
@@ -95,15 +94,14 @@ class DjangoCheck(DjangoModuleHelper):
         supports_check_mode=True,
     )
     arg_formats = dict(
+        database=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
         deploy=cmd_runner_fmt.as_bool("--deploy"),
         fail_level=cmd_runner_fmt.as_opt_val("--fail-level"),
-        tags=cmd_runner_fmt.as_func(stack_format("--tag")),
-        database=cmd_runner_fmt.as_func(stack_format("--database")),
+        tags=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--tag"),
         apps=cmd_runner_fmt.as_list(),
     )
     django_admin_cmd = "check"
     django_admin_arg_order = "database deploy fail_level tags apps"
-    _django_args = ["database"]
 
 
 def main():
