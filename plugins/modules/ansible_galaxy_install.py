@@ -202,7 +202,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', choices=['present', 'latest'], default="present"),
+            state=dict(type='str', choices=['present', 'latest'], default='present'),
             type=dict(type='str', choices=('collection', 'role', 'both'), required=True),
             name=dict(type='str'),
             requirements_file=dict(type='path'),
