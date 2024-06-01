@@ -40,7 +40,7 @@ options:
       - >
         Currently the O(state=latest) is ignored unless O(type=collection), and it will
         ensure the collection is installed and updated to the latest available version.
-      - Please note that using O(force=true) can be used to perform upgrade regardless of O(type).
+      - Please note that O(force=true) can be used to perform upgrade regardless of O(type).
     type: str
     choices: [ present, latest ]
     default: present
