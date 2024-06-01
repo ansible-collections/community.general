@@ -5,16 +5,15 @@
 
 .. _ansible_collections.community.general.docsite.guide_deps:
 
-**********************************
 ``deps`` Guide
-**********************************
+==============
 
 
 Using ``deps``
-==============
+^^^^^^^^^^^^^^
 
-The ``community.general.plugins.module_utils.deps`` module util simplifies the importing of code as described in
-:ref:`Importing and using shared code <shared_code>`.
+The ``ansible_collections.community.general.plugins.module_utils.deps`` module util simplifies
+the importing of code as described in :ref:`Importing and using shared code <shared_code>`.
 Please notice that ``deps`` is meant to be used specifically with Ansible modules, and not other types of plugins.
 
 The same example from the Developer Guide would become:
