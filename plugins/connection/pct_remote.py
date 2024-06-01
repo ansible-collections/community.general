@@ -13,144 +13,151 @@ DOCUMENTATION = r"""
     name: pct_remote
     short_description: Run tasks in Proxmox LXC container instances using pct CLI via ssh
     requirements:
-        - paramiko
+      - paramiko
     description:
-        - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via ssh.
-        - Use the Python SSH implementation (Paramiko) to connect to Proxmox.
+      - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via ssh.
+      - Use the Python SSH implementation (Paramiko) to connect to Proxmox.
     version_added: "9.1.0"
     options:
       remote_addr:
         description:
-            - Address of the remote target
+          - Address of the remote target
         default: inventory_hostname
         type: string
         vars:
-            - name: inventory_hostname
-            - name: ansible_host
-            - name: ansible_ssh_host
-            - name: ansible_paramiko_host
+          - name: inventory_hostname
+          - name: ansible_host
+          - name: ansible_ssh_host
+          - name: ansible_paramiko_host
       port:
-          description: Remote port to connect to.
-          type: int
-          default: 22
-          ini:
-            - section: defaults
-              key: remote_port
-            - section: paramiko_connection
-              key: remote_port
-          env:
-            - name: ANSIBLE_REMOTE_PORT
-            - name: ANSIBLE_REMOTE_PARAMIKO_PORT
-          vars:
-            - name: ansible_port
-            - name: ansible_ssh_port
-            - name: ansible_paramiko_port
-          keyword:
-            - name: port
+        description: Remote port to connect to.
+        type: int
+        default: 22
+        ini:
+          - section: defaults
+            key: remote_port
+          - section: paramiko_connection
+            key: remote_port
+        env:
+          - name: ANSIBLE_REMOTE_PORT
+          - name: ANSIBLE_REMOTE_PARAMIKO_PORT
+        vars:
+          - name: ansible_port
+          - name: ansible_ssh_port
+          - name: ansible_paramiko_port
+        keyword:
+          - name: port
       remote_user:
         description:
-            - User to login/authenticate as.
-            - It can be set from the CLI via the C(--user) or C(-u) options.
+          - User to login/authenticate as.
+          - It can be set from the CLI via the C(--user) or C(-u) options.
         type: string
         vars:
-            - name: ansible_user
-            - name: ansible_ssh_user
-            - name: ansible_paramiko_user
+          - name: ansible_user
+          - name: ansible_ssh_user
+          - name: ansible_paramiko_user
         env:
-            - name: ANSIBLE_REMOTE_USER
-            - name: ANSIBLE_PARAMIKO_REMOTE_USER
+          - name: ANSIBLE_REMOTE_USER
+          - name: ANSIBLE_PARAMIKO_REMOTE_USER
         ini:
-            - section: defaults
-              key: remote_user
-            - section: paramiko_connection
-              key: remote_user
+          - section: defaults
+            key: remote_user
+          - section: paramiko_connection
+            key: remote_user
         keyword:
-            - name: remote_user
+          - name: remote_user
       password:
         description:
           - Secret used to either login the ssh server or as a passphrase for ssh keys that require it.
           - It can be set from the CLI via the C(--ask-pass) option.
         type: string
         vars:
-            - name: ansible_password
-            - name: ansible_ssh_pass
-            - name: ansible_ssh_password
-            - name: ansible_paramiko_pass
-            - name: ansible_paramiko_password
+          - name: ansible_password
+          - name: ansible_ssh_pass
+          - name: ansible_ssh_password
+          - name: ansible_paramiko_pass
+          - name: ansible_paramiko_password
       use_rsa_sha2_algorithms:
         description:
-            - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.
-            - On paramiko versions older than 2.9, this only affects hostkeys.
-            - For behavior matching paramiko<2.9 set this to V(False).
+          - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.
+          - On paramiko versions older than 2.9, this only affects hostkeys.
+          - For behavior matching paramiko<2.9 set this to V(False).
         vars:
-            - name: ansible_paramiko_use_rsa_sha2_algorithms
+          - name: ansible_paramiko_use_rsa_sha2_algorithms
         ini:
-            - {key: use_rsa_sha2_algorithms, section: paramiko_connection}
+          - section: paramiko_connection
+            key: use_rsa_sha2_algorithms
         env:
-            - {name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS}
+          - name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS
         default: True
         type: boolean
       host_key_auto_add:
         description: Automatically add host keys.
-        env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
+        env:
+          - name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD
         ini:
-          - {key: host_key_auto_add, section: paramiko_connection}
+          - section: paramiko_connection
+            key: host_key_auto_add
         type: boolean
       look_for_keys:
         default: True
-        description: 'False to disable searching for private key files in ~/.ssh/.'
-        env: [{name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS}]
+        description: "False to disable searching for private key files in ~/.ssh/."
+        env:
+          - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
         ini:
-        - {key: look_for_keys, section: paramiko_connection}
+          - section: paramiko_connection
+            key: look_for_keys
         type: boolean
       proxy_command:
-        default: ''
+        default: ""
         description:
-            - Proxy information for running the connection via a jumphost.
-            - Also this plugin will scan 'ssh_args', 'ssh_extra_args' and 'ssh_common_args' from the 'ssh' plugin settings for proxy information if set.
+          - Proxy information for running the connection via a jumphost.
+          - Also this plugin will scan 'ssh_args', 'ssh_extra_args' and 'ssh_common_args' from the 'ssh' plugin settings for proxy information if set.
         type: string
-        env: [{name: ANSIBLE_PARAMIKO_PROXY_COMMAND}]
+        env:
+          - name: ANSIBLE_PARAMIKO_PROXY_COMMAND
         ini:
-          - {key: proxy_command, section: paramiko_connection}
+          - section: paramiko_connection
+            key: proxy_command
         vars:
           - name: ansible_paramiko_proxy_command
       ssh_args:
         description: Only used in parsing ProxyCommand for use in this plugin.
-        default: ''
+        default: ""
         type: string
         ini:
-            - section: 'ssh_connection'
-              key: 'ssh_args'
+          - section: "ssh_connection"
+            key: "ssh_args"
         env:
-            - name: ANSIBLE_SSH_ARGS
+          - name: ANSIBLE_SSH_ARGS
         vars:
-            - name: ansible_ssh_args
+          - name: ansible_ssh_args
         deprecated:
-            why: In favor of the "proxy_command" option.
-            version: "0.1.0"
-            alternatives: proxy_command
+          why: In favor of the "proxy_command" option.
+          version: "0.1.0"
+          alternatives: proxy_command
       ssh_common_args:
         description: Only used in parsing ProxyCommand for use in this plugin.
         type: string
         ini:
-            - section: 'ssh_connection'
-              key: 'ssh_common_args'
+          - section: "ssh_connection"
+            key: "ssh_common_args"
         env:
-            - name: ANSIBLE_SSH_COMMON_ARGS
+          - name: ANSIBLE_SSH_COMMON_ARGS
         vars:
-            - name: ansible_ssh_common_args
+          - name: ansible_ssh_common_args
         cli:
-            - name: ssh_common_args
-        default: ''
+          - name: ssh_common_args
+        default: ""
         deprecated:
-            why: In favor of the "proxy_command" option.
-            version: "0.1.0"
-            alternatives: proxy_command
+          why: In favor of the "proxy_command" option.
+          version: "0.1.0"
+          alternatives: proxy_command
       ssh_extra_args:
         description: Only used in parsing ProxyCommand for use in this plugin.
         type: string
         vars:
-            - name: ansible_ssh_extra_args
+          - name: ansible_ssh_extra_args
         env:
           - name: ANSIBLE_SSH_EXTRA_ARGS
         ini:
@@ -158,31 +165,31 @@ DOCUMENTATION = r"""
             section: ssh_connection
         cli:
           - name: ssh_extra_args
-        default: ''
+        default: ""
         deprecated:
-            why: In favor of the "proxy_command" option.
-            version: "0.1.0"
-            alternatives: proxy_command
+          why: In favor of the "proxy_command" option.
+          version: "0.1.0"
+          alternatives: proxy_command
       pty:
         default: True
-        description: 'SUDO usually requires a PTY, True to give a PTY and False to not give a PTY.'
+        description: "SUDO usually requires a PTY, True to give a PTY and False to not give a PTY."
         env:
           - name: ANSIBLE_PARAMIKO_PTY
         ini:
-          - section: paramiko_connection
-            key: pty
+          - key: pty
+            section: paramiko_connection
         type: boolean
       record_host_keys:
         default: True
-        description: 'Save the host keys to a file'
-        env: 
+        description: "Save the host keys to a file"
+        env:
           - name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS
         ini:
           - section: paramiko_connection
             key: record_host_keys
         type: boolean
       host_key_checking:
-        description: 'Set this to V(False) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host.'
+        description: "Set this to V(False) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host."
         type: boolean
         default: True
         env:
@@ -199,7 +206,7 @@ DOCUMENTATION = r"""
           - name: ansible_ssh_host_key_checking
           - name: ansible_paramiko_host_key_checking
       use_persistent_connections:
-        description: 'Toggles the use of persistence for connections'
+        description: "Toggles the use of persistence for connections"
         type: boolean
         default: False
         env:
@@ -240,30 +247,30 @@ DOCUMENTATION = r"""
         cli:
           - name: timeout
       private_key_file:
-          description:
-              - Path to private key file to use for authentication.
-          type: string
-          ini:
-            - section: defaults
-              key: private_key_file
-            - section: paramiko_connection
-              key: private_key_file
-          env:
-            - name: ANSIBLE_PRIVATE_KEY_FILE
-            - name: ANSIBLE_PARAMIKO_PRIVATE_KEY_FILE
-          vars:
-            - name: ansible_private_key_file
-            - name: ansible_ssh_private_key_file
-            - name: ansible_paramiko_private_key_file
-          cli:
-            - name: private_key_file
-              option: '--private-key'
+        description:
+          - Path to private key file to use for authentication.
+        type: string
+        ini:
+          - section: defaults
+            key: private_key_file
+          - section: paramiko_connection
+            key: private_key_file
+        env:
+          - name: ANSIBLE_PRIVATE_KEY_FILE
+          - name: ANSIBLE_PARAMIKO_PRIVATE_KEY_FILE
+        vars:
+          - name: ansible_private_key_file
+          - name: ansible_ssh_private_key_file
+          - name: ansible_paramiko_private_key_file
+        cli:
+          - name: private_key_file
+            option: "--private-key"
       vmid:
         description:
-            - Container ID
+          - Container ID
         default: proxmox_vmid
         vars:
-            - name: proxmox_vmid
+          - name: proxmox_vmid
     notes:
       - When NOT using this plugin as root, you need to have sudo installed on proxmox and setup so we can run it without prompting for the password.
 """
@@ -331,13 +338,12 @@ EXAMPLES = r"""
         msg: "This is coming from pct environment"
 """
 
-
-import os
-import uuid
-from ansible.utils.display import Display
-from ansible.plugins.connection.paramiko_ssh import Connection as SSH_Connection
-from ansible.errors import AnsibleError
 from ansible import constants as C
+from ansible.errors import AnsibleError
+from ansible.plugins.connection.paramiko_ssh import Connection as SSH_Connection
+from ansible.utils.display import Display
+import uuid
+import os
 
 
 display = Display()
