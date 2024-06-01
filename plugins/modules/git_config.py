@@ -263,7 +263,7 @@ def main():
         module.exit_json(changed=False, msg='', config_value=old_values[0] if old_values else '')
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
-    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add"):
+    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add") and not unset:
         module.exit_json(changed=False, msg="")
 
     # Until this point, the git config was just read and in case no change is needed, the module has already exited.
