@@ -294,7 +294,7 @@ options:
       - Block until the service is ready again.
     type: bool
     default: false
-    version_added: 9.2.0
+    version_added: 9.1.0
   wait_timeout:
     required: false
     description:
