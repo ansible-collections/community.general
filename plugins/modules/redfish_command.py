@@ -291,7 +291,7 @@ options:
   wait:
     required: false
     description:
-      - Block until the service is ready again
+      - Block until the service is ready again.
     type: bool
     default: false
     version_added: 9.2.0
