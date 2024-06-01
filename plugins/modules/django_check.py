@@ -30,15 +30,18 @@ options:
       - Message level that will trigger failure.
       - Default is the Django default value. Check the documentation for the version being used.
     type: str
+    choices: [CRITICAL, ERROR, WARNING, INFO, DEBUG]
   tags:
     description:
       - Restrict checks to specific tags.
-    type: str
+    type: list
+    elements: str
   apps:
     description:
       - Restrict checks to specific applications.
       - Default is to check all applications.
-    type: str
+    type: list
+    elements: str
 attributes:
   check_mode:
     support: full
@@ -46,14 +49,16 @@ attributes:
     support: none
 """
 
-EXAMPLES = """    **************************************
+EXAMPLES = """
 - name: Create cache table in the default database
-  community.general.check:
+  community.general.django_check:
     settings: myproject.settings
 
 - name: Create cache table in the other database
-  community.general.check:
-    database: myotherdb
+  community.general.django_check:
+    database:
+      - somedb
+      - myotherdb
     settings: fancysite.settings
     pythonpath: /home/joedoe/project/fancysite
     venv: /home/joedoe/project/fancysite/venv
@@ -81,7 +86,7 @@ def stack_format(param):
 
 class DjangoCheck(DjangoModuleHelper):
     module = dict(
-        arguments_spec=dict(
+        argument_spec=dict(
             deploy=dict(type="bool", default=False),
             fail_level=dict(type="str", choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]),
             tags=dict(type="list", elements="str"),
@@ -93,7 +98,7 @@ class DjangoCheck(DjangoModuleHelper):
         deploy=cmd_runner_fmt.as_bool("--deploy"),
         fail_level=cmd_runner_fmt.as_opt_val("--fail-level"),
         tags=cmd_runner_fmt.as_func(stack_format("--tag")),
-        tags=cmd_runner_fmt.as_func(stack_format("--database")),
+        database=cmd_runner_fmt.as_func(stack_format("--database")),
         apps=cmd_runner_fmt.as_list(),
     )
     django_admin_cmd = "check"
