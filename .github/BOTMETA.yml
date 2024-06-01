@@ -506,6 +506,8 @@ files:
     ignore: scottanderson42 tastychutney
     labels: django_manage
     maintainers: russoz
+  $modules/django_createcachetable.py:
+    maintainers: russoz
   $modules/django_command.py:
     maintainers: russoz
   $modules/dnf_versionlock.py:
