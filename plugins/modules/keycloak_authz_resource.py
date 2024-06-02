@@ -104,7 +104,7 @@ extends_documentation_fragment:
     - community.general.attributes
 
 author:
-    - Maximilian Pohle (@mattock)
+    - Maximilian Pohle (@maximilianpohle)
 '''
 
 EXAMPLES = '''
