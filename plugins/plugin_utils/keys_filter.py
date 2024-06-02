@@ -80,7 +80,7 @@ def _keys_filter_target_str(target, matching_parameter):
             tt = re.compile(r)
         except re.error:
             msg = ("The target must be a valid regex if matching_parameter is regex."
-                   "target is %s")
+                   " target is %s")
             raise AnsibleFilterError(msg % r)
     elif isinstance(target, string_types):
         tt = (target, )
