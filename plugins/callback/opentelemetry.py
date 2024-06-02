@@ -562,10 +562,11 @@ class CallbackModule(CallbackBase):
             return ""
         # ansible.builtin.uri contains the response in the json field
         save = result._result
-        if "json" in save and "ansible.builtin.uri" in task.action:
+
+        if "json" in save and task.action in ("ansible.builtin.uri", "ansible.legacy.uri", "uri"):
             save.pop("json")
         # ansible.builtin.slurp contains the response in the content field
-        if "content" in save and "ansible.builtin.slurp" in task.action:
+        if "content" in save and task.action in ("ansible.builtin.slurp", "ansible.legacy.slurp", "slurp"):
             save.pop("content")
         return self._dump_results(save)
 
