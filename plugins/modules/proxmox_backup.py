@@ -136,7 +136,7 @@ options:
   pool:
     description:
       - Backup all known guest systems included in the specified pool.
-      - Can not be use with vmid and pool in same job.
+      - Can not be use with O(vmid) and O(pool) in same job.
     type: str
   protected:
     description:
