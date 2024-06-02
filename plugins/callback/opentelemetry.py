@@ -561,7 +561,7 @@ class CallbackModule(CallbackBase):
         if self.disable_logs:
             return ""
         # ansible.builtin.uri contains the response in the json field
-        save = result._result
+        save = dict(result._result)
 
         if "json" in save and task.action in ("ansible.builtin.uri", "ansible.legacy.uri", "uri"):
             save.pop("json")
