@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_authz_resource
 
-version_added: 8.6.0
+version_added: 9.1.0
 
 short_description: Allows administration of Keycloak client authorization resources via Keycloak API
 
