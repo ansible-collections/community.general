@@ -15,7 +15,7 @@ from ansible.module_utils.common._collections_compat import Mapping, Sequence
 def _keys_filter_params(data, target, matching_parameter):
     """test parameters:
     * data must be a list of dictionaries. All keys must be strings.
-    * target must a non-empty sequence.
+    * target must be a non-empty sequence.
     * matching_parameter is member of a list.
     """
 
@@ -80,8 +80,8 @@ def _keys_filter_target_str(target, matching_parameter):
             tt = re.compile(r)
         except re.error:
             msg = ("The target must be a valid regex if matching_parameter is regex."
-                   "tt is %s")
-            raise AnsibleFilterError(msg % tt)
+                   "target is %s")
+            raise AnsibleFilterError(msg % r)
     else:
         tt = tuple(target)
 
