@@ -7,7 +7,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-import json
 
 __metaclass__ = type
 
@@ -24,12 +23,18 @@ description:
     - Manages daemons and services via Homebrew.
 extends_documentation_fragment:
     - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     name:
         description:
             - An installed homebrew package whose service is to be updated.
         aliases: [ 'formula', 'package', 'pkg' ]
         type: str
+        required: true
     path:
         description:
             - "A V(:) separated list of paths to search for C(brew) executable.
@@ -95,6 +100,7 @@ changed:
     sample: false
 """
 
+import json
 import sys
 
 from ansible.module_utils.basic import AnsibleModule
@@ -231,8 +237,8 @@ def main():
                 type="str",
             ),
             state=dict(
-                required=True,
                 choices=["present", "absent", "restarted"],
+                default="present",
             ),
             path=dict(
                 default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
