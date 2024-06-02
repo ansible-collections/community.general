@@ -14,9 +14,9 @@ from ansible.module_utils.common._collections_compat import Mapping, Sequence
 
 def _keys_filter_params(data, target, matching_parameter):
     """test parameters:
-       * data must be a list of dictionaries. All keys must be strings.
-       * target must a non-empty sequence.
-       * matching_parameter is member of a list.
+    * data must be a list of dictionaries. All keys must be strings.
+    * target must a non-empty sequence.
+    * matching_parameter is member of a list.
     """
 
     mp = matching_parameter
@@ -54,11 +54,11 @@ def _keys_filter_params(data, target, matching_parameter):
 
 def _keys_filter_target_str(target, matching_parameter):
     """test:
-       * target is a list of strings, or
-       * target is a string or list with single string if matching_parameter=regex
-       convert and return:
-       * tuple of unique target items, or
-       * compiled regex if matching_parameter=regex
+    * target is a list of strings, or
+    * target is a string or list with single string if matching_parameter=regex
+    convert and return:
+    * tuple of unique target items, or
+    * compiled regex if matching_parameter=regex
     """
 
     if type(target) is list:
@@ -90,8 +90,8 @@ def _keys_filter_target_str(target, matching_parameter):
 
 def _keys_filter_target_dict(target, matching_parameter):
     """test:
-       * target is a list of dictionaries
-       * ...
+    * target is a list of dictionaries
+    * ...
     """
 
     # TODO: Complete and use this in filter replace_kees
