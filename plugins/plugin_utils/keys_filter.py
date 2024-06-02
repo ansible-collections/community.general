@@ -61,7 +61,7 @@ def _keys_filter_target_str(target, matching_parameter):
     * compiled regex if matching_parameter=regex
     """
 
-    if type(target) is list:
+    if isinstance(target, list):
         for elem in target:
             if not isinstance(elem, string_types):
                 msg = "The target items must be strings. %s is %s"
@@ -96,7 +96,7 @@ def _keys_filter_target_dict(target, matching_parameter):
 
     # TODO: Complete and use this in filter replace_kees
 
-    if type(target) is list:
+    if isinstance(target, list):
         for elem in target:
             if not isinstance(elem, Mapping):
                 msg = "The target items must be dictionary. %s is %s"
