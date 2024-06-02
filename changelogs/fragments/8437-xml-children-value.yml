@@ -1,2 +1,2 @@
 minor_changes:
-  - minor changes to xml module to support adding value of children when creating with subnodes.
+  - xml - support adding value of children when creating with subnodes (https://github.com/ansible-collections/community.general/pull/8437).
