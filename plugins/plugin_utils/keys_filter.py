@@ -38,7 +38,7 @@ def _keys_filter_params(data, target, matching_parameter):
 
     if not isinstance(target, Sequence):
         msg = ("The target must be a list. It can be a string if matching_parameter is regex."
-               "target is %s.")
+               " target is %s.")
         raise AnsibleFilterError(msg % target)
 
     if len(target) == 0:
