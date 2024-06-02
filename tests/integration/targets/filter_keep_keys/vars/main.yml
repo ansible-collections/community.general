@@ -17,3 +17,17 @@ list1:
 result1:
    - {k0_x0: A0, k1_x1: B0}
    - {k0_x0: A1, k1_x1: B1}
+
+targets2:
+  - {mp: equal, tt: k0_x0}
+  - {mp: starts_with, tt: k0}
+  - {mp: ends_with, tt: x0}
+  - {mp: regex, tt: '^.*0_x.*$'}
+
+list2:
+  - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
+  - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
+
+result2:
+   - {k0_x0: A0}
+   - {k0_x0: A1}

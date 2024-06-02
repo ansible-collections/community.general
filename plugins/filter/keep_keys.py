@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2024 Vladimir Botka <vbotka@gmail.com>
+# Copyright (c) 2024 Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,7 +11,9 @@ DOCUMENTATION = '''
     name: keep_keys
     short_description: Keep specific keys from dictionaries in a list
     version_added: "9.1.0"
-    author: Vladimir Botka (@vbotka)
+    author:
+      - Vladimir Botka (@vbotka)
+      - Felix Fontein (@felixfontein)
     description: This filter keeps only specified keys from a provided list of dictionaries.
     options:
       _input:
@@ -22,10 +25,10 @@ DOCUMENTATION = '''
         required: true
       target:
         description:
+          - A key or key pattern to keep, or
           - A list of keys or keys patterns to keep.
           - The interpretation of O(target) depends on the option O(matching_parameter).
-          - Single item is required in O(target) list for O(matching_parameter=regex).
-          - The O(target) can be a string for O(matching_parameter=regex).
+          - Single item is required in O(target) for O(matching_parameter=regex).
         type: raw
         required: true
       matching_parameter:
@@ -46,30 +49,51 @@ EXAMPLES = '''
     - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
     - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
 
-  # By default match equal keys.
+  # 1) By default match keys that equal any of the items in the target.
   t: [k0_x0, k1_x1]
   r: "{{ l | keep_keys(target=t) }}"
 
-  # Match keys that starts with any of the items in the target.
+  # 2) Match keys that start with any of the items in the target.
   t: [k0, k1]
   r: "{{ l | keep_keys(target=t, matching_parameter='starts_with') }}"
 
-  # Match keys that ends with any of the items in target.
+  # 3) Match keys that end with any of the items in target.
   t: [x0, x1]
   r: "{{ l | keep_keys(target=t, matching_parameter='ends_with') }}"
 
-  # Match keys by the regex.
+  # 4) Match keys by the regex.
   t: ['^.*[01]_x.*$']
   r: "{{ l | keep_keys(target=t, matching_parameter='regex') }}"
 
-  # Match keys by the regex. The regex does not have to be in list.
+  # 5) Match keys by the regex.
   t: '^.*[01]_x.*$'
   r: "{{ l | keep_keys(target=t, matching_parameter='regex') }}"
 
-  # The results of all examples are all the same.
+  # The results of above examples 1-5 are all the same.
   r:
     - {k0_x0: A0, k1_x1: B0}
     - {k0_x0: A1, k1_x1: B1}
+
+  # 6) By default match keys that equal the target.
+  t: k0_x0
+  r: "{{ l | keep_keys(target=t) }}"
+
+  # 7) Match keys that start with the target.
+  t: k0
+  r: "{{ l | keep_keys(target=t, matching_parameter='starts_with') }}"
+
+  # 8) Match keys that end with the target.
+  t: x0
+  r: "{{ l | keep_keys(target=t, matching_parameter='ends_with') }}"
+
+  # 9) Match keys by the regex.
+  t: '^.*0_x.*$'
+  r: "{{ l | keep_keys(target=t, matching_parameter='regex') }}"
+
+  # The results of above examples 6-9 are all the same.
+  r:
+    - {k0_x0: A0}
+    - {k0_x0: A1}
 '''
 
 RETURN = '''

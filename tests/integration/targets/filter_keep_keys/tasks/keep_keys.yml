@@ -59,3 +59,21 @@
   vars:
     rr: "{{ list1 | community.general.keep_keys(target=item.tt, matching_parameter=item.mp) }}"
   tags: targets1
+
+- name: Test keep keys targets2
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result2) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  loop: "{{ targets2 }}"
+  loop_control:
+    label: "{{ item.mp }}: {{ item.tt }}"
+  vars:
+    rr: "{{ list2 | community.general.keep_keys(target=item.tt, matching_parameter=item.mp) }}"
+  tags: targets2
