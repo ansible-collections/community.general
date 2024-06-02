@@ -637,7 +637,7 @@
   vmid: "103"
   mode: "snapshot"
   mailnotification: "always"
-  mailto: "preprod@idnow.io"
+  mailto: "my mail address"
   repeat_missed: 0
   enabled: 1
   prune_backups:
