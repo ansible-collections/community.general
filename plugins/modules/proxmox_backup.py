@@ -80,15 +80,15 @@ options:
   id:
     description:
       - Required if O(state=absent).
-      - If O(state=present), it allow you to set a pattern of id (Example 0(backup-12345678-9123)) if it not set an ID will be generate automaticly.
-      - Rerquired if O(state=present) and you want to update a existing job.
+      - If O(state=present), it allow you to set a pattern of ID (example V(backup-12345678-9123)). If it is not set an ID will be generate automatically.
+      - Required if O(state=present) and you want to update a existing job.
     type: str
   ionice:
     description:
       - Set IO priority when using the BFQ scheduler.
       - For snapshot and suspend mode backups of VMs, this only affects the compressor.
       - A value of 8 means the idle priority is used,
-      - otherwise the best-effort priority is used with the specified value.
+        otherwise the best-effort priority is used with the specified value.
     type: int
   lockwait:
     description:
@@ -96,13 +96,14 @@ options:
     type: int
   mailnotification:
     description:
-      - Specify when to send a notification mail
+      - Specify when to send a notification mail.
     choices: ['always', 'failure']
     type: str
   mailto:
     description:
-      - Comma-separated list of email addresses or users that should receive email notifications.
-    type: str
+      - List of email addresses or users that should receive email notifications.
+    type: list
+    elements: str
   maxfiles:
     description:
       - Maximal number of backup files per guest system.
@@ -120,7 +121,7 @@ options:
     description:
       - Template string for generating notes for the backup(s).
       - It can contain variables which will be replaced by their values.
-      - Currently supported are V({{cluster}}), V{({guestname}}), V({{node}}), and V({{vmid}}),but more might be added in the future.
+      - Currently supported are V({{cluster}}), V{({guestname}}), V({{node}}), and V({{vmid}}), but more might be added in the future.
       - Needs to be a single line, newline and backslash need to be escaped.
     type: str
   performance:
@@ -135,11 +136,11 @@ options:
   pool:
     description:
       - Backup all known guest systems included in the specified pool.
-      - Can not be use with vmid and pool in same job
+      - Can not be use with vmid and pool in same job.
     type: str
   protected:
     description:
-      - If true, mark backup(s) as protected.
+      - If V(true), mark backup(s) as protected.
     type: bool
   prune_backups:
     description:
@@ -151,7 +152,7 @@ options:
     type: bool
   remove:
     description:
-      - Prune older backups according to 'prune-backups'.
+      - Prune older backups according to O(prune_backups).
     type: bool
   repeat_missed:
     description:
@@ -230,7 +231,7 @@ EXAMPLES = '''
     vmid: "103"
     mode: "snapshot"
     mailnotification: "always"
-    mailto: "preprod@idnow.io"
+    mailto: "my mail address"
     repeat_missed: 0
     enabled: 1
     prune_backups:
@@ -338,9 +339,10 @@ proxmox_backup:
       mailto:
         description:
           - >
-            Comma-separated list of email addresses or users that should receive email notifications.
+            List of email addresses or users that should receive email notifications.
         returned: on success
-        type: str
+        type: list
+        elements: str
       maxfiles:
         description: Maximal number of backup files per guest system.
         returned: on success
@@ -578,13 +580,16 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
     def get_task_parameters(self):
         # Filtre pour exclure les paramètres d'authentification
-        auth_keys = ['api_host', 'api_user', 'api_password', 'api_token_id',
-                     'api_token_secret', 'validate_certs', 'state']
+        exclude_keys = ['api_host', 'api_user', 'api_password', 'api_token_id',
+                     'api_token_secret', 'validate_certs', 'state', 'mailto']
         task_params = {
             k.replace('_', '-'): (1 if v is True else (0 if v is False else v))
             for k, v in self.module.params.items()
-            if k not in auth_keys and v is not None
+            if k not in exclude_keys and v is not None
         }
+
+        if 'mailto' in self.module.params and self.module.params['mailto'] is not None:
+            task_params['mailto'] = ','.join(self.module.params['mailto'])
         return task_params
 
 
@@ -646,7 +651,8 @@ def proxmox_backup_argument_spec():
             'choices': ['always', 'failure']
         },
         'mailto': {
-            'type': 'str'
+            'type': 'list',
+            'elements': 'str'
         },
         'maxfiles': {
             'type': 'int'
