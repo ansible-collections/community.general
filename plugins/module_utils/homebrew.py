@@ -125,7 +125,7 @@ def parse_brew_path(module) -> str:
     """
     path = module.params["path"]
     if not HomebrewValidate.valid_path(path):
-        module.fail_json(msg="Invalid path: {}".format(path))
+        module.fail_json(msg="Invalid path: {0}".format(path))
 
     if isinstance(path, string_types):
         paths = path.split(":")
@@ -134,6 +134,6 @@ def parse_brew_path(module) -> str:
 
     brew_path = module.get_bin_path("brew", required=True, opt_dirs=paths)
     if not HomebrewValidate.valid_brew_path(brew_path):
-        module.fail_json(msg="Invalid brew path: {}".format(brew_path))
-    
+        module.fail_json(msg="Invalid brew path: {0}".format(brew_path))
+
     return brew_path

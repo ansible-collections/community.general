@@ -163,11 +163,11 @@ def validate_and_load_arguments(module):
     """Reuse the Homebrew module's validation logic to validate these arguments."""
     package = module.params["name"]  # type: ignore
     if not HomebrewValidate.valid_package(package):
-        module.fail_json(msg="Invalid package name: {}".format(package))
+        module.fail_json(msg="Invalid package name: {0}".format(package))
 
     state = module.params["state"]  # type: ignore
     if state not in ["present", "absent", "restarted"]:
-        module.fail_json(msg="Invalid state: {}".format(state))
+        module.fail_json(msg="Invalid state: {0}".format(state))
 
     brew_path = parse_brew_path(module)
 
@@ -266,7 +266,7 @@ def main():
 
     # Argument validation should make this unreachable.
     module.fail_json(
-        msg="Code bug: Should not reach this point (state={})".format(
+        msg="Code bug: Should not reach this point (state={0})".format(
             service_args.state
         )
     )
