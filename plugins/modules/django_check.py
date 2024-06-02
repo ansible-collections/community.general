@@ -76,8 +76,6 @@ run_info:
   returned: success and O(verbosity) >= 3
 """
 
-from itertools import zip_longest
-
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
