@@ -23,9 +23,9 @@ DOCUMENTATION = '''
       target:
         description:
           - A list of keys or keys patterns to keep.
-          - The interpretation of O(target) depends on the option O(matching_parameter)
-          - Single item is required in O(target) list for O(matching_parameter=regex)
-          - The O(target) can be a string for O(matching_parameter=regex)
+          - The interpretation of O(target) depends on the option O(matching_parameter).
+          - Single item is required in O(target) list for O(matching_parameter=regex).
+          - The O(target) can be a string for O(matching_parameter=regex).
         type: raw
         required: true
       matching_parameter:
