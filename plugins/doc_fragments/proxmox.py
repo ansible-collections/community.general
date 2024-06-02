@@ -21,6 +21,7 @@ options:
       - Specify the target port of the Proxmox VE cluster.
     type: int
     required: false
+    version_added: 9.1.0
   api_user:
     description:
       - Specify the user to authenticate with.
