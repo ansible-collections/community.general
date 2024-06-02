@@ -163,6 +163,8 @@ files:
     maintainers: cfiehe
   $filters/lists_intersect.yml:
     maintainers: cfiehe
+  $filters/keep_keys.py:
+    maintainers: vbotka
   $filters/lists_mergeby.py:
     maintainers: vbotka
   $filters/lists_symmetric_difference.yml:
@@ -1419,6 +1421,8 @@ files:
     maintainers: $team_suse
   $plugin_utils/unsafe.py:
     maintainers: felixfontein
+  $plugin_utils/keys_filter.py:
+    maintainers: vbotka
   $tests/a_module.py:
     maintainers: felixfontein
   $tests/fqdn_valid.py:
