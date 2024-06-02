@@ -80,7 +80,8 @@ options:
   id:
     description:
       - Required if O(state=absent).
-      - If O(state=present), it allow you to set a pattern of ID (example V(backup-12345678-9123)). If it is not set an ID will be generate automatically.
+      - If O(state=present), it allow you to set a pattern of ID (example V(backup-12345678-9123)).
+        If it is not set an ID will be generate automatically.
       - Required if O(state=present) and you want to update a existing job.
     type: str
   ionice:
