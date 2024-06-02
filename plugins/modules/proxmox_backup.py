@@ -32,7 +32,7 @@ options:
   all:
     description:
       - Backup all known guest systems on this host.
-      - Can not be use with O(vmid) and O(pool) in same job
+      - Can not be use with O(vmid) and O(pool) in same job.
     type: bool
   bwlimit:
     description:
@@ -40,13 +40,13 @@ options:
     type: int
   comment:
     description:
-      - Description for the Job.
+      - Description for the job.
     type: str
   compress:
     description:
       - >
-        If you choice a renote storage (like Proxmox Backup Server storage) the V(zstd) will be set automatically and this the only available value.
-        If you choice a local storage you can choice between V(gzip), V(lzo) and V(zstd).
+        If you choose a remote storage (like Proxmox Backup Server storage), V(zstd) will be set automatically and this the only available value.
+        If you choose a local storage you can choose between V(gzip), V(lzo) and V(zstd).
     choices: ['gzip', 'lzo', 'zstd']
     type: str
   dow:
@@ -63,7 +63,7 @@ options:
     type: bool
   exclude:
     description:
-      - Exclude specified guest systems (assumes --all)
+      - Exclude specified guest systems (assumes V(--all)).
     type: str
   exclude_path:
     description:
@@ -197,7 +197,7 @@ options:
   zstd:
     description:
       - Zstd threads. V(N=0) uses half of the available cores,
-      - if V(N) is set to a value bigger than V(0), V(N) is used as thread count.
+        if V(N) is set to a value bigger than V(0), V(N) is used as thread count.
     type: int
 
 extends_documentation_fragment:
@@ -266,7 +266,7 @@ EXAMPLES = '''
 
 RETURN = '''
 proxmox_backup:
-    description: List of Proxmox VE backup.
+    description: List of Proxmox VE backups.
     returned: on success
     type: list
     elements: dict
