@@ -19,7 +19,7 @@
     fail_msg: |
       [ERR] result:
       {{ rr | to_yaml }}
-    quiet: "{{ quite_test | d(true) | bool }}"
+    quiet: "{{ quiet_test | d(true) | bool }}"
   vars:
     rr: "{{ list1 | community.general.remove_keys(target=tt) }}"
     tt: [k0_x0, k1_x1]
@@ -35,14 +35,14 @@
     fail_msg: |
       [ERR] result:
       {{ rr | to_yaml }}
-    quiet: "{{ quite_test | d(true) | bool }}"
+    quiet: "{{ quiet_test | d(true) | bool }}"
   vars:
     rr: "{{ list1 | community.general.remove_keys(target=tt, matching_parameter=mp) }}"
     mp: regex
     tt: '^.*[01]_x.*$'
   tags: regex_string
 
-- name: Test remove keys matching_parameter list
+- name: Test remove keys targets1
   ansible.builtin.assert:
     that:
       - (rr | difference(result1) | length) == 0
@@ -53,9 +53,9 @@
       [ERR] result:
       {{ rr | to_yaml }}
     quiet: "{{ quite_test | d(true) | bool }}"
-  loop: "{{ targets }}"
+  loop: "{{ targets1 }}"
   loop_control:
     label: "{{ item.mp }}: {{ item.tt }}"
   vars:
     rr: "{{ list1 | community.general.remove_keys(target=item.tt, matching_parameter=item.mp) }}"
-  tags: matching_parameter lists
+  tags: targets1

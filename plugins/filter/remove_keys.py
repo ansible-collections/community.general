@@ -8,33 +8,37 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: remove_keys
-    short_description: Remove specific keys from dictionaries in a list.
-    version_added: "2.17"
+    short_description: Remove specific keys from dictionaries in a list
+    version_added: "9.1.0"
     author: Vladimir Botka (@vbotka)
     description: This filter removes only specified keys from a provided list of dictionaries.
     options:
       _input:
-        description: A list of dictionaries.
+        description:
+          - A list of dictionaries.
+          - All keys must be strings.
         type: list
         elements: dictionary
         required: true
       target:
         description:
           - A list of keys or keys patterns to remove.
-          - The interpretation of the list items depends on the option C(matching_parameter)
-          - For matching_parameter C(regex) only the first item is taken.
-        type: list
-        elements: str
+          - The interpretation of O(target) depends on the option O(matching_parameter)
+          - Single item is required in O(target) list for O(matching_parameter=regex)
+          - The O(target) can be a string for O(matching_parameter=regex)
+        type: raw
         required: true
       matching_parameter:
         description: Specify the matching option of target keys.
         type: str
         default: equal
         choices:
-          - equal
-          - starts_with
-          - ends_with
-          - regex
+          equal: Matches keys of exactly one of the O(target) items.
+          starts_with: Matches keys that start with one of the O(target) items.
+          ends_with: Matches keys that end with one of the O(target) items.
+          regex:
+            - Matches keys that match the regular expresion provided in O(target).
+            - In this case, O(target) must be a regex string or a list with single regex string.
 '''
 
 EXAMPLES = '''
@@ -75,75 +79,33 @@ RETURN = '''
     elements: dictionary
 '''
 
-from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
-from ansible.module_utils.common._collections_compat import Mapping, Sequence
-
-import re
+from ansible_collections.community.general.plugins.plugin_utils.keys_filter import (
+    _keys_filter_params,
+    _keys_filter_target_str)
 
 
 def remove_keys(data, target=None, matching_parameter='equal'):
     """remove specific keys from dictionaries in a list"""
 
-    ld = data
-    tt = target
-    mp = matching_parameter
-    ml = ['equal', 'starts_with', 'ends_with', 'regex']
+    # test parameters
+    _keys_filter_params(data, target, matching_parameter)
+    # test and transform target
+    tt = _keys_filter_target_str(target, matching_parameter)
 
-    if not isinstance(ld, Sequence):
-        msg = "First argument for remove_keys must be a list. %s is %s"
-        raise AnsibleFilterError(msg % (ld, type(ld)))
+    if matching_parameter == 'equal':
+        def keep_key(key):
+            return key not in tt
+    elif matching_parameter == 'starts_with':
+        def keep_key(key):
+            return not key.startswith(tt)
+    elif matching_parameter == 'ends_with':
+        def keep_key(key):
+            return not key.endswith(tt)
+    elif matching_parameter == 'regex':
+        def keep_key(key):
+            return tt.match(key) is None
 
-    for elem in ld:
-        if not isinstance(elem, Mapping):
-            msg = "Elements of the data list for remove_keys must be dictionaries. %s is %s"
-            raise AnsibleFilterError(msg % (elem, type(elem)))
-
-    if mp not in ml:
-        msg = ("The matching_parameter for remove_keys must be one of %s. matching_parameter is %s")
-        raise AnsibleFilterError(msg % (ml, mp))
-
-    if mp == 'regex':
-        if isinstance(target, string_types):
-            tt = target
-        elif isinstance(target, Sequence):
-            tt = target[0]
-        else:
-            msg = ("The target for remove_keys must be a string or a list if matching_parameter is regex."
-                   "target is %s.")
-            raise AnsibleFilterError(msg % target)
-        try:
-            re.compile(tt)
-            is_valid = True
-        except re.error:
-            is_valid = False
-        if not is_valid:
-            msg = ("The target for remove_keys must be a valid regex if matching_parameter is regex."
-                   "target is %s")
-            raise AnsibleFilterError(msg % tt)
-    else:
-        if not isinstance(tt, Sequence):
-            msg = ("The target for remove_keys must be a list if matching_parameter is %s. %s is %s")
-            raise AnsibleFilterError(msg % (mp, tt, type(tt)))
-        for elem in tt:
-            if not isinstance(elem, string_types):
-                msg = "Elements of the targets for remove_keys must be strings. %s is %s"
-                raise AnsibleFilterError(msg % (elem, type(elem)))
-
-    if mp == 'equal':
-        my_keys = [[k for k in i.keys() if k not in tt] for i in ld]
-    elif mp == 'starts_with':
-        my_keys = [[k for k in i.keys() if not k.startswith(tuple(tt))] for i in ld]
-    elif mp == 'ends_with':
-        my_keys = [[k for k in i.keys() if not k.endswith(tuple(tt))] for i in ld]
-    elif mp == 'regex':
-        if isinstance(target, string_types):
-            tt = target
-        else:
-            tt = target[0]
-        my_keys = [[k for k in i.keys() if not re.match(tt, k)] for i in ld]
-
-    return [dict([(k, ld[i][k]) for k in j]) for i, j in enumerate(my_keys)]
+    return [dict((k, v) for k, v in d.items() if keep_key(k)) for d in data]
 
 
 class FilterModule(object):
