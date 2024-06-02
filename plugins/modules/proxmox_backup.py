@@ -582,7 +582,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def get_task_parameters(self):
         # Filtre pour exclure les paramètres d'authentification
         exclude_keys = ['api_host', 'api_user', 'api_password', 'api_token_id',
-                     'api_token_secret', 'validate_certs', 'state', 'mailto']
+                        'api_token_secret', 'validate_certs', 'state', 'mailto']
         task_params = {
             k.replace('_', '-'): (1 if v is True else (0 if v is False else v))
             for k, v in self.module.params.items()
