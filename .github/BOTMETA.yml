@@ -157,14 +157,14 @@ files:
   $filters/jc.py:
     maintainers: kellyjonbrazil
   $filters/json_query.py: {}
+  $filters/keep_keys.py:
+    maintainers: vbotka
   $filters/lists.py:
     maintainers: cfiehe
   $filters/lists_difference.yml:
     maintainers: cfiehe
   $filters/lists_intersect.yml:
     maintainers: cfiehe
-  $filters/keep_keys.py:
-    maintainers: vbotka
   $filters/lists_mergeby.py:
     maintainers: vbotka
   $filters/lists_symmetric_difference.yml:
@@ -1419,10 +1419,10 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
-  $plugin_utils/unsafe.py:
-    maintainers: felixfontein
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
+  $plugin_utils/unsafe.py:
+    maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
   $tests/fqdn_valid.py:
