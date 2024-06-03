@@ -25,10 +25,8 @@ DOCUMENTATION = '''
         required: true
       target:
         description:
-          - A key or key pattern to keep, or
-          - A list of keys or keys patterns to keep.
-          - The interpretation of O(target) depends on the option O(matching_parameter).
-          - Single item is required in O(target) for O(matching_parameter=regex).
+          - A single key or key pattern to keep, or a list of keys or keys patterns to keep.
+          - If O(matching_parameter=regex) there must be exactly one pattern provided.
         type: raw
         required: true
       matching_parameter:
