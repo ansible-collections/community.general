@@ -39,7 +39,7 @@ options:
     - "'A6', 'CNAME', 'DNAME' and 'TXT' are added in version 2.5."
     - "'SRV' and 'MX' are added in version 2.8."
     - "'NS' are added in comunity.general 8.2.0."
-    - "'SSHFP' are added in community.general 9.1.0"
+    - "'SSHFP' are added in community.general 9.1.0."
     required: false
     default: 'A'
     choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT', 'SSHFP']
