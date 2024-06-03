@@ -49,23 +49,23 @@ EXAMPLES = '''
 
   # 1) By default match keys that equal any of the items in the target.
   t: [k0_x0, k1_x1]
-  r: "{{ l | keep_keys(target=t) }}"
+  r: "{{ l | community.general.keep_keys(target=t) }}"
 
   # 2) Match keys that start with any of the items in the target.
   t: [k0, k1]
-  r: "{{ l | keep_keys(target=t, matching_parameter='starts_with') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='starts_with') }}"
 
   # 3) Match keys that end with any of the items in target.
   t: [x0, x1]
-  r: "{{ l | keep_keys(target=t, matching_parameter='ends_with') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='ends_with') }}"
 
   # 4) Match keys by the regex.
   t: ['^.*[01]_x.*$']
-  r: "{{ l | keep_keys(target=t, matching_parameter='regex') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='regex') }}"
 
   # 5) Match keys by the regex.
   t: '^.*[01]_x.*$'
-  r: "{{ l | keep_keys(target=t, matching_parameter='regex') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='regex') }}"
 
   # The results of above examples 1-5 are all the same.
   r:
@@ -74,19 +74,19 @@ EXAMPLES = '''
 
   # 6) By default match keys that equal the target.
   t: k0_x0
-  r: "{{ l | keep_keys(target=t) }}"
+  r: "{{ l | community.general.keep_keys(target=t) }}"
 
   # 7) Match keys that start with the target.
   t: k0
-  r: "{{ l | keep_keys(target=t, matching_parameter='starts_with') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='starts_with') }}"
 
   # 8) Match keys that end with the target.
   t: x0
-  r: "{{ l | keep_keys(target=t, matching_parameter='ends_with') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='ends_with') }}"
 
   # 9) Match keys by the regex.
   t: '^.*0_x.*$'
-  r: "{{ l | keep_keys(target=t, matching_parameter='regex') }}"
+  r: "{{ l | community.general.keep_keys(target=t, matching_parameter='regex') }}"
 
   # The results of above examples 6-9 are all the same.
   r:
