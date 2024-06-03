@@ -153,7 +153,7 @@ def _exit_with_state(args, module, changed=False, message=None):
     state = _brew_service_state(args, module)
     if message is None:
         message = (
-            f"Running: {state.running}, Changed: {state.running}, PID: {state.pid}"
+            "Running: {state.running}, Changed: {state.running}, PID: {state.pid}".format(state=state)
         )
     module.exit_json(msg=message, pid=state.pid, running=state.running, changed=changed)
 

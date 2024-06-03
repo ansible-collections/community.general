@@ -115,7 +115,8 @@ class HomebrewValidate(object):
         ) and not cls.INVALID_PACKAGE_REGEX.search(package)
 
 
-def parse_brew_path(module) -> str:
+def parse_brew_path(module):
+    # type: (...) -> str
     """Attempt to find the Homebrew executable path.
 
     Requires:
