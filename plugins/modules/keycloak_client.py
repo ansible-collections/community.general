@@ -863,12 +863,12 @@ def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
             continue
         if k == "browser":
             modelFlow["browser"] = v
-        elif k == "browser_name" or k == "browserName":
+        elif k == "browser_name":
             if not modelFlow["browser"]:
                 modelFlow["browser"] = get_authentication_flow_id(v, realm, kc)
         elif k == "direct_grant":
             modelFlow["direct_grant"] = v
-        elif k == "direct_grant_name" or k == "directGrantName":
+        elif k == "direct_grant_name":
             if not modelFlow["direct_grant"]:
                 modelFlow["direct_grant"] = get_authentication_flow_id(v, realm, kc)
 
