@@ -19,7 +19,7 @@ DOCUMENTATION = '''
       _input:
         description:
           - A list of dictionaries.
-          - All keys must be strings.
+          - Top level keys must be strings.
         type: list
         elements: dictionary
         required: true

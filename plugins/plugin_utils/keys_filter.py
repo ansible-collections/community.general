@@ -34,12 +34,11 @@ def _keys_filter_params(data, target, matching_parameter):
 
     for elem in data:
         if not all(isinstance(item, string_types) for item in elem.keys()):
-            msg = "All keys must be strings. keys: %s"
+            msg = "Top level keys must be strings. keys: %s"
             raise AnsibleFilterError(msg % elem.keys())
 
     if not isinstance(target, Sequence):
-        msg = ("The target must be a list. It can be a string if matching_parameter is regex."
-               " target is %s.")
+        msg = ("The target must be a string or a list. target is %s.")
         raise AnsibleFilterError(msg % target)
 
     if len(target) == 0:
@@ -55,10 +54,11 @@ def _keys_filter_params(data, target, matching_parameter):
 
 def _keys_filter_target_str(target, matching_parameter):
     """test:
-    * target is a list of strings, or
-    * target is a string or list with single string if matching_parameter=regex
+    * If target is list all items are strings
+    * If matching_parameter=regex target is a string or list with single string
     convert and return:
     * tuple of unique target items, or
+    * tuple with single item, or
     * compiled regex if matching_parameter=regex
     """
 
@@ -86,7 +86,7 @@ def _keys_filter_target_str(target, matching_parameter):
     elif isinstance(target, string_types):
         tt = (target, )
     else:
-        tt = tuple(target)
+        tt = tuple(set(target))
 
     return tt
 
