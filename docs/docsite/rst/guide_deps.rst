@@ -66,9 +66,7 @@ they can be validated selectively by doing:
 .. code-block:: python
 
     deps.validate(module, "foo")       # only validates the "foo" dependency
-
     deps.validate(module, "doe:bar")   # only validates the "doe" and "bar" dependencies
-
     deps.validate(module, "-doe:bar")  # validates all dependencies except "doe" and "bar"
 
 .. versionadded:: 6.1.0
