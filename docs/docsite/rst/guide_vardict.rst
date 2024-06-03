@@ -39,7 +39,7 @@ Then in ``main()``, or any other function called from there:
     vars["abc"] = 123
     vars.set("abc", 123)
 
-    vars.def = "bananas"
+    vars.xyz = "bananas"
     vars.ghi = False
 
 And by the time the module is about to exit:
@@ -55,7 +55,7 @@ That will make the return value of the module:
 
     {
         "abc": 123,
-        "def": "bananas",
+        "xyz": "bananas",
         "ghi": false
     }
 
@@ -66,8 +66,7 @@ The metadata values associated with each variable are:
 
 - ``output`` - marks the variable for module output as a module return value.
 - ``fact`` - marks the variable for module output as an Ansible fact.
-- ``verbosity`` - sets the minimum level of verbosity for which the variable will be included
-  in the output, as both return value or fact.
+- ``verbosity`` - sets the minimum level of verbosity for which the variable will be included in the output.
 - ``change`` - controls the detection of changes in the variable value.
 - ``initial_value`` - when using ``change`` and need to forcefully set an intial value to the variable.
 - ``diff`` - used along with ``change``, this will generate an Ansible-style diff ``dict``.
