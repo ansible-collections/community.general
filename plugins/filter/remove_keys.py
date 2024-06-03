@@ -94,7 +94,7 @@ EXAMPLES = '''
     - {k1_x1: B1, k2_x2: [C1], k3_x3: bar}
 '''
 
-RETURN = '''community.general.
+RETURN = '''
   _value:
     description: The list of dictionaries with selected keys.
     type: list
