@@ -359,6 +359,16 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Check the availability of the service with a timeout of 5 seconds
+    community.general.redfish_info:
+      category: Service
+      command: CheckAvailability
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      timeout: 5
+    register: result
 '''
 
 RETURN = '''
@@ -385,6 +395,7 @@ CATEGORY_COMMANDS_ALL = {
                "GetUpdateStatus"],
     "Manager": ["GetManagerNicInventory", "GetVirtualMedia", "GetLogs", "GetNetworkProtocols",
                 "GetHealthReport", "GetHostInterfaces", "GetManagerInventory", "GetServiceIdentification"],
+    "Service": ["CheckAvailability"],
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
@@ -393,7 +404,8 @@ CATEGORY_COMMANDS_DEFAULT = {
     "Accounts": "ListUsers",
     "Update": "GetFirmwareInventory",
     "Sessions": "GetSessions",
-    "Manager": "GetManagerNicInventory"
+    "Manager": "GetManagerNicInventory",
+    "Service": "CheckAvailability",
 }
 
 
@@ -473,7 +485,13 @@ def main():
             module.fail_json(msg="Invalid Category: %s" % category)
 
         # Organize by Categories / Commands
-        if category == "Systems":
+        if category == "Service":
+            # service-level commands are always available
+            for command in command_list:
+                if command == "CheckAvailability":
+                    result["service"] = rf_utils.check_service_availability()
+
+        elif category == "Systems":
             # execute only if we find a Systems resource
             resource = rf_utils._find_systems_resource()
             if resource['ret'] is False:
