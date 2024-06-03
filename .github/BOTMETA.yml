@@ -1458,6 +1458,8 @@ files:
     maintainers: $team_scaleway
   docs/docsite/rst/guide_deps.rst:
     maintainers: russoz
+  docs/docsite/rst/guide_vardict.rst:
+    maintainers: russoz
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
 #########################
