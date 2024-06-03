@@ -167,13 +167,13 @@ files:
     maintainers: cfiehe
   $filters/lists_mergeby.py:
     maintainers: vbotka
-  $filters/remove_keys.py:
-    maintainers: vbotka
   $filters/lists_symmetric_difference.yml:
     maintainers: cfiehe
   $filters/lists_union.yml:
     maintainers: cfiehe
   $filters/random_mac.py: {}
+  $filters/remove_keys.py:
+    maintainers: vbotka
   $filters/time.py:
     maintainers: resmo
   $filters/to_days.yml:
