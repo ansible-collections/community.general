@@ -864,13 +864,11 @@ def flow_binding_from_dict_to_model(newClientFlowBinding, realm, kc):
         if k == "browser":
             modelFlow["browser"] = v
         elif k == "browser_name":
-            if not modelFlow["browser"]:
-                modelFlow["browser"] = get_authentication_flow_id(v, realm, kc)
+            modelFlow["browser"] = get_authentication_flow_id(v, realm, kc)
         elif k == "direct_grant":
             modelFlow["direct_grant"] = v
         elif k == "direct_grant_name":
-            if not modelFlow["direct_grant"]:
-                modelFlow["direct_grant"] = get_authentication_flow_id(v, realm, kc)
+            modelFlow["direct_grant"] = get_authentication_flow_id(v, realm, kc)
 
     return modelFlow
 
@@ -1007,7 +1005,7 @@ def main():
         # they are not specified
         if client_param == 'protocol_mappers':
             new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
-        elif client_param in ['authentication_flow_binding_overrides', 'authenticationFlowBindingOverrides']:
+        elif client_param == 'authentication_flow_binding_overrides':
             new_param_value = flow_binding_from_dict_to_model(new_param_value, realm, kc)
 
         changeset[camel(client_param)] = new_param_value
