@@ -65,7 +65,7 @@ Metadata
 The metadata values associated with each variable are:
 
 - ``output: bool`` - marks the variable for module output as a module return value.
-- ``fact: bool `` - marks the variable for module output as an Ansible fact.
+- ``fact: bool`` - marks the variable for module output as an Ansible fact.
 - ``verbosity: int`` - sets the minimum level of verbosity for which the variable will be included in the output.
 - ``change: bool`` - controls the detection of changes in the variable value.
 - ``initial_value: any`` - when using ``change`` and need to forcefully set an intial value to the variable.
