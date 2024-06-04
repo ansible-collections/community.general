@@ -49,7 +49,7 @@ And by the time the module is about to exit:
     results = vars.output()
     module.exit_json(**results)
 
-That will make the return value of the module:
+That makes the return value of the module:
 
 .. code-block:: javascript
 
@@ -64,12 +64,12 @@ Metadata
 
 The metadata values associated with each variable are:
 
-- ``output`` - marks the variable for module output as a module return value.
-- ``fact`` - marks the variable for module output as an Ansible fact.
-- ``verbosity`` - sets the minimum level of verbosity for which the variable will be included in the output.
-- ``change`` - controls the detection of changes in the variable value.
-- ``initial_value`` - when using ``change`` and need to forcefully set an intial value to the variable.
-- ``diff`` - used along with ``change``, this will generate an Ansible-style diff ``dict``.
+- ``output: bool`` - marks the variable for module output as a module return value.
+- ``fact: bool `` - marks the variable for module output as an Ansible fact.
+- ``verbosity: int`` - sets the minimum level of verbosity for which the variable will be included in the output.
+- ``change: bool`` - controls the detection of changes in the variable value.
+- ``initial_value: any`` - when using ``change`` and need to forcefully set an intial value to the variable.
+- ``diff: bool`` - used along with ``change``, this generates an Ansible-style diff ``dict``.
 
 See the sections below for more details on how to use the metadata.
 
@@ -106,7 +106,7 @@ access its value and its metadata are:
 
 The names of methods, such as ``set``, ``get_meta``, ``output`` amongst others, are reserved and
 cannot be used as variable names. If you try to use a reserved name a ``ValueError`` exception
-will be raised with the message "Name <var> is reserved".
+is raised with the message "Name <var> is reserved".
 
 Generating output
 """""""""""""""""
