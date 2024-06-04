@@ -3,6 +3,14 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+list1:
+  - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
+  - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
+
+result1:
+  - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
+  - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
+
 targets1:
   equal:
     - {before: k0_x0, after: a0}
@@ -17,20 +25,12 @@ targets1:
     - {before: "^.*0_x.*$", after: a0}
     - {before: "^.*1_x.*$", after: a1}
 
-list1:
-  - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
-  - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
-
-result1:
-  - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
-  - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
-
 list2:
   - {aaa1: A, bbb1: B, ccc1: C}
   - {aaa2: D, bbb2: E, ccc2: F}
 
 targets2:
-  - label: If more keys match the same before attribute the last key/value will be used.
+  - label: If more keys match the same attribute before the last one will be used.
     match: regex
     target:
       - {before: "^.*_x.*$", after: X}
@@ -38,7 +38,7 @@ targets2:
     result:
       - X: foo
       - X: bar
-  - label: If before attributes are equal the last one will be used.
+  - label: If there are items with equal attribute before the last one will be used.
     match: regex
     target:
       - {before: "^.*_x.*$", after: X}

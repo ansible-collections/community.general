@@ -6,7 +6,7 @@
 - name: Debug ansible_version
   ansible.builtin.debug:
     var: ansible_version
-  when: not quite_test | d(true) | bool
+  when: not quiet_test | d(true) | bool
   tags: ansible_version
 
 - name: Test replace keys equal (default)
@@ -45,12 +45,12 @@
     rr: "{{ list1 | community.general.replace_keys(target=item.value, matching_parameter=item.key) }}"
   tags: targets1
 
-- name: Test replace keys targetsX
+- name: Test replace keys targets2
   include_tasks:
     file: fn-test-replace_keys.yml
     apply:
-      tags: targetsX
+      tags: targets2
   loop: "{{ targets2 }}"
   loop_control:
     label: "{{ item.label }}"
-  tags: targetsX
+  tags: targets2
