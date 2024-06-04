@@ -22,7 +22,7 @@ output values from the module.
 Quickstart
 """"""""""
 
-The simplest way of using ``Vardict`` is:
+The simplest way of using ``VarDict`` is:
 
 .. code-block:: python
 
