@@ -25,8 +25,8 @@ DOCUMENTATION = '''
         required: true
       target:
         description:
-          - A list of dictionaries with attributes O(before) and O(after).
-          - The value of O(after) replaces key matching O(before).
+          - A list of dictionaries with attributes C(before) and C(after).
+          - The value of C(after) replaces key matching C(before).
         type: list
         elements: dictionary
         required: true
@@ -34,9 +34,9 @@ DOCUMENTATION = '''
           before:
             description:
               - A key or key pattern to change.
-              - The interpretation of O(before) depends on O(matching_parameter).
-              - If more keys match the same O(before) the B(last) one will be used.
-              - If there are items with equal O(before) the B(last) one will be used.
+              - The interpretation of C(before) depends on O(matching_parameter).
+              - If more keys match the same C(before) the B(last) one will be used.
+              - If there are items with equal C(before) the B(last) one will be used.
               - If there are more matches for a key the B(first) one will be used.
             type: str
           after:
@@ -47,10 +47,10 @@ DOCUMENTATION = '''
         type: str
         default: equal
         choices:
-          equal: Matches keys of exactly one of the O(before) items.
-          starts_with: Matches keys that start with one of the O(before) items.
-          ends_with: Matches keys that end with one of the O(before) items.
-          regex:  Matches keys that match one of the regular expresions provided in O(before).
+          equal: Matches keys of exactly one of the C(before) items.
+          starts_with: Matches keys that start with one of the C(before) items.
+          ends_with: Matches keys that end with one of the C(before) items.
+          regex:  Matches keys that match one of the regular expresions provided in C(before).
 '''
 
 EXAMPLES = '''
