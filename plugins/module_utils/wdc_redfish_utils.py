@@ -210,7 +210,7 @@ class WdcRedfishUtils(RedfishUtils):
             # It is anticipated that DP firmware bundle will be having the value "DPG2"
             # for cookie1 in the header
             if cookie1.decode("utf8") == "MMG2" or cookie1.decode("utf8") == "DPG2":
-                file_name, _ = os.path.splitext(str(bundle_uri.rsplit('/', 1)[1]))
+                file_name, ext = os.path.splitext(str(bundle_uri.rsplit('/', 1)[1]))
                 # G2 bundle file name: Ultrastar-Data102_3000_SEP_1010-032_2.1.12.fwdl
                 parsedFileName = file_name.split('_')
                 if len(parsedFileName) == 5:
