@@ -18,7 +18,7 @@ author:
   - Matthew Gamble (@djmattyg007)
   - Marius Gedminas (@mgedmin)
 requirements: ['git']
-short_description: Read and write git configuration
+short_description: Update git configuration
 description:
   - The M(community.general.git_config) module changes git configuration by invoking C(git config).
     This is needed if you do not want to use M(ansible.builtin.template) for the entire git
@@ -36,6 +36,8 @@ options:
   list_all:
     description:
       - List all settings (optionally limited to a given O(scope)).
+      - This option is B(deprecated) and will be removed from community.general 11.0.0.
+        Please use M(community.general.git_config_info) instead.
     type: bool
     default: false
   name:
@@ -74,6 +76,8 @@ options:
     description:
       - When specifying the name of a single setting, supply a value to
         set that setting to the given value.
+      - From community.general 11.0.0 on, O(value) will be required if O(state=present).
+        To read values, use the M(community.general.git_config_info) module instead.
     type: str
   add_mode:
     description:
@@ -143,29 +147,6 @@ EXAMPLES = '''
     repo: /etc
     scope: local
     value: 'root@{{ ansible_fqdn }}'
-
-- name: Read individual values from git config
-  community.general.git_config:
-    name: alias.ci
-    scope: global
-
-- name: Scope system is also assumed when reading values, unless list_all=true
-  community.general.git_config:
-    name: alias.diffc
-
-- name: Read all values from git config
-  community.general.git_config:
-    list_all: true
-    scope: global
-
-- name: When list_all is yes and no scope is specified, you get configuration from all scopes
-  community.general.git_config:
-    list_all: true
-
-- name: Specify a repository to include local settings
-  community.general.git_config:
-    list_all: true
-    repo: /path/to/repo.git
 '''
 
 RETURN = '''
@@ -193,7 +174,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            list_all=dict(required=False, type='bool', default=False),
+            list_all=dict(required=False, type='bool', default=False, removed_in_version='11.0.0', removed_from_collection='community.general'),
             name=dict(type='str'),
             repo=dict(type='path'),
             file=dict(type='path'),
@@ -221,6 +202,14 @@ def main():
     unset = params['state'] == 'absent'
     new_value = params['value'] or ''
     add_mode = params['add_mode']
+
+    if not unset and not new_value and not params['list_all']:
+        module.deprecate(
+            'If state=present, a value must be specified from community.general 11.0.0 on.'
+            ' To read a config value, use the community.general.git_config_info module instead.',
+            version='11.0.0',
+            collection_name='community.general',
+        )
 
     scope = determine_scope(params)
     cwd = determine_cwd(scope, params)
