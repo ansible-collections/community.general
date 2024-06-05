@@ -38,11 +38,11 @@ def _keys_filter_params(data, target, matching_parameter):
             raise AnsibleFilterError(msg % elem.keys())
 
     if len(target) == 0:
-        msg = ("The target can't be empty.")
+        msg = "The target can't be empty."
         raise AnsibleFilterError(msg)
 
     if mp not in ml:
-        msg = ("The matching_parameter must be one of %s. matching_parameter is %s")
+        msg = "The matching_parameter must be one of %s. matching_parameter=%s"
         raise AnsibleFilterError(msg % (ml, mp))
 
     return
@@ -59,8 +59,8 @@ def _keys_filter_target_str(target, matching_parameter):
     """
 
     if not isinstance(target, Sequence):
-        msg = ("The target must be a string or a list. target is %s.")
-        raise AnsibleFilterError(msg % target)
+        msg = "The target must be a string or a list. target is %s."
+        raise AnsibleFilterError(msg % type(target))
 
     if isinstance(target, list):
         for elem in target:
@@ -73,14 +73,14 @@ def _keys_filter_target_str(target, matching_parameter):
             r = target
         else:
             if len(target) > 1:
-                msg = ("Single item is required in the target list if matching_parameter is regex.")
+                msg = "Single item is required in the target list if matching_parameter=regex."
                 raise AnsibleFilterError(msg)
             else:
                 r = target[0]
         try:
             tt = re.compile(r)
         except re.error:
-            msg = ("The target must be a valid regex if matching_parameter is regex."
+            msg = ("The target must be a valid regex if matching_parameter=regex."
                    " target is %s")
             raise AnsibleFilterError(msg % r)
     elif isinstance(target, string_types):
@@ -102,7 +102,7 @@ def _keys_filter_target_dict(target, matching_parameter):
     """
 
     if not isinstance(target, list):
-        msg = ("The target must be a list. target is %s.")
+        msg = "The target must be a list. target is %s."
         raise AnsibleFilterError(msg % (target, type(target)))
 
     for elem in target:
@@ -110,7 +110,7 @@ def _keys_filter_target_dict(target, matching_parameter):
             msg = "The target items must be dictionaries. %s is %s"
             raise AnsibleFilterError(msg % (elem, type(elem)))
         if not all(k in elem for k in ('before', 'after')):
-            msg = "Dictionaries in target must include: after, before."
+            msg = "All dictionaries in target must include: after, before."
             raise AnsibleFilterError(msg)
 
     before = [d['before'] for d in target]
