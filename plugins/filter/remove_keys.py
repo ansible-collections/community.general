@@ -25,7 +25,7 @@ DOCUMENTATION = '''
         required: true
       target:
         description:
-          - A single key or key pattern to keep, or a list of keys or keys patterns to keep.
+          - A single key or key pattern to remove, or a list of keys or keys patterns to remove.
           - If O(matching_parameter=regex) there must be exactly one pattern provided.
         type: raw
         required: true
