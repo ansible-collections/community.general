@@ -209,9 +209,9 @@ class ProxmoxVmInfoAnsible(ProxmoxAnsible):
                         desired_vm["config"] = call_vm_getter(this_vm_id).config().get(current=config_type)
                     if network:
                         if type == "qemu":
-                          desired_vm["network"] = call_vm_getter(this_vm_id).agent("network-get-interfaces").get()['result']
+                            desired_vm["network"] = call_vm_getter(this_vm_id).agent("network-get-interfaces").get()['result']
                         elif type == "lxc":
-                          desired_vm["network"] = call_vm_getter(this_vm_id).interfaces.get()
+                            desired_vm["network"] = call_vm_getter(this_vm_id).interfaces.get()
 
         return filtered_vms
 
