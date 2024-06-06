@@ -27,7 +27,7 @@ DOCUMENTATION = '''
       description:
         - A list of dictionaries or a list of lists of dictionaries.
         - The required type of the C(elements) is set to C(raw)
-          because all elements of O(input) can be either dictionaries
+          because all elements of O(_input) can be either dictionaries
           or lists.
       type: list
       elements: raw
