@@ -1,0 +1,2 @@
+bugfixes:
+  - "git_config - fix behavior of ``state=absent`` if ``value`` is present (https://github.com/ansible-collections/community.general/issues/8436, https://github.com/ansible-collections/community.general/pull/8452)."
