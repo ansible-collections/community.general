@@ -241,7 +241,7 @@ def main():
             type="str", choices=["none", "current", "pending"],
             default="none", required=False
         ),
-        network=dict(type="bool", default=False, required=False)
+        network=dict(type="bool", default=False, required=False),
     )
     module_args.update(vm_info_args)
 
