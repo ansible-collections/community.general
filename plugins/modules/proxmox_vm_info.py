@@ -60,7 +60,7 @@ options:
   network:
     description:
       - Whether to retrieve the current network status
-      - Requires enabled/running qemu-guest-agent
+      - Requires enabled/running qemu-guest-agent on qemu vms
     type: bool
     default: false
 extends_documentation_fragment:
