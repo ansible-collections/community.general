@@ -17,3 +17,4 @@ sections:
   - title: Developer Guides
     toctree:
       - guide_deps
+      - guide_vardict
