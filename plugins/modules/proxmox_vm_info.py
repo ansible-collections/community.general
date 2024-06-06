@@ -61,6 +61,8 @@ options:
     description:
       - Whether to retrieve the current network status
       - Requires enabled/running qemu-guest-agent
+    type: bool
+    default: false
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
@@ -239,7 +241,7 @@ def main():
             type="str", choices=["none", "current", "pending"],
             default="none", required=False
         ),
-        network=dict(type="bool", default=True, required=False)
+        network=dict(type="bool", default=False, required=False)
     )
     module_args.update(vm_info_args)
 
