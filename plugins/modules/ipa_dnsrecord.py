@@ -35,13 +35,14 @@ options:
   record_type:
     description:
     - The type of DNS record name.
-    - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV' and 'MX' are supported.
+    - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX' and 'SSHFP' are supported.
     - "'A6', 'CNAME', 'DNAME' and 'TXT' are added in version 2.5."
     - "'SRV' and 'MX' are added in version 2.8."
     - "'NS' are added in comunity.general 8.2.0."
+    - "'SSHFP' are added in community.general 9.1.0."
     required: false
     default: 'A'
-    choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT']
+    choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT', 'SSHFP']
     type: str
   record_value:
     description:
@@ -57,6 +58,7 @@ options:
     - In the case of 'TXT' record type, this will be a text.
     - In the case of 'SRV' record type, this will be a service record.
     - In the case of 'MX' record type, this will be a mail exchanger record.
+    - In the case of 'SSHFP' record type, this will be an SSH fingerprint record.
     type: str
   record_values:
     description:
@@ -71,6 +73,7 @@ options:
     - In the case of 'TXT' record type, this will be a text.
     - In the case of 'SRV' record type, this will be a service record.
     - In the case of 'MX' record type, this will be a mail exchanger record.
+    - In the case of 'SSHFP' record type, this will be an SSH fingerprint record.
     type: list
     elements: str
   record_ttl:
@@ -175,6 +178,20 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: ChangeMe!
+
+- name: Retrieve the current sshfp fingerprints
+  ansible.builtin.command: ssh-keyscan -D localhost
+  register: ssh_hostkeys
+
+- name: Update the SSHFP records in DNS
+  community.general.ipa_dnsrecord:
+    name: "{{ inventory_hostname}}"
+    zone_name: example.com
+    record_type: 'SSHFP'
+    record_values: "{{ ssh_hostkeys.stdout.split('\n') | map('split', 'SSHFP ') | map('last') | list }}"
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: ChangeMe!
 '''
 
 RETURN = r'''
@@ -228,6 +245,8 @@ class DNSRecordIPAClient(IPAClient):
                 item.update(srvrecord=value)
             elif details['record_type'] == 'MX':
                 item.update(mxrecord=value)
+            elif details['record_type'] == 'SSHFP':
+                item.update(sshfprecord=value)
 
             self._post_json(method='dnsrecord_add', name=zone_name, item=item)
 
@@ -266,6 +285,8 @@ def get_dnsrecord_dict(details=None):
         module_dnsrecord.update(srvrecord=details['record_values'])
     elif details['record_type'] == 'MX' and details['record_values']:
         module_dnsrecord.update(mxrecord=details['record_values'])
+    elif details['record_type'] == 'SSHFP' and details['record_values']:
+        module_dnsrecord.update(sshfprecord=details['record_values'])
 
     if details.get('record_ttl'):
         module_dnsrecord.update(dnsttl=details['record_ttl'])
@@ -328,7 +349,7 @@ def ensure(module, client):
 
 
 def main():
-    record_types = ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX']
+    record_types = ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX', 'SSHFP']
     argument_spec = ipa_argument_spec()
     argument_spec.update(
         zone_name=dict(type='str', required=True),
