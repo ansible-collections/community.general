@@ -172,6 +172,8 @@ files:
   $filters/lists_union.yml:
     maintainers: cfiehe
   $filters/random_mac.py: {}
+  $filters/remove_keys.py:
+    maintainers: vbotka
   $filters/time.py:
     maintainers: resmo
   $filters/to_days.yml:

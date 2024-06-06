@@ -1,0 +1,79 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Debug ansible_version
+  ansible.builtin.debug:
+    var: ansible_version
+  when: not quite_test | d(true) | bool
+  tags: ansible_version
+
+- name: Test remove keys equal (default)
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result1) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  vars:
+    rr: "{{ list1 | community.general.remove_keys(target=tt) }}"
+    tt: [k0_x0, k1_x1]
+  tags: equal_default
+
+- name: Test remove keys regex string
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result1) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  vars:
+    rr: "{{ list1 | community.general.remove_keys(target=tt, matching_parameter=mp) }}"
+    mp: regex
+    tt: '^.*[01]_x.*$'
+  tags: regex_string
+
+- name: Test remove keys targets1
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result1) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  loop: "{{ targets1 }}"
+  loop_control:
+    label: "{{ item.mp }}: {{ item.tt }}"
+  vars:
+    rr: "{{ list1 | community.general.remove_keys(target=item.tt, matching_parameter=item.mp) }}"
+  tags: targets1
+
+- name: Test remove keys targets2
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result2) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  loop: "{{ targets2 }}"
+  loop_control:
+    label: "{{ item.mp }}: {{ item.tt }}"
+  vars:
+    rr: "{{ list2 | community.general.remove_keys(target=item.tt, matching_parameter=item.mp) }}"
+  tags: targets1
