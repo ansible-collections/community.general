@@ -96,7 +96,7 @@ EXAMPLES = '''
 
 RETURN = '''
   _value:
-    description: The list of dictionaries with selected keys.
+    description: The list of dictionaries with selected keys removed.
     type: list
     elements: dictionary
 '''
