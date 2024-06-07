@@ -130,7 +130,7 @@ EXAMPLES = '''
 #    - {index: c, foo: baz}
 #    - {index: d, foo: qux}
 
-- name: Example 4. Merge two lists. Replace lists by default.
+- name: Example 4. Merge two lists. By default, replace nested lists.
   ansible.builtin.debug:
     var: r
   vars:
@@ -162,7 +162,7 @@ EXAMPLES = '''
 #    - {index: a, foo: [X1, X2, Y1, Y2]}
 #    - {index: b, foo: [X1, X2, Y1, Y2]}
 
-- name: Example 6. Merge two lists. Default recursive=false
+- name: Example 6. Merge two lists. By default, do not merge nested dictionaries.
   ansible.builtin.debug:
     var: r
   vars:
@@ -178,7 +178,7 @@ EXAMPLES = '''
 #    - {index: a, foo: {y: 3, z: 4}}
 #    - {index: b, foo: [Y1, Y2]}
 
-- name: Example 7. Merge two lists. recursive=true
+- name: Example 7. Merge two lists. Merge nested dictionaries too.
   ansible.builtin.debug:
     var: r
   vars:
@@ -215,7 +215,6 @@ def list_mergeby(x, y, index, recursive=False, list_merge='replace'):
     '''Merge 2 lists by attribute 'index'. The function 'merge_hash'
        from ansible.utils.vars is used.  This function is used by the
        function lists_mergeby.
-
     '''
 
     d = defaultdict(dict)
