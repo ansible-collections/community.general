@@ -5,15 +5,18 @@
 
 .. _ansible_collections.community.general.docsite.guide_cmdrunner:
 
-CmdRunner Guide
-===============
+``CmdRunner`` Guide
+===================
 
 Introduction
 ^^^^^^^^^^^^
 
 The ``ansible_collections.community.general.plugins.module_utils.cmd_runner`` module util provides the
 ``CmdRunner`` class to help execute external commands. The class provides standard mechanisms to handle:
-the command arguments, the localization setting,
+the command arguments, the localization setting, processing the output, check mode, etc.
+
+This is even more useful when one command is used in multiple modules, so that you can define all options
+in a module util file, and each module will then only use the ones that make sense to it.
 
 Quickstart
 """"""""""
@@ -63,16 +66,23 @@ That will generate a resulting command line similar to (again, taken from the ou
             "netbox.netbox"
         ]
 
-Using CmdRunner
-^^^^^^^^^^^^^^^
-
 Argument Formats
-""""""""""""""""
+^^^^^^^^^^^^^^^^
+
+As seen in the example, ``CmdRunner`` expects a parameter named ``arg_formats`` defining how to format each CLI named argument. 
 
 
+
+Command Runner
+^^^^^^^^^^^^^^
+
+Python Runner
+^^^^^^^^^^^^^
 
 Basic Usage
 """""""""""
+
+
 
 As shown above, variables can be accessed using the ``[]`` operator, as in a ``dict`` object,
 and also as an object attribute, such as ``vars.abc``. The form using the ``set()``
