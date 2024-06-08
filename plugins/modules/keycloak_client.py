@@ -356,6 +356,7 @@ options:
                 aliases:
                     - browserName
                 type: str
+                version_added: 9.1.0
 
             direct_grant:
                 description:
