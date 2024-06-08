@@ -59,8 +59,8 @@ options:
     version_added: 8.1.0
   network:
     description:
-      - Whether to retrieve the current network status
-      - Requires enabled/running qemu-guest-agent on qemu vms
+      - Whether to retrieve the current network status.
+      - Requires enabled/running qemu-guest-agent on qemu VMs.
     type: bool
     default: false
     version_added: 9.1.0
