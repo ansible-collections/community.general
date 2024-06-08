@@ -49,6 +49,7 @@ options:
     elements: str
 notes:
   - The outcome of the module is found in the common return values RV(ignore:stdout), RV(ignore:stderr), RV(ignore:rc).
+  - The module will fail if RV(ignore:rc) is not zero.
 attributes:
   check_mode:
     support: full
