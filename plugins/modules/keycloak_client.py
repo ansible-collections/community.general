@@ -375,6 +375,7 @@ options:
                 aliases:
                     - directGrantName
                 type: str
+                version_added: 9.1.0
         aliases:
             - authenticationFlowBindingOverrides
         version_added: 3.4.0
