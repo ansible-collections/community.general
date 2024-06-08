@@ -47,6 +47,8 @@ options:
       - Default is to check all applications.
     type: list
     elements: str
+notes:
+  - The outcome of the module is found in the common return values RV(ignore:stdout), RV(ignore:stderr), RV(ignore:rc).
 attributes:
   check_mode:
     support: full
@@ -73,7 +75,7 @@ RETURN = """
 run_info:
   description: Command-line execution information.
   type: dict
-  returned: success and O(verbosity) >= 3
+  returned: success and C(verbosity) >= 3
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
