@@ -8,7 +8,7 @@ Merging lists of dictionaries
 
 If you have two or more lists of dictionaries and want to combine them into a list of merged dictionaries, where the dictionaries are merged by an attribute, you can use the :ansplugin:`community.general.lists_mergeby <community.general.lists_mergeby#filter>` filter.
 
-.. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See the documentation for the :ref:`community.general.yaml <ansible_collections.community.general.yaml_callback>` callback plugin.
+.. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See the documentation for the :ansplugin:`community.general.yaml callback plugin <community.general.yaml#callback>`.
 
 Let us use the lists below in the following examples:
 
