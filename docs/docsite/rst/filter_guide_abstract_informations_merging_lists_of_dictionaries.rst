@@ -78,13 +78,10 @@ This produces the same result as in the previous example:
 .. code-block:: yaml
 
   list3:
-    - name: myname01
-      param01:
-        y: patch_value
-        z: patch_value
-        list: [patch_value]
-    - name: myname02
-      param01: [3, 4, 4]
+    - {name: bar, extra: false}
+    - {name: baz, path: /baz}
+    - {name: foo, extra: true, path: /foo}
+    - {name: meh, extra: true}
 
 
 The filter also accepts two optional parameters: :ansopt:`community.general.lists_mergeby#filter:recursive` and :ansopt:`community.general.lists_mergeby#filter:list_merge`. This is available since community.general 4.4.0.
@@ -204,8 +201,6 @@ Example :ansopt:`community.general.lists_mergeby#filter:list_merge=prepend`:
                                              recursive=true,
                                              list_merge='prepend') }}"
 
-list_merge=append_rp
-""""""""""""""""""""
 This produces:
 
 .. code-block:: yaml

@@ -56,7 +56,7 @@ examples:
     description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=prepend`:'
     file: example-006_vars/list3.yml
     lang: 'yaml+jinja'
-  - title: list_merge=append_rp
+  - title:
     description: 'This produces:'
     file: example-006.out
     lang: 'yaml'
