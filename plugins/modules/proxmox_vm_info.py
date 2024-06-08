@@ -63,6 +63,7 @@ options:
       - Requires enabled/running qemu-guest-agent on qemu vms
     type: bool
     default: false
+    version_added: 9.1.0
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
