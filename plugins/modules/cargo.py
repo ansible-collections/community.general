@@ -72,6 +72,7 @@ options:
       - This is only used when installing packages.
     type: path
     required: false
+    version_added: 9.1.0
 requirements:
     - cargo installed
 """
