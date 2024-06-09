@@ -1,2 +1,0 @@
-minor_changes:
-  - "cargo - add option ``directory``, which allows source directory to be specified (https://github.com/ansible-collections/community.general/pull/7895)."
