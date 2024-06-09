@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2013, Andrew Dunham <andrew@du.nham.ca>
+# Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
 # Copyright (c) 2024, Kit Ham <kitizz.devside@gmail.com>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -32,7 +35,7 @@ options:
     name:
         description:
             - An installed homebrew package whose service is to be updated.
-        aliases: [ 'formula', 'package', 'pkg' ]
+        aliases: [ 'formula' ]
         type: str
         required: true
     path:
@@ -44,7 +47,7 @@ options:
         type: path
     state:
         description:
-            - state of the package.
+            - State of the package's service.
         choices: [ 'present', 'absent', 'restarted' ]
         default: present
         type: str
@@ -232,7 +235,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(
-                aliases=["pkg", "package", "formula"],
+                aliases=["formula"],
                 required=True,
                 type="str",
             ),
