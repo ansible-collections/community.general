@@ -70,7 +70,7 @@ options:
     description:
       - Path to the source directory to install the Rust package from.
       - This is only used when installing packages.
-    type: str
+    type: path
     required: false
 requirements:
     - cargo installed
