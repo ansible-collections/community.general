@@ -65,6 +65,12 @@ options:
     type: str
     default: present
     choices: [ "present", "absent", "latest" ]
+  source:
+    description:
+      - Path to the Rust package source on disk.
+      - This is only used when installing packages.
+    type: str
+    required: false
 requirements:
     - cargo installed
 """
@@ -98,6 +104,11 @@ EXAMPLES = r"""
   community.general.cargo:
     name: ludusavi
     state: latest
+
+- name: Install "ludusavi" Rust package from source
+  community.general.cargo:
+    name: ludusavi
+    source: /path/to/ludusavi/source
 """
 
 import json
@@ -172,13 +183,11 @@ class Cargo(object):
 
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
-
         latest_version = (
             self.get_latest_published_version(name)
             if not self.source
             else self.get_source_version(name)
         )
-
         return installed_version != latest_version
 
     def get_latest_published_version(self, name):
