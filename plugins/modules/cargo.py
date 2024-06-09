@@ -66,9 +66,9 @@ options:
     type: str
     default: present
     choices: [ "present", "absent", "latest" ]
-  source:
+  directory:
     description:
-      - Path to the Rust package source on disk.
+      - Path to the source directory to install the Rust package from.
       - This is only used when installing packages.
     type: str
     required: false
@@ -109,7 +109,7 @@ EXAMPLES = r"""
 - name: Install "ludusavi" Rust package from source
   community.general.cargo:
     name: ludusavi
-    source: /path/to/ludusavi/source
+    directory: /path/to/ludusavi/source
 """
 
 import json
@@ -128,7 +128,7 @@ class Cargo(object):
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
-        self.source = kwargs["source"]
+        self.directory = kwargs["directory"]
 
     @property
     def path(self):
@@ -177,17 +177,17 @@ class Cargo(object):
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
-        if self.source:
+        if self.directory:
             cmd.append("--path")
-            cmd.append(self.source)
+            cmd.append(self.directory)
         return self._exec(cmd)
 
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
         latest_version = (
             self.get_latest_published_version(name)
-            if not self.source
-            else self.get_source_version(name)
+            if not self.directory
+            else self.get_source_directory_version(name)
         )
         return installed_version != latest_version
 
@@ -200,14 +200,14 @@ class Cargo(object):
             self.module.fail_json(msg=f"No published version for package {name} found")
         return match.group(1)
 
-    def get_source_version(self, name):
+    def get_source_directory_version(self, name):
         cmd = [
             "metadata",
             "--format-version",
             "1",
             "--no-deps",
             "--manifest-path",
-            os.path.join(self.source, "Cargo.toml"),
+            os.path.join(self.directory, "Cargo.toml"),
         ]
         data, dummy = self._exec(cmd, True, False, False)
         manifest = json.loads(data)
@@ -236,7 +236,7 @@ def main():
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
-        source=dict(default=None, type="str"),
+        directory=dict(default=None, type="str"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
