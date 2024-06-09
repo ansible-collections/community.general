@@ -106,7 +106,7 @@ EXAMPLES = r"""
     name: ludusavi
     state: latest
 
-- name: Install "ludusavi" Rust package from source
+- name: Install "ludusavi" Rust package from source directory
   community.general.cargo:
     name: ludusavi
     directory: /path/to/ludusavi/source
@@ -197,7 +197,9 @@ class Cargo(object):
 
         match = re.search(r'"(.+)"', data)
         if not match:
-            self.module.fail_json(msg=f"No published version for package {name} found")
+            self.module.fail_json(
+                msg="No published version for package %s found" % name
+            )
         return match.group(1)
 
     def get_source_directory_version(self, name):
@@ -218,7 +220,8 @@ class Cargo(object):
         )
         if not package:
             self.module.fail_json(
-                msg=f"Package {name} not defined in source, found: {[x['name'] for x in manifest['packages']]}"
+                msg="Package %s not defined in source, found: %s"
+                % (name, [x["name"] for x in manifest["packages"]])
             )
         return package["version"]
 
@@ -249,9 +252,7 @@ def main():
         module.fail_json(msg="Package name must be specified")
 
     if directory is not None and not os.path.isdir(directory):
-        module.fail_json(
-            msg="Source directory does not exist"
-        )
+        module.fail_json(msg="Source directory does not exist")
 
     # Set LANG env since we parse stdout
     module.run_command_environ_update = dict(
