@@ -100,6 +100,7 @@ EXAMPLES = r"""
     state: latest
 """
 
+import json
 import os
 import re
 
@@ -115,6 +116,7 @@ class Cargo(object):
         self.state = kwargs["state"]
         self.version = kwargs["version"]
         self.locked = kwargs["locked"]
+        self.source = kwargs["source"]
 
     @property
     def path(self):
@@ -163,19 +165,53 @@ class Cargo(object):
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
+        if self.source:
+            cmd.append("--path")
+            cmd.append(self.source)
         return self._exec(cmd)
 
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
 
+        latest_version = (
+            self.get_latest_published_version(name)
+            if not self.source
+            else self.get_source_version(name)
+        )
+
+        return installed_version != latest_version
+
+    def get_latest_published_version(self, name):
         cmd = ["search", name, "--limit", "1"]
         data, dummy = self._exec(cmd, True, False, False)
 
         match = re.search(r'"(.+)"', data)
-        if match:
-            latest_version = match.group(1)
+        if not match:
+            self.module.fail_json(msg=f"No published version for package {name} found")
+        return match.group(1)
 
-        return installed_version != latest_version
+    def get_source_version(self, name):
+        cmd = [
+            "metadata",
+            "--format-version",
+            "1",
+            "--no-deps",
+            "--manifest-path",
+            os.path.join(self.source, "Cargo.toml"),
+        ]
+        data, dummy = self._exec(cmd, True, False, False)
+        manifest = json.loads(data)
+
+        package = next(
+            (package for package in manifest["packages"] if package["name"] == name),
+            None,
+        )
+        if not package:
+            self.module.fail_json(
+                msg=f"Package {name} not defined in source: {[x['name'] for x in manifest['packages']]}"
+            )
+
+        return package["version"]
 
     def uninstall(self, packages=None):
         cmd = ["uninstall"]
@@ -191,6 +227,7 @@ def main():
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
+        source=dict(default=None, type="str"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
