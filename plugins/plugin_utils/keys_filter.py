@@ -106,6 +106,10 @@ def _keys_filter_target_dict(target, matching_parameter):
         msg = "The target must be a list. target is %s."
         raise AnsibleFilterError(msg % (target, type(target)))
 
+    if len(target) == 0:
+        msg = "The target can't be empty."
+        raise AnsibleFilterError(msg)
+
     for elem in target:
         if not isinstance(elem, Mapping):
             msg = "The target items must be dictionaries. %s is %s"
