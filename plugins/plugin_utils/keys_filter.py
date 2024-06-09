@@ -13,10 +13,9 @@ from ansible.module_utils.six import string_types
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
 
 
-def _keys_filter_params(data, target, matching_parameter):
+def _keys_filter_params(data, matching_parameter):
     """test parameters:
        * data must be a list of dictionaries. All keys must be strings.
-       * target must be a non-empty sequence.
        * matching_parameter is member of a list.
     """
 
@@ -37,10 +36,6 @@ def _keys_filter_params(data, target, matching_parameter):
             msg = "Top level keys must be strings. keys: %s"
             raise AnsibleFilterError(msg % elem.keys())
 
-    if len(target) == 0:
-        msg = "The target can't be empty."
-        raise AnsibleFilterError(msg)
-
     if mp not in ml:
         msg = "The matching_parameter must be one of %s. matching_parameter=%s"
         raise AnsibleFilterError(msg % (ml, mp))
@@ -49,18 +44,24 @@ def _keys_filter_params(data, target, matching_parameter):
 
 
 def _keys_filter_target_str(target, matching_parameter):
-    """test:
-       * If target is list all items are strings
-       * If matching_parameter=regex target is a string or list with single string
-       convert and return:
+    """
+       Test:
+       * target is a non-empty string or list.
+       * If target is list all items are strings.
+       * target is a string or list with single string if matching_parameter=regex.
+       Convert target and return:
        * tuple of unique target items, or
        * tuple with single item, or
-       * compiled regex if matching_parameter=regex
+       * compiled regex if matching_parameter=regex.
     """
 
     if not isinstance(target, Sequence):
         msg = "The target must be a string or a list. target is %s."
         raise AnsibleFilterError(msg % type(target))
+
+    if len(target) == 0:
+        msg = "The target can't be empty."
+        raise AnsibleFilterError(msg)
 
     if isinstance(target, list):
         for elem in target:
@@ -80,8 +81,7 @@ def _keys_filter_target_str(target, matching_parameter):
         try:
             tt = re.compile(r)
         except re.error:
-            msg = ("The target must be a valid regex if matching_parameter=regex."
-                   " target is %s")
+            msg = "The target must be a valid regex if matching_parameter=regex. target is %s"
             raise AnsibleFilterError(msg % r)
     elif isinstance(target, string_types):
         tt = (target, )
@@ -92,13 +92,14 @@ def _keys_filter_target_str(target, matching_parameter):
 
 
 def _keys_filter_target_dict(target, matching_parameter):
-    """test:
+    """
+       Test:
        * target is a list of dictionaries with attributes 'after' and 'before'.
-       * If matching_parameter=regex the attributes 'before' must be valid regex.
+       * Attributes 'before' must be valid regex if matching_parameter=regex.
        * Otherwise, the attributes 'before' must be strings.
-       convert and return:
-       * Dictionary of attributes 'before' and 'after'
-       * Dictionary of compiled regex of attributes 'before' and 'after'
+       Convert target and return:
+       * iterator that aggregates attributes 'before' and 'after', or
+       * iterator that aggregates compiled regex of attributes 'before' and 'after' if matching_parameter=regex.
     """
 
     if not isinstance(target, list):
@@ -118,8 +119,8 @@ def _keys_filter_target_dict(target, matching_parameter):
 
     if matching_parameter == 'regex':
         try:
-            tt = map(re.compile, before)
-            td = dict(zip(tt, after))
+            tr = map(re.compile, before)
+            tz = list(zip(tr, after))
         except re.error:
             msg = ("The attributes before must be valid regex if matching_parameter=regex."
                    " Not all items are valid regex in: %s")
@@ -130,6 +131,6 @@ def _keys_filter_target_dict(target, matching_parameter):
                    " Not all items are strings in: %s")
             raise AnsibleFilterError(msg % before)
         else:
-            td = dict(zip(before, after))
+            tz = list(zip(before, after))
 
-    return td
+    return tz

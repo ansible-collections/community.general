@@ -38,15 +38,15 @@ targets2:
     result:
       - X: foo
       - X: bar
-  - label: If there are items with equal attribute before the last one will be used.
+  - label: If there are items with equal attribute before the first one will be used.
     match: regex
     target:
       - {before: "^.*_x.*$", after: X}
       - {before: "^.*_x.*$", after: Y}
     data: "{{ list1 }}"
     result:
-      - Y: foo
-      - Y: bar
+      - X: foo
+      - X: bar
   - label: If there are more matches for a key the first one will be used.
     match: starts_with
     target:

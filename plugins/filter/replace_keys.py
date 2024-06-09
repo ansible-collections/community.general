@@ -36,7 +36,7 @@ DOCUMENTATION = '''
               - A key or key pattern to change.
               - The interpretation of C(before) depends on O(matching_parameter).
               - If more keys match the same C(before) the B(last) one will be used.
-              - If there are items with equal C(before) the B(last) one will be used.
+              - If there are items with equal C(before) the B(first) one will be used.
               - If there are more matches for a key the B(first) one will be used.
             type: str
           after:
@@ -98,7 +98,7 @@ EXAMPLES = '''
     - X: foo
     - X: bar
 
-  # 6) If there are items with equal attribute before the last one will be used.
+  # 6) If there are items with equal attribute before the first one will be used.
   t:
     - {before: "^.*_x.*$", after: X}
     - {before: "^.*_x.*$", after: Y}
@@ -107,8 +107,8 @@ EXAMPLES = '''
   # gives
 
   r:
-    - Y: foo
-    - Y: bar
+    - X: foo
+    - X: bar
 
   # 7) If there are more matches for a key the first one will be used.
   l:
@@ -142,41 +142,34 @@ def replace_keys(data, target=None, matching_parameter='equal'):
     """replace specific keys in a list of dictionaries"""
 
     # test parameters
-    _keys_filter_params(data, target, matching_parameter)
+    _keys_filter_params(data, matching_parameter)
     # test and transform target
-    td = _keys_filter_target_dict(target, matching_parameter)
+    tz = _keys_filter_target_dict(target, matching_parameter)
 
-    before = list(td.keys())
-    index = 0  # If there are multiple matches take the first one.
-
-    if matching_parameter == 'starts_with':
-        def match_key(key, t):
-            return key.startswith(t)
-    elif matching_parameter == 'ends_with':
-        def match_key(key, t):
-            return key.endswith(t)
-    elif matching_parameter == 'regex':
-        def match_key(key, t):
-            return t.match(key)
-
-    # If matching_parameter is 'equal' there may be a single match only.
     if matching_parameter == 'equal':
         def replace_key(key):
-            if key in before:
-                return td[key]
-            else:
-                return key
-    # Otherwise, there may be multiple matches. In this case, use index.
-    else:
+            for b, a in tz:
+                if key == b:
+                    return a
+            return key
+    elif matching_parameter == 'starts_with':
         def replace_key(key):
-            rl = []
-            for t in before:
-                if match_key(key, t):
-                    rl.append(td[t])
-            if rl:
-                return rl[index]
-            else:
-                return key
+            for b, a in tz:
+                if key.startswith(b):
+                    return a
+            return key
+    elif matching_parameter == 'ends_with':
+        def replace_key(key):
+            for b, a in tz:
+                if key.endswith(b):
+                    return a
+            return key
+    elif matching_parameter == 'regex':
+        def replace_key(key):
+            for b, a in tz:
+                if b.match(key):
+                    return a
+            return key
 
     return [dict((replace_key(k), v) for k, v in d.items()) for d in data]
 
