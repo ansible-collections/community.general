@@ -236,16 +236,22 @@ def main():
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
         locked=dict(default=False, type="bool"),
-        directory=dict(default=None, type="str"),
+        directory=dict(default=None, type="path"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
     state = module.params["state"]
     version = module.params["version"]
+    directory = module.params["directory"]
 
     if not name:
         module.fail_json(msg="Package name must be specified")
+
+    if directory is not None and not os.path.isdir(directory):
+        module.fail_json(
+            msg="Source directory does not exist"
+        )
 
     # Set LANG env since we parse stdout
     module.run_command_environ_update = dict(
