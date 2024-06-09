@@ -1,0 +1,22 @@
+---
+# Copyright (c) Colin Nolan
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create temp directory
+  tempfile:
+    state: directory
+  register: temp_directory
+
+- name: Test block
+  block:
+    - name: Copy files to temp directory
+      copy:
+        src: files/hello-world
+        dest: "{{ temp_directory.path }}"
+
+  always:
+    - name: Remove temp directory
+      file:
+        path: "{{ temp_directory.path }}"
+        state: absent
