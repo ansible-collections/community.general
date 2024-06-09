@@ -217,9 +217,8 @@ class Cargo(object):
         )
         if not package:
             self.module.fail_json(
-                msg=f"Package {name} not defined in source: {[x['name'] for x in manifest['packages']]}"
+                msg=f"Package {name} not defined in source, found: {[x['name'] for x in manifest['packages']]}"
             )
-
         return package["version"]
 
     def uninstall(self, packages=None):
