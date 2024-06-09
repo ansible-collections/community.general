@@ -1,5 +1,5 @@
 ---
-# Copyright (c) 2024 Colin Nolan <cn580@alumni.york.ac.uk>
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,10 +10,10 @@
 
 - name: Test block
   block:
-    - name: Copy files to temp directory
-      copy:
-        src: files/hello-world
-        dest: "{{ temp_directory.path }}"
+    - name: Initialize cargo hello-world package
+      command:
+        cmd: cargo init --name hello-world
+        chdir: "{{ temp_directory.path }}"
 
   always:
     - name: Remove temp directory
