@@ -21,7 +21,7 @@
         chdir: "{{ temp_directory.path }}"
       changed_when: false
 
-    - name: Set package version
+    - name: Set package version (1.0.0)
       ansible.builtin.lineinfile:
         path: "{{ manifest_path }}"
         regexp: '^version = ".*"$'
@@ -40,7 +40,7 @@
         directory: "{{ temp_directory.path }}"
       register: install_absent
 
-    - name: Change package version
+    - name: Change package version (1.0.1)
       ansible.builtin.lineinfile:
         path: "{{ manifest_path }}"
         regexp: '^version = ".*"$'
@@ -59,6 +59,27 @@
         state: latest
         directory: "{{ temp_directory.path }}"
       register: install_latest_state
+
+    - name: Change package version (2.0.0)
+      ansible.builtin.lineinfile:
+        path: "{{ manifest_path }}"
+        regexp: '^version = ".*"$'
+        line: 'version = "2.0.0"'
+
+    - name: Install package with given version (matched)
+      community.general.cargo:
+        name: "{{ package_name }}"
+        version: "2.0.0"
+        directory: "{{ temp_directory.path }}"
+      register: install_given_version_matched
+
+    - name: Install package with given version (unmatched)
+      community.general.cargo:
+        name: "{{ package_name }}"
+        version: "2.0.1"
+        directory: "{{ temp_directory.path }}"
+      register: install_given_version_unmatched
+      ignore_errors: true
 
     - name: Uninstall package
       community.general.cargo:
@@ -96,6 +117,8 @@
       - install_absent is changed
       - install_present_state is not changed
       - install_latest_state is changed
+      - install_given_version_matched is changed
+      - install_given_version_unmatched is failed
       - uninstall_present is changed
       - install_non_existant is failed
       - install_non_existant_source is failed
