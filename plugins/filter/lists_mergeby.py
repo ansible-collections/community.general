@@ -25,7 +25,7 @@ DOCUMENTATION = '''
   options:
     _input:
       description:
-        - A list of dictionaries or a list of lists of dictionaries.
+        - A list of dictionaries, or a list of lists of dictionaries.
         - The required type of the C(elements) is set to C(raw)
           because all elements of O(_input) can be either dictionaries
           or lists.
