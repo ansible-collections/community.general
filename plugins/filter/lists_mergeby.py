@@ -34,7 +34,7 @@ DOCUMENTATION = '''
       required: true
     another_list:
       description:
-        - Another list of dictionaries or a list of lists of dictionaries.
+        - Another list of dictionaries, or a list of lists of dictionaries.
         - This parameter can be specified multiple times.
       type: list
       elements: raw
