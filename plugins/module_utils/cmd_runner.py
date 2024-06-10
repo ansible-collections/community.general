@@ -218,6 +218,7 @@ class CmdRunner(object):
     It aims to provide a reusable runner with consistent argument formatting
     and sensible defaults.
     """
+    _SENTINEL = object()
 
     @staticmethod
     def _prepare_args_order(order):
@@ -254,7 +255,15 @@ class CmdRunner(object):
         return self.command[0]
 
     # remove parameter ignore_value_none in community.general 12.0.0
-    def __call__(self, args_order=None, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
+    def __call__(self, args_order=None, output_process=None, ignore_value_none=_SENTINEL, check_mode_skip=False, check_mode_return=None, **kwargs):
+        if ignore_value_none is CmdRunner._SENTINEL:
+            ignore_value_none
+        else:
+            self.module.deprecate(
+                "Using ignore_value_none when creating the runner context is now deprecated, "
+                "and the parameter will be removed in community.general 12.0.0. ",
+                version="12.0.0", collection_name="community.general"
+            )
         if output_process is None:
             output_process = _process_as_is
         if args_order is None:
