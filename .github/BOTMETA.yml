@@ -1444,6 +1444,14 @@ files:
     maintainers: felixfontein
   docs/docsite/rst/filter_guide_abstract_informations_lists_helper.rst:
     maintainers: cfiehe
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-keep_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-remove_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-replace_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries.rst:
+    maintainers: vbotka
   docs/docsite/rst/filter_guide_abstract_informations_merging_lists_of_dictionaries.rst:
     maintainers: vbotka
   docs/docsite/rst/filter_guide_conversions.rst:
