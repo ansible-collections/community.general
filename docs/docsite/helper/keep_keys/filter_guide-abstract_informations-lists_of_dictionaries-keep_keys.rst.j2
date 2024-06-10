@@ -1,0 +1,70 @@
+..
+  Copyright (c) Ansible Project
+  GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+  SPDX-License-Identifier: GPL-3.0-or-later
+
+keep_keys
+"""""""""
+
+Use the filter ``keep_keys`` if you have a list of dictionaries and want to keep certain keys only.
+
+.. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ref:`the documentation for the community.general.yaml callback plugin <ansible_collections.community.general.yaml_callback>`.
+
+Let us use the below list in the following examples:
+
+.. code-block:: yaml
+
+  {{ lookup('file', 'default-common.yml') | split('\n') | reject('match', '^(#|---)') | join ('\n')  | indent(2) }}
+
+* The results of the below examples 1-5 are all the same:
+
+.. code-block:: yaml
+
+  {{ lookup('file', 'example-001.out') | indent(2) }}
+
+{% for i in examples[0:1] %}
+{% if i.title | d('', true) | length > 0 %}
+{{ i.title }}
+{{ "%s" % ('"' * i.title|length) }}
+{% endif %}
+{{ examples.index(i) + 1 }}) {{ i.description }}
+
+.. code-block:: {{ i.lang }}
+
+  {{ lookup('file', i.example ~ '_vars/' ~ i.result) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
+
+{% endfor %}
+
+.. versionadded:: 9.1.0
+
+{% for i in examples[1:5] %}
+{% if i.title | d('', true) | length > 0 %}
+{{ i.title }}
+{{ "%s" % ('"' * i.title|length) }}
+{% endif %}
+{{ examples.index(i) + 1 }}) {{ i.description }}
+
+.. code-block:: {{ i.lang }}
+
+  {{ lookup('file', i.example ~ '_vars/' ~ i.result) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
+
+{% endfor %}
+
+* The results of the below examples 6-9 are all the same:
+
+.. code-block:: yaml
+
+  {{ lookup('file', 'example-006.out') | indent(2) }}
+
+{% for i in examples[5:9] %}
+{% if i.title | d('', true) | length > 0 %}
+{{ i.title }}
+{{ "%s" % ('"' * i.title|length) }}
+{% endif %}
+{{ examples.index(i) + 1 }}) {{ i.description }}
+
+.. code-block:: {{ i.lang }}
+
+  {{ lookup('file', i.example ~ '_vars/' ~ i.result) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
+
+{% endfor %}

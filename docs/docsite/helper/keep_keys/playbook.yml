@@ -1,0 +1,47 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# 1) Run all examples and create example-XXX.out
+# shell> ansible-playbook playbook.yml -e examples_create=true
+#
+# 2) Optionally, for testing, create examples_all.rst
+# shell> ansible-playbook playbook.yml -e examples_create_all=true
+#
+# 3) Create docs REST files
+# shell> ansible-playbook playbook.yml -e rst_create=true
+#
+# Notes:
+# * Use YAML callback, e.g. set ANSIBLE_STDOUT_CALLBACK=community.general.yaml
+# * Use sphinx-view to render and review the REST files
+#   shell> sphinx-view <path_to_helper>/examples_all.rst
+# * Proofread and copy completed docs *.rst files into the directory rst.
+# * Then delete the *.rst and *.out files from this directory. Do not
+#   add *.rst and *.out in this directory to the version control.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# community.general/docs/docsite/helper/lists_mergeby/playbook.yml
+
+- hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - examples.yml
+
+  tasks:
+
+    - include_tasks: examples-create.yml
+      loop: "{{ examples }}"
+      when: examples_create | d(false) | bool
+
+    - template:
+        src: examples_all.rst.j2
+        dest: examples_all.rst
+      when: examples_create_all | d(false) | bool
+
+    - template:
+        src: filter_guide-abstract_informations-lists_of_dictionaries-keep_keys.rst.j2
+        dest: filter_guide-abstract_informations-lists_of_dictionaries-keep_keys.rst
+      when: rst_create | d(false) | bool

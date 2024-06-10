@@ -1,0 +1,55 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+examples:
+  - title:
+    description: 'By default match keys that equal any of the items in the target.'
+    example: example-001
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys that start with any of the items in the target.'
+    example: example-002
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys that end with any of the items in target.'
+    example: example-003
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys by the regex.'
+    example: example-004
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys by the regex.'
+    example: example-005
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'By default match keys that equal the target.'
+    example: example-006
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys that start with the target.'
+    example: example-007
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys that end with the target.'
+    example: example-008
+    result: result.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'Match keys by the regex.'
+    example: example-009
+    result: result.yml
+    lang: 'yaml+jinja'
+# - title:
+#   description: 'This produces:'
+#   file: example-001.out
+#   lang: 'yaml'
