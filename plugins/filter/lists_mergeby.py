@@ -19,7 +19,7 @@ DOCUMENTATION = '''
     - To learn details on how to use the parameters O(recursive) and
       O(list_merge) see Ansible User's Guide chapter "Using filters to
       manipulate data" section R(Combining hashes/dictionaries, combine_filter) or the
-      filter C(ansible.builtin.combine).
+      filter P(ansible.builtin.combine#filter).
 
   positional: another_list, index
   options:
