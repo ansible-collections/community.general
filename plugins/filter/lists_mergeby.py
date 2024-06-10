@@ -18,7 +18,7 @@ DOCUMENTATION = '''
     - The function C(merge_hash) from C(ansible.utils.vars) is used.
     - To learn details on how to use the parameters O(recursive) and
       O(list_merge) see Ansible User's Guide chapter "Using filters to
-      manipulate data" section B(Combining hashes/dictionaries) or the
+      manipulate data" section R(Combining hashes/dictionaries, combine_filter) or the
       filter C(ansible.builtin.combine).
 
   positional: another_list, index
