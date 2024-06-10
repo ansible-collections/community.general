@@ -32,7 +32,7 @@ options:
     version_added: 7.5.0
   cluster:
     default: false
-    description: Get informations about cluster status
+    description: Get informations about cluster status as RV(cluster).
     type: bool
     version_added: 9.1.0
 seealso:
