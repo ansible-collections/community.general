@@ -194,7 +194,8 @@ info:
     }
 cluster:
   description: The default set of cluster information sections U(https://redis.io/commands/cluster-info).
-  returned: success
+  returned: success if O(cluster=true)
+  version_added: 9.1.0
   type: dict
   sample: {
      "cluster_state": ok,
@@ -235,7 +236,7 @@ def redis_client(**client_params):
 # Module execution.
 def main():
     module_args = dict(
-        cluster=dict(type='bool', default=False)
+        cluster=dict(type='bool', default=False),
     )
     module_args.update(redis_auth_argument_spec(tls_default=False))
     module = AnsibleModule(
@@ -257,11 +258,12 @@ def main():
 
     info = client.info()
 
-    cluster_info = dict()
-    if cluster:
-        cluster_info = client.execute_command('CLUSTER INFO')
+    result = dict(changed=False, info=info)
 
-    module.exit_json(changed=False, info=info, cluster_info=cluster_info)
+    if cluster:
+        result['cluster_info'] = client.execute_command('CLUSTER INFO')
+
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
