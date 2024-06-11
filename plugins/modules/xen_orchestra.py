@@ -39,7 +39,7 @@ options:
     choices: ['present', 'started', 'absent', 'stopped', 'restarted']
     default: present
   vm_uid:
-    description: 
+    description:
       - UID of the target Virtual Machine. Required when O(state=absent), O(state=started), O(state=stopped) or
         O(state=restarted)
     type: str
