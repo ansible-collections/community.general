@@ -72,7 +72,7 @@ def camel_case_key(key):
 def validate_check(check):
     validate_duration_keys = ['Interval', 'Ttl', 'Timeout']
     validate_tcp_regex = r"(?P<host>.*):(?P<port>(?:[0-9]+))$"
-    if 'Tcp' in check and check['Tcp'] is not None:
+    if check.get('Tcp') is not None:
         match = re.match(validate_tcp_regex, check['Tcp'])
         if not match:
             raise Exception('tcp check must be in host:port format')
