@@ -83,8 +83,7 @@ def validate_check(check):
 
 def validate_duration(duration):
     if duration:
-        duration_units = ['ns', 'us', 'ms', 's', 'm', 'h']
-        if not any(duration.endswith(suffix) for suffix in duration_units):
+        if not re.search("\d+(?:ns|us|ms|s|m|h)", duration):
             duration = "{0}s".format(duration)
     return duration
 
