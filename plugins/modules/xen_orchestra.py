@@ -8,8 +8,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: xen_orchestra
-    short_description: Management of instances on Xen Orchestra 
-    version_added: 4.1.0
+    short_description: Management of instances on Xen Orchestra
+    version_added: 9.0.1
     author:
       - Samori Gorse (@shinuza) <samorigorse@gmail.com>
     requirements:
@@ -116,7 +116,7 @@ try:
     import websocket
     from websocket import create_connection
 
-    if LooseVersion(websocket.__version__) <= LooseVersion('1.0.0'):
+    if LooseVersion(websocket.__version__) < LooseVersion('1.0.0'):
         raise ImportError
 except ImportError as e:
     HAS_WEBSOCKET = False
@@ -131,7 +131,6 @@ class XenOrchestra(object):
     NAME = 'community.general.xen_orchestra'
     CALL_TIMEOUT = 100
     '''Number of 1/10ths of a second to wait before method call times out.'''
-
 
     def __init__(self, module):
         # from config
@@ -205,16 +204,16 @@ class XenOrchestra(object):
         if 'error' in answer:
             raise self.module.fail_json(
                 'Could not create vm: {0}'.format(answer['error']))
-        
+
         return answer['result']
 
     def restart_vm(self, vm_uid):
-        answer = self.call('vm.restart', {'id': vm_uid, 'force': True })
+        answer = self.call('vm.restart', {'id': vm_uid, 'force': True})
 
         if 'error' in answer:
             raise self.module.fail_json(
                 'Could not restart vm: {0}'.format(answer['error']))
-        
+
         return answer['result']
 
     def stop_vm(self, vm_uid):
@@ -226,9 +225,9 @@ class XenOrchestra(object):
                 return False
             raise self.module.fail_json(
                 'Could not stop vm: {0}'.format(answer['error']))
-        
+
         return answer['result']
-    
+
     def start_vm(self, vm_uid):
         answer = self.call('vm.start', {'id': vm_uid})
 
@@ -238,7 +237,7 @@ class XenOrchestra(object):
                 return False
             raise self.module.fail_json(
                 'Could not start vm: {0}'.format(answer['error']))
-        
+
         return answer['result']
 
     def delete_vm(self, vm_uid):
@@ -249,13 +248,14 @@ class XenOrchestra(object):
                 return False
             raise self.module.fail_json(
                 'Could not delete vm: {0}'.format(answer['error']))
-        
+
         return answer['result']
+
 
 def main():
     if not HAS_WEBSOCKET:
         raise AnsibleError('This module requires websocket-client 1.0.0 or higher: '
-                               'https://github.com/websocket-client/websocket-client.')
+                           'https://github.com/websocket-client/websocket-client.')
 
     module_args = dict(
         api_host=dict(type='str', required=True),
@@ -269,10 +269,8 @@ def main():
         description=dict(type='str'),
         boot_after_create=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
-        
     )
 
-    
     module = AnsibleModule(
         argument_spec=module_args,
         required_if=[
@@ -307,6 +305,7 @@ def main():
     if state == 'present':
         result = xen_orchestra.create_vm()
         module.exit_json(changed=True, vm_uid=result)
+
 
 if __name__ == '__main__':
     main()
