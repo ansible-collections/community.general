@@ -83,7 +83,7 @@ def validate_check(check):
 
 def validate_duration(duration):
     if duration:
-        if not re.search("\d+(?:ns|us|ms|s|m|h)", duration):
+        if not re.search(r"\d+(?:ns|us|ms|s|m|h)", duration):
             duration = "{0}s".format(duration)
     return duration
 
