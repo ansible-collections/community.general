@@ -506,13 +506,15 @@ files:
     maintainers: tintoy
   $modules/discord.py:
     maintainers: cwollinger
-  $modules/django_manage.py:
-    ignore: scottanderson42 tastychutney
-    labels: django_manage
+  $modules/django_check.py:
+    maintainers: russoz
+  $modules/django_command.py:
     maintainers: russoz
   $modules/django_createcachetable.py:
     maintainers: russoz
-  $modules/django_command.py:
+  $modules/django_manage.py:
+    ignore: scottanderson42 tastychutney
+    labels: django_manage
     maintainers: russoz
   $modules/dnf_versionlock.py:
     maintainers: moreda
