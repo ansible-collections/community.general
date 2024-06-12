@@ -5,8 +5,8 @@
 
 .. _ansible_collections.community.general.docsite.guide_cmdrunner:
 
-``CmdRunner`` Guide
-===================
+Command Runner guide
+====================
 
 Introduction
 ^^^^^^^^^^^^
@@ -21,8 +21,14 @@ in a module util file, and each module will then only use the ones that make sen
 Quickstart
 """"""""""
 
-The simplest way of using ``CmdRunner`` is (this is a simplified example based on
-``ansible_collections.community.general.plugins.modules.ansible_galaxy_install``):
+A ``CmdRunner`` basically defines a command to be executed, and a set of coded instructions on how to format
+the command-line arguments, in which specific order, for that particular command. There are other features like
+automatic check of the command's exit code, forcing a specific localization encoding and environment variables.
+
+It relies on ``ansible.module_utils.basic.AnsibleModule.run_command()`` to execute the command.
+
+To use ``CmdRunner`` you must start by creating the ``CmdRunner`` object. The example below is a simplified
+version of the actual code in ``ansible_collections.community.general.plugins.modules.ansible_galaxy_install``:
 
 .. code-block:: python
 
@@ -45,12 +51,20 @@ The simplest way of using ``CmdRunner`` is (this is a simplified example based o
         check_rc=True
     )
 
-Then later in the code, you can write something like:
+Then you create a context for a specific execution of the command, and then you invoke the context method ``run()`` passing
+values for the arguments as needed. Keep in mind that ``CmdRunner`` will use the module parameters with the exact same names
+as values for the runner arguments. If no module parameter is found with the specified name, then you must provide the value
+explicitly (unless using ``cmd_runner_fmt.as_fixed``, see more on it below).
+
+The actual execution of the command in a particular context looks like:
 
 .. code-block:: python
 
         with self.runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install", upgrade=upgrade)
+
+In the example, values of ``type``, ``force``, ``no_deps`` and others will be taken straight from the parameters, whilst ``galaxy_cmd`` and ``upgrade``
+are passed explicitly. The regular output of the
 
 That will generate a resulting command line similar to (again, taken from the output of an integration test):
 
@@ -66,10 +80,109 @@ That will generate a resulting command line similar to (again, taken from the ou
             "netbox.netbox"
         ]
 
-Argument Formats
+Argument formats
 ^^^^^^^^^^^^^^^^
 
-As seen in the example, ``CmdRunner`` expects a parameter named ``arg_formats`` defining how to format each CLI named argument. 
+As seen in the example, ``CmdRunner`` expects a parameter named ``arg_formats`` defining how to format each CLI named argument.
+An "argument format" is nothing but a function to transform the value of a variable into something formatted for the command line.
+
+
+Argument format function
+""""""""""""""""""""""""
+
+An ``arg_format`` function should of the form:
+
+.. code-block:: python
+
+    def func(value):
+        result = <some transformation of value>
+        return result
+
+The parameter ``value`` is always one single parameter, and it can be of any type - although there are convenience mechanisms
+to help handling sequence and mapping objects.
+
+The result is expected to be of the type ``Sequence[str]`` type (most commonly ``list[str]`` or ``tuple[str]``), otherwise
+it will be considered to be, using the example above, ``[str(result)]``. This resulting sequence of strings will be added
+to the command line when that argument is actually used.
+
+For example, if ``func`` returns:
+
+- ``["nee", 2, "shruberries"]``, the command line will include arguments ``"nee" "2" "shruberries"``.
+- ``2 == 2``, the command line will include argument ``"True"``.
+- ``None``, the command line will include argument ``"None"``.
+- ``[]``, the command line will not include argument anything for that particular variable.
+
+a scalar, such as ``int``, ``str`` or ``bool``.
+
+Convenience functions
+"""""""""""""""""""""
+
+Command Runner provides a set of convenience functions that return format arguments functions for some relatively commom
+cases. In the first block of code in the `Quickstart`_ section you can see the ``from .. import`` of
+``ansible_collections.community.general.plugins.module_utils.cmd_runner.cmd_runner_fmt``, and in the instantiation of the
+``CmdRunner`` object, you can see how to use many of the convenience functions being used.
+
+Unless noted otherwise, for the sake of consistency in the reference below it is assumed that every convenience function deals
+with two parameters: ``arg``, usually specified during the creation of the ``CmdRunner`` object, and ``value``, specified
+during the execution of the command.
+
+The most common cases are:
+
+* +------------
+  | as_list()
+  +==============
+  | Description 
+  +-------------
+  | Creation
+  +-------------
+  | Va
+
++-------------------+--------------------------+-----------
+| function          | Description              | Creation | Value | Outcome |
++===================+==========================+===========
+| ``as_list``       | Does not accept ``arg``, | ``as_list()`` | * ``["foo", "bar"]`` | * ``["foo", "bar"]`` |
+|                   | returns ``value`` as-is  |               | * ``foobar``         | * ``["foobar"]``     |
++-------------------+-------------------------
+| ``as_optval``     | Concatenates ``arg`` and ``value`` as one string | ``as_optval("-i")`` | ``3`` | * ``["-i3"]`` |
++-------------------+
+| ``as_opt_val``    | Concatenates ``arg`` and ``value`` as one list | ``as_opt_val("--name")`` | ``abc`` | * ``["--name", "abc"]`` |
++-------------------+
+| ``as_opt_eq_val`` |
++-------------------+
+
+
+Here is a reference table of all of them:
+
++---------------------+-----------------------+-----------
+| function         | Description           | Example
++=====================+=======================+===========
+| ``as_bool``         | If value is True-ish, return th evalue
++---------------------+------------
+| ``as_bool_not``     |
++---------------------+
+| ``as_optval``       |
++---------------------+
+| ``as_opt_val``      |
++---------------------+
+| ``as_opt_eq_val`` |
++-------------------+
+| ``as_list``       |
++-------------------+
+| ``as_fixed``      |
++-------------------+
+| ``as_map``          |
++---------------------+
+| ``as_func``         |
++---------------------+
+
+
+cmd_runner_fmt.as_bool()
+""""""""""""""""""""""""
+
+
+cmd_runner_fmt.as_func()
+""""""""""""""""""""""""
+
 
 
 
@@ -78,6 +191,15 @@ Command Runner
 
 Python Runner
 ^^^^^^^^^^^^^
+
+Other features
+^^^^^^^^^^^^^^
+
+Prcessing results
+^^^^^^^^^^^^^^^^^
+
+
+
 
 Basic Usage
 """""""""""
