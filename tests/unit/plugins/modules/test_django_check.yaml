@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+- id: success
+  input:
+    settings: whatever.settings
+  run_command_calls:
+    - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: "whatever\n"
+      err: ""
+- id: multiple_databases
+  input:
+    settings: whatever.settings
+    database:
+      - abc
+      - def
+  run_command_calls:
+    - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, --database, abc, --database, def]
+      environ: *env-def
+      rc: 0
+      out: "whatever\n"
+      err: ""
