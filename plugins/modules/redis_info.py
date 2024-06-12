@@ -30,6 +30,11 @@ options:
     version_added: 7.5.0
   ca_certs:
     version_added: 7.5.0
+  cluster:
+    default: false
+    description: Get informations about cluster status as RV(cluster).
+    type: bool
+    version_added: 9.1.0
 seealso:
 - module: community.general.redis
 author: "Pavlo Bashynskyi (@levonet)"
@@ -43,6 +48,15 @@ EXAMPLES = r'''
 - name: Print server information
   ansible.builtin.debug:
     var: result.info
+
+- name: Get server cluster information
+  community.general.redis_info:
+    cluster: true
+  register: result
+
+- name: Print server cluster information
+  ansible.builtin.debug:
+    var: result.cluster_info
 '''
 
 RETURN = r'''
@@ -178,6 +192,25 @@ info:
       "used_memory_scripts_human": "0B",
       "used_memory_startup": 791264
     }
+cluster:
+  description: The default set of cluster information sections U(https://redis.io/commands/cluster-info).
+  returned: success if O(cluster=true)
+  version_added: 9.1.0
+  type: dict
+  sample: {
+     "cluster_state": ok,
+     "cluster_slots_assigned": 16384,
+     "cluster_slots_ok": 16384,
+     "cluster_slots_pfail": 0,
+     "cluster_slots_fail": 0,
+     "cluster_known_nodes": 6,
+     "cluster_size": 3,
+     "cluster_current_epoch": 6,
+     "cluster_my_epoch": 2,
+     "cluster_stats_messages_sent": 1483972,
+     "cluster_stats_messages_received": 1483968,
+     "total_cluster_links_buffer_limit_exceeded": 0
+  }
 '''
 
 import traceback
@@ -202,14 +235,19 @@ def redis_client(**client_params):
 
 # Module execution.
 def main():
+    module_args = dict(
+        cluster=dict(type='bool', default=False),
+    )
+    module_args.update(redis_auth_argument_spec(tls_default=False))
     module = AnsibleModule(
-        argument_spec=redis_auth_argument_spec(tls_default=False),
+        argument_spec=module_args,
         supports_check_mode=True,
     )
 
     fail_imports(module, module.params['tls'])
 
     redis_params = redis_auth_params(module)
+    cluster = module.params['cluster']
 
     # Connect and check
     client = redis_client(**redis_params)
@@ -219,7 +257,13 @@ def main():
         module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
 
     info = client.info()
-    module.exit_json(changed=False, info=info)
+
+    result = dict(changed=False, info=info)
+
+    if cluster:
+        result['cluster_info'] = client.execute_command('CLUSTER INFO')
+
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
