@@ -4,51 +4,75 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 examples:
-  - label: 'In the example below the lists are merged by the attribute ``name``:'
+  - title: Two lists
+    description: 'In the example below the lists are merged by the attribute ``name``:'
     file: example-001_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-001.out
     lang: 'yaml'
-  - label: 'It is possible to use a list of lists as an input of the filter:'
+  - title: List of two lists
+    description: 'It is possible to use a list of lists as an input of the filter:'
     file: example-002_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces the same result as in the previous example:'
+  - title:
+    description: 'This produces the same result as in the previous example:'
     file: example-002.out
     lang: 'yaml'
-  - label: 'Example ``list_merge=replace`` (default):'
+  - title: Single list
+    description: 'It is possible to merge single list:'
+    file: example-009_vars/list3.yml
+    lang: 'yaml+jinja'
+  - title:
+    description: 'This produces the same result as in the previous example:'
+    file: example-009.out
+    lang: 'yaml'
+  - title: list_merge=replace (default)
+    description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=replace` (default):'
     file: example-003_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-003.out
     lang: 'yaml'
-  - label: 'Example ``list_merge=keep``:'
+  - title: list_merge=keep
+    description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=keep`:'
     file: example-004_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-004.out
     lang: 'yaml'
-  - label: 'Example ``list_merge=append``:'
+  - title: list_merge=append
+    description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=append`:'
     file: example-005_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-005.out
     lang: 'yaml'
-  - label: 'Example ``list_merge=prepend``:'
+  - title: list_merge=prepend
+    description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=prepend`:'
     file: example-006_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-006.out
     lang: 'yaml'
-  - label: 'Example ``list_merge=append_rp``:'
+  - title: list_merge=append_rp
+    description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=append_rp`:'
     file: example-007_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-007.out
     lang: 'yaml'
-  - label: 'Example ``list_merge=prepend_rp``:'
+  - title: list_merge=prepend_rp
+    description: 'Example :ansopt:`community.general.lists_mergeby#filter:list_merge=prepend_rp`:'
     file: example-008_vars/list3.yml
     lang: 'yaml+jinja'
-  - label: 'This produces:'
+  - title:
+    description: 'This produces:'
     file: example-008.out
     lang: 'yaml'
