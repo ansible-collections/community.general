@@ -34,7 +34,7 @@ DOCUMENTATION = '''
           before:
             description:
               - A key or key pattern to change.
-              - The interpretation of C(before) depends on O(matching_parameter).
+              - The interpretation of O(target[].before) depends on O(matching_parameter).
               - If more keys match the same C(before) the B(last) one will be used.
               - If there are items with equal C(before) the B(first) one will be used.
               - If there are more matches for a key the B(first) one will be used.
