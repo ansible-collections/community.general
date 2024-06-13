@@ -47,10 +47,10 @@ DOCUMENTATION = '''
         type: str
         default: equal
         choices:
-          equal: Matches keys of exactly one of the C(before) items.
-          starts_with: Matches keys that start with one of the C(before) items.
-          ends_with: Matches keys that end with one of the C(before) items.
-          regex: Matches keys that match one of the regular expressions provided in C(before).
+          equal: Matches keys of exactly one of the O(target[].before) items.
+          starts_with: Matches keys that start with one of the O(target[].before) items.
+          ends_with: Matches keys that end with one of the O(target[].before) items.
+          regex: Matches keys that match one of the regular expressions provided in O(target[].before).
 '''
 
 EXAMPLES = '''
