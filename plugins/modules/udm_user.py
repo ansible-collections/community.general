@@ -20,6 +20,12 @@ description:
     - "This module allows to manage posix users on a univention corporate
        server (UCS).
        It uses the python API of the UCS to create a new object or edit it."
+notes:
+    - This module does B(not) work with Python 3.13 or newer. It uses the deprecated L(crypt Python module,
+      https://docs.python.org/3.12/library/crypt.html) from the Python standard library, which was removed
+      from Python 3.13.
+requirements:
+    - Python 3.12 or earlier
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -324,16 +330,25 @@ EXAMPLES = '''
 
 RETURN = '''# '''
 
-import crypt
 from datetime import date, timedelta
+import traceback
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     umc_module_for_add,
     umc_module_for_edit,
     ldap_search,
     base_dn,
 )
+
+try:
+    import crypt
+except ImportError:
+    HAS_CRYPT = False
+    CRYPT_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_CRYPT = True
+    CRYPT_IMPORT_ERROR = None
 
 
 def main():
@@ -451,6 +466,13 @@ def main():
             ('state', 'present', ['firstname', 'lastname', 'password'])
         ])
     )
+
+    if not HAS_CRYPT:
+        module.fail_json(
+            msg=missing_required_lib('crypt (part of Python 3.13 standard library)'),
+            exception=CRYPT_IMPORT_ERROR,
+        )
+
     username = module.params['username']
     position = module.params['position']
     ou = module.params['ou']
