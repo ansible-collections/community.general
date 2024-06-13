@@ -127,6 +127,7 @@ stages:
             - test: '3.10'
             - test: '3.11'
             - test: '3.12'
+            - test: '3.13'
   - stage: Units_2_17
     displayName: Units 2.17
     dependsOn: []
@@ -354,6 +355,7 @@ stages:
           targets:
             - test: '3.8'
             - test: '3.11'
+            - test: '3.13'
   - stage: Generic_2_17
     displayName: Generic 2.17
     dependsOn: []
