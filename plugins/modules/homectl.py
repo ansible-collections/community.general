@@ -17,6 +17,12 @@ short_description: Manage user accounts with systemd-homed
 version_added: 4.4.0
 description:
     - Manages a user's home directory managed by systemd-homed.
+notes:
+    - This module does B(not) work with Python 3.13 or newer. It uses the deprecated L(crypt Python module,
+      https://docs.python.org/3.12/library/crypt.html) from the Python standard library, which was removed
+      from Python 3.13.
+requirements:
+    - Python 3.12 or earlier
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -263,11 +269,20 @@ data:
     }
 '''
 
-import crypt
 import json
-from ansible.module_utils.basic import AnsibleModule
+import traceback
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.basic import jsonify
 from ansible.module_utils.common.text.formatters import human_to_bytes
+
+try:
+    import crypt
+except ImportError:
+    HAS_CRYPT = False
+    CRYPT_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_CRYPT = True
+    CRYPT_IMPORT_ERROR = None
 
 
 class Homectl(object):
@@ -590,6 +605,12 @@ def main():
             ('resize', True, ['disksize']),
         ]
     )
+
+    if not HAS_CRYPT:
+        module.fail_json(
+            msg=missing_required_lib('crypt (part of Python 3.13 standard library)'),
+            exception=CRYPT_IMPORT_ERROR,
+        )
 
     homectl = Homectl(module)
     homectl.result['state'] = homectl.state
