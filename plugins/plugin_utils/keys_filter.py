@@ -115,8 +115,14 @@ def _keys_filter_target_dict(target, matching_parameter):
             msg = "The target items must be dictionaries. %s is %s"
             raise AnsibleFilterError(msg % (elem, type(elem)))
         if not all(k in elem for k in ('before', 'after')):
-            msg = "All dictionaries in target must include: after, before."
+            msg = "All dictionaries in target must include attributes: after, before."
             raise AnsibleFilterError(msg)
+        if not isinstance(elem['before'], string_types):
+            msg = "The attributes before must be strings. %s is %s"
+            raise AnsibleFilterError(msg % (elem['before'], type(elem['before'])))
+        if not isinstance(elem['after'], string_types):
+            msg = "The attributes after must be strings. %s is %s"
+            raise AnsibleFilterError(msg % (elem['after'], type(elem['after'])))
 
     before = [d['before'] for d in target]
     after = [d['after'] for d in target]
@@ -130,11 +136,6 @@ def _keys_filter_target_dict(target, matching_parameter):
                    " Not all items are valid regex in: %s")
             raise AnsibleFilterError(msg % before)
     else:
-        if not all(isinstance(item, string_types) for item in before):
-            msg = ("The attributes before must be strings."
-                   " Not all items are strings in: %s")
-            raise AnsibleFilterError(msg % before)
-        else:
-            tz = list(zip(before, after))
+        tz = list(zip(before, after))
 
     return tz
