@@ -734,6 +734,11 @@ def normalise_cr(clientrep, remove_ids=False):
 
     if "attributes" in clientrep:
         clientrep["attributes"] = dict(sorted(clientrep["attributes"].items()))
+        # Ignore unchangeable attributes
+        attribute_ignorelist = ["saml.artifact.binding.identifier", "client.secret.creation.time"]
+        for attr in attribute_ignorelist:
+            if attr in clientrep["attributes"]:
+                clientrep["attributes"].pop(attr)
 
     if "redirectUris" in clientrep:
         clientrep["redirectUris"] = list(sorted(clientrep["redirectUris"]))
@@ -749,7 +754,10 @@ def normalise_cr(clientrep, remove_ids=False):
 
             # Set to a default value.
             mapper["consentRequired"] = mapper.get("consentRequired", False)
-    
+    else:
+        # Force the presence of protocolMappers
+        clientrep["protocolMappers"] = []
+
     if "defaultClientScopes" in clientrep:
         clientrep["defaultClientScopes"] = list(sorted(clientrep["defaultClientScopes"]))
     if "optionalClientScopes" in clientrep:
