@@ -26,7 +26,7 @@ DOCUMENTATION = '''
       target:
         description:
           - A list of dictionaries with attributes C(before) and C(after).
-          - The value of C(after) replaces key matching C(before).
+          - The value of O(target[].after) replaces key matching O(target[].before).
         type: list
         elements: dictionary
         required: true
