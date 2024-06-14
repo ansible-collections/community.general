@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: consul_agent_service
 short_description: Add, modify and delete services within a consul cluster
-version_added: 8.5.0
+version_added: 9.1.0
 description:
  - Allows the addition, modification and deletion of services in a consul
    cluster via the agent.
@@ -48,7 +48,7 @@ options:
     type: str
   id:
     description:
-      - Specifies a unique ID for this service. This must be unique per agent. This defaults to the Name parameter if not provided.
+      - Specifies a unique ID for this service. This must be unique per agent. This defaults to the O(name) parameter if not provided.
         If O(state=absent), defaults to the service name if supplied.
     type: str
   tags:
@@ -166,24 +166,24 @@ EXAMPLES = '''
 
 RETURN = """
 service:
-    description: The alert policy information
-    returned: success
+    description: The service as returned by the consul HTTP API.
+    returned: always
     type: dict
     sample:
-        Address: localhost
-        ContentHash: 61a245cd985261ac
-        Datacenter: dc1
-        EnableTagOverride: false
         ID: nginx
-        Meta:
-            - nginx_version: 1.23.3
-        Port: 80
         Service: nginx
+        Address: localhost
+        Port: 80
         Tags:
             - http
+        Meta:
+            - nginx_version: 1.23.3
+        Datacenter: dc1
         Weights:
             Passing: 1
             Warning: 1
+        ContentHash: 61a245cd985261ac
+        EnableTagOverride: false
 operation:
     description: The operation performed.
     returned: changed

@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: consul_agent_check
 short_description: Add, modify, and delete checks within a consul cluster
-version_added: 8.5.0
+version_added: 9.1.0
 description:
  - Allows the addition, modification and deletion of checks in a consul
    cluster via the agent. For more details on using and configuring Checks,
@@ -54,7 +54,7 @@ options:
     type: str
   id:
     description:
-      - Specifies a unique ID for this check on the node. This defaults to the "Name" parameter, but it may be necessary to provide
+      - Specifies a unique ID for this check on the node. This defaults to the O(name) parameter, but it may be necessary to provide
         an ID for uniqueness. This value will return in the response as "CheckId".
     type: str
   interval:
@@ -73,8 +73,6 @@ options:
       - Specifies command arguments to run to update the status of the check.
       - Requires O(interval) to be provided.
       - Mutually exclusive with O(ttl), O(tcp) and O(http).
-      - "There is an issue with args. It throws an 'Invalid check: TTL must be > 0 for TTL checks'"
-      - See U(https://github.com/hashicorp/consul/issues/6923#issuecomment-564476529) for more details
     type: list
     elements: str
   ttl:
@@ -141,6 +139,24 @@ EXAMPLES = '''
     id: nginx_http_check
     service_id: "{{ nginx_service.ID }}"
 '''
+
+RETURN = """
+check:
+    description: The check as returned by the consul HTTP API.
+    returned: always
+    type: dict
+    sample:
+        CheckID: nginx_check
+        ServiceID: nginx
+        Interval: 30s
+        Type: http
+        Notes: Nginx Check
+operation:
+    description: The operation performed.
+    returned: changed
+    type: str
+    sample: update
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.consul import (
