@@ -1,0 +1,21 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test replace keys
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(item.result) | length) == 0
+    success_msg: |
+      [OK]  {{ item.label }}
+      result:
+        {{ rr | to_nice_yaml(indent=2) | indent(2) }}
+    fail_msg: |
+      [ERR] {{ item.label }}
+      result:
+        {{ rr | to_nice_yaml(indent=2) | indent(2) }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  vars:
+    rr: "{{ item.data |
+            community.general.replace_keys(target=item.target, matching_parameter=item.match) }}"
