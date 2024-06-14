@@ -110,7 +110,7 @@ def keep_keys(data, target=None, matching_parameter='equal'):
     """keep specific keys from dictionaries in a list"""
 
     # test parameters
-    _keys_filter_params(data, target, matching_parameter)
+    _keys_filter_params(data, matching_parameter)
     # test and transform target
     tt = _keys_filter_target_str(target, matching_parameter)
 

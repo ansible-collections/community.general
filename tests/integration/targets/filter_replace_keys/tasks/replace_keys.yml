@@ -1,0 +1,56 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Debug ansible_version
+  ansible.builtin.debug:
+    var: ansible_version
+  when: not quiet_test | d(true) | bool
+  tags: ansible_version
+
+- name: Test replace keys equal (default)
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result1) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  vars:
+    rr: "{{ list1 | community.general.replace_keys(target=tt) }}"
+    tt:
+      - {before: k0_x0, after: a0}
+      - {before: k1_x1, after: a1}
+  tags: equal_default
+
+- name: Test replace keys targets1
+  ansible.builtin.assert:
+    that:
+      - (rr | difference(result1) | length) == 0
+    success_msg: |
+      [OK]  result:
+      {{ rr | to_yaml }}
+    fail_msg: |
+      [ERR] result:
+      {{ rr | to_yaml }}
+    quiet: "{{ quiet_test | d(true) | bool }}"
+  loop: "{{ targets1 | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  vars:
+    rr: "{{ list1 | community.general.replace_keys(target=item.value, matching_parameter=item.key) }}"
+  tags: targets1
+
+- name: Test replace keys targets2
+  include_tasks:
+    file: fn-test-replace_keys.yml
+    apply:
+      tags: targets2
+  loop: "{{ targets2 }}"
+  loop_control:
+    label: "{{ item.label }}"
+  tags: targets2
