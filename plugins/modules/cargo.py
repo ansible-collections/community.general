@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-
 __metaclass__ = type
 
 
@@ -25,6 +24,13 @@ attributes:
   diff_mode:
     support: none
 options:
+  config_path:
+    default: ~/.cargo/config.toml
+    description:
+      - Path to Cargo configuration file. Only used for parsing the registry info.
+    required: false
+    type: path
+    version_added: 8.3.0
   executable:
     description:
       - Path to the C(cargo) installed in the system.
@@ -43,6 +49,13 @@ options:
       The base path where to install the Rust packages. Cargo automatically appends
       V(/bin). In other words, V(/usr/local) will become V(/usr/local/bin).
     type: path
+  registry:
+    description:
+      - Specify which registry to use.
+      - This is used only when installing new packages or installing another version of a package.
+    required: false
+    type: str
+    version_added: 8.3.0
   version:
     description:
       ->
@@ -98,23 +111,40 @@ EXAMPLES = r"""
   community.general.cargo:
     name: ludusavi
     state: latest
+
+- name: Install "ludusavi" Rust package from "private" registry
+  community.general.cargo:
+    name: ludusavi
+    registry: private
+    state: latest
 """
 
+import collections
 import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils import toml
+
+
+PackageInfo = collections.namedtuple("PackageInfo", ["version", "registry_url"])
+
+
+class CargoError(Exception):
+    pass
 
 
 class Cargo(object):
     def __init__(self, module, **kwargs):
         self.module = module
+        self.config_path = kwargs["config_path"]
         self.executable = [kwargs["executable"] or module.get_bin_path("cargo", True)]
+        self.locked = kwargs["locked"]
         self.name = kwargs["name"]
         self.path = kwargs["path"]
+        self.registry = kwargs["registry"]
         self.state = kwargs["state"]
         self.version = kwargs["version"]
-        self.locked = kwargs["locked"]
 
     @property
     def path(self):
@@ -143,14 +173,28 @@ class Cargo(object):
 
         data, dummy = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r"^([\w\-]+) v(.+):$")
+        package_regex = re.compile(r"^([\w\-]+) v(.+?)(?: \(registry `(.+)`\))?:$")
+
         installed = {}
         for line in data.splitlines():
-            package_info = package_regex.match(line)
-            if package_info:
-                installed[package_info.group(1)] = package_info.group(2)
+            package_match = package_regex.match(line)
+            if package_match:
+                package_name = package_match.group(1)
+                package_info = PackageInfo(
+                    version=package_match.group(2),
+                    registry_url=package_match.group(3),
+                )
+                installed[package_name] = package_info
 
         return installed
+
+    def get_registry_url_from_name(self, name):
+        cargo_config = toml.load_toml(self.config_path)
+        try:
+            url = cargo_config['registries'][name]['index']
+        except KeyError:
+            raise CargoError("Registry {0} not found in {1}".format(name, self.config_path))
+        return url
 
     def install(self, packages=None):
         cmd = ["install"]
@@ -160,13 +204,16 @@ class Cargo(object):
         if self.path:
             cmd.append("--root")
             cmd.append(self.path)
+        if self.registry:
+            cmd.append("--registry")
+            cmd.append(self.registry)
         if self.version:
             cmd.append("--version")
             cmd.append(self.version)
         return self._exec(cmd)
 
     def is_outdated(self, name):
-        installed_version = self.get_installed().get(name)
+        installed_version = self.get_installed().get(name).version
 
         cmd = ["search", name, "--limit", "1"]
         data, dummy = self._exec(cmd, True, False, False)
@@ -185,16 +232,18 @@ class Cargo(object):
 
 def main():
     arg_spec = dict(
+        config_path=dict(default="~/.cargo/config.toml", type="path"),
         executable=dict(default=None, type="path"),
+        locked=dict(default=False, type="bool"),
         name=dict(required=True, type="list", elements="str"),
-        path=dict(default=None, type="path"),
+        path=dict(default=None, type="path"), registry=dict(default=None, type="str"),
         state=dict(default="present", choices=["present", "absent", "latest"]),
         version=dict(default=None, type="str"),
-        locked=dict(default=False, type="bool"),
     )
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
     name = module.params["name"]
+    registry = module.params["registry"]
     state = module.params["state"]
     version = module.params["version"]
 
@@ -214,7 +263,8 @@ def main():
             n
             for n in name
             if (n not in installed_packages)
-            or (version and version != installed_packages[n])
+            or (version and version != installed_packages[n].version)
+            or (registry and cargo.get_registry_url_from_name(registry) != installed_packages[n].registry_url)
         ]
         if to_install:
             changed = True
