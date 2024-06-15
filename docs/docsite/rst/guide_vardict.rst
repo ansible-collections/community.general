@@ -173,4 +173,4 @@ values of it. For that, you want to use:
     results["diff"] = vars.diff()
     module.exit_json(**results)
 
-.. versionadded:: 6.1.0
+.. versionadded:: 7.1.0
