@@ -177,14 +177,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             # found groups
             elif k == 'Groups':
-                for group in v.split('/'):
-                    if group:
-                        group = make_unsafe(group)
-                        group = self.inventory.add_group(group)
-                        self.inventory.add_child(group, current_host)
-                        if group not in cacheable_results:
-                            cacheable_results[group] = {'hosts': []}
-                        cacheable_results[group]['hosts'].append(current_host)
+                self._handle_vboxmanage_group_string(v, current_host, cacheable_results)
                 continue
 
             else:
@@ -226,6 +219,50 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             yield True
 
         return all(find_host(host, inventory))
+
+    def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
+        '''Handles parsing the VM's Group assignment from VBoxManage'''
+        # Per the VirtualBox documentation, a VM can be part of many groups, 
+        # and it's possible to have nested groups.
+        # Many groups are separated by commas ",", and nested groups use
+        # slash "/".
+        # https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
+        # Multi groups: VBoxManage modifyvm "vm01" --groups "/TestGroup,/TestGroup2"
+        # Nested groups: VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2"
+
+        for group in vboxmanage_group.split(','):
+            if not group:
+                # We could get an empty element due how to split works, and
+                # possible assignments from VirtualBox. e.g. ,/Group1
+                continue
+
+            if group == "/":
+                # This is the "root" group. We get here if the VM was not
+                # assigned to a particular group. Consider the host to be
+                # unassigned to a group.
+                continue
+            
+            parent_group = "all"
+            for subgroup in group.split('/'):
+                if not subgroup:
+                    # Similarly to above, we could get an empty element.
+                    # e.g //Group1
+                    continue
+
+                if subgroup == '/':
+                    # "root" group.
+                    # Consider the host to be unassigned
+                    continue
+
+                subgroup = make_unsafe(subgroup)
+                subgroup = self.inventory.add_group(subgroup)
+                self.inventory.add_child(parent_group, subgroup)
+                self.inventory.add_child(subgroup, current_host)
+                if subgroup not in cacheable_results:
+                    cacheable_results[subgroup] = {'hosts': []}
+                cacheable_results[subgroup]['hosts'].append(current_host)
+
+                parent_group = subgroup
 
     def verify_file(self, path):
 

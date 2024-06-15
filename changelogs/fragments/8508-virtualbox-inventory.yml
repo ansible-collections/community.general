@@ -1,0 +1,7 @@
+breaking_changes:
+  - >- 
+    virtualbox inventory plugin - the VirtualBox dynamic inventory automatically infers Ansible Groups based on VirtualBox groups. 
+    This change converges the dynamic inventory's group parsing logic to align more closely to VirtualBox groups. 
+    Previously, the `/` character would delineate the different groups, and place them at the top level. 
+    Now, the `/` character allows creation of nested groups, akin to filesystem directory hierarchy. The `,` character is introduced to delineate other top-level groups.
+    See https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups for details on how to assign VirtualBox groups. (https://github.com/ansible-collections/community.general/issues/8508)
