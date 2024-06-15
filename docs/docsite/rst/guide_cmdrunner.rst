@@ -95,8 +95,7 @@ An ``arg_format`` function should of the form:
 .. code-block:: python
 
     def func(value):
-        result = <some transformation of value>
-        return result
+        return ["--some-param-name", value]
 
 The parameter ``value`` is always one single parameter, and it can be of any type - although there are convenience mechanisms
 to help handling sequence and mapping objects.
@@ -128,52 +127,88 @@ during the execution of the command.
 
 The most common cases are:
 
-* +------------
-  | as_list()
-  +==============
-  | Description 
-  +-------------
-  | Creation
-  +-------------
-  | Va
++---------------+--------------------------------------------------------------+
+| as_list()                                                                    |
++===============+==============================================================+
+| Description   | Does not accept ``arg``, returns ``value`` as-is             |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_list()``                                                |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``["foo", "bar"]``  | * ``["foo", "bar"]``                 |
+|               | * ``foobar``          | * ``["foobar"]``                     |
++---------------+-----------------------+--------------------------------------+
 
-+-------------------+--------------------------+-----------
-| function          | Description              | Creation | Value | Outcome |
-+===================+==========================+===========
-| ``as_list``       | Does not accept ``arg``, | ``as_list()`` | * ``["foo", "bar"]`` | * ``["foo", "bar"]`` |
-|                   | returns ``value`` as-is  |               | * ``foobar``         | * ``["foobar"]``     |
-+-------------------+-------------------------
-| ``as_optval``     | Concatenates ``arg`` and ``value`` as one string | ``as_optval("-i")`` | ``3`` | * ``["-i3"]`` |
-+-------------------+
-| ``as_opt_val``    | Concatenates ``arg`` and ``value`` as one list | ``as_opt_val("--name")`` | ``abc`` | * ``["--name", "abc"]`` |
-+-------------------+
-| ``as_opt_eq_val`` |
-+-------------------+
++---------------+-----------------------+--------------------------------------+
+| as_optval()                                                                  |
++===============+==============================================================+
+| Description   | Concatenates ``arg`` and ``value`` as one string             |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_optval("-i")``                                          |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``3``               | * ``["-i3"]``                        |
+|               | * ``foobar``          | * ``["-ifoobar"]``                   |
++---------------+-----------------------+--------------------------------------+
+
++---------------+-----------------------+--------------------------------------+
+| as_opt_val()                                                                 |
++===============+==============================================================+
+| Description   | Concatenates ``arg`` and ``value`` as one list               |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_opt_val("--name")``                                     |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``abc``             | * ``["--name", "abc"]``              |
++---------------+-----------------------+--------------------------------------+
+
++---------------+-----------------------+--------------------------------------+
+| as_opt_eq_val()                                                              |
++===============+==============================================================+
+| Description   | Concatenates ``arg=value`` as one string                     |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_opt_eq_val("--num-cpus")``                              |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``10``              | * ``["--num-cpus=10"]``              |
++---------------+-----------------------+--------------------------------------+
+
++---------------+-----------------------+---------------------------------------+
+| as_fixed()                                                                    |
++===============+===============================================================+
+| Description   | Fixed arguments added regardless of value                     |
++---------------+---------------------------------------------------------------+
+| Creation      | ``as_fixed("--version")``                                     |
++---------------+-----------------------+---------------------------------------+
+| Value/Outcome |                       | * ``["--version"]``                   |
++---------------+-----------------------+---------------------------------------+
+| Note          | This is the only special case in which a value can be missing.|
+|               | The example also comes from the code in `Quickstart`_.        |
+|               | In that case, the module has code to determine the command's  |
+|               | version so that it can assert compatibility. There is no      |
+|               | *value* to be passed for that CLI argument.                   |
++---------------+---------------------------------------------------------------+
 
 
-Here is a reference table of all of them:
+.. Here is a reference table of all of them:
 
-+---------------------+-----------------------+-----------
-| function         | Description           | Example
-+=====================+=======================+===========
-| ``as_bool``         | If value is True-ish, return th evalue
-+---------------------+------------
-| ``as_bool_not``     |
-+---------------------+
-| ``as_optval``       |
-+---------------------+
-| ``as_opt_val``      |
-+---------------------+
-| ``as_opt_eq_val`` |
-+-------------------+
-| ``as_list``       |
-+-------------------+
-| ``as_fixed``      |
-+-------------------+
-| ``as_map``          |
-+---------------------+
-| ``as_func``         |
-+---------------------+
+.. +---------------------+-----------------------+-----------
+.. | function            | Description           | Example
+.. +=====================+=======================+===========
+.. | ``as_bool``         | If value is True-ish, return th evalue
+.. +---------------------+------------
+.. | ``as_bool_not``     |
+.. +---------------------+
+.. | ``as_optval``       |
+.. +---------------------+
+.. | ``as_opt_val``      |
+.. +---------------------+
+.. | ``as_opt_eq_val`` |
+.. +-------------------+
+.. | ``as_list``       |
+.. +-------------------+
+.. | ``as_fixed``      |
+.. +-------------------+
+.. | ``as_map``          |
+.. +---------------------+
+.. | ``as_func``         |
+.. +---------------------+
 
 
 cmd_runner_fmt.as_bool()
@@ -189,14 +224,22 @@ cmd_runner_fmt.as_func()
 Command Runner
 ^^^^^^^^^^^^^^
 
+lang
+environment
+check_rc
+
 Python Runner
 ^^^^^^^^^^^^^
 
 Other features
 ^^^^^^^^^^^^^^
 
-Prcessing results
-^^^^^^^^^^^^^^^^^
+unpack args
+unpack kwargs
+stack
+
+Processing results
+^^^^^^^^^^^^^^^^^^
 
 
 
