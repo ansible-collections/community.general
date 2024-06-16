@@ -127,7 +127,7 @@ class _Format(object):
 
     @staticmethod
     def as_bool_not(args):
-        return _ArgFormat(lambda value: [] if value else _ensure_list(args), ignore_none=False)
+        return _Format.as_bool([], args, ignore_none=False)
 
     @staticmethod
     def as_optval(arg, ignore_none=None):
