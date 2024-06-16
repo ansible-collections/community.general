@@ -10,6 +10,7 @@ __metaclass__ = type
 
 import copy
 import json
+import re
 
 from ansible.module_utils.six.moves.urllib import error as urllib_error
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -68,6 +69,25 @@ def camel_case_key(key):
     return "".join(parts)
 
 
+def validate_check(check):
+    validate_duration_keys = ['Interval', 'Ttl', 'Timeout']
+    validate_tcp_regex = r"(?P<host>.*):(?P<port>(?:[0-9]+))$"
+    if check.get('Tcp') is not None:
+        match = re.match(validate_tcp_regex, check['Tcp'])
+        if not match:
+            raise Exception('tcp check must be in host:port format')
+    for duration in validate_duration_keys:
+        if duration in check and check[duration] is not None:
+            check[duration] = validate_duration(check[duration])
+
+
+def validate_duration(duration):
+    if duration:
+        if not re.search(r"\d+(?:ns|us|ms|s|m|h)", duration):
+            duration = "{0}s".format(duration)
+    return duration
+
+
 STATE_PARAMETER = "state"
 STATE_PRESENT = "present"
 STATE_ABSENT = "absent"
@@ -81,7 +101,7 @@ OPERATION_DELETE = "remove"
 def _normalize_params(params, arg_spec):
     final_params = {}
     for k, v in params.items():
-        if k not in arg_spec:  # Alias
+        if k not in arg_spec or v is None:  # Alias
             continue
         spec = arg_spec[k]
         if (
@@ -105,9 +125,10 @@ class _ConsulModule:
     """
 
     api_endpoint = None  # type: str
-    unique_identifier = None  # type: str
+    unique_identifiers = None  # type: list
     result_key = None  # type: str
     create_only_fields = set()
+    operational_attributes = set()
     params = {}
 
     def __init__(self, module):
@@ -118,6 +139,8 @@ class _ConsulModule:
             for k in self.params
             if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
         }
+
+        self.operational_attributes.update({"CreateIndex", "CreateTime", "Hash", "ModifyIndex"})
 
     def execute(self):
         obj = self.read_object()
@@ -203,13 +226,23 @@ class _ConsulModule:
         return False
 
     def prepare_object(self, existing, obj):
-        operational_attributes = {"CreateIndex", "CreateTime", "Hash", "ModifyIndex"}
         existing = {
-            k: v for k, v in existing.items() if k not in operational_attributes
+            k: v for k, v in existing.items() if k not in self.operational_attributes
         }
         for k, v in obj.items():
             existing[k] = v
         return existing
+
+    def id_from_obj(self, obj, camel_case=False):
+        def key_func(key):
+            return camel_case_key(key) if camel_case else key
+
+        if self.unique_identifiers:
+            for identifier in self.unique_identifiers:
+                identifier = key_func(identifier)
+                if identifier in obj:
+                    return obj[identifier]
+        return None
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_CREATE:
@@ -219,7 +252,8 @@ class _ConsulModule:
         raise RuntimeError("invalid arguments passed")
 
     def read_object(self):
-        url = self.endpoint_url(OPERATION_READ, self.params.get(self.unique_identifier))
+        identifier = self.id_from_obj(self.params)
+        url = self.endpoint_url(OPERATION_READ, identifier)
         try:
             return self.get(url)
         except RequestError as e:
@@ -233,25 +267,28 @@ class _ConsulModule:
         if self._module.check_mode:
             return obj
         else:
-            return self.put(self.api_endpoint, data=self.prepare_object({}, obj))
+            url = self.endpoint_url(OPERATION_CREATE)
+            created_obj = self.put(url, data=self.prepare_object({}, obj))
+            if created_obj is None:
+                created_obj = self.read_object()
+            return created_obj
 
     def update_object(self, existing, obj):
-        url = self.endpoint_url(
-            OPERATION_UPDATE, existing.get(camel_case_key(self.unique_identifier))
-        )
         merged_object = self.prepare_object(existing, obj)
         if self._module.check_mode:
             return merged_object
         else:
-            return self.put(url, data=merged_object)
+            url = self.endpoint_url(OPERATION_UPDATE, self.id_from_obj(existing, camel_case=True))
+            updated_obj = self.put(url, data=merged_object)
+            if updated_obj is None:
+                updated_obj = self.read_object()
+            return updated_obj
 
     def delete_object(self, obj):
         if self._module.check_mode:
             return {}
         else:
-            url = self.endpoint_url(
-                OPERATION_DELETE, obj.get(camel_case_key(self.unique_identifier))
-            )
+            url = self.endpoint_url(OPERATION_DELETE, self.id_from_obj(obj, camel_case=True))
             return self.delete(url)
 
     def _request(self, method, url_parts, data=None, params=None):
@@ -309,7 +346,9 @@ class _ConsulModule:
         if 400 <= status < 600:
             raise RequestError(status, response_data)
 
-        return json.loads(response_data)
+        if response_data:
+            return json.loads(response_data)
+        return None
 
     def get(self, url_parts, **kwargs):
         return self._request("GET", url_parts, **kwargs)

@@ -235,13 +235,13 @@ def normalize_link_obj(api_obj, module_obj, key):
 class ConsulTokenModule(_ConsulModule):
     api_endpoint = "acl/token"
     result_key = "token"
-    unique_identifier = "accessor_id"
+    unique_identifiers = ["accessor_id"]
 
     create_only_fields = {"expiration_ttl"}
 
     def read_object(self):
         # if `accessor_id` is not supplied we can only create objects and are not idempotent
-        if not self.params.get(self.unique_identifier):
+        if not self.id_from_obj(self.params):
             return None
         return super(ConsulTokenModule, self).read_object()
 
