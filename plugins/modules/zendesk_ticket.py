@@ -10,34 +10,72 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import json
-import traceback
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.urls import Request
 
-REQUESTS_IMP_ERR = None
-try:
-    import requests
-    HAVE_REQUESTS = True
-except ImportError:
-    REQUESTS_IMP_ERR = traceback.format_exc()
-    HAVE_REQUESTS = False
+def create_ticket(host, username, password, body, severity, subject):
+
+    changed = False
+    url = f'{host}/api/v2/tickets'
+    payload = {
+        "ticket": {
+            "comment": {
+                "body": body
+            },
+            "priority": severity,
+            "subject": subject
+        }
+    }
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    try:
+        request = Request(url_username=username, url_password=password, headers=headers)
+        response = request.post(url, data=json.dumps(payload))
+        if response.getcode() == 201:
+            changed = True
+            return {
+                'changed': changed,
+                'response': json.load(response),
+            }
+    except Exception as e:
+        return {
+            'changed': changed,
+            'msg': to_native(e)
+        }
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             host=dict(type='str', required=True),
             username=dict(type='str', required=True, aliases=['user']),
-            password=dict(type='str', required=True, aliases=['password']),
-            state=dict(type='str',required=True, default='present',
-                       choices=['present', 'absent', 'update'], default='present'),
-            body=dict(type='str', required=False, default='')
-            severity=dict(type='str', required=False, default="Normal")
+            password=dict(type='str', required=True, aliases=['pass'], no_log=True),
+            state=dict(type='str', required=True,
+                       choices=['present', 'absent', 'update']),
+            body=dict(type='str', required=False, default=''),
+            severity=dict(type='str', required=False, default=''),
+            subject=dict(type='str', required=True)
         ),
         supports_check_mode=False
     )
-    if not HAVE_REQUESTS:
-        module.fail_json(msg=missing_required_lib("requests"), exception=REQUESTS_IMP_ERR)
 
+    host = module.params['host']
+    username = module.params['username']
+    password = module.params['password']
+    state = module.params['state']
+    body = module.params['body']
+    severity = module.params['severity']
+    subject = module.params['subject']
+
+    if state == 'present':
+        result = create_ticket(host, username, password, body, severity, subject)
+
+    if 'msg' in result:
+        module.fail_json(**result)
+    else:
+        module.exit_json(**result)
 
 if __name__ == '__main__':
     main()
