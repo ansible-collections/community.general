@@ -145,9 +145,9 @@ except ImportError:
 
 class ProxmoxTemplateAnsible(ProxmoxAnsible):
     def get_template(self, node, storage, content_type, template):
+        volid = '%s:%s/%s' % (storage, content_type, template)
         try:
-            return [True for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get()
-                    if tmpl['volid'] == '%s:%s/%s' % (storage, content_type, template)]
+            return any(tmpl['volid'] == volid for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get())
         except Exception as e:
             self.module.fail_json(msg="Failed to retrieve template '%s:%s/%s': %s" % (storage, content_type, template, e))
 
