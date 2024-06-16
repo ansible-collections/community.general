@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_realm - add normalizations for ``attributes`` and ``protocol_mappers`` (https://github.com/ansible-collections/community.general/pull/8496).
