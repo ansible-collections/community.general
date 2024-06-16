@@ -4,44 +4,40 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# 1) Run all examples and create example-XXX.out
-# shell> ansible-playbook playbook.yml -e examples_create=true
+# Create docs REST files
+# shell> ansible-playbook playbook.yml
 #
-# 2) Optionally, for testing, create examples_all.rst
-# shell> ansible-playbook playbook.yml -e examples_create_all=true
-#
-# 3) Create docs REST files
-# shell> ansible-playbook playbook.yml -e rst_create=true
-#
-# Notes:
-# * Use YAML callback, e.g. set ANSIBLE_STDOUT_CALLBACK=community.general.yaml
-# * Use sphinx-view to render and review the REST files
-#   shell> sphinx-view <path_to_helper>/examples_all.rst
-# * Proofread and copy completed docs *.rst files into the directory rst.
-# * Then delete the *.rst and *.out files from this directory. Do not
-#   add *.rst and *.out in this directory to the version control.
+# Proofread and copy created *.rst file into the directory
+# docs/docsite/rst. Do not add *.rst in this directory to the version
+# control.
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# community.general/docs/docsite/helper/lists_mergeby/playbook.yml
+# community.general/docs/docsite/helper/remove_keys/playbook.yml
 
-- hosts: localhost
+- name: Create RST file for docs/docsite/rst
+  hosts: localhost
   gather_facts: false
 
-  vars_files:
-    - examples.yml
+  vars:
+
+    docs_path:
+      - filter_guide
+      - abstract_informations
+      - lists_of_dictionaries
+      - remove_keys
+    file_base: "{{ docs_path | join('-') }}"
+    target: ../../../../tests/integration/targets/filter_remove_keys
 
   tasks:
 
-    - include_tasks: examples-create.yml
-      loop: "{{ examples }}"
-      when: examples_create | d(false) | bool
+    - name: Include target vars
+      include_vars:
+        file: "{{ target }}/vars/main/tests.yml"
 
-    - template:
-        src: examples_all.rst.j2
-        dest: examples_all.rst
-      when: examples_create_all | d(false) | bool
+    - debug:
+        var: tests
 
-    - template:
-        src: filter_guide-abstract_informations-lists_of_dictionaries-remove_keys.rst.j2
-        dest: filter_guide-abstract_informations-lists_of_dictionaries-remove_keys.rst
-      when: rst_create | d(false) | bool
+    - name: Create RST file
+      ansible.builtin.template:
+        src: "{{ file_base }}.rst.j2"
+        dest: "{{ file_base }}.rst"

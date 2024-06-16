@@ -10,61 +10,83 @@ Use the filter ``keep_keys`` if you have a list of dictionaries and want to keep
 
 .. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ref:`the documentation for the community.general.yaml callback plugin <ansible_collections.community.general.yaml_callback>`.
 
+
 Let us use the below list in the following examples:
 
 .. code-block:: yaml
 
-  {{ lookup('file', 'default-common.yml') | split('\n') | reject('match', '^(#|---)') | join ('\n')  | indent(2) }}
+   input:
+{{ tests.0.input | to_yaml(indent=2) | indent(3, first=True) }}
+
+{% for i in tests[0:1]|subelements('group') %}
+{% if i.0.title | d('', true) | length > 0 %}
+{{ i.0.title }}
+{{ "%s" % ('"' * i.0.title|length) }}
+{% endif %}
+* {{ i.1.d }}
+
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1
+
+   target: {{ i.1.tt }}
+   result: {{ lookup('file', target ~ '/templates/' ~ i.0.template) }}
+
+{% endfor %}
+
+gives
+
+.. code-block:: yaml
+   :emphasize-lines: 1-
+
+   result:
+{{ tests.0.result | to_yaml(indent=2) | indent(3, first=True) }}
+ 
+.. versionadded:: 9.1.0
 
 * The results of the below examples 1-5 are all the same:
 
 .. code-block:: yaml
+   :emphasize-lines: 1-
 
-  {{ lookup('file', 'example-001.out') | indent(2) }}
+   result:
+{{ tests.1.result | to_yaml(indent=2) | indent(3, first=True) }}
 
-{% for i in examples[0:1] %}
-{% if i.title | d('', true) | length > 0 %}
-{{ i.title }}
-{{ "%s" % ('"' * i.title|length) }}
+{% for i in tests[1:2]|subelements('group') %}
+{% if i.0.title | d('', true) | length > 0 %}
+{{ i.0.title }}
+{{ "%s" % ('"' * i.0.title|length) }}
 {% endif %}
-{{ examples.index(i) + 1 }}) {{ i.description }}
+{{ loop.index }}. {{ i.1.d }}
 
-.. code-block:: {{ i.lang }}
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1,2
 
-  {{ lookup('file', i.example ~ '_vars/' ~ i.result) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
-
-{% endfor %}
-
-.. versionadded:: 9.1.0
-
-{% for i in examples[1:5] %}
-{% if i.title | d('', true) | length > 0 %}
-{{ i.title }}
-{{ "%s" % ('"' * i.title|length) }}
-{% endif %}
-{{ examples.index(i) + 1 }}) {{ i.description }}
-
-.. code-block:: {{ i.lang }}
-
-  {{ lookup('file', i.example ~ '_vars/' ~ i.result) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
+   mp: {{ i.1.mp }}
+   target: {{ i.1.tt }}
+   result: {{ lookup('file', target ~ '/templates/' ~ i.0.template) }}
 
 {% endfor %}
 
 * The results of the below examples 6-9 are all the same:
 
 .. code-block:: yaml
+   :emphasize-lines: 1-
 
-  {{ lookup('file', 'example-006.out') | indent(2) }}
+   result:
+{{ tests.2.result | to_yaml(indent=2) | indent(3, first=True) }}
 
-{% for i in examples[5:9] %}
-{% if i.title | d('', true) | length > 0 %}
-{{ i.title }}
-{{ "%s" % ('"' * i.title|length) }}
+{% for i in tests[2:3]|subelements('group') %}
+{% if i.0.title | d('', true) | length > 0 %}
+{{ i.0.title }}
+{{ "%s" % ('"' * i.0.title|length) }}
 {% endif %}
-{{ examples.index(i) + 1 }}) {{ i.description }}
+{{ loop.index + 5 }}. {{ i.1.d }}
 
-.. code-block:: {{ i.lang }}
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1,2
 
-  {{ lookup('file', i.example ~ '_vars/' ~ i.result) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
+   mp: {{ i.1.mp }}
+   target: {{ i.1.tt }}
+   result: {{ lookup('file', target ~ '/templates/' ~ i.0.template) }}
 
 {% endfor %}
