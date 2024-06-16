@@ -12,11 +12,15 @@ Introduction
 ^^^^^^^^^^^^
 
 The ``ansible_collections.community.general.plugins.module_utils.cmd_runner`` module util provides the
-``CmdRunner`` class to help execute external commands. The class provides standard mechanisms to handle:
-the command arguments, the localization setting, processing the output, check mode, etc.
+``CmdRunner`` class to help execute external commands. The class provides standard mechanisms around
+the standard ``AnsibleModule.run_command()`` method, handling: command arguments, localization setting,
+output processing output, check mode, and other features.
 
-This is even more useful when one command is used in multiple modules, so that you can define all options
-in a module util file, and each module will then only use the ones that make sense to it.
+It is even more useful when one command is used in multiple modules, so that you can define all options
+in a module util file, and each module will use the same runner with different arguments.
+
+For the sake of clarity, throughout this guide, unless otherwise specified, we use the term *option* when referring to
+Ansible module options, and the term *argument* when referring to the command line arguments for the external command.
 
 Quickstart
 """"""""""
@@ -47,26 +51,33 @@ version of the actual code in ``ansible_collections.community.general.plugins.mo
             no_deps=cmd_runner_fmt.as_bool("--no-deps"),
             version=cmd_runner_fmt.as_fixed("--version"),
             name=cmd_runner_fmt.as_list(),
-        ),
-        check_rc=True
+        )
     )
 
-Then you create a context for a specific execution of the command, and then you invoke the context method ``run()`` passing
-values for the arguments as needed. Keep in mind that ``CmdRunner`` will use the module parameters with the exact same names
-as values for the runner arguments. If no module parameter is found with the specified name, then you must provide the value
-explicitly (unless using ``cmd_runner_fmt.as_fixed``, see more on it below).
-
-The actual execution of the command in a particular context looks like:
+This is meant to be done once, then every time you need to execute the command you create a context and pass values as needed:
 
 .. code-block:: python
 
-        with self.runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
+        # Run the command with these arguments, when values exist for them
+        with runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install", upgrade=upgrade)
 
-In the example, values of ``type``, ``force``, ``no_deps`` and others will be taken straight from the parameters, whilst ``galaxy_cmd`` and ``upgrade``
-are passed explicitly. The regular output of the
+        # Obtain the version
+        with runner("version") as ctx:
+            dummy, stdout, dummy = ctx.run()
 
-That will generate a resulting command line similar to (again, taken from the output of an integration test):
+        # Or simply
+        dummy, stdout, dummy = runner("version").run()
+
+Note that you can pass values for the arguments explicitly when calling ``run()``, otherwise ``CmdRunner`` will use the module
+options with the exact same names as values for the runner arguments. If no value is passed and no module option is found
+with the specified name, then an exception will be raised. The only exception to that rule is when using ``cmd_runner_fmt.as_fixed``,
+as with the argument ``version`` in the runner above. See more about it below.
+
+In the first example, values of ``type``, ``force``, ``no_deps`` and others will be taken straight from the module, whilst
+``galaxy_cmd`` and ``upgrade`` are passed explicitly.
+
+That will generate a resulting command line similar to (example taken from the output of an integration test):
 
 .. code-block:: javascript
 
@@ -97,51 +108,73 @@ An ``arg_format`` function should of the form:
     def func(value):
         return ["--some-param-name", value]
 
-The parameter ``value`` is always one single parameter, and it can be of any type - although there are convenience mechanisms
+The parameter ``value`` can be of any type - although there are convenience mechanisms
 to help handling sequence and mapping objects.
 
 The result is expected to be of the type ``Sequence[str]`` type (most commonly ``list[str]`` or ``tuple[str]``), otherwise
-it will be considered to be, using the example above, ``[str(result)]``. This resulting sequence of strings will be added
+it will be considered to be a ``str``, and it will be coerced into ``list[str]``. This resulting sequence of strings will be added
 to the command line when that argument is actually used.
 
 For example, if ``func`` returns:
 
 - ``["nee", 2, "shruberries"]``, the command line will include arguments ``"nee" "2" "shruberries"``.
-- ``2 == 2``, the command line will include argument ``"True"``.
-- ``None``, the command line will include argument ``"None"``.
-- ``[]``, the command line will not include argument anything for that particular variable.
+- ``2 == 2``, the command line will include argument ``True``.
+- ``None``, the command line will include argument ``None``.
+- ``[]``, the command line will not include argument anything for that particular argument.
 
-a scalar, such as ``int``, ``str`` or ``bool``.
+Convenience format functions
+""""""""""""""""""""""""""""
 
-Convenience functions
-"""""""""""""""""""""
-
-Command Runner provides a set of convenience functions that return format arguments functions for some relatively commom
+Command Runner provides a set of convenience functions that return format arguments functions for commom
 cases. In the first block of code in the `Quickstart`_ section you can see the ``from .. import`` of
-``ansible_collections.community.general.plugins.module_utils.cmd_runner.cmd_runner_fmt``, and in the instantiation of the
-``CmdRunner`` object, you can see how to use many of the convenience functions being used.
+``ansible_collections.community.general.plugins.module_utils.cmd_runner.cmd_runner_fmt``, and how to make
+use of many these convenience functions in the instantiation of the ``CmdRunner`` object.
 
 Unless noted otherwise, for the sake of consistency in the reference below it is assumed that every convenience function deals
 with two parameters: ``arg``, usually specified during the creation of the ``CmdRunner`` object, and ``value``, specified
 during the execution of the command.
 
-The most common cases are:
-
 +---------------+--------------------------------------------------------------+
 | as_list()                                                                    |
 +===============+==============================================================+
-| Description   | Does not accept ``arg``, returns ``value`` as-is             |
+| Description   | Does not accept ``arg``, returns ``value`` as-is.            |
 +---------------+--------------------------------------------------------------+
 | Creation      | ``as_list()``                                                |
 +---------------+-----------------------+--------------------------------------+
 | Value/Outcome | * ``["foo", "bar"]``  | * ``["foo", "bar"]``                 |
-|               | * ``foobar``          | * ``["foobar"]``                     |
+|               | * ``"foobar"``        | * ``["foobar"]``                     |
++---------------+-----------------------+--------------------------------------+
+
++---------------+--------------------------------------------------------------+
+| as_bool()                                                                    |
++===============+==============================================================+
+| Description   | It receives two different parameters: ``args_true`` and      |
+|               | ``args_false``, which is optional. If ``value`` is           |
+|               | ``True``-ish, the format function will return ``args_true``  |
+|               | and, when ``args_false`` is passed, ``args_false`` will be   |
+|               | returned when ``value`` is ``False``-ish.                    |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_bool("--force")``                                       |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``True``            | * ``["--force"]``                    |
+|               | * ``False``           | * ``[]``                             |
++---------------+-----------------------+--------------------------------------+
+
++---------------+--------------------------------------------------------------+
+| as_bool_not()                                                                |
++===============+==============================================================+
+| Description   | Returns ``arg`` when ``value`` is ``False``-ish.             |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_bool_not("--no-deps")``                                 |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``True``            | * ``[]``                             |
+|               | * ``False``           | * ``["--no-deps"]``                  |
 +---------------+-----------------------+--------------------------------------+
 
 +---------------+-----------------------+--------------------------------------+
 | as_optval()                                                                  |
 +===============+==============================================================+
-| Description   | Concatenates ``arg`` and ``value`` as one string             |
+| Description   | Concatenates ``arg`` and ``value`` as one string.            |
 +---------------+--------------------------------------------------------------+
 | Creation      | ``as_optval("-i")``                                          |
 +---------------+-----------------------+--------------------------------------+
@@ -152,7 +185,7 @@ The most common cases are:
 +---------------+-----------------------+--------------------------------------+
 | as_opt_val()                                                                 |
 +===============+==============================================================+
-| Description   | Concatenates ``arg`` and ``value`` as one list               |
+| Description   | Concatenates ``arg`` and ``value`` as one list.              |
 +---------------+--------------------------------------------------------------+
 | Creation      | ``as_opt_val("--name")``                                     |
 +---------------+-----------------------+--------------------------------------+
@@ -162,7 +195,7 @@ The most common cases are:
 +---------------+-----------------------+--------------------------------------+
 | as_opt_eq_val()                                                              |
 +===============+==============================================================+
-| Description   | Concatenates ``arg=value`` as one string                     |
+| Description   | Concatenates ``arg=value`` as one string.                    |
 +---------------+--------------------------------------------------------------+
 | Creation      | ``as_opt_eq_val("--num-cpus")``                              |
 +---------------+-----------------------+--------------------------------------+
@@ -172,7 +205,7 @@ The most common cases are:
 +---------------+-----------------------+---------------------------------------+
 | as_fixed()                                                                    |
 +===============+===============================================================+
-| Description   | Fixed arguments added regardless of value                     |
+| Description   | Fixed arguments added regardless of value.                    |
 +---------------+---------------------------------------------------------------+
 | Creation      | ``as_fixed("--version")``                                     |
 +---------------+-----------------------+---------------------------------------+
@@ -185,38 +218,27 @@ The most common cases are:
 |               | *value* to be passed for that CLI argument.                   |
 +---------------+---------------------------------------------------------------+
 
-
-.. Here is a reference table of all of them:
-
-.. +---------------------+-----------------------+-----------
-.. | function            | Description           | Example
-.. +=====================+=======================+===========
-.. | ``as_bool``         | If value is True-ish, return th evalue
-.. +---------------------+------------
-.. | ``as_bool_not``     |
-.. +---------------------+
-.. | ``as_optval``       |
-.. +---------------------+
-.. | ``as_opt_val``      |
-.. +---------------------+
-.. | ``as_opt_eq_val`` |
-.. +-------------------+
-.. | ``as_list``       |
-.. +-------------------+
-.. | ``as_fixed``      |
-.. +-------------------+
-.. | ``as_map``          |
-.. +---------------------+
-.. | ``as_func``         |
-.. +---------------------+
++---------------+-----------------------+--------------------------------------+
+| as_map()                                                                     |
++===============+==============================================================+
+| Description   | Requires ``arg`` to be a dictionay from which it chooses the |
+|               | resulting command line argument.                             |
++---------------+--------------------------------------------------------------+
+| Creation      | ``as_map(dict(a=1, b=2, c=3), default=0)``                   |
++---------------+-----------------------+--------------------------------------+
+| Value/Outcome | * ``"b"``             | * ``["2"]``                          |
+|               | * ``"yabadabadoo"``   | * ``["0"]``                          |
++---------------+-----------------------+--------------------------------------+
+| Note          | If ``default`` is not specified, invalid values will return  |
+|               | an empty list, meaning they will be silently ignored.        |
++---------------+--------------------------------------------------------------+
 
 
-cmd_runner_fmt.as_bool()
-""""""""""""""""""""""""
 
++---------------------+
+| ``as_func``         |
++---------------------+
 
-cmd_runner_fmt.as_func()
-""""""""""""""""""""""""
 
 
 
