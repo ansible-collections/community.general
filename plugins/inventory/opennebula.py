@@ -143,7 +143,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             nic = [nic]
 
         for net in nic:
-            return net['IP']
+            if net.get('IP'):
+                return net['IP']
 
         return False
 
