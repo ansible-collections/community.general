@@ -149,7 +149,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         try:
             return any(tmpl['volid'] == volid for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get())
         except Exception as e:
-            self.module.fail_json(msg="Failed to retrieve template '%s:%s/%s': %s" % (storage, content_type, template, e))
+            self.module.fail_json(msg="Failed to retrieve template '%s': %s" % (volid, e))
 
     def task_status(self, node, taskid, timeout):
         """
