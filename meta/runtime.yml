@@ -6,6 +6,8 @@
 requires_ansible: '>=2.13.0'
 action_groups:
   consul:
+    - consul_agent_check
+    - consul_agent_service
     - consul_auth_method
     - consul_binding_rule
     - consul_policy
