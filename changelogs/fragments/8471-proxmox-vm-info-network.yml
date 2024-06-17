@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox_vm_info - add ``network`` option to retrieve current network information (https://github.com/ansible-collections/community.general/pull/8471).
