@@ -174,6 +174,7 @@ options:
       - Allow to force stop VM.
       - Can be used with states V(stopped), V(restarted), and V(absent).
       - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
+      - Requires parameter O(archive).
     type: bool
   format:
     description:

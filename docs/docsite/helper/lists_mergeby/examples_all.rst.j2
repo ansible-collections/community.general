@@ -4,10 +4,10 @@
   SPDX-License-Identifier: GPL-3.0-or-later
 
 {% for i in examples %}
-{{ i.label }}
+{{ i.description }}
 
 .. code-block:: {{ i.lang }}
 
-  {{ lookup('file', i.file)|indent(2) }}
+  {{ lookup('file', i.file) | split('\n') | reject('match', '^(#|---)') | join ('\n') | indent(2) }}
 
 {% endfor %}
