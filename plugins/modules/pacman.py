@@ -367,8 +367,9 @@ class Pacman(object):
                 self.install_packages(pkgs)
                 self.success()
 
-        # This shouldn't happen...
-        self.fail("This is a bug")
+        # This happens if an empty list has been provided for name
+        self.add_exit_infos(msg='Nothing to do')
+        self.success()
 
     def install_packages(self, pkgs):
         pkgs_to_install = []
