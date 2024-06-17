@@ -1,0 +1,40 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Create docs REST files
+# shell> ansible-playbook playbook.yml
+#
+# Proofread and copy created *.rst file into the directory
+# docs/docsite/rst. Do not add *.rst in this directory to the version
+# control.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# community.general/docs/docsite/helper/replace_keys/playbook.yml
+
+- name: Create RST file for docs/docsite/rst
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+
+    docs_path:
+      - filter_guide
+      - abstract_informations
+      - lists_of_dictionaries
+      - replace_keys
+    file_base: "{{ docs_path | join('-') }}"
+    target: ../../../../tests/integration/targets/filter_replace_keys
+
+  tasks:
+
+    - name: Include target vars
+      include_vars:
+        file: "{{ target }}/vars/main/tests.yml"
+
+    - name: Create RST file
+      ansible.builtin.template:
+        src: "{{ file_base }}.rst.j2"
+        dest: "{{ file_base }}.rst"
