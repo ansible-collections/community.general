@@ -175,9 +175,45 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             raise AnsibleError("Something happened during XML-RPC call: {e}".format(e=to_native(e)))
 
         return vm_pool
+    
+    def _get_host_pool_info(self):
+        auth = self._get_connection_info()
+
+        if not (auth.username and auth.password):
+            raise AnsibleError('API Credentials missing. Check OpenNebula inventory file.')
+        else:
+            one_client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
+
+        # get hosts (underlying hardware hosts)
+        try:
+            host_pool_info = one_client.hostpool.info()
+        except Exception as e:
+            raise AnsibleError("Something happened during XML-RPC call: {e}".format(e=to_native(e)))
+
+        return host_pool_info
+
+    def _get_vm_to_host_map(self, host_pool_info):
+        vm_to_host_map = {}
+        
+        # Iterate over the hosts
+        for host in host_pool_info.HOST:
+            host_name = host.NAME
+            
+            # Some hosts might not have VMs, so we need to check for VMS attribute
+            if hasattr(host, 'VMS') and hasattr(host.VMS, 'ID'):
+                # VMS.ID could be a single ID or a list of IDs
+                if isinstance(host.VMS.ID, list):
+                    for vm_id in host.VMS.ID:
+                        vm_to_host_map[vm_id] = host_name
+                else:
+                    vm_to_host_map[host.VMS.ID] = host_name
+        
+        return vm_to_host_map
 
     def _retrieve_servers(self, label_filter=None):
         vm_pool = self._get_vm_pool()
+        host_pool_info = self._get_host_pool_info()
+        vm_to_host_map = self._get_vm_to_host_map(host_pool_info)
 
         result = []
 
@@ -199,6 +235,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     continue
 
             server['name'] = vm.NAME
+            server['id'] = vm.ID
+            server['host'] = vm_to_host_map.get(vm.ID, "VM ID not found")
             server['LABELS'] = labels
             server['v4_first_ip'] = self._get_vm_ipv4(vm)
             server['v6_first_ip'] = self._get_vm_ipv6(vm)
