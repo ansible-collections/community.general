@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_client - assign auth flow by name (https://github.com/ansible-collections/community.general/pull/8428).
