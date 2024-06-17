@@ -16,14 +16,14 @@ Let us use the below list in the following examples:
 .. code-block:: yaml
 
    input:
-   - k0_x0: A0
-     k1_x1: B0
-     k2_x2: [C0]
-     k3_x3: foo
-   - k0_x0: A1
-     k1_x1: B1
-     k2_x2: [C1]
-     k3_x3: bar
+     - k0_x0: A0
+       k1_x1: B0
+       k2_x2: [C0]
+       k3_x3: foo
+     - k0_x0: A1
+       k1_x1: B1
+       k2_x2: [C1]
+       k3_x3: bar
 
 
 * By default, match keys that equal any of the items in the target.
@@ -41,8 +41,8 @@ gives
    :emphasize-lines: 1-
 
    result:
-   - {k0_x0: A0, k1_x1: B0}
-   - {k0_x0: A1, k1_x1: B1}
+     - {k0_x0: A0, k1_x1: B0}
+     - {k0_x0: A1, k1_x1: B1}
 
  
 .. versionadded:: 9.1.0
@@ -53,8 +53,8 @@ gives
    :emphasize-lines: 1-
 
    result:
-   - {k0_x0: A0, k1_x1: B0}
-   - {k0_x0: A1, k1_x1: B1}
+     - {k0_x0: A0, k1_x1: B0}
+     - {k0_x0: A1, k1_x1: B1}
 
 
 1. Match keys that equal any of the items in the target.
@@ -109,8 +109,8 @@ gives
    :emphasize-lines: 1-
 
    result:
-   - {k0_x0: A0}
-   - {k0_x0: A1}
+     - {k0_x0: A0}
+     - {k0_x0: A1}
 
 
 6. Match keys that equal the target.
