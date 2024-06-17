@@ -25,7 +25,7 @@ DOCUMENTATION = r'''
             description: Token that ensures this is a source file for the 'opennebula' plugin.
             type: string
             required: true
-            choices: [ community.general.opennebula  ]
+            choices: [ community.general.opennebula ]
         api_url:
             description:
               - URL of the OpenNebula RPC server.
@@ -82,7 +82,7 @@ EXAMPLES = r'''
 # Example command line: ansible-inventory --list -i inventory_opennebula.yml
 
 # Pass a label filter to the API
-plugin: community.general.opennebula 
+plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
 '''
@@ -262,7 +262,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         for server in servers:
             server = make_unsafe(server)
             hostname = server['name']
-            
+
             # check for labels
             if group_by_labels and server['LABELS']:
                 for label in server['LABELS']:
