@@ -14,6 +14,7 @@ DOCUMENTATION = '''
         - Get inventory hosts from the local virtualbox installation.
         - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
         - The inventory_hostname is always the 'Name' of the virtualbox instance.
+        - Groups can be assigned to the VMs using `VBoxManage modifyvm "vmid" -- groups "/TestGroup"`. Multiple groups can be assigned by using `/` as a delimeter. A separate parameter, `enable_advanced_group_parsing` is exposed to change this behaviour. See the parameter documentation for details.
     extends_documentation_fragment:
       - constructed
       - inventory_cache
@@ -35,6 +36,15 @@ DOCUMENTATION = '''
             description: create vars from virtualbox properties
             type: dictionary
             default: {}
+        enable_advanced_group_parsing:
+            description: >
+                The default group parsing rule (when this setting is set to `false`) is to split the VirtualBox VM's group based on the `/` character and assign the resulting list elements as an Ansible Group.
+                Setting `enable_advanced_group_parsing` to `true` changes this behaviour to match VirtualBox's interpretation of groups according to: https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
+                Groups are now split using the `,` character, and the `/` character indicates nested groups.
+                So, for a VM that's been configured using `VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3"`:
+                - TestGroup2 is a child group of TestGroup
+                - The VM will be part of TestGroup2 and TestGroup3.
+            default: false
 '''
 
 EXAMPLES = '''
@@ -177,7 +187,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             # found groups
             elif k == 'Groups':
-                self._handle_vboxmanage_group_string(v, current_host, cacheable_results)
+                if self.get_option('enable_advanced_group_parsing'):
+                    self._handle_vboxmanage_group_string(v, current_host, cacheable_results)
+                else:
+                    self._handle_group_string(v, current_host, cacheable_results)
                 continue
 
             else:
@@ -220,9 +233,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         return all(find_host(host, inventory))
 
+    def _handle_group_string(self, vboxmanage_group, current_host, cacheable_results):
+        '''Handles parsing the VM's Group assignment from VBoxManage according to this inventory's initial implementation.'''
+        # The original implementation of this inventory plugin treated `/` as
+        # a delimeter to split and use as Ansible Groups.
+        for group in vboxmanage_group.split('/'):
+            if group:
+                group = make_unsafe(group)
+                group = self.inventory.add_group(group)
+                self.inventory.add_child(group, current_host)
+                if group not in cacheable_results:
+                    cacheable_results[group] = {'hosts': []}
+                cacheable_results[group]['hosts'].append(current_host)
+
     def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
-        '''Handles parsing the VM's Group assignment from VBoxManage'''
-        # Per the VirtualBox documentation, a VM can be part of many groups, 
+        '''Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation.'''
+        # Per the VirtualBox documentation, a VM can be part of many groups,
         # and it's possible to have nested groups.
         # Many groups are separated by commas ",", and nested groups use
         # slash "/".
@@ -241,7 +267,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # assigned to a particular group. Consider the host to be
                 # unassigned to a group.
                 continue
-            
+
             parent_group = "all"
             for subgroup in group.split('/'):
                 if not subgroup:
