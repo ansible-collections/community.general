@@ -1,0 +1,2 @@
+bugfixes:
+  - "paman - do not fail if an empty list of packages has been provided and there is nothing to do (https://github.com/ansible-collections/community.general/pull/8514)."
