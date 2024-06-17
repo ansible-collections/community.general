@@ -1,0 +1,2 @@
+bugfixes:
+  - launched - correctly report changed status in check mode (https://github.com/ansible-collections/community.general/pull/8406).

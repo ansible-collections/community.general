@@ -514,7 +514,8 @@ def main():
             result['status']['current_pid'] != result['status']['previous_pid']):
         result['changed'] = True
     if module.check_mode:
-        result['changed'] = True
+        if result['status']['current_state'] != action:
+            result['changed'] = True
     module.exit_json(**result)
 
 
