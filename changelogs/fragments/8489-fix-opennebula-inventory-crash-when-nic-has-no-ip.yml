@@ -1,2 +1,3 @@
 bugfixes:
   - opennebula inventory plugin - fix invalid reference to IP when inventory runs against NICs with no IPv4 address (https://github.com/ansible-collections/community.general/pull/8489).
+  
