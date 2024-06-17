@@ -34,9 +34,6 @@
       include_vars:
         file: "{{ target }}/vars/main/tests.yml"
 
-    - debug:
-        var: tests
-
     - name: Create RST file
       ansible.builtin.template:
         src: "{{ file_base }}.rst.j2"
