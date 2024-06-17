@@ -175,7 +175,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             raise AnsibleError("Something happened during XML-RPC call: {e}".format(e=to_native(e)))
 
         return vm_pool
-    
+
     def _get_host_pool_info(self):
         auth = self._get_connection_info()
 
@@ -194,11 +194,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def _get_vm_to_host_map(self, host_pool_info):
         vm_to_host_map = {}
-        
+
         # Iterate over the hosts
         for host in host_pool_info.HOST:
             host_name = host.NAME
-            
+
             # Some hosts might not have VMs, so we need to check for VMS attribute
             if hasattr(host, 'VMS') and hasattr(host.VMS, 'ID'):
                 # VMS.ID could be a single ID or a list of IDs
@@ -207,7 +207,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                         vm_to_host_map[vm_id] = host_name
                 else:
                     vm_to_host_map[host.VMS.ID] = host_name
-        
+
         return vm_to_host_map
 
     def _retrieve_servers(self, label_filter=None):
