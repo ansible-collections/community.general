@@ -14,49 +14,64 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import Request
 
-def create_ticket(host, username, password, body, severity, subject):
+class ZENDESK_API:
+    def __init__(self, username, password, token, host):
+        self.username = username
+        self.password = password
+        self.token = token
+        self.host = host
 
-    changed = False
-    url = f'{host}/api/v2/tickets'
-    payload = {
-        "ticket": {
-            "comment": {
-                "body": body
-            },
-            "priority": severity,
-            "subject": subject
+    def create_ticket(self, body, priority, subject):
+        changed = False
+        url = f'{self.host}/api/v2/tickets'
+        payload = {
+            "ticket": {
+                "comment": {
+                    "body": body
+                },
+                "priority": priority,
+                "subject": subject
+            }
         }
-    }
-    headers = {
-        "Content-Type": "application/json",
-    }
+        headers = {
+            "Content-Type": "application/json"
+        }
 
-    try:
-        request = Request(url_username=username, url_password=password, headers=headers)
-        response = request.post(url, data=json.dumps(payload))
-        if response.getcode() == 201:
-            changed = True
+        if self.token:
+            request = Request(url_username=f"{self.username}/token", url_password=self.token, headers=headers)
+        else:
+            request = Request(url_username=self.username, url_password=self.password, headers=headers)
+
+        try:
+            response = request.post(url, data=json.dumps(payload))
+            if response.getcode() == 201:
+                changed = True
+                return {
+                    'changed': changed,
+                    'response': json.load(response),
+                }
+        except Exception as e:
             return {
                 'changed': changed,
-                'response': json.load(response),
+                'msg': to_native(e)
             }
-    except Exception as e:
-        return {
-            'changed': changed,
-            'msg': to_native(e)
-        }
+    
+    def close_ticket(self, ticket_id, status):
 
+        return
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             host=dict(type='str', required=True),
             username=dict(type='str', required=True, aliases=['user']),
-            password=dict(type='str', required=True, aliases=['pass'], no_log=True),
-            state=dict(type='str', required=True,
-                       choices=['present', 'absent', 'update']),
+            password=dict(type='str', required=False, aliases=['pass'], no_log=True),
+            status=dict(type='str', required=True,
+                       choices=['new', 'closed', 'solved']),
             body=dict(type='str', required=False, default=''),
-            severity=dict(type='str', required=False, default=''),
-            subject=dict(type='str', required=True)
+            priority=dict(type='str', required=False, choices=['urgent', 'high', 'normal', 'low']),
+            subject=dict(type='str', required=False),
+            token=dict(type='str', required=False, no_log=False),
+            ticket_id=dict(type='int')
         ),
         supports_check_mode=False
     )
@@ -64,14 +79,27 @@ def main():
     host = module.params['host']
     username = module.params['username']
     password = module.params['password']
-    state = module.params['state']
+    status = module.params['status']
     body = module.params['body']
-    severity = module.params['severity']
+    priority = module.params['priority']
     subject = module.params['subject']
+    token = module.params['token']
+    ticket_id = module.params['ticket_id']
 
-    if state == 'present':
-        result = create_ticket(host, username, password, body, severity, subject)
+    if not password and not token:
+        module.fail_json(msg="Either 'password' or 'token' must be provided.")
+    
+    zendesk_api = ZENDESK_API(username, password, token, host)
 
+    if status == 'new':
+        if not subject or not priority:
+            module.fail_json(msg="Both 'subject' and 'priority' must be provided when creating a new ticket.")
+        result = zendesk_api.create_ticket(body, priority, subject)
+    elif status in ['closed', 'solved']:
+        if not ticket_id:
+            module.fail_json(msg="The 'ticket_id' must be provided when the status is 'closed'")
+        result = zendesk_api.close_ticket(ticket_id)
+        
     if 'msg' in result:
         module.fail_json(**result)
     else:
