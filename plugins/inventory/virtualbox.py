@@ -14,7 +14,8 @@ DOCUMENTATION = '''
         - Get inventory hosts from the local virtualbox installation.
         - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
         - The inventory_hostname is always the 'Name' of the virtualbox instance.
-        - Groups can be assigned to the VMs using `VBoxManage modifyvm "vmid" -- groups "/TestGroup"`. Multiple groups can be assigned by using `/` as a delimeter. A separate parameter, `enable_advanced_group_parsing` is exposed to change this behaviour. See the parameter documentation for details.
+        - Groups can be assigned to the VMs using `VBoxManage`. Multiple groups can be assigned by using `/` as a delimeter.
+        - A separate parameter, `enable_advanced_group_parsing` is exposed to change grouping behaviour. See the parameter documentation for details.
     extends_documentation_fragment:
       - constructed
       - inventory_cache
@@ -38,8 +39,10 @@ DOCUMENTATION = '''
             default: {}
         enable_advanced_group_parsing:
             description: >
-                The default group parsing rule (when this setting is set to `false`) is to split the VirtualBox VM's group based on the `/` character and assign the resulting list elements as an Ansible Group.
-                Setting `enable_advanced_group_parsing` to `true` changes this behaviour to match VirtualBox's interpretation of groups according to: https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
+                The default group parsing rule (when this setting is set to `false`) is to split the VirtualBox VM's group based on the `/` character and
+                assign the resulting list elements as an Ansible Group.
+                Setting `enable_advanced_group_parsing` to `true` changes this behaviour to match VirtualBox's interpretation of groups according to:
+                https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
                 Groups are now split using the `,` character, and the `/` character indicates nested groups.
                 So, for a VM that's been configured using `VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3"`:
                 - TestGroup2 is a child group of TestGroup
