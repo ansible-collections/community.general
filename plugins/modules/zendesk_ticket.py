@@ -6,8 +6,87 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-
 __metaclass__ = type
+
+DOCUMENTATION = '''
+---
+module: zendesk_ticket
+short_description: Manages tickets in Zendesk
+description:
+  - This module allows you to create and delete tickets in Zendesk.
+version_added: "1.0"
+author: Luis Valle (@elchico2007)
+notes:
+  - Authentication is handled by the ZENDESK_API class.
+options:
+  username:
+    type: str
+    description:
+      - The Zendesk account username.
+    required: true
+    aliases: [user]
+  password:
+    type: str
+    description:
+      - The Zendesk account password.
+    required: false
+    aliases: [pass]
+    no_log: true
+  token:
+    type: str
+    description:
+      - The API token for authentication.
+    required: false
+    no_log: false
+  host:
+    type: str
+    description:
+      - The URL of the Zendesk instance.
+    required: true
+  body:
+    type: str
+    description:
+      - The body of the ticket.
+    required: true
+  priority:
+    type: str
+    description:
+      - The priority of the ticket. Needs to be one of the following: urgent, high, normal, low.
+    default: normal
+  status:
+    type: str
+    description:
+      - The status of the ticket. Needs to be one of the following: new, closed, resolved.
+    required: true
+    default: new
+  ticket_id:
+    type: int
+    description:
+      - The ID of the ticket to be closed or resolved.
+    required: false
+  subject:
+    type: str
+    description:
+      - The subject of the ticket.
+    required: true
+examples:
+  - name: Create a new ticket
+    zendesk_ticket:
+      username: 'your_username'
+      token: 'your_api_aut'
+      host: 'https://yourcompany.zendesk.com'
+      body: 'This is a sample ticket'
+      priority: 'normal'
+      subject: 'New Ticket'
+      status: 'new'
+  - name: Close a ticket
+    zendesk_ticket:
+      username: 'your_username'
+      token: 'your_api_aut'
+      host: 'https://yourcompany.zendesk.com'
+      ticket_id: 12345
+      status: 'closed'
+'''
 
 import json
 from ansible.module_utils.basic import AnsibleModule
@@ -15,7 +94,26 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import Request
 
 class ZENDESK_API:
+    """
+    Handles interactions with the Zendesk API for ticket management.
+
+    Attributes:
+        username (str): Zendesk account username.
+        password (str): Zendesk account password (optional if token is used).
+        token (str): API token for authentication (optional if password is used).
+        host (str): URL of the Zendesk instance.
+        headers (dict): Default headers for API requests.
+    """
     def __init__(self, username, password, token, host):
+        """
+        Initializes the ZENDESK_API object with authentication credentials.
+
+        Args:
+            username (str): Zendesk account username.
+            password (str): Zendesk account password.
+            token (str): API token for authentication.
+            host (str): URL of the Zendesk instance.
+        """
         self.username = username
         self.password = password
         self.token = token
@@ -24,7 +122,13 @@ class ZENDESK_API:
             "Content-Type": "application/json",
         }
     
-    def api_token(self):
+    def api_aut(self):
+        """
+        Configures and returns a Request object with authentication headers.
+
+        Returns:
+            Request: Configured Request object for API calls.
+        """
         if self.token:
             request = Request(url_username=f"{self.username}/token", url_password=self.token, headers=self.headers)
         else:
@@ -32,6 +136,17 @@ class ZENDESK_API:
         return request
 
     def create_ticket(self, body, priority, subject):
+        """
+        Creates a new ticket in Zendesk.
+
+        Args:
+            body (str): The text body of the ticket.
+            priority (str): The priority of the ticket (e.g., 'urgent', 'high', 'normal', 'low').
+            subject (str): The subject of the ticket.
+
+        Returns:
+            dict: A dictionary containing the result of the ticket creation operation.
+        """
         changed = False
         url = f'{self.host}/api/v2/tickets'
         payload = {
@@ -44,7 +159,7 @@ class ZENDESK_API:
             }
         }
 
-        request = self.api_token()
+        request = self.api_aut()
 
         try:
             response = request.post(url, data=json.dumps(payload))
@@ -61,6 +176,17 @@ class ZENDESK_API:
             }
     
     def close_ticket(self, ticket_id, status, body):
+        """
+        Closes or resolves a ticket in Zendesk.
+
+        Args:
+            ticket_id (int): The ID of the ticket to be closed or resolved.
+            status (str): The new status for the ticket ('closed' or 'resolved').
+            body (str): An optional comment to add to the ticket.
+
+        Returns:
+            dict: A dictionary containing the result of the ticket update operation.
+        """
         url = f'{self.host}/api/v2/tickets/{ticket_id}'
         payload = {
             "ticket": {
@@ -71,7 +197,7 @@ class ZENDESK_API:
             }
         }
 
-        request = self.api_token()
+        request = self.api_aut()
 
         try:
             response = request.patch(url, data=json.dumps(payload))
@@ -92,7 +218,7 @@ def main():
             username=dict(type='str', required=True, aliases=['user']),
             password=dict(type='str', required=False, aliases=['pass'], no_log=True),
             status=dict(type='str', required=True,
-                       choices=['new', 'closed', 'resolved']),
+                       choices=['new', 'closed', 'resolved'], default='new'),
             body=dict(type='str', required=False, default=''),
             priority=dict(type='str', required=False, choices=['urgent', 'high', 'normal', 'low']),
             subject=dict(type='str', required=False),
