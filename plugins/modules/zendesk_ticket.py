@@ -60,11 +60,14 @@ class ZENDESK_API:
                 'msg': to_native(e)
             }
     
-    def close_ticket(self, ticket_id, status):
+    def close_ticket(self, ticket_id, status, body):
         url = f'{self.host}/api/v2/tickets/{ticket_id}'
         payload = {
             "ticket": {
-                "status": status
+                "status": status,
+                "comment": {
+                    "body": body
+                }
             }
         }
 
@@ -121,7 +124,7 @@ def main():
     elif status in ['closed', 'resolved']:
         if not ticket_id:
             module.fail_json(msg="The 'ticket_id' must be provided when the status is 'closed'")
-        result = zendesk_api.close_ticket(ticket_id, status)
+        result = zendesk_api.close_ticket(ticket_id, status, body)
         
     if 'msg' in result:
         module.fail_json(**result)
