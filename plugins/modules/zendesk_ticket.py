@@ -20,6 +20,16 @@ class ZENDESK_API:
         self.password = password
         self.token = token
         self.host = host
+        self.headers = {
+            "Content-Type": "application/json",
+        }
+    
+    def api_token(self):
+        if self.token:
+            request = Request(url_username=f"{self.username}/token", url_password=self.token, headers=self.headers)
+        else:
+            request = Request(url_username=self.username, url_password=self.password, headers=self.headers)
+        return request
 
     def create_ticket(self, body, priority, subject):
         changed = False
@@ -33,14 +43,8 @@ class ZENDESK_API:
                 "subject": subject
             }
         }
-        headers = {
-            "Content-Type": "application/json"
-        }
 
-        if self.token:
-            request = Request(url_username=f"{self.username}/token", url_password=self.token, headers=headers)
-        else:
-            request = Request(url_username=self.username, url_password=self.password, headers=headers)
+        request = self.api_token()
 
         try:
             response = request.post(url, data=json.dumps(payload))
@@ -57,8 +61,27 @@ class ZENDESK_API:
             }
     
     def close_ticket(self, ticket_id, status):
+        url = f'{self.host}/api/v2/tickets/{ticket_id}'
+        payload = {
+            "ticket": {
+                "status": status
+            }
+        }
 
-        return
+        request = self.api_token()
+
+        try:
+            response = request.patch(url, data=json.dumps(payload))
+            if response.getcode() in [200, 204]:
+                return {
+                    'changed': True,
+                    'response': json.load(response),
+                }
+        except Exception as e:
+            return {
+                'changed': False,
+                'msg': to_native(e)
+            }
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -66,7 +89,7 @@ def main():
             username=dict(type='str', required=True, aliases=['user']),
             password=dict(type='str', required=False, aliases=['pass'], no_log=True),
             status=dict(type='str', required=True,
-                       choices=['new', 'closed', 'solved']),
+                       choices=['new', 'closed', 'resolved']),
             body=dict(type='str', required=False, default=''),
             priority=dict(type='str', required=False, choices=['urgent', 'high', 'normal', 'low']),
             subject=dict(type='str', required=False),
