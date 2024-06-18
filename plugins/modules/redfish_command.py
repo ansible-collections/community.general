@@ -312,6 +312,7 @@ options:
       - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
     type: list
     elements: str
+    version_added: 9.2.0
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
