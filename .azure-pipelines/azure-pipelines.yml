@@ -172,12 +172,15 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: Alpine 3.19
-              test: alpine/3.19
-            # - name: Fedora 39
-            #   test: fedora/39
-            - name: Ubuntu 22.04
-              test: ubuntu/22.04
+            - name: Alpine 3.20
+              test: alpine/3.20
+            # - name: Fedora 40
+            #   test: fedora/40
+            # TODO:
+            #- name: Ubuntu 22.04
+            #  test: ubuntu/22.04
+            # - name: Ubuntu 24.04
+            #   test: ubuntu/24.04
           groups:
             - vm
   - stage: Remote_devel
@@ -190,8 +193,9 @@ stages:
           targets:
             - name: macOS 14.3
               test: macos/14.3
-            - name: RHEL 9.3
-              test: rhel/9.3
+            # TODO:
+            #- name: RHEL 9.4
+            #  test: rhel/9.4
             - name: FreeBSD 14.0
               test: freebsd/14.0
           groups:
@@ -208,6 +212,8 @@ stages:
           targets:
             - name: FreeBSD 13.3
               test: freebsd/13.3
+            - name: RHEL 9.3
+              test: rhel/9.3
           groups:
             - 1
             - 2
@@ -264,12 +270,15 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: Fedora 39
-              test: fedora39
-            - name: Ubuntu 20.04
-              test: ubuntu2004
+            - name: Fedora 40
+              test: fedora40
+            - name: Alpine 3.20
+              test: alpine320
             - name: Ubuntu 22.04
               test: ubuntu2204
+            # TODO:
+            #- name: Ubuntu 24.04
+            #  test: ubuntu2404
           groups:
             - 1
             - 2
@@ -282,8 +291,12 @@ stages:
         parameters:
           testFormat: 2.17/linux/{0}
           targets:
+            - name: Fedora 39
+              test: fedora39
             - name: Alpine 3.19
               test: alpine319
+            - name: Ubuntu 20.04
+              test: ubuntu2004
           groups:
             - 1
             - 2
