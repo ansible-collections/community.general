@@ -14,10 +14,14 @@ module: zendesk_ticket
 short_description: Manages tickets in Zendesk
 description:
   - This module allows you to create and delete tickets in Zendesk.
-version_added: "1.0"
-author: Luis Valle (@elchico2007)
+author: "Luis Valle (@elchico2007)"
 notes:
   - Authentication is handled by the ZENDESK_API class.
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
 options:
   username:
     type: str
@@ -31,13 +35,11 @@ options:
       - The Zendesk account password.
     required: false
     aliases: [pass]
-    no_log: true
   token:
     type: str
     description:
       - The API token for authentication.
     required: false
-    no_log: false
   host:
     type: str
     description:
@@ -47,18 +49,17 @@ options:
     type: str
     description:
       - The body of the ticket.
-    required: true
+    default: ''
   priority:
     type: str
-    description:
-      - The priority of the ticket. Needs to be one of the following: urgent, high, normal, low.
+    description: The priority of the ticket.
+    choices: ['urgent', 'high', 'normal', 'low']
     default: normal
   status:
     type: str
-    description:
-      - The status of the ticket. Needs to be one of the following: new, closed, resolved.
+    description: The status of the ticket.
     required: true
-    default: new
+    choices: ['new', 'closed', 'resolved']
   ticket_id:
     type: int
     description:
@@ -68,24 +69,31 @@ options:
     type: str
     description:
       - The subject of the ticket.
-    required: true
 examples:
   - name: Create a new ticket
-    zendesk_ticket:
+    community.general.zendesk_ticket:
       username: 'your_username'
-      token: 'your_api_aut'
+      token: 'your_api_token'
       host: 'https://yourcompany.zendesk.com'
       body: 'This is a sample ticket'
       priority: 'normal'
       subject: 'New Ticket'
       status: 'new'
   - name: Close a ticket
-    zendesk_ticket:
+    community.general.zendesk_ticket:
       username: 'your_username'
-      token: 'your_api_aut'
+      token: 'your_api_token'
       host: 'https://yourcompany.zendesk.com'
       ticket_id: 12345
       status: 'closed'
+  - name: Resolve a ticket with a message
+    community.general.zendesk_ticket:
+      username: 'your_username'
+      token: 'your_api_token'
+      host: 'https://yourcompany.zendesk.com'
+      ticket_id: 54321
+      status: 'resolved'
+      body: 'Issue has been resolved after updating the system.'
 '''
 
 import json
@@ -211,18 +219,19 @@ class ZENDESK_API:
                 'changed': False,
                 'msg': to_native(e)
             }
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             host=dict(type='str', required=True),
             username=dict(type='str', required=True, aliases=['user']),
-            password=dict(type='str', required=False, aliases=['pass'], no_log=True),
-            status=dict(type='str', required=True,
-                       choices=['new', 'closed', 'resolved'], default='new'),
-            body=dict(type='str', required=False, default=''),
-            priority=dict(type='str', required=False, choices=['urgent', 'high', 'normal', 'low']),
-            subject=dict(type='str', required=False),
-            token=dict(type='str', required=False, no_log=False),
+            password=dict(type='str', required=False, aliases=['pass']),
+            status=dict(type='str', required=True, choices=['new', 'closed', 'resolved']),
+            body=dict(type='str', default=''),
+            priority=dict(type='str', choices=['urgent', 'high', 'normal', 'low'], default='normal'),
+            subject=dict(type='str'),
+            token=dict(type='str', required=False),
             ticket_id=dict(type='int')
         ),
         supports_check_mode=False
