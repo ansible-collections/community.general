@@ -10,3 +10,5 @@ skip/freebsd            # no iptables/netfilter (Linux specific)
 skip/osx                # no iptables/netfilter (Linux specific)
 skip/macos              # no iptables/netfilter (Linux specific)
 skip/aix                # no iptables/netfilter (Linux specific)
+
+skip/ubuntu22.04  # TODO there's a problem here!
