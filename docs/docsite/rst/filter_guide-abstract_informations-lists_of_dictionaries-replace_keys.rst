@@ -35,7 +35,7 @@ Let us use the below list in the following examples:
      - {after: a0, before: k0_x0}
      - {after: a1, before: k1_x1}
 
-   result: {{ input | community.general.replace_keys(target=target) }}
+   result: "{{ input | community.general.replace_keys(target=target) }}"
 
 
 gives
@@ -82,7 +82,7 @@ gives
      - {after: a0, before: k0}
      - {after: a1, before: k1}
 
-   result: {{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
 
 2. Replace keys that ends with any of the attributes before.
 
@@ -94,7 +94,7 @@ gives
      - {after: a0, before: x0}
      - {after: a1, before: x1}
 
-   result: {{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
 
 3. Replace keys that match any regex of the attributes before.
 
@@ -106,7 +106,7 @@ gives
      - {after: a0, before: ^.*0_x.*$}
      - {after: a1, before: ^.*1_x.*$}
 
-   result: {{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
 
 
 * The results of the below examples 4-5 are the same:
@@ -128,7 +128,7 @@ gives
    target:
      - {after: X, before: ^.*_x.*$}
 
-   result: {{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
 
 5. If there are items with equal attribute before the first one will be used.
 
@@ -140,7 +140,7 @@ gives
      - {after: X, before: ^.*_x.*$}
      - {after: Y, before: ^.*_x.*$}
 
-   result: {{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
 
 
 6. If there are more matches for a key the first one will be used.
@@ -161,7 +161,7 @@ gives
      - {after: X, before: a}
      - {after: Y, before: aa}
 
-   result: {{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.replace_keys(target=target, matching_parameter=mp) }}"
 
 gives
 

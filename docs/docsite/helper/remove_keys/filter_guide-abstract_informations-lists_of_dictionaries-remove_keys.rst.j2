@@ -29,7 +29,7 @@ Let us use the below list in the following examples:
    :emphasize-lines: 1
 
    target: {{ i.1.tt }}
-   result: {{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}"
 
 {% endfor %}
 
@@ -63,7 +63,7 @@ gives
 
    mp: {{ i.1.mp }}
    target: {{ i.1.tt }}
-   result: {{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}"
 
 {% endfor %}
 
@@ -87,6 +87,6 @@ gives
 
    mp: {{ i.1.mp }}
    target: {{ i.1.tt }}
-   result: {{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}"
 
 {% endfor %}

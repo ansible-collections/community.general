@@ -32,7 +32,7 @@ Let us use the below list in the following examples:
    :emphasize-lines: 1
 
    target: ['k0_x0', 'k1_x1']
-   result: {{ input | community.general.remove_keys(target=target) }}
+   result: "{{ input | community.general.remove_keys(target=target) }}"
 
 
 gives
@@ -68,7 +68,7 @@ gives
 
    mp: equal
    target: ['k0_x0', 'k1_x1']
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 2. Match keys that start with any of the items in the target.
 
@@ -77,7 +77,7 @@ gives
 
    mp: starts_with
    target: ['k0', 'k1']
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 3. Match keys that end with any of the items in target.
 
@@ -86,7 +86,7 @@ gives
 
    mp: ends_with
    target: ['x0', 'x1']
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 4. Match keys by the regex.
 
@@ -95,7 +95,7 @@ gives
 
    mp: regex
    target: ['^.*[01]_x.*$']
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 5. Match keys by the regex.
 
@@ -104,7 +104,7 @@ gives
 
    mp: regex
    target: ^.*[01]_x.*$
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 
 * The results of the below examples 6-9 are all the same:
@@ -128,7 +128,7 @@ gives
 
    mp: equal
    target: k0_x0
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 7. Match keys that start with the target.
 
@@ -137,7 +137,7 @@ gives
 
    mp: starts_with
    target: k0
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 8. Match keys that end with the target.
 
@@ -146,7 +146,7 @@ gives
 
    mp: ends_with
    target: x0
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
 9. Match keys by the regex.
 
@@ -155,5 +155,5 @@ gives
 
    mp: regex
    target: ^.*0_x.*$
-   result: {{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}
+   result: "{{ input | community.general.remove_keys(target=target, matching_parameter=mp) }}"
 
