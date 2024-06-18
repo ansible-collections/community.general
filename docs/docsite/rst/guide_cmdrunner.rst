@@ -134,26 +134,26 @@ Unless noted otherwise, for the sake of consistency in the reference below it is
 with two parameters: ``arg``, usually specified during the creation of the ``CmdRunner`` object, and ``value``, specified
 during the execution of the command.
 
-+---------------+--------------------------------------------------------------+
++---------------+-----------------------+--------------------------------------+
 | as_list()                                                                    |
-+===============+==============================================================+
++===============+=======================+======================================+
 | Description   | Does not accept ``arg``, returns ``value`` as-is.            |
-+---------------+--------------------------------------------------------------+
++---------------+-----------------------+--------------------------------------+
 | Creation      | ``as_list()``                                                |
 +---------------+-----------------------+--------------------------------------+
 | Value/Outcome | * ``["foo", "bar"]``  | * ``["foo", "bar"]``                 |
 |               | * ``"foobar"``        | * ``["foobar"]``                     |
 +---------------+-----------------------+--------------------------------------+
 
-+---------------+--------------------------------------------------------------+
++---------------+-----------------------+--------------------------------------+
 | as_bool()                                                                    |
-+===============+==============================================================+
++===============+=======================+======================================+
 | Description   | It receives two different parameters: ``args_true`` and      |
 |               | ``args_false``, which is optional. If ``value`` is           |
 |               | ``True``-ish, the format function will return ``args_true``  |
 |               | and, when ``args_false`` is passed, ``args_false`` will be   |
 |               | returned when ``value`` is ``False``-ish.                    |
-+---------------+--------------------------------------------------------------+
++---------------+-----------------------+--------------------------------------+
 | Creation      | ``as_bool("--force")``                                       |
 +---------------+-----------------------+--------------------------------------+
 | Value/Outcome | * ``True``            | * ``["--force"]``                    |
@@ -233,14 +233,24 @@ during the execution of the command.
 |               | an empty list, meaning they will be silently ignored.        |
 +---------------+--------------------------------------------------------------+
 
++---------------+----------------------------------------------------------------------------------+
+| as_func()                                                                                        |
++===============+==================================================================================+
+| Description   | In this case ``arg`` itself is a format function. It must                        |
+|               | abide by the rules described above.                                              |
++---------------+----------------------------------------------------------------------------------+
+| Creation      | ``as_func(lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)])``   |
++---------------+----------------------------------------------------------------------------------+
+| Note          | The outcome for that depends entirely on the function provided by the developer. |
++---------------+----------------------------------------------------------------------------------+
 
+Other features for argument formatting
+""""""""""""""""""""""""""""""""""""""
 
-+---------------------+
-| ``as_func``         |
-+---------------------+
-
-
-
+``cmd_runner_fmt`` provides 
+unpack args
+unpack kwargs
+stack
 
 
 Command Runner
@@ -255,10 +265,6 @@ Python Runner
 
 Other features
 ^^^^^^^^^^^^^^
-
-unpack args
-unpack kwargs
-stack
 
 Processing results
 ^^^^^^^^^^^^^^^^^^
