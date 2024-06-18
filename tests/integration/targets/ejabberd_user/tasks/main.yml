@@ -14,7 +14,7 @@
   # TODO: remove Ubuntu 24.04 (noble) from the list
   when: >
     ansible_distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora', 'Archlinux')
-    or (ansible_distribution == 'Ubuntu' and ansible_distribution_release not in ['noble'])
+    or (ansible_distribution == 'Ubuntu' and ansible_distribution_release in ['noble'])
 
 - name: Remove ejabberd
   ansible.builtin.package:
