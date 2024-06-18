@@ -118,10 +118,10 @@ def main():
         if not subject or not priority:
             module.fail_json(msg="Both 'subject' and 'priority' must be provided when creating a new ticket.")
         result = zendesk_api.create_ticket(body, priority, subject)
-    elif status in ['closed', 'solved']:
+    elif status in ['closed', 'resolved']:
         if not ticket_id:
             module.fail_json(msg="The 'ticket_id' must be provided when the status is 'closed'")
-        result = zendesk_api.close_ticket(ticket_id)
+        result = zendesk_api.close_ticket(ticket_id, status)
         
     if 'msg' in result:
         module.fail_json(**result)
