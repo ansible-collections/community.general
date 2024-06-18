@@ -1423,6 +1423,9 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
+  $modules/zendesk_ticket.py:
+    labels: zendesk
+    maintainers: elchico2007
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
