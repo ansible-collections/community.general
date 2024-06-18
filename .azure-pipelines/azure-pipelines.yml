@@ -176,11 +176,10 @@ stages:
               test: alpine/3.20
             # - name: Fedora 40
             #   test: fedora/40
-            # TODO:
-            #- name: Ubuntu 22.04
-            #  test: ubuntu/22.04
-            # - name: Ubuntu 24.04
-            #   test: ubuntu/24.04
+            - name: Ubuntu 22.04
+              test: ubuntu/22.04
+            - name: Ubuntu 24.04
+              test: ubuntu/24.04
           groups:
             - vm
   - stage: Remote_devel
@@ -193,9 +192,8 @@ stages:
           targets:
             - name: macOS 14.3
               test: macos/14.3
-            # TODO:
-            #- name: RHEL 9.4
-            #  test: rhel/9.4
+            - name: RHEL 9.4
+              test: rhel/9.4
             - name: FreeBSD 14.0
               test: freebsd/14.0
           groups:
@@ -276,9 +274,8 @@ stages:
               test: alpine320
             - name: Ubuntu 22.04
               test: ubuntu2204
-            # TODO:
-            #- name: Ubuntu 24.04
-            #  test: ubuntu2404
+            - name: Ubuntu 24.04
+              test: ubuntu2404
           groups:
             - 1
             - 2
