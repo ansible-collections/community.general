@@ -11,5 +11,4 @@ skip/osx                # no iptables/netfilter (Linux specific)
 skip/macos              # no iptables/netfilter (Linux specific)
 skip/aix                # no iptables/netfilter (Linux specific)
 
-skip/ubuntu22.04  # TODO there's a problem here!
 skip/rhel10.0     # TODO there's a problem here!
