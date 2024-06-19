@@ -204,14 +204,17 @@ class WdcRedfishUtils(RedfishUtils):
         # If not tarfile, then if the file has "MMG2" or "DPG2" at 2048th byte
         # then the bundle is for MM or DP G2
         if not tarfile.is_tarfile(bundle_temp_filename):
-            bundle_file = open(bundle_temp_filename, "rb")
-            bundle_file.seek(2048)
-            cookie1 = bundle_file.read(4)
+            cookie1 = None
+            with open(bundle_temp_filename, "rb") as bundle_file:
+                file_size = os.path.getsize(bundle_temp_filename)
+                if file_size >= 2052:
+                    bundle_file.seek(2048)
+                    cookie1 = bundle_file.read(4)
             # It is anticipated that DP firmware bundle will be having the value "DPG2"
             # for cookie1 in the header
-            if cookie1.decode("utf8") == "MMG2" or cookie1.decode("utf8") == "DPG2":
+            if cookie1 and cookie1.decode("utf8") == "MMG2" or cookie1.decode("utf8") == "DPG2":
                 file_name, ext = os.path.splitext(str(bundle_uri.rsplit('/', 1)[1]))
-                # G2 bundle file name: Ultrastar-Data102_3000_SEP_1010-032_2.1.12.fwdl
+                # G2 bundle file name: Ultrastar-Data102_3000_SEP_1010-032_2.1.12
                 parsedFileName = file_name.split('_')
                 if len(parsedFileName) == 5:
                     bundle_version = parsedFileName[4]
@@ -220,27 +223,27 @@ class WdcRedfishUtils(RedfishUtils):
                     gen = "G2"
 
             return bundle_version, is_multi_tenant, gen
-        else:
-            # Bundle is for MM or DP G1
-            tf = tarfile.open(bundle_temp_filename)
-            pattern_pkg = r"oobm-(.+)\.pkg"
-            pattern_bin = r"(.*\.bin)"
-            bundle_version = None
-            is_multi_tenant = None
-            for filename in tf.getnames():
-                match_pkg = re.match(pattern_pkg, filename)
-                if match_pkg is not None:
-                    bundle_version = match_pkg.group(1)
-                match_bin = re.match(pattern_bin, filename)
-                if match_bin is not None:
-                    bin_filename = match_bin.group(1)
-                    bin_file = tf.extractfile(bin_filename)
-                    bin_file.seek(11)
-                    byte_11 = bin_file.read(1)
-                    is_multi_tenant = byte_11 == b'\x80'
-                    gen = "G1"
 
-            return bundle_version, is_multi_tenant, gen
+        # Bundle is for MM or DP G1
+        tf = tarfile.open(bundle_temp_filename)
+        pattern_pkg = r"oobm-(.+)\.pkg"
+        pattern_bin = r"(.*\.bin)"
+        bundle_version = None
+        is_multi_tenant = None
+        for filename in tf.getnames():
+            match_pkg = re.match(pattern_pkg, filename)
+            if match_pkg is not None:
+                bundle_version = match_pkg.group(1)
+            match_bin = re.match(pattern_bin, filename)
+            if match_bin is not None:
+                bin_filename = match_bin.group(1)
+                bin_file = tf.extractfile(bin_filename)
+                bin_file.seek(11)
+                byte_11 = bin_file.read(1)
+                is_multi_tenant = byte_11 == b'\x80'
+                gen = "G1"
+
+        return bundle_version, is_multi_tenant, gen
 
     @staticmethod
     def uri_is_http(uri):
