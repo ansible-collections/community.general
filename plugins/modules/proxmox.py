@@ -693,7 +693,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             size=None,
             mountpoint=None,
             options=None,
-            **kwargs,
+            **kwargs
         ):
             if size is not None and isinstance(size, str):
                 size = size.strip("G")
