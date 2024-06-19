@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: zendesk_ticket
 short_description: Manages tickets in Zendesk
-description: 
+description:
   - This module allows you to create and delete tickets in Zendesk.
   - Authentication is handled by the ZENDESK_API class.
 author: "Luis Valle (@elchico2007)"
@@ -129,7 +129,7 @@ class ZENDESK_API:
             Request: Configured Request object for API calls.
         """
         if self.token:
-            request = Request(url_username=f'{self.username}/token', url_password=self.token, headers=self.headers)
+            request = Request(url_username='{}/token'.format(self.username), url_password=self.token, headers=self.headers)
         else:
             request = Request(url_username=self.username, url_password=self.password, headers=self.headers)
         return request
@@ -147,7 +147,7 @@ class ZENDESK_API:
             dict: A dictionary containing the result of the ticket creation operation.
         """
         changed = False
-        url = f'{self.host}/api/v2/tickets'
+        url = '{}/api/v2/tickets'.format(self.host)
         payload = {
             "ticket": {
                 "comment": {
@@ -186,7 +186,7 @@ class ZENDESK_API:
         Returns:
             dict: A dictionary containing the result of the ticket update operation.
         """
-        url = f'{self.host}/api/v2/tickets/{ticket_id}'
+        url = '{}/api/v2/tickets/{}'.format(self.host, ticket_id)
         payload = {
             "ticket": {
                 "status": status,
