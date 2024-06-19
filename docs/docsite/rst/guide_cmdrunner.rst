@@ -224,10 +224,10 @@ during the execution of the command.
 | Description   | Requires ``arg`` to be a dictionay from which it chooses the |
 |               | resulting command line argument.                             |
 +---------------+--------------------------------------------------------------+
-| Creation      | ``as_map(dict(a=1, b=2, c=3), default=0)``                   |
+| Creation      | ``as_map(dict(a=1, b=2, c=3), default=42)``                  |
 +---------------+-----------------------+--------------------------------------+
 | Value/Outcome | * ``"b"``             | * ``["2"]``                          |
-|               | * ``"yabadabadoo"``   | * ``["0"]``                          |
+|               | * ``"yabadabadoo"``   | * ``["42"]``                         |
 +---------------+-----------------------+--------------------------------------+
 | Note          | If ``default`` is not specified, invalid values will return  |
 |               | an empty list, meaning they will be silently ignored.        |
@@ -247,10 +247,63 @@ during the execution of the command.
 Other features for argument formatting
 """"""""""""""""""""""""""""""""""""""
 
-``cmd_runner_fmt`` provides 
-unpack args
-unpack kwargs
-stack
+Some additional features are available as decorators:
+
+- ``cmd_runner_fmt.unpack args()``
+
+  This decorator unpacks the incoming ``value`` as a list of elements.
+
+  For example, in P(community.general.puppet,module_utils), it is used as:
+
+  .. code-block:: python
+
+        @cmd_runner_fmt.unpack_args
+        def execute_func(execute, manifest):
+            if execute:
+                return ["--execute", execute]
+            else:
+                return [manifest]
+
+        runner = CmdRunner(
+            module,
+            command=_prepare_base_cmd(),
+            path_prefix=_PUPPET_PATH_PREFIX,
+            arg_formats=dict(
+                # ...
+                _execute=cmd_runner_fmt.as_func(execute_func),
+                # ...
+            ),
+        )
+
+  Then, in M(community.general.puppet) it is put to use with:
+
+  .. code-block:: python
+
+        with runner(args_order) as ctx:
+            rc, stdout, stderr = ctx.run(_execute=[p['execute'], p['manifest']])
+
+- ``cmd_runner_fmt.unpack_kwargs()``
+
+  Conversely, this decorator unpacks the incoming ``value`` as a ``dict``-like object.
+
+- ``cmd_runner_fmt.stack()``
+
+  This decorator will assume ``value`` is a sequence and will concatenate the output
+  of the wrapped function applied to each element of the sequence.
+
+  For example, in M(community.general.django_check), the database argument format
+  is defined as:
+
+  .. code-block:: python
+
+        arg_formats = dict(
+            database=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
+
+  When receiving a list ``["abc", "def"]``, the output will be:
+
+  .. code-block:: python
+
+        ["--database", "abc", "--database", "def"]
 
 
 Command Runner
