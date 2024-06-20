@@ -73,6 +73,17 @@ options:
       - Handle to check the status of an update in progress.
     type: str
     version_added: '6.1.0'
+  ciphers:
+    required: false
+    description:
+      - SSL/TLS Ciphers to use for the request.
+      - 'When a list is provided, all ciphers are joined in order with V(:).'
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+        for more details.
+      - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
+    type: list
+    elements: str
+    version_added: 9.2.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -423,6 +434,7 @@ def main():
             timeout=dict(type='int', default=60),
             update_handle=dict(),
             manager=dict(),
+            ciphers=dict(type='list', elements='str'),
         ),
         required_together=[
             ('username', 'password'),
@@ -450,9 +462,12 @@ def main():
     # manager
     manager = module.params['manager']
 
+    # ciphers
+    ciphers = module.params['ciphers']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = RedfishUtils(creds, root_uri, timeout, module)
+    rf_utils = RedfishUtils(creds, root_uri, timeout, module, ciphers=ciphers)
 
     # Build Category list
     if "all" in module.params['category']:
