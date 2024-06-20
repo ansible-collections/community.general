@@ -129,7 +129,7 @@ class ZENDESK_API:
             Request: Configured Request object for API calls.
         """
         if self.token:
-            request = Request(url_username='{}/token'.format(self.username), url_password=self.token, headers=self.headers)
+            request = Request(url_username='{0}/token'.format(self.username), url_password=self.token, headers=self.headers)
         else:
             request = Request(url_username=self.username, url_password=self.password, headers=self.headers)
         return request
@@ -147,7 +147,7 @@ class ZENDESK_API:
             dict: A dictionary containing the result of the ticket creation operation.
         """
         changed = False
-        url = '{}/api/v2/tickets'.format(self.host)
+        url = '{0}/api/v2/tickets'.format(self.host)
         payload = {
             "ticket": {
                 "comment": {
@@ -186,7 +186,7 @@ class ZENDESK_API:
         Returns:
             dict: A dictionary containing the result of the ticket update operation.
         """
-        url = '{}/api/v2/tickets/{}'.format(self.host, ticket_id)
+        url = '{0}/api/v2/tickets/{1}'.format(self.host, ticket_id)
         payload = {
             "ticket": {
                 "status": status,
