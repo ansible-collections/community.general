@@ -42,7 +42,7 @@ FAIL_MSG = 'Issuing a data modification command without specifying the '\
 class RedfishUtils(object):
 
     def __init__(self, creds, root_uri, timeout, module, resource_id=None,
-                 data_modification=False, strip_etag_quotes=False):
+                 data_modification=False, strip_etag_quotes=False, ciphers=None):
         self.root_uri = root_uri
         self.creds = creds
         self.timeout = timeout
@@ -53,6 +53,7 @@ class RedfishUtils(object):
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
+        self.ciphers = ciphers
         self._vendor = None
         self._init_session()
 
@@ -149,7 +150,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=timeout)
+                            use_proxy=True, timeout=timeout, ciphers=self.ciphers)
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
             try:
                 if headers.get('content-encoding') == 'gzip' and LooseVersion(ansible_version) < LooseVersion('2.14'):
@@ -199,7 +200,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
             try:
                 data = json.loads(to_native(resp.read()))
             except Exception as e:
@@ -253,7 +254,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False, 'changed': False,
@@ -288,7 +289,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -314,7 +315,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
