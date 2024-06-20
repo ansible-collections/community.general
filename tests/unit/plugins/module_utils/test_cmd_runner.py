@@ -32,6 +32,7 @@ TC_FORMATS = dict(
     simple_opt_val__int=(partial(cmd_runner_fmt.as_opt_val, "-t"), 42, ["-t", "42"], None),
     simple_opt_eq_val__str=(partial(cmd_runner_fmt.as_opt_eq_val, "--food"), "potatoes", ["--food=potatoes"], None),
     simple_opt_eq_val__int=(partial(cmd_runner_fmt.as_opt_eq_val, "--answer"), 42, ["--answer=42"], None),
+    simple_list_empty=(cmd_runner_fmt.as_list, [], [], None),
     simple_list_potato=(cmd_runner_fmt.as_list, "literal_potato", ["literal_potato"], None),
     simple_list_42=(cmd_runner_fmt.as_list, 42, ["42"], None),
     simple_list_min_len_ok=(partial(cmd_runner_fmt.as_list, min_len=1), 42, ["42"], None),
