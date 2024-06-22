@@ -472,7 +472,9 @@ def main():
             # Process an update
 
             # no changes
-            if desired_clientscope == before_clientscope:
+            # remove ids for compare, problematic if desired has no ids set (not required),
+            # normalize for consentRequired in protocolMappers
+            if normalise_cr(desired_clientscope, remove_ids=True) == normalise_cr(before_clientscope, remove_ids=True):
                 result['changed'] = False
                 result['end_state'] = sanitize_cr(desired_clientscope)
                 result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])

@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_clientscope - remove IDs from clientscope and its protocol mappers on comparison for changed check (https://github.com/ansible-collections/community.general/pull/8545).
