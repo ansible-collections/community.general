@@ -76,7 +76,7 @@ EXAMPLES = r'''
     template: 355ee47d-ff4c-4924-3db2-fd86ae629676-a3d70e4d-c5ac-4dfb-999b-30a0a7efe546
     label: This is a test from ansible
     description: This is a test from ansible
-    boot_after_create: no
+    boot_after_create: false
 
 - name: Start an existing virtual machine
   community.general.xen_orchestra:
