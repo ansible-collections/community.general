@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-module: xen_orchestra
+module: xen_orchestra_instance
 short_description: Management of instances on Xen Orchestra
 description:
   - Allows you to create/delete/restart/stop instances on Xen Orchestra.
