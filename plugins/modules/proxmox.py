@@ -84,10 +84,9 @@ options:
         type: path
       options:
         description:
-          - O(disk_volume.options) is a list of extra options.
-          - The options are given as key-value pairs such as C([ro=0, acl=1]).
-        type: list
-        elements: str
+          - O(disk_volume.options) is a dict of extra options.
+          - The value of any given option must be a string, e.g. V("1").
+        type: dict
   cores:
     description:
       - Specify number of cores per socket.
@@ -173,10 +172,9 @@ options:
         required: true
       options:
         description:
-          - O(mount_volumes[].options) is a list of extra options.
-          - The options are given as key-value pairs such as C([ro=1, backup=1]).
-        type: list
-        elements: str
+          - O(mount_volumes[].options) is a dict of extra options.
+          - The value of any given option must be a string, e.g. V("1").
+        type: dict
   ip_address:
     description:
       - specifies the address the container will be assigned
@@ -734,7 +732,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 vol_string += ",mp={mountpoint}".format(mountpoint=mountpoint)
             if options is not None:
                 vol_string += ","
-                vol_string += ",".join(options)
+                vol_string += ",".join(map("=".join, options.items()))
             if kwargs:
                 vol_string += ","
                 vol_string += ",".join(map("=".join, kwargs.items()))
@@ -989,7 +987,7 @@ def main():
                 volume=dict(type="str"),
                 size=dict(type="int"),
                 host_path=dict(type="path"),
-                options=dict(type="list", elements="str"),
+                options=dict(type="dict"),
             ),
             required_together=[("storage", "size")],
             required_by={
@@ -1017,7 +1015,7 @@ def main():
                 size=dict(type="int"),
                 host_path=dict(type="path"),
                 mountpoint=dict(type="path", required=True),
-                options=dict(type="list", elements="str"),
+                options=dict(type="dict"),
             ),
             required_together=[("storage", "size")],
             required_by={
