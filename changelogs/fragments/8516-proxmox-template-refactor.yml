@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_template - small refactor in logic for determining whether a template exists or not (https://github.com/ansible-collections/community.general/pull/8516).

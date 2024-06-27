@@ -144,12 +144,12 @@ except ImportError:
 
 
 class ProxmoxTemplateAnsible(ProxmoxAnsible):
-    def get_template(self, node, storage, content_type, template):
+    def has_template(self, node, storage, content_type, template):
+        volid = '%s:%s/%s' % (storage, content_type, template)
         try:
-            return [True for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get()
-                    if tmpl['volid'] == '%s:%s/%s' % (storage, content_type, template)]
+            return any(tmpl['volid'] == volid for tmpl in self.proxmox_api.nodes(node).storage(storage).content.get())
         except Exception as e:
-            self.module.fail_json(msg="Failed to retrieve template '%s:%s/%s': %s" % (storage, content_type, template, e))
+            self.module.fail_json(msg="Failed to retrieve template '%s': %s" % (volid, e))
 
     def task_status(self, node, taskid, timeout):
         """
@@ -190,7 +190,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         volid = '%s:%s/%s' % (storage, content_type, template)
         self.proxmox_api.nodes(node).storage(storage).content.delete(volid)
         while timeout:
-            if not self.get_template(node, storage, content_type, template):
+            if not self.has_template(node, storage, content_type, template):
                 return True
             timeout = timeout - 1
             if timeout == 0:
@@ -239,14 +239,14 @@ def main():
             if not template:
                 module.fail_json(msg='template param for downloading appliance template is mandatory')
 
-            if proxmox.get_template(node, storage, content_type, template) and not module.params['force']:
+            if proxmox.has_template(node, storage, content_type, template) and not module.params['force']:
                 module.exit_json(changed=False, msg='template with volid=%s:%s/%s already exists' % (storage, content_type, template))
 
             if proxmox.download_template(node, storage, template, timeout):
                 module.exit_json(changed=True, msg='template with volid=%s:%s/%s downloaded' % (storage, content_type, template))
 
         template = os.path.basename(src)
-        if proxmox.get_template(node, storage, content_type, template) and not module.params['force']:
+        if proxmox.has_template(node, storage, content_type, template) and not module.params['force']:
             module.exit_json(changed=False, msg='template with volid=%s:%s/%s is already exists' % (storage, content_type, template))
         elif not src:
             module.fail_json(msg='src param to uploading template file is mandatory')
@@ -261,7 +261,7 @@ def main():
             content_type = module.params['content_type']
             template = module.params['template']
 
-            if not proxmox.get_template(node, storage, content_type, template):
+            if not proxmox.has_template(node, storage, content_type, template):
                 module.exit_json(changed=False, msg='template with volid=%s:%s/%s is already deleted' % (storage, content_type, template))
 
             if proxmox.delete_template(node, storage, content_type, template, timeout):
