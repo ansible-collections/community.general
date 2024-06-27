@@ -174,8 +174,9 @@ class Bitwarden(object):
             else:
                 initial_matches = [initial_matches]
 
-        # Filter to only include results from the right field.
-        return [item for item in initial_matches if not search_value or item[search_field] == search_value]
+        # Filter to only include results from the right field, if a search is requested by value or field
+        return [item for item in initial_matches
+                if not search_value or not search_field or item.get(search_field) == search_value]
 
     def get_field(self, field, search_value, search_field="name", collection_id=None, organization_id=None):
         """Return a list of the specified field for records whose search_field match search_value
