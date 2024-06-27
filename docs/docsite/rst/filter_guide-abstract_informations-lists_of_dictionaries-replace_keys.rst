@@ -6,9 +6,9 @@
 replace_keys
 """"""""""""
 
-Use the filter ``replace_keys`` if you have a list of dictionaries and want to replace certain keys.
+Use the filter :ansplugin:`community.general.replace_keys#filter` if you have a list of dictionaries and want to replace certain keys.
 
-.. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ref:`the documentation for the community.general.yaml callback plugin <ansible_collections.community.general.yaml_callback>`.
+.. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ansplugin:`the documentation for the community.general.yaml callback plugin <community.general.yaml#callback>`.
 
 
 Let us use the below list in the following examples:
