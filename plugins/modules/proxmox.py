@@ -61,30 +61,30 @@ options:
     suboptions:
       storage:
         description:
-          - O(storage) is the storage identifier of the storage to use for the C(rootfs).
+          - O(disk_volume.storage) is the storage identifier of the storage to use for the C(rootfs).
           - Mutually exclusive with O(disk_volume.host_path).
         type: str
       volume:
         description:
-          - O(volume) is the name of an existing volume.
+          - O(disk_volume.volume) is the name of an existing volume.
           - If not defined, the module will check if one exists. If not, a new volume will be created.
           - If defined, the volume must exist under that name.
           - Required only if O(disk_volume.storage) is defined and mutually exclusive with O(disk_volume.host_path).
         type: str
       size:
         description:
-          - O(size) is the size of the storage to use.
+          - O(disk_volume.size) is the size of the storage to use.
           - The size is given in GB.
           - Required only if O(disk_volume.storage) is defined and mutually exclusive with O(disk_volume.host_path).
         type: int
       host_path:
         description:
-          - O(host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
+          - O(disk_volume.host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
           - Mutually exclusive with O(disk_volume.storage), O(disk_volume.volume), and O(disk_volume.size).
         type: path
       options:
         description:
-          - O(options) is a list of extra options.
+          - O(disk_volume.options) is a list of extra options.
           - The options are given as key-value pairs such as C([ro=0, acl=1]).
         type: list
         elements: str
@@ -140,40 +140,40 @@ options:
     suboptions:
       id:
         description:
-          - O(id) is the identifier of the mount point written as C(mp[n])
+          - O(mount_volumes.id) is the identifier of the mount point written as C(mp[n])
         type: str
         required: true
       storage:
         description:
-          - O(storage) is the storage identifier of the storage to use.
-          - Mutually exclusive with O(mount_volumes.[].host_path).
+          - O(mount_volumes.storage) is the storage identifier of the storage to use.
+          - Mutually exclusive with O(mount_volumes.host_path).
         type: str
       volume:
         description:
-          - O(volume) is the name of an existing volume.
+          - O(mount_volumes.volume) is the name of an existing volume.
           - If not defined, the module will check if one exists. If not, a new volume will be created.
           - If defined, the volume must exist under that name.
-          - Required only if O(storage) is defined and mutually exclusive with O(mount_volumes.[].host_path).
+          - Required only if O(mount_volumes.storage) is defined and mutually exclusive with O(mount_volumes.host_path).
         type: str
       size:
         description:
-          - O(size) is the size of the storage to use.
+          - O(mount_volumes.size) is the size of the storage to use.
           - The size is given in GB.
-          - Required only if O(mount_volumes.[].storage) is defined and mutually exclusive with O(mount_volumes.[].host_path).
+          - Required only if O(mount_volumes.storage) is defined and mutually exclusive with O(mount_volumes.host_path).
         type: int
       host_path:
         description:
-          - O(host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
-          - Mutually exclusive with O(mount_volumes.[].storage), O(mount_volumes.[].volume), and O(mount_volumes.[].size).
+          - O(mount_volumes.host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
+          - Mutually exclusive with O(mount_volumes.storage), O(mount_volumes.volume), and O(mount_volumes.size).
         type: path
       mountpoint:
         description:
-          - O(mountpoint) is the mount point of the volume.
+          - O(mount_volumes.mountpoint) is the mount point of the volume.
         type: path
         required: true
       options:
         description:
-          - O(options) is a list of extra options.
+          - O(mount_volumes.options) is a list of extra options.
           - The options are given as key-value pairs such as C([ro=1, backup=1]).
         type: list
         elements: str
