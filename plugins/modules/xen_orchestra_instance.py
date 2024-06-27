@@ -11,7 +11,14 @@ module: xen_orchestra_instance
 short_description: Management of instances on Xen Orchestra
 description:
   - Allows you to create/delete/restart/stop instances on Xen Orchestra.
-version_added: 9.1.0
+version_added: 9.2.0
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   api_host:
     description: API host to XOA API.
