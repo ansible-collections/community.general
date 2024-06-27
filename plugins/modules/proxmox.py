@@ -50,40 +50,42 @@ options:
         comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
         [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
-      - Should not be used in conjunction with O(storage).
+      - This option is mutually exclusive with O(storage) and O(disk_volume).
     type: str
   disk_volume:
     description:
       - Specify a hash/dictionary of the C(rootfs) disk.
       - See U(https://pve.proxmox.com/wiki/Linux_Container#pct_mount_points) for a full description.
+      - This option is mutually exclusive with O(storage) and O(disk).
     type: dict
+    version_added: 9.2.0
     suboptions:
       storage:
         description:
-          - V(storage) is the storage identifier of the storage to use for the C(rootfs).
-          - Mutually exclusive with V(host_path).
+          - O(storage) is the storage identifier of the storage to use for the C(rootfs).
+          - Mutually exclusive with O(disk_volume.host_path).
         type: str
       volume:
         description:
-          - V(volume) is the name of an existing volume.
+          - O(volume) is the name of an existing volume.
           - If not defined, the module will check if one exists. If not, a new volume will be created.
           - If defined, the volume must exist under that name.
-          - Required only if V(storage) is defined and mutually exclusive with V(host_path).
+          - Required only if O(disk_volume.storage) is defined and mutually exclusive with O(disk_volume.host_path).
         type: str
       size:
         description:
-          - V(size) is the size of the storage to use.
+          - O(size) is the size of the storage to use.
           - The size is given in GB.
-          - Required only if V(storage) is defined and mutually exclusive with V(host_path).
+          - Required only if O(disk_volume.storage) is defined and mutually exclusive with O(disk_volume.host_path).
         type: int
       host_path:
         description:
-          - V(host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
-          - Mutually exclusive with V(storage), V(volume), and V(size).
+          - O(host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
+          - Mutually exclusive with O(disk_volume.storage), O(disk_volume.volume), and O(disk_volume.size).
         type: path
       options:
         description:
-          - V(options) is a list of extra options.
+          - O(options) is a list of extra options.
           - The options are given as key-value pairs such as C([ro=0, acl=1]).
         type: list
         elements: str
@@ -125,51 +127,54 @@ options:
     version_added: 8.5.0
   mounts:
     description:
-      - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points as strings.
+      - Specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points as strings.
+      - This Option is mutually exclusive with O(mount_volumes).
     type: dict
   mount_volumes:
     description:
       - Specify additional mounts (separate disks) for the container. As a hash/dictionary defining mount points.
       - See U(https://pve.proxmox.com/wiki/Linux_Container#pct_mount_points) for a full description.
+      - This Option is mutually exclusive with O(mounts).
     type: list
     elements: dict
+    version_added: 9.2.0
     suboptions:
       id:
         description:
-          - V(id) is the identifier of the mount point written as C(mp[n])
+          - O(id) is the identifier of the mount point written as C(mp[n])
         type: str
         required: true
       storage:
         description:
-          - V(storage) is the storage identifier of the storage to use.
-          - Mutually exclusive with V(host_path).
+          - O(storage) is the storage identifier of the storage to use.
+          - Mutually exclusive with O(mount_volumes.[].host_path).
         type: str
       volume:
         description:
-          - V(volume) is the name of an existing volume.
+          - O(volume) is the name of an existing volume.
           - If not defined, the module will check if one exists. If not, a new volume will be created.
           - If defined, the volume must exist under that name.
-          - Required only if V(storage) is defined and mutually exclusive with V(host_path).
+          - Required only if O(storage) is defined and mutually exclusive with O(mount_volumes.[].host_path).
         type: str
       size:
         description:
-          - V(size) is the size of the storage to use.
+          - O(size) is the size of the storage to use.
           - The size is given in GB.
-          - Required only if V(storage) is defined and mutually exclusive with V(host_path).
+          - Required only if O(mount_volumes.[].storage) is defined and mutually exclusive with O(mount_volumes.[].host_path).
         type: int
       host_path:
         description:
-          - V(host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
-          - Mutually exclusive with V(storage), V(volume), and V(size).
+          - O(host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
+          - Mutually exclusive with O(mount_volumes.[].storage), O(mount_volumes.[].volume), and O(mount_volumes.[].size).
         type: path
       mountpoint:
         description:
-          - V(mountpoint) is the mount point of the volume.
+          - O(mountpoint) is the mount point of the volume.
         type: path
         required: true
       options:
         description:
-          - V(options) is a list of extra options.
+          - O(options) is a list of extra options.
           - The options are given as key-value pairs such as C([ro=1, backup=1]).
         type: list
         elements: str
@@ -183,8 +188,8 @@ options:
     type: bool
   storage:
     description:
-      - target storage
-      - Should not be used in conjunction with O(disk).
+      - Target storage
+      - This Option is mutually exclusive with O(disk) and O(disk_volume).
     type: str
     default: 'local'
   ostype:
