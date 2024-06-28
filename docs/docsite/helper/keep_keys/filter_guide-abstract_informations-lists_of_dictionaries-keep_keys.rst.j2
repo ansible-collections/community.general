@@ -19,17 +19,13 @@ Let us use the below list in the following examples:
      {{ tests.0.input | to_yaml(indent=2) | indent(5) }}
 
 {% for i in tests[0:1]|subelements('group') %}
-{% if i.0.title | d('', true) | length > 0 %}
-{{ i.0.title }}
-{{ "%s" % ('"' * i.0.title|length) }}
-{% endif %}
 * {{ i.1.d }}
 
 .. code-block:: yaml+jinja
    :emphasize-lines: 1
 
    target: {{ i.1.tt }}
-   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}"
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
 
 {% endfor %}
 
@@ -52,10 +48,6 @@ gives
      {{ tests.1.result | to_yaml(indent=2) | indent(5) }}
 
 {% for i in tests[1:2]|subelements('group') %}
-{% if i.0.title | d('', true) | length > 0 %}
-{{ i.0.title }}
-{{ "%s" % ('"' * i.0.title|length) }}
-{% endif %}
 {{ loop.index }}. {{ i.1.d }}
 
 .. code-block:: yaml+jinja
@@ -63,7 +55,7 @@ gives
 
    mp: {{ i.1.mp }}
    target: {{ i.1.tt }}
-   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}"
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
 
 {% endfor %}
 
@@ -76,10 +68,6 @@ gives
      {{ tests.2.result | to_yaml(indent=2) | indent(5) }}
 
 {% for i in tests[2:3]|subelements('group') %}
-{% if i.0.title | d('', true) | length > 0 %}
-{{ i.0.title }}
-{{ "%s" % ('"' * i.0.title|length) }}
-{% endif %}
 {{ loop.index + 5 }}. {{ i.1.d }}
 
 .. code-block:: yaml+jinja
@@ -87,6 +75,6 @@ gives
 
    mp: {{ i.1.mp }}
    target: {{ i.1.tt }}
-   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) | regex_replace('\{#[\s\S]*#\}\n', multiline=True) }}"
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
 
 {% endfor %}
