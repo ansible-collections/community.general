@@ -12,7 +12,7 @@
 # control.
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# community.general/docs/docsite/helper/replace_keys/playbook.yml
+# community.general/docs/docsite/helper/keep_keys/playbook.yml
 
 - name: Create RST file for docs/docsite/rst
   hosts: localhost
