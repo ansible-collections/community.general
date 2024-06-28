@@ -16,6 +16,14 @@ description:
   - This module allows you to create and delete tickets in Zendesk.
   - Authentication is handled by the ZENDESK_API class.
 author: "Luis Valle (@elchico2007)"
+version_added: 9.2.0
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   host:
     type: str
