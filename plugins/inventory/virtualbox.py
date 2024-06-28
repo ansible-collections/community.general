@@ -38,16 +38,18 @@ DOCUMENTATION = '''
             type: dictionary
             default: {}
         enable_advanced_group_parsing:
-            description: >
-                The default group parsing rule (when this setting is set to `false`) is to split the VirtualBox VM's group based on the `/` character and
+            description:
+              - The default group parsing rule (when this setting is set to V(false)) is to split the VirtualBox VM's group based on the V(/) character and
                 assign the resulting list elements as an Ansible Group.
-                Setting `enable_advanced_group_parsing` to `true` changes this behaviour to match VirtualBox's interpretation of groups according to:
-                https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
-                Groups are now split using the `,` character, and the `/` character indicates nested groups.
-                So, for a VM that's been configured using `VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3"`:
-                - TestGroup2 is a child group of TestGroup
-                - The VM will be part of TestGroup2 and TestGroup3.
+              - Setting O(enable_advanced_group_parsing=true) changes this behaviour to match VirtualBox's interpretation of groups according to
+                U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups).
+                Groups are now split using the V(,) character, and the V(/) character indicates nested groups.
+              - So, for a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3"):
+                C(TestGroup2) is a child group of C(TestGroup);
+                the VM will be part of C(TestGroup2) and C(TestGroup3).
             default: false
+            type: bool
+            version_added: 9.2.0
 '''
 
 EXAMPLES = '''
@@ -271,7 +273,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # unassigned to a group.
                 continue
 
-            parent_group = "all"
+            parent_group = None
             for subgroup in group.split('/'):
                 if not subgroup:
                     # Similarly to above, we could get an empty element.
@@ -285,7 +287,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
                 subgroup = make_unsafe(subgroup)
                 subgroup = self.inventory.add_group(subgroup)
-                self.inventory.add_child(parent_group, subgroup)
+                if parent_group is not None:
+                    self.inventory.add_child(parent_group, subgroup)
                 self.inventory.add_child(subgroup, current_host)
                 if subgroup not in cacheable_results:
                     cacheable_results[subgroup] = {'hosts': []}

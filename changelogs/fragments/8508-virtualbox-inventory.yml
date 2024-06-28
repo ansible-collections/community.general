@@ -1,7 +1,3 @@
 minor_changes:
   - >- 
-    virtualbox inventory plugin - expose a new parameter `enable_advanced_group_parsing` to change how the VirtualBox dynamic inventory parses VM groups.
-    The dynamic inventory automatically assigns VMs to Ansible Groups based on VirtualBox groups configured using VBoxManage.
-    When set to `false` (default, existing behaviour), the `/` character would delineate the different groups.
-    When set to `true`, the `/` character allows creation of nested groups, and the `,` character is used to delineate the groups.
-    See https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups for details on how to assign VirtualBox groups. (https://github.com/ansible-collections/community.general/issues/8508)
+    virtualbox inventory plugin - expose a new parameter ``enable_advanced_group_parsing`` to change how the VirtualBox dynamic inventory parses VM groups (https://github.com/ansible-collections/community.general/issues/8508).
