@@ -44,9 +44,9 @@ DOCUMENTATION = '''
               - Setting O(enable_advanced_group_parsing=true) changes this behaviour to match VirtualBox's interpretation of groups according to
                 U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups).
                 Groups are now split using the V(,) character, and the V(/) character indicates nested groups.
-              - So, for a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3"):
-                C(TestGroup2) is a child group of C(TestGroup);
-                the VM will be part of C(TestGroup2) and C(TestGroup3).
+              - When enabled, a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3") will result in
+                the group C(TestGroup2) being a child group of C(TestGroup); and
+                the VM being a part of C(TestGroup2) and C(TestGroup3).
             default: false
             type: bool
             version_added: 9.2.0
