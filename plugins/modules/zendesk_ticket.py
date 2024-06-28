@@ -77,6 +77,7 @@ EXAMPLES = '''
       priority: 'normal'
       subject: 'New Ticket'
       status: 'new'
+
   - name: Close a ticket
     community.general.zendesk_ticket:
       username: 'your_username'
