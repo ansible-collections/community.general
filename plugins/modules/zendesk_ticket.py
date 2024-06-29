@@ -86,6 +86,8 @@ EXAMPLES = '''
       host: 'https://yourcompany.zendesk.com'
       ticket_id: 12345
       status: 'closed'
+
+
   - name: Resolve a ticket
     community.general.zendesk_ticket:
       username: 'your_username'
@@ -235,6 +237,14 @@ def main():
             token=dict(type='str', required=False, no_log=True),
             ticket_id=dict(type='int')
         ),
+        required_if=[
+            ('status', 'new', ('priority', 'subject')),
+            ('status', 'closed', ('ticket_id',)),
+            ('status', 'resolved', ('ticket_id',))
+        ],
+        required_one_of=[
+            ('password', 'token')
+        ],
         supports_check_mode=False
     )
 
@@ -254,12 +264,8 @@ def main():
     zendesk_api = ZENDESK_API(username, password, token, host)
 
     if status == 'new':
-        if not subject or not priority:
-            module.fail_json(msg="Both 'subject' and 'priority' must be provided when creating a new ticket.")
         result = zendesk_api.create_ticket(body, priority, subject)
     elif status in ['closed', 'resolved']:
-        if not ticket_id:
-            module.fail_json(msg="The 'ticket_id' must be provided when the status is 'closed'")
         result = zendesk_api.close_ticket(ticket_id, status, body)
 
     if 'msg' in result:
