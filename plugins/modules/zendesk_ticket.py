@@ -146,6 +146,20 @@ class ZENDESK_API:
             request = Request(url_username=self.username, url_password=self.password, headers=self.headers)
         return request
 
+    def check_ticket(self, ticket_id):
+        """
+        Checks if a ticket exists in Zendesk.
+        Returns:
+            bool: True if the ticket exists, False otherwise.
+        """
+        url = '{0}/api/v2/tickets/{1}'.format(self.host, ticket_id)
+        request = self.api_auth()
+        try:
+            response = request.get(url)
+        except Exception as e:
+            return False
+        return response.getcode() == 200
+
     def create_ticket(self, body, priority, subject):
         """
         Creates a new ticket in Zendesk.
@@ -266,6 +280,8 @@ def main():
     if status == 'new':
         result = zendesk_api.create_ticket(body, priority, subject)
     elif status in ['closed', 'resolved']:
+        if not zendesk_api.check_ticket(ticket_id):
+            module.fail_json(msg="Ticket ID {0} does not exist.".format(ticket_id))
         result = zendesk_api.close_ticket(ticket_id, status, body)
 
     if 'msg' in result:
