@@ -133,7 +133,7 @@ class ZENDESK_API:
             "Content-Type": "application/json",
         }
 
-    def api_aut(self):
+    def api_auth(self):
         """
         Configures and returns a Request object with authentication headers.
 
@@ -170,7 +170,7 @@ class ZENDESK_API:
             }
         }
 
-        request = self.api_aut()
+        request = self.api_auth()
 
         try:
             response = request.post(url, data=json.dumps(payload))
@@ -208,7 +208,7 @@ class ZENDESK_API:
             }
         }
 
-        request = self.api_aut()
+        request = self.api_auth()
 
         try:
             response = request.patch(url, data=json.dumps(payload))
