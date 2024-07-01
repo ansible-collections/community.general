@@ -1,0 +1,17 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+url: http://localhost:8080/auth
+admin_realm: master
+admin_user: admin
+admin_password: password
+realm: master
+client_id: authz
+resource_name: resource
+displayName: Resource
+icon_uri: icon.png
+uris:
+  - https://url1.com
+  - https://url2.com
