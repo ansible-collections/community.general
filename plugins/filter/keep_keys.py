@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2024 Vladimir Botka <vbotka@gmail.com>
 # Copyright (c) 2024 Felix Fontein <felix@fontein.de>
+# Copyright (c) 2024 Michael Pardatscher <michael@pardatscher.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -14,6 +15,7 @@ DOCUMENTATION = '''
     author:
       - Vladimir Botka (@vbotka)
       - Felix Fontein (@felixfontein)
+      - Michael Pardatscher (@Migsi)
     description: This filter keeps only specified keys from a provided list of dictionaries.
     options:
       _input:
@@ -40,6 +42,10 @@ DOCUMENTATION = '''
           regex:
             - Matches keys that match the regular expresion provided in O(target).
             - In this case, O(target) must be a regex string or a list with single regex string.
+      recurse_lists:
+        description: Recurse over subsequent lists of dicts.
+        type: bool
+        default: False
 '''
 
 EXAMPLES = '''
@@ -106,7 +112,7 @@ from ansible_collections.community.general.plugins.plugin_utils.keys_filter impo
     _keys_filter_target_str)
 
 
-def keep_keys(data, target=None, matching_parameter='equal'):
+def keep_keys(data, target=None, matching_parameter='equal', recurse_lists=False):
     """keep specific keys from dictionaries in a list"""
 
     # test parameters
@@ -126,8 +132,31 @@ def keep_keys(data, target=None, matching_parameter='equal'):
     elif matching_parameter == 'regex':
         def keep_key(key):
             return tt.match(key) is not None
-
-    return [dict((k, v) for k, v in d.items() if keep_key(k)) for d in data]
+    
+    result = {}
+    for d in data:
+        for k, v in d.items():
+            if keep_key(k):  # if key is kept, update result with it
+                result.update({k: v})
+            elif recurse_lists and isinstance(v, list):
+                sub_result = []
+                for element in v:  # element in list 'v'
+                    # if element is dict, recurse with it, add result to list
+                    if isinstance(element, dict):
+                        sub_result = (sub_result
+                                      + keep_keys(
+                                            [element],
+                                            target,
+                                            matching_parameter,
+                                            recurse_lists)
+                                     )
+                # if any sub_result yielded (i.e. subsequent key is kept,
+                # update result with it
+                if sub_result:
+                    result.update({k: sub_result})
+    
+    # avoid returning a list of empty dicts
+    return [result] if result else []
 
 
 class FilterModule(object):
