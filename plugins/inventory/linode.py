@@ -124,10 +124,12 @@ from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 try:
     from linode_api4 import LinodeClient
+    from linode_api4.linode_client import package_version
     from linode_api4.objects.linode import Instance
     from linode_api4.errors import ApiError as LinodeApiError
     HAS_LINODE = True
@@ -219,7 +221,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if ip_style == 'api':
                 ips = instance.ips.ipv4.public + instance.ips.ipv4.private
                 ips += [instance.ips.ipv6.slaac, instance.ips.ipv6.link_local]
-                ips += instance.ips.ipv6.pools
+                # linode_api4 renamed pools to ranges in 5.4.1 (https://github.com/linode/linode_api4-python/releases/tag/v5.4.1,
+                # https://github.com/linode/linode_api4-python/commit/dc592c706518abc1c6d4b4c88b074970e5375d5f)
+                if LooseVersion(package_version) < LooseVersion("5.4.1"):
+                    ips += instance.ips.ipv6.pools
+                else:
+                    ips += instance.ips.ipv6.ranges
 
                 for ip_type in set(ip.type for ip in ips):
                     self.inventory.set_variable(
