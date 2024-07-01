@@ -177,8 +177,6 @@ class ConfigParser(object):
         for host_entry in self.config_data:
             if host_entry.get("type") != 'entry':
                 continue
-            if host_entry.get("host") == "*":
-                continue
 
             searchable_information = host_entry.get("host")
             for key, value in host_entry.get("options").items():
