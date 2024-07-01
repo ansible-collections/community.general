@@ -16,7 +16,9 @@ action_groups:
     - consul_token
   proxmox:
     - proxmox
+    - proxmox_backup
     - proxmox_disk
+    - proxmox_backup
     - proxmox_domain_info
     - proxmox_group_info
     - proxmox_kvm
