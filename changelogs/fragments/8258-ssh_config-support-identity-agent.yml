@@ -1,0 +1,2 @@
+minor_changes:
+  - ssh_config - add parameter identity_agent (https://github.com/ansible-collections/community.general/pull/8258).
