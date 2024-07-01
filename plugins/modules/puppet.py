@@ -128,6 +128,8 @@ options:
       - The default value, V(C), is supported on every system, but can lead to encoding errors if UTF-8 is used in the output
       - Use V(C.UTF-8) or V(en_US.UTF-8) or similar UTF-8 supporting locales in case of problems. You need to make sure
         the selected locale is supported on the system the puppet agent runs on.
+      - Starting with community.general 9.1.0, you can use the value V(auto) and the module will
+        try and determine the best parseable locale to use.
     type: str
     default: C
     version_added: 8.6.0
