@@ -9,6 +9,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import zendesk_ticket
 
+
 def test_create_ticket_failure():
     # Test creating a new ticket in Zendesk with invalid data
     invalid_ticket_data = {
@@ -24,6 +25,7 @@ def test_create_ticket_failure():
     api = zendesk_ticket.ZENDESK_API(username='your_username', password='your_password', token='invalid_token', host='https://your_zendesk_host')
     result = api.create_ticket(invalid_ticket_data['body'], invalid_ticket_data['priority'], invalid_ticket_data['subject'])
     assert 'msg' in result  # Assert that 'msg' is in the result indicating failure
+
 
 def test_create_ticket_no_password():
     # Test creating a new ticket in Zendesk without providing a password
