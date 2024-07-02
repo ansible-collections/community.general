@@ -316,6 +316,45 @@ check_rc
 Python Runner
 ^^^^^^^^^^^^^
 
+The ``PythonRunner```class is a specialized version of ``CmdRunner``, geared towards the execution of
+Python scripts. It feature two mutually exclusive extra parameters ``python`` and  ``venv`` in its constructor:
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.python_runner import PythonRunner
+    from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
+
+    runner = PythonRunner(
+        module,
+        command=["-m", "django"],
+        arg_formats=dict(...),
+        python="python",
+        venv="/path/to/some/venv",
+    )
+
+The default value for ``python`` is the string ``python``, and the for ``venv`` it is ``None``.
+
+The command line produced by such a command with ``python="python3.12"`` is something like:
+
+.. code-block:: shell
+
+    /usr/bin/python3.12 -m django <arg1> <arg2> ...
+
+And the command line for ``venv="/work/venv"`` is like:
+
+.. code-block:: shell
+
+    /work/venv/bin/python -m django <arg1> <arg2> ...
+
+You may provide the value of the ``command`` argument as a string (in that case the string will be used as a script name)
+or as a list, in which case the elements of the list must be valid arguments for the Python interpreter, as in the example above.
+See ``
+
+If the parameter ``python```is an absolute path, or contains directory separators, such as ``/```, then it will be used
+as-is, otherwise the runtime ``PATH`` will be searched for that command name.
+
+Other than that, everything else works as in ``CmdRunner``.
+
 Other features
 ^^^^^^^^^^^^^^
 
