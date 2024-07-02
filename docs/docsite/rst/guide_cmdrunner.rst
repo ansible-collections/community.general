@@ -12,7 +12,7 @@ Introduction
 ^^^^^^^^^^^^
 
 The ``ansible_collections.community.general.plugins.module_utils.cmd_runner`` module util provides the
-``CmdRunner`` class to help execute external commands. The class provides standard mechanisms around
+``CmdRunner`` class to help execute external commands. The class is a wrapper around
 the standard ``AnsibleModule.run_command()`` method, handling: command arguments, localization setting,
 output processing output, check mode, and other features.
 
@@ -31,8 +31,8 @@ automatic check of the command's exit code, forcing a specific localization enco
 
 It relies on ``ansible.module_utils.basic.AnsibleModule.run_command()`` to execute the command.
 
-To use ``CmdRunner`` you must start by creating the ``CmdRunner`` object. The example below is a simplified
-version of the actual code in ``ansible_collections.community.general.plugins.modules.ansible_galaxy_install``:
+To use ``CmdRunner`` you must start by creating an object. The example below is a simplified
+version of the actual code in :ansplugin:`community.general.ansible_galaxy_install#module`:
 
 .. code-block:: python
 
@@ -275,7 +275,7 @@ Some additional features are available as decorators:
             ),
         )
 
-  Then, in ``ansible_collections.community.general.plugins.modules.puppet`` it is put to use with:
+  Then, in :ansplugin:`community.general.puppet#module` it is put to use with:
 
   .. code-block:: python
 
@@ -291,7 +291,7 @@ Some additional features are available as decorators:
   This decorator will assume ``value`` is a sequence and will concatenate the output
   of the wrapped function applied to each element of the sequence.
 
-  For example, in ``ansible_collections.community.general.plugins.modules.django_check``, the database argument format
+  For example, in :ansplugin:`community.general.django_check#module`, the argument format for ``database``
   is defined as:
 
   .. code-block:: python
@@ -348,7 +348,7 @@ And the command line for ``venv="/work/venv"`` is like:
 
 You may provide the value of the ``command`` argument as a string (in that case the string will be used as a script name)
 or as a list, in which case the elements of the list must be valid arguments for the Python interpreter, as in the example above.
-See ``
+See `<https://docs.python.org/3/using/cmdline.html>` for more details.
 
 If the parameter ``python```is an absolute path, or contains directory separators, such as ``/```, then it will be used
 as-is, otherwise the runtime ``PATH`` will be searched for that command name.
