@@ -253,7 +253,7 @@ Some additional features are available as decorators:
 
   This decorator unpacks the incoming ``value`` as a list of elements.
 
-  For example, in P(community.general.puppet,module_utils), it is used as:
+  For example, in ``ansible_collections.community.general.plugins.module_utils.puppet``, it is used as:
 
   .. code-block:: python
 
@@ -275,7 +275,7 @@ Some additional features are available as decorators:
             ),
         )
 
-  Then, in M(community.general.puppet) it is put to use with:
+  Then, in ``ansible_collections.community.general.plugins.modules.puppet`` it is put to use with:
 
   .. code-block:: python
 
@@ -291,7 +291,7 @@ Some additional features are available as decorators:
   This decorator will assume ``value`` is a sequence and will concatenate the output
   of the wrapped function applied to each element of the sequence.
 
-  For example, in M(community.general.django_check), the database argument format
+  For example, in ``ansible_collections.community.general.plugins.modules.django_check``, the database argument format
   is defined as:
 
   .. code-block:: python
