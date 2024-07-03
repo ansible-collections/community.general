@@ -1,0 +1,2 @@
+minor_changes:
+  - redis cache plugin - add Redis connection parameters full access in order to be able to set advanced socket options, like enabling keep alive (https://github.com/ansible-collections/community.general/pull/8578)
