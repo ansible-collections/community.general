@@ -34,6 +34,8 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: start_result
+      environment:
+        HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check the black service is running
       assert:
@@ -47,12 +49,14 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: restart_result
+      environment:
+        HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check the black service is restarted
       assert:
         that:
           - restart_result is success
-    
+
     - name: Stop the black service
       community.general.homebrew_services:
         name: black
@@ -60,6 +64,8 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: stop_result
+      environment:
+        HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check the black service is stopped
       assert:
