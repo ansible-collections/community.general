@@ -5,8 +5,10 @@
 
 .. _ansible_collections.community.general.docsite.guide_cmdrunner:
 
+
 Command Runner guide
 ====================
+
 
 Introduction
 ^^^^^^^^^^^^
@@ -22,14 +24,14 @@ in a module util file, and each module will use the same runner with different a
 For the sake of clarity, throughout this guide, unless otherwise specified, we use the term *option* when referring to
 Ansible module options, and the term *argument* when referring to the command line arguments for the external command.
 
+
 Quickstart
 """"""""""
 
-A ``CmdRunner`` basically defines a command to be executed, and a set of coded instructions on how to format
-the command-line arguments, in which specific order, for that particular command. There are other features like
-automatic check of the command's exit code, forcing a specific localization encoding and environment variables.
-
+``CmdRunner`` basically defines a command to be executed, and a set of coded instructions on how to format
+the command-line arguments, in which specific order, for that particular command.
 It relies on ``ansible.module_utils.basic.AnsibleModule.run_command()`` to execute the command.
+There are other features, see more details through this document.
 
 To use ``CmdRunner`` you must start by creating an object. The example below is a simplified
 version of the actual code in :ansplugin:`community.general.ansible_galaxy_install#module`:
@@ -62,24 +64,28 @@ This is meant to be done once, then every time you need to execute the command y
         with runner("type galaxy_cmd upgrade force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install", upgrade=upgrade)
 
-        # Obtain the version
+        # version is fixed, requires no value
         with runner("version") as ctx:
             dummy, stdout, dummy = ctx.run()
 
-        # Or simply
+        # Another way of expressing it
         dummy, stdout, dummy = runner("version").run()
 
-Note that you can pass values for the arguments explicitly when calling ``run()``, otherwise ``CmdRunner`` will use the module
-options with the exact same names as values for the runner arguments. If no value is passed and no module option is found
-with the specified name, then an exception will be raised. The only exception to that rule is when using ``cmd_runner_fmt.as_fixed``,
-as with the argument ``version`` in the runner above. See more about it below.
+Note that you can pass values for the arguments  when calling ``run()``,
+otherwise ``CmdRunner`` will use the module options with the exact same names to
+provide values for the runner arguments. If no value is passed and no module option
+is found with the specified name, then an exception will be raised, unless the
+argument is using ``cmd_runner_fmt.as_fixed`` as format function, like the
+``version`` in the example above. See more about it below.
 
-In the first example, values of ``type``, ``force``, ``no_deps`` and others will be taken straight from the module, whilst
-``galaxy_cmd`` and ``upgrade`` are passed explicitly.
+In the first example, values of ``type``, ``force``, ``no_deps`` and others will
+be taken straight from the module, whilst ``galaxy_cmd`` and ``upgrade`` are
+passed explicitly.
 
-That will generate a resulting command line similar to (example taken from the output of an integration test):
+That will generate a resulting command line similar to (example taken from the
+output of an integration test):
 
-.. code-block:: javascript
+.. code-block:: python
 
         [
             "<venv>/bin/ansible-galaxy",
@@ -88,14 +94,17 @@ That will generate a resulting command line similar to (example taken from the o
             "--upgrade",
             "-p",
             "<collection-install-path>",
-            "netbox.netbox"
+            "netbox.netbox",
         ]
+
 
 Argument formats
 ^^^^^^^^^^^^^^^^
 
-As seen in the example, ``CmdRunner`` expects a parameter named ``arg_formats`` defining how to format each CLI named argument.
-An "argument format" is nothing but a function to transform the value of a variable into something formatted for the command line.
+As seen in the example, ``CmdRunner`` expects a parameter named ``arg_formats``
+defining how to format each CLI named argument.
+An "argument format" is nothing but a function to transform the value of a variable
+into something formatted for the command line.
 
 
 Argument format function
@@ -108,12 +117,14 @@ An ``arg_format`` function should be of the form:
     def func(value):
         return ["--some-param-name", value]
 
-The parameter ``value`` can be of any type - although there are convenience mechanisms
-to help handling sequence and mapping objects.
+The parameter ``value`` can be of any type - although there are convenience
+mechanisms to help handling sequence and mapping objects.
 
-The result is expected to be of the type ``Sequence[str]`` type (most commonly ``list[str]`` or ``tuple[str]``), otherwise
-it will be considered to be a ``str``, and it will be coerced into ``list[str]``. This resulting sequence of strings will be added
-to the command line when that argument is actually used.
+The result is expected to be of the type ``Sequence[str]`` type (most commonly
+``list[str]`` or ``tuple[str]``), otherwise it will be considered to be a ``str``,
+and it will be coerced into ``list[str]``.
+This resulting sequence of strings will be added to the command line when that
+argument is actually used.
 
 For example, if ``func`` returns:
 
@@ -122,20 +133,26 @@ For example, if ``func`` returns:
 - ``None``, the command line will include argument ``None``.
 - ``[]``, the command line will not include argument anything for that particular argument.
 
-Convenience format functions
-""""""""""""""""""""""""""""
 
-Command Runner provides a set of convenience functions that return format arguments functions for commom
-cases. In the first block of code in the `Quickstart`_ section you can see the ``from .. import`` of
-``ansible_collections.community.general.plugins.module_utils.cmd_runner.cmd_runner_fmt``, and how to make
-use of many these convenience functions in the instantiation of the ``CmdRunner`` object.
+Convenience format methods
+""""""""""""""""""""""""""
 
-Unless noted otherwise, for the sake of consistency in the reference below it is assumed that every convenience function deals
-with two parameters: ``arg``, usually specified during the creation of the ``CmdRunner`` object, and ``value``, specified
-during the execution of the command.
+In the same module as ``CmdRunner`` there is a class ``cmd_runner_fmt`` which
+provides a set of convenience methods that return format functions for common cases.
+In the first block of code in the `Quickstart`_ section you can see the importing of
+that class:
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
+
+The same example shows how to make use of some of them in the instantiation of the ``CmdRunner`` object.
+Below you will find a description of each one of the convenience methods available and
+examples of how to use them. In these descriptions ``value`` refers to the single
+parameter passed to the formatting function.
 
 - ``cmd_runner_fmt.as_list()``
-    Does not accept ``arg``, returns ``value`` as-is.
+    It does not receive any parameter, function returns ``value`` as-is.
 
     - Creation:
         ``cmd_runner_fmt.as_list()``
@@ -149,9 +166,10 @@ during the execution of the command.
         +----------------------+---------------------+
 
 - ``cmd_runner_fmt.as_bool()``
-    It receives two different parameters: ``args_true`` and ``args_false``, which is optional. If the boolean
-    evaluation of ``value`` is ``True``, the format function will return ``args_true`` and, when ``args_false``
-    is passed, ``args_false`` will be returned when ``value`` evaluates to ``False``.
+    It receives two different parameters: ``args_true`` and ``args_false``, latter being optional.
+    If the boolean evaluation of ``value`` is ``True``, the format function will return ``args_true``.
+    If the boolean evaluation is ``False``, then the function will return ``args_false``
+    if it was provided, or ``[]`` otherwise.
 
     - Creation:
         ``cmd_runner_fmt.as_bool("--force")``
@@ -165,7 +183,8 @@ during the execution of the command.
         +------------+--------------------+
 
 - ``cmd_runner_fmt.as_bool_not()``
-    Returns ``arg`` when ``value`` is ``False``-ish.
+    It receives one parameter, which is returned by the function when the boolean evaluation
+    of ``value`` is ``False``.
 
     - Creation:
         ``cmd_runner_fmt.as_bool_not("--no-deps")``
@@ -179,7 +198,8 @@ during the execution of the command.
         +-------------+---------------------+
 
 - ``cmd_runner_fmt.as_optval()``
-    Concatenates ``arg`` and ``value`` as one string.
+    It receives one parameter ``arg``, the function returns the string concatenation
+    of ``arg`` and ``value``.
 
     - Creation:
         ``cmd_runner_fmt.as_optval("-i")``
@@ -193,7 +213,7 @@ during the execution of the command.
         +---------------+---------------------+
 
 - ``cmd_runner_fmt.as_opt_val()``
-    Concatenates ``arg`` and ``value`` as one list.
+    It receives one parameter ``arg``, the function returns ``[arg, value]``.
 
     - Creation:
         ``cmd_runner_fmt.as_opt_val("--name")``
@@ -205,7 +225,8 @@ during the execution of the command.
         +--------------+--------------------------+
 
 - ``cmd_runner_fmt.as_opt_eq_val()``
-    Concatenates ``arg=value`` as one string.
+    It receives one parameter ``arg``, the function returns the string of the form
+    ``{arg}={value}``.
 
     - Creation:
         ``cmd_runner_fmt.as_opt_eq_val("--num-cpus")``
@@ -217,7 +238,9 @@ during the execution of the command.
         +------------+-------------------------+
 
 - ``cmd_runner_fmt.as_fixed()``
-    Fixed arguments added regardless of value.
+    It receives one parameter ``arg``, the function expects no ``value`` - if one
+    is provided then it is ignored.
+    The function returns ``arg`` as-is.
 
     - Creation:
         ``cmd_runner_fmt.as_fixed("--version")``
@@ -227,14 +250,19 @@ during the execution of the command.
         +=========+=======================+
         |         | ``["--version"]``     |
         +---------+-----------------------+
+        | 57      | ``["--version"]``     |
+        +---------+-----------------------+
 
     - Note:
-        This is the only special case in which a value can be missing. The example also comes from
-        the code in `Quickstart`_. In that case, the module has code to determine the command's
-        version so that it can assert compatibility. There is no *value* to be passed for that CLI argument.
+        This is the only special case in which a value can be missing for the formatting function.
+        The example also comes from the code in `Quickstart`_.
+        In that case, the module has code to determine the command's version so that it can assert compatibility.
+        There is no *value* to be passed for that CLI argument.
 
 - ``cmd_runner_fmt.as_map()``
-    Requires ``arg`` to be a dictionay from which it chooses the resulting command line argument.
+    It receives one parameter ``arg`` which must be a dictionary, and an optional parameter ``default``.
+    The function returns the evaluation of ``arg[value]``.
+    If ``value not in arg``, then it returns ``default`` if defined, otherwise ``[]``.
 
     - Creation:
         ``cmd_runner_fmt.as_map(dict(a=1, b=2, c=3), default=42)``
@@ -373,6 +401,19 @@ might occur if redefining options already present in the runner or its context c
 Processing results
 ^^^^^^^^^^^^^^^^^^
 
+As mentioned, ``CmdRunner`` uses ``AnsibleModule.run_command()`` to execute the external command,
+and it passes the return value from that method back to caller. That means that,
+by default, the result is going to be a tuple ``(rc, stdout, stderr)``.
+
+If you need to transform or process that output, you can pass a function to the context,
+as the ``output_process`` parameter. It must be a function like:
+
+.. code-block:: python
+
+    def process(rc, stdout, stderr):
+        # do some magic
+        return processed_value    # whatever that is
+
 
 PythonRunner
 ^^^^^^^^^^^^
@@ -411,15 +452,9 @@ You may provide the value of the ``command`` argument as a string (in that case 
 or as a list, in which case the elements of the list must be valid arguments for the Python interpreter, as in the example above.
 See `<https://docs.python.org/3/using/cmdline.html>` for more details.
 
-If the parameter ``python```is an absolute path, or contains directory separators, such as ``/```, then it will be used
+If the parameter ``python`` is an absolute path, or contains directory separators, such as ``/```, then it will be used
 as-is, otherwise the runtime ``PATH`` will be searched for that command name.
 
 Other than that, everything else works as in ``CmdRunner``.
-
-Other features
-^^^^^^^^^^^^^^
-
-
-
 
 .. versionadded:: 6.1.0
