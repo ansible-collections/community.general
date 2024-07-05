@@ -85,7 +85,7 @@ options:
       options:
         description:
           - O(disk_volume.options) is a dict of extra options.
-          - The value of any given option must be a string, e.g. V("1").
+          - The value of any given option must be a string, for example V("1").
         type: dict
   cores:
     description:
