@@ -1,0 +1,110 @@
+..
+  Copyright (c) Ansible Project
+  GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+  SPDX-License-Identifier: GPL-3.0-or-later
+
+replace_keys
+""""""""""""
+
+Use the filter :ansplugin:`community.general.replace_keys#filter` if you have a list of dictionaries and want to replace certain keys.
+
+.. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ansplugin:`the documentation for the community.general.yaml callback plugin <community.general.yaml#callback>`.
+
+
+Let us use the below list in the following examples:
+
+.. code-block:: yaml
+
+   input:
+     {{ tests.0.input | to_yaml(indent=2) | indent(5) }}
+
+{% for i in tests[0:1]|subelements('group') %}
+* {{ i.1.d }}
+
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1-3
+
+   target:
+     {{ i.1.tt | to_yaml(indent=2) | indent(5) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
+
+{% endfor %}
+
+gives
+
+.. code-block:: yaml
+   :emphasize-lines: 1-
+
+   result:
+     {{ tests.0.result | to_yaml(indent=2) | indent(5) }}
+ 
+.. versionadded:: 9.1.0
+
+* The results of the below examples 1-3 are all the same:
+
+.. code-block:: yaml
+   :emphasize-lines: 1-
+
+   result:
+     {{ tests.1.result | to_yaml(indent=2) | indent(5) }}
+
+{% for i in tests[1:2]|subelements('group') %}
+{{ loop.index }}. {{ i.1.d }}
+
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1-4
+
+   mp: {{ i.1.mp }}
+   target:
+     {{ i.1.tt | to_yaml(indent=2) | indent(5) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
+
+{% endfor %}
+
+* The results of the below examples 4-5 are the same:
+
+.. code-block:: yaml
+   :emphasize-lines: 1-
+
+   result:
+     {{ tests.2.result | to_yaml(indent=2) | indent(5) }}
+
+{% for i in tests[2:3]|subelements('group') %}
+{{ loop.index + 3 }}. {{ i.1.d }}
+
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1-3
+
+   mp: {{ i.1.mp }}
+   target:
+     {{ i.1.tt | to_yaml(indent=2) | indent(5) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
+
+{% endfor %}
+
+{% for i in tests[3:4]|subelements('group') %}
+{{ loop.index + 5 }}. {{ i.1.d }}
+
+.. code-block:: yaml
+   :emphasize-lines: 1-
+
+   input:
+     {{ i.0.input | to_yaml(indent=2) | indent(5) }}
+
+.. code-block:: yaml+jinja
+   :emphasize-lines: 1-4
+
+   mp: {{ i.1.mp }}
+   target:
+     {{ i.1.tt | to_yaml(indent=2) | indent(5) }}
+   result: "{{ lookup('file', target ~ '/templates/' ~ i.0.template) }}"
+
+gives
+
+.. code-block:: yaml
+   :emphasize-lines: 1-
+
+   result:
+     {{ i.0.result | to_yaml(indent=2) | indent(5) }}
+
+{% endfor %}
