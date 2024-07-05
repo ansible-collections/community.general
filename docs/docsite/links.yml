@@ -25,3 +25,7 @@ communication:
   mailing_lists:
     - topic: Ansible Project List
       url: https://groups.google.com/g/ansible-project
+  forums:
+    - topic: Ansible Forum
+      # The following URL directly points to the "Get Help" section
+      url: https://forum.ansible.com/c/help/6/none
