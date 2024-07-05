@@ -173,7 +173,7 @@ options:
       options:
         description:
           - O(mount_volumes[].options) is a dict of extra options.
-          - The value of any given option must be a string, e.g. V("1").
+          - The value of any given option must be a string, for example V("1").
         type: dict
   ip_address:
     description:
