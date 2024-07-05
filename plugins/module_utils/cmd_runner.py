@@ -11,6 +11,7 @@ from functools import wraps
 
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.six import iteritems
+from ansible.module_utils.common.locale import get_best_parsable_locale
 
 
 def _ensure_list(value):
@@ -236,7 +237,13 @@ class CmdRunner(object):
                 fmt = _Format.as_func(func=fmt, ignore_none=True)
             self.arg_formats[fmt_name] = fmt
         self.check_rc = check_rc
-        self.force_lang = force_lang
+        if force_lang == "auto":
+            try:
+                self.force_lang = get_best_parsable_locale()
+            except RuntimeWarning:
+                self.force_lang = "C"
+        else:
+            self.force_lang = force_lang
         self.path_prefix = path_prefix
         if environ_update is None:
             environ_update = {}
