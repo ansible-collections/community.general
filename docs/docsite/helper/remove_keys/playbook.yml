@@ -1,0 +1,79 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Create docs REST files
+# shell> ansible-playbook playbook.yml
+#
+# Proofread and copy created *.rst file into the directory
+# docs/docsite/rst. Do not add *.rst in this directory to the version
+# control.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# community.general/docs/docsite/helper/remove_keys/playbook.yml
+
+- name: Create RST file for docs/docsite/rst
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+
+    plugin: remove_keys
+    plugin_type: filter
+    docs_path:
+      - filter_guide
+      - abstract_informations
+      - lists_of_dictionaries
+
+    file_base: "{{ (docs_path + [plugin]) | join('-') }}"
+    file_rst: ../../rst/{{ file_base }}.rst
+    file_sha1: "{{ plugin }}.rst.sha1"
+
+    target: "../../../../tests/integration/targets/{{ plugin_type }}_{{ plugin }}"
+    target_vars: "{{ target }}/vars/main/tests.yml"
+    target_sha1: tests.yml.sha1
+
+  tasks:
+
+    - name: Test integrity tests.yml
+      when:
+        - integrity | d(true) | bool
+        - lookup('file', target_sha1) != lookup('pipe', 'sha1sum ' ~  target_vars)
+      block:
+
+        - name: Changed tests.yml
+          ansible.builtin.debug:
+            msg: |
+              Changed {{ target_vars }}
+              Review the changes and update {{ target_sha1 }}
+              shell> sha1sum {{ target_vars }} > {{ target_sha1 }}
+
+        - name: Changed tests.yml end host
+          ansible.builtin.meta: end_play
+
+    - name: Test integrity RST file
+      when:
+        - integrity | d(true) | bool
+        - lookup('file', file_sha1) != lookup('pipe', 'sha1sum ' ~ file_rst)
+      block:
+
+        - name: Changed RST file
+          ansible.builtin.debug:
+            msg: |
+              Changed {{ file_rst }}
+              Review the changes and update {{ file_sha1 }}
+              shell> sha1sum {{ file_rst }} > {{ file_sha1 }}
+
+        - name: Changed RST file end host
+          ansible.builtin.meta: end_play
+
+    - name: Include target vars
+      include_vars:
+        file: "{{ target_vars }}"
+
+    - name: Create RST file
+      ansible.builtin.template:
+        src: "{{ file_base }}.rst.j2"
+        dest: "{{ file_base }}.rst"
