@@ -460,4 +460,4 @@ as-is, otherwise the runtime ``PATH`` is searched for that command name.
 
 Other than that, everything else works as in ``CmdRunner``.
 
-.. versionadded:: 6.1.0
+.. versionadded:: 4.8.0
