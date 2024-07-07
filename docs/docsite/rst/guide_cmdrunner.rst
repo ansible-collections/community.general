@@ -336,7 +336,10 @@ Some additional features are available as decorators:
     .. code-block:: python
 
           arg_formats = dict(
+              # ...
               database=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
+              # ...
+          )
 
     When receiving a list ``["abc", "def"]``, the output is:
 
@@ -450,7 +453,7 @@ And the command line for ``venv="/work/venv"`` is like:
 
 You may provide the value of the ``command`` argument as a string (in that case the string is used as a script name)
 or as a list, in which case the elements of the list must be valid arguments for the Python interpreter, as in the example above.
-See `https://docs.python.org/3/using/cmdline.html`_ for more details.
+See `Command line and environment <https://docs.python.org/3/using/cmdline.html>`_ for more details.
 
 If the parameter ``python`` is an absolute path, or contains directory separators, such as ``/``, then it is used
 as-is, otherwise the runtime ``PATH`` is searched for that command name.
