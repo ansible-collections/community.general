@@ -15,11 +15,11 @@ Introduction
 
 The ``ansible_collections.community.general.plugins.module_utils.cmd_runner`` module util provides the
 ``CmdRunner`` class to help execute external commands. The class is a wrapper around
-the standard ``AnsibleModule.run_command()`` method, handling: command arguments, localization setting,
+the standard ``AnsibleModule.run_command()`` method, handling command arguments, localization setting,
 output processing output, check mode, and other features.
 
 It is even more useful when one command is used in multiple modules, so that you can define all options
-in a module util file, and each module will use the same runner with different arguments.
+in a module util file, and each module uses the same runner with different arguments.
 
 For the sake of clarity, throughout this guide, unless otherwise specified, we use the term *option* when referring to
 Ansible module options, and the term *argument* when referring to the command line arguments for the external command.
@@ -28,10 +28,10 @@ Ansible module options, and the term *argument* when referring to the command li
 Quickstart
 """"""""""
 
-``CmdRunner`` basically defines a command to be executed, and a set of coded instructions on how to format
-the command-line arguments, in which specific order, for that particular command.
-It relies on ``ansible.module_utils.basic.AnsibleModule.run_command()`` to execute the command.
-There are other features, see more details through this document.
+``CmdRunner`` defines a command and a set of coded instructions on how to format
+the command-line arguments, in which specific order, for a particular execution.
+It relies on ``ansible.module_utils.basic.AnsibleModule.run_command()`` to actually execute the command.
+There are other features, see more details throughout this document.
 
 To use ``CmdRunner`` you must start by creating an object. The example below is a simplified
 version of the actual code in :ansplugin:`community.general.ansible_galaxy_install#module`:
@@ -71,18 +71,18 @@ This is meant to be done once, then every time you need to execute the command y
         # Another way of expressing it
         dummy, stdout, dummy = runner("version").run()
 
-Note that you can pass values for the arguments  when calling ``run()``,
-otherwise ``CmdRunner`` will use the module options with the exact same names to
+Note that you can pass values for the arguments when calling ``run()``,
+otherwise ``CmdRunner`` uses the module options with the exact same names to
 provide values for the runner arguments. If no value is passed and no module option
-is found with the specified name, then an exception will be raised, unless the
-argument is using ``cmd_runner_fmt.as_fixed`` as format function, like the
+is found for the name specified, then an exception is raised, unless the
+argument is using ``cmd_runner_fmt.as_fixed`` as format function like the
 ``version`` in the example above. See more about it below.
 
-In the first example, values of ``type``, ``force``, ``no_deps`` and others will
-be taken straight from the module, whilst ``galaxy_cmd`` and ``upgrade`` are
+In the first example, values of ``type``, ``force``, ``no_deps`` and others
+are taken straight from the module, whilst ``galaxy_cmd`` and ``upgrade`` are
 passed explicitly.
 
-That will generate a resulting command line similar to (example taken from the
+That generates a resulting command line similar to (example taken from the
 output of an integration test):
 
 .. code-block:: python
@@ -121,17 +121,17 @@ The parameter ``value`` can be of any type - although there are convenience
 mechanisms to help handling sequence and mapping objects.
 
 The result is expected to be of the type ``Sequence[str]`` type (most commonly
-``list[str]`` or ``tuple[str]``), otherwise it will be considered to be a ``str``,
-and it will be coerced into ``list[str]``.
-This resulting sequence of strings will be added to the command line when that
+``list[str]`` or ``tuple[str]``), otherwise it is considered to be a ``str``,
+and it is coerced into ``list[str]``.
+This resulting sequence of strings is added to the command line when that
 argument is actually used.
 
 For example, if ``func`` returns:
 
-- ``["nee", 2, "shruberries"]``, the command line will include arguments ``"nee" "2" "shruberries"``.
-- ``2 == 2``, the command line will include argument ``True``.
-- ``None``, the command line will include argument ``None``.
-- ``[]``, the command line will not include argument anything for that particular argument.
+- ``["nee", 2, "shruberries"]``, the command line adds arguments ``"nee" "2" "shruberries"``.
+- ``2 == 2``, the command line adds argument ``True``.
+- ``None``, the command line adds argument ``None``.
+- ``[]``, the command line adds no command line argument for that particular argument.
 
 
 Convenience format methods
@@ -147,12 +147,11 @@ that class:
     from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 The same example shows how to make use of some of them in the instantiation of the ``CmdRunner`` object.
-Below you will find a description of each one of the convenience methods available and
-examples of how to use them. In these descriptions ``value`` refers to the single
-parameter passed to the formatting function.
+A description of each one of the convenience methods available and examples of how to use them is found below.
+In these descriptions ``value`` refers to the single parameter passed to the formatting function.
 
 - ``cmd_runner_fmt.as_list()``
-    It does not receive any parameter, function returns ``value`` as-is.
+    This method does not receive any parameter, function returns ``value`` as-is.
 
     - Creation:
         ``cmd_runner_fmt.as_list()``
@@ -166,9 +165,9 @@ parameter passed to the formatting function.
         +----------------------+---------------------+
 
 - ``cmd_runner_fmt.as_bool()``
-    It receives two different parameters: ``args_true`` and ``args_false``, latter being optional.
-    If the boolean evaluation of ``value`` is ``True``, the format function will return ``args_true``.
-    If the boolean evaluation is ``False``, then the function will return ``args_false``
+    This method receives two different parameters: ``args_true`` and ``args_false``, latter being optional.
+    If the boolean evaluation of ``value`` is ``True``, the format function returns ``args_true``.
+    If the boolean evaluation is ``False``, then the function returns ``args_false``
     if it was provided, or ``[]`` otherwise.
 
     - Creation:
@@ -183,7 +182,7 @@ parameter passed to the formatting function.
         +------------+--------------------+
 
 - ``cmd_runner_fmt.as_bool_not()``
-    It receives one parameter, which is returned by the function when the boolean evaluation
+    This method receives one parameter, which is returned by the function when the boolean evaluation
     of ``value`` is ``False``.
 
     - Creation:
@@ -198,7 +197,7 @@ parameter passed to the formatting function.
         +-------------+---------------------+
 
 - ``cmd_runner_fmt.as_optval()``
-    It receives one parameter ``arg``, the function returns the string concatenation
+    This method receives one parameter ``arg``, the function returns the string concatenation
     of ``arg`` and ``value``.
 
     - Creation:
@@ -213,7 +212,7 @@ parameter passed to the formatting function.
         +---------------+---------------------+
 
 - ``cmd_runner_fmt.as_opt_val()``
-    It receives one parameter ``arg``, the function returns ``[arg, value]``.
+    This method receives one parameter ``arg``, the function returns ``[arg, value]``.
 
     - Creation:
         ``cmd_runner_fmt.as_opt_val("--name")``
@@ -225,7 +224,7 @@ parameter passed to the formatting function.
         +--------------+--------------------------+
 
 - ``cmd_runner_fmt.as_opt_eq_val()``
-    It receives one parameter ``arg``, the function returns the string of the form
+    This method receives one parameter ``arg``, the function returns the string of the form
     ``{arg}={value}``.
 
     - Creation:
@@ -238,7 +237,7 @@ parameter passed to the formatting function.
         +------------+-------------------------+
 
 - ``cmd_runner_fmt.as_fixed()``
-    It receives one parameter ``arg``, the function expects no ``value`` - if one
+    This method receives one parameter ``arg``, the function expects no ``value`` - if one
     is provided then it is ignored.
     The function returns ``arg`` as-is.
 
@@ -260,7 +259,7 @@ parameter passed to the formatting function.
         There is no *value* to be passed for that CLI argument.
 
 - ``cmd_runner_fmt.as_map()``
-    It receives one parameter ``arg`` which must be a dictionary, and an optional parameter ``default``.
+    This method receives one parameter ``arg`` which must be a dictionary, and an optional parameter ``default``.
     The function returns the evaluation of ``arg[value]``.
     If ``value not in arg``, then it returns ``default`` if defined, otherwise ``[]``.
 
@@ -276,13 +275,13 @@ parameter passed to the formatting function.
         +---------------------+---------------+
 
     - Note:
-        If ``default`` is not specified, invalid values will return an empty list, meaning they will be silently ignored.
+        If ``default`` is not specified, invalid values return an empty list, meaning they are silently ignored.
 
 - ``cmd_runner_fmt.as_func()``
-    In this case ``arg`` itself is a format function. It must abide by the rules described above.
+    This method receives one parameter ``arg`` which is itself is a format function and it must abide by the rules described above.
 
-    - Creation: ``cmd_runner_fmt.as_func(lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)])``
-    - Example:
+    - Creation:
+        ``cmd_runner_fmt.as_func(lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)])``
     - Note:
         The outcome for that depends entirely on the function provided by the developer.
 
@@ -328,7 +327,7 @@ Some additional features are available as decorators:
     Conversely, this decorator unpacks the incoming ``value`` as a ``dict``-like object.
 
 - ``cmd_runner_fmt.stack()``
-    This decorator will assume ``value`` is a sequence and will concatenate the output
+    This decorator assumes ``value`` is a sequence and concatenates the output
     of the wrapped function applied to each element of the sequence.
 
     For example, in :ansplugin:`community.general.django_check#module`, the argument format for ``database``
@@ -339,7 +338,7 @@ Some additional features are available as decorators:
           arg_formats = dict(
               database=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--database"),
 
-    When receiving a list ``["abc", "def"]``, the output will be:
+    When receiving a list ``["abc", "def"]``, the output is:
 
     .. code-block:: python
 
@@ -355,15 +354,15 @@ Settings that can be passed to the ``CmdRunner`` constructor are:
     Module instance. Mandatory parameter.
 - ``command: str | list[str]``
     Command to be executed. It can be a single string, the executable name, or a list
-    of strings containing the executable name as the first element and fixed parameters. Those parameters
-    will be used in all executions of the runner.
+    of strings containing the executable name as the first element and, optionally, fixed parameters.
+    Those parameters are used in all executions of the runner.
 - ``arg_formats: dict``
     Mapping of argument names to formatting functions.
 - ``default_args_order: str``
     As the name suggests, a default ordering for the arguments. When
     this is passed, the context can be created without specifying ``args_order``. Defaults to ``()``.
 - ``check_rc: bool``
-    When ``True``, if the return code from the command is not zero, the module will exit
+    When ``True``, if the return code from the command is not zero, the module exits
     with an error. Defaults to ``False``.
 - ``path_prefix: list[str]``
     If the command being executed is installed in a non-standard directory path,
@@ -372,18 +371,17 @@ Settings that can be passed to the ``CmdRunner`` constructor are:
     Pass additional environment variables to be set during the command execution.
     Defaults to ``None``.
 - ``force_lang: str``
-    Most of the times, it will be important to force the locale to one specific
-    value, so that responses are consistent and, therefore, parseable. Please note that using this option (which
-    is enabled by default) overwrites the environment variables ``LANGUAGE`` and ``LC_ALL``.
+    It is usually important to force the locale to one specific value, so that responses are consistent and, therefore, parseable.
+    Please note that using this option (which is enabled by default) overwrites the environment variables ``LANGUAGE`` and ``LC_ALL``.
     To disable this mechanism, set this parameter to ``None``.
-    In community.general 9.1.0 it was introduced a special value ``auto`` for this parameter, which will
-    try to determine the best parseable locale for the runtime. It should become the default value in the
-    future, but for the time being the default value is ``C``.
+    In community.general 9.1.0 a special value ``auto`` was introduced for this parameter, with the effect
+    that ``CmdRunner`` then tries to determine the best parseable locale for the runtime.
+    It should become the default value in the future, but for the time being the default value is ``C``.
 
 When creating a context, the additional settings that can be passed to the call are:
 
 - ``args_order: str``
-    Established the order in which the arguments will be rendered in the command line.
+    Establishes the order in which the arguments are rendered in the command line.
     This parameter is mandatory unless ``default_args_order`` was provided to the runner instance.
 - ``output_process: func``
     Function to transform the output of the executable into different values or formats.
@@ -414,12 +412,14 @@ as the ``output_process`` parameter. It must be a function like:
         # do some magic
         return processed_value    # whatever that is
 
+In that case, the return of ``run()`` is the ``processed_value`` returned by the function.
+
 
 PythonRunner
 ^^^^^^^^^^^^
 
-The ``PythonRunner```class is a specialized version of ``CmdRunner``, geared towards the execution of
-Python scripts. It feature two mutually exclusive extra parameters ``python`` and  ``venv`` in its constructor:
+The ``PythonRunner`` class is a specialized version of ``CmdRunner``, geared towards the execution of
+Python scripts. It features two extra and  mutually exclusive parameters ``python`` and ``venv`` in its constructor:
 
 .. code-block:: python
 
@@ -448,12 +448,12 @@ And the command line for ``venv="/work/venv"`` is like:
 
     /work/venv/bin/python -m django <arg1> <arg2> ...
 
-You may provide the value of the ``command`` argument as a string (in that case the string will be used as a script name)
+You may provide the value of the ``command`` argument as a string (in that case the string is used as a script name)
 or as a list, in which case the elements of the list must be valid arguments for the Python interpreter, as in the example above.
-See `<https://docs.python.org/3/using/cmdline.html>` for more details.
+See `https://docs.python.org/3/using/cmdline.html`_ for more details.
 
-If the parameter ``python`` is an absolute path, or contains directory separators, such as ``/```, then it will be used
-as-is, otherwise the runtime ``PATH`` will be searched for that command name.
+If the parameter ``python`` is an absolute path, or contains directory separators, such as ``/``, then it is used
+as-is, otherwise the runtime ``PATH`` is searched for that command name.
 
 Other than that, everything else works as in ``CmdRunner``.
 
