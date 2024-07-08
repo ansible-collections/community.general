@@ -6,9 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common._collections_compat import Mapping
-
 DOCUMENTATION = '''
     name: reveal_ansible_type
     short_description: Return input type
@@ -125,13 +122,6 @@ from ansible_collections.community.general.plugins.plugin_utils.ansible_type imp
 
 def reveal_ansible_type(data, alias=None):
     """Returns data type"""
-
-    if not alias:
-        alias = {}
-
-    if not isinstance(alias, Mapping):
-        msg = "Argument alias must be a dictionary. %s is %s"
-        raise AnsibleFilterError(msg % (alias, type(alias)))
 
     return _ansible_type(data, alias)
 

@@ -5,9 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common._collections_compat import Mapping, Sequence
-
 DOCUMENTATION = '''
     name: ansible_type
     short_description: Validate input type
@@ -178,18 +175,13 @@ RETURN = '''
     type: bool
 '''
 
+from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common._collections_compat import Sequence
 from ansible_collections.community.general.plugins.plugin_utils.ansible_type import _ansible_type
 
 
 def ansible_type(data, dtype, alias=None):
     """Validates data type"""
-
-    if not alias:
-        alias = {}
-
-    if not isinstance(alias, Mapping):
-        msg = "The argument alias must be a dictionary. %s is %s"
-        raise AnsibleFilterError(msg % (alias, type(alias)))
 
     if not isinstance(dtype, Sequence):
         msg = "The argument dtype must be a string or a list. dtype is %s."

@@ -5,6 +5,9 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common._collections_compat import Mapping, Sequence
+
 
 def _atype(data, alias):
     """
@@ -12,16 +15,20 @@ def _atype(data, alias):
     """
 
     data_type = type(data).__name__
-
-    if data_type in alias:
-        return alias[data_type]
-    return data_type
+    return alias.get(data_type, data_type)
 
 
 def _ansible_type(data, alias):
     """
     Returns the Ansible data type.
     """
+
+    if not alias:
+        alias = {}
+
+    if not isinstance(alias, Mapping):
+        msg = "The argument alias must be a dictionary. %s is %s"
+        raise AnsibleFilterError(msg % (alias, type(alias)))
 
     data_type = _atype(data, alias)
 
