@@ -1,0 +1,2 @@
+minor_changes:
+  - wdc_redfish_command - minor change to handle upgrade file for Redfish WD platforms (https://github.com/ansible-collections/community.general/pull/8444).
