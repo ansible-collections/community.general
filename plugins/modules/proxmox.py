@@ -724,18 +724,12 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     vol_string = "{storage}:{size}".format(storage=storage, size=size)
 
             # 1.3 If we have a host_path, we don't have storage, a volume, or a size
-            if host_path is not None:
-                vol_string = host_path
-
-            # 2. Build valid string
-            if mountpoint is not None:
-                vol_string += ",mp={mountpoint}".format(mountpoint=mountpoint)
-            if options is not None:
-                vol_string += ","
-                vol_string += ",".join(map("=".join, options.items()))
-            if kwargs:
-                vol_string += ","
-                vol_string += ",".join(map("=".join, kwargs.items()))
+            vol_string = ",".join(
+                ([] if host_path is None else [host_path]) +
+                ([] if mountpoint is None else ["mp={0}".format(mountpoint)]) +
+                ([] if options is None else [map("=".join, options.items())]) +
+                ([] if not kwargs else [map("=".join, kwargs.items())])
+            )
 
             return {key: vol_string}
 
