@@ -27,4 +27,4 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || '' }}
 
       - name: REUSE Compliance Check
-        uses: fsfe/reuse-action@v3
+        uses: fsfe/reuse-action@v4
