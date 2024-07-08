@@ -1468,14 +1468,16 @@ files:
     maintainers: ericzolf
   docs/docsite/rst/guide_alicloud.rst:
     maintainers: xiaozhu36
+  docs/docsite/rst/guide_cmdrunner.rst:
+    maintainers: russoz
+  docs/docsite/rst/guide_deps.rst:
+    maintainers: russoz
   docs/docsite/rst/guide_online.rst:
     maintainers: remyleone
   docs/docsite/rst/guide_packet.rst:
     maintainers: baldwinSPC nurfet-becirevic t0mk teebes
   docs/docsite/rst/guide_scaleway.rst:
     maintainers: $team_scaleway
-  docs/docsite/rst/guide_deps.rst:
-    maintainers: russoz
   docs/docsite/rst/guide_vardict.rst:
     maintainers: russoz
   docs/docsite/rst/test_guide.rst:
