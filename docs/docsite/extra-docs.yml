@@ -18,3 +18,4 @@ sections:
     toctree:
       - guide_deps
       - guide_vardict
+      - guide_cmdrunner
