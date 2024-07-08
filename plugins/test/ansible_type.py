@@ -181,9 +181,11 @@ RETURN = '''
 from ansible_collections.community.general.plugins.plugin_utils.ansible_type import _ansible_type
 
 
-def ansible_type(data, dtype, alias={}):
-
+def ansible_type(data, dtype, alias=None):
     """Validates data type"""
+
+    if not alias:
+        alias = {}
 
     if not isinstance(alias, Mapping):
         msg = "The argument alias must be a dictionary. %s is %s"

@@ -123,8 +123,11 @@ RETURN = '''
 from ansible_collections.community.general.plugins.plugin_utils.ansible_type import _ansible_type
 
 
-def reveal_ansible_type(data, alias={}):
+def reveal_ansible_type(data, alias=None):
     """Returns data type"""
+
+    if not alias:
+        alias = {}
 
     if not isinstance(alias, Mapping):
         msg = "Argument alias must be a dictionary. %s is %s"
