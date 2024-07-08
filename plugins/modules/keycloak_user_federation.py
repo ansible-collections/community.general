@@ -765,6 +765,7 @@ def main():
         evictionMinute=dict(type='str'),
         fullSyncPeriod=dict(type='int', default=-1),
         importEnabled=dict(type='bool', default=True),
+        krbPrincipalAttribute=dict(type='str'),
         kerberosRealm=dict(type='str'),
         keyTab=dict(type='str', no_log=False),
         maxLifespan=dict(type='int'),
