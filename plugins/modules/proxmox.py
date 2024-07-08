@@ -139,7 +139,7 @@ options:
     suboptions:
       id:
         description:
-          - O(mount_volumes[].id) is the identifier of the mount point written as C(mp[n])
+          - O(mount_volumes[].id) is the identifier of the mount point written as C(mp[n]).
         type: str
         required: true
       storage:
@@ -185,7 +185,7 @@ options:
     type: bool
   storage:
     description:
-      - Target storage
+      - Target storage.
       - This Option is mutually exclusive with O(disk) and O(disk_volume).
     type: str
     default: 'local'
