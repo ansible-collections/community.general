@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.common._collections_compat import Mapping, Sequence
+from ansible.module_utils.common._collections_compat import Mapping
 
 
 def _atype(data, alias):
