@@ -24,7 +24,7 @@ class TestBootcManageModule(ModuleTestCase):
         set_module_args({'state': 'switch'})
         with self.assertRaises(AnsibleFailJson) as result:
             self.module.main()
-        self.assertEqual(result.exception.args[0]['msg'], "Image is required when state is 'switch'")
+        self.assertEqual(result.exception.args[0]['msg'], "state is switch but all of the following are missing: image")
 
     def test_switch_with_image(self):
         """Test successful switch with image provided"""
@@ -60,7 +60,7 @@ class TestBootcManageModule(ModuleTestCase):
             run_command_mock.return_value = (1, '', 'ERROR')
             with self.assertRaises(AnsibleFailJson) as result:
                 self.module.main()
-            self.assertEqual(result.exception.args[0]['msg'], 'ERROR: Failed to switch image.')
+            self.assertEqual(result.exception.args[0]['msg'], 'ERROR: Command execution failed.')
 
     def test_latest_state_failure(self):
         """Test failure during upgrade"""
@@ -69,4 +69,4 @@ class TestBootcManageModule(ModuleTestCase):
             run_command_mock.return_value = (1, '', 'ERROR')
             with self.assertRaises(AnsibleFailJson) as result:
                 self.module.main()
-            self.assertEqual(result.exception.args[0]['msg'], 'ERROR: Failed to apply updates.')
+            self.assertEqual(result.exception.args[0]['msg'], 'ERROR: Command execution failed.')

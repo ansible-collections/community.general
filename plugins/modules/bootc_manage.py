@@ -21,7 +21,6 @@ options:
     state:
         description:
             - 'Control to apply the latest image or switch the image.'
-            - 'This is a string value.'
             - 'NOTE: This will not reboot the system.'
             - 'Please use M(ansible.builtin.reboot) to reboot the system.'
         required: true
@@ -74,7 +73,7 @@ def main():
     if state == 'switch':
         command = ['bootc', 'switch', image, '--retain']
     elif state == 'latest':
-        command = 'bootc upgrade'
+        command = ['bootc', 'upgrade']
 
     rc, out, err = module.run_command(command)
 
