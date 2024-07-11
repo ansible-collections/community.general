@@ -14,8 +14,8 @@ DOCUMENTATION = '''
         - Get inventory hosts from the local virtualbox installation.
         - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
         - The inventory_hostname is always the 'Name' of the virtualbox instance.
-        - Groups can be assigned to the VMs using `VBoxManage`. Multiple groups can be assigned by using `/` as a delimeter.
-        - A separate parameter, `enable_advanced_group_parsing` is exposed to change grouping behaviour. See the parameter documentation for details.
+        - Groups can be assigned to the VMs using C(VBoxManage). Multiple groups can be assigned by using V(/) as a delimeter.
+        - A separate parameter, O(enable_advanced_group_parsing) is exposed to change grouping behaviour. See the parameter documentation for details.
     extends_documentation_fragment:
       - constructed
       - inventory_cache
