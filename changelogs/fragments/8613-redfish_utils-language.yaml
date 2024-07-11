@@ -1,2 +1,2 @@
 bugfixes:
-  - redfish_utils - fix to not fail when language is not exactly "en" (https://github.com/ansible-collections/community.general/pull/8613).
+  - redfish_utils - don't fail when language is not exactly "en" (https://github.com/ansible-collections/community.general/pull/8613).
