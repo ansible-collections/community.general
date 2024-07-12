@@ -3833,7 +3833,7 @@ class RedfishUtils(object):
         vendor = self._get_vendor()['Vendor']
         rsp_uri = ""
         for loc in resp_data['Location']:
-            if loc['Language'] == "en":
+            if loc['Language'].startswith("en"):
                 rsp_uri = loc['Uri']
                 if vendor == 'HPE':
                     # WORKAROUND
