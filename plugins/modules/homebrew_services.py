@@ -142,12 +142,13 @@ else:
 def _brew_service_state(args, module):
     # type: (HomebrewServiceArgs, AnsibleModule) -> HomebrewServiceState
     cmd = [args.brew_path, "services", "info", args.name, "--json"]
-    rc, stdout, stderr = module.run_command(cmd)
+    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
 
-    if rc != 0:
-        module.fail_json(msg=stderr.strip())
+    try:
+        data = json.loads(stdout)[0]
+    except json.JSONDecodeError:
+        module.fail_json(msg="Failed to parse JSON output:\n{0}".format(stdout))
 
-    data = json.loads(stdout)[0]
     return HomebrewServiceState(running=data["status"] == "started", pid=data["pid"])
 
 
@@ -156,7 +157,9 @@ def _exit_with_state(args, module, changed=False, message=None):
     state = _brew_service_state(args, module)
     if message is None:
         message = (
-            "Running: {state.running}, Changed: {state.running}, PID: {state.pid}".format(state=state)
+            "Running: {state.running}, Changed: {changed}, PID: {state.pid}".format(
+                state=state, changed=changed
+            )
         )
     module.exit_json(msg=message, pid=state.pid, running=state.running, changed=changed)
 
@@ -189,9 +192,7 @@ def start_service(args, module):
         _exit_with_state(args, module, changed=True, message="Service would be started")
 
     start_cmd = [args.brew_path, "services", "start", args.name]
-    rc, stdout, stderr = module.run_command(start_cmd)
-    if rc != 0:
-        module.fail_json(msg=stderr.strip())
+    rc, stdout, stderr = module.run_command(start_cmd, check_rc=True)
 
     _exit_with_state(args, module, changed=True)
 
@@ -208,9 +209,7 @@ def stop_service(args, module):
         _exit_with_state(args, module, changed=True, message="Service would be stopped")
 
     stop_cmd = [args.brew_path, "services", "stop", args.name]
-    rc, stdout, stderr = module.run_command(stop_cmd)
-    if rc != 0:
-        module.fail_json(msg=stderr.strip())
+    rc, stdout, stderr = module.run_command(stop_cmd, check_rc=True)
 
     _exit_with_state(args, module, changed=True)
 
@@ -224,9 +223,7 @@ def restart_service(args, module):
         )
 
     restart_cmd = [args.brew_path, "services", "restart", args.name]
-    rc, stdout, stderr = module.run_command(restart_cmd)
-    if rc != 0:
-        module.fail_json(msg=stderr.strip())
+    rc, stdout, stderr = module.run_command(restart_cmd, check_rc=True)
 
     _exit_with_state(args, module, changed=True)
 
@@ -244,9 +241,13 @@ def main():
                 default="present",
             ),
             path=dict(
-                default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
-                required=False,
-                type="path",
+                default=[
+                    "/usr/local/bin",
+                    "/opt/homebrew/bin",
+                    "/home/linuxbrew/.linuxbrew/bin",
+                ],
+                type="list",
+                element="path",
             ),
         ),
         supports_check_mode=True,
@@ -266,13 +267,6 @@ def main():
         stop_service(service_args, module)
     elif service_args.state == "restarted":
         restart_service(service_args, module)
-
-    # Argument validation should make this unreachable.
-    module.fail_json(
-        msg="Code bug: Should not reach this point (state={0})".format(
-            service_args.state
-        )
-    )
 
 
 if __name__ == "__main__":
