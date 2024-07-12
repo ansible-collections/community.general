@@ -187,10 +187,10 @@ def ansible_type(data, dtype, alias=None):
         msg = "The argument dtype must be a string or a list. dtype is %s."
         raise AnsibleFilterError(msg % (dtype, type(dtype)))
 
-    if isinstance(dtype, list):
-        data_types = dtype
-    else:
+    if isinstance(dtype, str):
         data_types = [dtype]
+    else:
+        data_types = dtype
 
     return _ansible_type(data, alias) in data_types
 
