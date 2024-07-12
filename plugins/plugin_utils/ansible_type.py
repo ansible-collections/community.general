@@ -23,7 +23,7 @@ def _ansible_type(data, alias):
     Returns the Ansible data type.
     """
 
-    if not alias:
+    if alias is None:
         alias = {}
 
     if not isinstance(alias, Mapping):
