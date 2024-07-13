@@ -63,7 +63,7 @@ DOCUMENTATION = """
             required: false 
             type: boolean
             ini:
-              - section: sudo_become_plugin
+              - section: community.general.sudosu
                 key: alternative_method
             vars:
               - name: ansible_sudosu_alt_method
