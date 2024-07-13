@@ -68,6 +68,7 @@ DOCUMENTATION = """
               - name: ansible_sudosu_alt_method
             env:
               - name: ANSIBLE_SUDOSU_ALT_METHOD
+            version_added: 9.2.0
 """
 
 
