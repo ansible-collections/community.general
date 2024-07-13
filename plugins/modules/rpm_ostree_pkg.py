@@ -57,13 +57,13 @@ EXAMPLES = r'''
     state: absent
 
 # In case a different transaction is currently running the module would fail.
-# Adding a delay can help mitigate this problem.
+# Adding a delay can help mitigate this problem:
 - name: Install overlay package
   community.general.rpm_ostree_pkg:
     name: nfs-utils
     state: present
   register: rpm_ostree_pkg
-  until: rpm_ostree_pkg.failed is false
+  until: rpm_ostree_pkg is not failed
   retries: 10
   dealy: 30
 '''
