@@ -60,6 +60,7 @@ DOCUMENTATION = """
               - Whether to use an alternative method to call sudosu. 
               - Use this when the default one is not working on your system.
             required: false 
+            type: boolean
             ini:
               - section: sudo_become_plugin
                 key: alternative_method
