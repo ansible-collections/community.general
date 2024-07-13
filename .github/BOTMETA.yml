@@ -176,6 +176,8 @@ files:
     maintainers: vbotka
   $filters/replace_keys.py:
     maintainers: vbotka
+  $filters/reveal_ansible_type.py:
+    maintainers: vbotka
   $filters/time.py:
     maintainers: resmo
   $filters/to_days.yml:
@@ -1425,12 +1427,16 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
+  $plugin_utils/ansible_type.py:
+    maintainers: vbotka
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
     maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
+  $tests/ansible_type.py:
+    maintainers: vbotka
   $tests/fqdn_valid.py:
     maintainers: vbotka
 #########################
