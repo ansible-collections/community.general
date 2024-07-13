@@ -55,6 +55,18 @@ DOCUMENTATION = """
             ini:
               - section: sudo_become_plugin
                 key: password
+        alt_method:
+            description: 
+              - Whether to use an alternative method to call sudosu. 
+              - Use this when the default one is not working on your system.
+            required: false 
+            ini:
+              - section: sudo_become_plugin
+                key: alternative_method
+            vars:
+              - name: ansible_sudosu_alt_method
+            env:
+              - name: ANSIBLE_SUDOSU_ALT_METHOD
 """
 
 
@@ -89,4 +101,7 @@ class BecomeModule(BecomeBase):
         if user:
             user = '%s' % (user)
 
-        return ' '.join([becomecmd, flags, prompt, "su -l", user, "-c", self._build_success_command(cmd, shell, True)])
+        if self.get_option('alt_method'):
+            return ' '.join([becomecmd, flags, prompt, "su -l", user, "-c", self._build_success_command(cmd, shell, True)])
+        else:
+            return ' '.join([becomecmd, flags, prompt, 'su -l', user, self._build_success_command(cmd, shell)])
