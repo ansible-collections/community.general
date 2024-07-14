@@ -14,6 +14,8 @@ DOCUMENTATION = '''
         - Get inventory hosts from the local virtualbox installation.
         - Uses a YAML configuration file that ends with virtualbox.(yml|yaml) or vbox.(yml|yaml).
         - The inventory_hostname is always the 'Name' of the virtualbox instance.
+        - Groups can be assigned to the VMs using C(VBoxManage). Multiple groups can be assigned by using V(/) as a delimeter.
+        - A separate parameter, O(enable_advanced_group_parsing) is exposed to change grouping behaviour. See the parameter documentation for details.
     extends_documentation_fragment:
       - constructed
       - inventory_cache
@@ -35,6 +37,19 @@ DOCUMENTATION = '''
             description: create vars from virtualbox properties
             type: dictionary
             default: {}
+        enable_advanced_group_parsing:
+            description:
+              - The default group parsing rule (when this setting is set to V(false)) is to split the VirtualBox VM's group based on the V(/) character and
+                assign the resulting list elements as an Ansible Group.
+              - Setting O(enable_advanced_group_parsing=true) changes this behaviour to match VirtualBox's interpretation of groups according to
+                U(https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups).
+                Groups are now split using the V(,) character, and the V(/) character indicates nested groups.
+              - When enabled, a VM that's been configured using V(VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2,/TestGroup3") will result in
+                the group C(TestGroup2) being a child group of C(TestGroup); and
+                the VM being a part of C(TestGroup2) and C(TestGroup3).
+            default: false
+            type: bool
+            version_added: 9.2.0
 '''
 
 EXAMPLES = '''
@@ -177,14 +192,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             # found groups
             elif k == 'Groups':
-                for group in v.split('/'):
-                    if group:
-                        group = make_unsafe(group)
-                        group = self.inventory.add_group(group)
-                        self.inventory.add_child(group, current_host)
-                        if group not in cacheable_results:
-                            cacheable_results[group] = {'hosts': []}
-                        cacheable_results[group]['hosts'].append(current_host)
+                if self.get_option('enable_advanced_group_parsing'):
+                    self._handle_vboxmanage_group_string(v, current_host, cacheable_results)
+                else:
+                    self._handle_group_string(v, current_host, cacheable_results)
                 continue
 
             else:
@@ -226,6 +237,64 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             yield True
 
         return all(find_host(host, inventory))
+
+    def _handle_group_string(self, vboxmanage_group, current_host, cacheable_results):
+        '''Handles parsing the VM's Group assignment from VBoxManage according to this inventory's initial implementation.'''
+        # The original implementation of this inventory plugin treated `/` as
+        # a delimeter to split and use as Ansible Groups.
+        for group in vboxmanage_group.split('/'):
+            if group:
+                group = make_unsafe(group)
+                group = self.inventory.add_group(group)
+                self.inventory.add_child(group, current_host)
+                if group not in cacheable_results:
+                    cacheable_results[group] = {'hosts': []}
+                cacheable_results[group]['hosts'].append(current_host)
+
+    def _handle_vboxmanage_group_string(self, vboxmanage_group, current_host, cacheable_results):
+        '''Handles parsing the VM's Group assignment from VBoxManage according to VirtualBox documentation.'''
+        # Per the VirtualBox documentation, a VM can be part of many groups,
+        # and it's possible to have nested groups.
+        # Many groups are separated by commas ",", and nested groups use
+        # slash "/".
+        # https://www.virtualbox.org/manual/UserManual.html#gui-vmgroups
+        # Multi groups: VBoxManage modifyvm "vm01" --groups "/TestGroup,/TestGroup2"
+        # Nested groups: VBoxManage modifyvm "vm01" --groups "/TestGroup/TestGroup2"
+
+        for group in vboxmanage_group.split(','):
+            if not group:
+                # We could get an empty element due how to split works, and
+                # possible assignments from VirtualBox. e.g. ,/Group1
+                continue
+
+            if group == "/":
+                # This is the "root" group. We get here if the VM was not
+                # assigned to a particular group. Consider the host to be
+                # unassigned to a group.
+                continue
+
+            parent_group = None
+            for subgroup in group.split('/'):
+                if not subgroup:
+                    # Similarly to above, we could get an empty element.
+                    # e.g //Group1
+                    continue
+
+                if subgroup == '/':
+                    # "root" group.
+                    # Consider the host to be unassigned
+                    continue
+
+                subgroup = make_unsafe(subgroup)
+                subgroup = self.inventory.add_group(subgroup)
+                if parent_group is not None:
+                    self.inventory.add_child(parent_group, subgroup)
+                self.inventory.add_child(subgroup, current_host)
+                if subgroup not in cacheable_results:
+                    cacheable_results[subgroup] = {'hosts': []}
+                cacheable_results[subgroup]['hosts'].append(current_host)
+
+                parent_group = subgroup
 
     def verify_file(self, path):
 
