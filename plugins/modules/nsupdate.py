@@ -370,7 +370,8 @@ class RecordManager(object):
             except (socket_error, dns.exception.Timeout) as e:
                 self.module.fail_json(msg='DNS server error: (%s): %s' % (e.__class__.__name__, to_native(e)))
 
-            entries_to_remove = [n.to_text() for n in lookup.answer[0].items if n.to_text() not in self.value]
+            lookup_result = lookup.answer[0] if lookup.answer else lookup.authority[0]
+            entries_to_remove = [n.to_text() for n in lookup_result.items if n.to_text() not in self.value]
         else:
             update.delete(self.module.params['record'], self.module.params['type'])
 
