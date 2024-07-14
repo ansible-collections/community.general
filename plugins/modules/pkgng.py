@@ -481,7 +481,7 @@ def main():
     def run_pkgng(action, *args, **kwargs):
         cmd = [pkgng_path, dir_arg, action]
 
-        if p["use_globs"] and  action in ('info', 'install', 'upgrade',) :
+        if p["use_globs"] and action in ('info', 'install', 'upgrade',):
             args = ('-g',) + args
 
         pkgng_env = {'BATCH': 'yes'}
