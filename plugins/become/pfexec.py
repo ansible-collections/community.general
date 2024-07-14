@@ -14,9 +14,10 @@ DOCUMENTATION = '''
     options:
         become_user:
             description:
-                - User you 'become' to execute the task
+                - User you 'become' to execute the task.
                 - This plugin ignores this setting as pfexec uses it's own C(exec_attr) to figure this out,
                   but it is supplied here for Ansible to make decisions needed for the task execution, like file permissions.
+            type: string
             default: root
             ini:
               - section: privilege_escalation
@@ -30,7 +31,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_PFEXEC_USER
         become_exe:
-            description: Sudo executable
+            description: Sudo executable.
+            type: string
             default: pfexec
             ini:
               - section: privilege_escalation
@@ -44,7 +46,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_PFEXEC_EXE
         become_flags:
-            description: Options to pass to pfexec
+            description: Options to pass to pfexec.
+            type: string
             default: -H -S -n
             ini:
               - section: privilege_escalation
@@ -58,7 +61,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_PFEXEC_FLAGS
         become_pass:
-            description: pfexec password
+            description: pfexec password.
+            type: string
             required: false
             vars:
               - name: ansible_become_password
@@ -71,7 +75,7 @@ DOCUMENTATION = '''
               - section: pfexec_become_plugin
                 key: password
         wrap_exe:
-            description: Toggle to wrap the command pfexec calls in 'shell -c' or not
+            description: Toggle to wrap the command pfexec calls in C(shell -c) or not.
             default: false
             type: bool
             ini:
@@ -82,7 +86,7 @@ DOCUMENTATION = '''
             env:
               - name: ANSIBLE_PFEXEC_WRAP_EXECUTION
     notes:
-      - This plugin ignores O(become_user) as pfexec uses it's own C(exec_attr) to figure this out.
+      - This plugin ignores O(become_user) as pfexec uses its own C(exec_attr) to figure this out.
 '''
 
 from ansible.plugins.become import BecomeBase

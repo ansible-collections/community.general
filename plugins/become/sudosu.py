@@ -16,6 +16,7 @@ DOCUMENTATION = """
     options:
         become_user:
             description: User you 'become' to execute the task.
+            type: string
             default: root
             ini:
               - section: privilege_escalation
@@ -30,6 +31,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_SUDO_USER
         become_flags:
             description: Options to pass to C(sudo).
+            type: string
             default: -H -S -n
             ini:
               - section: privilege_escalation
@@ -44,6 +46,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_SUDO_FLAGS
         become_pass:
             description: Password to pass to C(sudo).
+            type: string
             required: false
             vars:
               - name: ansible_become_password
