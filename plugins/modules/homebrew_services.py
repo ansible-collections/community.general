@@ -22,6 +22,7 @@ author:
 requirements:
     - homebrew must already be installed on the target system
 short_description: Services manager for Homebrew
+version_added: 9.2.0
 description:
     - Manages daemons and services via Homebrew.
 extends_documentation_fragment:
@@ -76,13 +77,6 @@ EXAMPLES = """
 """
 
 RETURN = """
-msg:
-    description:
-      - Whether the service is now running, its PID if it is running,
-        and whether the running state changed (including restarts).
-    returned: always
-    type: str
-    sample: "Running: true, Changed: false, PID: 1234"
 pid:
     description:
       - If the service is now running, this is the PID of the service, otherwise -1.
@@ -95,12 +89,6 @@ running:
     returned: success
     type: bool
     sample: true
-changed:
-    description:
-      - Whether the service state changed. This is true when an already running service is restarted.
-    returned: success
-    type: bool
-    sample: false
 """
 
 import json
@@ -241,13 +229,8 @@ def main():
                 default="present",
             ),
             path=dict(
-                default=[
-                    "/usr/local/bin",
-                    "/opt/homebrew/bin",
-                    "/home/linuxbrew/.linuxbrew/bin",
-                ],
-                type="list",
-                element="path",
+                default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
+                type="path",
             ),
         ),
         supports_check_mode=True,
