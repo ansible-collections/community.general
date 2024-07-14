@@ -1,0 +1,2 @@
+minor_changes:
+  - sudosu become plugin - added an option (``alt_method``) to enhance compatibility with more versions of ``su`` (https://github.com/ansible-collections/community.general/pull/8214).
