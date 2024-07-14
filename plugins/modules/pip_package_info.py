@@ -27,6 +27,7 @@ options:
     type: list
     elements: path
 requirements:
+  - pip >= 20.3b1 (necessary for the C(--format) option)
   - The requested pip executables must be installed on the target.
 author:
   - Matthew Jones (@matburt)
