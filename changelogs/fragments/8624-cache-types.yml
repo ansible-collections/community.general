@@ -1,0 +1,2 @@
+minor_changes:
+  - "memcached, pickle, redis, yaml cache plugins - make sure that all options are typed (https://github.com/ansible-collections/community.general/pull/8624)."
