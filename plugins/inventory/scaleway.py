@@ -20,6 +20,7 @@ DOCUMENTATION = r'''
         plugin:
             description: Token that ensures this is a source file for the 'scaleway' plugin.
             required: true
+            type: string
             choices: ['scaleway', 'community.general.scaleway']
         regions:
             description: Filter results on a specific Scaleway region.
@@ -46,6 +47,7 @@ DOCUMENTATION = r'''
             - If not explicitly defined or in environment variables, it will try to lookup in the scaleway-cli configuration file
               (C($SCW_CONFIG_PATH), C($XDG_CONFIG_HOME/scw/config.yaml), or C(~/.config/scw/config.yaml)).
             - More details on L(how to generate token, https://www.scaleway.com/en/docs/generate-api-keys/).
+            type: string
             env:
                 # in order of precedence
                 - name: SCW_TOKEN
