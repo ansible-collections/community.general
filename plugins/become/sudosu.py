@@ -55,6 +55,21 @@ DOCUMENTATION = """
             ini:
               - section: sudo_become_plugin
                 key: password
+        alt_method:
+            description:
+              - Whether to use an alternative method to call C(su). Instead of running C(su -l user /path/to/shell -c command),
+                it runs C(su -l user -c command).
+              - Use this when the default one is not working on your system.
+            required: false
+            type: boolean
+            ini:
+              - section: community.general.sudosu
+                key: alternative_method
+            vars:
+              - name: ansible_sudosu_alt_method
+            env:
+              - name: ANSIBLE_SUDOSU_ALT_METHOD
+            version_added: 9.2.0
 """
 
 
@@ -89,4 +104,7 @@ class BecomeModule(BecomeBase):
         if user:
             user = '%s' % (user)
 
-        return ' '.join([becomecmd, flags, prompt, 'su -l', user, self._build_success_command(cmd, shell)])
+        if self.get_option('alt_method'):
+            return ' '.join([becomecmd, flags, prompt, "su -l", user, "-c", self._build_success_command(cmd, shell, True)])
+        else:
+            return ' '.join([becomecmd, flags, prompt, 'su -l', user, self._build_success_command(cmd, shell)])
