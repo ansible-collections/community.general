@@ -1401,6 +1401,9 @@ files:
     ignore: chrishoffman verkaufer
   $modules/yum_versionlock.py:
     maintainers: gyptazy aminvakil
+  $modules/zendesk_ticket.py:
+    labels: zendesk
+    maintainers: elchico2007
   $modules/zfs:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
     labels: solaris
@@ -1423,9 +1426,6 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
-  $modules/zendesk_ticket.py:
-    labels: zendesk
-    maintainers: elchico2007
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
