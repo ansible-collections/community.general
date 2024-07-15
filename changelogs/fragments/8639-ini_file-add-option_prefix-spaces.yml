@@ -1,0 +1,2 @@
+minor_changes:
+  - ini_file - add option_prefix_spaces parameter to prefix option with a number of spaces defined by parameter
