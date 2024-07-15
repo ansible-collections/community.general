@@ -21,7 +21,7 @@ options:
     state:
         description:
             - 'Control to apply the latest image or switch the image.'
-            - 'NOTE: This will not reboot the system.'
+            - 'B(Note:) This will not reboot the system.'
             - 'Please use M(ansible.builtin.reboot) to reboot the system.'
         required: true
         type: str
