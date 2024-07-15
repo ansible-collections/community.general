@@ -53,6 +53,7 @@ RETURN = '''
 
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.locale import get_best_parsable_locale
 
 
 def main():
@@ -75,7 +76,9 @@ def main():
     elif state == 'latest':
         command = ['bootc', 'upgrade']
 
-    rc, stdout, err = module.run_command(command)
+    locale = get_best_parsable_locale(module)
+    module.run_command_environ_update = dict(LANG=locale, LC_ALL=locale, LC_MESSAGES=locale, LC_CTYPE=locale, LANGUAGE=locale)
+    rc, out, err = module.run_command(command)
 
     if rc == 0:
         if 'Queued for next boot: ' in stdout:
