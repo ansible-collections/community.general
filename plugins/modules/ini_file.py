@@ -153,6 +153,12 @@ options:
     type: bool
     default: false
     version_added: 7.1.0
+  option_prefix_spaces:
+    description:
+    - This flag indicates that the option should start with spaces.
+    type: int
+    default: 0
+    version_added: 8.0.0
 notes:
    - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
    - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
@@ -257,6 +263,14 @@ EXAMPLES = r'''
     value: xxxxxxxxxxxxxxxxxxxx
     mode: '0600'
     state: present
+- name: Update the option and indent with spaces
+  community.general.ini_file:
+    path: /etc/influxdb/config.toml
+    section: default
+    option: url
+    value: http://localhost:8086
+    option_prefix_spaces: 2
+    state: present
 '''
 
 import io
@@ -311,7 +325,8 @@ def check_section_has_values(section_has_values, section_lines):
 
 def do_ini(module, filename, section=None, section_has_values=None, option=None, values=None,
            state='present', exclusive=True, backup=False, no_extra_spaces=False,
-           ignore_spaces=False, create=True, allow_no_value=False, modify_inactive_option=True, follow=False):
+           ignore_spaces=False, create=True, allow_no_value=False, modify_inactive_option=True,
+           follow=False, option_prefix_spaces=0):
 
     if section is not None:
         section = to_text(section)
@@ -383,6 +398,9 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
         assignment_format = u'%s=%s\n'
     else:
         assignment_format = u'%s = %s\n'
+
+    if option_prefix_spaces > 0:
+        assignment_format = (' ' * option_prefix_spaces) + assignment_format
 
     option_no_value_present = False
 
@@ -599,7 +617,8 @@ def main():
             allow_no_value=dict(type='bool', default=False),
             modify_inactive_option=dict(type='bool', default=True),
             create=dict(type='bool', default=True),
-            follow=dict(type='bool', default=False)
+            follow=dict(type='bool', default=False),
+            option_prefix_spaces=dict(type='int', default=0)
         ),
         mutually_exclusive=[
             ['value', 'values']
@@ -623,6 +642,7 @@ def main():
     modify_inactive_option = module.params['modify_inactive_option']
     create = module.params['create']
     follow = module.params['follow']
+    option_prefix_spaces = module.params['option_prefix_spaces']
 
     if state == 'present' and not allow_no_value and value is None and not values:
         module.fail_json(msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
@@ -642,7 +662,8 @@ def main():
 
     (changed, backup_file, diff, msg) = do_ini(
         module, path, section, section_has_values, option, values, state, exclusive, backup,
-        no_extra_spaces, ignore_spaces, create, allow_no_value, modify_inactive_option, follow)
+        no_extra_spaces, ignore_spaces, create, allow_no_value, modify_inactive_option,
+        follow, option_prefix_spaces)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
