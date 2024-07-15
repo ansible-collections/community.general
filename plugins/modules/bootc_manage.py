@@ -63,8 +63,8 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ('state', 'switch', ['image'])
-        ]
+            ('state', 'switch', ['image']),
+        ],
     )
 
     state = module.params['state']
