@@ -58,7 +58,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     argument_spec = dict(
         state=dict(type='str', required=True, choices=['switch', 'latest']),
-        image=dict(type='str', required=False)
+        image=dict(type='str', required=False),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
