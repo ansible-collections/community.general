@@ -25,7 +25,7 @@ attributes:
   diff_mode:
     support: none
 options:
-  host:
+  url:
     type: str
     description: The URL of the Zendesk instance.
     required: true
@@ -72,7 +72,7 @@ EXAMPLES = '''
     community.general.zendesk_ticket:
       username: 'your_username'
       token: 'your_api_token'
-      host: 'https://yourcompany.zendesk.com'
+      url: 'https://yourcompany.zendesk.com'
       body: 'This is a sample ticket'
       priority: 'normal'
       subject: 'New Ticket'
@@ -83,7 +83,7 @@ EXAMPLES = '''
     community.general.zendesk_ticket:
       username: 'your_username'
       token: 'your_api_token'
-      host: 'https://yourcompany.zendesk.com'
+      url: 'https://yourcompany.zendesk.com'
       ticket_id: 12345
       status: 'closed'
 
@@ -92,7 +92,7 @@ EXAMPLES = '''
     community.general.zendesk_ticket:
       username: 'your_username'
       token: 'your_api_token'
-      host: 'https://yourcompany.zendesk.com'
+      url: 'https://yourcompany.zendesk.com'
       ticket_id: 12345
       status: 'resolved'
       body: 'Issue has been resolved'
@@ -112,10 +112,10 @@ class ZENDESK_API:
         username (str): Zendesk account username.
         password (str): Zendesk account password (optional if token is used).
         token (str): API token for authentication (optional if password is used).
-        host (str): URL of the Zendesk instance.
+        url (str): URL of the Zendesk instance.
         headers (dict): Default headers for API requests.
     """
-    def __init__(self, username, password, token, host):
+    def __init__(self, username, password, token, url):
         """
         Initializes the ZENDESK_API object with authentication credentials.
 
@@ -123,12 +123,12 @@ class ZENDESK_API:
             username (str): Zendesk account username.
             password (str): Zendesk account password.
             token (str): API token for authentication.
-            host (str): URL of the Zendesk instance.
+            url (str): URL of the Zendesk instance.
         """
         self.username = username
         self.password = password
         self.token = token
-        self.host = host
+        self.url = url
         self.headers = {
             "Content-Type": "application/json",
         }
@@ -152,7 +152,7 @@ class ZENDESK_API:
         Returns:
             bool: True if the ticket exists, False otherwise.
         """
-        url = '{0}/api/v2/tickets/{1}'.format(self.host, ticket_id)
+        url = '{0}/api/v2/tickets/{1}'.format(self.url, ticket_id)
         request = self.api_auth()
         try:
             response = request.get(url)
@@ -173,7 +173,7 @@ class ZENDESK_API:
             dict: A dictionary containing the result of the ticket creation operation.
         """
         changed = False
-        url = '{0}/api/v2/tickets'.format(self.host)
+        url = '{0}/api/v2/tickets'.format(self.url)
         payload = {
             "ticket": {
                 "comment": {
@@ -212,7 +212,7 @@ class ZENDESK_API:
         Returns:
             dict: A dictionary containing the result of the ticket update operation.
         """
-        url = '{0}/api/v2/tickets/{1}'.format(self.host, ticket_id)
+        url = '{0}/api/v2/tickets/{1}'.format(self.url, ticket_id)
         payload = {
             "ticket": {
                 "status": status,
@@ -241,7 +241,7 @@ class ZENDESK_API:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(type='str', required=True),
+            url=dict(type='str', required=True),
             username=dict(type='str', required=True, aliases=['user']),
             password=dict(type='str', required=False, aliases=['pass'], no_log=True),
             status=dict(type='str', required=True, choices=['new', 'closed', 'resolved']),
@@ -262,7 +262,7 @@ def main():
         supports_check_mode=False
     )
 
-    host = module.params['host']
+    url = module.params['url']
     username = module.params['username']
     password = module.params['password']
     status = module.params['status']
@@ -275,7 +275,7 @@ def main():
     if not password and not token:
         module.fail_json(msg="Either 'password' or 'token' must be provided.")
 
-    zendesk_api = ZENDESK_API(username, password, token, host)
+    zendesk_api = ZENDESK_API(username, password, token, url)
 
     if status == 'new':
         result = zendesk_api.create_ticket(body, priority, subject)
