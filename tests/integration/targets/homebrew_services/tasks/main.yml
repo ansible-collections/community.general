@@ -25,6 +25,8 @@
       name: black
       state: present
     register: install_result
+    notify:
+      - uninstall black
 
   - name: Check the black service is installed
     assert:
@@ -82,5 +84,3 @@
     assert:
       that:
         - stop_result is success
-    notify:
-      - uninstall black
