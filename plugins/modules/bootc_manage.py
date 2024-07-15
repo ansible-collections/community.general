@@ -75,13 +75,13 @@ def main():
     elif state == 'latest':
         command = ['bootc', 'upgrade']
 
-    rc, out, err = module.run_command(command)
+    rc, stdout, err = module.run_command(command)
 
     if rc == 0:
-        if 'Queued for next boot: ' in out:
-            result = {'changed': True, 'output': out}
-        elif 'No changes in ' in out or 'Image specification is unchanged.' in out:
-            result = {'changed': False, 'output': out}
+        if 'Queued for next boot: ' in stdout:
+            result = {'changed': True, 'stdoutput': stdout}
+        elif 'No changes in ' in stdout or 'Image specification is unchanged.' in stdout:
+            result = {'changed': False, 'stdoutput': stdout}
         else:
             result = {'changed': False, 'stderr': err}
             module.fail_json(msg='ERROR: Command execution failed.', **result)
