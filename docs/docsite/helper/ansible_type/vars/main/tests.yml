@@ -1,0 +1,105 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Note: Expansion in a loop will convert all AnsibleUnicode types to str.
+
+tests:
+  - name: 0.Test AnsibleUnicode.
+    i: abc
+    r: AnsibleUnicode
+    d: String. AnsibleUnicode.
+  - name: 1.Test AnsibleUnicode alias str.
+    alias:
+      AnsibleUnicode: str
+    i: abc
+    r: str
+    d: String. AnsibleUnicode alias str.
+  - name: 2.Test list[AnsibleUnicode].
+    i: [a, b, c]
+    r: list[AnsibleUnicode]
+    d: List. All items are AnsibleUnicode.
+  - name: 3.Test dict[AnsibleUnicode, AnsibleUnicode].
+    i: {a: foo, b: bar, c: baz}
+    r: dict[AnsibleUnicode, AnsibleUnicode]
+    d: Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
+  - name: 4.Test no substitution and no alias. Type of strings is str.
+    alias: {}
+    group:
+      - i: abc
+        r: str
+        d: String
+      - i: 123
+        r: int
+        d: Integer
+      - i: 123.45
+        r: float
+        d: Float
+      - i: True
+        r: bool
+        d: Boolean
+      - i: [a, b, c]
+        r: list[str]
+        d: List. All items are strings.
+      - i: [{a: 1}, {b: 2}]
+        r: list[dict]
+        d: List of dictionaries.
+      - i: {a: 1}
+        r: dict[str, int]
+        d: Dictionary. All keys are strings. All values are integers.
+      - i: {a: 1, b: 2}
+        r: dict[str, int]
+        d: Dictionary. All keys are strings. All values are integers.
+  - name: 5.Test no substitution and no alias. Type of strings is str.
+    alias:
+      AnsibleUnicode: str
+    group:
+      - i: {1: a, b: b}
+        r: dict[int|str, str]
+        d: Dictionary. The keys are integers or strings. All values are strings.
+      - i: {1: a, 2: b}
+        r: dict[int, str]
+        d: Dictionary. All keys are integers. All values are keys.
+      - i:
+          a: 1
+          b: 1.1
+          c: abc
+          d: true
+          e: [x, y, z]
+          f: {x: 1, y: 2}
+        r: dict[str, bool|dict|float|int|list|str]
+        d: Dictionary. All keys are strings. Multiple types values.
+      - i:
+          - 1
+          - 2
+          - 1.1
+          - abc
+          - true
+          - [x, y, z]
+          - {x: 1, y: 2}
+        r: list[bool|dict|float|int|list|str]
+        d: List. Multiple types items.
+  - name: 6.Test dtype list.
+    alias: {}
+    group:
+      - i: abc
+        r: [AnsibleUnicode, str]
+        d: AnsibleUnicode or str
+      - i: 123
+        r: [float, int]
+        d: float or int
+      - i: 123.45
+        r: [float, int]
+        d: float or int
+  - name: 7.Multiple alias.
+    alias:
+      int: number
+      float: number
+    group:
+      - i: 123
+        r: number
+        d: int alias number
+      - i: 123.45
+        r: number
+        d: float alias number

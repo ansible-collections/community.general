@@ -1,0 +1,67 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Substitution converts str to AnsibleUnicode
+# -------------------------------------------
+{% for i in (0, 1, 2, 3) %}
+
+# {{ tests[i].d }}
+{% if tests[i].alias is defined %}
+alias: {{ tests[i].alias | to_json }}
+dtype: {{ tests[i].r }}
+data: {{ tests[i].i | to_json }}
+result: '{{ start }} data is community.general.ansible_type(dtype, alias) {{ stop }}'
+# result => true
+{% else %}
+dtype: {{ tests[i].r }}
+data: {{ tests[i].i | to_json }}
+result: '{{ start }} data is community.general.ansible_type(dtype) {{ stop }}'
+# result => true
+{% endif %}
+{% endfor %}
+
+# No substitution and no alias. Type of strings is str
+# ----------------------------------------------------
+{% for test in tests.4.group %}
+
+# {{ test.d }}
+dtype: {{ test.r }}
+result: '{{ start }} {{ test.i | to_json }} is community.general.ansible_type(dtype) {{ stop }}'
+# result => true
+{% endfor %}
+
+# Type of strings is AnsibleUnicode or str
+# ----------------------------------------
+{% for test in tests.5.group %}
+
+# {{ test.d }}
+alias: {{ tests.5.alias | to_json }}
+dtype: {{ test.r }}
+data: {{ test.i }}
+result: '{{ start }} data is community.general.ansible_type(dtype, alias) {{ stop }}'
+# result => true
+{% endfor %}
+
+# Option dtype is list
+# --------------------
+{% for test in tests.6.group %}
+
+# {{ test.d }}
+dtype: {{ test.r }}
+data: {{ test.i }}
+result: '{{ start }} data is community.general.ansible_type(dtype) {{ stop }}'
+# result => true
+{% endfor %}
+
+# Multiple alias
+# --------------
+{% for test in tests.7.group %}
+
+# {{ test.d }}
+alias: {{ tests.7.alias | to_json }}
+dtype: {{ test.r }}
+data: {{ test.i }}
+result: '{{ start }} data is community.general.ansible_type(dtype, alias) {{ stop }}'
+# result => true
+{% endfor %}

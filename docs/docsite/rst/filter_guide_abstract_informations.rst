@@ -15,3 +15,4 @@ Abstract transformations
    filter_guide_abstract_informations_merging_lists_of_dictionaries
    filter_guide_abstract_informations_lists_helper
    filter_guide_abstract_informations_counting_elements_in_sequence
+   filter_guide-abstract_informations-types
