@@ -727,6 +727,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
             # 1.3 If we have a host_path, we don't have storage, a volume, or a size
             vol_string = ",".join(
+                [vol_string] +
                 ([] if host_path is None else [host_path]) +
                 ([] if mountpoint is None else ["mp={0}".format(mountpoint)]) +
                 ([] if options is None else [map("=".join, options.items())]) +
