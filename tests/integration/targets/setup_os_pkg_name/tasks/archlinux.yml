@@ -6,4 +6,6 @@
 - name: Update OS Package name fact (archlinux)
   ansible.builtin.set_fact:
     os_package_name: "{{ os_package_name | combine({item.key: item.value}) }}"
-  loop: []
+  loop:
+    - key: virtualenv
+      value: python-virtualenv
