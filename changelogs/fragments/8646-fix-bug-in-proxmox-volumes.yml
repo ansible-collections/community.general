@@ -1,0 +1,4 @@
+bugfixes:
+  - proxmox - Removed the forced conversion of non-string values to strings to be consistent with the module documentation
+  - proxmox - Fixed an issue where the new volume handling incorrectly converted `None`-type values into `"None"` strings
+  - proxmox - Fixed an issue where volume strings where overwritten instead of appended to in the new `build_volume()` method
