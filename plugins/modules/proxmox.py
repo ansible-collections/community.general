@@ -760,9 +760,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if disk is not None:
             kwargs["disk_volume"] = parse_disk_string(disk)
         if "disk_volume" in kwargs:
-            if not all(isinstance(val, string_types) for val in kwargs["disk_volume"].values()):
-                self.module.warn("All disk_volume values must be strings. Converting non-string values to strings.")
-                kwargs["disk_volume"] = {key: to_text(val) for key, val in kwargs["disk_volume"].items()}
             disk_dict = build_volume(key="rootfs", **kwargs.pop("disk_volume"))
             kwargs.update(disk_dict)
         if memory is not None:
@@ -776,9 +773,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if "mount_volumes" in kwargs:
             mounts_list = kwargs.pop("mount_volumes")
             for mount_config in mounts_list:
-                if not all(isinstance(val, string_types) for val in mount_config.values()):
-                    self.module.warn("All mount_volumes values must be strings. Converting non-string values to strings.")
-                    mount_config = {key: to_text(val) for key, val in mount_config.items()}
                 key = mount_config.pop("id")
                 mount_dict = build_volume(key=key, **mount_config)
                 kwargs.update(mount_dict)
