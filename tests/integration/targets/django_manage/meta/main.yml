@@ -5,3 +5,4 @@
 
 dependencies:
   - setup_pkg_mgr
+  - setup_os_pkg_name

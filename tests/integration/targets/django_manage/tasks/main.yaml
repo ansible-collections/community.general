@@ -11,7 +11,7 @@
 
 - name: Install virtualenv
   package:
-    name: virtualenv
+    name: "{{ os_package_name.virtualenv }}"
     state: present
 
 - name: Install required library
