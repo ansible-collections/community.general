@@ -590,8 +590,7 @@ import time
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_native
 
 
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
