@@ -78,21 +78,17 @@ def main():
 
     locale = get_best_parsable_locale(module)
     module.run_command_environ_update = dict(LANG=locale, LC_ALL=locale, LC_MESSAGES=locale, LC_CTYPE=locale, LANGUAGE=locale)
-    rc, stdout, err = module.run_command(command)
+    rc, stdout, err = module.run_command(command, check_rc=True)
 
-    if rc == 0:
-        if 'Queued for next boot: ' in stdout:
-            result = {'changed': True, 'output': stdout}
-        elif 'No changes in ' in stdout or 'Image specification is unchanged.' in stdout:
-            result = {'changed': False, 'output': stdout}
-        else:
-            result = {'changed': False, 'stderr': err}
-            module.fail_json(msg='ERROR: Command execution failed.', **result)
+    if 'Queued for next boot: ' in stdout:
+        result = {'changed': True, 'stdout': stdout}
+        module.exit_json(**result)
+    elif 'No changes in ' in stdout or 'Image specification is unchanged.' in stdout:
+        result = {'changed': False, 'stdout': stdout}
         module.exit_json(**result)
     else:
         result = {'changed': False, 'stderr': err}
         module.fail_json(msg='ERROR: Command execution failed.', **result)
-
 
 if __name__ == '__main__':
     main()
