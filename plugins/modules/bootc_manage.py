@@ -90,5 +90,6 @@ def main():
         result = {'changed': False, 'stderr': err}
         module.fail_json(msg='ERROR: Command execution failed.', **result)
 
+
 if __name__ == '__main__':
     main()
