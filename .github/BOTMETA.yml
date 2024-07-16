@@ -1558,11 +1558,7 @@ files:
   docs/docsite/rst/guide_vardict.rst:
     maintainers: russoz
   docs/docsite/rst/test_guide.rst:
-    maintainers: felixfontein
-  docs/docsite/rst/test_guide-ansible_type.rst:
-    maintainers: vbotka
-  docs/docsite/rst/test_guide-feature_tests.rst:
-    maintainers: felixfontein
+    maintainers: felixfontein vbotka
 #########################
   tests/:
     labels: tests
