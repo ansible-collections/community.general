@@ -466,6 +466,7 @@ def main():
     state = module.params['state']
     runner_description = module.params['description']
     runner_active = module.params['active']
+    runner_paused = module.params['paused']
     tag_list = module.params['tag_list']
     run_untagged = module.params['run_untagged']
     runner_locked = module.params['locked']
@@ -500,7 +501,7 @@ def main():
             module.exit_json(changed=False, msg="Runner deleted or does not exists")
 
     if state == 'present':
-        if gitlab_runner.create_or_update_runner(runner_description, {
+        runner_values = {
             "active": runner_active,
             "tag_list": tag_list,
             "run_untagged": run_untagged,
@@ -510,7 +511,11 @@ def main():
             "registration_token": registration_token,
             "group": group,
             "project": project,
-        }):
+        }
+        if LooseVersion(gitlab_runner._gitlab.version()[0]) >= LooseVersion("14.8.0"):
+            # the paused attribute for runners is available since 14.8
+            runner_values["paused"] = runner_paused
+        if gitlab_runner.create_or_update_runner(runner_description, runner_values):
             module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:
