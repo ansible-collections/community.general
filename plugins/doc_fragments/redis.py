@@ -49,6 +49,20 @@ options:
       - Path to root certificates file. If not set and O(tls) is
         set to V(true), certifi ca-certificates will be used.
     type: str
+    aliases:
+      - tls_ca_cert_file
+  client_cert_file:
+    description:
+      - Path to the client certificate file.
+    type: str
+    aliases:
+      - tls_cert_file
+  client_key_file:
+    description:
+      - Path to the client private key file.
+    type: str
+    aliases:
+      - tls_key_file
 requirements: [ "redis", "certifi" ]
 
 notes:
