@@ -30,6 +30,23 @@ options:
     version_added: 7.5.0
   ca_certs:
     version_added: 7.5.0
+    description:
+      - Path to a CA certificates directory or a CA certificate file.
+    type: str
+    aliases:
+      - tls_ca_cert_file
+  client_cert_file:
+    description:
+      - Path to the client certificate file.
+    type: str
+    aliases:
+      - tls_cert_file
+  client_key_file:
+    description:
+      - Path to the client private key file.
+    type: str
+    aliases:
+      - tls_key_file
   cluster:
     default: false
     description: Get informations about cluster status as RV(cluster).
