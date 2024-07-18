@@ -729,8 +729,8 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 [vol_string] +
                 ([] if host_path is None else [host_path]) +
                 ([] if mountpoint is None else ["mp={0}".format(mountpoint)]) +
-                ([] if options is None else [map("=".join, options.items())]) +
-                ([] if not kwargs else [map("=".join, kwargs.items())])
+                ([] if options is None else list(map("=".join, options.items()))) +
+                ([] if not kwargs else list(map("=".join, kwargs.items())))
             )
 
             return {key: vol_string}
