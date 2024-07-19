@@ -1568,6 +1568,10 @@ class RedfishUtils(object):
                 extended_messages = return_data.get('@Message.ExtendedInfo', [])
             # Go through each message and look for Base.1.X.PasswordChangeRequired
             for message in extended_messages:
+                message_id = message.get('MessageId')
+                if message_id is None:
+                    # While this is invalid, treat the lack of a MessageId as "no message"
+                    continue
                 if message_id.startswith('Base.1.') and message_id.endswith('.PasswordChangeRequired'):
                     # Password change required; get the URI of the user account
                     uri = message['MessageArgs'][0]
