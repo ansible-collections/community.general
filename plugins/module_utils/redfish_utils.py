@@ -1261,11 +1261,11 @@ class RedfishUtils(object):
             if username:
                 if username == data.get('UserName'):
                     return {'ret': True, 'data': data,
-                            'headers': headers, 'uri': uri}
+                            'headers': headers, 'uri': password_change_uri}
             if acct_id:
                 if acct_id == data.get('Id'):
                     return {'ret': True, 'data': data,
-                            'headers': headers, 'uri': uri}
+                            'headers': headers, 'uri': password_change_uri}
         else:
             # Walk the accounts collection to find the desired user
             response = self.get_request(self.root_uri + self.accounts_uri)
