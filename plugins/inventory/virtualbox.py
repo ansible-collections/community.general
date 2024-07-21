@@ -22,6 +22,7 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: token that ensures this is a source file for the 'virtualbox' plugin
+            type: string
             required: true
             choices: ['virtualbox', 'community.general.virtualbox']
         running_only:
@@ -30,8 +31,10 @@ DOCUMENTATION = '''
             default: false
         settings_password_file:
             description: provide a file containing the settings password (equivalent to --settingspwfile)
+            type: string
         network_info_path:
             description: property path to query for network information (ansible_host)
+            type: string
             default: "/VirtualBox/GuestInfo/Net/0/V4/IP"
         query:
             description: create vars from virtualbox properties

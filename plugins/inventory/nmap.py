@@ -20,6 +20,7 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: token that ensures this is a source file for the 'nmap' plugin.
+            type: string
             required: true
             choices: ['nmap', 'community.general.nmap']
         sudo:
@@ -29,6 +30,7 @@ DOCUMENTATION = '''
             type: boolean
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
+            type: string
             required: true
             env:
                 - name: ANSIBLE_NMAP_ADDRESS
@@ -91,7 +93,7 @@ DOCUMENTATION = '''
             default: true
             version_added: 7.4.0
     notes:
-        - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
+        - At least one of O(ipv4) or O(ipv6) is required to be V(true); both can be V(true), but they cannot both be V(false).
         - 'TODO: add OS fingerprinting'
 '''
 EXAMPLES = '''
