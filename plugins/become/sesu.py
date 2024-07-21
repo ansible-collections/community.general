@@ -13,7 +13,8 @@ DOCUMENTATION = '''
     author: ansible (@nekonyuu)
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -27,7 +28,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_SESU_USER
         become_exe:
-            description: sesu executable
+            description: sesu executable.
+            type: string
             default: sesu
             ini:
               - section: privilege_escalation
@@ -41,7 +43,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_SESU_EXE
         become_flags:
-            description: Options to pass to sesu
+            description: Options to pass to sesu.
+            type: string
             default: -H -S -n
             ini:
               - section: privilege_escalation
@@ -55,7 +58,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_SESU_FLAGS
         become_pass:
-            description: Password to pass to sesu
+            description: Password to pass to sesu.
+            type: string
             required: false
             vars:
               - name: ansible_become_password

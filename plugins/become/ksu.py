@@ -13,7 +13,8 @@ DOCUMENTATION = '''
     author: Ansible Core Team
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
+            type: string
             ini:
               - section: privilege_escalation
                 key: become_user
@@ -27,7 +28,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_KSU_USER
             required: true
         become_exe:
-            description: Su executable
+            description: Su executable.
+            type: string
             default: ksu
             ini:
               - section: privilege_escalation
@@ -41,7 +43,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_KSU_EXE
         become_flags:
-            description: Options to pass to ksu
+            description: Options to pass to ksu.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -55,7 +58,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_KSU_FLAGS
         become_pass:
-            description: ksu password
+            description: Ksu password.
+            type: string
             required: false
             vars:
               - name: ansible_ksu_pass
@@ -69,8 +73,10 @@ DOCUMENTATION = '''
                 key: password
         prompt_l10n:
             description:
-                - List of localized strings to match for prompt detection
-                - If empty we'll use the built in one
+                - List of localized strings to match for prompt detection.
+                - If empty we will use the built in one.
+            type: list
+            elements: string
             default: []
             ini:
               - section: ksu_become_plugin

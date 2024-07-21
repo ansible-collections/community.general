@@ -13,7 +13,8 @@ DOCUMENTATION = '''
     author: Ansible Core Team
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
+            type: string
             ini:
               - section: privilege_escalation
                 key: become_user
@@ -26,7 +27,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_DOAS_USER
         become_exe:
-            description: Doas executable
+            description: Doas executable.
+            type: string
             default: doas
             ini:
               - section: privilege_escalation
@@ -40,7 +42,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_DOAS_EXE
         become_flags:
-            description: Options to pass to doas
+            description: Options to pass to doas.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -54,7 +57,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_DOAS_FLAGS
         become_pass:
-            description: password for doas prompt
+            description: Password for doas prompt.
+            type: string
             required: false
             vars:
               - name: ansible_become_password
@@ -68,8 +72,10 @@ DOCUMENTATION = '''
                 key: password
         prompt_l10n:
             description:
-                - List of localized strings to match for prompt detection
-                - If empty we'll use the built in one
+                - List of localized strings to match for prompt detection.
+                - If empty we will use the built in one.
+            type: list
+            elements: string
             default: []
             ini:
               - section: doas_become_plugin
