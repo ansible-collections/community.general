@@ -42,8 +42,9 @@ DOCUMENTATION = '''
         default: false
       umask:
         description:
-          - Sets the umask for the created .gpg files. The first octed must be greater than 3 (user readable).
+          - Sets the umask for the created V(.gpg) files. The first octed must be greater than 3 (user readable).
           - Note pass' default value is V('077').
+        type: string
         env:
           - name: PASSWORD_STORE_UMASK
         version_added: 1.3.0
