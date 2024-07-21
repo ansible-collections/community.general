@@ -13,7 +13,8 @@ DOCUMENTATION = '''
     author: Ansible Core Team
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
+            type: string
             ini:
               - section: privilege_escalation
                 key: become_user
@@ -26,7 +27,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_DZDO_USER
         become_exe:
-            description: Dzdo executable
+            description: Dzdo executable.
+            type: string
             default: dzdo
             ini:
               - section: privilege_escalation
@@ -40,7 +42,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_DZDO_EXE
         become_flags:
-            description: Options to pass to dzdo
+            description: Options to pass to dzdo.
+            type: string
             default: -H -S -n
             ini:
               - section: privilege_escalation
@@ -54,7 +57,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_DZDO_FLAGS
         become_pass:
-            description: Options to pass to dzdo
+            description: Options to pass to dzdo.
+            type: string
             required: false
             vars:
               - name: ansible_become_password
