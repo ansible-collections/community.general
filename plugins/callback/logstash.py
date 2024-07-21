@@ -20,6 +20,7 @@ DOCUMENTATION = r'''
     options:
       server:
         description: Address of the Logstash server.
+        type: str
         env:
           - name: LOGSTASH_SERVER
         ini:
@@ -29,6 +30,7 @@ DOCUMENTATION = r'''
         default: localhost
       port:
         description: Port on which logstash is listening.
+        type: int
         env:
             - name: LOGSTASH_PORT
         ini:
@@ -38,6 +40,7 @@ DOCUMENTATION = r'''
         default: 5000
       type:
         description: Message type.
+        type: str
         env:
           - name: LOGSTASH_TYPE
         ini:
@@ -47,6 +50,7 @@ DOCUMENTATION = r'''
         default: ansible
       pre_command:
         description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
+        type: str
         version_added: 2.0.0
         ini:
           - section: callback_logstash

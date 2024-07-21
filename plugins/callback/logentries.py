@@ -22,6 +22,7 @@ DOCUMENTATION = '''
     options:
       api:
         description: URI to the Logentries API.
+        type: str
         env:
           - name: LOGENTRIES_API
         default: data.logentries.com
@@ -30,6 +31,7 @@ DOCUMENTATION = '''
             key: api
       port:
         description: HTTP port to use when connecting to the API.
+        type: int
         env:
             - name: LOGENTRIES_PORT
         default: 80
@@ -38,6 +40,7 @@ DOCUMENTATION = '''
             key: port
       tls_port:
         description: Port to use when connecting to the API when TLS is enabled.
+        type: int
         env:
             - name: LOGENTRIES_TLS_PORT
         default: 443
@@ -46,6 +49,7 @@ DOCUMENTATION = '''
             key: tls_port
       token:
         description: The logentries C(TCP token).
+        type: str
         env:
           - name: LOGENTRIES_ANSIBLE_TOKEN
         required: true

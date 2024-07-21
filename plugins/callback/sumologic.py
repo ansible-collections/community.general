@@ -20,6 +20,7 @@ requirements:
 options:
   url:
     description: URL to the Sumologic HTTP collector source.
+    type: str
     env:
       - name: SUMOLOGIC_URL
     ini:

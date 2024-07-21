@@ -19,6 +19,7 @@ DOCUMENTATION = '''
     options:
       server:
         description: Syslog server that will receive the event.
+        type: str
         env:
         - name: SYSLOG_SERVER
         default: localhost
@@ -27,6 +28,7 @@ DOCUMENTATION = '''
             key: syslog_server
       port:
         description: Port on which the syslog server is listening.
+        type: int
         env:
           - name: SYSLOG_PORT
         default: 514
@@ -35,6 +37,7 @@ DOCUMENTATION = '''
             key: syslog_port
       facility:
         description: Syslog facility to log as.
+        type: str
         env:
           - name: SYSLOG_FACILITY
         default: user

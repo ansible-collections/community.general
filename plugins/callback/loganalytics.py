@@ -21,6 +21,7 @@ DOCUMENTATION = '''
     options:
       workspace_id:
         description: Workspace ID of the Azure log analytics workspace.
+        type: str
         required: true
         env:
           - name: WORKSPACE_ID
@@ -29,6 +30,7 @@ DOCUMENTATION = '''
             key: workspace_id
       shared_key:
         description: Shared key to connect to Azure log analytics workspace.
+        type: str
         required: true
         env:
           - name: WORKSPACE_SHARED_KEY

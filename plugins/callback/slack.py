@@ -22,6 +22,7 @@ DOCUMENTATION = '''
       webhook_url:
         required: true
         description: Slack Webhook URL.
+        type: str
         env:
           - name: SLACK_WEBHOOK_URL
         ini:
@@ -30,6 +31,7 @@ DOCUMENTATION = '''
       channel:
         default: "#ansible"
         description: Slack room to post in.
+        type: str
         env:
           - name: SLACK_CHANNEL
         ini:
@@ -37,6 +39,7 @@ DOCUMENTATION = '''
             key: channel
       username:
         description: Username to post as.
+        type: str
         env:
           - name: SLACK_USERNAME
         default: ansible

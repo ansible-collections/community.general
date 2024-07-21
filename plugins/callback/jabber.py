@@ -20,21 +20,25 @@ DOCUMENTATION = '''
     options:
       server:
         description: connection info to jabber server
+        type: str
         required: true
         env:
           - name: JABBER_SERV
       user:
         description: Jabber user to authenticate as
+        type: str
         required: true
         env:
           - name: JABBER_USER
       password:
         description: Password for the user to the jabber server
+        type: str
         required: true
         env:
           - name: JABBER_PASS
       to:
         description: chat identifier that will receive the message
+        type: str
         required: true
         env:
           - name: JABBER_TO
