@@ -22,6 +22,7 @@ DOCUMENTATION = '''
     options:
       url:
         description: URL to the Splunk HTTP collector source.
+        type: str
         env:
           - name: SPLUNK_URL
         ini:
@@ -29,6 +30,7 @@ DOCUMENTATION = '''
             key: url
       authtoken:
         description: Token to authenticate the connection to the Splunk HTTP collector.
+        type: str
         env:
           - name: SPLUNK_AUTHTOKEN
         ini:
