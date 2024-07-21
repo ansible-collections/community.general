@@ -15,11 +15,15 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: Sets of key value pairs of parameters.
+        type: list
+        elements: str
       key:
         description: Key to query.
+        type: str
         required: true
       file:
         description: Path to shelve file.
+        type: path
         required: true
 '''
 
