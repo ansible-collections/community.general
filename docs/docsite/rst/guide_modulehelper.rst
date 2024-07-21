@@ -58,22 +58,16 @@ Bear in mind that it does **not** showcase all of MH's features:
 
 From this example notice:
 
-- All the parameters automatically become variables in the ``self.vars`` field, which is of the ``VarDict`` type.
-  See :ref:`ansible_collections.community.general.docsite.guide_vardict` for more details on  how to use ``VarDict``.
 - Some convenience methods delegate straight into ``AnsibleModule``, like ``self.check_mode``.
-- There is no need to call ``module.exit_json()`` (or ``module.fail_json()`` for that matter),
-  exceptions are used to cause the module to fail.
-  If no exception is raised, the module has succeeded.
-  There is a generic method to raise exceptions called ``self.do_raise()``.
 
 These and other features are described in more detail below.
 
 
-Features
-^^^^^^^^
+Module Helper
+^^^^^^^^^^^^^
 
-General structure
-"""""""""""""""""
+Introduction
+""""""""""""
 
 ``ModuleHelper`` is a wrapper around the standard ``AnsibleModule``, providing some features.
 The basic structure of a module using ``ModuleHelper`` is as shown in the `Quickstart`_ section above,
@@ -91,17 +85,20 @@ but there are more elements that will take part in it.
         facts_params = ()
         use_old_vardict = True
         mute_vardict_deprecation = False
-        module = dict(...)
+        module = dict(
+            argument_spec=dict(...),
+            ...
+        )
 
-After importing ``ModuleHelper``, you need to declare a class that extends ``ModuleHelper``.
+After importing the ``ModuleHelper`` class, you need to declare your own class extending it.
 This part will always be the same, except when using ``StateModuleHelper``, which builds on top
-of the features provided by MH. See below for more details.
+of the features provided by MH. See `StateModuleHelper`_ below for more details.
 
 The easiest way of specifying the module is to create the class variable ``module`` with a dictionary
 containing the exact arguments that would be passed as paramters to ``AnsibleModule``.
 Keep in mind that ``module`` can be either a dictionary as show above, or it can be a proper ``AnsibleModule`` object.
 MH also accepts a parameter ``module`` in its constructor, if that parameter is used used,
-then it will override the class variable. The parametercan also be a ``dict`` or ``AnsibleModule``.
+then it will override the class variable. The parameter can either be ``dict`` or ``AnsibleModule`` as well.
 
 Beyond the definition of the module, there are other variables that can be used to control aspects
 of MH's behavior. These variables should be set at the very beginning of the class, and their semantics are
@@ -131,11 +128,12 @@ Moreover, the default ``self.output`` will also handle Ansible ``facts`` and *di
 See more in `Parameters, variables, and output`_ below.
 The property ``self.output`` method can be overriden, but of course you would need to address these issues in your own code.
 
-Also note the changed status comes from self.has_changed(), which is usually calculated from variables that are marked
+Also note the changed status comes from ``self.has_changed()``, which is usually calculated from variables that are marked
 to track changes in their content. See more in `Handling changes`_ below.
+And last but not least, the method is decorated with ``@module_fails_on_exception``, which will
+capture exceptions that are raised and call ``self.module.exit_json()`` with the exception text as message.
 
-And last but not least on this code above, the method is decorated with ``@module_fails_on_exception``, which will
-capture exceptions that are raised and
+Given that, another way to write the example from the `Quickstart`_ would be:
 
 .. code-block:: python
 
@@ -154,6 +152,14 @@ capture exceptions that are raised and
             if self.vars.name == "fail me":
                 self.do_raise("You requested this to fail")
 
+There is no need to call ``module.exit_json()`` (or ``module.fail_json()`` for that matter), exceptions are used to cause the module to fail.
+There is a generic method to raise exceptions called ``self.do_raise()``.
+If no exception was raised, then the module has succeeded.
+
+
+Ansible modules must have a ``main()`` function and the usual test for ``__main__``. When using MH they should look like:
+
+.. code-block:: python
 
     def main():
         MyTest.execute()
@@ -163,20 +169,108 @@ capture exceptions that are raised and
         main()
 
 
-The following methods in MH are executed in the order:
+Parameters, variables, and output
+"""""""""""""""""""""""""""""""""
 
-#. ``self.__init_module__()``: commonly used to initialize variables
-#. ``self.__run__()``: the actual execution of the module logic
-#. ``self.__quit_module__()``: tear-down logic or any code that must be executed after the main part.
+All the parameters automatically become variables in the ``self.vars`` field, which is of the ``VarDict`` type.
+By using ``self.vars``, you have a central mechanism to access the parameters but also to expose variables as return values of the module.
+As described in :ref:`ansible_collections.community.general.docsite.guide_vardict`, variables in ``VarDict`` have metadata associated to them.
+One of the fields in that metadata marks the variable for output, and MH makes use of that to generate the module's return values.
 
+.. note::
 
-- class
+    The ``VarDict`` feature from the documentation was introduced in community.general 7.1.0, but there was a first
+    implementation of it embedded within ``ModuleHelper``.
+    That older implementation is now deprecated and will be removed in community.general 11.0.0.
+    After community.general 7.1.0, MH modules generate a deprecation message about *using the old VarDict*.
+    There are two ways to prevent that from happening:
 
-  - ``__init_module__()``
-  - ``__run__()``
-  - ``__quit_module__()``
+        #.  Set ``mute_vardict_deprecation = True`` and the deprecation will be silenced. If the module still uses the old ``VarDict``,
+            it will not be able to update to community.general 11.0.0 (Spring 2026) upon its release.
+        #.  Set ``use_old_vardict = False`` to make the MH module use the new ``VarDict`` immediatelly.
+            The new ``VarDict`` and its use is documented.
+            This is the recommended way to handle this.
 
-- main > class.execute()
+    .. code-block:: python
+
+        class MyTest(ModuleHelper):
+            use_old_vardict = False
+            mute_vardict_deprecation = True
+            ...
+
+    These two settings are mutually exclusive, but that is not enforced and the behavior when setting both is not specified.
+
+By default, all variables created in ``VarDict`` are set with ``output=True``, but keep in mind that **module parameters are not set for output by default**.
+If you want to include some module parameters in the output, list them in the ``output_params`` class variable.
+
+.. code-block:: python
+
+    class MyTest(ModuleHelper):
+        output_params = ('state', 'name')
+        ...
+
+A neat feature provided by MH by using ``VarDict`` is the automatic tracking of changes in variables.
+This is achieved by setting the metadata ``change=True``, as in:
+
+.. code-block:: python
+
+    # using __init_module__() as example, it works the same in __run__() and __quit_module__()
+    def __init_module__(self):
+        # example from community.general.ansible_galaxy_install
+        self.vars.set("new_roles", {}, change=True)
+
+        # example of "hidden" variable used only to track change in a value from community.general.gconftool2
+        self.vars.set('_value', self.vars.previous_value, output=False, change=True)
+        ...
+
+If the end value of any variable marked ``change`` is different from its initial value, then the module task will return ``changed=True``.
+
+Again, to track changes in variables created from module parameters, you must list them in the ``change_params`` class variable.
+
+.. code-block:: python
+
+    class MyTest(ModuleHelper):
+        # example from community.general.xfconf
+        change_params = ('value', )
+        ...
+
+See more about this in `Handling Changes`_ below.
+
+Similarly, if you want to use Ansible's diff mode, you can set the metadata ``diff=True`` and ``diff_params`` for module parameters.
+With that, MH will automatically generate the diff output for variables that have changed.
+
+.. code-block:: python
+
+    def __run__(self):
+        # example from community.general.gio_mime
+        self.vars.set_meta("handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
+
+Moreover, if a module is set to return *facts* instead of return values, then again use the metadata ``fact=True`` and ``fact_params`` for module parameters.
+Additionally, you must specify ``facts_name``, as in:
+
+.. code-block:: python
+
+    class VolumeFacts(ModuleHelper):
+        facts_name = 'volume_facts'
+
+        def __init_module__(self):
+            self.vars.set("volume", 123, fact=True)
+
+That generates an Ansible fact like:
+
+.. code-block:: yaml+jinja
+
+    - name: Obtain volume facts
+      some.collection.volume_facts:
+        # parameters
+
+    - name: Print volume facts
+      debug:
+        msg: Volume fact is {{ ansible_facts.volume_facts.volume }}
+
+.. important::
+
+    If ``facts_name`` is not set, the module does not generate any facts.
 
 
 Handling changes
@@ -187,24 +281,7 @@ Handling changes
 - override ``self.has_changed()``
 
 
-Parameters, variables, and output
-"""""""""""""""""""""""""""""""""
-
-- VarDict
-
-  - ``use_old_vardict = True``
-  - ``mute_vardict_deprecation = False``
-
-- output
-- track changes
-
-  - present diff in output
-
-- facts
-
-  - facts vars
-  - facts parameters
-  - facts name
+--------------------------------------------------------------------------------------------------------------------------------------------
 
 
 Exceptions
@@ -218,11 +295,11 @@ StateModuleHelper
 References
 ^^^^^^^^^^
 
-- `Developer Guide <https://docs.ansible.com/ansible/latest/dev_guide/index.html>`_
-
-    - `Creating a module <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
+- `Ansible Developer Guide <https://docs.ansible.com/ansible/latest/dev_guide/index.html>`_
+- `Creating a module <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
+- `Returning ansible facts <https://docs.ansible.com/ansible/latest/reference_appendices/common_return_values.html#ansible-facts>`_
 
 - :ref:`ansible_collections.community.general.docsite.guide_vardict`
--
+
 
 .. versionadded:: 3.1.0
