@@ -91,8 +91,11 @@ but there are more elements that will take part in it.
         )
 
 After importing the ``ModuleHelper`` class, you need to declare your own class extending it.
-This part will always be the same, except when using ``StateModuleHelper``, which builds on top
-of the features provided by MH. See `StateModuleHelper`_ below for more details.
+
+.. seealso::
+
+    There is a variation called ``StateModuleHelper``, which builds on top
+    of the features provided by MH. See `StateModuleHelper`_ below for more details.
 
 The easiest way of specifying the module is to create the class variable ``module`` with a dictionary
 containing the exact arguments that would be passed as paramters to ``AnsibleModule``.
@@ -118,18 +121,21 @@ The main logic of the module happens in the ``ModuleHelper.run()`` method, which
             output['failed'] = False
         self.module.exit_json(changed=self.has_changed(), **output)
 
-Most modules will be able to perform their tasks simply by implementing the ``ModuleHelper.__run__()``.
-However, in some cases, you might want to execute actions before and/or after the main tasks,
-for those cases you can use, respectively, ``ModuleHelper.__init_module__()`` and ``ModuleHelper.__quit_module__()``.
+The method ``ModuleHelper.__run__()`` must be implemented by the module.
+Most modules will be able to perform their tasks using only that method.
+However, in some cases, you might want to execute actions before or after the main tasks, in which cases
+you should implement ``ModuleHelper.__init_module__()`` and ``ModuleHelper.__quit_module__()`` respectively.
 
 Note that the output comes from ``self.output``, which is a ``@property`` method.
 By default, that property will collect all the variables that are marked for output and return them in a dictionary with their values.
 Moreover, the default ``self.output`` will also handle Ansible ``facts`` and *diff mode*.
-See more in `Parameters, variables, and output`_ below.
-The property ``self.output`` method can be overriden, but of course you would need to address these issues in your own code.
-
 Also note the changed status comes from ``self.has_changed()``, which is usually calculated from variables that are marked
-to track changes in their content. See more in `Handling changes`_ below.
+to track changes in their content.
+
+.. seealso::
+
+    More details in sections `Parameters, variables, and output`_ and `Handling changes`_ below.
+
 And last but not least, the method is decorated with ``@module_fails_on_exception``, which will
 capture exceptions that are raised and call ``self.module.exit_json()`` with the exception text as message.
 
@@ -157,7 +163,7 @@ There is a generic method to raise exceptions called ``self.do_raise()``.
 If no exception was raised, then the module has succeeded.
 
 
-Ansible modules must have a ``main()`` function and the usual test for ``__main__``. When using MH they should look like:
+Ansible modules must have a ``main()`` function and the usual test for ``'__main__'``. When using MH that should look like:
 
 .. code-block:: python
 
@@ -234,7 +240,7 @@ Again, to track changes in variables created from module parameters, you must li
         change_params = ('value', )
         ...
 
-See more about this in `Handling Changes`_ below.
+.. seealso:: See more about this in `Handling Changes`_ below.
 
 Similarly, if you want to use Ansible's diff mode, you can set the metadata ``diff=True`` and ``diff_params`` for module parameters.
 With that, MH will automatically generate the diff output for variables that have changed.
