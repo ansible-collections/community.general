@@ -22,10 +22,12 @@ DOCUMENTATION = '''
         name:
           description:
             - Name of the databag
+          type: string
           required: true
         item:
           description:
             - Item to fetch
+          type: string
           required: true
 '''
 
