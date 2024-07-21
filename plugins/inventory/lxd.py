@@ -20,6 +20,7 @@ DOCUMENTATION = r'''
     options:
         plugin:
             description: Token that ensures this is a source file for the 'lxd' plugin.
+            type: string
             required: true
             choices: [ 'community.general.lxd' ]
         url:
@@ -27,8 +28,8 @@ DOCUMENTATION = r'''
             - The unix domain socket path or the https URL for the lxd server.
             - Sockets in filesystem have to start with C(unix:).
             - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
+            type: string
             default: unix:/var/snap/lxd/common/lxd/unix.socket
-            type: str
         client_key:
             description:
             - The client certificate key file path.

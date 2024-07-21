@@ -21,20 +21,24 @@ DOCUMENTATION = '''
     options:
       plugin:
         description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as it's own.
+        type: string
         required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
+        type: string
         default: 'http://cobbler/cobbler_api'
         env:
             - name: COBBLER_SERVER
       user:
         description: Cobbler authentication user.
+        type: string
         required: false
         env:
             - name: COBBLER_USER
       password:
         description: Cobbler authentication password.
+        type: string
         required: false
         env:
             - name: COBBLER_PASSWORD
