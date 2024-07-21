@@ -145,7 +145,6 @@ EXAMPLES = '''
     name: "*"
     state: latest
 
-# "use_globs" support added in 9.2.0
 - name: Upgrade foo/bar
   community.general.pkgng:
     name: foo/bar
