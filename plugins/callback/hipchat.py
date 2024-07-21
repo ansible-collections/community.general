@@ -25,6 +25,7 @@ DOCUMENTATION = '''
     options:
       token:
         description: HipChat API token for v1 or v2 API.
+        type: str
         required: true
         env:
           - name: HIPCHAT_TOKEN
@@ -33,6 +34,10 @@ DOCUMENTATION = '''
             key: token
       api_version:
         description: HipChat API version, v1 or v2.
+        type: str
+        choices:
+          - v1
+          - v2
         required: false
         default: v1
         env:
@@ -42,6 +47,7 @@ DOCUMENTATION = '''
             key: api_version
       room:
         description: HipChat room to post in.
+        type: str
         default: ansible
         env:
           - name: HIPCHAT_ROOM
@@ -50,6 +56,7 @@ DOCUMENTATION = '''
             key: room
       from:
         description:  Name to post as
+        type: str
         default: ansible
         env:
           - name: HIPCHAT_FROM
