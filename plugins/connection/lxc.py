@@ -17,6 +17,7 @@ DOCUMENTATION = '''
       remote_addr:
         description:
             - Container identifier
+        type: string
         default: inventory_hostname
         vars:
             - name: inventory_hostname
@@ -26,6 +27,7 @@ DOCUMENTATION = '''
         default: /bin/sh
         description:
             - Shell executable
+        type: string
         vars:
             - name: ansible_executable
             - name: ansible_lxc_executable

@@ -21,6 +21,7 @@ DOCUMENTATION = '''
       remote_addr:
         description:
             - The path of the chroot you want to access.
+        type: string
         default: inventory_hostname
         vars:
             - name: ansible_host

@@ -19,6 +19,7 @@ DOCUMENTATION = """
       remote_addr:
         description:
             - The instance identifier.
+        type: string
         default: inventory_hostname
         vars:
             - name: inventory_hostname
@@ -27,6 +28,7 @@ DOCUMENTATION = """
       executable:
         description:
             - The shell to use for execution inside the instance.
+        type: string
         default: /bin/sh
         vars:
             - name: ansible_executable
@@ -35,6 +37,7 @@ DOCUMENTATION = """
         description:
             - The name of the Incus remote to use (per C(incus remote list)).
             - Remotes are used to access multiple servers from a single client.
+        type: string
         default: local
         vars:
             - name: ansible_incus_remote
@@ -42,6 +45,7 @@ DOCUMENTATION = """
         description:
             - The name of the Incus project to use (per C(incus project list)).
             - Projects are used to divide the instances running on a server.
+        type: string
         default: default
         vars:
             - name: ansible_incus_project

@@ -19,6 +19,7 @@ DOCUMENTATION = '''
             - Instance (container/VM) identifier.
             - Since community.general 8.0.0, a FQDN can be provided; in that case, the first component (the part before C(.))
               is used as the instance identifier.
+        type: string
         default: inventory_hostname
         vars:
             - name: inventory_hostname
@@ -27,6 +28,7 @@ DOCUMENTATION = '''
       executable:
         description:
             - Shell to use for execution inside instance.
+        type: string
         default: /bin/sh
         vars:
             - name: ansible_executable
@@ -34,6 +36,7 @@ DOCUMENTATION = '''
       remote:
         description:
             - Name of the LXD remote to use.
+        type: string
         default: local
         vars:
             - name: ansible_lxd_remote
@@ -41,6 +44,7 @@ DOCUMENTATION = '''
       project:
         description:
             - Name of the LXD project to use.
+        type: string
         vars:
             - name: ansible_lxd_project
         version_added: 2.0.0

@@ -20,12 +20,14 @@ DOCUMENTATION = '''
       remote_addr:
         description:
             - Path to the jail
+        type: string
         vars:
             - name: ansible_host
             - name: ansible_iocage_host
       remote_user:
         description:
             - User to execute as inside the jail
+        type: string
         vars:
             - name: ansible_user
             - name: ansible_iocage_user
