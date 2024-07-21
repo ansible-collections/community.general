@@ -17,19 +17,23 @@ DOCUMENTATION = '''
     options :
       _command:
         description: Cyberark CLI utility.
+        type: string
         env:
           - name: AIM_CLIPASSWORDSDK_CMD
         default: '/opt/CARKaim/sdk/clipasswordsdk'
       appid:
         description: Defines the unique ID of the application that is issuing the password request.
+        type: string
         required: true
       query:
         description: Describes the filter criteria for the password retrieval.
+        type: string
         required: true
       output:
         description:
           - Specifies the desired output fields separated by commas.
           - "They could be: Password, PassProps.<property>, PasswordChangeInProcess"
+        type: string
         default: 'password'
       _extra:
         description: for extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"

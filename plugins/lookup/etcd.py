@@ -25,12 +25,14 @@ DOCUMENTATION = '''
         url:
             description:
                 - Environment variable with the URL for the etcd server
+            type: string
             default: 'http://127.0.0.1:4001'
             env:
               - name: ANSIBLE_ETCD_URL
         version:
             description:
                 - Environment variable with the etcd protocol version
+            type: string
             default: 'v1'
             env:
               - name: ANSIBLE_ETCD_VERSION

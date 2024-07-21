@@ -29,13 +29,17 @@ DOCUMENTATION = '''
       index:
         description:
           - If the key has a value with the specified index then this is returned allowing access to historical values.
+        type: int
       datacenter:
         description:
           - Retrieve the key from a consul datacenter other than the default for the consul host.
+        type: str
       token:
         description: The acl token to allow access to restricted values.
+        type: str
       host:
         default: localhost
+        type: str
         description:
           - The target to connect to, must be a resolvable address.
           - Will be determined from E(ANSIBLE_CONSUL_URL) if that is set.
@@ -46,22 +50,26 @@ DOCUMENTATION = '''
         description:
           - The port of the target host to connect to.
           - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
+        type: int
         default: 8500
       scheme:
         default: http
+        type: str
         description:
           - Whether to use http or https.
           - If you use E(ANSIBLE_CONSUL_URL) this value will be used from there.
       validate_certs:
         default: true
-        description: Whether to verify the ssl connection or not.
+        description: Whether to verify the TLS connection or not.
+        type: bool
         env:
           - name: ANSIBLE_CONSUL_VALIDATE_CERTS
         ini:
           - section: lookup_consul
             key: validate_certs
       client_cert:
-        description: The client cert to verify the ssl connection.
+        description: The client cert to verify the TLS connection.
+        type: str
         env:
           - name: ANSIBLE_CONSUL_CLIENT_CERT
         ini:
@@ -94,7 +102,7 @@ EXAMPLES = """
 
   - name: retrieving a KV from a remote cluster on non default port
     ansible.builtin.debug:
-      msg: "{{ lookup('community.general.consul_kv', 'my/key', host='10.10.10.10', port='2000') }}"
+      msg: "{{ lookup('community.general.consul_kv', 'my/key', host='10.10.10.10', port=2000) }}"
 """
 
 RETURN = """

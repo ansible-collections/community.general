@@ -25,7 +25,8 @@ options:
     _terms:
         description: The integer ID of the secret.
         required: true
-        type: int
+        type: list
+        elements: int
     secret_path:
         description: Indicate a full path of secret including folder and secret name when the secret ID is set to 0.
         required: false
@@ -52,6 +53,7 @@ options:
         version_added: 7.0.0
     base_url:
         description: The base URL of the server, for example V(https://localhost/SecretServer).
+        type: string
         env:
             - name: TSS_BASE_URL
         ini:
@@ -60,6 +62,7 @@ options:
         required: true
     username:
         description: The username with which to request the OAuth2 Access Grant.
+        type: string
         env:
             - name: TSS_USERNAME
         ini:
@@ -69,6 +72,7 @@ options:
         description:
             - The password associated with the supplied username.
             - Required when O(token) is not provided.
+        type: string
         env:
             - name: TSS_PASSWORD
         ini:
@@ -80,6 +84,7 @@ options:
           - The domain with which to request the OAuth2 Access Grant.
           - Optional when O(token) is not provided.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
+        type: string
         env:
             - name: TSS_DOMAIN
         ini:
@@ -92,6 +97,7 @@ options:
           - Existing token for Thycotic authorizer.
           - If provided, O(username) and O(password) are not needed.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
+        type: string
         env:
             - name: TSS_TOKEN
         ini:
@@ -102,6 +108,7 @@ options:
         default: /api/v1
         description: The path to append to the base URL to form a valid REST
             API request.
+        type: string
         env:
             - name: TSS_API_PATH_URI
         required: false
@@ -109,6 +116,7 @@ options:
         default: /oauth2/token
         description: The path to append to the base URL to form a valid OAuth2
             Access Grant request.
+        type: string
         env:
             - name: TSS_TOKEN_PATH_URI
         required: false
