@@ -106,7 +106,7 @@ options:
         required: false
         type: bool
         default: true
-        version_added: 9.2.0
+        version_added: 9.3.0
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
