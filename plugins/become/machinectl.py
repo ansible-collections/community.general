@@ -13,7 +13,8 @@ DOCUMENTATION = '''
     author: Ansible Core Team
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -27,7 +28,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_MACHINECTL_USER
         become_exe:
-            description: Machinectl executable
+            description: Machinectl executable.
+            type: string
             default: machinectl
             ini:
               - section: privilege_escalation
@@ -41,7 +43,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_MACHINECTL_EXE
         become_flags:
-            description: Options to pass to machinectl
+            description: Options to pass to machinectl.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -55,7 +58,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_MACHINECTL_FLAGS
         become_pass:
-            description: Password for machinectl
+            description: Password for machinectl.
+            type: string
             required: false
             vars:
               - name: ansible_become_password

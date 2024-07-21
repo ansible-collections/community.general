@@ -13,7 +13,8 @@ DOCUMENTATION = '''
     author: Ansible Core Team
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -27,7 +28,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_PBRUN_USER
         become_exe:
-            description: Sudo executable
+            description: Sudo executable.
+            type: string
             default: pbrun
             ini:
               - section: privilege_escalation
@@ -41,7 +43,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_PBRUN_EXE
         become_flags:
-            description: Options to pass to pbrun
+            description: Options to pass to pbrun.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -55,7 +58,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_PBRUN_FLAGS
         become_pass:
-            description: Password for pbrun
+            description: Password for pbrun.
+            type: string
             required: false
             vars:
               - name: ansible_become_password
@@ -68,7 +72,7 @@ DOCUMENTATION = '''
               - section: pbrun_become_plugin
                 key: password
         wrap_exe:
-            description: Toggle to wrap the command pbrun calls in 'shell -c' or not
+            description: Toggle to wrap the command pbrun calls in C(shell -c) or not.
             default: false
             type: bool
             ini:
