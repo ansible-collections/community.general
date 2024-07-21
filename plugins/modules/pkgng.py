@@ -440,7 +440,8 @@ def main():
             chroot=dict(required=False, type='path'),
             jail=dict(required=False, type='str'),
             autoremove=dict(default=False, type='bool'),
-            use_globs=dict(default=True, required=False, type='bool')),
+            use_globs=dict(default=True, required=False, type='bool'),
+        ),
         supports_check_mode=True,
         mutually_exclusive=[["rootdir", "chroot", "jail"]])
 
