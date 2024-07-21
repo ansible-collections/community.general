@@ -66,4 +66,4 @@
       - not pkgng_install_idempotent_cached.stdout is match("Updating \w+ repository catalogue\.\.\.")
       - pkgng_install_stat_after.stat.exists
       - pkgng_install_stat_after.stat.executable
-      - not pkgng_upgrade_orig_noglobs.changed
+      - pkgng_upgrade_orig_noglobs is not changed
