@@ -20,6 +20,7 @@ DOCUMENTATION = '''
       remote_addr:
         description:
             - The path of the chroot you want to access.
+        type: string
         default: inventory_hostname
         vars:
             - name: inventory_hostname
@@ -27,6 +28,7 @@ DOCUMENTATION = '''
       executable:
         description:
             - User specified executable shell
+        type: string
         ini:
           - section: defaults
             key: executable
@@ -38,6 +40,7 @@ DOCUMENTATION = '''
       chroot_exe:
         description:
             - User specified chroot binary
+        type: string
         ini:
           - section: chroot_connection
             key: exe
