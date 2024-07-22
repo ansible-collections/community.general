@@ -57,9 +57,9 @@ def redis_auth_argument_spec(tls_default=True):
         validate_certs=dict(type='bool',
                             default=True
                             ),
-        ca_certs=dict(type='str', aliases=['tls_ca_cert_file']),
-        client_cert_file=dict(type='str', aliases=['tls_cert_file']),
-        client_key_file=dict(type='str', aliases=['tls_key_file']),
+        ca_certs=dict(type='str'),
+        client_cert_file=dict(type='str'),
+        client_key_file=dict(type='str'),
     )
 
 
