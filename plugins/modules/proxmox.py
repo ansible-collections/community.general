@@ -414,8 +414,8 @@ EXAMPLES = r'''
     password: 123456
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
-      netif:
-        net0: "name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"
+    netif:
+      net0: "name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"
 
 - name: Create new container with more options defining network interface with static ip4 and ip6 with vlan-tag and mtu
   community.general.proxmox:
@@ -440,7 +440,7 @@ EXAMPLES = r'''
     password: 123456
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
-    mounts: 
+    mounts:
       mp0: "local:8,mp=/mnt/test/"
 
 - name: Create new container with minimal options defining a mount with 8GB using mount_volumes
@@ -527,7 +527,7 @@ EXAMPLES = r'''
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
-    netif: 
+    netif:
       net0: "name=eth0,gw=192.168.0.1,ip=192.168.0.3/24,bridge=vmbr0"
     update: true
 
