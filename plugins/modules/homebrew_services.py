@@ -22,7 +22,7 @@ author:
 requirements:
     - homebrew must already be installed on the target system
 short_description: Services manager for Homebrew
-version_added: 9.2.0
+version_added: 9.3.0
 description:
     - Manages daemons and services via Homebrew.
 extends_documentation_fragment:
