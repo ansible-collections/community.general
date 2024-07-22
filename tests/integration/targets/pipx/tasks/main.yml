@@ -240,7 +240,7 @@
     state: inject
     name: ansible-lint
     inject_packages:
-      - black
+      - httpx
     install_apps: true
   register: inject_pkgs_apps_ansible_lint
 
@@ -259,7 +259,7 @@
       - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
       - inject_pkgs_apps_ansible_lint is changed
       - '"ansible-lint" in inject_pkgs_apps_ansible_lint.application'
-      - '"black" in inject_pkgs_apps_ansible_lint.application["ansible-lint"]["injected"]'
+      - '"httpx" in inject_pkgs_apps_ansible_lint.application["ansible-lint"]["injected"]'
       - uninstall_ansible_lint is changed
 
 ##############################################################################
