@@ -114,6 +114,12 @@ options:
             - Arbitrary arguments to pass directly to C(pip).
         type: str
         version_added: 4.6.0
+    suffix:
+        description:
+            - Optional suffix for virtual environment and executable names.
+            - "B(Warning): C(pipx) documentation states this is an B(experimental) feature subject to change."
+        type: str
+        version_added: 9.3.0
 notes:
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
@@ -188,6 +194,7 @@ class PipX(StateModuleHelper):
             executable=dict(type='path'),
             editable=dict(type='bool', default=False),
             pip_args=dict(type='str'),
+            suffix=dict(type='str'),
         ),
         required_if=[
             ('state', 'present', ['name']),
@@ -253,7 +260,8 @@ class PipX(StateModuleHelper):
     def state_install(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            with self.runner('state index_url install_deps force python system_site_packages editable pip_args name_source', check_mode_skip=True) as ctx:
+            args = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            with self.runner(args, check_mode_skip=True) as ctx:
                 ctx.run(name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
@@ -314,7 +322,8 @@ class PipX(StateModuleHelper):
     def state_latest(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            with self.runner('state index_url install_deps force python system_site_packages editable pip_args name_source', check_mode_skip=True) as ctx:
+            args = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            with self.runner(args, check_mode_skip=True) as ctx:
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
