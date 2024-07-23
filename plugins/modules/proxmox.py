@@ -590,8 +590,7 @@ import time
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_native
 
 
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
@@ -727,10 +726,11 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
             # 1.3 If we have a host_path, we don't have storage, a volume, or a size
             vol_string = ",".join(
+                [vol_string] +
                 ([] if host_path is None else [host_path]) +
                 ([] if mountpoint is None else ["mp={0}".format(mountpoint)]) +
-                ([] if options is None else [map("=".join, options.items())]) +
-                ([] if not kwargs else [map("=".join, kwargs.items())])
+                ([] if options is None else ["{0}={1}".format(k, v) for k, v in options.items()]) +
+                ([] if not kwargs else ["{0}={1}".format(k, v) for k, v in kwargs.items()])
             )
 
             return {key: vol_string}
@@ -759,9 +759,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if disk is not None:
             kwargs["disk_volume"] = parse_disk_string(disk)
         if "disk_volume" in kwargs:
-            if not all(isinstance(val, string_types) for val in kwargs["disk_volume"].values()):
-                self.module.warn("All disk_volume values must be strings. Converting non-string values to strings.")
-                kwargs["disk_volume"] = {key: to_text(val) for key, val in kwargs["disk_volume"].items()}
             disk_dict = build_volume(key="rootfs", **kwargs.pop("disk_volume"))
             kwargs.update(disk_dict)
         if memory is not None:
@@ -775,9 +772,6 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if "mount_volumes" in kwargs:
             mounts_list = kwargs.pop("mount_volumes")
             for mount_config in mounts_list:
-                if not all(isinstance(val, string_types) for val in mount_config.values()):
-                    self.module.warn("All mount_volumes values must be strings. Converting non-string values to strings.")
-                    mount_config = {key: to_text(val) for key, val in mount_config.items()}
                 key = mount_config.pop("id")
                 mount_dict = build_volume(key=key, **mount_config)
                 kwargs.update(mount_dict)
