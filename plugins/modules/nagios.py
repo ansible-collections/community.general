@@ -39,8 +39,6 @@ options:
   action:
     description:
       - Action to take.
-      - servicegroup options were added in 2.0.
-      - delete_downtime options were added in 2.2.
       - The V(acknowledge) and V(forced_check) actions were added in community.general 1.2.0.
     required: true
     choices: [ "downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence",
