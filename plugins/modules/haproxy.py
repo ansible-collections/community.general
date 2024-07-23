@@ -65,9 +65,8 @@ options:
   state:
     description:
       - Desired state of the provided backend host.
-      - Note that V(drain) state was added in version 2.4.
-      - It is supported only by HAProxy version 1.5 or later,
-      - When used on versions < 1.5, it will be ignored.
+      - Note that V(drain) state is supported only by HAProxy version 1.5 or later.
+        When used on versions < 1.5, it will be ignored.
     type: str
     required: true
     choices: [ disabled, drain, enabled ]

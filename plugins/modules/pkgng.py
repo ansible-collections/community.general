@@ -127,7 +127,6 @@ EXAMPLES = '''
       - bar
     state: absent
 
-# "latest" support added in 2.7
 - name: Upgrade package baz
   community.general.pkgng:
     name: baz

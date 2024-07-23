@@ -35,11 +35,8 @@ options:
   record_type:
     description:
     - The type of DNS record name.
-    - Currently, 'A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'NS', 'PTR', 'TXT', 'SRV', 'MX' and 'SSHFP' are supported.
-    - "'A6', 'CNAME', 'DNAME' and 'TXT' are added in version 2.5."
-    - "'SRV' and 'MX' are added in version 2.8."
-    - "'NS' are added in comunity.general 8.2.0."
-    - "'SSHFP' are added in community.general 9.1.0."
+    - Support for V(NS) was added in comunity.general 8.2.0.
+    - Support for V(SSHFP) was added in community.general 9.1.0.
     required: false
     default: 'A'
     choices: ['A', 'AAAA', 'A6', 'CNAME', 'DNAME', 'MX', 'NS', 'PTR', 'SRV', 'TXT', 'SSHFP']
@@ -49,31 +46,31 @@ options:
     - Manage DNS record name with this value.
     - Mutually exclusive with O(record_values), and exactly one of O(record_value) and O(record_values) has to be specified.
     - Use O(record_values) if you need to specify multiple values.
-    - In the case of 'A' or 'AAAA' record types, this will be the IP address.
-    - In the case of 'A6' record type, this will be the A6 Record data.
-    - In the case of 'CNAME' record type, this will be the hostname.
-    - In the case of 'DNAME' record type, this will be the DNAME target.
-    - In the case of 'NS' record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
-    - In the case of 'PTR' record type, this will be the hostname.
-    - In the case of 'TXT' record type, this will be a text.
-    - In the case of 'SRV' record type, this will be a service record.
-    - In the case of 'MX' record type, this will be a mail exchanger record.
-    - In the case of 'SSHFP' record type, this will be an SSH fingerprint record.
+    - In the case of V(A) or V(AAAA) record types, this will be the IP address.
+    - In the case of V(A6) record type, this will be the A6 Record data.
+    - In the case of V(CNAME) record type, this will be the hostname.
+    - In the case of V(DNAME) record type, this will be the DNAME target.
+    - In the case of V(NS) record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
+    - In the case of V(PTR) record type, this will be the hostname.
+    - In the case of V(TXT) record type, this will be a text.
+    - In the case of V(SRV) record type, this will be a service record.
+    - In the case of V(MX) record type, this will be a mail exchanger record.
+    - In the case of V(SSHFP) record type, this will be an SSH fingerprint record.
     type: str
   record_values:
     description:
     - Manage DNS record name with this value.
     - Mutually exclusive with O(record_value), and exactly one of O(record_value) and O(record_values) has to be specified.
-    - In the case of 'A' or 'AAAA' record types, this will be the IP address.
-    - In the case of 'A6' record type, this will be the A6 Record data.
-    - In the case of 'CNAME' record type, this will be the hostname.
-    - In the case of 'DNAME' record type, this will be the DNAME target.
-    - In the case of 'NS' record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
-    - In the case of 'PTR' record type, this will be the hostname.
-    - In the case of 'TXT' record type, this will be a text.
-    - In the case of 'SRV' record type, this will be a service record.
-    - In the case of 'MX' record type, this will be a mail exchanger record.
-    - In the case of 'SSHFP' record type, this will be an SSH fingerprint record.
+    - In the case of V(A) or V(AAAA) record types, this will be the IP address.
+    - In the case of V(A6) record type, this will be the A6 Record data.
+    - In the case of V(CNAME) record type, this will be the hostname.
+    - In the case of V(DNAME) record type, this will be the DNAME target.
+    - In the case of V(NS) record type, this will be the name server hostname. Hostname must already have a valid A or AAAA record.
+    - In the case of V(PTR) record type, this will be the hostname.
+    - In the case of V(TXT) record type, this will be a text.
+    - In the case of V(SRV) record type, this will be a service record.
+    - In the case of V(MX) record type, this will be a mail exchanger record.
+    - In the case of V(SSHFP) record type, this will be an SSH fingerprint record.
     type: list
     elements: str
   record_ttl:
