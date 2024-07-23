@@ -264,7 +264,7 @@
 
 ##############################################################################
 - name: install jupyter - not working smoothly in freebsd
-  when: ansible_system != 'FreeBSD'
+  # when: ansible_system != 'FreeBSD'
   block:
     - name: ensure application jupyter is uninstalled
       community.general.pipx:
