@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Update OS Package name fact (alpine)
-  ansible.builtin.set_fact:0
+  ansible.builtin.set_fact:
     os_package_name: "{{ os_package_name | combine(specific_package_names) }}"
   vars:
     specific_package_names:
