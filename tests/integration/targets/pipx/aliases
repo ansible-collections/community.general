@@ -6,4 +6,3 @@ azp/posix/2
 destructive
 skip/python2
 skip/python3.5
-disabled  # TODO
