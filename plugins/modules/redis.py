@@ -132,6 +132,16 @@ EXAMPLES = '''
     command: config
     name: lua-time-limit
     value: 100
+
+- name: Connect using TLS and certificate authentication
+  community.general.redis:
+    command: config
+    name: lua-time-limit
+    value: 100
+    tls: true
+    ca_certs: /etc/redis/certs/ca.crt
+    client_cert_file: /etc/redis/certs/redis.crt
+    client_key_file: /etc/redis/certs/redis.key
 '''
 
 import traceback
