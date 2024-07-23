@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: maven_artifact
 short_description: Downloads an Artifact from a Maven Repository
@@ -22,7 +22,7 @@ description:
 author: "Chris Schmidt (@chrisisbeef)"
 requirements:
     - lxml
-    - boto if using a S3 repository (s3://...)
+    - boto if using a S3 repository (V(s3://...))
 attributes:
     check_mode:
         support: none
@@ -32,52 +32,52 @@ options:
     group_id:
         type: str
         description:
-            - The Maven groupId coordinate
+            - The Maven groupId coordinate.
         required: true
     artifact_id:
         type: str
         description:
-            - The maven artifactId coordinate
+            - The maven artifactId coordinate.
         required: true
     version:
         type: str
         description:
-            - The maven version coordinate
+            - The maven version coordinate.
             - Mutually exclusive with O(version_by_spec).
     version_by_spec:
         type: str
         description:
             - The maven dependency version ranges.
             - See supported version ranges on U(https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution)
-            - The range type "(,1.0],[1.2,)" and "(,1.1),(1.1,)" is not supported.
+            - The range type V((,1.0],[1.2,\)) and V((,1.1\),(1.1,\)) is not supported.
             - Mutually exclusive with O(version).
         version_added: '0.2.0'
     classifier:
         type: str
         description:
-            - The maven classifier coordinate
+            - The maven classifier coordinate.
         default: ''
     extension:
         type: str
         description:
-            - The maven type/extension coordinate
+            - The maven type/extension coordinate.
         default: jar
     repository_url:
         type: str
         description:
             - The URL of the Maven Repository to download from.
-            - Use s3://... if the repository is hosted on Amazon S3, added in version 2.2.
-            - Use file://... if the repository is local, added in version 2.6
+            - Use V(s3://...) if the repository is hosted on Amazon S3.
+            - Use V(file://...) if the repository is local.
         default: https://repo1.maven.org/maven2
     username:
         type: str
         description:
-            - The username to authenticate as to the Maven Repository. Use AWS secret key of the repository is hosted on S3
+            - The username to authenticate as to the Maven Repository. Use AWS secret key of the repository is hosted on S3.
         aliases: [ "aws_secret_key" ]
     password:
         type: str
         description:
-            - The password to authenticate with to the Maven Repository. Use AWS secret access key of the repository is hosted on S3
+            - The password to authenticate with to the Maven Repository. Use AWS secret access key of the repository is hosted on S3.
         aliases: [ "aws_secret_access_key" ]
     headers:
         description:
@@ -95,19 +95,19 @@ options:
     dest:
         type: path
         description:
-            - The path where the artifact should be written to
-            - If file mode or ownerships are specified and destination path already exists, they affect the downloaded file
+            - The path where the artifact should be written to.
+            - If file mode or ownerships are specified and destination path already exists, they affect the downloaded file.
         required: true
     state:
         type: str
         description:
-            - The desired state of the artifact
+            - The desired state of the artifact.
         default: present
         choices: [present,absent]
     timeout:
         type: int
         description:
-            - Specifies a timeout in seconds for the connection attempt
+            - Specifies a timeout in seconds for the connection attempt.
         default: 10
     validate_certs:
         description:
