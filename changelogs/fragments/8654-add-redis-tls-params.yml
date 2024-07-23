@@ -1,0 +1,2 @@
+minor_changes:
+  - redis, redis_info - add ``client_cert`` and ``client_key`` options to specify path to certificate for Redis authentication  (https://github.com/ansible-collections/community.general/pull/8654).
