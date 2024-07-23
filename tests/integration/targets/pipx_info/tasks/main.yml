@@ -68,7 +68,7 @@
     apps:
       - name: tox
         source: tox==3.24.0
-      - name: ansible-lint
+      - name: pylint
         inject_packages:
           - licenses
 
@@ -81,7 +81,7 @@
 - name: install applications
   community.general.pipx:
     name: "{{ item.name }}"
-    source: "{{ item.source|default(omit) }}"
+    source: "{{ item.source | default(omit) }}"
   loop: "{{ apps }}"
 
 - name: inject packages
@@ -102,9 +102,9 @@
     include_injected: true
   register: info2_all_deps
 
-- name: retrieve application ansible-lint
+- name: retrieve application pylint
   community.general.pipx_info:
-    name: ansible-lint
+    name: pylint
     include_deps: true
     include_injected: true
   register: info2_lint
@@ -131,10 +131,10 @@
       - "'injected' in all_apps_deps[0]"
       - "'licenses' in all_apps_deps[0].injected"
 
-      - lint|length == 1
+      - lint | length == 1
       - all_apps_deps|length == 2
       - lint[0] == all_apps_deps[0]
   vars:
     all_apps: "{{ info2_all.application|sort(attribute='name') }}"
-    all_apps_deps: "{{ info2_all_deps.application|sort(attribute='name') }}"
-    lint: "{{ info2_lint.application|sort(attribute='name') }}"
+    all_apps_deps: "{{ info2_all_deps.application | sort(attribute='name') }}"
+    lint: "{{ info2_lint.application | sort(attribute='name') }}"
