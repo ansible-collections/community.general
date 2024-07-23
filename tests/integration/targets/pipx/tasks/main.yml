@@ -266,27 +266,27 @@
 - name: install jupyter - not working smoothly in freebsd
   # when: ansible_system != 'FreeBSD'
   block:
-    - name: ensure application jupyter is uninstalled
+    - name: ensure application mkdocs is uninstalled
       community.general.pipx:
-        name: jupyter
+        name: mkdocs
         state: absent
 
-    - name: install application jupyter
+    - name: install application mkdocs
       community.general.pipx:
-        name: jupyter
+        name: mkdocs
         install_deps: true
-      register: install_jupyter
+      register: install_mkdocs
 
-    - name: cleanup jupyter
+    - name: cleanup mkdocs
       community.general.pipx:
         state: absent
-        name: jupyter
+        name: mkdocs
 
     - name: check assertions
       assert:
         that:
-          - install_jupyter is changed
-          - '"ipython" in install_jupyter.stdout'
+          - install_mkdocs is changed
+          - '"mkdocs-get-deps" in install_mkdocs.stdout'
 
 ##############################################################################
 - name: ensure /opt/pipx
