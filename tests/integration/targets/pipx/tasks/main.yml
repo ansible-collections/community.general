@@ -286,7 +286,7 @@
       assert:
         that:
           - install_mkdocs is changed
-          - '"mkdocs-get-deps" in install_mkdocs.stdout'
+          - '"markdown_py" in install_mkdocs.stdout'
 
 ##############################################################################
 - name: ensure /opt/pipx
