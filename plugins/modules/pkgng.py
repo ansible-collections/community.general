@@ -100,6 +100,13 @@ options:
         type: bool
         default: false
         version_added: 1.3.0
+    use_globs:
+        description:
+            - Treat the package names as shell glob patterns.
+        required: false
+        type: bool
+        default: true
+        version_added: 9.3.0
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
@@ -136,6 +143,12 @@ EXAMPLES = '''
   community.general.pkgng:
     name: "*"
     state: latest
+
+- name: Upgrade foo/bar
+  community.general.pkgng:
+    name: foo/bar
+    state: latest
+    use_globs: false
 '''
 
 
@@ -146,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def query_package(module, run_pkgng, name):
 
-    rc, out, err = run_pkgng('info', '-g', '-e', name)
+    rc, out, err = run_pkgng('info', '-e', name)
 
     return rc == 0
 
@@ -156,7 +169,7 @@ def query_update(module, run_pkgng, name):
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
     # rc = 1, updates available
-    rc, out, err = run_pkgng('upgrade', '-g', '-n', name)
+    rc, out, err = run_pkgng('upgrade', '-n', name)
 
     return rc == 1
 
@@ -259,7 +272,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
             action_count[action] += len(package_list)
             continue
 
-        pkgng_args = [action, '-g', '-U', '-y'] + package_list
+        pkgng_args = [action, '-U', '-y'] + package_list
         rc, out, err = run_pkgng(*pkgng_args)
         stdout += out
         stderr += err
@@ -289,7 +302,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
 
 
 def annotation_query(module, run_pkgng, package, tag):
-    rc, out, err = run_pkgng('info', '-g', '-A', package)
+    rc, out, err = run_pkgng('info', '-A', package)
     match = re.search(r'^\s*(?P<tag>%s)\s*:\s*(?P<value>\w+)' % tag, out, flags=re.MULTILINE)
     if match:
         return match.group('value')
@@ -424,7 +437,9 @@ def main():
             rootdir=dict(required=False, type='path'),
             chroot=dict(required=False, type='path'),
             jail=dict(required=False, type='str'),
-            autoremove=dict(default=False, type='bool')),
+            autoremove=dict(default=False, type='bool'),
+            use_globs=dict(default=True, required=False, type='bool'),
+        ),
         supports_check_mode=True,
         mutually_exclusive=[["rootdir", "chroot", "jail"]])
 
@@ -464,6 +479,9 @@ def main():
 
     def run_pkgng(action, *args, **kwargs):
         cmd = [pkgng_path, dir_arg, action]
+
+        if p["use_globs"] and action in ('info', 'install', 'upgrade',):
+            args = ('-g',) + args
 
         pkgng_env = {'BATCH': 'yes'}
 
