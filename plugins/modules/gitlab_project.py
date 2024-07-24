@@ -180,6 +180,14 @@ options:
       - Supports project's default branch update since community.general 8.0.0.
     type: str
     version_added: "4.2.0"
+  repository_access_level:
+    description:
+      - V(private) means that accessing repository is allowed only to project members.
+      - V(disabled) means that accessing repository is disabled.
+      - V(enabled) means that accessing repository is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.3.0"
   builds_access_level:
     description:
       - V(private) means that repository CI/CD is allowed only to project members.
@@ -375,6 +383,7 @@ class GitLabProject(object):
             'squash_option': options['squash_option'],
             'ci_config_path': options['ci_config_path'],
             'shared_runners_enabled': options['shared_runners_enabled'],
+            'repository_access_level': options['repository_access_level'],
             'builds_access_level': options['builds_access_level'],
             'forking_access_level': options['forking_access_level'],
             'container_registry_access_level': options['container_registry_access_level'],
@@ -526,6 +535,7 @@ def main():
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
         avatar_path=dict(type='path'),
+        repository_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         forking_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         container_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
@@ -585,6 +595,7 @@ def main():
     shared_runners_enabled = module.params['shared_runners_enabled']
     avatar_path = module.params['avatar_path']
     default_branch = module.params['default_branch']
+    repository_access_level = module.params['repository_access_level']
     builds_access_level = module.params['builds_access_level']
     forking_access_level = module.params['forking_access_level']
     container_registry_access_level = module.params['container_registry_access_level']
@@ -659,6 +670,7 @@ def main():
             "ci_config_path": ci_config_path,
             "shared_runners_enabled": shared_runners_enabled,
             "avatar_path": avatar_path,
+            "repository_access_level": repository_access_level,
             "builds_access_level": builds_access_level,
             "forking_access_level": forking_access_level,
             "container_registry_access_level": container_registry_access_level,
