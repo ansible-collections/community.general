@@ -267,6 +267,39 @@ options:
     type: list
     elements: str
     version_added: "6.6.0"
+  container_expiration_policy:
+    description:
+      - Project cleanup policy for its container registry
+    type: dict
+    suboptions:
+      cadence:
+        description:
+          - How often cleanup should be run.
+        type: str
+        choices: ["1d", "7d", "14d", "1month", "3month"]
+      enabled:
+        description:
+          - Enable the cleanup policy
+        type: bool
+      keep_n:
+        description:
+          - Number of tags kept per image name
+        type: int
+        choices: [1, 5, 10, 25, 50, 100]
+      older_than:
+        description:
+          - Destroy tags older than this.
+        type: str
+        choices: ["7d", "14d", "30d", "90d"]
+      name_regex:
+        description:
+          - Destroy tags matching this regular expression.
+        type: str
+      name_regex_keep:
+        description:
+          - Keep tags matching this regular expression.
+        type: str
+    version_added: "9.3.0"
 '''
 
 EXAMPLES = r'''
@@ -393,6 +426,7 @@ class GitLabProject(object):
             'infrastructure_access_level': options['infrastructure_access_level'],
             'monitor_access_level': options['monitor_access_level'],
             'security_and_compliance_access_level': options['security_and_compliance_access_level'],
+            'container_expiration_policy': options['container_expiration_policy'],
         }
 
         # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version
@@ -480,7 +514,14 @@ class GitLabProject(object):
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
                 if getattr(project, arg_key) != arguments[arg_key]:
-                    setattr(project, arg_key, arguments[arg_key])
+                    if (arg_key == 'container_expiration_policy'):
+                        old_val = getattr(project, arg_key)
+                        old_val.pop('next_run_at', None)
+                        if (old_val == arg_value):
+                            continue
+                        setattr(project, 'container_expiration_policy_attributes', arg_value)
+                    else:
+                        setattr(project, arg_key, arg_value)
                     changed = True
 
         return (changed, project)
@@ -546,6 +587,14 @@ def main():
         monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         topics=dict(type='list', elements='str'),
+        container_expiration_policy=dict(type='dict', default=None, options=dict(
+            cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
+            enabled=dict(type='bool'),
+            keep_n=dict(type='int', choices=[1, 5, 10, 25, 50, 100]),
+            older_than=dict(type='str', choices=["7d", "14d", "30d", "90d"]),
+            name_regex=dict(type='str'),
+            name_regex_keep=dict(type='str'),
+        ))
     ))
 
     module = AnsibleModule(
@@ -606,6 +655,7 @@ def main():
     monitor_access_level = module.params['monitor_access_level']
     security_and_compliance_access_level = module.params['security_and_compliance_access_level']
     topics = module.params['topics']
+    container_expiration_policy = module.params['container_expiration_policy']
 
     # Set project_path to project_name if it is empty.
     if project_path is None:
@@ -681,6 +731,7 @@ def main():
             "monitor_access_level": monitor_access_level,
             "security_and_compliance_access_level": security_and_compliance_access_level,
             "topics": topics,
+            "container_expiration_policy": container_expiration_policy,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
