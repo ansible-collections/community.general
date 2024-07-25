@@ -269,7 +269,7 @@ options:
     version_added: "6.6.0"
   container_expiration_policy:
     description:
-      - Project cleanup policy for its container registry
+      - Project cleanup policy for its container registry.
     type: dict
     suboptions:
       cadence:
@@ -514,10 +514,9 @@ class GitLabProject(object):
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
                 if getattr(project, arg_key) != arguments[arg_key]:
-                    if (arg_key == 'container_expiration_policy'):
+                    if arg_key == 'container_expiration_policy':
                         old_val = getattr(project, arg_key)
-                        old_val.pop('next_run_at', None)
-                        if (old_val == arg_value):
+                        if all(old_val.get(key) == value for key, value in arg_value.items()):
                             continue
                         setattr(project, 'container_expiration_policy_attributes', arg_value)
                     else:
