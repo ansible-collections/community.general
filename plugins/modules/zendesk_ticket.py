@@ -27,75 +27,82 @@ attributes:
 options:
   url:
     type: str
-    description: The URL of the Zendesk instance.
+    description:
+      - The URL of the Zendesk instance.
     required: true
   username:
     type: str
-    description: The Zendesk account username.
+    description:
+      - The Zendesk account username.
     required: true
     aliases: ['user']
   password:
     type: str
-    description: The Zendesk account password.
+    description:
+      - The Zendesk account password.
     required: false
     aliases: ['pass']
   token:
     type: str
-    description: The API token for authentication.
+    description:
+      - The API token for authentication.
     required: false
   body:
     type: str
-    description: The body of the ticket.
+    description:
+      - The body of the ticket.
     default: ''
   priority:
     type: str
-    description: The priority of the ticket.
+    description:
+      - The priority of the ticket.
     choices: ['urgent', 'high', 'normal', 'low']
     default: normal
   status:
     type: str
-    description: The status of the ticket.
+    description:
+      - The status of the ticket.
     choices: ['new', 'closed', 'resolved']
     required: true
   ticket_id:
     type: int
-    description: The ID of the ticket to be closed or resolved.
+    description:
+      - The ID of the ticket to be closed or resolved.
     required: false
   subject:
     type: str
-    description: The subject of the ticket.
+    description:
+      - The subject of the ticket.
     required: false
 '''
 
 EXAMPLES = '''
-  - name: Create a new ticket
-    community.general.zendesk_ticket:
-      username: 'your_username'
-      token: 'your_api_token'
-      url: 'https://yourcompany.zendesk.com'
-      body: 'This is a sample ticket'
-      priority: 'normal'
-      subject: 'New Ticket'
-      status: 'new'
+- name: Create a new ticket
+  community.general.zendesk_ticket:
+    username: 'your_username'
+    token: 'your_api_token'
+    url: 'https://yourcompany.zendesk.com'
+    body: 'This is a sample ticket'
+    priority: 'normal'
+    subject: 'New Ticket'
+    status: 'new'
 
+- name: Close a ticket
+  community.general.zendesk_ticket:
+    username: 'your_username'
+    token: 'your_api_token'
+    url: 'https://yourcompany.zendesk.com'
+    ticket_id: 12345
+    status: 'closed'
 
-  - name: Close a ticket
-    community.general.zendesk_ticket:
-      username: 'your_username'
-      token: 'your_api_token'
-      url: 'https://yourcompany.zendesk.com'
-      ticket_id: 12345
-      status: 'closed'
-
-
-  - name: Resolve a ticket
-    community.general.zendesk_ticket:
-      username: 'your_username'
-      token: 'your_api_token'
-      url: 'https://yourcompany.zendesk.com'
-      ticket_id: 12345
-      status: 'resolved'
-      body: 'Issue has been resolved'
+- name: Resolve a ticket
+  community.general.zendesk_ticket:
+    username: 'your_username'
+    token: 'your_api_token'
+    url: 'https://yourcompany.zendesk.com'
+    ticket_id: 12345
+    status: 'resolved'
+    body: 'Issue has been resolved'
 '''
 
 import json

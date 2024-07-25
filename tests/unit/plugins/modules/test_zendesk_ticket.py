@@ -8,7 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import zendesk_ticket
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleExitJson, AnsibleFailJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleFailJson
+
 
 class TestZendeskTicket(ModuleTestCase):
     def setUp(self):
@@ -17,7 +18,7 @@ class TestZendeskTicket(ModuleTestCase):
 
     def tearDown(self):
         super(TestZendeskTicket, self).tearDown()
-    
+
     def test_with_no_parameters(self):
         """
         Test that the module fails when no parameters are provided.
@@ -48,11 +49,7 @@ class TestZendeskTicket(ModuleTestCase):
 
     def test_resolve_ticket_idempotency_with_mock(self):
         """
-        Test that attempting to resolve a non-existent ticket fails.
-        
-        This test mocks a scenario where a ticket with ID 35436 does not exist,
-        and verifies that the module fails with the appropriate error message
-        when trying to resolve it.
+        Test the module's behavior when attempting to resolve a non-existent ticket.
         """
         ticket_data = {
             'url': 'http://zendesk.com',
@@ -63,10 +60,10 @@ class TestZendeskTicket(ModuleTestCase):
             'body': 'Ticket is resolved.'
         }
         set_module_args(ticket_data)
-        
+
         with self.assertRaises(AnsibleFailJson) as exc_info:
             self.module.main()
-        
+
         result = exc_info.exception.args[0]
         self.assertTrue(result['failed'])
         self.assertEqual(result['msg'], 'Ticket ID 35436 does not exist.')
