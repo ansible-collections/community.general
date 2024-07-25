@@ -277,10 +277,12 @@ options:
           - How often cleanup should be run.
         type: str
         choices: ["1d", "7d", "14d", "1month", "3month"]
+        required: true
       enabled:
         description:
           - Enable the cleanup policy
         type: bool
+        required: true
       keep_n:
         description:
           - Number of tags kept per image name
@@ -295,6 +297,7 @@ options:
         description:
           - Destroy tags matching this regular expression.
         type: str
+        required: true
       name_regex_keep:
         description:
           - Keep tags matching this regular expression.
@@ -587,13 +590,13 @@ def main():
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         topics=dict(type='list', elements='str'),
         container_expiration_policy=dict(type='dict', default=None, options=dict(
-            cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
-            enabled=dict(type='bool'),
+            cadence=dict(type='str', required=True, choices=["1d", "7d", "14d", "1month", "3month"]),
+            enabled=dict(type='bool', required=True),
             keep_n=dict(type='int', choices=[1, 5, 10, 25, 50, 100]),
             older_than=dict(type='str', choices=["7d", "14d", "30d", "90d"]),
-            name_regex=dict(type='str'),
+            name_regex=dict(type='str', required=True),
             name_regex_keep=dict(type='str'),
-        ))
+        )),
     ))
 
     module = AnsibleModule(
