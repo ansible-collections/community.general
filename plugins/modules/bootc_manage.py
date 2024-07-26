@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: bootc_manage
-version_added: 9.2.0
+version_added: 9.3.0
 author:
 - Ryan Cook (@cooktheryan)
 short_description: Bootc Switch and Upgrade
