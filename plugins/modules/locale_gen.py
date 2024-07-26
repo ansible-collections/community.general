@@ -188,7 +188,6 @@ class LocaleGen(StateModuleHelper):
         with open("/etc/locale.gen", 'w') as fw:
             fw.writelines(lines)
 
-
     def apply_change(self, targetState, names: list[str]):
         """Create or remove locale.
 
