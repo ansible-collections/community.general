@@ -142,7 +142,7 @@ class LocaleGen(StateModuleHelper):
     def is_present(self):
         return not self.locale_get_not_present(self.vars.name)
 
-    def locale_get_not_present(self, locales: list[str]) -> list[str]:
+    def locale_get_not_present(self, locales):
         runner = locale_runner(self.module)
         with runner() as ctx:
             rc, out, err = ctx.run()
@@ -163,12 +163,12 @@ class LocaleGen(StateModuleHelper):
             name = name.replace(s, r)
         return name
 
-    def set_locale(self, names: list[str], enabled=True):
+    def set_locale(self, names, enabled=True):
         """ Sets the state of the locale. Defaults to enabled. """
         with open("/etc/locale.gen", 'r') as fr:
             lines = fr.readlines()
 
-        locale_regexes: [tuple[re.Pattern[str], str]] = []
+        locale_regexes = []
 
         for name in names:
             search_string = r'^#?\s*%s (?P<charset>.+)' % re.escape(name)
@@ -188,7 +188,7 @@ class LocaleGen(StateModuleHelper):
         with open("/etc/locale.gen", 'w') as fw:
             fw.writelines(lines)
 
-    def apply_change(self, targetState, names: list[str]):
+    def apply_change(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
@@ -202,7 +202,7 @@ class LocaleGen(StateModuleHelper):
         with runner() as ctx:
             ctx.run()
 
-    def apply_change_ubuntu(self, targetState, names: list[str]):
+    def apply_change_ubuntu(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
