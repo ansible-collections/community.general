@@ -138,7 +138,7 @@ class LocaleGen(StateModuleHelper):
         locales_not_found = self.locale_get_not_present(locales_not_found)
 
         if locales_not_found:
-            self.do_raise(f"The following locales you've entered are not available on your system: {', '.join(locales_not_found)}")
+            self.do_raise("The following locales you've entered are not available on your system: {0}".format(', '.join(locales_not_found)))
 
     def is_present(self):
         return not self.locale_get_not_present(self.vars.name)
