@@ -184,7 +184,6 @@ class LocaleGen(StateModuleHelper):
             for [search, replace] in locale_regexes:
                 lines[i] = search.sub(replace, lines[i])
 
-        # raise Exception(f"{''.join(lines)}")
         # Write the modified content back to the file
         with open("/etc/locale.gen", 'w') as fw:
             fw.writelines(lines)
