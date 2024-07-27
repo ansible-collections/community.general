@@ -277,27 +277,24 @@ options:
           - How often cleanup should be run.
         type: str
         choices: ["1d", "7d", "14d", "1month", "3month"]
-        required: true
       enabled:
         description:
-          - Enable the cleanup policy
+          - Enable the cleanup policy.
         type: bool
-        required: true
       keep_n:
         description:
-          - Number of tags kept per image name
+          - Number of tags kept per image name.
         type: int
-        choices: [1, 5, 10, 25, 50, 100]
+        choices: [0, 1, 5, 10, 25, 50, 100]
       older_than:
         description:
           - Destroy tags older than this.
         type: str
-        choices: ["7d", "14d", "30d", "90d"]
+        choices: ["0d", "7d", "14d", "30d", "90d"]
       name_regex:
         description:
           - Destroy tags matching this regular expression.
         type: str
-        required: true
       name_regex_keep:
         description:
           - Keep tags matching this regular expression.
@@ -519,9 +516,16 @@ class GitLabProject(object):
                 if getattr(project, arg_key) != arguments[arg_key]:
                     if arg_key == 'container_expiration_policy':
                         old_val = getattr(project, arg_key)
-                        if all(old_val.get(key) == value for key, value in arg_value.items()):
+                        final_val = {key: value for key, value in arg_value.items() if value is not None}
+                        if all(old_val.get(key) == value for key, value in final_val.items()):
                             continue
-                        setattr(project, 'container_expiration_policy_attributes', arg_value)
+
+                        if final_val.get('older_than') == '0d':
+                            final_val['older_than'] = None
+                        if final_val.get('keep_n') == 0:
+                            final_val['keep_n'] = None
+
+                        setattr(project, 'container_expiration_policy_attributes', final_val)
                     else:
                         setattr(project, arg_key, arg_value)
                     changed = True
@@ -590,11 +594,11 @@ def main():
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         topics=dict(type='list', elements='str'),
         container_expiration_policy=dict(type='dict', default=None, options=dict(
-            cadence=dict(type='str', required=True, choices=["1d", "7d", "14d", "1month", "3month"]),
-            enabled=dict(type='bool', required=True),
-            keep_n=dict(type='int', choices=[1, 5, 10, 25, 50, 100]),
-            older_than=dict(type='str', choices=["7d", "14d", "30d", "90d"]),
-            name_regex=dict(type='str', required=True),
+            cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
+            enabled=dict(type='bool'),
+            keep_n=dict(type='int', choices=[0, 1, 5, 10, 25, 50, 100]),
+            older_than=dict(type='str', choices=["0d", "7d", "14d", "30d", "90d"]),
+            name_regex=dict(type='str'),
             name_regex_keep=dict(type='str'),
         )),
     ))
