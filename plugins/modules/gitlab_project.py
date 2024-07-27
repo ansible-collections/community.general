@@ -517,14 +517,14 @@ class GitLabProject(object):
                     if arg_key == 'container_expiration_policy':
                         old_val = getattr(project, arg_key)
                         final_val = {key: value for key, value in arg_value.items() if value is not None}
-                        if all(old_val.get(key) == value for key, value in final_val.items()):
-                            continue
 
                         if final_val.get('older_than') == '0d':
                             final_val['older_than'] = None
                         if final_val.get('keep_n') == 0:
                             final_val['keep_n'] = None
 
+                        if all(old_val.get(key) == value for key, value in final_val.items()):
+                            continue
                         setattr(project, 'container_expiration_policy_attributes', final_val)
                     else:
                         setattr(project, arg_key, arg_value)
