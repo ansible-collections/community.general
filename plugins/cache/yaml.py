@@ -41,7 +41,8 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_timeout
             section: defaults
-        type: float
+        type: integer
+        # TODO: determine whether it is OK to change to: type: float
 '''
 
 

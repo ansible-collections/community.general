@@ -58,7 +58,8 @@ DOCUMENTATION = '''
         version_added: 1.3.0
       _timeout:
         default: 86400
-        type: float
+        type: integer
+        # TODO: determine whether it is OK to change to: type: float
         description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
         env:
           - name: ANSIBLE_CACHE_PLUGIN_TIMEOUT
