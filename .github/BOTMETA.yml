@@ -448,6 +448,8 @@ files:
     maintainers: hkariti
   $modules/bitbucket_:
     maintainers: catcombo
+  $modules/bootc_manage.py:
+    maintainers: cooktheryan
   $modules/bower.py:
     maintainers: mwarkentin
   $modules/btrfs_:
