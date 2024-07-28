@@ -216,21 +216,7 @@ If you want to include some module parameters in the output, list them in the ``
         ...
 
 A neat feature provided by MH by using ``VarDict`` is the automatic tracking of changes in variables.
-This is achieved by setting the metadata ``change=True``, as in:
-
-.. code-block:: python
-
-    # using __init_module__() as example, it works the same in __run__() and __quit_module__()
-    def __init_module__(self):
-        # example from community.general.ansible_galaxy_install
-        self.vars.set("new_roles", {}, change=True)
-
-        # example of "hidden" variable used only to track change in a value from community.general.gconftool2
-        self.vars.set('_value', self.vars.previous_value, output=False, change=True)
-        ...
-
-If the end value of any variable marked ``change`` is different from its initial value, then the module task will return ``changed=True``.
-
+This is achieved by setting the metadata ``change=True``. See examples in `Tracking changes in variables`_.
 Again, to track changes in variables created from module parameters, you must list them in the ``change_params`` class variable.
 
 .. code-block:: python
@@ -282,9 +268,56 @@ That generates an Ansible fact like:
 Handling changes
 """"""""""""""""
 
-- ``self.__changed__()``
-- self.vars
-- override ``self.has_changed()``
+In MH there are many ways to indicate change in the module execution. Here they are:
+
+Tracking changes in variables
+-----------------------------
+
+As explained above, you can enable change tracking in any number of variables in ``self.vars``.
+By the end of the module execution, if any of them has a different value then the first value assigned to them,
+then that change will be picked up by MH and signalled at the module output.
+See the example below to learn how you can enabled change tracking in variables:
+
+.. code-block:: python
+
+    # using __init_module__() as example, it works the same in __run__() and __quit_module__()
+    def __init_module__(self):
+        # example from community.general.ansible_galaxy_install
+        self.vars.set("new_roles", {}, change=True)
+
+        # example of "hidden" variable used only to track change in a value from community.general.gconftool2
+        self.vars.set('_value', self.vars.previous_value, output=False, change=True)
+
+        # enable change-tracking without assigning value
+        self.vars.set_meta("new_roles", change=True)
+
+        # if you must force an initial value to the variable
+        self.vars.set_meta("new_roles", initial_value=[])
+        ...
+
+If the end value of any variable marked ``change`` is different from its initial value, then the module will return ``changed=True``.
+
+Indicating changes with ``changed``
+-----------------------------------
+
+Another way to indicate change is to use the ``self.changed`` property in the module.
+Beware that this is a ``@property`` method in MH, with both *getter* and *setter*.
+The *setter* will store the value in a hidden field in the module.
+The *getter* will try to use ``self.__changed__()`` first.
+If that method is not implemented, then it will use the value from the hidden field.
+By default, that hidden field is set to ``False``.
+
+Indicating changes with ``__changed__()``
+-----------------------------------------
+
+This method, by default, raises a ``NotImplementedError``.
+You can implement a more complex logic to determine the change state of the module by overriding it.
+
+Effective change
+----------------
+
+The effective outcome for the module is determined in the ``self.has_changed()`` method, and it consists of the logical *OR* operation
+between ``self.changed`` and the change outcome from ``self.vars``.
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------
