@@ -23,10 +23,6 @@ description:
     - The names of module options are snake_cased versions of the camelCase ones found in the
       Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/latest/rest-api/index.html).
 
-    - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and will
-      be returned that way by this module. You may pass single values for attributes when calling the module,
-      and this will be translated into a list suitable for the API.
-
 options:
     realm:
         type: str
@@ -52,13 +48,13 @@ EXAMPLES = """
     auth_password: PASSWORD
     realm: MyCustomRealm
   delegate_to: localhost
-  register: keys_metadata
+  register: keycloak_keys_metadata
 
 - name: Write the Keycloak keys certificate into a file
   ansible.builtin.copy:
     dest: /tmp/keycloak.cert
     content: |
-      {{ keys_metadata['keys_metadata']['keys']
+      {{ keys_metadata['keycloak_keys_metadata']['keys']
       | selectattr('algorithm', 'equalto', 'RS256')
       | map(attribute='certificate')
       | first
@@ -82,12 +78,13 @@ keys_metadata:
     type: dict
     contains:
         active:
-            description: A mapping (i.e. a dict) from key algorithms to UUIDs.
+            description: A mapping (that is, a dict) from key algorithms to UUIDs.
             type: dict
             returned: always
         keys:
             description: A list of dicts providing detailed information on the keys.
             type: list
+            elements: dict
             returned: always
 """
 
