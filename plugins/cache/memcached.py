@@ -29,6 +29,7 @@ DOCUMENTATION = '''
             section: defaults
       _prefix:
         description: User defined prefix to use when creating the DB entries
+        type: string
         default: ansible_facts
         env:
           - name: ANSIBLE_CACHE_PLUGIN_PREFIX
@@ -37,13 +38,14 @@ DOCUMENTATION = '''
             section: defaults
       _timeout:
         default: 86400
+        type: integer
+        # TODO: determine whether it is OK to change to: type: float
         description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
         env:
           - name: ANSIBLE_CACHE_PLUGIN_TIMEOUT
         ini:
           - key: fact_caching_timeout
             section: defaults
-        type: integer
 '''
 
 import collections

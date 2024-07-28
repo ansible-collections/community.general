@@ -24,6 +24,7 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_connection
             section: defaults
+        type: path
       _prefix:
         description: User defined prefix to use when creating the files
         env:
@@ -31,6 +32,7 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_prefix
             section: defaults
+        type: string
       _timeout:
         default: 86400
         description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
@@ -39,6 +41,7 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_timeout
             section: defaults
+        type: float
 '''
 
 try:
