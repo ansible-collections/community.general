@@ -712,6 +712,18 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from copy import deepcopy
 
+def set_mapper_defaults(mapper):
+    '''
+    Set explicit default values expected by the kc API for the different mapper types.
+    '''
+    # keycloak explicity sets the default ['config']['always.read.enabled.value.from.ldap'] == 'true'
+    # if the parameter is not present in the config
+    # we match this behavior to get a cleaner diff
+    if mapper.get('providerId') == 'msad-user-account-control-mapper':
+        if not mapper.get('config'):
+            mapper['config'] = {}
+        if not 'always.read.enabled.value.from.ldap' in mapper['config']:
+            mapper['config']['always.read.enabled.value.from.ldap'] = True
 
 def sanitize(comp):
     compcopy = deepcopy(comp)
@@ -719,13 +731,13 @@ def sanitize(comp):
         compcopy['config'] = dict((k, v[0]) for k, v in compcopy['config'].items())
         if 'bindCredential' in compcopy['config']:
             compcopy['config']['bindCredential'] = '**********'
-        # an empty string is valid for krbPrincipalAttribute but is filtered out in diff
-        if 'krbPrincipalAttribute' not in compcopy['config']:
-            compcopy['config']['krbPrincipalAttribute'] = ''
     if 'mappers' in compcopy:
         for mapper in compcopy['mappers']:
             if 'config' in mapper:
                 mapper['config'] = dict((k, v[0]) for k, v in mapper['config'].items())
+        # the frontend sorts mappers by name, the API however has a different random order for every federation
+        # the order is not really relevant, we only sort here to get a correct diff/changes
+        compcopy['mappers'] = sorted(compcopy['mappers'], key=lambda x: x['name'])
     return compcopy
 
 
@@ -774,7 +786,12 @@ def main():
         readTimeout=dict(type='int'),
         searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
-        krbPrincipalAttribute=dict(type='str'),
+        # When creating a user federation with this parameter not present or set to '', this parameter is set explicitly to the default value 'userPrincipalName' by kc
+        # even if kerbereos authentication is disabled.
+        # To get krbPrincipalAttribute = '' (and the optional behavior described in the GUI) explicitly set it to '', and run the module twice:
+        # once to create the federation with the default value and then to update it to the desired '' value.
+        # see last comment https://github.com/keycloak/keycloak/issues/28011 for this behavior
+        krbPrincipalAttribute=dict(type='str', default='userPrincipalName'),
         startTls=dict(type='bool', default=False),
         syncRegistrations=dict(type='bool', default=False),
         trustEmail=dict(type='bool', default=False),
@@ -843,6 +860,7 @@ def main():
 
     if mappers is not None:
         for mapper in mappers:
+            set_mapper_defaults(mapper)
             if mapper.get('config') is not None:
                 mapper['config'] = dict((k, [str(v).lower() if not isinstance(v, str) else v])
                                         for k, v in mapper['config'].items() if mapper['config'][k] is not None)
@@ -868,7 +886,7 @@ def main():
 
     # if user federation exists, get associated mappers
     if cid is not None and before_comp:
-        before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
+        before_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
 
     # Build a proposed changeset from parameters given to this module
     changeset = {}
