@@ -905,10 +905,10 @@ def main():
                     old_mapper = {}
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+            # changeset contains all desired mappers: those existing, to update or to create
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            changeset['mappers'].append(new_mapper)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_comp = before_comp.copy()
@@ -931,20 +931,21 @@ def main():
         # Process a creation
         result['changed'] = True
 
-        if module._diff:
-            result['diff'] = dict(before='', after=sanitize(desired_comp))
-
         if module.check_mode:
+            if module._diff:
+                result['diff'] = dict(before='', after=sanitize(desired_comp))
             module.exit_json(**result)
 
+
         # create it
-        desired_comp = desired_comp.copy()
-        updated_mappers = desired_comp.pop('mappers', [])
+        desired_mappers = desired_comp.pop('mappers', [])
         after_comp = kc.create_component(desired_comp, realm)
+        updated_mappers = []
 
         cid = after_comp['id']
 
-        for mapper in updated_mappers:
+        # create new mappers or update existing default mappers
+        for mapper in desired_mappers:
             found = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)
             if len(found) > 1:
                 module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=mapper['name']))
@@ -958,15 +959,25 @@ def main():
 
             if new_mapper.get('id') is not None:
                 kc.update_component(new_mapper, realm)
+                updated_mappers.append(new_mapper)
             else:
                 if new_mapper.get('parentId') is None:
                     new_mapper['parentId'] = after_comp['id']
-                mapper = kc.create_component(new_mapper, realm)
+                updated_mappers.append(kc.create_component(new_mapper, realm)) 
 
-        after_comp['mappers'] = updated_mappers
+        # when creating a user federation, keycloak automatically creates default mappers
+        # we remove all unwanted default mappers
+        # we use ids so we dont accidently remove one of the previously updated default mapper
+        existing_mappers = kc.get_components(urlencode(dict(parent=cid)), realm)
+        for existing_mapper in existing_mappers:
+            if not existing_mapper['id'] in [x['id'] for x in updated_mappers]:
+                kc.delete_component(existing_mapper['id'], realm)
+
+        after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+        if module._diff:
+            result['diff'] = dict(before='', after=sanitize(after_comp))
         result['end_state'] = sanitize(after_comp)
-
-        result['msg'] = "User federation {id} has been created".format(id=after_comp['id'])
+        result['msg'] = "User federation {} has been created".format(after_comp.get('name', after_comp['id']))
         module.exit_json(**result)
 
     else:
@@ -990,22 +1001,32 @@ def main():
                 module.exit_json(**result)
 
             # do the update
-            desired_comp = desired_comp.copy()
-            updated_mappers = desired_comp.pop('mappers', [])
+            desired_mappers = desired_comp.pop('mappers', [])
             kc.update_component(desired_comp, realm)
-            after_comp = kc.get_component(cid, realm)
 
-            for mapper in updated_mappers:
+            for before_mapper in before_comp.get('mappers', []):
+                # remove unwanted existing mappers that will not be updated
+                if not before_mapper['id'] in [x['id'] for x in desired_mappers]:
+                    kc.delete_component(before_mapper['id'], realm)
+
+            for mapper in desired_mappers:
+                if mapper in before_comp.get('mappers', []):
+                    continue          
                 if mapper.get('id') is not None:
                     kc.update_component(mapper, realm)
                 else:
                     if mapper.get('parentId') is None:
                         mapper['parentId'] = desired_comp['id']
-                    mapper = kc.create_component(mapper, realm)
+                    kc.create_component(mapper, realm)
 
-            after_comp['mappers'] = updated_mappers
-            result['end_state'] = sanitize(after_comp)
-
+            after_comp = kc.get_component(cid, realm)
+            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+            after_comp_sanitized = sanitize(after_comp)
+            before_comp_sanitized = sanitize(before_comp)
+            result['end_state'] = after_comp_sanitized
+            if module._diff:
+                result['diff'] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
+            result['changed'] = before_comp_sanitized != after_comp_sanitized
             result['msg'] = "User federation {id} has been updated".format(id=cid)
             module.exit_json(**result)
 
