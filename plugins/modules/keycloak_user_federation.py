@@ -991,20 +991,19 @@ def main():
         if state == 'present':
             # Process an update
 
-            # no changes
-            if desired_comp == before_comp:
-                result['changed'] = False
-                result['end_state'] = sanitize(desired_comp)
-                result['msg'] = "No changes required to user federation {id}.".format(id=cid)
-                module.exit_json(**result)
-
-            # doing an update
-            result['changed'] = True
-
-            if module._diff:
-                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(desired_comp))
-
             if module.check_mode:
+                before_comp_sanitized = sanitize(before_comp)
+                desired_comp_sanitized = sanitize(desired_comp)
+                if module._diff:
+                    result['diff'] = dict(before=before_comp_sanitized, after=desired_comp_sanitized)
+
+                if desired_comp_sanitized == before_comp_sanitized:
+                    result['changed'] = False
+                    result['msg'] = "No changes required to user federation {id}.".format(id=cid)
+                else:
+                    result['changed'] = True
+                    result['msg'] = "Changes are required to user federation {id}.".format(id=cid)
+                result['end_state'] = desired_comp_sanitized
                 module.exit_json(**result)
 
             # do the update
@@ -1021,8 +1020,15 @@ def main():
                         mapper['parentId'] = desired_comp['id']
                     mapper = kc.create_component(mapper, realm)
 
-            after_comp['mappers'] = updated_mappers
-            result['end_state'] = sanitize(after_comp)
+            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)
+            before_comp['mappers'] = updated_mappers
+            after_comp_sanitized = sanitize(after_comp)
+            before_comp_sanitized = sanitize(before_comp)
+            result['end_state'] = after_comp_sanitized
+            if module._diff:
+                result['diff'] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
+            result['changed'] = before_comp_sanitized != after_comp_sanitized
+
 
             result['msg'] = "User federation {id} has been updated".format(id=cid)
             module.exit_json(**result)
