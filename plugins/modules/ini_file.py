@@ -155,10 +155,11 @@ options:
     version_added: 7.1.0
   option_prefix_spaces:
     description:
-    - This flag indicates that the option should start with spaces.
+    - The number of spaces to insert before every option name.
+    - By default (value V(0)), no spaces are inserted before the option name.
     type: int
     default: 0
-    version_added: 8.0.0
+    version_added: 9.3.0
 notes:
    - While it is possible to add an O(option) without specifying a O(value), this makes no sense.
    - As of community.general 3.2.0, UTF-8 BOM markers are discarded when reading files.
@@ -263,9 +264,10 @@ EXAMPLES = r'''
     value: xxxxxxxxxxxxxxxxxxxx
     mode: '0600'
     state: present
+
 - name: Update the option and indent with spaces
   community.general.ini_file:
-    path: /etc/influxdb/config.toml
+    path: /etc/influxdb/config.ini
     section: default
     option: url
     value: http://localhost:8086
@@ -618,7 +620,7 @@ def main():
             modify_inactive_option=dict(type='bool', default=True),
             create=dict(type='bool', default=True),
             follow=dict(type='bool', default=False),
-            option_prefix_spaces=dict(type='int', default=0)
+            option_prefix_spaces=dict(type='int', default=0),
         ),
         mutually_exclusive=[
             ['value', 'values']
