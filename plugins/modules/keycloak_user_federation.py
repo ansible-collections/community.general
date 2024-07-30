@@ -892,11 +892,11 @@ def main():
             if cid is None:
                 old_mapper = {}
             elif change.get('id') is not None:
-                old_mapper = kc.get_component(change['id'], realm)
+                old_mapper = next((before_mapper for before_mapper in before_mapper.get('mappers', []) if before_mapper["id"] == change['id']), None)
                 if old_mapper is None:
                     old_mapper = {}
             else:
-                found = kc.get_components(urlencode(dict(parent=cid, name=change['name'])), realm)
+                found = list(filter(lambda before_mapper: before_mapper['name'] == change['name'], before_comp.get('mappers', [])))
                 if len(found) > 1:
                     module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=change['name']))
                 if len(found) == 1:
@@ -940,38 +940,38 @@ def main():
         # create it
         desired_mappers = desired_comp.pop('mappers', [])
         after_comp = kc.create_component(desired_comp, realm)
-        updated_mappers = []
-
         cid = after_comp['id']
+        updated_mappers = []
+        # when creating a user federation, keycloak automatically creates default mappers
+        default_mappers = kc.get_components(urlencode(dict(parent=cid)), realm)
+
 
         # create new mappers or update existing default mappers
-        for mapper in desired_mappers:
-            found = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)
+        for desired_mapper in desired_mappers:
+            found = list(filter(lambda default_mapper: default_mapper['name'] == desired_mapper['name'], default_mappers))
             if len(found) > 1:
-                module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=mapper['name']))
+                module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=desired_mapper['name']))
             if len(found) == 1:
                 old_mapper = found[0]
             else:
                 old_mapper = {}
 
             new_mapper = old_mapper.copy()
-            new_mapper.update(mapper)
+            new_mapper.update(desired_mapper)
 
             if new_mapper.get('id') is not None:
                 kc.update_component(new_mapper, realm)
                 updated_mappers.append(new_mapper)
             else:
                 if new_mapper.get('parentId') is None:
-                    new_mapper['parentId'] = after_comp['id']
+                    new_mapper['parentId'] = cid
                 updated_mappers.append(kc.create_component(new_mapper, realm)) 
 
-        # when creating a user federation, keycloak automatically creates default mappers
         # we remove all unwanted default mappers
         # we use ids so we dont accidently remove one of the previously updated default mapper
-        existing_mappers = kc.get_components(urlencode(dict(parent=cid)), realm)
-        for existing_mapper in existing_mappers:
-            if not existing_mapper['id'] in [x['id'] for x in updated_mappers]:
-                kc.delete_component(existing_mapper['id'], realm)
+        for default_mapper in default_mappers:
+            if not default_mapper['id'] in [x['id'] for x in updated_mappers]:
+                kc.delete_component(default_mapper['id'], realm)
 
         after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
         if module._diff:
