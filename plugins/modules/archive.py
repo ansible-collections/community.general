@@ -551,10 +551,10 @@ class TGZFileWithMtime(tarfile.TarFile):
         if fileobj is None:
             fileobj = open(name, mode + "b")
 
-        # filename intentionally empty to match GNU tar
         try:
+            # filename intentionally empty to match GNU tar
             gzipfileobj = gzip.GzipFile("", mode, compresslevel, fileobj, mtime)
-        except:
+        except Exception:
             fileobj.close()
             raise
 
@@ -563,7 +563,7 @@ class TGZFileWithMtime(tarfile.TarFile):
 
         try:
             super(TGZFileWithMtime, self).__init__(mode="w", fileobj=gzipfileobj, **kwargs)
-        except:
+        except Exception:
             gzipfileobj.close()
             raise
 
