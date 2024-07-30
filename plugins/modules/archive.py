@@ -550,7 +550,7 @@ class ZipArchive(Archive):
         return checksums
 
 
-class TGZFileWithMtime(tarfile.TarFile):
+class ReproducibleTGZFile(tarfile.TarFile):
     def __init__(
         self, name=None, mode=None, compresslevel=-1, fileobj=None, mtime=None, **kwargs
     ):
@@ -558,7 +558,7 @@ class TGZFileWithMtime(tarfile.TarFile):
             fileobj = open(name, mode + "b")
 
         try:
-            # filename intentionally empty to match GNU tar
+            # output filename intentionally empty exclude it from gzip header
             gzipfileobj = gzip.GzipFile("", mode, compresslevel, fileobj, mtime)
         except Exception:
             fileobj.close()
@@ -568,7 +568,7 @@ class TGZFileWithMtime(tarfile.TarFile):
         gzipfileobj.myfileobj = fileobj
 
         try:
-            super(TGZFileWithMtime, self).__init__(mode="w", fileobj=gzipfileobj, **kwargs)
+            super(ReproducibleTGZFile, self).__init__(mode=mode, fileobj=gzipfileobj, **kwargs)
         except Exception:
             gzipfileobj.close()
             raise
@@ -598,7 +598,7 @@ class TarArchive(Archive):
 
     def open(self):
         if self.reproducible_tar and self.format == "gz":
-            self.file = TGZFileWithMtime(
+            self.file = ReproducibleTGZFile(
                 _to_native_ascii(self.destination), "w", mtime=self._reproducible_mtime()
             )
         elif self.format in ('gz', 'bz2'):
@@ -627,7 +627,7 @@ class TarArchive(Archive):
                 if tarinfo.isdir():
                     mode = 0o40000 | 0o755
                 else:
-                    mode = 0o100000 | 0o644
+                    mode = 0o100000 | (0o755 if tarinfo.mode & 0o100 else 0o644)
 
                 # Copy tarfile while reducing metadata
                 return tarinfo.replace(
