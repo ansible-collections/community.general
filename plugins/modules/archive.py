@@ -365,14 +365,14 @@ class Archive(object):
         try:
             for target in self.targets:
                 if os.path.isdir(target):
-                    paths = []
-                    for directory_path, _directory_names, file_names in os.walk(target, topdown=True):
-                        paths.append(directory_path)
-                        for file_name in file_names:
-                            paths.append(os.path.join(directory_path, file_name))
+                    for directory_path, directory_names, file_names in os.walk(target, topdown=True):
+                        for directory_name in directory_names:
+                            full_path = os.path.join(directory_path, directory_name)
+                            self.add(full_path, strip_prefix(self.root, full_path))
 
-                    for path in sorted(paths):
-                        self.add(path, strip_prefix(self.root, path))
+                        for file_name in file_names:
+                            full_path = os.path.join(directory_path, file_name)
+                            self.add(full_path, strip_prefix(self.root, full_path))
                 else:
                     self.add(target, strip_prefix(self.root, target))
         except Exception as e:
