@@ -1,2 +1,2 @@
 minor_changes:
-  - archive - add ``reproducible_tar`` option to make tar archives vary with the same input (https://github.com/ansible-collections/community.general/pull/8691).
+  - archive - add ``reproducible_tar`` option to make tar archives vary less given the same input file content (https://github.com/ansible-collections/community.general/pull/8691).

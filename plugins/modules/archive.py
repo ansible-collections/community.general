@@ -71,6 +71,13 @@ options:
       - Remove any added source files and trees after adding to archive.
     type: bool
     default: false
+  reproducible_tar:
+    description:
+      - Set tar metadata and gzip headers to vary less given the same input file content.
+      - Useful for minimizing unneeded archive changes and avoiding handlers that may trigger on such changes.
+    type: bool
+    default: false
+    version_added: 9.3.0
 notes:
     - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
     - This module uses C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on the target host to create archives.
@@ -189,7 +196,6 @@ import shutil
 import tarfile
 import zipfile
 from fnmatch import fnmatch
-from sys import version_info
 from traceback import format_exc
 from zlib import crc32
 
@@ -360,7 +366,7 @@ class Archive(object):
             for target in self.targets:
                 if os.path.isdir(target):
                     paths = []
-                    for directory_path, _, file_names in os.walk(target, topdown=True):
+                    for directory_path, _directory_names, file_names in os.walk(target, topdown=True):
                         paths.append(directory_path)
                         for file_name in file_names:
                             paths.append(os.path.join(directory_path, file_name))
@@ -608,7 +614,8 @@ class TarArchive(Archive):
             self.module.fail_json(msg="%s is not a valid archive format" % self.format)
 
     def _add(self, path, archive_name):
-        def filter(tarinfo: tarfile.TarInfo):
+        def filter(tarinfo):
+            # type: (tarfile.TarInfo) -> tarfile.TarInfo | None
             if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns):
                 return None
 
