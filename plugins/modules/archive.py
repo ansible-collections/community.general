@@ -218,8 +218,6 @@ else:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
 
-PY27 = version_info[0:2] >= (2, 7)
-
 STATE_ABSENT = 'absent'
 STATE_ARCHIVED = 'archive'
 STATE_COMPRESSED = 'compress'
@@ -282,6 +280,7 @@ class Archive(object):
         self.format = module.params['format']
         self.must_archive = module.params['force_archive']
         self.remove = module.params['remove']
+        self.reproducible_tar = module.params["reproducible_tar"] or False
 
         self.changed = False
         self.destination_state = STATE_ABSENT
@@ -360,14 +359,14 @@ class Archive(object):
         try:
             for target in self.targets:
                 if os.path.isdir(target):
-                    for directory_path, directory_names, file_names in os.walk(target, topdown=True):
-                        for directory_name in directory_names:
-                            full_path = os.path.join(directory_path, directory_name)
-                            self.add(full_path, strip_prefix(self.root, full_path))
-
+                    paths = []
+                    for directory_path, _, file_names in os.walk(target, topdown=True):
+                        paths.append(directory_path)
                         for file_name in file_names:
-                            full_path = os.path.join(directory_path, file_name)
-                            self.add(full_path, strip_prefix(self.root, full_path))
+                            paths.append(os.path.join(directory_path, file_name))
+
+                    for path in sorted(paths):
+                        self.add(path, strip_prefix(self.root, path))
                 else:
                     self.add(target, strip_prefix(self.root, target))
         except Exception as e:
@@ -490,6 +489,9 @@ class Archive(object):
 
         return f
 
+    def _reproducible_mtime(self):
+        return 0
+
     @abc.abstractmethod
     def close(self):
         pass
@@ -542,6 +544,33 @@ class ZipArchive(Archive):
         return checksums
 
 
+class TGZFileWithMtime(tarfile.TarFile):
+    def __init__(
+        self, name=None, mode=None, compresslevel=-1, fileobj=None, mtime=None, **kwargs
+    ):
+        if fileobj is None:
+            fileobj = open(name, mode + "b")
+
+        # filename intentionally empty to match GNU tar
+        try:
+            gzipfileobj = gzip.GzipFile("", mode, compresslevel, fileobj, mtime)
+        except:
+            fileobj.close()
+            raise
+
+        # Allow GzipFile to close fileobj as needed
+        gzipfileobj.myfileobj = fileobj
+
+        try:
+            super(TGZFileWithMtime, self).__init__(mode="w", fileobj=gzipfileobj, **kwargs)
+        except:
+            gzipfileobj.close()
+            raise
+
+        # Allow TarFile to close GzipFile as needed
+        self._extfileobj = False
+
+
 class TarArchive(Archive):
     def __init__(self, module):
         super(TarArchive, self).__init__(module)
@@ -562,7 +591,11 @@ class TarArchive(Archive):
         return True
 
     def open(self):
-        if self.format in ('gz', 'bz2'):
+        if self.reproducible_tar and self.format == "gz":
+            self.file = TGZFileWithMtime(
+                _to_native_ascii(self.destination), "w", mtime=self._reproducible_mtime()
+            )
+        elif self.format in ('gz', 'bz2'):
             self.file = tarfile.open(_to_native_ascii(self.destination), 'w|' + self.format)
         # python3 tarfile module allows xz format but for python2 we have to create the tarfile
         # in memory and then compress it with lzma.
@@ -575,16 +608,33 @@ class TarArchive(Archive):
             self.module.fail_json(msg="%s is not a valid archive format" % self.format)
 
     def _add(self, path, archive_name):
-        def py27_filter(tarinfo):
-            return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
+        def filter(tarinfo: tarfile.TarInfo):
+            if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns):
+                return None
 
-        def py26_filter(path):
-            return matches_exclusion_patterns(path, self.exclusion_patterns)
+            if self.reproducible_tar:
+                # Remove unused backref that prevents copy
+                if hasattr(tarinfo, "tarfile"):
+                    delattr(tarinfo, "tarfile")
 
-        if PY27:
-            self.file.add(path, archive_name, recursive=False, filter=py27_filter)
-        else:
-            self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
+                if tarinfo.isdir():
+                    mode = 0o40000 | 0o755
+                else:
+                    mode = 0o100000 | 0o644
+
+                # Copy tarfile while reducing metadata
+                return tarinfo.replace(
+                    mtime=self._reproducible_mtime(),
+                    mode=mode,
+                    uid=0,
+                    gid=0,
+                    uname="",
+                    gname="",
+                )
+
+            return tarinfo
+
+        self.file.add(path, archive_name, recursive=False, filter=filter)
 
     def _get_checksums(self, path):
         if HAS_LZMA:
@@ -637,6 +687,7 @@ def main():
             exclusion_patterns=dict(type='list', elements='path'),
             force_archive=dict(type='bool', default=False),
             remove=dict(type='bool', default=False),
+            reproducible_tar=dict(type="bool", default=False),
         ),
         add_file_common_args=True,
         supports_check_mode=True,
