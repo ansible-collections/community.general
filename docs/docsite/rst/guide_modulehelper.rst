@@ -348,7 +348,7 @@ Or, to make your life simpler, no need to import, just use the ``do_raise()`` me
 
 Other than ``SystemExit``, all exceptions are captured and translated into a ``fail_json()`` call.
 However, if you do want to call ``self.module.fail_json()`` yourself it will work,
-just keep in mind that there will be no automatic handling of output varialbes in that case.
+just keep in mind that there will be no automatic handling of output variables in that case.
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
