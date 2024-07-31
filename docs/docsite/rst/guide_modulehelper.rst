@@ -56,12 +56,6 @@ Bear in mind that it does **not** showcase all of MH's features:
     if __name__ == '__main__':
         main()
 
-From this example notice:
-
-- Some convenience methods delegate straight into ``AnsibleModule``, like ``self.check_mode``.
-
-These and other features are described in more detail below.
-
 
 Module Helper
 ^^^^^^^^^^^^^
@@ -319,12 +313,54 @@ Effective change
 The effective outcome for the module is determined in the ``self.has_changed()`` method, and it consists of the logical *OR* operation
 between ``self.changed`` and the change outcome from ``self.vars``.
 
+Exceptions
+""""""""""
+
+In MH, instead of calling ``module.fail_json()`` you can just raise an exception.
+The output variables are collected the same way they would be for a flawless execution.
+However, you can set output variables specifically for that exception, if you so choose.
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
+
+    def __init_module__(self):
+        if not complex_validation():
+            raise ModuleHelperException("Validation failed!")
+
+        # Or passing output variables
+        awesomeness = calculate_awesomeness()
+        if awesomeness > 1000:
+            raise ModuleHelperException("Too awesome fo me!", update_output={"awesomeness": awesomeness})
+
+Or, to make your life simpler, no need to import, just use the ``do_raise()`` method:
+
+.. code-block:: python
+
+    def __init_module__(self):
+        if not complex_validation():
+            self.do_raise("Validation failed!")
+
+        # Or passing output variables
+        awesomeness = calculate_awesomeness()
+        if awesomeness > 1000:
+            self.do_raise("Over awesome!", update_output={"awesomeness": awesomeness})
+
+Other than ``SystemExit``, all exceptions are captured and translated into a ``fail_json()`` call.
+However, if you do want to call ``self.module.fail_json()`` yourself it will work,
+just keep in mind that there will be no automatic handling of output varialbes in that case.
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 
-Exceptions
-""""""""""
+Other Conveniences
+""""""""""""""""""
+
+check_mode
+verbosity
+
+
+
 
 StateModuleHelper
 ^^^^^^^^^^^^^^^^^
@@ -337,7 +373,6 @@ References
 - `Ansible Developer Guide <https://docs.ansible.com/ansible/latest/dev_guide/index.html>`_
 - `Creating a module <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
 - `Returning ansible facts <https://docs.ansible.com/ansible/latest/reference_appendices/common_return_values.html#ansible-facts>`_
-
 - :ref:`ansible_collections.community.general.docsite.guide_vardict`
 
 
