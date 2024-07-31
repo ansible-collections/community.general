@@ -927,10 +927,10 @@ def main():
                     old_mapper = {}
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+            # changeset includes all desired mappers: unchanged, modified and newly created
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            changeset['mappers'].append(new_mapper)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_comp = before_comp.copy()
