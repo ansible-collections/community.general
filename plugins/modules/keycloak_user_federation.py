@@ -1020,8 +1020,7 @@ def main():
                         mapper['parentId'] = desired_comp['id']
                     mapper = kc.create_component(mapper, realm)
 
-            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)
-            before_comp['mappers'] = updated_mappers
+            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
             after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized
