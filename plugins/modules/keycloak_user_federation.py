@@ -347,6 +347,7 @@ options:
                       to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
                       it will assume that LDAP username is V(john).
                 type: str
+                default: 'userPrincipalName'
                 version_added: 8.1.0
 
             serverPrincipal:
@@ -712,6 +713,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from copy import deepcopy
 
+
 def set_mapper_defaults(mapper):
     '''
     Set explicit default values expected by the kc API for the different mapper types.
@@ -722,8 +724,9 @@ def set_mapper_defaults(mapper):
     if mapper.get('providerId') == 'msad-user-account-control-mapper':
         if not mapper.get('config'):
             mapper['config'] = {}
-        if not 'always.read.enabled.value.from.ldap' in mapper['config']:
+        if 'always.read.enabled.value.from.ldap' not in mapper['config']:
             mapper['config']['always.read.enabled.value.from.ldap'] = True
+
 
 def sanitize(comp):
     compcopy = deepcopy(comp)
@@ -786,7 +789,8 @@ def main():
         readTimeout=dict(type='int'),
         searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
-        # When creating a user federation with this parameter not present or set to '', this parameter is set explicitly to the default value 'userPrincipalName' by kc
+        # When creating a user federation with this parameter not present or set to '',
+        # this parameter is set explicitly to the default value 'userPrincipalName' by kc,
         # even if kerbereos authentication is disabled.
         # To get krbPrincipalAttribute = '' (and the optional behavior described in the GUI) explicitly set it to '', and run the module twice:
         # once to create the federation with the default value and then to update it to the desired '' value.
@@ -1027,7 +1031,6 @@ def main():
             if module._diff:
                 result['diff'] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
             result['changed'] = before_comp_sanitized != after_comp_sanitized
-
 
             result['msg'] = "User federation {id} has been updated".format(id=cid)
             module.exit_json(**result)
