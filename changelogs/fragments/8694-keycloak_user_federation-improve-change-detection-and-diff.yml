@@ -1,0 +1,9 @@
+bugfixes:
+  - set the default value of the ``krbPrincipalAttribute`` parameter to ``userPrincipalName`` to match the KC API behavior (this parameter is present even if kereberos authentication is disabled)
+  - set the default parameter ``always.read.enabled.value.from.ldap = True`` for the mapper ``msad-user-account-control-mapper`` to match KC API behavior 
+  - diff now correctly evaluates unchanged mappers (e.g. when changes are necessary, in check mode, diffing before with desired (after updating it with the changeset) would wrongly show, that the unchanged mappers should/will be removed)
+
+minor_changes:
+  - to get a more precise diff we order the mappers of before and after by name in the sanitize function (the order is not really relevant and not used in the code, the API also seems to have a different random order for every user federation)
+  - when updating, always send the desired user federation config (except for check mod); this way we always have a up to date ``bindCredential`` parameter and still overwrite/ignore it when evaluating changed and diffing (for secrets the KC API always returns **********, so comparing before with desired states always leads to ``changed = True``)
+  - mapper data is fetched again after an update for the comparison with the before state
