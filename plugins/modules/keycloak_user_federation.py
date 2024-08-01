@@ -975,7 +975,7 @@ def main():
         if module._diff:
             result['diff'] = dict(before='', after=sanitize(after_comp))
         result['end_state'] = sanitize(after_comp)
-        result['msg'] = "User federation {} has been created".format(after_comp.get('name', after_comp['id']))
+        result['msg'] = "User federation {id} has been created".format(id=cid)
         module.exit_json(**result)
 
     else:
