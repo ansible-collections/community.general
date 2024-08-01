@@ -1,0 +1,2 @@
+bugfixes:
+  - remove existing user federation mappers if they are not present in the federation configuration and will not be updated
