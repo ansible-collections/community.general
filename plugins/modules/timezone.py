@@ -75,6 +75,7 @@ diff:
 
 EXAMPLES = r'''
 - name: Set timezone to Asia/Tokyo
+  become: true
   community.general.timezone:
     name: Asia/Tokyo
 '''
