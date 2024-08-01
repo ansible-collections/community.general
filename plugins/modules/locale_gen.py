@@ -46,6 +46,7 @@ EXAMPLES = '''
   community.general.locale_gen:
     name: de_CH.UTF-8
     state: present
+
 - name: Ensure multiple locales exist
   community.general.locale_gen:
     name:
