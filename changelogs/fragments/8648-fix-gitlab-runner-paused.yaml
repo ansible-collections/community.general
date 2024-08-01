@@ -1,0 +1,2 @@
+bugfixes:
+  - "gitlab_runner - fix ``paused`` parameter being ignored (https://github.com/ansible-collections/community.general/pull/8648)."
