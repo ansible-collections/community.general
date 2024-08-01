@@ -19,6 +19,7 @@ from ansible.module_utils.common.text.converters import to_native, to_text
 URL_REALM_INFO = "{url}/realms/{realm}"
 URL_REALMS = "{url}/admin/realms"
 URL_REALM = "{url}/admin/realms/{realm}"
+URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
@@ -290,6 +291,37 @@ class KeycloakAPI(object):
 
         try:
             return json.loads(to_native(open_url(realm_info_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.fail_open_url(e, msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                   exception=traceback.format_exc())
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+
+    def get_realm_keys_metadata_by_id(self, realm='master'):
+        """Obtain realm public info by id
+
+        :param realm: realm id
+
+        :return: None, or a 'KeysMetadataRepresentation'
+                 (https://www.keycloak.org/docs-api/latest/rest-api/index.html#KeysMetadataRepresentation)
+                 -- a dict containing the keys 'active' and 'keys', the former containing a mapping
+                 from algorithms to key-ids, the latter containing a list of dicts with key
+                 information.
+        """
+        realm_keys_metadata_url = URL_REALM_KEYS_METADATA.format(url=self.baseurl, realm=realm)
+
+        try:
+            return json.loads(to_native(open_url(realm_keys_metadata_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
