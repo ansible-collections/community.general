@@ -29,7 +29,7 @@ options:
         elements: str
         description:
             - Name and encoding of the locales, such as "en_GB.UTF-8".
-            - Before 9.4.0, this was a string. Using a string still works.
+            - Before community.general 9.3.0, this was a string. Using a string still works.
         required: true
     state:
         type: str
