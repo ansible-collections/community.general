@@ -177,7 +177,7 @@ By using ``self.vars``, you have a central mechanism to access the parameters bu
 As described in :ref:`ansible_collections.community.general.docsite.guide_vardict`, variables in ``VarDict`` have metadata associated to them.
 One of the fields in that metadata marks the variable for output, and MH makes use of that to generate the module's return values.
 
-.. note::
+.. important::
 
     The ``VarDict`` feature from the documentation was introduced in community.general 7.1.0, but there was a first
     implementation of it embedded within ``ModuleHelper``.
