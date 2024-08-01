@@ -648,6 +648,11 @@ files:
     labels: homebrew_ macos
     maintainers: $team_macos
     notify: chris-short
+  $modules/homebrew_services.py:
+    ignore: ryansb
+    keywords: brew cask services darwin homebrew macosx macports osx
+    labels: homebrew_ macos
+    maintainers: $team_macos kitizz
   $modules/homectl.py:
     maintainers: jameslivulpi
   $modules/honeybadger_deployment.py:
