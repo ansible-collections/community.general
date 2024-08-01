@@ -346,8 +346,8 @@ class TestKeycloakUserFederation(ModuleTestCase):
             ]
         }
         return_value_components_get = [
-            [], 
-            # default mapper created by keylocak
+            [],
+            # exemplary default mapper created by keylocak
             [
                 {
                     "config": {

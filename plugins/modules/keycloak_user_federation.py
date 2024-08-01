@@ -936,7 +936,6 @@ def main():
                 result['diff'] = dict(before='', after=sanitize(desired_comp))
             module.exit_json(**result)
 
-
         # create it
         desired_mappers = desired_comp.pop('mappers', [])
         after_comp = kc.create_component(desired_comp, realm)
@@ -944,7 +943,6 @@ def main():
         updated_mappers = []
         # when creating a user federation, keycloak automatically creates default mappers
         default_mappers = kc.get_components(urlencode(dict(parent=cid)), realm)
-
 
         # create new mappers or update existing default mappers
         for desired_mapper in desired_mappers:
@@ -965,7 +963,7 @@ def main():
             else:
                 if new_mapper.get('parentId') is None:
                     new_mapper['parentId'] = cid
-                updated_mappers.append(kc.create_component(new_mapper, realm)) 
+                updated_mappers.append(kc.create_component(new_mapper, realm))
 
         # we remove all unwanted default mappers
         # we use ids so we dont accidently remove one of the previously updated default mapper
@@ -1011,7 +1009,7 @@ def main():
 
             for mapper in desired_mappers:
                 if mapper in before_comp.get('mappers', []):
-                    continue          
+                    continue
                 if mapper.get('id') is not None:
                     kc.update_component(mapper, realm)
                 else:
