@@ -285,7 +285,7 @@ See the example below to learn how you can enabled change tracking in variables:
         # enable change-tracking without assigning value
         self.vars.set_meta("new_roles", change=True)
 
-        # if you must force an initial value to the variable
+        # if you must forcibly set an initial value to the variable
         self.vars.set_meta("new_roles", initial_value=[])
         ...
 
@@ -300,12 +300,6 @@ The *setter* will store the value in a hidden field in the module.
 The *getter* will try to use ``self.__changed__()`` first.
 If that method is not implemented, then it will use the value from the hidden field.
 By default, that hidden field is set to ``False``.
-
-Indicating changes with ``__changed__()``
------------------------------------------
-
-This method, by default, raises a ``NotImplementedError``.
-You can implement a more complex logic to determine the change state of the module by overriding it.
 
 Effective change
 ----------------
@@ -322,21 +316,6 @@ However, you can set output variables specifically for that exception, if you so
 
 .. code-block:: python
 
-    from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
-
-    def __init_module__(self):
-        if not complex_validation():
-            raise ModuleHelperException("Validation failed!")
-
-        # Or passing output variables
-        awesomeness = calculate_awesomeness()
-        if awesomeness > 1000:
-            raise ModuleHelperException("Too awesome fo me!", update_output={"awesomeness": awesomeness})
-
-Or, to make your life simpler, no need to import, just use the ``do_raise()`` method:
-
-.. code-block:: python
-
     def __init_module__(self):
         if not complex_validation():
             self.do_raise("Validation failed!")
@@ -344,7 +323,7 @@ Or, to make your life simpler, no need to import, just use the ``do_raise()`` me
         # Or passing output variables
         awesomeness = calculate_awesomeness()
         if awesomeness > 1000:
-            self.do_raise("Over awesome!", update_output={"awesomeness": awesomeness})
+            self.do_raise("Over awesome, I cannot handle it!", update_output={"awesomeness": awesomeness})
 
 Other than ``SystemExit``, all exceptions are captured and translated into a ``fail_json()`` call.
 However, if you do want to call ``self.module.fail_json()`` yourself it will work,
@@ -359,12 +338,96 @@ Other Conveniences
 check_mode
 verbosity
 
+@cause_changes -- ex: jira module
 
 
+--------------------------------------------------------------------------------------------------------------------------------------------
 
 StateModuleHelper
 ^^^^^^^^^^^^^^^^^
 
+Many modules use a parameter ``state`` that effectively controls the exact action performed by the module, such as
+``state=present`` or ``state=absent`` for installing or removing packages.
+By using ``StateModuleHelper`` you can make your code like the excerpt from the ``gconftool2`` below:
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+
+    class GConftool(StateModuleHelper):
+        ...
+        module = dict(
+            ...
+        )
+        use_old_vardict = False
+
+        def __init_module__(self):
+            self.runner = gconftool2_runner(self.module, check_rc=True)
+            ...
+
+            self.vars.set('previous_value', self._get(), fact=True)
+            self.vars.set('value_type', self.vars.value_type)
+            self.vars.set('_value', self.vars.previous_value, output=False, change=True)
+            self.vars.set_meta('value', initial_value=self.vars.previous_value)
+            self.vars.set('playbook_value', self.vars.value, fact=True)
+
+        ...
+
+        def state_absent(self):
+            with self.runner("state key", output_process=self._make_process(False)) as ctx:
+                ctx.run()
+                if self.verbosity >= 4:
+                    self.vars.run_info = ctx.run_info
+            self.vars.set('new_value', None, fact=True)
+            self.vars._value = None
+
+        def state_present(self):
+            with self.runner("direct config_source value_type state key value", output_process=self._make_process(True)) as ctx:
+                ctx.run()
+                if self.verbosity >= 4:
+                    self.vars.run_info = ctx.run_info
+            self.vars.set('new_value', self._get(), fact=True)
+            self.vars._value = self.vars.new_value
+
+Note that the method ``__run__()`` is implemented in ``StateModuleHelper``, all you need to implement are the methods ``state_<state_value>``.
+In the example above, :ansplugin:`community.general.gconftool2#module` only has two states, ``present`` and ``absent``, thus, ``state_present()`` and ``state_absent()``.
+
+If, like the :ansplugin:`community.general.jira#module` module, there is not a ``state`` parameter, but rather one called ``operation``, just let SMH know about it:
+
+.. code-block:: python
+
+    class JIRA(StateModuleHelper):
+        ...
+        state_param = 'operation'
+
+        def operation_create(self):
+            ...
+
+        def operation_search(self):
+            ...
+
+        ...
+
+Lastly, if the module is called with ``state=somevalue`` and the method ``state_somevalue``
+is not implemented, SMH will resort to call a method called ``__state_fallback__()``.
+By default, this method will raise a ``ValueError`` indicating the method was not found.
+Naturally, you can override that method to write a default implementation, as in :ansplugin:`community.general.locale_gen#module`:
+
+.. code-block:: python
+
+        def __state_fallback__(self):
+            if self.vars.state_tracking == self.vars.state:
+                return
+            if self.vars.ubuntu_mode:
+                self.apply_change_ubuntu(self.vars.state, self.vars.name)
+            else:
+                self.apply_change(self.vars.state, self.vars.name)
+
+That module has only the states ``present`` and ``absent`` and the code for both is the one in the fallback method.
+
+.. note::
+
+    Please note that the name of the fallback method **does not change** if you set a different value of ``state_param``.
 
 
 References
