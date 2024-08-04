@@ -818,6 +818,10 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     if new_value not in current_values:
                         update_config = True
                         break
+                # Check if current values have more elements than requested values
+                if len(current_values) != len(requested_values):
+                    update_config = True
+
             # if it's not a list (or string) just compare the current value
             else:
                 # some types don't match with the API, so forcing to string for comparison
