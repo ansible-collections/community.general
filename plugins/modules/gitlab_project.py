@@ -284,11 +284,13 @@ options:
       keep_n:
         description:
           - Number of tags kept per image name.
+          - V(0) clears the field.
         type: int
         choices: [0, 1, 5, 10, 25, 50, 100]
       older_than:
         description:
           - Destroy tags older than this.
+          - V(0d) clears the field.
         type: str
         choices: ["0d", "7d", "14d", "30d", "90d"]
       name_regex:
