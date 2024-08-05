@@ -392,12 +392,11 @@ By using ``StateModuleHelper`` you can make your code like the excerpt from the 
 Note that the method ``__run__()`` is implemented in ``StateModuleHelper``, all you need to implement are the methods ``state_<state_value>``.
 In the example above, :ansplugin:`community.general.gconftool2#module` only has two states, ``present`` and ``absent``, thus, ``state_present()`` and ``state_absent()``.
 
-If, like the :ansplugin:`community.general.jira#module` module, there is not a ``state`` parameter, but rather one called ``operation``, just let SMH know about it:
+If the controlling parameter is not called ``state``, like in :ansplugin:`community.general.jira#module` module, just let SMH know about it:
 
 .. code-block:: python
 
     class JIRA(StateModuleHelper):
-        ...
         state_param = 'operation'
 
         def operation_create(self):
@@ -405,8 +404,6 @@ If, like the :ansplugin:`community.general.jira#module` module, there is not a `
 
         def operation_search(self):
             ...
-
-        ...
 
 Lastly, if the module is called with ``state=somevalue`` and the method ``state_somevalue``
 is not implemented, SMH will resort to call a method called ``__state_fallback__()``.
