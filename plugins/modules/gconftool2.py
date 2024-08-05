@@ -127,9 +127,8 @@ class GConftool(StateModuleHelper):
 
     def __init_module__(self):
         self.runner = gconftool2_runner(self.module, check_rc=True)
-        if self.vars.state != "get":
-            if not self.vars.direct and self.vars.config_source is not None:
-                self.module.fail_json(msg='If the "config_source" is specified then "direct" must be "true"')
+        if not self.vars.direct and self.vars.config_source is not None:
+            self.do_raise('If the "config_source" is specified then "direct" must be "true"')
 
         self.vars.set('previous_value', self._get(), fact=True)
         self.vars.set('value_type', self.vars.value_type)
@@ -140,7 +139,7 @@ class GConftool(StateModuleHelper):
     def _make_process(self, fail_on_err):
         def process(rc, out, err):
             if err and fail_on_err:
-                self.ansible.fail_json(msg='gconftool-2 failed with error: %s' % (str(err)))
+                self.do_raise('gconftool-2 failed with error:\n%s' % err.strip())
             out = out.rstrip()
             self.vars.value = None if out == "" else out
             return self.vars.value
@@ -152,16 +151,14 @@ class GConftool(StateModuleHelper):
     def state_absent(self):
         with self.runner("state key", output_process=self._make_process(False)) as ctx:
             ctx.run()
-            if self.verbosity >= 4:
-                self.vars.run_info = ctx.run_info
+            self.vars.set('run_info', ctx.run_info, verbosity=4)
         self.vars.set('new_value', None, fact=True)
         self.vars._value = None
 
     def state_present(self):
         with self.runner("direct config_source value_type state key value", output_process=self._make_process(True)) as ctx:
             ctx.run()
-            if self.verbosity >= 4:
-                self.vars.run_info = ctx.run_info
+            self.vars.set('run_info', ctx.run_info, verbosity=4)
         self.vars.set('new_value', self._get(), fact=True)
         self.vars._value = self.vars.new_value
 

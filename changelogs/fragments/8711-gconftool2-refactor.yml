@@ -1,0 +1,2 @@
+minor_changes:
+  - gconftool2 - make use of ``ModuleHelper`` features to simplify code (https://github.com/ansible-collections/community.general/pull/8711).
