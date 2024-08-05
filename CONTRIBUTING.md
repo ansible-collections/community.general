@@ -81,11 +81,20 @@ ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools
 
 The following commands show how to run integration tests:
 
-```.bash
-# Run integration tests for the interfaces_files module in a Docker container using the
-# fedora35 operating system image (the supported images depend on your ansible-core version):
-ansible-test integration --docker fedora35 -v interfaces_file
+#### In docker
 
+```.bash
+# Run integration tests in a Docker container for a specific module, e.g. community.general.pacman:
+ansible-test integration -v --docker default pacman
+
+# Integration test on a specific docker image. Find out which target docker images are supported by
+# running ansible-test integration --help and choose one, e.g. fedora35:
+ansible-test integration -v --docker fedora35
+```
+
+#### Without isolation
+
+```.bash
 # Run integration tests for the flattened lookup **without any isolation**:
 ansible-test integration -v lookup_flattened
 ```
