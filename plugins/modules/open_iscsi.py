@@ -45,6 +45,7 @@ options:
     login:
         description:
         - Whether the target node should be connected.
+        - When O(target) is omitted, will login to all availabled.
         type: bool
         aliases: [ state ]
     node_auth:
@@ -101,7 +102,6 @@ options:
         type: bool
         default: false
         version_added: 4.1.0
-
 '''
 
 EXAMPLES = r'''
@@ -117,8 +117,7 @@ EXAMPLES = r'''
     discover: true
     ip: 10.1.2.3
 
-# NOTE: Only works if exactly one target is exported to the initiator
-- name: Discover targets on portal and login to the one available
+- name: Discover targets on portal and login to the ones available
   community.general.open_iscsi:
     portal: '{{ iscsi_target }}'
     login: true
@@ -227,7 +226,7 @@ def target_loggedon(module, target, portal=None, port=None):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_login(module, target, portal=None, port=None):
+def target_login(module, target, portal=None, port=None, check_rc=True):
     node_auth = module.params['node_auth']
     node_user = module.params['node_user']
     node_pass = module.params['node_pass']
@@ -240,21 +239,21 @@ def target_login(module, target, portal=None, port=None):
                   ('node.session.auth.password', node_pass)]
         for (name, value) in params:
             cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--op=update', '--name', name, '--value', value]
-            module.run_command(cmd, check_rc=True)
+            module.run_command(cmd, check_rc=check_rc)
 
     if node_user_in:
         params = [('node.session.auth.username_in', node_user_in),
                   ('node.session.auth.password_in', node_pass_in)]
         for (name, value) in params:
             cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
-            module.run_command(cmd, check_rc=True)
+            module.run_command(cmd, check_rc=check_rc)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
         cmd.append('--portal')
         cmd.append('%s:%s' % (portal, port))
 
-    module.run_command(cmd, check_rc=True)
+    module.run_command(cmd, check_rc=check_rc)
 
 
 def target_logout(module, target):
@@ -385,9 +384,7 @@ def main():
     if login is not None or automatic is not None:
         if target is None:
             if len(nodes) > 1:
-                module.fail_json(msg="Need to specify a target")
-            else:
-                target = nodes[0]
+                check_rc = False
         else:
             # check given target is in cache
             check_target = False
@@ -402,24 +399,26 @@ def main():
         result['nodes'] = nodes
 
     if login is not None:
-        loggedon = target_loggedon(module, target, portal, port)
-        if (login and loggedon) or (not login and not loggedon):
-            result['changed'] |= False
-            if login:
-                result['devicenodes'] = target_device_node(target)
-        elif not check:
-            if login:
-                target_login(module, target, portal, port)
-                # give udev some time
-                time.sleep(1)
-                result['devicenodes'] = target_device_node(target)
+        result['devicenodes'] = []
+        for target in nodes:
+            loggedon = target_loggedon(module, target, portal, port)
+            if (login and loggedon) or (not login and not loggedon):
+                result['changed'] |= False
+                if login:
+                    result['devicenodes'] += target_device_node(target)
+            elif not check:
+                if login:
+                    target_login(module, target, portal, port, check_rc)
+                    # give udev some time
+                    time.sleep(1)
+                    result['devicenodes'] += target_device_node(target)
+                else:
+                    target_logout(module, target)
+                result['changed'] |= True
+                result['connection_changed'] = True
             else:
-                target_logout(module, target)
-            result['changed'] |= True
-            result['connection_changed'] = True
-        else:
-            result['changed'] |= True
-            result['connection_changed'] = True
+                result['changed'] |= True
+                result['connection_changed'] = True
 
     if automatic is not None:
         isauto = target_isauto(module, target)
@@ -454,8 +453,10 @@ def main():
             result['automatic_portal_changed'] = True
 
     if rescan is not False:
-        result['changed'] = True
-        result['sessions'] = iscsi_rescan(module, target)
+        result['sessions'] = []
+        for target in nodes:
+            result['changed'] = True
+            result['sessions'] += iscsi_rescan(module, target)
 
     module.exit_json(**result)
 
