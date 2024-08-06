@@ -552,29 +552,31 @@ class ZipArchive(Archive):
 
 class ReproducibleTGZFile(tarfile.TarFile):
     def __init__(
-        self, name=None, mode=None, compresslevel=-1, fileobj=None, mtime=None, **kwargs
+        self, name=None, mode=None, compresslevel=9, fileobj=None, mtime=None, **kwargs
     ):
-        if fileobj is None:
-            fileobj = open(name, mode + "b")
+        self._fileobj = fileobj or open(name, mode + "b")
 
         try:
-            # output filename intentionally empty exclude it from gzip header
-            gzipfileobj = gzip.GzipFile("", mode, compresslevel, fileobj, mtime)
+            # filename intentionally empty to exclude it from gzip header
+            self._gzipfileobj = gzip.GzipFile("", mode, compresslevel, self._fileobj, mtime)
+
+            try:
+                super(ReproducibleTGZFile, self).__init__(mode=mode, fileobj=self._gzipfileobj, **kwargs)
+            except Exception:
+                self._gzipfileobj.close()
+                raise
         except Exception:
-            fileobj.close()
+            self._fileobj.close()
             raise
 
-        # Allow GzipFile to close fileobj as needed
-        gzipfileobj.myfileobj = fileobj
-
+    def close(self) -> None:
         try:
-            super(ReproducibleTGZFile, self).__init__(mode=mode, fileobj=gzipfileobj, **kwargs)
-        except Exception:
-            gzipfileobj.close()
-            raise
-
-        # Allow TarFile to close GzipFile as needed
-        self._extfileobj = False
+            super(ReproducibleTGZFile, self).close()
+        finally:
+            try:
+                self._gzipfileobj.close()
+            finally:
+                self._fileobj.close()
 
 
 class TarArchive(Archive):
