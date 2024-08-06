@@ -569,7 +569,7 @@ class ReproducibleTGZFile(tarfile.TarFile):
             self._fileobj.close()
             raise
 
-    def close(self) -> None:
+    def close(self):
         try:
             super(ReproducibleTGZFile, self).close()
         finally:
