@@ -896,7 +896,7 @@ def main():
                 if old_mapper is None:
                     old_mapper = {}
             else:
-                found = list(filter(lambda before_mapper: before_mapper['name'] == change['name'], before_comp.get('mappers', [])))
+                found = [before_mapper for before_mapper in before_comp.get('mappers', []) if before_mapper['name'] == change['name']]
                 if len(found) > 1:
                     module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=change['name']))
                 if len(found) == 1:
