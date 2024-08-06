@@ -56,6 +56,8 @@ cd ~/dev/ansible_collections/community/general
 
 Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with Ansible 2.9+.
 
+### Sanity tests
+
 The following commands show how to run sanity tests:
 
 ```.bash
@@ -65,6 +67,8 @@ ansible-test sanity --docker -v
 # Run sanity tests for the given files and directories:
 ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration/targets/pids/
 ```
+
+### Unit tests
 
 The following commands show how to run unit tests:
 
@@ -79,17 +83,23 @@ ansible-test units --docker -v --python 3.8
 ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools/test_nmcli.py
 ```
 
+### Integration tests
+
 The following commands show how to run integration tests:
 
 #### In docker
 
-```.bash
-# Run integration tests in a Docker container for a specific module, e.g. community.general.pacman:
-ansible-test integration -v --docker default pacman
+Integration tests on docker require two parameters:
+- `image_name`: The name of the docker image. To get the list of supported docker images, run
+  `ansible-test integration --help` and look for _target docker images_.
+- `module_name`: The name of the module. For example, pacman in case of community.general.pacma
 
-# Integration test on a specific docker image. Find out which target docker images are supported by
-# running ansible-test integration --help and choose one, e.g. fedora35:
-ansible-test integration -v --docker fedora35
+```.bash
+# Template
+ansible-test integration -v --docker image_name module_name
+
+# Example community.general.pacman module on fedora35 docker image:
+ansible-test integration -v --docker fedora35 pacman
 ```
 
 #### Without isolation
