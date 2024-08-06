@@ -256,6 +256,7 @@ def target_login(module, target, check_rc, portal=None, port=None):
     rc, out, err = module.run_command(cmd, check_rc=check_rc)
     return rc
 
+
 def target_logout(module, target):
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--logout']
     module.run_command(cmd, check_rc=True)
@@ -416,7 +417,7 @@ def main():
                 else:
                     target_logout(module, target)
                 # Check if there are multiple targets on a single portal and
-                # do not mark the task changed if host could not login to one of them 
+                # do not mark the task changed if host could not login to one of them
                 if len(nodes) > 1 and login_result == 24:
                     result['changed'] |= False
                     result['connection_changed'] = False
@@ -424,8 +425,8 @@ def main():
                     result['changed'] |= True
                     result['connection_changed'] = True
             else:
-                    result['changed'] |= True
-                    result['connection_changed'] = True
+                result['changed'] |= True
+                result['connection_changed'] = True
 
     if automatic is not None:
         isauto = target_isauto(module, target)
