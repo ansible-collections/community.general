@@ -1,9 +1,9 @@
 bugfixes:
-  - set the default value of the ``krbPrincipalAttribute`` parameter to ``userPrincipalName`` to match the KC API behavior (this parameter is present even if kereberos authentication is disabled)
-  - set the default parameter ``always.read.enabled.value.from.ldap = True`` for the mapper ``msad-user-account-control-mapper`` to match KC API behavior 
-  - diff now correctly evaluates unchanged mappers (e.g. when changes are necessary, in check mode, diffing before with desired (after updating it with the changeset) would wrongly show, that the unchanged mappers should/will be removed)
-
+  - keycloak_user_federation - set the default value of the ``krbPrincipalAttribute`` parameter to ``userPrincipalName`` to match the KC API behavior (this parameter is present even if kereberos authentication is disabled) (https://github.com/ansible-collections/community.general/pull/8694)
+  - keycloak_user_federation - set the default parameter ``always.read.enabled.value.from.ldap = True`` for the mapper ``msad-user-account-control-mapper`` to match KC API behavior (https://github.com/ansible-collections/community.general/pull/8694)
+  - keycloak_user_federation - ``desired_comp`` now includes desired existing mappers, not only mappers that will be updated or newly created; this fixes diff and change detection wrongly indicating desired existing mappers should be/were removed (https://github.com/ansible-collections/community.general/pull/8694)
+  
 minor_changes:
-  - to get a more precise diff we order the mappers of before and after by name in the sanitize function (the order is not really relevant and not used in the code, the API also seems to have a different random order for every user federation)
-  - when updating, always send the desired user federation config (except for check mod); this way we always have a up to date ``bindCredential`` parameter and still overwrite/ignore it when evaluating changed and diffing (for secrets the KC API always returns **********, so comparing before with desired states always leads to ``changed = True``)
-  - mapper data is fetched again after an update for the comparison with the before state
+  - keycloak_user_federation - to get a more precise diff and better change detection we order the mappers by name in the sanitize function before comparing two states (the order is not really relevant and not used in the code, the API also seems to have a different random order for every user federation) (https://github.com/ansible-collections/community.general/pull/8694)
+  - keycloak_user_federation - when updating, always send the desired user federation config (except for check mod); this way we always have a up to date ``bindCredential`` parameter and still overwrite/ignore it when evaluating changed and diffing (for secrets the KC API always returns **********, so comparing before with desired states always leads to ``changed = True``) (https://github.com/ansible-collections/community.general/pull/8694)
+  - keycloak_user_federation - mapper data is fetched again after an update for the comparison with the before state (https://github.com/ansible-collections/community.general/pull/8694)
