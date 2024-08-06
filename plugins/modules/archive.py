@@ -286,7 +286,7 @@ class Archive(object):
         self.format = module.params['format']
         self.must_archive = module.params['force_archive']
         self.remove = module.params['remove']
-        self.reproducible_tar = module.params["reproducible_tar"] or False
+        self.reproducible_tar = module.params["reproducible_tar"]
 
         self.changed = False
         self.destination_state = STATE_ABSENT
