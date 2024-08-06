@@ -226,7 +226,7 @@ def target_loggedon(module, target, portal=None, port=None):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_login(module, target, portal=None, port=None, check_rc=True):
+def target_login(module, target, check_rc, portal=None, port=None):
     node_auth = module.params['node_auth']
     node_user = module.params['node_user']
     node_pass = module.params['node_pass']
@@ -368,6 +368,7 @@ def main():
 
     # return json dict
     result = {'changed': False}
+    check_rc = True
 
     if discover:
         if check:
@@ -408,7 +409,7 @@ def main():
                     result['devicenodes'] += target_device_node(target)
             elif not check:
                 if login:
-                    target_login(module, target, portal, port, check_rc)
+                    target_login(module, target, check_rc, portal, port)
                     # give udev some time
                     time.sleep(1)
                     result['devicenodes'] += target_device_node(target)
