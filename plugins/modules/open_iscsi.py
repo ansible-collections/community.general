@@ -239,22 +239,22 @@ def target_login(module, target, check_rc, portal=None, port=None):
                   ('node.session.auth.password', node_pass)]
         for (name, value) in params:
             cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--op=update', '--name', name, '--value', value]
-            module.run_command(cmd, check_rc=check_rc)
+            rc, out, err = module.run_command(cmd, check_rc=check_rc)
 
     if node_user_in:
         params = [('node.session.auth.username_in', node_user_in),
                   ('node.session.auth.password_in', node_pass_in)]
         for (name, value) in params:
             cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
-            module.run_command(cmd, check_rc=check_rc)
+            rc, out, err = module.run_command(cmd, check_rc=check_rc)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
         cmd.append('--portal')
         cmd.append('%s:%s' % (portal, port))
 
-    module.run_command(cmd, check_rc=check_rc)
-
+    rc, out, err = module.run_command(cmd, check_rc=check_rc)
+    return rc
 
 def target_logout(module, target):
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--logout']
@@ -409,17 +409,23 @@ def main():
                     result['devicenodes'] += target_device_node(target)
             elif not check:
                 if login:
-                    target_login(module, target, check_rc, portal, port)
+                    login_result = target_login(module, target, check_rc, portal, port)
                     # give udev some time
                     time.sleep(1)
                     result['devicenodes'] += target_device_node(target)
                 else:
                     target_logout(module, target)
-                result['changed'] |= True
-                result['connection_changed'] = True
+                # Check if there are multiple targets on a single portal and
+                # do not mark the task changed if host could not login to one of them 
+                if len(nodes) > 1 and login_result == 24:
+                    result['changed'] |= False
+                    result['connection_changed'] = False
+                else:
+                    result['changed'] |= True
+                    result['connection_changed'] = True
             else:
-                result['changed'] |= True
-                result['connection_changed'] = True
+                    result['changed'] |= True
+                    result['connection_changed'] = True
 
     if automatic is not None:
         isauto = target_isauto(module, target)
