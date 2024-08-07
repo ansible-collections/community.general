@@ -1,0 +1,2 @@
+minor_changes:
+  - pipx - add parameter ``suffix`` to module (https://github.com/ansible-collections/community.general/pull/8675, https://github.com/ansible-collections/community.general/issues/8656).
