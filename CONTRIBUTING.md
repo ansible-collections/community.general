@@ -87,10 +87,10 @@ ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools
 
 The following commands show how to run integration tests:
 
-#### In docker
+#### In Docker
 
-Integration tests on docker require two parameters:
-- `image_name`: The name of the docker image. To get the list of supported docker images, run
+Integration tests on Docker require two parameters:
+- `image_name`: The name of the Docker image. To get the list of supported Docker images, run
   `ansible-test integration --help` and look for _target docker images_.
 - `module_name`: The name of the module. For example, pacman in case of community.general.pacma
 
@@ -98,7 +98,7 @@ Integration tests on docker require two parameters:
 # Template
 ansible-test integration -v --docker image_name module_name
 
-# Example community.general.pacman module on fedora35 docker image:
+# Example community.general.pacman module on fedora35 Docker image:
 ansible-test integration -v --docker fedora35 pacman
 ```
 
