@@ -171,7 +171,7 @@
     state: latest
   register: install_tox_latest_with_preinstall_again
 
-- name: install application latest tox
+- name: install application latest tox (force)
   community.general.pipx:
     name: tox
     state: latest
@@ -339,3 +339,36 @@
   assert:
     that:
       - install_pyinstaller is changed
+
+##############################################################################
+# Test for issue 8656
+- name: ensure application conan2 is uninstalled
+  community.general.pipx:
+    name: conan2
+    state: absent
+
+- name: Install Python Package conan with suffix 2 (conan2)
+  community.general.pipx:
+    name: conan
+    state: install
+    suffix: "2"
+  register: install_conan2
+
+- name: Install Python Package conan with suffix 2 (conan2) again
+  community.general.pipx:
+    name: conan
+    state: install
+    suffix: "2"
+  register: install_conan2_again
+
+- name: cleanup conan2
+  community.general.pipx:
+    name: conan2
+    state: absent
+
+- name: check assertions
+  assert:
+    that:
+      - install_conan2 is changed
+      - "'    - conan2' in install_conan2.stdout"
+      - install_conan2_again is not changed
