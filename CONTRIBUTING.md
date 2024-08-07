@@ -99,8 +99,8 @@ Integration tests on Docker require two parameters:
 # Template
 ansible-test integration -v --docker image_name module_name
 
-# Example community.general.pacman module on fedora35 Docker image:
-ansible-test integration -v --docker fedora35 pacman
+# Example community.general.ini_file module on fedora40 Docker image:
+ansible-test integration -v --docker fedora40 ini_file
 ```
 
 #### Without isolation
