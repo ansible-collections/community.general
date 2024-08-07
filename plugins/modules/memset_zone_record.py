@@ -181,6 +181,7 @@ def api_validation(args=None):
     https://www.memset.com/apidocs/methods_dns.html#dns.zone_record_create)
     '''
     failed_validation = False
+    error = None
 
     # priority can only be integer 0 > 999
     if not 0 <= args['priority'] <= 999:
