@@ -92,8 +92,9 @@ The following commands show how to run integration tests:
 Integration tests on Docker require two parameters:
 - `image_name`: The name of the Docker image. To get the list of supported Docker images, run
   `ansible-test integration --help` and look for _target docker images_.
-- `module_name`: The name of the module. For example, pacman in case of community.general.pacma
-
+- `test_name`: The name of the integration test.  
+  For modules, this equals the short name of the module; for example, `pacman` in case of `community.general.pacman`.  
+  For plugins, the plugin type is added before the plugin's short name, for example `callback_yaml` for the `community.general.yaml` callback.
 ```.bash
 # Template
 ansible-test integration -v --docker image_name module_name
