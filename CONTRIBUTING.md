@@ -89,15 +89,18 @@ The following commands show how to run integration tests:
 
 #### In Docker
 
-Integration tests on Docker require two parameters:
-- `image_name`: The name of the Docker image. To get the list of supported Docker images, run
+Integration tests on Docker have the following parameters:
+- `image_name` (required): The name of the Docker image. To get the list of supported Docker images, run
   `ansible-test integration --help` and look for _target docker images_.
-- `test_name`: The name of the integration test.  
+- `test_name` (optional): The name of the integration test.  
   For modules, this equals the short name of the module; for example, `pacman` in case of `community.general.pacman`.  
   For plugins, the plugin type is added before the plugin's short name, for example `callback_yaml` for the `community.general.yaml` callback.
 ```.bash
+# Test all plugins/modules on fedora40
+ansible-test integration -v --docker fedora40
+
 # Template
-ansible-test integration -v --docker image_name module_name
+ansible-test integration -v --docker image_name test_name
 
 # Example community.general.ini_file module on fedora40 Docker image:
 ansible-test integration -v --docker fedora40 ini_file
