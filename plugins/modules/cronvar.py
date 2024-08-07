@@ -183,6 +183,7 @@ class CronVar(object):
             fileh = open(backup_file, 'w')
         elif self.cron_file:
             fileh = open(self.cron_file, 'w')
+            path = None
         else:
             filed, path = tempfile.mkstemp(prefix='crontab')
             fileh = os.fdopen(filed, 'w')

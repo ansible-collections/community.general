@@ -544,6 +544,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             # NOOP
             return False, "Disk %s not found in VM %s and creation was disabled in parameters." % (disk, vmid)
 
+        timeout_str = "Reached timeout. Last line in task before timeout: %s"
         if (create == 'regular' and disk not in vm_config) or (create == 'forced'):
             # CREATE
             playbook_config = self.get_create_attributes()

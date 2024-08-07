@@ -740,6 +740,8 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 # If not, we have proxmox create one using the special syntax
                 except Exception:
                     vol_string = "{storage}:{size}".format(storage=storage, size=size)
+            else:
+                raise AssertionError('Internal error')
 
             # 1.3 If we have a host_path, we don't have storage, a volume, or a size
             vol_string = ",".join(

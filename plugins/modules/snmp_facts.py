@@ -307,6 +307,8 @@ def main():
         if m_args['community'] is None:
             module.fail_json(msg='Community not set when using snmp version 2')
 
+    integrity_proto = None
+    privacy_proto = None
     if m_args['version'] == "v3":
         if m_args['username'] is None:
             module.fail_json(msg='Username not set when using snmp version 3')

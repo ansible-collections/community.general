@@ -459,6 +459,7 @@ def main():
         if not os.access(b_path, os.R_OK):
             module.fail_json(msg="Source %s not readable" % path)
         state_to_restore = read_state(b_path)
+        cmd = None
     else:
         cmd = ' '.join(SAVECOMMAND)
 

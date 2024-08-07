@@ -356,6 +356,7 @@ class OpenTelemetrySource(object):
         status = Status(status_code=StatusCode.OK)
         if host_data.status != 'included':
             # Support loops
+            enriched_error_message = None
             if 'results' in host_data.result._result:
                 if host_data.status == 'failed':
                     message = self.get_error_message_from_results(host_data.result._result['results'], task_data.action)

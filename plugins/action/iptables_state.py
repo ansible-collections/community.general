@@ -88,6 +88,10 @@ class ActionModule(ActionBase):
             max_timeout = self._connection._play_context.timeout
             module_args = self._task.args
 
+            async_status_args = {}
+            starter_cmd = None
+            confirm_cmd = None
+
             if module_args.get('state', None) == 'restored':
                 if not wrap_async:
                     if not check_mode:
