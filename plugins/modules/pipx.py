@@ -114,14 +114,20 @@ options:
             - Arbitrary arguments to pass directly to C(pip).
         type: str
         version_added: 4.6.0
+    suffix:
+        description:
+            - Optional suffix for virtual environment and executable names.
+            - "B(Warning): C(pipx) documentation states this is an B(experimental) feature subject to change."
+        type: str
+        version_added: 9.3.0
 notes:
+    - This module requires C(pipx) version 0.16.2.1 or above.
+    - Please note that C(pipx) requires Python 3.6 or above.
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
     - >
       This module will honor C(pipx) environment variables such as but not limited to C(PIPX_HOME) and C(PIPX_BIN_DIR)
       passed using the R(environment Ansible keyword, playbooks_environment).
-    - This module requires C(pipx) version 0.16.2.1 or above.
-    - Please note that C(pipx) requires Python 3.6 or above.
     - >
       This first implementation does not verify whether a specified version constraint has been installed or not.
       Hence, when using version operators, C(pipx) module will always try to execute the operation,
@@ -168,6 +174,10 @@ from ansible_collections.community.general.plugins.module_utils.pipx import pipx
 from ansible.module_utils.facts.compat import ansible_facts
 
 
+def _make_name(name, suffix):
+    return name if suffix is None else "{0}{1}".format(name, suffix)
+
+
 class PipX(StateModuleHelper):
     output_params = ['name', 'source', 'index_url', 'force', 'installdeps']
     module = dict(
@@ -188,6 +198,7 @@ class PipX(StateModuleHelper):
             executable=dict(type='path'),
             editable=dict(type='bool', default=False),
             pip_args=dict(type='str'),
+            suffix=dict(type='str'),
         ),
         required_if=[
             ('state', 'present', ['name']),
@@ -199,6 +210,9 @@ class PipX(StateModuleHelper):
             ('state', 'latest', ['name']),
             ('state', 'inject', ['name', 'inject_packages']),
         ],
+        required_by=dict(
+            suffix="name",
+        ),
         supports_check_mode=True,
     )
     use_old_vardict = False
@@ -222,9 +236,10 @@ class PipX(StateModuleHelper):
         installed = self.runner('_list', output_process=process_list).run(_list=1)
 
         if self.vars.name is not None:
-            app_list = installed.get(self.vars.name)
+            name = _make_name(self.vars.name, self.vars.suffix)
+            app_list = installed.get(name)
             if app_list:
-                return {self.vars.name: app_list}
+                return {name: app_list}
             else:
                 return {}
 
@@ -253,45 +268,50 @@ class PipX(StateModuleHelper):
     def state_install(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            with self.runner('state index_url install_deps force python system_site_packages editable pip_args name_source', check_mode_skip=True) as ctx:
+            args = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            with self.runner(args, check_mode_skip=True) as ctx:
                 ctx.run(name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
     state_present = state_install
 
     def state_upgrade(self):
+        name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to upgrade a non-existent application: {0}".format(self.vars.name))
+            self.do_raise("Trying to upgrade a non-existent application: {0}".format(name))
         if self.vars.force:
             self.changed = True
 
         with self.runner('state include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
-            ctx.run()
+            ctx.run(name=name)
             self._capture_results(ctx)
 
     def state_uninstall(self):
         if self.vars.application:
+            name = _make_name(self.vars.name, self.vars.suffix)
             with self.runner('state name', check_mode_skip=True) as ctx:
-                ctx.run()
+                ctx.run(name=name)
                 self._capture_results(ctx)
 
     state_absent = state_uninstall
 
     def state_reinstall(self):
+        name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to reinstall a non-existent application: {0}".format(self.vars.name))
+            self.do_raise("Trying to reinstall a non-existent application: {0}".format(name))
         self.changed = True
         with self.runner('state name python', check_mode_skip=True) as ctx:
-            ctx.run()
+            ctx.run(name=name)
             self._capture_results(ctx)
 
     def state_inject(self):
+        name = _make_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
-            self.do_raise("Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
+            self.do_raise("Trying to inject packages into a non-existent application: {0}".format(name))
         if self.vars.force:
             self.changed = True
         with self.runner('state index_url install_apps install_deps force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
-            ctx.run()
+            ctx.run(name=name)
             self._capture_results(ctx)
 
     def state_uninstall_all(self):
@@ -314,7 +334,8 @@ class PipX(StateModuleHelper):
     def state_latest(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            with self.runner('state index_url install_deps force python system_site_packages editable pip_args name_source', check_mode_skip=True) as ctx:
+            args = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            with self.runner(args, check_mode_skip=True) as ctx:
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 

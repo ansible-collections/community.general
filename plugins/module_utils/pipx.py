@@ -28,7 +28,6 @@ def pipx_runner(module, command, **kwargs):
         module,
         command=command,
         arg_formats=dict(
-
             state=fmt.as_map(_state_map),
             name=fmt.as_list(),
             name_source=fmt.as_func(fmt.unpack_args(lambda n, s: [s] if s else [n])),
@@ -43,6 +42,7 @@ def pipx_runner(module, command, **kwargs):
             _list=fmt.as_fixed(['list', '--include-injected', '--json']),
             editable=fmt.as_bool("--editable"),
             pip_args=fmt.as_opt_eq_val('--pip-args'),
+            suffix=fmt.as_opt_val('--suffix'),
         ),
         environ_update={'USE_EMOJI': '0'},
         check_rc=True,
