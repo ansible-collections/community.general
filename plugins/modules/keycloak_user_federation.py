@@ -347,6 +347,7 @@ options:
                       to the first part of his Kerberos principal. For instance, for principal C(john@KEYCLOAK.ORG),
                       it will assume that LDAP username is V(john).
                 type: str
+                default: 'userPrincipalName'
                 version_added: 8.1.0
 
             serverPrincipal:
@@ -713,19 +714,33 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from copy import deepcopy
 
 
+def set_mapper_defaults(mapper):
+    '''
+    Set explicit default values expected by the kc API for the different mapper types.
+    '''
+    # keycloak explicity sets the default ['config']['always.read.enabled.value.from.ldap'] == 'true'
+    # if the parameter is not present in the config
+    # we match this behavior to get a cleaner diff
+    if mapper.get('providerId') == 'msad-user-account-control-mapper':
+        if not mapper.get('config'):
+            mapper['config'] = {}
+        if 'always.read.enabled.value.from.ldap' not in mapper['config']:
+            mapper['config']['always.read.enabled.value.from.ldap'] = True
+
+
 def sanitize(comp):
     compcopy = deepcopy(comp)
     if 'config' in compcopy:
         compcopy['config'] = dict((k, v[0]) for k, v in compcopy['config'].items())
         if 'bindCredential' in compcopy['config']:
             compcopy['config']['bindCredential'] = '**********'
-        # an empty string is valid for krbPrincipalAttribute but is filtered out in diff
-        if 'krbPrincipalAttribute' not in compcopy['config']:
-            compcopy['config']['krbPrincipalAttribute'] = ''
     if 'mappers' in compcopy:
         for mapper in compcopy['mappers']:
             if 'config' in mapper:
                 mapper['config'] = dict((k, v[0]) for k, v in mapper['config'].items())
+        # the frontend sorts mappers by name, the API however has a different random order for every federation
+        # the order is not really relevant, we only sort here to get a correct diff/changes
+        compcopy['mappers'] = sorted(compcopy['mappers'], key=lambda x: x['name'])
     return compcopy
 
 
@@ -774,7 +789,13 @@ def main():
         readTimeout=dict(type='int'),
         searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
-        krbPrincipalAttribute=dict(type='str'),
+        # When creating a user federation with this parameter not present or set to '',
+        # this parameter is set explicitly to the default value 'userPrincipalName' by kc,
+        # even if kerbereos authentication is disabled.
+        # To get krbPrincipalAttribute = '' (and the optional behavior described in the GUI) explicitly set it to '', and run the module twice:
+        # once to create the federation with the default value and then to update it to the desired '' value.
+        # see last comment https://github.com/keycloak/keycloak/issues/28011 for this behavior
+        krbPrincipalAttribute=dict(type='str', default='userPrincipalName'),
         startTls=dict(type='bool', default=False),
         syncRegistrations=dict(type='bool', default=False),
         trustEmail=dict(type='bool', default=False),
@@ -843,6 +864,7 @@ def main():
 
     if mappers is not None:
         for mapper in mappers:
+            set_mapper_defaults(mapper)
             if mapper.get('config') is not None:
                 mapper['config'] = dict((k, [str(v).lower() if not isinstance(v, str) else v])
                                         for k, v in mapper['config'].items() if mapper['config'][k] is not None)
@@ -868,7 +890,7 @@ def main():
 
     # if user federation exists, get associated mappers
     if cid is not None and before_comp:
-        before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
+        before_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
 
     # Build a proposed changeset from parameters given to this module
     changeset = {}
@@ -905,10 +927,10 @@ def main():
                     old_mapper = {}
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
-            if new_mapper != old_mapper:
-                if changeset.get('mappers') is None:
-                    changeset['mappers'] = list()
-                changeset['mappers'].append(new_mapper)
+            # changeset includes all desired mappers: unchanged, modified and newly created
+            if changeset.get('mappers') is None:
+                changeset['mappers'] = list()
+            changeset['mappers'].append(new_mapper)
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_comp = before_comp.copy()
@@ -973,20 +995,19 @@ def main():
         if state == 'present':
             # Process an update
 
-            # no changes
-            if desired_comp == before_comp:
-                result['changed'] = False
-                result['end_state'] = sanitize(desired_comp)
-                result['msg'] = "No changes required to user federation {id}.".format(id=cid)
-                module.exit_json(**result)
-
-            # doing an update
-            result['changed'] = True
-
-            if module._diff:
-                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(desired_comp))
-
             if module.check_mode:
+                before_comp_sanitized = sanitize(before_comp)
+                desired_comp_sanitized = sanitize(desired_comp)
+                if module._diff:
+                    result['diff'] = dict(before=before_comp_sanitized, after=desired_comp_sanitized)
+
+                if desired_comp_sanitized == before_comp_sanitized:
+                    result['changed'] = False
+                    result['msg'] = "No changes required to user federation {id}.".format(id=cid)
+                else:
+                    result['changed'] = True
+                    result['msg'] = "Changes are required to user federation {id}.".format(id=cid)
+                result['end_state'] = desired_comp_sanitized
                 module.exit_json(**result)
 
             # do the update
@@ -1003,8 +1024,13 @@ def main():
                         mapper['parentId'] = desired_comp['id']
                     mapper = kc.create_component(mapper, realm)
 
-            after_comp['mappers'] = updated_mappers
-            result['end_state'] = sanitize(after_comp)
+            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+            after_comp_sanitized = sanitize(after_comp)
+            before_comp_sanitized = sanitize(before_comp)
+            result['end_state'] = after_comp_sanitized
+            if module._diff:
+                result['diff'] = dict(before=before_comp_sanitized, after=after_comp_sanitized)
+            result['changed'] = before_comp_sanitized != after_comp_sanitized
 
             result['msg'] = "User federation {id} has been updated".format(id=cid)
             module.exit_json(**result)
