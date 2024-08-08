@@ -42,6 +42,7 @@ class TestArchive(ModuleTestCase):
                 exclusion_patterns=dict(type='list', elements='path'),
                 force_archive=dict(type='bool', default=False),
                 remove=dict(type='bool', default=False),
+                reproducible_tar=dict(type="bool", default=False),
             ),
             add_file_common_args=True,
             supports_check_mode=True,
