@@ -259,6 +259,27 @@ options:
     type: list
     elements: str
     version_added: "6.6.0"
+  pages_access_level:
+    description:
+      - V(private) means that accessing pages tab is allowed only to project members.
+      - V(disabled) means that accessing pages tab is disabled.
+      - V(enabled) means that accessing pages tab is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.3.0"
+  service_desk_enabled:
+    description:
+      - Enable Service Desk.
+    type: bool
+    version_added: "9.3.0"
+  model_registry_access_level:
+    description:
+      - V(private) means that accessing model registry tab is allowed only to project members.
+      - V(disabled) means that accessing model registry tab is disabled.
+      - V(enabled) means that accessing model registry tab is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.3.0"
 '''
 
 EXAMPLES = r'''
@@ -384,6 +405,9 @@ class GitLabProject(object):
             'infrastructure_access_level': options['infrastructure_access_level'],
             'monitor_access_level': options['monitor_access_level'],
             'security_and_compliance_access_level': options['security_and_compliance_access_level'],
+            'pages_access_level': options['pages_access_level'],
+            'service_desk_enabled': options['service_desk_enabled'],
+            'model_registry_access_level': options['model_registry_access_level'],
         }
 
         # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version
@@ -535,6 +559,9 @@ def main():
         infrastructure_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        pages_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        service_desk_enabled=dict(type='bool'),
+        model_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         topics=dict(type='list', elements='str'),
     ))
 
@@ -594,6 +621,9 @@ def main():
     infrastructure_access_level = module.params['infrastructure_access_level']
     monitor_access_level = module.params['monitor_access_level']
     security_and_compliance_access_level = module.params['security_and_compliance_access_level']
+    pages_access_level = module.params['pages_access_level']
+    service_desk_enabled = module.params['service_desk_enabled']
+    model_registry_access_level = module.params['model_registry_access_level']
     topics = module.params['topics']
 
     # Set project_path to project_name if it is empty.
@@ -633,7 +663,7 @@ def main():
         if project_exists:
             gitlab_project.delete_project()
             module.exit_json(changed=True, msg="Successfully deleted project %s" % project_name)
-        module.exit_json(changed=False, msg="Project deleted or does not exists")
+        module.exit_json(changed=False, msg="Project deleted or does not exist")
 
     if state == 'present':
 
@@ -668,6 +698,9 @@ def main():
             "infrastructure_access_level": infrastructure_access_level,
             "monitor_access_level": monitor_access_level,
             "security_and_compliance_access_level": security_and_compliance_access_level,
+            "pages_access_level": pages_access_level,
+            "service_desk_enabled": service_desk_enabled,
+            "model_registry_access_level": model_registry_access_level,
             "topics": topics,
         }):
 
