@@ -721,8 +721,6 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
-
-
     def test_delete_when_absent(self):
         """Remove an absent identity provider"""
 
