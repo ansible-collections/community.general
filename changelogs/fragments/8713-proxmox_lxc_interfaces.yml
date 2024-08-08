@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox inventory plugin - add new fact for LXC interface details (https://github.com/ansible-collections/community.general/pull/8713).
