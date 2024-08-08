@@ -445,6 +445,15 @@ def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
     if idp is not None:
         idp['mappers'] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get('name'))
+        # clientSecret returned by API when using `get_identity_provider(alias, realm)` is always **********
+        # to detect changes to the secret, we get the actual cleartext secret from the full realm info
+        if 'config' in idp:
+            if 'clientSecret' in idp['config']:
+                for idp_from_realm in kc.get_realm_by_id(realm).get('identityProviders', []):
+                    if idp_from_realm['internalId'] == idp['internalId']:
+                        cleartext_secret = idp_from_realm.get('config', {}).get('clientSecret')
+                        if cleartext_secret:
+                            idp['config']['clientSecret'] = cleartext_secret
     if idp is None:
         idp = {}
     return idp
