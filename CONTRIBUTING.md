@@ -56,6 +56,8 @@ cd ~/dev/ansible_collections/community/general
 
 Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with Ansible 2.9+.
 
+### Sanity tests
+
 The following commands show how to run sanity tests:
 
 ```.bash
@@ -65,6 +67,8 @@ ansible-test sanity --docker -v
 # Run sanity tests for the given files and directories:
 ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration/targets/pids/
 ```
+
+### Unit tests
 
 The following commands show how to run unit tests:
 
@@ -79,13 +83,32 @@ ansible-test units --docker -v --python 3.8
 ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools/test_nmcli.py
 ```
 
+### Integration tests
+
 The following commands show how to run integration tests:
 
-```.bash
-# Run integration tests for the interfaces_files module in a Docker container using the
-# fedora35 operating system image (the supported images depend on your ansible-core version):
-ansible-test integration --docker fedora35 -v interfaces_file
+#### In Docker
 
+Integration tests on Docker have the following parameters:
+- `image_name` (required): The name of the Docker image. To get the list of supported Docker images, run
+  `ansible-test integration --help` and look for _target docker images_.
+- `test_name` (optional): The name of the integration test.  
+  For modules, this equals the short name of the module; for example, `pacman` in case of `community.general.pacman`.  
+  For plugins, the plugin type is added before the plugin's short name, for example `callback_yaml` for the `community.general.yaml` callback.
+```.bash
+# Test all plugins/modules on fedora40
+ansible-test integration -v --docker fedora40
+
+# Template
+ansible-test integration -v --docker image_name test_name
+
+# Example community.general.ini_file module on fedora40 Docker image:
+ansible-test integration -v --docker fedora40 ini_file
+```
+
+#### Without isolation
+
+```.bash
 # Run integration tests for the flattened lookup **without any isolation**:
 ansible-test integration -v lookup_flattened
 ```
