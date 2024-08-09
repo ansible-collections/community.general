@@ -535,7 +535,7 @@ class HomebrewCask(object):
 
         if rc == 0:
             # 'brew upgrade --cask' does not output anything if no casks are upgraded
-            if not out:
+            if not out.strip():
                 self.message = 'Homebrew casks already upgraded.'
 
             # handle legacy 'brew cask upgrade'
