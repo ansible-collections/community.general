@@ -1,0 +1,2 @@
+minor_changes:
+  - locale_gen - add support for multiple locales (https://github.com/ansible-collections/community.general/issues/8677, https://github.com/ansible-collections/community.general/pull/8682).
