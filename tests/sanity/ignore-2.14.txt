@@ -6,6 +6,7 @@ plugins/lookup/etcd3.py validate-modules:invalid-documentation
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
 plugins/modules/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
+plugins/modules/keycloak_userprofile.py validate-modules:parameter-invalid
 plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice

@@ -1,0 +1,300 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Remove Keycloak test realm to avoid failures from previous failed runs
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: absent
+
+- name: Create Keycloak test realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: present
+
+- name: Create default userprofile (check mode)
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_default }}"
+  check_mode: true
+  register: result
+
+- name: Assert that userprofile would be created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg == "Userprofile declarative-user-profile would be created"
+
+- name: Create default userprofile
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_default }}"
+  diff: true
+  register: result
+
+- name: Assert that userprofile was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg == "Userprofile declarative-user-profile created"
+
+- name: Create default userprofile (test for idempotency)
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_default }}"
+  register: result
+
+- name: Assert that userprofile was in sync
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg == "Userprofile declarative-user-profile was in sync"
+
+- name: Update default userprofile (check mode)
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_updated }}"
+  check_mode: true
+  register: result
+
+- name: Assert that userprofile would be changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg.startswith("Userprofile declarative-user-profile would be changed:")
+
+- name: Update default userprofile
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_updated }}"
+  diff: true
+  register: result
+
+- name: Assert that userprofile changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg.startswith("Userprofile declarative-user-profile changed:")
+
+- name: Update default userprofile (test for idempotency)
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_updated }}"
+  register: result
+
+- name: Assert that userprofile was in sync
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg == "Userprofile declarative-user-profile was in sync"
+
+## No force implemented
+# - name: Force update default userprofile
+#   community.general.keycloak_userprofile:
+#     auth_keycloak_url: "{{ url }}"
+#     auth_realm: "{{ admin_realm }}"
+#     auth_username: "{{ admin_user }}"
+#     auth_password: "{{ admin_password }}"
+#     force: true
+#     state: present
+#     parent_id: "{{ realm }}"
+#     provider_id: "{{ provider_id }}"
+#     config: "{{ config_updated }}"
+#   register: result
+# 
+# - name: Assert that forced update ran correctly
+#   assert:
+#     that:
+#       - result is changed
+#       - result.end_state != {}
+#       - result.end_state.parentId == "{{ realm }}"
+#       - result.end_state.providerId == "declarative-user-profile"
+#       - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+#       - result.msg == "Userprofile declarative-user-profile was forcibly updated"
+
+- name: Remove default userprofile
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_default }}"
+  diff: true
+  register: result
+
+- name: Assert that userprofile was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == "Userprofile declarative-user-profile deleted"
+
+- name: Remove default userprofile (test for idempotency)
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_default }}"
+  register: result
+
+- name: Assert that userprofile not present
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+      - result.msg == "Userprofile declarative-user-profile not present"
+
+- name: Create userprofile with unmanaged attributes ENABLED
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_unmanaged_attributes_enabled }}"
+  diff: true
+  register: result
+
+- name: Assert that userprofile was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg == "Userprofile declarative-user-profile created"
+
+- name: Attempt to change the userprofile to unmanaged ADMIN_EDIT
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_unmanaged_attributes_admin_edit }}"
+  diff: true
+  register: result
+
+- name: Assert that userprofile was changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg.startswith("Userprofile declarative-user-profile changed:")
+
+- name: Attempt to change the userprofile to unmanaged ADMIN_VIEW
+  community.general.keycloak_userprofile:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    parent_id: "{{ realm }}"
+    provider_id: "{{ provider_id }}"
+    config: "{{ config_unmanaged_attributes_admin_view }}"
+  diff: true
+  register: result
+
+- name: Assert that userprofile was changed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.parentId == "{{ realm }}"
+      - result.end_state.providerId == "declarative-user-profile"
+      - result.end_state.providerType == "org.keycloak.userprofile.UserProfileProvider"
+      - result.msg.startswith("Userprofile declarative-user-profile changed:")
+
+- name: Remove Keycloak test realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}" 
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ realm }}"
+    state: absent

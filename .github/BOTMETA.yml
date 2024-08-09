@@ -809,6 +809,8 @@ files:
     maintainers: elfelip
   $modules/keycloak_user_federation.py:
     maintainers: laurpaum
+  $modules/keycloak_userprofile.py:
+    maintainers: yeoldegrove
   $modules/keycloak_component_info.py:
     maintainers: desand01
   $modules/keycloak_client_rolescope.py:
