@@ -366,7 +366,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if not properties[self._fact('status')] == 'running':
             return
 
-        ret = self._get_json("%s/api2/json/nodes/%s/lxc/%s/interfaces" % (self.proxmox_url, node, vmid))
+        ret = self._get_json("%s/api2/json/nodes/%s/lxc/%s/interfaces" % (self.proxmox_url, node, vmid), ignore_errors=[501])
+        if not ret:
+            return
 
         result = []
 
