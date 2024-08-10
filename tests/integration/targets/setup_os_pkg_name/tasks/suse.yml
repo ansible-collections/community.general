@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Update OS Package name fact (suse)
+  ansible.builtin.set_fact:
+    os_package_name: "{{ os_package_name | combine(specific_package_names) }}"
+  vars:
+    specific_package_names:
+      virtualenv: python3-virtualenv
