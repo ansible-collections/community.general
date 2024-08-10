@@ -363,32 +363,26 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 return None
 
     def _get_lxc_interfaces(self, properties, node, vmid):
-        try:
-            ret = self._get_json("%s/api2/json/nodes/%s/lxc/%s/interfaces" % (self.proxmox_url, node, vmid))
-        except Exception:
+        if not properties[self._fact('status')] == 'running':
             return
 
-        if not ret:
-            return
+        ret = self._get_json("%s/api2/json/nodes/%s/lxc/%s/interfaces" % (self.proxmox_url, node, vmid))
 
         result = []
 
-        try:
-            for iface in ret:
-                result_iface = {
-                    'name': iface['name'],
-                    'hwaddr': iface['hwaddr']
-                }
+        for iface in ret:
+            result_iface = {
+                'name': iface['name'],
+                'hwaddr': iface['hwaddr']
+            }
 
-                if 'inet' in iface:
-                    result_iface['inet'] = iface['inet']
+            if 'inet' in iface:
+                result_iface['inet'] = iface['inet']
 
-                if 'inet6' in iface:
-                    result_iface['inet6'] = iface['inet6']
+            if 'inet6' in iface:
+                result_iface['inet6'] = iface['inet6']
 
-                result.append(result_iface)
-        except Exception:
-            return
+            result.append(result_iface)
 
         properties[self._fact('lxc_interfaces')] = result
 
