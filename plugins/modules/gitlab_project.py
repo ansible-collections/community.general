@@ -180,6 +180,14 @@ options:
       - Supports project's default branch update since community.general 8.0.0.
     type: str
     version_added: "4.2.0"
+  repository_access_level:
+    description:
+      - V(private) means that accessing repository is allowed only to project members.
+      - V(disabled) means that accessing repository is disabled.
+      - V(enabled) means that accessing repository is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.3.0"
   builds_access_level:
     description:
       - V(private) means that repository CI/CD is allowed only to project members.
@@ -259,6 +267,41 @@ options:
     type: list
     elements: str
     version_added: "6.6.0"
+  container_expiration_policy:
+    description:
+      - Project cleanup policy for its container registry.
+    type: dict
+    suboptions:
+      cadence:
+        description:
+          - How often cleanup should be run.
+        type: str
+        choices: ["1d", "7d", "14d", "1month", "3month"]
+      enabled:
+        description:
+          - Enable the cleanup policy.
+        type: bool
+      keep_n:
+        description:
+          - Number of tags kept per image name.
+          - V(0) clears the field.
+        type: int
+        choices: [0, 1, 5, 10, 25, 50, 100]
+      older_than:
+        description:
+          - Destroy tags older than this.
+          - V(0d) clears the field.
+        type: str
+        choices: ["0d", "7d", "14d", "30d", "90d"]
+      name_regex:
+        description:
+          - Destroy tags matching this regular expression.
+        type: str
+      name_regex_keep:
+        description:
+          - Keep tags matching this regular expression.
+        type: str
+    version_added: "9.3.0"
 '''
 
 EXAMPLES = r'''
@@ -375,6 +418,7 @@ class GitLabProject(object):
             'squash_option': options['squash_option'],
             'ci_config_path': options['ci_config_path'],
             'shared_runners_enabled': options['shared_runners_enabled'],
+            'repository_access_level': options['repository_access_level'],
             'builds_access_level': options['builds_access_level'],
             'forking_access_level': options['forking_access_level'],
             'container_registry_access_level': options['container_registry_access_level'],
@@ -384,6 +428,7 @@ class GitLabProject(object):
             'infrastructure_access_level': options['infrastructure_access_level'],
             'monitor_access_level': options['monitor_access_level'],
             'security_and_compliance_access_level': options['security_and_compliance_access_level'],
+            'container_expiration_policy': options['container_expiration_policy'],
         }
 
         # topics was introduced on gitlab >=14 and replace tag_list. We get current gitlab version
@@ -471,7 +516,20 @@ class GitLabProject(object):
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
                 if getattr(project, arg_key) != arguments[arg_key]:
-                    setattr(project, arg_key, arguments[arg_key])
+                    if arg_key == 'container_expiration_policy':
+                        old_val = getattr(project, arg_key)
+                        final_val = {key: value for key, value in arg_value.items() if value is not None}
+
+                        if final_val.get('older_than') == '0d':
+                            final_val['older_than'] = None
+                        if final_val.get('keep_n') == 0:
+                            final_val['keep_n'] = None
+
+                        if all(old_val.get(key) == value for key, value in final_val.items()):
+                            continue
+                        setattr(project, 'container_expiration_policy_attributes', final_val)
+                    else:
+                        setattr(project, arg_key, arg_value)
                     changed = True
 
         return (changed, project)
@@ -526,6 +584,7 @@ def main():
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
         avatar_path=dict(type='path'),
+        repository_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         forking_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         container_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
@@ -536,6 +595,14 @@ def main():
         monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         topics=dict(type='list', elements='str'),
+        container_expiration_policy=dict(type='dict', default=None, options=dict(
+            cadence=dict(type='str', choices=["1d", "7d", "14d", "1month", "3month"]),
+            enabled=dict(type='bool'),
+            keep_n=dict(type='int', choices=[0, 1, 5, 10, 25, 50, 100]),
+            older_than=dict(type='str', choices=["0d", "7d", "14d", "30d", "90d"]),
+            name_regex=dict(type='str'),
+            name_regex_keep=dict(type='str'),
+        )),
     ))
 
     module = AnsibleModule(
@@ -585,6 +652,7 @@ def main():
     shared_runners_enabled = module.params['shared_runners_enabled']
     avatar_path = module.params['avatar_path']
     default_branch = module.params['default_branch']
+    repository_access_level = module.params['repository_access_level']
     builds_access_level = module.params['builds_access_level']
     forking_access_level = module.params['forking_access_level']
     container_registry_access_level = module.params['container_registry_access_level']
@@ -595,6 +663,7 @@ def main():
     monitor_access_level = module.params['monitor_access_level']
     security_and_compliance_access_level = module.params['security_and_compliance_access_level']
     topics = module.params['topics']
+    container_expiration_policy = module.params['container_expiration_policy']
 
     # Set project_path to project_name if it is empty.
     if project_path is None:
@@ -659,6 +728,7 @@ def main():
             "ci_config_path": ci_config_path,
             "shared_runners_enabled": shared_runners_enabled,
             "avatar_path": avatar_path,
+            "repository_access_level": repository_access_level,
             "builds_access_level": builds_access_level,
             "forking_access_level": forking_access_level,
             "container_registry_access_level": container_registry_access_level,
@@ -669,6 +739,7 @@ def main():
             "monitor_access_level": monitor_access_level,
             "security_and_compliance_access_level": security_and_compliance_access_level,
             "topics": topics,
+            "container_expiration_policy": container_expiration_policy,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
