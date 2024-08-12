@@ -23,6 +23,18 @@ We follow [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/comm
 
 If you encounter abusive behavior violating the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html), please refer to the [policy violations](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html#policy-violations) section of the Code of Conduct for information on how to raise a complaint.
 
+## Communication
+
+* Join the Ansible forum:
+  * [Get Help](https://forum.ansible.com/c/help/6): get help or help others. This is for questions about modules or plugins in the collection.
+  * [Tag `community-general`](https://forum.ansible.com/tag/community-general): discuss the *collection itself*, instead of specific modules or plugins.
+  * [Social Spaces](https://forum.ansible.com/c/chat/4): gather and interact with fellow enthusiasts.
+  * [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide announcements including social events.
+
+* The Ansible [Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
+
+For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+
 ## Tested with Ansible
 
 Tested with the current ansible-core 2.13, ansible-core 2.14, ansible-core 2.15, ansible-core 2.16, ansible-core 2.17 releases and the current development version of ansible-core. Ansible-core versions before 2.13.0 are not supported. This includes all ansible-base 2.10 and Ansible 2.9 releases.
@@ -97,18 +109,6 @@ It is necessary for maintainers of this collection to be subscribed to:
 * The "Changes Impacting Collection Contributors and Maintainers" [issue](https://github.com/ansible-collections/overview/issues/45).
 
 They also should be subscribed to Ansible's [The Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
-
-## Communication
-
-We announce important development changes and releases through Ansible's [The Bullhorn newsletter](https://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
-
-Join us in the `#ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels) on [Libera.chat](https://libera.chat).
-
-We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track [The Bullhorn newsletter](https://eepurl.com/gZmiEP) and join us.
-
-For more information about communities, meetings and agendas see [Community Wiki](https://github.com/ansible/community/wiki/Community).
-
-For more information about communication, refer to Ansible's the [Communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
 
 ## Publishing New Version
 
