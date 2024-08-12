@@ -469,7 +469,8 @@ class LookupModule(LookupBase):
     def opt_lock(self, type):
         if self.get_option('lock') == type:
             tmpdir = os.environ.get('TMPDIR', '/tmp')
-            lockfile = os.path.join(tmpdir, '.passwordstore.lock')
+            user = os.environ.get('USER')
+            lockfile = os.path.join(tmpdir, '.{0}.passwordstore.lock'.format(user))
             with FileLock().lock_file(lockfile, tmpdir, self.lock_timeout):
                 self.locked = type
                 yield
