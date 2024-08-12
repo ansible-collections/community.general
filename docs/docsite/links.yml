@@ -9,6 +9,8 @@ edit_on_github:
   path_prefix: ''
 
 extra_links:
+  - description: Ask for help
+    url: https://forum.ansible.com/c/help/6/none
   - description: Submit a bug report
     url: https://github.com/ansible-collections/community.general/issues/new?assignees=&labels=&template=bug_report.yml
   - description: Request a feature
