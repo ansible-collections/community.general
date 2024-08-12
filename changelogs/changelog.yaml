@@ -1541,3 +1541,27 @@ releases:
       - 8613-redfish_utils-language.yaml
       - 8614-nsupdate-index-out-of-range.yml
     release_date: '2024-07-14'
+  8.6.4:
+    changes:
+      bugfixes:
+        - gitlab_runner - fix ``paused`` parameter being ignored (https://github.com/ansible-collections/community.general/pull/8648).
+        - homebrew_cask - fix ``upgrade_all`` returns ``changed`` when nothing upgraded
+          (https://github.com/ansible-collections/community.general/issues/8707, https://github.com/ansible-collections/community.general/pull/8708).
+        - keycloak_user_federation - get cleartext IDP ``clientSecret`` from full
+          realm info to detect changes to it (https://github.com/ansible-collections/community.general/issues/8294,
+          https://github.com/ansible-collections/community.general/pull/8735).
+        - keycloak_user_federation - remove existing user federation mappers if they
+          are not present in the federation configuration and will not be updated
+          (https://github.com/ansible-collections/community.general/issues/7169, https://github.com/ansible-collections/community.general/pull/8695).
+      minor_changes:
+        - passwordstore lookup plugin - add the current user to the lockfile file
+          name to address issues on multi-user systems (https://github.com/ansible-collections/community.general/pull/8689).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 8.6.4.yml
+      - 8648-fix-gitlab-runner-paused.yaml
+      - 8689-passwordstore-lock-naming.yml
+      - 8695-keycloak_user_federation-mapper-removal.yml
+      - 8708-homebrew_cask-fix-upgrade-all.yml
+      - 8735-keycloak_identity_provider-get-cleartext-secret-from-realm-info.yml
+    release_date: '2024-08-12'
