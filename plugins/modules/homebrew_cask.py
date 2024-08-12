@@ -534,7 +534,12 @@ class HomebrewCask(object):
             rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            if re.search(r'==> No Casks to upgrade', out.strip(), re.IGNORECASE):
+            # 'brew upgrade --cask' does not output anything if no casks are upgraded
+            if not out.strip():
+                self.message = 'Homebrew casks already upgraded.'
+
+            # handle legacy 'brew cask upgrade'
+            elif re.search(r'==> No Casks to upgrade', out.strip(), re.IGNORECASE):
                 self.message = 'Homebrew casks already upgraded.'
 
             else:
