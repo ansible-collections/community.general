@@ -342,8 +342,7 @@ def main():
         required_if=[
             ('discover', True, ['portal']),
             ('auto_node_startup', True, ['target']),
-            ('auto_portal_startup', True, ['target'])
-            ],
+            ('auto_portal_startup', True, ['target'])],
         supports_check_mode=True,
     )
 
