@@ -85,7 +85,6 @@ DOCUMENTATION = '''
             key: disable_attributes_in_logs
         version_added: 7.1.0
       store_spans_in_file:
-        default: None
         type: str
         description:
           -  It stores the exported spans in the given file
