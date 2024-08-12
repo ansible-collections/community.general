@@ -946,7 +946,7 @@ def main():
 
         # create new mappers or update existing default mappers
         for desired_mapper in desired_mappers:
-            found = list(filter(lambda default_mapper: default_mapper['name'] == desired_mapper['name'], default_mappers))
+            found = [default_mapper for default_mapper in default_mappers if default_mapper['name'] == desired_mapper['name']]
             if len(found) > 1:
                 module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=desired_mapper['name']))
             if len(found) == 1:
