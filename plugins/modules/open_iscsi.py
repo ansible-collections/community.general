@@ -239,14 +239,14 @@ def target_login(module, target, check_rc, portal=None, port=None):
                   ('node.session.auth.password', node_pass)]
         for (name, value) in params:
             cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--op=update', '--name', name, '--value', value]
-            rc, out, err = module.run_command(cmd, check_rc=check_rc)
+            module.run_command(cmd, check_rc=check_rc)
 
     if node_user_in:
         params = [('node.session.auth.username_in', node_user_in),
                   ('node.session.auth.password_in', node_pass_in)]
         for (name, value) in params:
             cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
-            rc, out, err = module.run_command(cmd, check_rc=check_rc)
+            module.run_command(cmd, check_rc=check_rc)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
@@ -339,7 +339,11 @@ def main():
         ),
 
         required_together=[['node_user', 'node_pass'], ['node_user_in', 'node_pass_in']],
-        required_if=[('discover', True, ['portal'])],
+        required_if=[
+            ('discover', True, ['portal']),
+            ('auto_node_startup', True, ['target']),
+            ('auto_portal_startup', True, ['target'])
+            ],
         supports_check_mode=True,
     )
 
@@ -400,22 +404,22 @@ def main():
     if show_nodes:
         result['nodes'] = nodes
 
-    if login is not None:
+    if login is not None and not check_rc:
         result['devicenodes'] = []
-        for target in nodes:
-            loggedon = target_loggedon(module, target, portal, port)
+        for index_target in nodes:
+            loggedon = target_loggedon(module, index_target, portal, port)
             if (login and loggedon) or (not login and not loggedon):
                 result['changed'] |= False
                 if login:
-                    result['devicenodes'] += target_device_node(target)
+                    result['devicenodes'] += target_device_node(index_target)
             elif not check:
                 if login:
-                    login_result = target_login(module, target, check_rc, portal, port)
+                    login_result = target_login(module, index_target, check_rc, portal, port)
                     # give udev some time
                     time.sleep(1)
-                    result['devicenodes'] += target_device_node(target)
+                    result['devicenodes'] += target_device_node(index_target)
                 else:
-                    target_logout(module, target)
+                    target_logout(module, index_target)
                 # Check if there are multiple targets on a single portal and
                 # do not mark the task changed if host could not login to one of them
                 if len(nodes) > 1 and login_result == 24:
@@ -428,7 +432,27 @@ def main():
                 result['changed'] |= True
                 result['connection_changed'] = True
 
-    if automatic is not None:
+    if login is not None and check_rc:
+        loggedon = target_loggedon(module, target, portal, port)
+        if (login and loggedon) or (not login and not loggedon):
+            result['changed'] |= False
+            if login:
+                result['devicenodes'] = target_device_node(target)
+        elif not check:
+            if login:
+                target_login(module, target, portal, port)
+                # give udev some time
+                time.sleep(1)
+                result['devicenodes'] = target_device_node(target)
+            else:
+                target_logout(module, target)
+            result['changed'] |= True
+            result['connection_changed'] = True
+        else:
+            result['changed'] |= True
+            result['connection_changed'] = True
+
+    if automatic is not None and check_rc:
         isauto = target_isauto(module, target)
         if (automatic and isauto) or (not automatic and not isauto):
             result['changed'] |= False
@@ -444,7 +468,7 @@ def main():
             result['changed'] |= True
             result['automatic_changed'] = True
 
-    if automatic_portal is not None:
+    if automatic_portal is not None and check_rc:
         isauto = target_isauto(module, target, portal, port)
         if (automatic_portal and isauto) or (not automatic_portal and not isauto):
             result['changed'] |= False
@@ -461,10 +485,8 @@ def main():
             result['automatic_portal_changed'] = True
 
     if rescan is not False:
-        result['sessions'] = []
-        for target in nodes:
-            result['changed'] = True
-            result['sessions'] += iscsi_rescan(module, target)
+        result['changed'] = True
+        result['sessions'] = iscsi_rescan(module, target)
 
     module.exit_json(**result)
 
