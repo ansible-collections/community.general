@@ -25,9 +25,11 @@ attributes:
         support: none
 options:
     name:
-        type: str
+        type: list
+        elements: str
         description:
-            - Name and encoding of the locale, such as "en_GB.UTF-8".
+            - Name and encoding of the locales, such as V(en_GB.UTF-8).
+            - Before community.general 9.3.0, this was a string. Using a string still works.
         required: true
     state:
         type: str
@@ -43,6 +45,13 @@ EXAMPLES = '''
 - name: Ensure a locale exists
   community.general.locale_gen:
     name: de_CH.UTF-8
+    state: present
+
+- name: Ensure multiple locales exist
+  community.general.locale_gen:
+    name:
+      - en_GB.UTF-8
+      - nl_NL.UTF-8
     state: present
 '''
 
@@ -74,7 +83,7 @@ class LocaleGen(StateModuleHelper):
     output_params = ["name"]
     module = dict(
         argument_spec=dict(
-            name=dict(type='str', required=True),
+            name=dict(type="list", elements="str", required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
         ),
         supports_check_mode=True,
@@ -91,9 +100,7 @@ class LocaleGen(StateModuleHelper):
                     self.LOCALE_SUPPORTED, self.LOCALE_GEN
                 ))
 
-        if not self.is_available():
-            self.do_raise("The locale you've entered is not available on your system.")
-
+        self.assert_available()
         self.vars.set("is_present", self.is_present(), output=False)
         self.vars.set("state_tracking", self._state_name(self.vars.is_present), output=False, change=True)
 
@@ -104,8 +111,8 @@ class LocaleGen(StateModuleHelper):
     def _state_name(present):
         return "present" if present else "absent"
 
-    def is_available(self):
-        """Check if the given locale is available on the system. This is done by
+    def assert_available(self):
+        """Check if the given locales are available on the system. This is done by
         checking either :
         * if the locale is present in /etc/locales.gen
         * or if the locale is present in /usr/share/i18n/SUPPORTED"""
@@ -121,18 +128,35 @@ class LocaleGen(StateModuleHelper):
             res = [re_compiled.match(line) for line in lines]
             if self.verbosity >= 4:
                 self.vars.available_lines = lines
-            if any(r.group("locale") == self.vars.name for r in res if r):
-                return True
+
+            locales_not_found = []
+            for locale in self.vars.name:
+                # Check if the locale is not found in any of the matches
+                if not any(match and match.group("locale") == locale for match in res):
+                    locales_not_found.append(locale)
+
         # locale may be installed but not listed in the file, for example C.UTF-8 in some systems
-        return self.is_present()
+        locales_not_found = self.locale_get_not_present(locales_not_found)
+
+        if locales_not_found:
+            self.do_raise("The following locales you've entered are not available on your system: {0}".format(', '.join(locales_not_found)))
 
     def is_present(self):
+        return not self.locale_get_not_present(self.vars.name)
+
+    def locale_get_not_present(self, locales):
         runner = locale_runner(self.module)
         with runner() as ctx:
             rc, out, err = ctx.run()
             if self.verbosity >= 4:
                 self.vars.locale_run_info = ctx.run_info
-        return any(self.fix_case(self.vars.name) == self.fix_case(line) for line in out.splitlines())
+
+        not_found = []
+        for locale in locales:
+            if not any(self.fix_case(locale) == self.fix_case(line) for line in out.splitlines()):
+                not_found.append(locale)
+
+        return not_found
 
     def fix_case(self, name):
         """locale -a might return the encoding in either lower or upper case.
@@ -141,39 +165,50 @@ class LocaleGen(StateModuleHelper):
             name = name.replace(s, r)
         return name
 
-    def set_locale(self, name, enabled=True):
+    def set_locale(self, names, enabled=True):
         """ Sets the state of the locale. Defaults to enabled. """
-        search_string = r'#?\s*%s (?P<charset>.+)' % re.escape(name)
-        if enabled:
-            new_string = r'%s \g<charset>' % (name)
-        else:
-            new_string = r'# %s \g<charset>' % (name)
-        re_search = re.compile(search_string)
-        with open("/etc/locale.gen", "r") as fr:
-            lines = [re_search.sub(new_string, line) for line in fr]
-        with open("/etc/locale.gen", "w") as fw:
-            fw.write("".join(lines))
+        with open("/etc/locale.gen", 'r') as fr:
+            lines = fr.readlines()
 
-    def apply_change(self, targetState, name):
+        locale_regexes = []
+
+        for name in names:
+            search_string = r'^#?\s*%s (?P<charset>.+)' % re.escape(name)
+            if enabled:
+                new_string = r'%s \g<charset>' % (name)
+            else:
+                new_string = r'# %s \g<charset>' % (name)
+            re_search = re.compile(search_string)
+            locale_regexes.append([re_search, new_string])
+
+        for i in range(len(lines)):
+            for [search, replace] in locale_regexes:
+                lines[i] = search.sub(replace, lines[i])
+
+        # Write the modified content back to the file
+        with open("/etc/locale.gen", 'w') as fw:
+            fw.writelines(lines)
+
+    def apply_change(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
         targetState -- Desired state, either present or absent.
-        name -- Name including encoding such as de_CH.UTF-8.
+        names -- Names list including encoding such as de_CH.UTF-8.
         """
 
-        self.set_locale(name, enabled=(targetState == "present"))
+        self.set_locale(names, enabled=(targetState == "present"))
 
         runner = locale_gen_runner(self.module)
         with runner() as ctx:
             ctx.run()
 
-    def apply_change_ubuntu(self, targetState, name):
+    def apply_change_ubuntu(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
         targetState -- Desired state, either present or absent.
-        name -- Name including encoding such as de_CH.UTF-8.
+        names -- Name list including encoding such as de_CH.UTF-8.
         """
         runner = locale_gen_runner(self.module)
 
@@ -189,7 +224,7 @@ class LocaleGen(StateModuleHelper):
             with open("/var/lib/locales/supported.d/local", "w") as fw:
                 for line in content:
                     locale, charset = line.split(' ')
-                    if locale != name:
+                    if locale not in names:
                         fw.write(line)
             # Purge locales and regenerate.
             # Please provide a patch if you know how to avoid regenerating the locales to keep!
