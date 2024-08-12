@@ -362,6 +362,34 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             except Exception:
                 return None
 
+    def _get_lxc_interfaces(self, properties, node, vmid):
+        status_key = self._fact('status')
+
+        if status_key not in properties or not properties[status_key] == 'running':
+            return
+
+        ret = self._get_json("%s/api2/json/nodes/%s/lxc/%s/interfaces" % (self.proxmox_url, node, vmid), ignore_errors=[501])
+        if not ret:
+            return
+
+        result = []
+
+        for iface in ret:
+            result_iface = {
+                'name': iface['name'],
+                'hwaddr': iface['hwaddr']
+            }
+
+            if 'inet' in iface:
+                result_iface['inet'] = iface['inet']
+
+            if 'inet6' in iface:
+                result_iface['inet6'] = iface['inet6']
+
+            result.append(result_iface)
+
+        properties[self._fact('lxc_interfaces')] = result
+
     def _get_agent_network_interfaces(self, node, vmid, vmtype):
         result = []
 
@@ -525,6 +553,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._get_vm_status(properties, node, vmid, ittype, name)
             self._get_vm_config(properties, node, vmid, ittype, name)
             self._get_vm_snapshots(properties, node, vmid, ittype, name)
+
+            if ittype == 'lxc':
+                self._get_lxc_interfaces(properties, node, vmid)
 
         # ensure the host satisfies filters
         if not self._can_add_host(name, properties):

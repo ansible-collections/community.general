@@ -37,7 +37,7 @@ def get_auth():
 
 # NOTE: when updating/adding replies to this function,
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
-def get_json(url):
+def get_json(url, ignore_errors=None):
     if url == "https://localhost:8006/api2/json/nodes":
         # _get_nodes
         return [{"type": "node",
