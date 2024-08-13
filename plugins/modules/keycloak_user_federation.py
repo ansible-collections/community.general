@@ -1020,7 +1020,7 @@ def main():
                     kc.create_component(mapper, realm)
 
             after_comp = kc.get_component(cid, realm)
-            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+            after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
             after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized
