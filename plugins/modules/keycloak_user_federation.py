@@ -1004,7 +1004,7 @@ def main():
 
             for before_mapper in before_comp.get('mappers', []):
                 # remove unwanted existing mappers that will not be updated
-                if not before_mapper['id'] in [x['id'] for x in desired_mappers]:
+                if not before_mapper['id'] in [x['id'] for x in desired_mappers if 'id' in x]:
                     kc.delete_component(before_mapper['id'], realm)
 
             for mapper in desired_mappers:
