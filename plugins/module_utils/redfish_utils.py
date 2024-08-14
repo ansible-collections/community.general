@@ -220,7 +220,7 @@ class RedfishUtils(object):
         except Exception as e:
             return {'ret': False,
                     'msg': "Failed POST request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'data': data, 'headers': headers, 'resp': resp}
+        return {'ret': True, 'data': data, 'headers': headers, 'resp': resp, 'changed': True}
 
     def patch_request(self, uri, pyld, check_pyld=False):
         req_headers = dict(PATCH_HEADERS)
@@ -2741,14 +2741,22 @@ class RedfishUtils(object):
 
     @staticmethod
     def _find_virt_media_to_eject(resources, image_url):
-        matched_uri, matched_data = None, None
+        '''
+        Iterate over a provided list of VM resources and return a list of resources to eject.
+
+        If image_url is provided, only return virtual media devices matching the image_url.
+        '''
+        media_to_eject = []
         for uri, data in resources.items():
-            if data.get('Image'):
-                if urlparse(image_url) == urlparse(data.get('Image')):
-                    matched_uri, matched_data = uri, data
-                    if data.get('Inserted', True) and data.get('ImageName', 'x'):
-                        return uri, data, True
-        return matched_uri, matched_data, False
+            if data.get('Image'):   # Only devices with media have the Image key
+                if image_url:
+                    if not urlparse(image_url) == urlparse(data.get('Image')):
+                        continue
+                if data.get('Inserted', True):
+                    media_to_eject.append({"uri": uri, "data": data, "eject": True})
+                else:
+                    media_to_eject.append({"uri": uri, "data": data, "eject": False})
+        return media_to_eject
 
     def _read_virt_media_resources(self, uri_list):
         resources = {}
@@ -2929,10 +2937,9 @@ class RedfishUtils(object):
         return resp
 
     def virtual_media_eject(self, options, resource_type='Manager'):
-        image_url = options.get('image_url')
-        if not image_url:
-            return {'ret': False,
-                    'msg': "image_url option required for VirtualMediaEject"}
+        image_url = None
+        if options:
+            image_url = options.get('image_url')
 
         # locate and read the VirtualMedia resources
         # Given resource_type, use the proper URI
@@ -2957,48 +2964,62 @@ class RedfishUtils(object):
             virt_media_list.append(member[u'@odata.id'])
         resources, headers = self._read_virt_media_resources(virt_media_list)
 
-        # find the VirtualMedia resource to eject
-        uri, data, eject = self._find_virt_media_to_eject(resources, image_url)
-        if uri and eject:
-            if ('Actions' not in data or
-                    '#VirtualMedia.EjectMedia' not in data['Actions']):
-                # try to eject via PATCH if no EjectMedia action found
-                h = headers[uri]
-                if 'allow' in h:
-                    methods = [m.strip() for m in h.get('allow').split(',')]
-                    if 'PATCH' not in methods:
-                        # if Allow header present and PATCH missing, return error
-                        return {'ret': False,
-                                'msg': "%s action not found and PATCH not allowed"
-                                       % '#VirtualMedia.EjectMedia'}
-                return self.virtual_media_eject_via_patch(uri)
+        eject_list = self._find_virt_media_to_eject(resources, image_url)
+
+        if not eject_list:
+            if image_url:
+                return {'ret': False, 'changed': False,
+                        "msg": "No VirtualMedia resource found with image '%s' inserted." % image_url}
             else:
-                # POST to the EjectMedia Action
-                action = data['Actions']['#VirtualMedia.EjectMedia']
-                if 'target' not in action:
-                    return {'ret': False,
-                            'msg': "target URI property missing from Action "
-                                   "#VirtualMedia.EjectMedia"}
-                action_uri = action['target']
-                # empty payload for Eject action
-                payload = {}
-                # POST to action
-                response = self.post_request(self.root_uri + action_uri,
-                                             payload)
-                if response['ret'] is False:
-                    return response
-                return {'ret': True, 'changed': True,
-                        'msg': "VirtualMedia ejected"}
-        elif uri and not eject:
-            # already ejected: return success but changed=False
+                return {'ret': True, 'changed': False,
+                        'msg': "No VirtualMedia to eject"}
+
+        changed = False
+        resp = None
+        for media in eject_list:
+            if media["eject"]:
+                if ('Actions' not in media["data"] or
+                        '#VirtualMedia.EjectMedia' not in media["data"]['Actions']):
+                    # try to eject via PATCH if no EjectMedia action found
+                    h = headers[media["uri"]]
+                    if 'allow' in h:
+                        methods = [m.strip() for m in h.get('allow').split(',')]
+                        if 'PATCH' not in methods:
+                            # if Allow header present and PATCH missing, return error
+                            return {'ret': False,
+                                    'msg': "%s action not found and PATCH not allowed"
+                                    % '#VirtualMedia.EjectMedia'}
+
+                    resp = self.virtual_media_eject_via_patch(media["uri"])
+                else:
+                    # POST to the EjectMedia Action
+                    action = media["data"]['Actions']['#VirtualMedia.EjectMedia']
+                    if 'target' not in action:
+                        return {'ret': False,
+                                'msg': "target URI property missing from Action "
+                                "#VirtualMedia.EjectMedia"}
+                    action_uri = action['target']
+                    # empty payload for Eject action
+                    payload = {}
+                    # POST to action
+                    resp = self.post_request(self.root_uri + action_uri, payload)
+
+                if resp['ret'] and resp['changed']:  # Media was successfully ejected
+                    changed = True
+                    continue
+                else:  # An error occured
+                    return resp
+            else:
+                # All media is already ejected
+                changed = False
+                continue
+
+        if not changed:
+            # all media already ejected: return success but changed=False
             return {'ret': True, 'changed': False,
-                    'msg': "VirtualMedia image '%s' already ejected" %
-                           image_url}
-        else:
-            # return failure (no resources matching image_url found)
-            return {'ret': False, 'changed': False,
-                    'msg': "No VirtualMedia resource found with image '%s' "
-                           "inserted" % image_url}
+                    'msg': "VirtualMedia already ejected"}
+
+        return resp
 
     def get_psu_inventory(self):
         result = {}
