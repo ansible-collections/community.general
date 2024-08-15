@@ -386,7 +386,7 @@ The return value in that case is ``None``.
 
 This decorator is similar to the previous one, but the developer can control the return value for the method when running in check mode.
 It is used with one of two parameters. One is ``callable`` and the return value in check mode will be ``callable(self, *args, **kwargs)``,
-where ``self``is the ``ModuleHelper`` instance and the union of ``args`` and ``kwargs`` will contain all the parameters passed to the method.
+where ``self`` is the ``ModuleHelper`` instance and the union of ``args`` and ``kwargs`` will contain all the parameters passed to the method.
 
 The other option is to use the parameter ``value``, in which case the method will return ``value`` when in check mode.
 
