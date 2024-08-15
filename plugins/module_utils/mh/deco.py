@@ -18,7 +18,7 @@ def cause_changes(on_success=None, on_failure=None, when=None):
     def deco(func):
         try:
             self = func.__self__
-        except:
+        except Exception:
             self = func.im_self
 
         @wraps(func)
