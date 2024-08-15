@@ -361,7 +361,7 @@ The value of ``changed`` in the module output will be set to the value of the pa
     from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
 
     # adapted excerpt from the community.general.jira module
-    class JIRA(ModuleHelper):
+    class JIRA(StateModuleHelper):
         @cause_changes(on_success=True)
         def operation_create(self):
             ...
@@ -424,16 +424,14 @@ By using ``StateModuleHelper`` you can make your code like the excerpt from the 
         def state_absent(self):
             with self.runner("state key", output_process=self._make_process(False)) as ctx:
                 ctx.run()
-                if self.verbosity >= 4:
-                    self.vars.run_info = ctx.run_info
+                self.vars.set('run_info', ctx.run_info, verbosity=4)
             self.vars.set('new_value', None, fact=True)
             self.vars._value = None
 
         def state_present(self):
             with self.runner("direct config_source value_type state key value", output_process=self._make_process(True)) as ctx:
                 ctx.run()
-                if self.verbosity >= 4:
-                    self.vars.run_info = ctx.run_info
+                self.vars.set('run_info', ctx.run_info, verbosity=4)
             self.vars.set('new_value', self._get(), fact=True)
             self.vars._value = self.vars.new_value
 
