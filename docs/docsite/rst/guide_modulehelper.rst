@@ -335,13 +335,61 @@ just keep in mind that there will be no automatic handling of output variables i
 Other Conveniences
 """"""""""""""""""
 
+Properties
+----------
+
 check_mode
 verbosity
 
-@cause_changes -- ex: jira module
+
+Decorators
+----------
+
+The following decorators **MUST** be used in a ``ModuleHelper`` class.
+
+@cause_changes
+~~~~~~~~~~~~~~
+
+This decorator will control whether the outcome of the method will cause the module to signal change in its output.
+If the method completes without raising an exception it is considered to have succeeded, otherwise, it will have failed.
+
+The decorator has two boolean parameters, ``on_success`` and ``on_failure``.
+The value of ``changed`` in the module output will be set to the value of the parameter corresponding to the module outcome status.
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
+
+    # adapted excerpt from the community.general.jira module
+    class JIRA(ModuleHelper):
+        @cause_changes(on_success=True)
+        def operation_create(self):
+            ...
+
+@module_fails_on_exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In a method using this decorator, if an exception is raised, the text message of that exception will be captured
+by the decorator and used to call ``self.module.fail_json()``.
+
+In most of the cases there will be no need to use this decorator, because ``ModuleHelper.run()`` already uses it.
+
+@check_mode_skip
+~~~~~~~~~~~~~~~~
+
+If the module is running in check mode, this decorator will prevent the method from executing.
+The return value in that case is ``None``.
 
 
---------------------------------------------------------------------------------------------------------------------------------------------
+@check_mode_skip_returns
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This decorator is similar to the previous one, but the developer can control the return value for the method when running in check mode.
+It is used with one of two parameters. One is ``callable`` and the return value in check mode will be ``callable(self, *args, **kwargs)``,
+where ``self``is the ``ModuleHelper`` instance and the union of ``args`` and ``kwargs`` will contain all the parameters passed to the method.
+
+The other option is to use the parameter ``value``, in which case the method will return ``value`` when in check mode.
+
 
 StateModuleHelper
 ^^^^^^^^^^^^^^^^^
