@@ -329,8 +329,6 @@ Other than ``SystemExit``, all exceptions are captured and translated into a ``f
 However, if you do want to call ``self.module.fail_json()`` yourself it will work,
 just keep in mind that there will be no automatic handling of output variables in that case.
 
---------------------------------------------------------------------------------------------------------------------------------------------
-
 
 Other Conveniences
 """"""""""""""""""
