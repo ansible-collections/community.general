@@ -18,7 +18,7 @@ author: "Alexander Bakanovskii (@abakanovskii)"
 requirements:
   - pyone
 description:
-  - Manages OpenNebula networks
+  - Manages virtual networks in OpenNebula.
 attributes:
   check_mode:
     support: partial
@@ -35,8 +35,8 @@ options:
   name:
     description:
       - A O(name) of the network you would like to manage.  If a network with
-      - the given name does not exist it will be created, otherwise it will be
-      - managed by this module.
+        the given name does not exist it will be created, otherwise it will be
+        managed by this module.
     type: str
   template:
     description:
@@ -56,17 +56,19 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-- name: Fetch the NETWORK by id
+- name: Make sure the network is present by ID
   community.general.one_vnet:
     id: 0
+    state: present
   register: result
 
-- name: Fetch the TEMPLATE by name
+- name: Make sure the network is present by name
   community.general.one_vnet:
     name: opennebula-bridge
+    state: present
   register: result
 
-- name: Create a new or update an existing NETWORK
+- name: Create a new or update an existing network
   community.general.one_vnet:
     name: bridge-network
     template: |
@@ -81,7 +83,7 @@ EXAMPLES = '''
       DNS     = 192.0.2.1
       GATEWAY = 192.0.2.1
 
-- name: Delete the NETWORK by id
+- name: Delete the network by ID
   community.general.one_vnet:
     id: 0
     state: absent
@@ -89,17 +91,17 @@ EXAMPLES = '''
 
 RETURN = '''
 id:
-    description: network id
+    description: The network id.
     type: int
     returned: when O(state=present)
     sample: 153
 name:
-    description: network name
+    description: The network name.
     type: str
     returned: when O(state=present)
     sample: app1
 template:
-    description: the parsed network template
+    description: The parsed network template.
     type: dict
     returned: when O(state=present)
     sample:
@@ -111,74 +113,74 @@ template:
       VLAN_ID: 1000
       VN_MAD: 802.1Q
 user_id:
-    description: network's user name
+    description: The network's user name.
     type: int
     returned: when O(state=present)
     sample: 1
 user_name:
-    description: network's user id
+    description: The network's user id.
     type: str
     returned: when O(state=present)
     sample: oneadmin
 group_id:
-    description: network's group id
+    description: The network's group id.
     type: int
     returned: when O(state=present)
     sample: 1
 group_name:
-    description: network's group name
+    description: The network's group name.
     type: str
     returned: when O(state=present)
     sample: one-users
 owner_id:
-    description: network's owner id
+    description: The network's owner id.
     type: int
     returned: when O(state=present)
     sample: 143
 owner_name:
-    description: network's owner name
+    description: The network's owner name.
     type: str
     returned: when O(state=present)
     sample: ansible-test
 permissions:
-    description: network's permissions
+    description: The network's permissions.
     type: dict
     returned: when O(state=present)
     contains:
       owner_u:
-        description: network's owner USAGE permissions
+        description: The network's owner USAGE permissions.
         type: str
         sample: 1
       owner_m:
-        description: network's owner MANAGE permissions
+        description: The network's owner MANAGE permissions.
         type: str
         sample: 0
       owner_a:
-        description: network's owner ADMIN permissions
+        description: The network's owner ADMIN permissions.
         type: str
         sample: 0
       group_u:
-        description: network's group USAGE permissions
+        description: The network's group USAGE permissions.
         type: str
         sample: 0
       group_m:
-        description: network's group MANAGE permissions
+        description: The network's group MANAGE permissions.
         type: str
         sample: 0
       group_a:
-        description: network's group ADMIN permissions
+        description: The network's group ADMIN permissions.
         type: str
         sample: 0
       other_u:
-        description: network's other users USAGE permissions
+        description: The network's other users USAGE permissions.
         type: str
         sample: 0
       other_m:
-        description: network's other users MANAGE permissions
+        description: The network's other users MANAGE permissions.
         type: str
         sample: 0
       other_a:
-        description: network's other users ADMIN permissions
+        description: The network's other users ADMIN permissions
         type: str
         sample: 0
     sample:
@@ -192,52 +194,52 @@ permissions:
       other_m: 0
       other_a: 0
 clusters:
-    description: network's clusters
+    description: The network's clusters.
     type: list
     returned: when O(state=present)
     sample: [0, 100]
 bridge:
-    description: network's bridge interface
+    description: The network's bridge interface.
     type: str
     returned: when O(state=present)
     sample: br0
 bridge_type:
-    description: network's bridge type
+    description: The network's bridge type.
     type: str
     returned: when O(state=present)
     sample: linux
 parent_network_id:
-    description: network's parent network id
+    description: The network's parent network id.
     type: int
     returned: when O(state=present)
     sample: 1
 vm_mad:
-    description: network's VM_MAD
+    description: The network's VM_MAD.
     type: str
     returned: when O(state=present)
     sample: bridge
 phydev:
-    description: network's physical device (NIC)
+    description: The network's physical device (NIC).
     type: str
     returned: when O(state=present)
     sample: eth0
 vlan_id:
-    description: network's VLAN tag
+    description: The network's VLAN tag.
     type: int
     returned: when O(state=present)
     sample: 1000
 outer_vlan_id:
-    description: network's outer VLAN tag
+    description: The network's outer VLAN tag.
     type: int
     returned: when O(state=present)
     sample: 1000
 vrouters:
-    description: network's list of virtual routers IDs
+    description: The network's list of virtual routers IDs.
     type: list
     returned: when O(state=present)
     sample: [0, 1]
 ar_pool:
-    description: network's list of ar_pool
+    description: The network's list of ar_pool.
     type: list
     returned: when O(state=present)
     sample:
