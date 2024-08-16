@@ -1,0 +1,5 @@
+minor_changes:
+  - gitlab_project - add option ``analytics_access_level`` to enable/disable analytics (https://github.com/ansible-collections/community.general/pull/8768).
+  - gitlab_project - add option ``requirements_access_level`` to enable/disable requirements (https://github.com/ansible-collections/community.general/pull/8768).
+  - gitlab_project - add option ``requirements_enabled`` to enable/disable requirements (https://github.com/ansible-collections/community.general/pull/8768).
+  - gitlab_project - add option ``model_experiments_access_level`` to enable/disable model experiments (https://github.com/ansible-collections/community.general/pull/8768).

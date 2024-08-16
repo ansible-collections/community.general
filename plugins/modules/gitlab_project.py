@@ -39,6 +39,14 @@ options:
       - Allow merge when skipped pipelines exist.
     type: bool
     version_added: "3.4.0"
+  analytics_access_level:
+    description:
+      - V(private) means that analytics is allowed only to project members.
+      - V(disabled) means that analytics is disabled.
+      - V(enabled) means that analytics is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.4.0"
   avatar_path:
     description:
       - Absolute path image to configure avatar. File size should not exceed 200 kb.
@@ -198,6 +206,14 @@ options:
       - If merge requests can be made or not.
     type: bool
     default: true
+  model_experiments_access_level:
+    description:
+      - V(private) means that accessing model experiments tab is allowed only to project members.
+      - V(disabled) means that accessing model experiments tab is disabled.
+      - V(enabled) means that accessing model rexperiments tab is enabled.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.4.0"
   model_registry_access_level:
     description:
       - V(private) means that accessing model registry tab is allowed only to project members.
@@ -268,6 +284,22 @@ options:
     type: str
     choices: ["private", "disabled", "enabled"]
     version_added: "9.3.0"
+  requirements_access_level:
+    description:
+      - V(private) means that requirements tab is allowed only to project members.
+      - V(disabled) means that requirements tab is disabled.
+      - V(enabled) means that requirements tab is enabled.
+      - O(requirements_access_level) and O(requirements_enabled) are mutually exclusive.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.4.0"
+  requirements_enabled:
+    description:
+      - Whether you want requirements to be available or not.
+      - O(requirements_access_level) and O(requirements_enabled) are mutually exclusive.
+    type: bool
+    default: true
+    version_added: "9.4.0"
   security_and_compliance_access_level:
     description:
       - V(private) means that accessing security and complicance tab is allowed only to project members.
@@ -431,6 +463,7 @@ class GitLabProject(object):
         changed = False
         project_options = {
             'allow_merge_on_skipped_pipeline': options['allow_merge_on_skipped_pipeline'],
+            'analytics_access_level': options['analytics_access_level'],
             'builds_access_level': options['builds_access_level'],
             'ci_config_path': options['ci_config_path'],
             'container_expiration_policy': options['container_expiration_policy'],
@@ -445,6 +478,7 @@ class GitLabProject(object):
             'lfs_enabled': options['lfs_enabled'],
             'merge_method': options['merge_method'],
             'merge_requests_enabled': options['merge_requests_enabled'],
+            'model_experiments_access_level': options['model_experiments_access_level'],
             'model_registry_access_level': options['model_registry_access_level'],
             'monitor_access_level': options['monitor_access_level'],
             'name': project_name,
@@ -455,6 +489,8 @@ class GitLabProject(object):
             'releases_access_level': options['releases_access_level'],
             'remove_source_branch_after_merge': options['remove_source_branch_after_merge'],
             'repository_access_level': options['repository_access_level'],
+            'requirements_access_level': options['requirements_access_level'],
+            'requirements_enabled': options['requirements_enabled'],
             'security_and_compliance_access_level': options['security_and_compliance_access_level'],
             'service_desk_enabled': options['service_desk_enabled'],
             'shared_runners_enabled': options['shared_runners_enabled'],
@@ -593,6 +629,7 @@ def main():
     argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
         allow_merge_on_skipped_pipeline=dict(type='bool'),
+        analytics_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         avatar_path=dict(type='path'),
         builds_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         ci_config_path=dict(type='str'),
@@ -619,6 +656,7 @@ def main():
         lfs_enabled=dict(default=False, type='bool'),
         merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
         merge_requests_enabled=dict(type='bool', default=True),
+        model_experiments_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         model_registry_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         monitor_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         name=dict(type='str', required=True),
@@ -630,6 +668,8 @@ def main():
         releases_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         remove_source_branch_after_merge=dict(type='bool'),
         repository_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        requirements_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
+        requirements_enabled=dict(type='bool'),
         security_and_compliance_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         service_desk_enabled=dict(type='bool'),
         shared_runners_enabled=dict(type='bool'),
@@ -652,6 +692,7 @@ def main():
             ['api_token', 'api_job_token'],
             ['group', 'username'],
             ['issues_access_level', 'issues_enabled'],
+            ['requirements_access_level', 'requirements_enabled'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -666,6 +707,7 @@ def main():
     gitlab_instance = gitlab_authentication(module)
 
     allow_merge_on_skipped_pipeline = module.params['allow_merge_on_skipped_pipeline']
+    analytics_access_level = module.params['analytics_access_level']
     avatar_path = module.params['avatar_path']
     builds_access_level = module.params['builds_access_level']
     ci_config_path = module.params['ci_config_path']
@@ -684,6 +726,7 @@ def main():
     lfs_enabled = module.params['lfs_enabled']
     merge_method = module.params['merge_method']
     merge_requests_enabled = module.params['merge_requests_enabled']
+    model_experiments_access_level = module.params['model_registry_access_level']
     model_registry_access_level = module.params['model_registry_access_level']
     monitor_access_level = module.params['monitor_access_level']
     only_allow_merge_if_all_discussions_are_resolved = module.params['only_allow_merge_if_all_discussions_are_resolved']
@@ -696,6 +739,8 @@ def main():
     releases_access_level = module.params['releases_access_level']
     remove_source_branch_after_merge = module.params['remove_source_branch_after_merge']
     repository_access_level = module.params['repository_access_level']
+    requirements_access_level = module.params['requirements_access_level']
+    requirements_enabled = module.params['requirements_enabled']
     security_and_compliance_access_level = module.params['security_and_compliance_access_level']
     service_desk_enabled = module.params['service_desk_enabled']
     shared_runners_enabled = module.params['shared_runners_enabled']
@@ -750,6 +795,7 @@ def main():
 
         if gitlab_project.create_or_update_project(module, project_name, namespace, {
             "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+            "analytics_access_level": analytics_access_level,
             "avatar_path": avatar_path,
             "builds_access_level": builds_access_level,
             "ci_config_path": ci_config_path,
@@ -768,6 +814,7 @@ def main():
             "lfs_enabled": lfs_enabled,
             "merge_method": merge_method,
             "merge_requests_enabled": merge_requests_enabled,
+            "model_experiments_access_level": model_experiments_access_level,
             "model_registry_access_level": model_registry_access_level,
             "monitor_access_level": monitor_access_level,
             "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
@@ -778,6 +825,8 @@ def main():
             "releases_access_level": releases_access_level,
             "remove_source_branch_after_merge": remove_source_branch_after_merge,
             "repository_access_level": repository_access_level,
+            "requirements_access_level": requirements_access_level,
+            "requirements_enabled": requirements_enabled,
             "security_and_compliance_access_level": security_and_compliance_access_level,
             "service_desk_enabled": service_desk_enabled,
             "shared_runners_enabled": shared_runners_enabled,
