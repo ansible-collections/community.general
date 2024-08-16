@@ -974,6 +974,8 @@ files:
     maintainers: $team_opennebula
   $modules/one_host.py:
     maintainers: rvalle
+  $modules/one_vnet.py:
+    maintainers: abakanovskii
   $modules/oneandone_:
     maintainers: aajdinov edevenport
   $modules/onepassword_info.py:
