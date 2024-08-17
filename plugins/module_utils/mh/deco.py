@@ -16,12 +16,10 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 def cause_changes(on_success=None, on_failure=None, when=None):
 
     def deco(func):
-        self = func.__self__
-
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             try:
-                func(*args, **kwargs)
+                func(self, *args, **kwargs)
                 if on_success is not None:
                     self.changed = on_success
                 elif when == "success":

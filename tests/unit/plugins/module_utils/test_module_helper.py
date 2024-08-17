@@ -119,13 +119,6 @@ def test_variable_meta_change():
     assert vd.has_changed('d')
 
 
-class MockMH(object):
-    changed = None
-
-    def div_(self, x, y):
-        return x / y
-
-
 CAUSE_CHG_DECO_PARAMS = ['deco_args', 'expect_exception', 'expect_changed']
 CAUSE_CHG_DECO = dict(
     none_succ=dict(deco_args={}, expect_exception=False, expect_changed=None),
@@ -152,12 +145,19 @@ CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
                           for tc in CAUSE_CHG_DECO_IDS],
                          ids=CAUSE_CHG_DECO_IDS)
 def test_cause_changes_deco(deco_args, expect_exception, expect_changed):
+
+    class MockMH(object):
+        changed = None
+
+        @cause_changes(**deco_args)
+        def div_(self, x, y):
+            return x / y
+
     mh = MockMH()
-    div = cause_changes(**deco_args)(mh.div_)
     if expect_exception:
         with pytest.raises(Exception):
-            div(1, 0)
+            mh.div_(1, 0)
     else:
-        div(9, 3)
+        mh.div_(9, 3)
 
     assert mh.changed == expect_changed
