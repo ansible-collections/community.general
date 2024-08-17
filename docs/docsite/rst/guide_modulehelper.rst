@@ -130,8 +130,10 @@ to track changes in their content.
 
     More details in sections `Parameters, variables, and output`_ and `Handling changes`_ below.
 
-And last but not least, the method is decorated with ``@module_fails_on_exception``, which will
-capture exceptions that are raised and call ``self.module.exit_json()`` with the exception text as message.
+.. seealso::
+
+    See more about the decorator `@module_fails_on_exception`_ below.
+
 
 Given that, another way to write the example from the `Quickstart`_ would be:
 
