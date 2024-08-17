@@ -16,10 +16,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 def cause_changes(on_success=None, on_failure=None, when=None):
 
     def deco(func):
-        try:
-            self = func.__self__
-        except Exception:
-            self = func.im_self
+        self = func.__self__
 
         @wraps(func)
         def wrapper(*args, **kwargs):
