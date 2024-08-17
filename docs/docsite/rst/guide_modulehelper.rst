@@ -135,7 +135,7 @@ to track changes in their content.
     See more about the decorator `@module_fails_on_exception`_ below.
 
 
-Given that, another way to write the example from the `Quickstart`_ would be:
+Another way to write the example from the `Quickstart`_ would be:
 
 .. code-block:: python
 
@@ -154,10 +154,13 @@ Given that, another way to write the example from the `Quickstart`_ would be:
             if self.vars.name == "fail me":
                 self.do_raise("You requested this to fail")
 
-There is no need to call ``module.exit_json()`` (or ``module.fail_json()`` for that matter), exceptions are used to cause the module to fail.
+Notice that there are no calls to ``module.exit_json()`` nor ``module.fail_json()``, use exceptions to cause the module to fail.
 There is a generic method to raise exceptions called ``self.do_raise()``.
 If no exception was raised, then the module has succeeded.
 
+.. seealso::
+
+    See more about exceptions in section `Exceptions`_ below.
 
 Ansible modules must have a ``main()`` function and the usual test for ``'__main__'``. When using MH that should look like:
 
@@ -332,90 +335,6 @@ However, if you do want to call ``self.module.fail_json()`` yourself it will wor
 just keep in mind that there will be no automatic handling of output variables in that case.
 
 
-Other Conveniences
-""""""""""""""""""
-
-Delegations to AnsibleModule
-----------------------------
-
-The MH properties and methods below are delegated as-is to the underlying ``AnsibleModule`` instance in ``self.module``:
-
-- ``check_mode``
-- ``get_bin_path()``
-- ``warn()``
-- ``deprecate()``
-
-Additionally, MH will also delegate:
-
-- ``diff_mode`` to ``self.module._diff``
-- ``verbosity`` to ``self.module._verbosity``
-
-Decorators
-----------
-
-The following decorators should only be used within ``ModuleHelper`` class.
-
-@cause_changes
-~~~~~~~~~~~~~~
-
-This decorator will control whether the outcome of the method will cause the module to signal change in its output.
-If the method completes without raising an exception it is considered to have succeeded, otherwise, it will have failed.
-
-The decorator has a parameter ``when`` that accepts three different values: ``success``, ``failure``, and ``always``.
-There are also two legacy parameters, ``on_success`` and ``on_failure``, that will be deprecated, so do not use them.
-The value of ``changed`` in the module output will be set to ``True``:
-
-- ``when="success"`` and the method completes without raising an exception.
-- ``when="failure"`` and the method raises an exception.
-- ``when="always"``, regardless of the method raising an exception or not.
-
-.. code-block:: python
-
-    from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
-
-    # adapted excerpt from the community.general.jira module
-    class JIRA(StateModuleHelper):
-        @cause_changes(when="success")
-        def operation_create(self):
-            ...
-
-If ``when`` has a different value or no parameters are specificied, the decorator will have no effect whatsoever.
-
-@module_fails_on_exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In a method using this decorator, if an exception is raised, the text message of that exception will be captured
-by the decorator and used to call ``self.module.fail_json()``.
-
-In most of the cases there will be no need to use this decorator, because ``ModuleHelper.run()`` already uses it.
-
-@check_mode_skip
-~~~~~~~~~~~~~~~~
-
-If the module is running in check mode, this decorator will prevent the method from executing.
-The return value in that case is ``None``.
-
-.. code-block:: python
-
-    from ansible_collections.community.general.plugins.module_utils.module_helper import check_mode_skip
-
-    # adapted excerpt from the community.general.locale_gen module
-    class LocaleGen(StateModuleHelper):
-        @check_mode_skip
-        def __state_fallback__(self):
-            ...
-
-
-@check_mode_skip_returns
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-This decorator is similar to the previous one, but the developer can control the return value for the method when running in check mode.
-It is used with one of two parameters. One is ``callable`` and the return value in check mode will be ``callable(self, *args, **kwargs)``,
-where ``self`` is the ``ModuleHelper`` instance and the union of ``args`` and ``kwargs`` will contain all the parameters passed to the method.
-
-The other option is to use the parameter ``value``, in which case the method will return ``value`` when in check mode.
-
-
 StateModuleHelper
 ^^^^^^^^^^^^^^^^^
 
@@ -495,7 +414,91 @@ That module has only the states ``present`` and ``absent`` and the code for both
 
 .. note::
 
-    Please note that the name of the fallback method **does not change** if you set a different value of ``state_param``.
+    The name of the fallback method **does not change** if you set a different value of ``state_param``.
+
+
+Other Conveniences
+^^^^^^^^^^^^^^^^^^
+
+Delegations to AnsibleModule
+""""""""""""""""""""""""""""
+
+The MH properties and methods below are delegated as-is to the underlying ``AnsibleModule`` instance in ``self.module``:
+
+- ``check_mode``
+- ``get_bin_path()``
+- ``warn()``
+- ``deprecate()``
+
+Additionally, MH will also delegate:
+
+- ``diff_mode`` to ``self.module._diff``
+- ``verbosity`` to ``self.module._verbosity``
+
+Decorators
+""""""""""
+
+The following decorators should only be used within ``ModuleHelper`` class.
+
+@cause_changes
+--------------
+
+This decorator will control whether the outcome of the method will cause the module to signal change in its output.
+If the method completes without raising an exception it is considered to have succeeded, otherwise, it will have failed.
+
+The decorator has a parameter ``when`` that accepts three different values: ``success``, ``failure``, and ``always``.
+There are also two legacy parameters, ``on_success`` and ``on_failure``, that will be deprecated, so do not use them.
+The value of ``changed`` in the module output will be set to ``True``:
+
+- ``when="success"`` and the method completes without raising an exception.
+- ``when="failure"`` and the method raises an exception.
+- ``when="always"``, regardless of the method raising an exception or not.
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.module_helper import cause_changes
+
+    # adapted excerpt from the community.general.jira module
+    class JIRA(StateModuleHelper):
+        @cause_changes(when="success")
+        def operation_create(self):
+            ...
+
+If ``when`` has a different value or no parameters are specificied, the decorator will have no effect whatsoever.
+
+@module_fails_on_exception
+--------------------------
+
+In a method using this decorator, if an exception is raised, the text message of that exception will be captured
+by the decorator and used to call ``self.module.fail_json()``.
+
+In most of the cases there will be no need to use this decorator, because ``ModuleHelper.run()`` already uses it.
+
+@check_mode_skip
+----------------
+
+If the module is running in check mode, this decorator will prevent the method from executing.
+The return value in that case is ``None``.
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.module_helper import check_mode_skip
+
+    # adapted excerpt from the community.general.locale_gen module
+    class LocaleGen(StateModuleHelper):
+        @check_mode_skip
+        def __state_fallback__(self):
+            ...
+
+
+@check_mode_skip_returns
+------------------------
+
+This decorator is similar to the previous one, but the developer can control the return value for the method when running in check mode.
+It is used with one of two parameters. One is ``callable`` and the return value in check mode will be ``callable(self, *args, **kwargs)``,
+where ``self`` is the ``ModuleHelper`` instance and the union of ``args`` and ``kwargs`` will contain all the parameters passed to the method.
+
+The other option is to use the parameter ``value``, in which case the method will return ``value`` when in check mode.
 
 
 References
