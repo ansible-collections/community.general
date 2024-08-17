@@ -81,7 +81,6 @@ but there are more elements that will take part in it.
         mute_vardict_deprecation = False
         module = dict(
             argument_spec=dict(...),
-            ...
         )
 
 After importing the ``ModuleHelper`` class, you need to declare your own class extending it.
@@ -325,7 +324,7 @@ However, you can set output variables specifically for that exception, if you so
         if awesomeness > 1000:
             self.do_raise("Over awesome, I cannot handle it!", update_output={"awesomeness": awesomeness})
 
-Other than ``SystemExit``, all exceptions are captured and translated into a ``fail_json()`` call.
+All exceptions derived from ``Exception`` are captured and translated into a ``fail_json()`` call.
 However, if you do want to call ``self.module.fail_json()`` yourself it will work,
 just keep in mind that there will be no automatic handling of output variables in that case.
 
@@ -333,8 +332,8 @@ just keep in mind that there will be no automatic handling of output variables i
 Other Conveniences
 """"""""""""""""""
 
-Attributes from AnsibleModule
------------------------------
+Delegations to AnsibleModule
+----------------------------
 
 The MH properties and methods below are delegated as-is to the underlying ``AnsibleModule`` instance in ``self.module``:
 
@@ -351,7 +350,7 @@ Additionally, MH will also delegate:
 Decorators
 ----------
 
-The following decorators **MUST** be used in a ``ModuleHelper`` class.
+The following decorators should only be used within ``ModuleHelper`` class.
 
 @cause_changes
 ~~~~~~~~~~~~~~
