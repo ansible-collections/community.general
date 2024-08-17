@@ -13,23 +13,26 @@ from functools import wraps
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
 
 
-def cause_changes(on_success=None, on_failure=None):
+def cause_changes(on_success=None, on_failure=None, when=None):
 
     def deco(func):
-        if on_success is None and on_failure is None:
-            return func
-
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             try:
-                self = args[0]
-                func(*args, **kwargs)
+                func(self, *args, **kwargs)
                 if on_success is not None:
                     self.changed = on_success
+                elif when == "success":
+                    self.changed = True
             except Exception:
                 if on_failure is not None:
                     self.changed = on_failure
+                elif when == "failure":
+                    self.changed = True
                 raise
+            finally:
+                if when == "always":
+                    self.changed = True
 
         return wrapper
 
@@ -50,8 +53,6 @@ def module_fails_on_exception(func):
 
         try:
             func(self, *args, **kwargs)
-        except SystemExit:
-            raise
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
@@ -73,6 +74,7 @@ def check_mode_skip(func):
     def wrapper(self, *args, **kwargs):
         if not self.module.check_mode:
             return func(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -87,15 +89,12 @@ def check_mode_skip_returns(callable=None, value=None):
                 return func(self, *args, **kwargs)
             return wrapper_callable
 
-        if value is not None:
+        else:
             @wraps(func)
             def wrapper_value(self, *args, **kwargs):
                 if self.module.check_mode:
                     return value
                 return func(self, *args, **kwargs)
             return wrapper_value
-
-    if callable is None and value is None:
-        return check_mode_skip
 
     return deco
