@@ -333,12 +333,20 @@ just keep in mind that there will be no automatic handling of output variables i
 Other Conveniences
 """"""""""""""""""
 
-Properties
-----------
+Attributes from AnsibleModule
+-----------------------------
 
-check_mode
-verbosity
+The MH properties and methods below are delegated as-is to the underlying ``AnsibleModule`` instance in ``self.module``:
 
+- ``check_mode``
+- ``get_bin_path()``
+- ``warn()``
+- ``deprecate()``
+
+Additionally, MH will also delegate:
+
+- ``diff_mode`` to ``self.module._diff``
+- ``verbosity`` to ``self.module._verbosity``
 
 Decorators
 ----------
@@ -351,8 +359,13 @@ The following decorators **MUST** be used in a ``ModuleHelper`` class.
 This decorator will control whether the outcome of the method will cause the module to signal change in its output.
 If the method completes without raising an exception it is considered to have succeeded, otherwise, it will have failed.
 
-The decorator has two boolean parameters, ``on_success`` and ``on_failure``.
-The value of ``changed`` in the module output will be set to the value of the parameter corresponding to the module outcome status.
+The decorator has a parameter ``when`` that accepts three different values: ``success``, ``failure``, and ``always``.
+There are also two legacy parameters, ``on_success`` and ``on_failure``, that will be deprecated, so do not use them.
+The value of ``changed`` in the module output will be set to ``True``:
+
+- ``when="success"`` and the method completes without raising an exception.
+- ``when="failure"`` and the method raises an exception.
+- ``when="always"``, regardless of the method raising an exception or not.
 
 .. code-block:: python
 
@@ -360,9 +373,11 @@ The value of ``changed`` in the module output will be set to the value of the pa
 
     # adapted excerpt from the community.general.jira module
     class JIRA(StateModuleHelper):
-        @cause_changes(on_success=True)
+        @cause_changes(when="success")
         def operation_create(self):
             ...
+
+If ``when`` has a different value or no parameters are specificied, the decorator will have no effect whatsoever.
 
 @module_fails_on_exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -377,6 +392,16 @@ In most of the cases there will be no need to use this decorator, because ``Modu
 
 If the module is running in check mode, this decorator will prevent the method from executing.
 The return value in that case is ``None``.
+
+.. code-block:: python
+
+    from ansible_collections.community.general.plugins.module_utils.module_helper import check_mode_skip
+
+    # adapted excerpt from the community.general.locale_gen module
+    class LocaleGen(StateModuleHelper):
+        @check_mode_skip
+        def __state_fallback__(self):
+            ...
 
 
 @check_mode_skip_returns
