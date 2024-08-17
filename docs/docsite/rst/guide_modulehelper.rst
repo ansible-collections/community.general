@@ -63,7 +63,7 @@ Module Helper
 Introduction
 """"""""""""
 
-``ModuleHelper`` is a wrapper around the standard ``AnsibleModule``, providing some features.
+``ModuleHelper`` is a wrapper around the standard ``AnsibleModule``, providing extra features and conveniences.
 The basic structure of a module using ``ModuleHelper`` is as shown in the `Quickstart`_ section above,
 but there are more elements that will take part in it.
 
@@ -81,6 +81,7 @@ but there are more elements that will take part in it.
         mute_vardict_deprecation = False
         module = dict(
             argument_spec=dict(...),
+            # ...
         )
 
 After importing the ``ModuleHelper`` class, you need to declare your own class extending it.
