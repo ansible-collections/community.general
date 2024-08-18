@@ -20,8 +20,9 @@ That is where ``ModuleHelper`` comes to assistance: a lot of that boilerplate co
 Quickstart
 """"""""""
 
-The example from Ansible documentation written with ``ModuleHelper`` is below.
-Bear in mind that it does **not** showcase all of MH's features:
+See the `example from Ansible documentation <https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#creating-a-module>`_
+written with ``ModuleHelper``.
+But bear in mind that it does not showcase all of MH's features:
 
 .. code-block:: python
 
@@ -36,6 +37,7 @@ Bear in mind that it does **not** showcase all of MH's features:
             ),
             supports_check_mode=True,
         )
+        use_old_vardict = False
 
         def __run__(self):
             self.vars.original_message = ''
@@ -44,7 +46,7 @@ Bear in mind that it does **not** showcase all of MH's features:
                 return
             self.vars.original_message = self.vars.name
             self.vars.message = 'goodbye'
-            self.changed = bool(self.vars.new)
+            self.changed = self.vars['new']
             if self.vars.name == "fail me":
                 self.do_raise("You requested this to fail")
 
@@ -92,8 +94,8 @@ After importing the ``ModuleHelper`` class, you need to declare your own class e
     of the features provided by MH. See `StateModuleHelper`_ below for more details.
 
 The easiest way of specifying the module is to create the class variable ``module`` with a dictionary
-containing the exact arguments that would be passed as paramters to ``AnsibleModule``.
-Keep in mind that ``module`` can be either a dictionary as show above, or it can be a proper ``AnsibleModule`` object.
+containing the exact arguments that would be passed as parameters to ``AnsibleModule``.
+If you prefer to create the ``AnsibleModule`` object yourself, just assign it to the ``module`` class variable.
 MH also accepts a parameter ``module`` in its constructor, if that parameter is used used,
 then it will override the class variable. The parameter can either be ``dict`` or ``AnsibleModule`` as well.
 
@@ -101,7 +103,7 @@ Beyond the definition of the module, there are other variables that can be used 
 of MH's behavior. These variables should be set at the very beginning of the class, and their semantics are
 explained through this document.
 
-The main logic of the module happens in the ``ModuleHelper.run()`` method, which looks like:
+The main logic of MH happens in the ``ModuleHelper.run()`` method, which looks like:
 
 .. code-block:: python
 
@@ -115,8 +117,7 @@ The main logic of the module happens in the ``ModuleHelper.run()`` method, which
             output['failed'] = False
         self.module.exit_json(changed=self.has_changed(), **output)
 
-The method ``ModuleHelper.__run__()`` must be implemented by the module.
-Most modules will be able to perform their tasks using only that method.
+The method ``ModuleHelper.__run__()`` must be implemented by the module and most modules will be able to perform their actions using only that method.
 However, in some cases, you might want to execute actions before or after the main tasks, in which cases
 you should implement ``ModuleHelper.__init_module__()`` and ``ModuleHelper.__quit_module__()`` respectively.
 
@@ -148,15 +149,15 @@ Another way to write the example from the `Quickstart`_ would be:
                 return
             self.vars.original_message = self.vars.name
             self.vars.message = 'goodbye'
-            self.changed = bool(self.vars.new)
+            self.changed = self.vars['new']
 
         def __quit_module__(self):
             if self.vars.name == "fail me":
                 self.do_raise("You requested this to fail")
 
-Notice that there are no calls to ``module.exit_json()`` nor ``module.fail_json()``, use exceptions to cause the module to fail.
-There is a generic method to raise exceptions called ``self.do_raise()``.
-If no exception was raised, then the module has succeeded.
+Notice that there are no calls to ``module.exit_json()`` nor ``module.fail_json()``: if the module fails, raise an exception.
+You can use the convenience method ``self.do_raise()`` or raise the exception as usual in Python to do that.
+If no exception is raised, then the module succeeds.
 
 .. seealso::
 
@@ -173,18 +174,27 @@ Ansible modules must have a ``main()`` function and the usual test for ``'__main
     if __name__ == '__main__':
         main()
 
+The class method ``execute()`` is nothing more than a convenience shorcut for:
+
+.. code-block:: python
+
+    m = MyTest()
+    m.run()
+
+Optionally, an ``AnsibleModule`` may be passed as parameter to ``execute()``.
+
 
 Parameters, variables, and output
 """""""""""""""""""""""""""""""""
 
-All the parameters automatically become variables in the ``self.vars`` field, which is of the ``VarDict`` type.
-By using ``self.vars``, you have a central mechanism to access the parameters but also to expose variables as return values of the module.
+All the parameters automatically become variables in the ``self.vars`` attribute, which is of the ``VarDict`` type.
+By using ``self.vars``, you get a central mechanism to access the parameters but also to expose variables as return values of the module.
 As described in :ref:`ansible_collections.community.general.docsite.guide_vardict`, variables in ``VarDict`` have metadata associated to them.
-One of the fields in that metadata marks the variable for output, and MH makes use of that to generate the module's return values.
+One of the attributes in that metadata marks the variable for output, and MH makes use of that to generate the module's return values.
 
 .. important::
 
-    The ``VarDict`` feature from the documentation was introduced in community.general 7.1.0, but there was a first
+    The ``VarDict`` feature described was introduced in community.general 7.1.0, but there was a first
     implementation of it embedded within ``ModuleHelper``.
     That older implementation is now deprecated and will be removed in community.general 11.0.0.
     After community.general 7.1.0, MH modules generate a deprecation message about *using the old VarDict*.
@@ -193,8 +203,7 @@ One of the fields in that metadata marks the variable for output, and MH makes u
         #.  Set ``mute_vardict_deprecation = True`` and the deprecation will be silenced. If the module still uses the old ``VarDict``,
             it will not be able to update to community.general 11.0.0 (Spring 2026) upon its release.
         #.  Set ``use_old_vardict = False`` to make the MH module use the new ``VarDict`` immediatelly.
-            The new ``VarDict`` and its use is documented.
-            This is the recommended way to handle this.
+            The new ``VarDict`` and its use is documented and this is the recommended way to handle this.
 
     .. code-block:: python
 
@@ -205,7 +214,7 @@ One of the fields in that metadata marks the variable for output, and MH makes u
 
     These two settings are mutually exclusive, but that is not enforced and the behavior when setting both is not specified.
 
-By default, all variables created in ``VarDict`` are set with ``output=True``, but keep in mind that **module parameters are not set for output by default**.
+Contrary to new variables created in ``VarDict``, module parameters are not set for output by default.
 If you want to include some module parameters in the output, list them in the ``output_params`` class variable.
 
 .. code-block:: python
@@ -214,9 +223,8 @@ If you want to include some module parameters in the output, list them in the ``
         output_params = ('state', 'name')
         ...
 
-A neat feature provided by MH by using ``VarDict`` is the automatic tracking of changes in variables.
-This is achieved by setting the metadata ``change=True``. See examples in `Tracking changes in variables`_.
-Again, to track changes in variables created from module parameters, you must list them in the ``change_params`` class variable.
+Another neat feature provided by MH by using ``VarDict`` is the automatic tracking of changes when setting the metadata ``change=True``.
+Again, to enable this feature for module parameters, you must list them in the ``change_params`` class variable.
 
 .. code-block:: python
 
@@ -231,6 +239,9 @@ Similarly, if you want to use Ansible's diff mode, you can set the metadata ``di
 With that, MH will automatically generate the diff output for variables that have changed.
 
 .. code-block:: python
+
+    class MyTest(ModuleHelper):
+        diff_params = ('value', )
 
     def __run__(self):
         # example from community.general.gio_mime
@@ -273,8 +284,8 @@ Tracking changes in variables
 -----------------------------
 
 As explained above, you can enable change tracking in any number of variables in ``self.vars``.
-By the end of the module execution, if any of them has a different value then the first value assigned to them,
-then that change will be picked up by MH and signalled at the module output.
+By the end of the module execution, if any of those variables has a value different then the first value assigned to them,
+then that will be picked up by MH and signalled as changed at the module output.
 See the example below to learn how you can enabled change tracking in variables:
 
 .. code-block:: python
@@ -294,29 +305,26 @@ See the example below to learn how you can enabled change tracking in variables:
         self.vars.set_meta("new_roles", initial_value=[])
         ...
 
-If the end value of any variable marked ``change`` is different from its initial value, then the module will return ``changed=True``.
+If the end value of any variable marked ``change`` is different from its initial value, then MH will return ``changed=True``.
 
 Indicating changes with ``changed``
 -----------------------------------
 
-Another way to indicate change is to use the ``self.changed`` property in the module.
-Beware that this is a ``@property`` method in MH, with both *getter* and *setter*.
-The *setter* will store the value in a hidden field in the module.
-The *getter* will try to use ``self.__changed__()`` first.
-If that method is not implemented, then it will use the value from the hidden field.
+If you want to indicate change directly in the code, then use the ``self.changed`` property in MH.
+Beware that this is a ``@property`` method in MH, with both a *getter* and a *setter*.
 By default, that hidden field is set to ``False``.
 
 Effective change
 ----------------
 
 The effective outcome for the module is determined in the ``self.has_changed()`` method, and it consists of the logical *OR* operation
-between ``self.changed`` and the change outcome from ``self.vars``.
+between ``self.changed`` and the change calculated from ``self.vars``.
 
 Exceptions
 """"""""""
 
 In MH, instead of calling ``module.fail_json()`` you can just raise an exception.
-The output variables are collected the same way they would be for a flawless execution.
+The output variables are collected the same way they would be for a successful execution.
 However, you can set output variables specifically for that exception, if you so choose.
 
 .. code-block:: python
@@ -471,7 +479,6 @@ If ``when`` has a different value or no parameters are specificied, the decorato
 
 In a method using this decorator, if an exception is raised, the text message of that exception will be captured
 by the decorator and used to call ``self.module.fail_json()``.
-
 In most of the cases there will be no need to use this decorator, because ``ModuleHelper.run()`` already uses it.
 
 @check_mode_skip
