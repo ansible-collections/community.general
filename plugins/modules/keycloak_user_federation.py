@@ -87,7 +87,7 @@ options:
 
     remove_unspecified_mappers:
         description:
-            - Remove mappers that are not specified in the configuration for this federation
+            - Remove mappers that are not specified in the configuration for this federation.
         type: bool
         default: true
 
