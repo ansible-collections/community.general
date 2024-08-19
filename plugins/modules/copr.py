@@ -255,6 +255,8 @@ class CoprModule(object):
         """
         if not repo_content:
             repo_content = self._download_repo_info()
+        if self.ansible_module.params.get("includepkgs"): # Add includepkg options
+            repo_content +=  f"\nincludepkgs={self.ansible_module.params['includepkgs']}\n"
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
@@ -470,6 +472,7 @@ def run_module():
         name=dict(type="str", required=True),
         state=dict(type="str", choices=["enabled", "disabled", "absent"], default="enabled"),
         chroot=dict(type="str"),
+        includepkgs=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     params = module.params
