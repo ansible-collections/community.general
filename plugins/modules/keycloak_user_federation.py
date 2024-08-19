@@ -918,7 +918,7 @@ def main():
             changeset['mappers'].append(new_mapper)
 
         # to keep unspecified existing mappers we add them to the desired mappers list, unless they're already present
-        if not module.params.get('remove_unspecified_mappers') and 'mappers' in before_comp:
+        if not module.params['remove_unspecified_mappers'] and 'mappers' in before_comp:
             changeset_mapper_ids = [mapper['id'] for mapper in changeset['mappers'] if 'id' in mapper]
             changeset['mappers'].extend([mapper for mapper in before_comp['mappers'] if mapper['id'] not in changeset_mapper_ids])
 
@@ -977,7 +977,7 @@ def main():
                     new_mapper['parentId'] = cid
                 updated_mappers.append(kc.create_component(new_mapper, realm))
 
-        if module.params.get('remove_unspecified_mappers'):
+        if module.params['remove_unspecified_mappers']:
             # we remove all unwanted default mappers
             # we use ids so we dont accidently remove one of the previously updated default mapper
             for default_mapper in default_mappers:
