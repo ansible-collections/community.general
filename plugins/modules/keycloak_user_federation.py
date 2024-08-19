@@ -85,7 +85,7 @@ options:
             - parentId
         type: str
 
-    removeUnspecifiedMappers:
+    remove_unspecified_mappers:
         description:
             - Remove mappers that are not specified in the configuration for this federation
         type: bool
@@ -814,7 +814,7 @@ def main():
         provider_id=dict(type='str', aliases=['providerId']),
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
-        removeUnspecifiedMappers=dict(type='bool', default=True),
+        remove_unspecified_mappers=dict(type='bool', default=True),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
@@ -856,7 +856,7 @@ def main():
 
     # Filter and map the parameters names that apply
     comp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers', 'removeUnspecifiedMappers'] and
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers', 'remove_unspecified_mappers'] and
                    module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
@@ -918,7 +918,7 @@ def main():
             changeset['mappers'].append(new_mapper)
 
         # to keep unspecified existing mappers we add them to the desired mappers list, unless they're already present
-        if not module.params.get('removeUnspecifiedMappers') and 'mappers' in before_comp:
+        if not module.params.get('remove_unspecified_mappers') and 'mappers' in before_comp:
             changeset_mapper_ids = [mapper['id'] for mapper in changeset['mappers'] if 'id' in mapper]
             changeset['mappers'].extend([mapper for mapper in before_comp['mappers'] if mapper['id'] not in changeset_mapper_ids])
 
@@ -977,7 +977,7 @@ def main():
                     new_mapper['parentId'] = cid
                 updated_mappers.append(kc.create_component(new_mapper, realm))
 
-        if module.params.get('removeUnspecifiedMappers'):
+        if module.params.get('remove_unspecified_mappers'):
             # we remove all unwanted default mappers
             # we use ids so we dont accidently remove one of the previously updated default mapper
             for default_mapper in default_mappers:
