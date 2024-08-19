@@ -345,7 +345,7 @@ def main():
             enabled=dict(required=False, default=True, type='bool'),
             overwrite_multiple=dict(required=False, default=False, type='bool'),
             auto_import_keys=dict(required=False, default=False, type='bool'),
-            list=dict(required=False),
+            list=dict(required=False, type='bool'),
         ),
         supports_check_mode=False,
         required_one_of=[['state', 'runrefresh', 'list']],
