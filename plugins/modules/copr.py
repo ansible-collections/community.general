@@ -52,6 +52,10 @@ options:
               for example V(epel-7-x86_64). Default chroot is determined by the operating system,
               version of the operating system, and architecture on which the module is run.
         type: str
+    includepkgs:
+        description: List of packages to include.
+        required: false
+        type: str
 """
 
 EXAMPLES = r"""
@@ -255,8 +259,8 @@ class CoprModule(object):
         """
         if not repo_content:
             repo_content = self._download_repo_info()
-        if self.ansible_module.params.get("includepkgs"): # Add includepkg options
-            repo_content +=  f"\nincludepkgs={self.ansible_module.params['includepkgs']}\n"
+        if self.ansible_module.params.get("includepkgs"):
+            repo_content += "\nincludepkgs={}\n".format(self.ansible_module.params['includepkgs'])
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
