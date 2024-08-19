@@ -88,6 +88,11 @@ options:
             - Set repository to enabled (or disabled).
         type: bool
         default: true
+    list:
+        description:
+            - print a list of all registered parameters
+            - if this parameter is set, all  other parameters are ignored
+        type: bool
 
 
 requirements:
@@ -128,6 +133,11 @@ EXAMPLES = '''
     name: my_ci_repo
     state: present
     runrefresh: true
+
+- name: Read list of registered repositories into fact repositories
+  community.general.zypper_repository:
+    list: true
+  register: repositories
 '''
 
 import traceback
