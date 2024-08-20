@@ -88,6 +88,7 @@ options:
     remove_unspecified_mappers:
         description:
             - Remove mappers that are not specified in the configuration for this federation.
+            - Set to V(false) to keep mappers that are not listed in O(mappers).
         type: bool
         default: true
         version_added: 9.4.0
