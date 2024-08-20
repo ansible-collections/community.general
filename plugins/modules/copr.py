@@ -260,8 +260,7 @@ class CoprModule(object):
         if not repo_content:
             repo_content = self._download_repo_info()
         if self.ansible_module.params.get("includepkgs"):
-            includepkgs = self.ansible_module.params['includepkgs']
-            repo_content += f"\nincludepkgs={includepkgs}\n"
+            repo_content += "\nincludepkgs={}\n".format(self.ansible_module.params['includepkgs'])
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
