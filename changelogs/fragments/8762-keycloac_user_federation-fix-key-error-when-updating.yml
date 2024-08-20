@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_user_federation - fix key error when removing mappers during an update and new mappers are specified in the module args (https://github.com/ansible-collections/community.general/pull/8762).
