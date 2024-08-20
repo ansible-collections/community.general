@@ -57,6 +57,11 @@ options:
         required: false
         type: str
         version_added: 9.4.0
+    excludepkgs:
+        description: List of packages to exclude.
+        required: false
+        type: str
+        version_added: 9.4.0
 """
 
 EXAMPLES = r"""
@@ -262,6 +267,8 @@ class CoprModule(object):
             repo_content = self._download_repo_info()
         if self.ansible_module.params.get("includepkgs"):
             repo_content = repo_content.rstrip('\n') + '\nincludepkgs={0}\n'.format(self.ansible_module.params['includepkgs'])
+        if self.ansible_module.params.get("excludepkgs"):
+            repo_content = repo_content.rstrip('\n') + '\nexcludepkgs={0}\n'.format(self.ansible_module.params['excludepkgs'])
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
@@ -478,6 +485,7 @@ def run_module():
         state=dict(type="str", choices=["enabled", "disabled", "absent"], default="enabled"),
         chroot=dict(type="str"),
         includepkgs=dict(type='str', required=False),
+        excludepkgs=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     params = module.params
