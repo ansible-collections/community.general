@@ -62,6 +62,7 @@ options:
     type: str
     description:
       - The status of the ticket.
+      - The 'new' choice is not idempotent and will create a new ticket each time it's used.
     choices: ['new', 'closed', 'resolved']
     required: true
   ticket_id:
