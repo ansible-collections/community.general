@@ -117,7 +117,8 @@ The main logic of MH happens in the ``ModuleHelper.run()`` method, which looks l
             output['failed'] = False
         self.module.exit_json(changed=self.has_changed(), **output)
 
-The method ``ModuleHelper.__run__()`` must be implemented by the module and most modules will be able to perform their actions using only that method.
+The method ``ModuleHelper.__run__()`` must be implemented by the module and most
+modules will be able to perform their actions implementing only that MH method.
 However, in some cases, you might want to execute actions before or after the main tasks, in which cases
 you should implement ``ModuleHelper.__init_module__()`` and ``ModuleHelper.__quit_module__()`` respectively.
 
