@@ -40,12 +40,14 @@ options:
     type: str
     description:
       - The Zendesk account password.
+      - Optional if token is used.
     required: false
     aliases: ['pass']
   token:
     type: str
     description:
       - The API token for authentication.
+      - Optional if password is used.
     required: false
   body:
     type: str
