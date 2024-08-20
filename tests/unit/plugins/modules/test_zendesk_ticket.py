@@ -56,7 +56,7 @@ class TestZendeskTicket(ModuleTestCase):
             'username': 'your_username',
             'password': 'your_password',
             'ticket_id': 35436,
-            'status': 'resolved',
+            'status': 'closed',
             'body': 'Ticket is resolved.'
         }
         set_module_args(ticket_data)
