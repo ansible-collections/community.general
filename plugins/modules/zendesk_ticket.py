@@ -282,9 +282,6 @@ def main():
     token = module.params['token']
     ticket_id = module.params['ticket_id']
 
-    if not password and not token:
-        module.fail_json(msg="Either 'password' or 'token' must be provided.")
-
     zendesk_api = ZENDESK_API(username, password, token, url)
 
     if status == 'new':
