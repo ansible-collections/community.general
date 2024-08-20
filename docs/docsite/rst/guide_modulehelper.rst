@@ -16,6 +16,7 @@ Writing a module for Ansible is largely described in existing documentation.
 However, a good part of that is boilerplate code that needs to be repeated every single time.
 That is where ``ModuleHelper`` comes to assistance: a lot of that boilerplate code is done.
 
+.. _ansible_collections.community.general.docsite.guide_modulehelper.quickstart:
 
 Quickstart
 """"""""""
@@ -66,8 +67,9 @@ Introduction
 """"""""""""
 
 ``ModuleHelper`` is a wrapper around the standard ``AnsibleModule``, providing extra features and conveniences.
-The basic structure of a module using ``ModuleHelper`` is as shown in the `Quickstart`_ section above,
-but there are more elements that will take part in it.
+The basic structure of a module using ``ModuleHelper`` is as shown in the
+:ref:`ansible_collections.community.general.docsite.guide_modulehelper.quickstart`
+section above, but there are more elements that will take part in it.
 
 .. code-block:: python
 
@@ -90,8 +92,8 @@ After importing the ``ModuleHelper`` class, you need to declare your own class e
 
 .. seealso::
 
-    There is a variation called ``StateModuleHelper``, which builds on top
-    of the features provided by MH. See `StateModuleHelper`_ below for more details.
+    There is a variation called ``StateModuleHelper``, which builds on top of the features provided by MH.
+    See :ref:`ansible_collections.community.general.docsite.guide_modulehelper.statemh` below for more details.
 
 The easiest way of specifying the module is to create the class variable ``module`` with a dictionary
 containing the exact arguments that would be passed as parameters to ``AnsibleModule``.
@@ -130,14 +132,19 @@ to track changes in their content.
 
 .. seealso::
 
-    More details in sections `Parameters, variables, and output`_ and `Handling changes`_ below.
+    More details in sections
+    :ref:`ansible_collections.community.general.docsite.guide_modulehelper.paramvaroutput` and
+    :ref:`ansible_collections.community.general.docsite.guide_modulehelper.changes` below.
 
 .. seealso::
 
-    See more about the decorator `@module_fails_on_exception`_ below.
+    See more about the decorator
+    :ref:`ansible_collections.community.general.docsite.guide_modulehelper.modulefailsdeco` below.
 
 
-Another way to write the example from the `Quickstart`_ would be:
+Another way to write the example from the
+:ref:`ansible_collections.community.general.docsite.guide_modulehelper.quickstart`
+would be:
 
 .. code-block:: python
 
@@ -162,7 +169,8 @@ If no exception is raised, then the module succeeds.
 
 .. seealso::
 
-    See more about exceptions in section `Exceptions`_ below.
+    See more about exceptions in section
+    :ref:`ansible_collections.community.general.docsite.guide_modulehelper.exceptions` below.
 
 Ansible modules must have a ``main()`` function and the usual test for ``'__main__'``. When using MH that should look like:
 
@@ -184,6 +192,7 @@ The class method ``execute()`` is nothing more than a convenience shorcut for:
 
 Optionally, an ``AnsibleModule`` may be passed as parameter to ``execute()``.
 
+.. _ansible_collections.community.general.docsite.guide_modulehelper.paramvaroutput:
 
 Parameters, variables, and output
 """""""""""""""""""""""""""""""""
@@ -234,7 +243,10 @@ Again, to enable this feature for module parameters, you must list them in the `
         change_params = ('value', )
         ...
 
-.. seealso:: See more about this in `Handling Changes`_ below.
+.. seealso::
+
+    See more about this in
+    :ref:`ansible_collections.community.general.docsite.guide_modulehelper.changes` below.
 
 Similarly, if you want to use Ansible's diff mode, you can set the metadata ``diff=True`` and ``diff_params`` for module parameters.
 With that, MH will automatically generate the diff output for variables that have changed.
@@ -275,6 +287,8 @@ That generates an Ansible fact like:
 
     If ``facts_name`` is not set, the module does not generate any facts.
 
+
+.. _ansible_collections.community.general.docsite.guide_modulehelper.changes:
 
 Handling changes
 """"""""""""""""
@@ -321,6 +335,8 @@ Effective change
 The effective outcome for the module is determined in the ``self.has_changed()`` method, and it consists of the logical *OR* operation
 between ``self.changed`` and the change calculated from ``self.vars``.
 
+.. _ansible_collections.community.general.docsite.guide_modulehelper.exceptions:
+
 Exceptions
 """"""""""
 
@@ -343,6 +359,7 @@ All exceptions derived from ``Exception`` are captured and translated into a ``f
 However, if you do want to call ``self.module.fail_json()`` yourself it will work,
 just keep in mind that there will be no automatic handling of output variables in that case.
 
+.. _ansible_collections.community.general.docsite.guide_modulehelper.statemh:
 
 StateModuleHelper
 ^^^^^^^^^^^^^^^^^
@@ -474,6 +491,8 @@ The value of ``changed`` in the module output will be set to ``True``:
             ...
 
 If ``when`` has a different value or no parameters are specificied, the decorator will have no effect whatsoever.
+
+.. _ansible_collections.community.general.docsite.guide_modulehelper.modulefailsdeco:
 
 @module_fails_on_exception
 --------------------------
