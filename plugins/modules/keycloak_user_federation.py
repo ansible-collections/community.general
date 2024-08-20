@@ -90,6 +90,7 @@ options:
             - Remove mappers that are not specified in the configuration for this federation.
         type: bool
         default: true
+        version_added: 9.4.0
 
     config:
         description:
