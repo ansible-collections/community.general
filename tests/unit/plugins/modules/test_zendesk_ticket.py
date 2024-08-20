@@ -10,29 +10,29 @@ __metaclass__ = type
 from ansible_collections.community.general.plugins.modules import zendesk_ticket
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleExitJson, AnsibleFailJson
 from httmock import HTTMock, response, urlmatch
-import json
 
-@urlmatch(netloc=r'(.*\.)?zendesk\.com$')
-def zendesk_api_mock(request):
-    return response(201, json.dumps({
-        "ticket": {
-            "id": 35436,
-            "subject": "Test Ticket",
-            "status": "new",
-            "priority": "high",
-            "description": "This is a test ticket body",
-            "created_at": "2023-05-22T10:00:00Z",
-            "updated_at": "2023-05-22T10:00:00Z",
-            "requester_id": 20978392,
-            "submitter_id": 76872,
-            "assignee_id": 235323,
-            "organization_id": 509974,
-            "group_id": 98738,
-            "tags": ["test", "mock"],
-            "url": "https://example.zendesk.com/api/v2/tickets/35436.json"
-        }
-    }), {'Content-Type': 'application/json'},
-    request)
+
+@urlmatch(netloc=r'(.)*zendesk\.com(.)*')
+def zendesk_api_mock(url, request):
+    ticket_data = {
+        "id": 35436,
+        "subject": "Test Ticket",
+        "status": "new",
+        "priority": "high",
+        "description": "This is a test ticket body",
+        "created_at": "2023-05-22T10:00:00Z",
+        "updated_at": "2023-05-22T10:00:00Z",
+        "requester_id": 20978392,
+        "submitter_id": 76872,
+        "assignee_id": 235323,
+        "organization_id": 509974,
+        "group_id": 98738,
+        "tags": ["test", "mock"],
+        "url": "https://example.zendesk.com/api/v2/tickets/35436.json"
+    }
+    headers = {'content-type': 'application/json'}
+    return response(201, ticket_data, headers, None, 5, request)
+
 
 class TestZendeskTicket(ModuleTestCase):
     def setUp(self):
