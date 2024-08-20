@@ -56,6 +56,7 @@ options:
         description: List of packages to include.
         required: false
         type: str
+        version_added: 9.4.0
 """
 
 EXAMPLES = r"""
@@ -260,7 +261,7 @@ class CoprModule(object):
         if not repo_content:
             repo_content = self._download_repo_info()
         if self.ansible_module.params.get("includepkgs"):
-            repo_content += "\nincludepkgs={}\n".format(self.ansible_module.params['includepkgs'])
+            repo_content = repo_content.rstrip('\n') + '\nincludepkgs={0}\n'.format(self.ansible_module.params['includepkgs'])
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
