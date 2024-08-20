@@ -117,8 +117,8 @@ class ZENDESK_API:
 
     Attributes:
         username (str): Zendesk account username.
-        password (str): Zendesk account password (optional if token is used).
-        token (str): API token for authentication (optional if password is used).
+        password (str): Zendesk account password.
+        token (str): API token for authentication.
         url (str): URL of the Zendesk instance.
         headers (dict): Default headers for API requests.
     """
