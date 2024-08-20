@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 module: zendesk_ticket
 short_description: Manages tickets in Zendesk
 description:
-  - This module allows you to create and delete tickets in Zendesk.
+  - This module allows you to create and close tickets in Zendesk.
   - Authentication is handled by the ZENDESK_API class.
 author: "Luis Valle (@elchico2007)"
 version_added: 9.4.0
@@ -65,7 +65,8 @@ options:
     description:
       - The status of the ticket.
       - The 'new' choice is not idempotent and will create a new ticket each time it's used.
-    choices: ['new', 'closed', 'resolved']
+      - The 'closed' choice will close the ticket. If a body is provided, it will mark the ticket as resolved with the given resolution.
+    choices: ['new', 'closed']
     required: true
   ticket_id:
     type: int
@@ -104,7 +105,7 @@ EXAMPLES = '''
     token: 'your_api_token'
     url: 'https://yourcompany.zendesk.com'
     ticket_id: 12345
-    status: 'resolved'
+    status: 'closed'
     body: 'Issue has been resolved'
 '''
 
@@ -226,11 +227,10 @@ class ZENDESK_API:
         payload = {
             "ticket": {
                 "status": status,
-                "comment": {
-                    "body": body
-                }
             }
         }
+        if body:
+            payload["ticket"]["comment"] = {"body": body}
 
         request = self.api_auth()
 
@@ -254,7 +254,7 @@ def main():
             url=dict(type='str', required=True),
             username=dict(type='str', required=True, aliases=['user']),
             password=dict(type='str', required=False, aliases=['pass'], no_log=True),
-            status=dict(type='str', required=True, choices=['new', 'closed', 'resolved']),
+            status=dict(type='str', required=True, choices=['new', 'closed']),
             body=dict(type='str', default=''),
             priority=dict(type='str', choices=['urgent', 'high', 'normal', 'low'], default='normal'),
             subject=dict(type='str'),
@@ -262,9 +262,8 @@ def main():
             ticket_id=dict(type='int')
         ),
         required_if=[
-            ('status', 'new', ('priority', 'subject')),
-            ('status', 'closed', ('ticket_id',)),
-            ('status', 'resolved', ('ticket_id',))
+            ('status', 'new', ('subject',)),
+            ('status', 'close', ('ticket_id',)),
         ],
         required_one_of=[
             ('password', 'token')
@@ -284,12 +283,14 @@ def main():
 
     zendesk_api = ZENDESK_API(username, password, token, url)
 
+    result = {}  # Initialize result dictionary
+
     if status == 'new':
         result = zendesk_api.create_ticket(body, priority, subject)
-    elif status in ['closed', 'resolved']:
+    elif status == 'closed':
         if not zendesk_api.check_ticket(ticket_id):
             module.fail_json(msg="Ticket ID {0} does not exist.".format(ticket_id))
-        result = zendesk_api.close_ticket(ticket_id, status, body)
+        result = zendesk_api.close_ticket(ticket_id, 'closed', body)
 
     if 'msg' in result:
         module.fail_json(**result)
