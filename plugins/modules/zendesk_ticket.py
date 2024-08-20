@@ -163,7 +163,7 @@ class ZENDESK_API:
         request = self.api_auth()
         try:
             response = request.get(url)
-        except Exception as e:
+        except Exception:
             return False
         return response.getcode() == 200
 
