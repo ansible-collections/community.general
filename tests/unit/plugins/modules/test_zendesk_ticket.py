@@ -8,8 +8,31 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import zendesk_ticket
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleFailJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleExitJson, AnsibleFailJson
+from httmock import HTTMock, response, urlmatch
+import json
 
+@urlmatch(netloc=r'(.*\.)?zendesk\.com$')
+def zendesk_api_mock(request):
+    return response(201, json.dumps({
+        "ticket": {
+            "id": 35436,
+            "subject": "Test Ticket",
+            "status": "new",
+            "priority": "high",
+            "description": "This is a test ticket body",
+            "created_at": "2023-05-22T10:00:00Z",
+            "updated_at": "2023-05-22T10:00:00Z",
+            "requester_id": 20978392,
+            "submitter_id": 76872,
+            "assignee_id": 235323,
+            "organization_id": 509974,
+            "group_id": 98738,
+            "tags": ["test", "mock"],
+            "url": "https://example.zendesk.com/api/v2/tickets/35436.json"
+        }
+    }), {'Content-Type': 'application/json'},
+    request)
 
 class TestZendeskTicket(ModuleTestCase):
     def setUp(self):
@@ -67,3 +90,21 @@ class TestZendeskTicket(ModuleTestCase):
         result = exc_info.exception.args[0]
         self.assertTrue(result['failed'])
         self.assertEqual(result['msg'], 'Ticket ID 35436 does not exist.')
+
+    def test_create_ticket_with_mock(self):
+        set_module_args({
+            'url': 'https://your_company.zendesk.com',
+            'username': 'user',
+            'token': 'test_token',
+            'status': 'new',
+            'subject': 'Test Ticket',
+            'body': 'This is a test ticket body',
+            'priority': 'high'
+        })
+
+        with HTTMock(zendesk_api_mock):
+            with self.assertRaises(AnsibleExitJson) as result:
+                self.module.main()
+
+        self.assertTrue(result.exception.args[0]['changed'])
+        self.assertEqual(result.exception.args[0]['ticket']['id'], 35436)
