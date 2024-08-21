@@ -64,8 +64,8 @@ options:
     type: str
     description:
       - The status of the ticket.
-      - The 'new' choice is not idempotent and will create a new ticket each time it's used.
-      - The 'closed' choice will close the ticket. If a body is provided, it will mark the ticket as resolved with the given resolution.
+      - The V(new) choice is not idempotent and will create a new ticket each time it's used.
+      - The V(closed) choice will close the ticket. If O(body) is provided, it will mark the ticket as resolved with the given resolution.
     choices: ['new', 'closed']
     required: true
   ticket_id:
