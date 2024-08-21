@@ -58,7 +58,7 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 132,
         'GNAME': 'CSApparelVDC',
-        'HISTORY_RECORDS': OrderedDict({
+        'HISTORY_RECORDS': list [
             'HISTORY': OrderedDict({
                 'OID': '42',
                 'SEQ': '384',
@@ -69,8 +69,8 @@ def get_vm_pool():
                 'VM_MAD': 'kvm',
                 'TM_MAD': '3par',
                 'ACTION': '0'
-            })
-        }),
+            }),
+        ],
         'ID': 7157,
         'LAST_POLL': 1632762935,
         'LCM_STATE': 3,
@@ -116,7 +116,7 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 0,
         'GNAME': 'oneadmin',
-        'HISTORY_RECORDS': {},
+        'HISTORY_RECORDS': [],
         'ID': 327,
         'LAST_POLL': 1632763543,
         'LCM_STATE': 3,
@@ -179,7 +179,7 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 0,
         'GNAME': 'oneadmin',
-        'HISTORY_RECORDS': {},
+        'HISTORY_RECORDS': [],
         'ID': 107,
         'LAST_POLL': 1632764186,
         'LCM_STATE': 3,
