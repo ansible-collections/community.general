@@ -14,7 +14,6 @@ module: zendesk_ticket
 short_description: Manages tickets in Zendesk
 description:
   - This module allows you to create and close tickets in Zendesk.
-  - Authentication is handled by the ZENDESK_API class.
 author: "Luis Valle (@elchico2007)"
 version_added: 9.4.0
 extends_documentation_fragment:
