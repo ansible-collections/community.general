@@ -200,8 +200,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
             server['name'] = vm.NAME
             server['id'] = vm.ID
-            if vm.HISTORY_RECORDS.HISTORY:
-                server['host'] = vm.HISTORY_RECORDS.HISTORY[-1].HOSTNAME
+            if 'HISTORY' in vm.HISTORY_RECORDS:
+                if vm.HISTORY_RECORDS['HISTORY']:
+                    server['host'] = vm.HISTORY_RECORDS.HISTORY[-1].HOSTNAME
             server['LABELS'] = labels
             server['v4_first_ip'] = self._get_vm_ipv4(vm)
             server['v6_first_ip'] = self._get_vm_ipv6(vm)
