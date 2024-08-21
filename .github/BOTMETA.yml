@@ -1485,6 +1485,8 @@ files:
     maintainers: russoz
   docs/docsite/rst/guide_deps.rst:
     maintainers: russoz
+  docs/docsite/rst/guide_modulehelper.rst:
+    maintainers: russoz
   docs/docsite/rst/guide_online.rst:
     maintainers: remyleone
   docs/docsite/rst/guide_packet.rst:
