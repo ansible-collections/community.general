@@ -97,6 +97,7 @@ except ImportError:
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common._collections_compat import Sequence
 
 from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
@@ -200,10 +201,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
             server['name'] = vm.NAME
             server['id'] = vm.ID
-            if hasattr(vm.HISTORY_RECORDS, 'HISTORY'):
-                if isinstance(vm.HISTORY_RECORDS.HISTORY, list) and len(vm.HISTORY_RECORDS.HISTORY) > 0:
-                    if hasattr(vm.HISTORY_RECORDS.HISTORY[-1], 'HOSTNAME'):
-                        server['host'] = vm.HISTORY_RECORDS.HISTORY[-1].HOSTNAME
+            if isinstance(vm.HISTORY_RECORDS.HISTORY, Sequence) and len(vm.HISTORY_RECORDS.HISTORY) > 0:
+                if hasattr(vm.HISTORY_RECORDS.HISTORY[-1], 'HOSTNAME'):
+                    server['host'] = vm.HISTORY_RECORDS.HISTORY[-1].HOSTNAME
             server['LABELS'] = labels
             server['v4_first_ip'] = self._get_vm_ipv4(vm)
             server['v6_first_ip'] = self._get_vm_ipv6(vm)
