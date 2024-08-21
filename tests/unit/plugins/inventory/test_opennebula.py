@@ -58,18 +58,20 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 132,
         'GNAME': 'CSApparelVDC',
-        'HISTORY_RECORDS': list [
-            'HISTORY': OrderedDict({
-                'OID': '42',
-                'SEQ': '384',
-                'HOSTNAME': 'sam-691-sam',
-                'HID': '10',
-                'CID': '0',
-                'DS_ID': '100',
-                'VM_MAD': 'kvm',
-                'TM_MAD': '3par',
-                'ACTION': '0'
-            }),
+        'HISTORY_RECORDS': [
+            {
+                'HISTORY': OrderedDict({
+                    'OID': '42',
+                    'SEQ': '384',
+                    'HOSTNAME': 'sam-691-sam',
+                    'HID': '10',
+                    'CID': '0',
+                    'DS_ID': '100',
+                    'VM_MAD': 'kvm',
+                    'TM_MAD': '3par',
+                    'ACTION': '0'
+                }),
+            }
         ],
         'ID': 7157,
         'LAST_POLL': 1632762935,
