@@ -55,12 +55,14 @@ options:
     includepkgs:
         description: List of packages to include.
         required: false
-        type: str
+        type: list
+        elements: str
         version_added: 9.4.0
     excludepkgs:
         description: List of packages to exclude.
         required: false
-        type: str
+        type: list
+        elements: str
         version_added: 9.4.0
 """
 
@@ -265,10 +267,12 @@ class CoprModule(object):
         """
         if not repo_content:
             repo_content = self._download_repo_info()
-        if self.ansible_module.params.get("includepkgs"):
-            repo_content = repo_content.rstrip('\n') + '\nincludepkgs={0}\n'.format(self.ansible_module.params['includepkgs'])
-        if self.ansible_module.params.get("excludepkgs"):
-            repo_content = repo_content.rstrip('\n') + '\nexcludepkgs={0}\n'.format(self.ansible_module.params['excludepkgs'])
+        if self.ansible_module.params["includepkgs"]:
+            includepkgs_value = ','.join(self.ansible_module.params['includepkgs'])
+            repo_content = repo_content.rstrip('\n') + '\nincludepkgs={0}\n'.format(includepkgs_value)
+        if self.ansible_module.params["excludepkgs"]:
+            excludepkgs_value = ','.join(self.ansible_module.params['excludepkgs'])
+            repo_content = repo_content.rstrip('\n') + '\nexcludepkgs={0}\n'.format(excludepkgs_value)
         if self._compare_repo_content(repo_filename_path, repo_content):
             return False
         if not self.check_mode:
@@ -484,8 +488,8 @@ def run_module():
         name=dict(type="str", required=True),
         state=dict(type="str", choices=["enabled", "disabled", "absent"], default="enabled"),
         chroot=dict(type="str"),
-        includepkgs=dict(type='str', required=False),
-        excludepkgs=dict(type='str', required=False),
+        includepkgs=dict(type='list', elements="str", required=False),
+        excludepkgs=dict(type='list', elements="str", required=False),
     )
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     params = module.params
