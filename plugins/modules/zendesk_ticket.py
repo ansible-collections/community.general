@@ -127,7 +127,7 @@ class ZendeskAPI:
     """
     def __init__(self, username, password, token, url):
         """
-        Initializes the ZENDESK_API object with authentication credentials.
+        Initializes the ZendeskAPI object with authentication credentials.
 
         Args:
             username (str): Zendesk account username.
@@ -280,7 +280,7 @@ def main():
     token = module.params['token']
     ticket_id = module.params['ticket_id']
 
-    zendesk_api = ZENDESK_API(username, password, token, url)
+    zendesk_api = ZendeskAPI(username, password, token, url)
 
     result = {}  # Initialize result dictionary
 
