@@ -114,7 +114,7 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import Request
 
 
-class ZENDESK_API:
+class ZendeskAPI:
     """
     Handles interactions with the Zendesk API for ticket management.
 
