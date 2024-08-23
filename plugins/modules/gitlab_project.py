@@ -512,7 +512,8 @@ class GitLabProject(object):
             return True
 
         arguments['namespace_id'] = namespace.id
-        arguments['container_expiration_policy_attributes'] = arguments['container_expiration_policy']
+        if 'container_expiration_policy' in arguments:
+            arguments['container_expiration_policy_attributes'] = arguments['container_expiration_policy']
         try:
             project = self._gitlab.projects.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
