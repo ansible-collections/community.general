@@ -85,6 +85,14 @@ options:
             - parentId
         type: str
 
+    remove_unspecified_mappers:
+        description:
+            - Remove mappers that are not specified in the configuration for this federation.
+            - Set to V(false) to keep mappers that are not listed in O(mappers).
+        type: bool
+        default: true
+        version_added: 9.4.0
+
     config:
         description:
             - Dict specifying the configuration options for the provider; the contents differ depending on
@@ -808,6 +816,7 @@ def main():
         provider_id=dict(type='str', aliases=['providerId']),
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
+        remove_unspecified_mappers=dict(type='bool', default=True),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
@@ -849,7 +858,7 @@ def main():
 
     # Filter and map the parameters names that apply
     comp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers'] and
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers', 'remove_unspecified_mappers'] and
                    module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
@@ -910,6 +919,11 @@ def main():
                 changeset['mappers'] = list()
             changeset['mappers'].append(new_mapper)
 
+        # to keep unspecified existing mappers we add them to the desired mappers list, unless they're already present
+        if not module.params['remove_unspecified_mappers'] and 'mappers' in before_comp:
+            changeset_mapper_ids = [mapper['id'] for mapper in changeset['mappers'] if 'id' in mapper]
+            changeset['mappers'].extend([mapper for mapper in before_comp['mappers'] if mapper['id'] not in changeset_mapper_ids])
+
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_comp = before_comp.copy()
     desired_comp.update(changeset)
@@ -965,11 +979,12 @@ def main():
                     new_mapper['parentId'] = cid
                 updated_mappers.append(kc.create_component(new_mapper, realm))
 
-        # we remove all unwanted default mappers
-        # we use ids so we dont accidently remove one of the previously updated default mapper
-        for default_mapper in default_mappers:
-            if not default_mapper['id'] in [x['id'] for x in updated_mappers]:
-                kc.delete_component(default_mapper['id'], realm)
+        if module.params['remove_unspecified_mappers']:
+            # we remove all unwanted default mappers
+            # we use ids so we dont accidently remove one of the previously updated default mapper
+            for default_mapper in default_mappers:
+                if not default_mapper['id'] in [x['id'] for x in updated_mappers]:
+                    kc.delete_component(default_mapper['id'], realm)
 
         after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
         if module._diff:
