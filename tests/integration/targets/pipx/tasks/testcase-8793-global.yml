@@ -7,11 +7,6 @@
   environment:
     PATH: /usr/local/bin:{{ ansible_env.PATH }}
   block:
-    - name: install pipx
-      pip:
-        name: pipx>=1.6.0
-        extra_args: --user
-
     - name: Remove global pipx dir
       ansible.builtin.file:
         path: /opt/pipx
