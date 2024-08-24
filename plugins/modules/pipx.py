@@ -120,6 +120,12 @@ options:
             - "B(Warning): C(pipx) documentation states this is an B(experimental) feature subject to change."
         type: str
         version_added: 9.3.0
+    global:
+        description:
+            - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
+            - The C(--global) is only available in C(pipx>=1.6.0), make sure to have a compatible version when using this option.
+        type: bool
+        version_added: 9.4.0
 notes:
     - This module requires C(pipx) version 0.16.2.1 or above.
     - Please note that C(pipx) requires Python 3.6 or above.
@@ -191,26 +197,29 @@ def _make_name(name, suffix):
 
 class PipX(StateModuleHelper):
     output_params = ['name', 'source', 'index_url', 'force', 'installdeps']
+    argument_spec = dict(
+        state=dict(type='str', default='install',
+                   choices=['present', 'absent', 'install', 'uninstall', 'uninstall_all',
+                            'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all', 'latest']),
+        name=dict(type='str'),
+        source=dict(type='str'),
+        install_apps=dict(type='bool', default=False),
+        install_deps=dict(type='bool', default=False),
+        inject_packages=dict(type='list', elements='str'),
+        force=dict(type='bool', default=False),
+        include_injected=dict(type='bool', default=False),
+        index_url=dict(type='str'),
+        python=dict(type='str'),
+        system_site_packages=dict(type='bool', default=False),
+        executable=dict(type='path'),
+        editable=dict(type='bool', default=False),
+        pip_args=dict(type='str'),
+        suffix=dict(type='str'),
+    )
+    argument_spec["global"] = dict(type='bool')
+
     module = dict(
-        argument_spec=dict(
-            state=dict(type='str', default='install',
-                       choices=['present', 'absent', 'install', 'uninstall', 'uninstall_all',
-                                'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all', 'latest']),
-            name=dict(type='str'),
-            source=dict(type='str'),
-            install_apps=dict(type='bool', default=False),
-            install_deps=dict(type='bool', default=False),
-            inject_packages=dict(type='list', elements='str'),
-            force=dict(type='bool', default=False),
-            include_injected=dict(type='bool', default=False),
-            index_url=dict(type='str'),
-            python=dict(type='str'),
-            system_site_packages=dict(type='bool', default=False),
-            executable=dict(type='path'),
-            editable=dict(type='bool', default=False),
-            pip_args=dict(type='str'),
-            suffix=dict(type='str'),
-        ),
+        argument_spec=argument_spec,
         required_if=[
             ('state', 'present', ['name']),
             ('state', 'install', ['name']),
@@ -279,8 +288,8 @@ class PipX(StateModuleHelper):
     def state_install(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            args = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
-            with self.runner(args, check_mode_skip=True) as ctx:
+            args_order = 'state global index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            with self.runner(args_order, check_mode_skip=True) as ctx:
                 ctx.run(name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
@@ -293,14 +302,14 @@ class PipX(StateModuleHelper):
         if self.vars.force:
             self.changed = True
 
-        with self.runner('state include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
+        with self.runner('state global include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run(name=name)
             self._capture_results(ctx)
 
     def state_uninstall(self):
         if self.vars.application:
             name = _make_name(self.vars.name, self.vars.suffix)
-            with self.runner('state name', check_mode_skip=True) as ctx:
+            with self.runner('state global name', check_mode_skip=True) as ctx:
                 ctx.run(name=name)
                 self._capture_results(ctx)
 
@@ -311,7 +320,7 @@ class PipX(StateModuleHelper):
         if not self.vars.application:
             self.do_raise("Trying to reinstall a non-existent application: {0}".format(name))
         self.changed = True
-        with self.runner('state name python', check_mode_skip=True) as ctx:
+        with self.runner('state global name python', check_mode_skip=True) as ctx:
             ctx.run(name=name)
             self._capture_results(ctx)
 
@@ -321,32 +330,32 @@ class PipX(StateModuleHelper):
             self.do_raise("Trying to inject packages into a non-existent application: {0}".format(name))
         if self.vars.force:
             self.changed = True
-        with self.runner('state index_url install_apps install_deps force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
+        with self.runner('state global index_url install_apps install_deps force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
             ctx.run(name=name)
             self._capture_results(ctx)
 
     def state_uninstall_all(self):
-        with self.runner('state', check_mode_skip=True) as ctx:
+        with self.runner('state global', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
     def state_reinstall_all(self):
-        with self.runner('state python', check_mode_skip=True) as ctx:
+        with self.runner('state global python', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
     def state_upgrade_all(self):
         if self.vars.force:
             self.changed = True
-        with self.runner('state include_injected force', check_mode_skip=True) as ctx:
+        with self.runner('state global include_injected force', check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
 
     def state_latest(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            args = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
-            with self.runner(args, check_mode_skip=True) as ctx:
+            args_order = 'state index_url install_deps force python system_site_packages editable pip_args suffix name_source'
+            with self.runner(args_order, check_mode_skip=True) as ctx:
                 ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
 
