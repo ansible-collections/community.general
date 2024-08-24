@@ -233,5 +233,17 @@
 - name: Include testcase for issue 8656
   ansible.builtin.include_tasks: testcase-8656.yml
 
-- name: Include testcase for PR 8793 --global
-  ansible.builtin.include_tasks: testcase-8793-global.yml
+- name: install pipx
+  pip:
+    name: pipx>=1.6.0
+    extra_args: --user
+  ignore_errors: true
+  register: pipx160_install
+
+- name: Recent features
+  when:
+    - pipx160_install is not failed
+    - pipx160_install is changed
+  block:
+    - name: Include testcase for PR 8793 --global
+      ansible.builtin.include_tasks: testcase-8793-global.yml

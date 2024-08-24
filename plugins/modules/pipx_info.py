@@ -52,6 +52,7 @@ options:
             - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
             - The C(--global) is only available in C(pipx>=1.6.0), make sure to have a compatible version when using this option.
         type: bool
+        default: false
         version_added: 9.3.0
 notes:
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
@@ -153,7 +154,7 @@ class PipXInfo(ModuleHelper):
         include_raw=dict(type='bool', default=False),
         executable=dict(type='path'),
     )
-    argument_spec["global"] = dict(type='bool')
+    argument_spec["global"] = dict(type='bool', default=False)
     module = dict(
         argument_spec=argument_spec,
         supports_check_mode=True,

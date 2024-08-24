@@ -125,6 +125,7 @@ options:
             - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
             - The C(--global) is only available in C(pipx>=1.6.0), make sure to have a compatible version when using this option.
         type: bool
+        default: false
         version_added: 9.4.0
 notes:
     - This module requires C(pipx) version 0.16.2.1 or above.
@@ -216,7 +217,7 @@ class PipX(StateModuleHelper):
         pip_args=dict(type='str'),
         suffix=dict(type='str'),
     )
-    argument_spec["global"] = dict(type='bool')
+    argument_spec["global"] = dict(type='bool', default=False)
 
     module = dict(
         argument_spec=argument_spec,
