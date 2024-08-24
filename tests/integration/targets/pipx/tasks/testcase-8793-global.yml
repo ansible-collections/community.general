@@ -26,10 +26,12 @@
     name: pycowsay
     global: true
 
-- name: Run pycowsay
+- name: Run pycowsay (should fail)
   ansible.builtin.command: pycowsay Moooooooo!
   changed_when: false
   ignore_errors: true
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
 
 - name: Install pycowsay (global)
   community.general.pipx:
@@ -37,10 +39,12 @@
     name: pycowsay
     global: true
 
-- name: Run pycowsay
+- name: Run pycowsay (should succeed)
   ansible.builtin.command: pycowsay Moooooooo!
   changed_when: false
   register: what_the_cow_said
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
 
 - name: Which cow?
   ansible.builtin.command: which pycowsay
