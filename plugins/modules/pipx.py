@@ -163,6 +163,17 @@ EXAMPLES = '''
   community.general.pipx:
     name: pycowsay
     state: absent
+
+- name: Install multiple packages from list
+  vars:
+    pipx_packages:
+      - pycowsay
+      - black
+      - tox
+  community.general.pipx:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ pipx_packages }}"
 '''
 
 
