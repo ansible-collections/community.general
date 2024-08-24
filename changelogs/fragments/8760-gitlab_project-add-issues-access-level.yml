@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_project - add option ``issues_access_level`` to enable/disable project issues (https://github.com/ansible-collections/community.general/pull/8760).

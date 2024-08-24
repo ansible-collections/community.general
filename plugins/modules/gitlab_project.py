@@ -162,10 +162,19 @@ options:
     type: bool
     default: false
     version_added: "4.0.0"
+  issues_access_level:
+    description:
+      - V(private) means that accessing issues tab is allowed only to project members.
+      - V(disabled) means that accessing issues tab is disabled.
+      - V(enabled) means that accessing issues tab is enabled.
+      - O(issues_access_level) and O(issues_enabled) are mutually exclusive.
+    type: str
+    choices: ["private", "disabled", "enabled"]
+    version_added: "9.4.0"
   issues_enabled:
     description:
       - Whether you want to create issues or not.
-      - Possible values are true and false.
+      - O(issues_access_level) and O(issues_enabled) are mutually exclusive.
     type: bool
     default: true
   lfs_enabled:
@@ -187,7 +196,6 @@ options:
   merge_requests_enabled:
     description:
       - If merge requests can be made or not.
-      - Possible values are true and false.
     type: bool
     default: true
   model_registry_access_level:
@@ -432,6 +440,7 @@ class GitLabProject(object):
             'feature_flags_access_level': options['feature_flags_access_level'],
             'forking_access_level': options['forking_access_level'],
             'infrastructure_access_level': options['infrastructure_access_level'],
+            'issues_access_level': options['issues_access_level'],
             'issues_enabled': options['issues_enabled'],
             'lfs_enabled': options['lfs_enabled'],
             'merge_method': options['merge_method'],
@@ -605,6 +614,7 @@ def main():
         import_url=dict(type='str'),
         infrastructure_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         initialize_with_readme=dict(type='bool', default=False),
+        issues_access_level=dict(type='str', choices=['private', 'disabled', 'enabled']),
         issues_enabled=dict(type='bool', default=True),
         lfs_enabled=dict(default=False, type='bool'),
         merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
@@ -641,6 +651,7 @@ def main():
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
             ['group', 'username'],
+            ['issues_access_level', 'issues_enabled'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -668,6 +679,7 @@ def main():
     import_url = module.params['import_url']
     infrastructure_access_level = module.params['infrastructure_access_level']
     initialize_with_readme = module.params['initialize_with_readme']
+    issues_access_level = module.params['issues_access_level']
     issues_enabled = module.params['issues_enabled']
     lfs_enabled = module.params['lfs_enabled']
     merge_method = module.params['merge_method']
@@ -751,6 +763,7 @@ def main():
             "import_url": import_url,
             "infrastructure_access_level": infrastructure_access_level,
             "initialize_with_readme": initialize_with_readme,
+            "issues_access_level": issues_access_level,
             "issues_enabled": issues_enabled,
             "lfs_enabled": lfs_enabled,
             "merge_method": merge_method,
