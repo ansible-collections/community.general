@@ -1,0 +1,42 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Uninstall pycowsay
+  community.general.pipx:
+    state: uninstall
+    name: pycowsay
+
+- name: Run pycowsay
+  ansible.builtin.command: pycowsay Moooooooo!
+  changed_when: false
+  ignore_errors: true
+
+- name: Uninstall pycowsay (global)
+  community.general.pipx:
+    state: uninstall
+    name: pycowsay
+    global: true
+
+- name: Install pycowsay
+  community.general.pipx:
+    state: install
+    name: pycowsay
+    global: true
+
+- name: Run pycowsay
+  ansible.builtin.command: pycowsay Moooooooo!
+  changed_when: false
+  register: what_the_cow_said
+
+- name: Which cow?
+  ansible.builtin.command: which pycowsay
+  changed_when: false
+  register: which_cow
+
+- name: Assert Moooooooo
+  ansible.builtin.assert:
+    that:
+      - "'Moooooooo!' in what_the_cow_said.stdout"
+      - "'/usr/local/bin/pycowsay' in which_cow.stdout"
