@@ -521,6 +521,8 @@ class GitLabProject(object):
             return True
 
         arguments['namespace_id'] = namespace.id
+        if 'container_expiration_policy' in arguments:
+            arguments['container_expiration_policy_attributes'] = arguments['container_expiration_policy']
         try:
             project = self._gitlab.projects.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
@@ -548,9 +550,9 @@ class GitLabProject(object):
 
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
-                if getattr(project, arg_key) != arguments[arg_key]:
+                if getattr(project, arg_key, None) != arguments[arg_key]:
                     if arg_key == 'container_expiration_policy':
-                        old_val = getattr(project, arg_key)
+                        old_val = getattr(project, arg_key, {})
                         final_val = {key: value for key, value in arg_value.items() if value is not None}
 
                         if final_val.get('older_than') == '0d':
