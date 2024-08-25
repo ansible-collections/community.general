@@ -4,7 +4,7 @@ minor_changes:
 deprecated_features:
   - >
     pipx -
-    support for versions of the command line tool ``pipx`` older than C(1.7.0) is deprecated and will be removed in community.general 11.0.0
+    support for versions of the command line tool ``pipx`` older than ``1.7.0`` is deprecated and will be removed in community.general 11.0.0
     (https://github.com/ansible-collections/community.general/pull/8793).
   - >
     pipx_info -
