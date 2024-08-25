@@ -14,6 +14,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 
 
 def cause_changes(on_success=None, on_failure=None, when=None):
+    # Parameters on_success and on_failure are deprecated and should be removed in community.general 12.0.0
 
     def deco(func):
         @wraps(func)

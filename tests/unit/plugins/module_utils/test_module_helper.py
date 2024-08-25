@@ -119,6 +119,11 @@ def test_variable_meta_change():
     assert vd.has_changed('d')
 
 
+#
+# DEPRECATION NOTICE
+# Parameters on_success and on_failure are deprecated and will be removed in community.genral 12.0.0
+# Remove testcases with those params when releasing 12.0.0
+#
 CAUSE_CHG_DECO_PARAMS = ['deco_args', 'expect_exception', 'expect_changed']
 CAUSE_CHG_DECO = dict(
     none_succ=dict(deco_args={}, expect_exception=False, expect_changed=None),
