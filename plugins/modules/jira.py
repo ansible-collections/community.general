@@ -544,7 +544,7 @@ class JIRA(StateModuleHelper):
         self.vars.uri = self.vars.uri.strip('/')
         self.vars.set('restbase', self.vars.uri + '/rest/api/2')
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_create(self):
         createfields = {
             'project': {'key': self.vars.project},
@@ -562,7 +562,7 @@ class JIRA(StateModuleHelper):
         url = self.vars.restbase + '/issue/'
         self.vars.meta = self.post(url, data)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_comment(self):
         data = {
             'body': self.vars.comment
@@ -578,7 +578,7 @@ class JIRA(StateModuleHelper):
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
         self.vars.meta = self.post(url, data)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_worklog(self):
         data = {
             'comment': self.vars.comment
@@ -594,7 +594,7 @@ class JIRA(StateModuleHelper):
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/worklog'
         self.vars.meta = self.post(url, data)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_edit(self):
         data = {
             'fields': self.vars.fields
@@ -602,7 +602,7 @@ class JIRA(StateModuleHelper):
         url = self.vars.restbase + '/issue/' + self.vars.issue
         self.vars.meta = self.put(url, data)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_update(self):
         data = {
             "update": self.vars.fields,
@@ -624,7 +624,7 @@ class JIRA(StateModuleHelper):
 
         self.vars.meta = self.get(url)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_transition(self):
         # Find the transition id
         turl = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
@@ -657,7 +657,7 @@ class JIRA(StateModuleHelper):
         url = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
         self.vars.meta = self.post(url, data)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_link(self):
         data = {
             'type': {'name': self.vars.linktype},
@@ -667,7 +667,7 @@ class JIRA(StateModuleHelper):
         url = self.vars.restbase + '/issueLink/'
         self.vars.meta = self.post(url, data)
 
-    @cause_changes(on_success=True)
+    @cause_changes(when="success")
     def operation_attach(self):
         v = self.vars
         filename = v.attachment.get('filename')
