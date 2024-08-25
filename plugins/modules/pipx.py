@@ -117,18 +117,19 @@ options:
     suffix:
         description:
             - Optional suffix for virtual environment and executable names.
-            - "B(Warning): C(pipx) documentation states this is an B(experimental) feature subject to change."
+            - "B(Warning:) C(pipx) documentation states this is an B(experimental) feature subject to change."
         type: str
         version_added: 9.3.0
     global:
         description:
             - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
-            - The C(--global) is only available in C(pipx>=1.6.0), make sure to have a compatible version when using this option.
+            - The C(--global) is only available in C(pipx>=1.6.0), so make sure to have a compatible version when using this option.
+              Moreover, a nasty bug with C(--global) was fixed in C(pipx==1.7.0), so it is strongly recommended you used that version or newer.
         type: bool
         default: false
         version_added: 9.4.0
 notes:
-    - This module requires C(pipx) version 0.16.2.1 or above.
+    - This module requires C(pipx) version 0.16.2.1 or above. From community.general 11.0.0 onwards, the module will require C(pipx>=1.7.0).
     - Please note that C(pipx) requires Python 3.6 or above.
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.

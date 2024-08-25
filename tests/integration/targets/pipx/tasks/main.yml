@@ -235,15 +235,15 @@
 
 - name: install pipx
   pip:
-    name: pipx>=1.6.0
+    name: pipx>=1.7.0
     extra_args: --user
   ignore_errors: true
-  register: pipx160_install
+  register: pipx170_install
 
 - name: Recent features
   when:
-    - pipx160_install is not failed
-    - pipx160_install is changed
+    - pipx170_install is not failed
+    - pipx170_install is changed
   block:
     - name: Include testcase for PR 8793 --global
       ansible.builtin.include_tasks: testcase-8793-global.yml
