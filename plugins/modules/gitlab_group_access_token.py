@@ -313,7 +313,10 @@ def main():
                     module.exit_json(changed=True, msg="Successfully recreated access token", access_token=gitlab_access_token.access_token_object._attrs)
         else:
             gitlab_access_token.create_access_token(group, {'name': name, 'scopes': scopes, 'access_level': access_level, 'expires_at': expires_at})
-            module.exit_json(changed=True, msg="Successfully created access token", access_token=gitlab_access_token.access_token_object._attrs)
+            if module.check_mode:
+                module.exit_json(changed=True, msg="Successfully created access token", access_token={})
+            else:
+                module.exit_json(changed=True, msg="Successfully created access token", access_token=gitlab_access_token.access_token_object._attrs)
 
 
 if __name__ == '__main__':
