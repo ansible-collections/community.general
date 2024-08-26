@@ -1,0 +1,40 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Ensure /opt/pipx
+  ansible.builtin.file:
+    path: /opt/pipx
+    state: directory
+    mode: 0755
+
+- name: Install tox site-wide
+  community.general.pipx:
+    name: tox
+    state: latest
+  register: install_tox_sitewide
+  environment:
+    PIPX_HOME: /opt/pipx
+    PIPX_BIN_DIR: /usr/local/bin
+
+- name: stat /usr/local/bin/tox
+  ansible.builtin.stat:
+    path: /usr/local/bin/tox
+  register: usrlocaltox
+
+- name: Uninstall tox site-wide
+  community.general.pipx:
+    name: tox
+    state: uninstall
+  register: uninstall_tox_sitewide
+  environment:
+    PIPX_HOME: /opt/pipx
+    PIPX_BIN_DIR: /usr/local/bin
+
+- name: check assertions
+  ansible.builtin.assert:
+    that:
+      - install_tox_sitewide is changed
+      - usrlocaltox.stat.exists
+      - uninstall_tox_sitewide is changed
