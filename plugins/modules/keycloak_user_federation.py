@@ -722,12 +722,14 @@ from copy import deepcopy
 
 
 def normalize_kc_comp(comp):
-    # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
-    # to make change detection and diff more accurate we set it again in the kc responses
     if 'config' in comp:
+        # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
+        # to make change detection and diff more accurate we set it again in the kc responses
         if 'krbPrincipalAttribute' not in comp['config']:
             comp['config']['krbPrincipalAttribute'] = ['']
 
+        # kc stores a timestamp of the last sync in `lastSync` to time the periodic sync, it is removed to minimize diff/changes
+        comp['config'].pop('lastSync', None)
 
 def sanitize(comp):
     compcopy = deepcopy(comp)
@@ -1049,8 +1051,7 @@ def main():
 
             after_comp = kc.get_component(cid, realm)
             after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
-            normalize_kc_comp(after_comp)
-            after_comp_sanitized = sanitize(after_comp)
+            after_comp_sanitized = sanitize(normalize_kc_comp(after_comp))
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized
             if module._diff:
