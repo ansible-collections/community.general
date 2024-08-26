@@ -24,26 +24,29 @@ _state_map = dict(
 
 
 def pipx_runner(module, command, **kwargs):
+    arg_formats = dict(
+        state=fmt.as_map(_state_map),
+        name=fmt.as_list(),
+        name_source=fmt.as_func(fmt.unpack_args(lambda n, s: [s] if s else [n])),
+        install_apps=fmt.as_bool("--include-apps"),
+        install_deps=fmt.as_bool("--include-deps"),
+        inject_packages=fmt.as_list(),
+        force=fmt.as_bool("--force"),
+        include_injected=fmt.as_bool("--include-injected"),
+        index_url=fmt.as_opt_val('--index-url'),
+        python=fmt.as_opt_val('--python'),
+        system_site_packages=fmt.as_bool("--system-site-packages"),
+        _list=fmt.as_fixed(['list', '--include-injected', '--json']),
+        editable=fmt.as_bool("--editable"),
+        pip_args=fmt.as_opt_eq_val('--pip-args'),
+        suffix=fmt.as_opt_val('--suffix'),
+    )
+    arg_formats["global"] = fmt.as_bool("--global")
+
     runner = CmdRunner(
         module,
         command=command,
-        arg_formats=dict(
-            state=fmt.as_map(_state_map),
-            name=fmt.as_list(),
-            name_source=fmt.as_func(fmt.unpack_args(lambda n, s: [s] if s else [n])),
-            install_apps=fmt.as_bool("--include-apps"),
-            install_deps=fmt.as_bool("--include-deps"),
-            inject_packages=fmt.as_list(),
-            force=fmt.as_bool("--force"),
-            include_injected=fmt.as_bool("--include-injected"),
-            index_url=fmt.as_opt_val('--index-url'),
-            python=fmt.as_opt_val('--python'),
-            system_site_packages=fmt.as_bool("--system-site-packages"),
-            _list=fmt.as_fixed(['list', '--include-injected', '--json']),
-            editable=fmt.as_bool("--editable"),
-            pip_args=fmt.as_opt_eq_val('--pip-args'),
-            suffix=fmt.as_opt_val('--suffix'),
-        ),
+        arg_formats=arg_formats,
         environ_update={'USE_EMOJI': '0'},
         check_rc=True,
         **kwargs

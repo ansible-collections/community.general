@@ -1,0 +1,12 @@
+minor_changes:
+  - pipx - added parameter ``global`` to module (https://github.com/ansible-collections/community.general/pull/8793).
+  - pipx_info - added parameter ``global`` to module (https://github.com/ansible-collections/community.general/pull/8793).
+deprecated_features:
+  - >
+    pipx -
+    support for versions of the command line tool ``pipx`` older than ``1.7.0`` is deprecated and will be removed in community.general 11.0.0
+    (https://github.com/ansible-collections/community.general/pull/8793).
+  - >
+    pipx_info -
+    support for versions of the command line tool ``pipx`` older than ``1.7.0`` is deprecated and will be removed in community.general 11.0.0
+    (https://github.com/ansible-collections/community.general/pull/8793).
