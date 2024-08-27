@@ -150,7 +150,7 @@ options:
         description:
             - Spec metadata file for O(state=install_all).
             - This content of the file is usually generated with C(pipx list --json), and it can be obtained with M(community.general.pipx_info)
-              with O(ignore:include_raw=true) and obtaining the content from the RV(ignore:raw_output).
+              with O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
         type: path
         version_added: 9.4.0
 notes:
