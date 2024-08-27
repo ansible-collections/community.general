@@ -253,3 +253,6 @@
 
     - name: Include testcase for PR 8809 pin
       ansible.builtin.include_tasks: testcase-8809-pin.yml
+
+    - name: Include testcase for PR 8809 injectpkg
+      ansible.builtin.include_tasks: testcase-8809-uninjectpkg.yml

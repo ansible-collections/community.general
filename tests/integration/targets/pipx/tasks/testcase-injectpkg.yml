@@ -30,14 +30,6 @@
     install_apps: true
   register: inject_pkgs_apps_pylint
 
-- name: Uninject package
-  community.general.pipx:
-    state: uninject
-    name: pylint
-    inject_packages:
-      - black
-  register: uninject_b
-
 - name: Cleanup pylint
   community.general.pipx:
     state: absent
@@ -55,4 +47,3 @@
       - '"pylint" in inject_pkgs_apps_pylint.application'
       - '"black" in inject_pkgs_apps_pylint.application["pylint"]["injected"]'
       - uninstall_pylint is changed
-      - uninject_b is changed
