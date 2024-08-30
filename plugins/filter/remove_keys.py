@@ -127,7 +127,7 @@ def remove_keys(data, target=None, matching_parameter='equal'):
         def keep_key(key):
             return tt.match(key) is None
 
-    return [dict((k, v) for k, v in d.items() if keep_key(k)) for d in data]
+    return [{k: v for k, v in d.items() if keep_key(k)} for d in data]
 
 
 class FilterModule(object):

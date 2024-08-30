@@ -286,7 +286,7 @@ class BalancerMember(object):
                           'hot_standby': 'Stby',
                           'ignore_errors': 'Ign'}
         actual_status = str(self.attributes['Status'])
-        status = dict((mode, patt in actual_status) for mode, patt in iteritems(status_mapping))
+        status = {mode: patt in actual_status for mode, patt in iteritems(status_mapping)}
         return status
 
     def set_member_status(self, values):
