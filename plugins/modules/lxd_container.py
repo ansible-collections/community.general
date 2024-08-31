@@ -768,7 +768,7 @@ class LXDContainerManagement(object):
             self.old_instance_json = self._get_instance_json()
             self.old_sections = {
                 section: adjust_content(content)
-                for section, content in (self.old_instance_json.get('metadata', None) or {}).items()
+                for section, content in self.old_instance_json.get('metadata', {}).items()
                 if section in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS)
             }
 

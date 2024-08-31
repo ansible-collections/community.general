@@ -886,7 +886,7 @@ def main():
         new_param_value = module.params.get(param)
         old_value = before_comp[camel(param)] if camel(param) in before_comp else None
         if param == 'mappers':
-            new_param_value = [{k: v for k, v in x.items() if x[k] is not None} for x in new_param_value]
+            new_param_value = [{k: v for k, v in x.items() if v is not None} for x in new_param_value]
         if new_param_value != old_value:
             changeset[camel(param)] = new_param_value
 
@@ -895,7 +895,7 @@ def main():
         if module.params['provider_id'] in ['kerberos', 'sssd']:
             module.fail_json(msg='Cannot configure mappers for {type} provider.'.format(type=module.params['provider_id']))
         for change in module.params['mappers']:
-            change = {k: v for k, v in change.items() if change[k] is not None}
+            change = {k: v for k, v in change.items() if v is not None}
             if change.get('id') is None and change.get('name') is None:
                 module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
             if cid is None:
