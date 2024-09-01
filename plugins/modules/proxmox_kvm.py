@@ -970,7 +970,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             self.module.fail_json(msg='Getting information for VM with vmid = %s failed with exception: %s' % (vmid, e))
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
@@ -996,7 +996,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         return proxmox_node.qemu(vmid).config.set(**kwargs) is None
 
@@ -1031,7 +1031,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
         kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
 
         version = self.version()
