@@ -329,8 +329,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     data = json['data']
                     break
                 else:
-                    # /hosts 's 'results' is a list of all hosts, returned is paginated
-                    data = data + json['data']
+                    if json['data']:
+                        # /hosts 's 'results' is a list of all hosts, returned is paginated
+                        data = data + json['data']
                     break
 
             self._cache[self.cache_key][url] = data
