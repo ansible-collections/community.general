@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-from ansible_collections.community.general.plugins.modules.monitoring.datadog import datadog_downtime
+from ansible_collections.community.general.plugins.modules import datadog_downtime
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
@@ -36,7 +36,7 @@ class TestDatadogDowntime(ModuleTestCase):
             set_module_args({})
             self.module.main()
 
-    @patch("ansible_collections.community.general.plugins.modules.monitoring.datadog.datadog_downtime.DowntimesApi")
+    @patch("ansible_collections.community.general.plugins.modules.datadog_downtime.DowntimesApi")
     def test_create_downtime_when_no_id(self, downtimes_api_mock):
         set_module_args({
             "monitor_tags": ["foo:bar"],
@@ -60,10 +60,11 @@ class TestDatadogDowntime(ModuleTestCase):
         downtime.end = 2222
         downtime.timezone = "UTC"
         downtime.recurrence = DowntimeRecurrence(
-            rrule="rrule"
+            rrule="rrule",
+            type="rrule"
         )
 
-        create_downtime_mock = MagicMock(return_value=Downtime(id=12345))
+        create_downtime_mock = MagicMock(return_value=self.__downtime_with_id(12345))
         downtimes_api_mock.return_value = MagicMock(create_downtime=create_downtime_mock)
         with self.assertRaises(AnsibleExitJson) as result:
             self.module.main()
@@ -71,7 +72,7 @@ class TestDatadogDowntime(ModuleTestCase):
         self.assertEqual(result.exception.args[0]['downtime']['id'], 12345)
         create_downtime_mock.assert_called_once_with(downtime)
 
-    @patch("ansible_collections.community.general.plugins.modules.monitoring.datadog.datadog_downtime.DowntimesApi")
+    @patch("ansible_collections.community.general.plugins.modules.datadog_downtime.DowntimesApi")
     def test_create_downtime_when_id_and_disabled(self, downtimes_api_mock):
         set_module_args({
             "id": 1212,
@@ -96,11 +97,16 @@ class TestDatadogDowntime(ModuleTestCase):
         downtime.end = 2222
         downtime.timezone = "UTC"
         downtime.recurrence = DowntimeRecurrence(
-            rrule="rrule"
+            rrule="rrule",
+            type="rrule"
         )
 
-        create_downtime_mock = MagicMock(return_value=Downtime(id=12345))
-        get_downtime_mock = MagicMock(return_value=Downtime(id=1212, disabled=True))
+        disabled_downtime = Downtime()
+        disabled_downtime.disabled = True
+        disabled_downtime.id = 1212
+
+        create_downtime_mock = MagicMock(return_value=self.__downtime_with_id(12345))
+        get_downtime_mock = MagicMock(return_value=disabled_downtime)
         downtimes_api_mock.return_value = MagicMock(
             create_downtime=create_downtime_mock, get_downtime=get_downtime_mock
         )
@@ -111,7 +117,7 @@ class TestDatadogDowntime(ModuleTestCase):
         create_downtime_mock.assert_called_once_with(downtime)
         get_downtime_mock.assert_called_once_with(1212)
 
-    @patch("ansible_collections.community.general.plugins.modules.monitoring.datadog.datadog_downtime.DowntimesApi")
+    @patch("ansible_collections.community.general.plugins.modules.datadog_downtime.DowntimesApi")
     def test_update_downtime_when_not_disabled(self, downtimes_api_mock):
         set_module_args({
             "id": 1212,
@@ -136,11 +142,16 @@ class TestDatadogDowntime(ModuleTestCase):
         downtime.end = 2222
         downtime.timezone = "UTC"
         downtime.recurrence = DowntimeRecurrence(
-            rrule="rrule"
+            rrule="rrule",
+            type="rrule"
         )
 
-        update_downtime_mock = MagicMock(return_value=Downtime(id=1212))
-        get_downtime_mock = MagicMock(return_value=Downtime(id=1212, disabled=False))
+        enabled_downtime = Downtime()
+        enabled_downtime.disabled = False
+        enabled_downtime.id = 1212
+
+        update_downtime_mock = MagicMock(return_value=self.__downtime_with_id(1212))
+        get_downtime_mock = MagicMock(return_value=enabled_downtime)
         downtimes_api_mock.return_value = MagicMock(
             update_downtime=update_downtime_mock, get_downtime=get_downtime_mock
         )
@@ -151,7 +162,7 @@ class TestDatadogDowntime(ModuleTestCase):
         update_downtime_mock.assert_called_once_with(1212, downtime)
         get_downtime_mock.assert_called_once_with(1212)
 
-    @patch("ansible_collections.community.general.plugins.modules.monitoring.datadog.datadog_downtime.DowntimesApi")
+    @patch("ansible_collections.community.general.plugins.modules.datadog_downtime.DowntimesApi")
     def test_update_downtime_no_change(self, downtimes_api_mock):
         set_module_args({
             "id": 1212,
@@ -176,7 +187,8 @@ class TestDatadogDowntime(ModuleTestCase):
         downtime.end = 2222
         downtime.timezone = "UTC"
         downtime.recurrence = DowntimeRecurrence(
-            rrule="rrule"
+            rrule="rrule",
+            type="rrule"
         )
 
         downtime_get = Downtime()
@@ -205,7 +217,7 @@ class TestDatadogDowntime(ModuleTestCase):
         update_downtime_mock.assert_called_once_with(1212, downtime)
         get_downtime_mock.assert_called_once_with(1212)
 
-    @patch("ansible_collections.community.general.plugins.modules.monitoring.datadog.datadog_downtime.DowntimesApi")
+    @patch("ansible_collections.community.general.plugins.modules.datadog_downtime.DowntimesApi")
     def test_delete_downtime(self, downtimes_api_mock):
         set_module_args({
             "id": 1212,
@@ -215,12 +227,16 @@ class TestDatadogDowntime(ModuleTestCase):
         })
 
         cancel_downtime_mock = MagicMock()
-        get_downtime_mock = MagicMock(return_value=Downtime(id=1212))
         downtimes_api_mock.return_value = MagicMock(
-            get_downtime=get_downtime_mock,
+            get_downtime=self.__downtime_with_id,
             cancel_downtime=cancel_downtime_mock
         )
         with self.assertRaises(AnsibleExitJson) as result:
             self.module.main()
         self.assertTrue(result.exception.args[0]['changed'])
         cancel_downtime_mock.assert_called_once_with(1212)
+
+    def __downtime_with_id(self, id):
+        downtime = Downtime()
+        downtime.id = id
+        return downtime
