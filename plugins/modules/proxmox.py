@@ -771,7 +771,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 )
 
         # Remove all empty kwarg entries
-        kwargs = dict((key, val) for key, val in kwargs.items() if val is not None)
+        kwargs = {key: val for key, val in kwargs.items() if val is not None}
 
         if cpus is not None:
             kwargs["cpulimit"] = cpus
@@ -842,7 +842,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Remove all empty kwarg entries
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         pve_version = self.version()
 

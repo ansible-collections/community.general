@@ -670,7 +670,7 @@ def main():
         backupwindow=backupwindow,
     )
 
-    kwargs = dict((k, v) for k, v in check_items.items() if v is not None)
+    kwargs = {k: v for k, v in check_items.items() if v is not None}
 
     # setup the auth
     try:

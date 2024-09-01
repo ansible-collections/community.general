@@ -190,7 +190,7 @@ def main():
     try:
         for file, filedata in (botmeta.get('files') or {}).items():
             file = convert_macros(file, macros)
-            filedata = dict((k, convert_macros(v, macros)) for k, v in filedata.items())
+            filedata = {k: convert_macros(v, macros) for k, v in filedata.items()}
             files[file] = filedata
             for k, v in filedata.items():
                 if k in LIST_ENTRIES:

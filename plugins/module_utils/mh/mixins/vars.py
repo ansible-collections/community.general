@@ -113,7 +113,7 @@ class VarDict(object):
         self._meta[name] = meta
 
     def output(self):
-        return dict((k, v) for k, v in self._data.items() if self.meta(k).output)
+        return {k: v for k, v in self._data.items() if self.meta(k).output}
 
     def diff(self):
         diff_results = [(k, self.meta(k).diff_result) for k in self._data]
@@ -125,7 +125,7 @@ class VarDict(object):
         return None
 
     def facts(self):
-        facts_result = dict((k, v) for k, v in self._data.items() if self._meta[k].fact)
+        facts_result = {k: v for k, v in self._data.items() if self._meta[k].fact}
         return facts_result if facts_result else None
 
     def change_vars(self):

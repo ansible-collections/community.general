@@ -616,8 +616,15 @@ class LXDContainerManagement(object):
     def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
         data = (self._get_instance_state_json() or {}).get('metadata', None) or {}
-        network = dict((k, v) for k, v in (data.get('network', None) or {}).items() if k not in ignore_devices)
-        addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items())
+        network = {
+            k: v
+            for k, v in data.get('network', {}).items()
+            if k not in ignore_devices
+        }
+        addresses = {
+            k: [a['address'] for a in v['addresses'] if a['family'] == 'inet']
+            for k, v in network.items()
+        }
         return addresses
 
     @staticmethod
@@ -748,19 +755,22 @@ class LXDContainerManagement(object):
     def run(self):
         """Run the main method."""
 
+        def adjust_content(content):
+            return content if not isinstance(content, dict) else {
+                k: v for k, v in content.items() if not (self.ignore_volatile_options and k.startswith('volatile.'))
+            }
+
         try:
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
             self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
             self.old_instance_json = self._get_instance_json()
-            self.old_sections = dict(
-                (section, content) if not isinstance(content, dict)
-                else (section, dict((k, v) for k, v in content.items()
-                                    if not (self.ignore_volatile_options and k.startswith('volatile.'))))
-                for section, content in (self.old_instance_json.get('metadata', None) or {}).items()
+            self.old_sections = {
+                section: adjust_content(content)
+                for section, content in self.old_instance_json.get('metadata', {}).items()
                 if section in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS)
-            )
+            }
 
             self.diff['before']['instance'] = self.old_sections
             # preliminary, will be overwritten in _apply_instance_configs() if called

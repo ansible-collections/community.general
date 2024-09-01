@@ -27,7 +27,7 @@ def initialize_hashids(**kwargs):
     if not HAS_HASHIDS:
         raise AnsibleError("The hashids library must be installed in order to use this plugin")
 
-    params = dict((k, v) for k, v in kwargs.items() if v)
+    params = {k: v for k, v in kwargs.items() if v}
 
     try:
         return Hashids(**params)
