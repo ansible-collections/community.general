@@ -339,7 +339,7 @@ def get_service_info(module, auth, service):
 
 def create_service(module, auth, template_id, service_name, custom_attrs, unique, wait, wait_timeout):
     # make sure that the values in custom_attrs dict are strings
-    custom_attrs_with_str = dict((k, str(v)) for k, v in custom_attrs.items())
+    custom_attrs_with_str = {k: str(v) for k, v in custom_attrs.items()}
 
     data = {
         "action": {

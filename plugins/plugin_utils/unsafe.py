@@ -24,7 +24,7 @@ def make_unsafe(value):
         return value
 
     if isinstance(value, Mapping):
-        return dict((make_unsafe(key), make_unsafe(val)) for key, val in value.items())
+        return {make_unsafe(key): make_unsafe(val) for key, val in value.items()}
     elif isinstance(value, Set):
         return set(make_unsafe(elt) for elt in value)
     elif is_sequence(value):
