@@ -169,7 +169,7 @@ def replace_keys(data, target=None, matching_parameter='equal'):
                     return a
             return key
 
-    return [dict((replace_key(k), v) for k, v in d.items()) for d in data]
+    return [{replace_key(k): v for k, v in d.items()} for d in data]
 
 
 class FilterModule(object):
