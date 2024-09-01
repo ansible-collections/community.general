@@ -683,11 +683,11 @@ class LxcContainerManagement(object):
             variables.pop(v, None)
 
         false_values = BOOLEANS_FALSE.union([None, ''])
-        result = dict(
-            (v, self.module.params[k])
+        result = {
+            v: self.module.params[k]
             for k, v in variables.items()
             if self.module.params[k] not in false_values
-        )
+        }
         return result
 
     def _config(self):

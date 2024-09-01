@@ -613,9 +613,11 @@ class RedfishUtils(object):
                     ai = dict((p['Name'], p)
                               for p in params if 'Name' in p)
         if not ai:
-            ai = dict((k[:-24],
-                       {'AllowableValues': v}) for k, v in action.items()
-                      if k.endswith('@Redfish.AllowableValues'))
+            ai = {
+                k[:-24]: {'AllowableValues': v}
+                for k, v in action.items()
+                if k.endswith('@Redfish.AllowableValues')
+            }
         return ai
 
     def _get_allowable_values(self, action, name, default_values=None):
@@ -2242,7 +2244,7 @@ class RedfishUtils(object):
                 continue
 
             # If already set to requested value, remove it from PATCH payload
-            if data[u'Attributes'][attr_name] == attributes[attr_name]:
+            if data[u'Attributes'][attr_name] == attr_value:
                 del attrs_to_patch[attr_name]
 
         warning = ""
@@ -2780,9 +2782,11 @@ class RedfishUtils(object):
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
         # get AllowableValues
-        ai = dict((k[:-24],
-                   {'AllowableValues': v}) for k, v in data.items()
-                  if k.endswith('@Redfish.AllowableValues'))
+        ai = {
+            k[:-24]: {'AllowableValues': v}
+            for k, v in data.items()
+            if k.endswith('@Redfish.AllowableValues')
+        }
         # construct payload
         payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload and not image_only:
