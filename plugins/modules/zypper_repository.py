@@ -346,7 +346,6 @@ def main():
     overwrite_multiple = module.params['overwrite_multiple']
     auto_import_keys = module.params['auto_import_keys']
     runrefresh = module.params['runrefresh']
-    list = module.params['list']
 
     zypper_version = get_zypper_version(module)
     warnings = []  # collect warning messages for final output
