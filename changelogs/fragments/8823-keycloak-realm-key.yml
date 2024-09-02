@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_realm_key: fix invalid usage of parent_id
