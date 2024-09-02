@@ -15,9 +15,9 @@ DOCUMENTATION = '''
 ---
 module: zypper_repository
 author: "Matthias Vogelgesang (@matze)"
-short_description: List, add and remove Zypper repositories
+short_description: Add and remove Zypper repositories
 description:
-    - List, add or remove Zypper repositories on SUSE and openSUSE
+    - Add or remove Zypper repositories on SUSE and openSUSE
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -28,7 +28,7 @@ attributes:
 options:
     name:
         description:
-            - A name for the repository. Not required when adding or listing repofiles.
+            - A name for the repository. Not required when adding repofiles.
         type: str
     repo:
         description:
@@ -335,10 +335,9 @@ def main():
             enabled=dict(required=False, default=True, type='bool'),
             overwrite_multiple=dict(required=False, default=False, type='bool'),
             auto_import_keys=dict(required=False, default=False, type='bool'),
-            list=dict(required=False),
         ),
         supports_check_mode=False,
-        required_one_of=[['state', 'runrefresh', 'list']],
+        required_one_of=[['state', 'runrefresh']],
     )
 
     repo = module.params['repo']
@@ -374,10 +373,6 @@ def main():
 
     def exit_unchanged():
         module.exit_json(changed=False, repodata=repodata, state=state)
-
-    if list:
-        repodatalist = _parse_repos(module)
-        module.exit_json(changed=False, repodatalist=repodatalist)
 
     # Check run-time module parameters
     if repo == '*' or alias == '*':
