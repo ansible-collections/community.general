@@ -86,7 +86,7 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         self.module = keycloak_realm_key
 
     def test_create_when_absent(self):
-        """Add a new user federation"""
+        """Add a new realm key"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
@@ -174,7 +174,7 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_create_when_present(self):
-        """Update existing user federation"""
+        """Update existing realm key""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
@@ -252,9 +252,8 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
-
     def test_delete_when_absent(self):
-        """Remove an absent user federation"""
+        """Remove an absent realm key"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
@@ -298,7 +297,7 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_delete_when_present(self):
-        """Remove an existing user federation"""
+        """Remove an existing realm key"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
