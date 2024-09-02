@@ -174,7 +174,7 @@ class TestKeycloakRealmKeys(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_create_when_present(self):
-        """Update existing realm key""
+        """Update existing realm key"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
