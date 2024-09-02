@@ -17,7 +17,7 @@ author: "Tobias Zeuch"
 short_description: List Zypper repositories
 description:
     - List Zypper repositories on SUSE and openSUSE.
-    Note: for info about packages, use the packages ansible.builtin.package_facts
+    - Note: for info about packages, use the packages ansible.builtin.package_facts
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -49,11 +49,6 @@ except ImportError:
     HAS_XML = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.common.text.converters import to_text
-from ansible.module_utils.six.moves import configparser, StringIO
-from io import open
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -93,11 +88,13 @@ def _parse_repos(module):
     else:
         module.fail_json(msg='Failed to execute "%s"' % " ".join(cmd), rc=rc, stdout=stdout, stderr=stderr)
 
+
 def get_zypper_version(module):
     rc, stdout, stderr = module.run_command([module.get_bin_path('zypper', required=True), '--version'])
     if rc != 0 or not stdout.startswith('zypper '):
         return LooseVersion('1.0')
     return LooseVersion(stdout.split()[1])
+
 
 def main():
     module = AnsibleModule(
@@ -111,6 +108,7 @@ def main():
 
     repodatalist = _parse_repos(module)
     module.exit_json(changed=False, repodatalist=repodatalist)
+
 
 if __name__ == '__main__':
     main()
