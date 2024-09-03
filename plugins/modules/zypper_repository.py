@@ -357,18 +357,21 @@ def main():
         'priority': module.params['priority'],
     }
     # rewrite bools in the language that zypper lr -x provides for easier comparison
-    if module.params['enabled']:
-        repodata['enabled'] = '1'
-    else:
-        repodata['enabled'] = '0'
-    if module.params['disable_gpg_check']:
-        repodata['gpgcheck'] = '0'
-    else:
-        repodata['gpgcheck'] = '1'
-    if module.params['autorefresh']:
-        repodata['autorefresh'] = '1'
-    else:
-        repodata['autorefresh'] = '0'
+    if 'enabled' in module.params 
+        if module.params['enabled']:
+            repodata['enabled'] = '1'
+        else:
+            repodata['enabled'] = '0'
+    if 'disable_gpg_check' in module.params
+        if module.params['disable_gpg_check']:
+            repodata['gpgcheck'] = '0'
+        else:
+            repodata['gpgcheck'] = '1'
+    if 'autorefresh' in module.params
+        if module.params['autorefresh']:
+            repodata['autorefresh'] = '1'
+        else:
+            repodata['autorefresh'] = '0'
 
     def exit_unchanged():
         module.exit_json(changed=False, repodata=repodata, state=state)
@@ -435,13 +438,17 @@ def main():
 
         # Map additional values, if available
         if 'name' in repofile_items:
-            repodata['name'] = repofile_items['name']
+            if 'name' not in repodata
+                repodata['name'] = repofile_items['name']
         if 'enabled' in repofile_items:
-            repodata['enabled'] = repofile_items['enabled']
+            if 'enabled' not in repodata
+                repodata['enabled'] = repofile_items['enabled']
         if 'autorefresh' in repofile_items:
-            repodata['autorefresh'] = repofile_items['autorefresh']
+            if 'autorefresh' not in repodata
+                repodata['autorefresh'] = repofile_items['autorefresh']
         if 'gpgcheck' in repofile_items:
-            repodata['gpgcheck'] = repofile_items['gpgcheck']
+            if 'gpgcheck' not in repodata
+                repodata['gpgcheck'] = repofile_items['gpgcheck']
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
