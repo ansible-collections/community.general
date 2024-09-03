@@ -161,6 +161,12 @@ options:
       - Filename, with optional path, of the image for the update.
     type: path
     version_added: '7.1.0'
+  update_image_type:
+    required: false
+    description:
+      - The image type to be set in OemParameters for the update.
+    type: str
+    version_added: '9.4.0'
   update_protocol:
     required: false
     description:
@@ -626,6 +632,7 @@ EXAMPLES = '''
       password: "{{ password }}"
       timeout: 600
       update_image_file: ~/images/myupdate.img
+      update_image_type: BMC
 
   - name: Multipart HTTP push with additional options; timeout is 600 seconds
       to allow for a large image transfer
@@ -848,6 +855,7 @@ def main():
             resource_id=dict(),
             update_image_uri=dict(),
             update_image_file=dict(type='path'),
+            update_image_type=dict(),
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
             update_oem_params=dict(type='dict'),
@@ -923,6 +931,7 @@ def main():
     update_opts = {
         'update_image_uri': module.params['update_image_uri'],
         'update_image_file': module.params['update_image_file'],
+        'update_image_type': module.params['update_image_type'],
         'update_protocol': module.params['update_protocol'],
         'update_targets': module.params['update_targets'],
         'update_creds': module.params['update_creds'],

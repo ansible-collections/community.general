@@ -1863,6 +1863,7 @@ class RedfishUtils(object):
         targets = update_opts.get('update_targets')
         apply_time = update_opts.get('update_apply_time')
         oem_params = update_opts.get('update_oem_params')
+        image_type = update_opts.get('update_image_type')
 
         # Ensure the image file is provided
         if not image_file:
@@ -1899,6 +1900,9 @@ class RedfishUtils(object):
             'UpdateParameters': {'content': json.dumps(payload), 'mime_type': 'application/json'},
             'UpdateFile': {'filename': image_file, 'content': image_payload, 'mime_type': 'application/octet-stream'}
         }
+        if image_type:
+            payload = {'ImageType': image_type}
+            multipart_payload["OemParameters"] = {'content': json.dumps(payload), 'mime_type': 'application/json'}
         response = self.post_request(self.root_uri + update_uri, multipart_payload, multipart=True)
         if response['ret'] is False:
             return response
