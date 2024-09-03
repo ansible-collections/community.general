@@ -14,29 +14,73 @@ DOCUMENTATION = '''
 ---
 module: zypper_repository_info
 author: "Tobias Zeuch"
+version_added: 9.4.0
 short_description: List Zypper repositories
 description:
     - List Zypper repositories on SUSE and openSUSE.
     - Note: for info about packages, use the packages ansible.builtin.package_facts
 extends_documentation_fragment:
     - community.general.attributes
-attributes:
-    check_mode:
-        support: none
-    diff_mode:
-        support: none
+    - community.general.attributes.info_module
 
 requirements:
-    - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
+    - "zypper >= 1.0  (included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0)"
     - python-xml
+notes:
+    - "for info about packages, use the module M(ansible.builtin.package_facts)"
 '''
 
 EXAMPLES = '''
-- name: List registered repositories and store in fact repositories
+- name: List registered repositories and store in variable repositories
   community.general.zypper_repository_info:
-  register: repositories
-
+  register: repodatalist
 '''
+
+RETURN = r'''
+repodatalist:
+    description:
+        - a list of repository descriptions like it is returned by the command zypper repos
+    type: list
+    elements: dict
+    contains:
+        alias:
+            description: the alias of the repository
+            type: str
+        autorefresh:
+            description: indicates, if autorefresh is enabled on the repository
+            type: int
+        enabled:
+            description: indicates, if the repository is enabled
+            type: int
+        gpgcheck:
+            description: indicates, if the GPG signature of the repository meta data is checked
+            type: int
+        name:
+            description: the name of the repository
+            type: str
+        priority:
+            description: the priority of the repository
+            type: int
+        url:
+            description: the url of the repository on the internet
+            type:str
+    sample:
+         "repositories": {
+        "changed": false,
+        "failed": false,
+        "repodatalist": [
+            {
+                "alias": "SLE-Product-SLES",
+                "autorefresh": "1",
+                "enabled": "1",
+                "gpgcheck": "1",
+                "name": "SLE-Product-SLES",
+                "priority": "99",
+                "url": "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP2/x86_64/product"
+            }
+        ]
+'''
+
 
 import traceback
 
@@ -89,22 +133,12 @@ def _parse_repos(module):
         module.fail_json(msg='Failed to execute "%s"' % " ".join(cmd), rc=rc, stdout=stdout, stderr=stderr)
 
 
-def get_zypper_version(module):
-    rc, stdout, stderr = module.run_command([module.get_bin_path('zypper', required=True), '--version'])
-    if rc != 0 or not stdout.startswith('zypper '):
-        return LooseVersion('1.0')
-    return LooseVersion(stdout.split()[1])
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
         ),
         supports_check_mode=False,
     )
-
-    zypper_version = get_zypper_version(module)
-    warnings = []  # collect warning messages for final output
 
     repodatalist = _parse_repos(module)
     module.exit_json(changed=False, repodatalist=repodatalist)
