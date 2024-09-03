@@ -17,7 +17,7 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
-from plugins.modules import keycloak_component
+from ansible_collections.community.general.plugins.modules import keycloak_component
 
 
 @contextmanager
