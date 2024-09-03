@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_component - add plugin for managing any keycloak component (https://github.com/ansible-collections/community.general/pull/8826)
