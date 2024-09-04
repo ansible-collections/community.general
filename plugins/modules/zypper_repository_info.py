@@ -64,21 +64,21 @@ repodatalist:
         url:
             description: the url of the repository on the internet
             type:str
-    sample:
-         "repositories": {
-        "changed": false,
-        "failed": false,
-        "repodatalist": [
-            {
-                "alias": "SLE-Product-SLES",
-                "autorefresh": "1",
-                "enabled": "1",
-                "gpgcheck": "1",
-                "name": "SLE-Product-SLES",
-                "priority": "99",
-                "url": "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP2/x86_64/product"
-            }
-        ]
+        sample:
+            "repositories": {
+            "changed": false,
+            "failed": false,
+            "repodatalist": [
+                {
+                    "alias": "SLE-Product-SLES",
+                    "autorefresh": "1",
+                    "enabled": "1",
+                    "gpgcheck": "1",
+                    "name": "SLE-Product-SLES",
+                    "priority": "99",
+                    "url": "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP2/x86_64/product"
+                }
+            ]
 '''
 
 
