@@ -45,11 +45,11 @@ def module_fails_on_exception(func):
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        def fix_key(k):
+            return k if k not in conflict_list else "_" + k
+
         def fix_var_conflicts(output):
-            result = dict([
-                (k if k not in conflict_list else "_" + k, v)
-                for k, v in output.items()
-            ])
+            result = {fix_key(k): v for k, v in output.items()}
             return result
 
         try:

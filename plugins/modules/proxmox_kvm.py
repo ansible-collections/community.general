@@ -1032,7 +1032,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
-        kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
+        kwargs.update({k: int(v) for k, v in kwargs.items() if isinstance(v, bool)})
 
         version = self.version()
         pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
@@ -1163,7 +1163,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             for param in valid_clone_params:
                 if self.module.params[param] is not None:
                     clone_params[param] = self.module.params[param]
-            clone_params.update(dict([k, int(v)] for k, v in clone_params.items() if isinstance(v, bool)))
+            clone_params.update({k: int(v) for k, v in clone_params.items() if isinstance(v, bool)})
             taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
         else:
             taskid = proxmox_node.qemu.create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
