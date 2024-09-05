@@ -847,8 +847,11 @@ def main():
 
     # Keycloak API expects config parameters to be arrays containing a single string element
     if config is not None:
-        module.params['config'] = dict((k, [str(v).lower() if not isinstance(v, str) else v])
-                                       for k, v in config.items() if config[k] is not None)
+        module.params['config'] = {
+            k: [str(v).lower() if not isinstance(v, str) else v]
+            for k, v in config.items()
+            if config[k] is not None
+        }
 
     if mappers is not None:
         for mapper in mappers:
