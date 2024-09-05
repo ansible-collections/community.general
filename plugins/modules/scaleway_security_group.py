@@ -135,11 +135,11 @@ from uuid import uuid4
 
 
 def payload_from_security_group(security_group):
-    return dict(
-        (k, v)
+    return {
+        k: v
         for k, v in security_group.items()
         if k != 'id' and v is not None
-    )
+    }
 
 
 def present_strategy(api, security_group):

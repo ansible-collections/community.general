@@ -193,13 +193,8 @@ def run_module():
 
     allowed_keys = ['host', 'port', 'ca_cert', 'cert_cert', 'cert_key',
                     'timeout', 'user', 'password']
-    # TODO(evrardjp): Move this back to a dict comprehension when python 2.7 is
-    # the minimum supported version
-    # client_params = {key: value for key, value in module.params.items() if key in allowed_keys}
-    client_params = dict()
-    for key, value in module.params.items():
-        if key in allowed_keys:
-            client_params[key] = value
+
+    client_params = {key: value for key, value in module.params.items() if key in allowed_keys}
     try:
         etcd = etcd3.client(**client_params)
     except Exception as exp:

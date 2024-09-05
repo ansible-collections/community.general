@@ -51,11 +51,11 @@ def scaleway_waitable_resource_argument_spec():
 
 
 def payload_from_object(scw_object):
-    return dict(
-        (k, v)
+    return {
+        k: v
         for k, v in scw_object.items()
         if k != 'id' and v is not None
-    )
+    }
 
 
 class ScalewayException(Exception):
@@ -117,10 +117,7 @@ class SecretVariables(object):
     @staticmethod
     def list_to_dict(source_list, hashed=False):
         key_value = 'hashed_value' if hashed else 'value'
-        return dict(
-            (var['key'], var[key_value])
-            for var in source_list
-        )
+        return {var['key']: var[key_value] for var in source_list}
 
     @classmethod
     def decode(cls, secrets_list, values_list):

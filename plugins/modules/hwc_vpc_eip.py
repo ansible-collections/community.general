@@ -547,8 +547,7 @@ def async_wait_create(config, result, client, timeout):
     path_parameters = {
         "publicip_id": ["publicip", "id"],
     }
-    data = dict((key, navigate_value(result, path))
-                for key, path in path_parameters.items())
+    data = {key: navigate_value(result, path) for key, path in path_parameters.items()}
 
     url = build_path(module, "publicips/{publicip_id}", data)
 

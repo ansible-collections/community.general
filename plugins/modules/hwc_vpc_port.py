@@ -560,8 +560,7 @@ def async_wait_create(config, result, client, timeout):
     path_parameters = {
         "port_id": ["port", "id"],
     }
-    data = dict((key, navigate_value(result, path))
-                for key, path in path_parameters.items())
+    data = {key: navigate_value(result, path) for key, path in path_parameters.items()}
 
     url = build_path(module, "ports/{port_id}", data)
 

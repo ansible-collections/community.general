@@ -446,7 +446,7 @@ def main():
 
     params = module.params
 
-    commands = dict((key, params[key]) for key in command_keys if params[key])
+    commands = {key: params[key] for key in command_keys if params[key]}
 
     # Ensure ufw is available
     ufw_bin = module.get_bin_path('ufw', True)

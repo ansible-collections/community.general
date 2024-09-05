@@ -120,10 +120,10 @@ class LookupModule(LookupBase):
         aws_secret_access_key = self.get_option('aws_secret_access_key')
         aws_session_token = self.get_option('aws_session_token')
 
-        context = dict(
-            (k, v) for k, v in kwargs.items()
+        context = {
+            k: v for k, v in kwargs.items()
             if k not in ('version', 'region', 'table', 'profile_name', 'aws_access_key_id', 'aws_secret_access_key', 'aws_session_token')
-        )
+        }
 
         kwargs_pass = {
             'profile_name': profile_name,

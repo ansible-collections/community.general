@@ -185,8 +185,7 @@ def get_token(module_params):
             'password': auth_password,
         }
         # Remove empty items, for instance missing client_secret
-        payload = dict(
-            (k, v) for k, v in temp_payload.items() if v is not None)
+        payload = {k: v for k, v in temp_payload.items() if v is not None}
         try:
             r = json.loads(to_native(open_url(auth_url, method='POST',
                                               validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,

@@ -558,9 +558,11 @@ def create_payload(module, uuid):
 
     # Filter out the few options that are not valid VM properties.
     module_options = ['force', 'state']
-    # @TODO make this a simple {} comprehension as soon as py2 is ditched
-    # @TODO {k: v for k, v in p.items() if k not in module_options}
-    vmdef = dict([(k, v) for k, v in module.params.items() if k not in module_options and v])
+    vmdef = {
+        k: v
+        for k, v in module.params.items()
+        if k not in module_options and v
+    }
 
     try:
         vmdef_json = json.dumps(vmdef)

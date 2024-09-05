@@ -534,11 +534,7 @@ class GitLabProject(object):
     @param arguments Attributes of the project
     '''
     def get_options_with_value(self, arguments):
-        ret_arguments = dict()
-        for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                ret_arguments[arg_key] = arg_value
-
+        ret_arguments = {k: v for k, v in arguments.items() if v is not None}
         return ret_arguments
 
     '''
@@ -549,8 +545,8 @@ class GitLabProject(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(project, arg_key, None) != arguments[arg_key]:
+            if arg_value is not None:
+                if getattr(project, arg_key, None) != arg_value:
                     if arg_key == 'container_expiration_policy':
                         old_val = getattr(project, arg_key, {})
                         final_val = {key: value for key, value in arg_value.items() if value is not None}

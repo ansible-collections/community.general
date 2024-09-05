@@ -392,9 +392,7 @@ def ensure(module, client):
                       'counter': 'ipatokenhotpcounter'}
 
     # Create inverse dictionary for mapping return values
-    ipa_to_ansible = {}
-    for (k, v) in ansible_to_ipa.items():
-        ipa_to_ansible[v] = k
+    ipa_to_ansible = {v: k for k, v in ansible_to_ipa.items()}
 
     unmodifiable_after_creation = ['otptype', 'secretkey', 'algorithm',
                                    'digits', 'offset', 'interval', 'counter']

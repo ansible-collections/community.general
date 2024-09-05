@@ -1163,8 +1163,7 @@ def send_delete_volume_request(module, params, client, info):
     path_parameters = {
         "volume_id": ["volume_id"],
     }
-    data = dict((key, navigate_value(info, path))
-                for key, path in path_parameters.items())
+    data = {key: navigate_value(info, path) for key, path in path_parameters.items()}
 
     url = build_path(module, "cloudservers/{id}/detachvolume/{volume_id}", data)
 

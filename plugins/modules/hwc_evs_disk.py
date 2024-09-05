@@ -771,8 +771,7 @@ def async_wait(config, result, client, timeout):
     path_parameters = {
         "job_id": ["job_id"],
     }
-    data = dict((key, navigate_value(result, path))
-                for key, path in path_parameters.items())
+    data = {key: navigate_value(result, path) for key, path in path_parameters.items()}
 
     url = build_path(module, "jobs/{job_id}", data)
 
