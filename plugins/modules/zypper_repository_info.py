@@ -44,7 +44,7 @@ repodatalist:
     elements: dict
     contains:
         alias:
-            description: the alias of the repository
+            description: The alias of the repository.
             type: str
         autorefresh:
             description: indicates, if autorefresh is enabled on the repository
