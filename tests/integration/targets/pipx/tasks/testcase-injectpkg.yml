@@ -3,17 +3,17 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: ensure application pylint is uninstalled
+- name: Ensure application pylint is uninstalled
   community.general.pipx:
     name: pylint
     state: absent
 
-- name: install application pylint
+- name: Install application pylint
   community.general.pipx:
     name: pylint
   register: install_pylint
 
-- name: inject packages
+- name: Inject packages
   community.general.pipx:
     state: inject
     name: pylint
@@ -21,7 +21,7 @@
       - licenses
   register: inject_pkgs_pylint
 
-- name: inject packages with apps
+- name: Inject packages with apps
   community.general.pipx:
     state: inject
     name: pylint
@@ -30,13 +30,13 @@
     install_apps: true
   register: inject_pkgs_apps_pylint
 
-- name: cleanup pylint
+- name: Cleanup pylint
   community.general.pipx:
     state: absent
     name: pylint
   register: uninstall_pylint
 
-- name: check assertions inject_packages
+- name: Check assertions inject_packages
   assert:
     that:
       - install_pylint is changed
