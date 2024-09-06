@@ -1,0 +1,59 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set up environment
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  block:
+    - name: Uninstall pycowsay and black
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+
+    - name: Uninstall pycowsay and black (again)
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: uninstall_all_1
+
+    - name: Use install-all
+      community.general.pipx:
+        state: install-all
+        spec_metadata: spec.json
+      register: install_all
+
+    - name: Run pycowsay (should succeed)
+      ansible.builtin.command: pycowsay Moooooooo!
+      changed_when: false
+      register: what_the_cow_said
+
+    - name: Which cow?
+      ansible.builtin.command: which pycowsay
+      changed_when: false
+      register: which_cow
+
+    - name: Uninstall pycowsay and black (again)
+      community.general.pipx:
+        state: uninstall
+        name: "{{ item }}"
+      loop:
+        - black
+        - pycowsay
+      register: uninstall_all_2
+
+    - name: Assert uninstall-all
+      ansible.builtin.assert:
+        that:
+          - uninstall_all_1 is not changed
+          - install_all is changed
+          - "'Moooooooo!' in what_the_cow_said.stdout"
+          - "'/usr/local/bin/pycowsay' in which_cow.stdout"
+          - uninstall_all_2 is changed

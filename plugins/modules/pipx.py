@@ -26,13 +26,31 @@ attributes:
 options:
     state:
         type: str
-        choices: [present, absent, install, uninstall, uninstall_all, inject, upgrade, upgrade_all, reinstall, reinstall_all, latest]
+        choices:
+            - present
+            - absent
+            - install
+            - install_all
+            - uninstall
+            - uninstall_all
+            - inject
+            - uninject
+            - upgrade
+            - upgrade_shared
+            - upgrade_all
+            - reinstall
+            - reinstall_all
+            - latest
+            - pin
+            - unpin
         default: install
         description:
             - Desired state for the application.
             - The states V(present) and V(absent) are aliases to V(install) and V(uninstall), respectively.
             - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade).
               It was added in community.general 5.5.0.
+            - The states V(install_all), V(uninject), V(upgrade_shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0),
+              make sure to have a compatible version when using this option. These states have been added in community.general 9.4.0.
     name:
         type: str
         description:
@@ -128,6 +146,13 @@ options:
         type: bool
         default: false
         version_added: 9.4.0
+    spec_metadata:
+        description:
+            - Spec metadata file for O(state=install_all).
+            - This content of the file is usually generated with C(pipx list --json), and it can be obtained with M(community.general.pipx_info)
+              with O(community.general.pipx_info#module:include_raw=true) and obtaining the content from the RV(community.general.pipx_info#module:raw_output).
+        type: path
+        version_added: 9.4.0
 notes:
     - This module requires C(pipx) version 0.16.2.1 or above. From community.general 11.0.0 onwards, the module will require C(pipx>=1.7.0).
     - Please note that C(pipx) requires Python 3.6 or above.
@@ -201,8 +226,10 @@ class PipX(StateModuleHelper):
     output_params = ['name', 'source', 'index_url', 'force', 'installdeps']
     argument_spec = dict(
         state=dict(type='str', default='install',
-                   choices=['present', 'absent', 'install', 'uninstall', 'uninstall_all',
-                            'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all', 'latest']),
+                   choices=[
+                       'present', 'absent', 'install', 'install_all', 'uninstall', 'uninstall_all', 'inject', 'uninject',
+                       'upgrade', 'upgrade_shared', 'upgrade_all', 'reinstall', 'reinstall_all', 'latest', 'pin', 'unpin',
+                   ]),
         name=dict(type='str'),
         source=dict(type='str'),
         install_apps=dict(type='bool', default=False),
@@ -217,6 +244,7 @@ class PipX(StateModuleHelper):
         editable=dict(type='bool', default=False),
         pip_args=dict(type='str'),
         suffix=dict(type='str'),
+        spec_metadata=dict(type='path'),
     )
     argument_spec["global"] = dict(type='bool', default=False)
 
@@ -225,12 +253,15 @@ class PipX(StateModuleHelper):
         required_if=[
             ('state', 'present', ['name']),
             ('state', 'install', ['name']),
+            ('state', 'install_all', ['spec_metadata']),
             ('state', 'absent', ['name']),
             ('state', 'uninstall', ['name']),
             ('state', 'upgrade', ['name']),
             ('state', 'reinstall', ['name']),
             ('state', 'latest', ['name']),
             ('state', 'inject', ['name', 'inject_packages']),
+            ('state', 'pin', ['name']),
+            ('state', 'unpin', ['name']),
         ],
         required_by=dict(
             suffix="name",
@@ -284,8 +315,7 @@ class PipX(StateModuleHelper):
         self.vars.stdout = ctx.results_out
         self.vars.stderr = ctx.results_err
         self.vars.cmd = ctx.cmd
-        if self.verbosity >= 4:
-            self.vars.run_info = ctx.run_info
+        self.vars.set('run_info', ctx.run_info, verbosity=4)
 
     def state_install(self):
         if not self.vars.application or self.vars.force:
@@ -296,6 +326,12 @@ class PipX(StateModuleHelper):
                 self._capture_results(ctx)
 
     state_present = state_install
+
+    def state_install_all(self):
+        self.changed = True
+        with self.runner('state global index_url force python system_site_packages editable pip_args spec_metadata', check_mode_skip=True) as ctx:
+            ctx.run(name_source=[self.vars.name, self.vars.source])
+            self._capture_results(ctx)
 
     def state_upgrade(self):
         name = _make_name(self.vars.name, self.vars.suffix)
@@ -336,6 +372,14 @@ class PipX(StateModuleHelper):
             ctx.run(name=name)
             self._capture_results(ctx)
 
+    def state_uninject(self):
+        name = _make_name(self.vars.name, self.vars.suffix)
+        if not self.vars.application:
+            self.do_raise("Trying to uninject packages into a non-existent application: {0}".format(name))
+        with self.runner('state global name inject_packages', check_mode_skip=True) as ctx:
+            ctx.run(name=name)
+            self._capture_results(ctx)
+
     def state_uninstall_all(self):
         with self.runner('state global', check_mode_skip=True) as ctx:
             ctx.run()
@@ -353,6 +397,11 @@ class PipX(StateModuleHelper):
             ctx.run()
             self._capture_results(ctx)
 
+    def state_upgrade_shared(self):
+        with self.runner('state global pip_args', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
+
     def state_latest(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
@@ -363,6 +412,16 @@ class PipX(StateModuleHelper):
 
         with self.runner('state include_injected index_url force editable pip_args name', check_mode_skip=True) as ctx:
             ctx.run(state='upgrade')
+            self._capture_results(ctx)
+
+    def state_pin(self):
+        with self.runner('state global name', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
+
+    def state_unpin(self):
+        with self.runner('state global name', check_mode_skip=True) as ctx:
+            ctx.run()
             self._capture_results(ctx)
 
 

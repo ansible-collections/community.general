@@ -11,15 +11,20 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 
 _state_map = dict(
     install='install',
+    install_all='install-all',
     present='install',
     uninstall='uninstall',
     absent='uninstall',
     uninstall_all='uninstall-all',
     inject='inject',
+    uninject='uninject',
     upgrade='upgrade',
+    upgrade_shared='upgrade-shared',
     upgrade_all='upgrade-all',
     reinstall='reinstall',
     reinstall_all='reinstall-all',
+    pin='pin',
+    unpin='unpin',
 )
 
 
