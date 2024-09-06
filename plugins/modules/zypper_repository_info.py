@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: zypper_repository_info
-author: "Tobias Zeuch"
+author: "Tobias Zeuch (@TobiasZeuch181)"
 version_added: 9.4.0
 short_description: List Zypper repositories
 description:
