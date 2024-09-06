@@ -39,7 +39,7 @@ EXAMPLES = '''
 RETURN = r'''
 repodatalist:
     description:
-        - a list of repository descriptions like it is returned by the command zypper repos
+        - A list of repository descriptions like it is returned by the command C(zypper repos).
     type: list
     elements: dict
     contains:
