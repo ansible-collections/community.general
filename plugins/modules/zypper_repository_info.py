@@ -65,10 +65,7 @@ repodatalist:
             description: the url of the repository on the internet
             type:str
     sample:
-            "repositories": {
-            "changed": false,
-            "failed": false,
-            "repodatalist": [
+            [
                 {
                     "alias": "SLE-Product-SLES",
                     "autorefresh": "1",
