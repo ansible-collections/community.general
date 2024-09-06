@@ -49,7 +49,7 @@ options:
             - The states V(present) and V(absent) are aliases to V(install) and V(uninstall), respectively.
             - The state V(latest) is equivalent to executing the task twice, with state V(install) and then V(upgrade).
               It was added in community.general 5.5.0.
-            - The states V(install_all), V(uninject), V(upgrade-shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0),
+            - The states V(install_all), V(uninject), V(upgrade_shared), V(pin) and V(unpin) are only available in C(pipx>=1.6.0),
               make sure to have a compatible version when using this option. These states have been added in community.general 9.4.0.
     name:
         type: str
