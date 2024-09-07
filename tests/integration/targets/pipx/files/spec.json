@@ -1,0 +1,91 @@
+{
+    "pipx_spec_version": "0.1",
+    "venvs": {
+        "black": {
+            "metadata": {
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/az/.local/pipx/venvs/black/bin/black",
+                            "__type__": "Path"
+                        },
+                        {
+                            "__Path__": "/home/az/.local/pipx/venvs/black/bin/blackd",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {},
+                    "apps": [
+                        "black",
+                        "blackd"
+                    ],
+                    "apps_of_dependencies": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "black",
+                    "package_or_url": "black",
+                    "package_version": "24.8.0",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.5",
+                "python_version": "Python 3.11.9",
+                "source_interpreter": {
+                    "__Path__": "/home/az/.pyenv/versions/3.11.9/bin/python3.11",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+        "pycowsay": {
+            "metadata": {
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/home/az/.local/pipx/venvs/pycowsay/bin/pycowsay",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {},
+                    "apps": [
+                        "pycowsay"
+                    ],
+                    "apps_of_dependencies": [],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "man_pages": [
+                        "man6/pycowsay.6"
+                    ],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [
+                        {
+                            "__Path__": "/home/az/.local/pipx/venvs/pycowsay/share/man/man6/pycowsay.6",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "man_paths_of_dependencies": {},
+                    "package": "pycowsay",
+                    "package_or_url": "pycowsay",
+                    "package_version": "0.0.0.2",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.5",
+                "python_version": "Python 3.11.9",
+                "source_interpreter": {
+                    "__Path__": "/home/az/.pyenv/versions/3.11.9/bin/python3.11",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        },
+    }
+}
