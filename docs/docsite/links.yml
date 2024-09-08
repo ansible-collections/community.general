@@ -24,9 +24,6 @@ communication:
     - topic: General usage and support questions
       network: Libera
       channel: '#ansible'
-  mailing_lists:
-    - topic: Ansible Project List
-      url: https://groups.google.com/g/ansible-project
   forums:
     - topic: "Ansible Forum: General usage and support questions"
       # The following URL directly points to the "Get Help" section
