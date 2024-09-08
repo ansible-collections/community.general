@@ -68,7 +68,7 @@ options:
         type: bool
     parent_id:
         description:
-            - The parent_id of the realm key. In practice the ID (name) of the realm.
+            - The parent_id of the realm key. In practice the name of the realm.
         type: str
         required: true
     provider_id:
@@ -300,7 +300,7 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state", "force"]
+    params_to_ignore = list(keycloak_argument_spec().keys()) + ["state", "force", "parent_id"]
 
     # Filter and map the parameters names that apply to the role
     component_params = [x for x in module.params
@@ -371,7 +371,7 @@ def main():
     parent_id = module.params.get('parent_id')
 
     # Get a list of all Keycloak components that are of keyprovider type.
-    realm_keys = kc.get_components(urlencode(dict(type=provider_type, parent=parent_id)), parent_id)
+    realm_keys = kc.get_components(urlencode(dict(type=provider_type)), parent_id)
 
     # If this component is present get its key ID. Confusingly the key ID is
     # also known as the Provider ID.
