@@ -344,7 +344,7 @@ class AlternativesModule(object):
 
         subcmd_path_map = dict(subcmd_path_link_regex.findall(display_output))
         if not subcmd_path_map and self.subcommands:
-            subcmd_path_map = dict((s['name'], s['link']) for s in self.subcommands)
+            subcmd_path_map = {s['name']: s['link'] for s in self.subcommands}
 
         for path, prio, subcmd in alternative_regex.findall(display_output):
             self.current_alternatives[path] = dict(

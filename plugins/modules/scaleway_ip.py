@@ -145,11 +145,11 @@ def ip_attributes_should_be_changed(api, target_ip, wished_ip):
 
 
 def payload_from_wished_ip(wished_ip):
-    return dict(
-        (k, v)
+    return {
+        k: v
         for k, v in wished_ip.items()
         if k != 'id' and v is not None
-    )
+    }
 
 
 def present_strategy(api, wished_ip):
@@ -161,8 +161,7 @@ def present_strategy(api, wished_ip):
             response.status_code, response.json['message']))
 
     ips_list = response.json["ips"]
-    ip_lookup = dict((ip["id"], ip)
-                     for ip in ips_list)
+    ip_lookup = {ip["id"]: ip for ip in ips_list}
 
     if wished_ip["id"] not in ip_lookup.keys():
         changed = True
@@ -212,8 +211,7 @@ def absent_strategy(api, wished_ip):
         api.module.fail_json(msg='Error getting IPs [{0}: {1}]'.format(
             status_code, response.json['message']))
 
-    ip_lookup = dict((ip["id"], ip)
-                     for ip in ips_list)
+    ip_lookup = {ip["id"]: ip for ip in ips_list}
     if wished_ip["id"] not in ip_lookup.keys():
         return changed, {}
 
