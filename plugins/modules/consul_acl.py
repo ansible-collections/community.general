@@ -273,8 +273,8 @@ def set_acl(consul_client, configuration):
     :return: the output of setting the ACL
     """
     acls_as_json = decode_acls_as_json(consul_client.acl.list())
-    existing_acls_mapped_by_name = dict((acl.name, acl) for acl in acls_as_json if acl.name is not None)
-    existing_acls_mapped_by_token = dict((acl.token, acl) for acl in acls_as_json)
+    existing_acls_mapped_by_name = {acl.name: acl for acl in acls_as_json if acl.name is not None}
+    existing_acls_mapped_by_token = {acl.token: acl for acl in acls_as_json}
     if None in existing_acls_mapped_by_token:
         raise AssertionError("expecting ACL list to be associated to a token: %s" %
                              existing_acls_mapped_by_token[None])

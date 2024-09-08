@@ -323,8 +323,7 @@ def merge(one, two):
     ''' Merge two complex nested datastructures into one'''
     if isinstance(one, dict) and isinstance(two, dict):
         copy = dict(one)
-        # copy.update({key: merge(one.get(key, None), two[key]) for key in two})
-        copy.update(dict((key, merge(one.get(key, None), two[key])) for key in two))
+        copy.update({key: merge(one.get(key, None), two[key]) for key in two})
         return copy
 
     elif isinstance(one, list) and isinstance(two, list):

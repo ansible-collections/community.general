@@ -140,7 +140,7 @@ def resource_attributes_should_be_changed(target, wished, verifiable_mutable_att
             diff[attr] = wished[attr]
 
     if diff:
-        return dict((attr, wished[attr]) for attr in mutable_attributes)
+        return {attr: wished[attr] for attr in mutable_attributes}
     else:
         return diff
 

@@ -856,8 +856,11 @@ def main():
     if mappers is not None:
         for mapper in mappers:
             if mapper.get('config') is not None:
-                mapper['config'] = dict((k, [str(v).lower() if not isinstance(v, str) else v])
-                                        for k, v in mapper['config'].items() if mapper['config'][k] is not None)
+                mapper['config'] = {
+                    k: [str(v).lower() if not isinstance(v, str) else v]
+                    for k, v in mapper['config'].items()
+                    if mapper['config'][k] is not None
+                }
 
     # Filter and map the parameters names that apply
     comp_params = [x for x in module.params

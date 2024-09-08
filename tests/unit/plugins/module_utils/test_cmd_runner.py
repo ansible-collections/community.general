@@ -359,7 +359,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
     )
 
     def _assert_run_info(actual, expected):
-        reduced = dict((k, actual[k]) for k in expected.keys())
+        reduced = {k: actual[k] for k in expected.keys()}
         assert reduced == expected, "{0}".format(reduced)
 
     def _assert_run(runner_input, cmd_execution, expected, ctx, results):

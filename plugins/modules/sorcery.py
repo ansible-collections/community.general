@@ -280,7 +280,7 @@ def codex_list(module, skip_new=False):
 
     # return only specified grimoires unless requested to skip new
     if params['repository'] and not skip_new:
-        codex = dict((x, codex.get(x, NA)) for x in params['name'])
+        codex = {x: codex.get(x, NA) for x in params['name']}
 
     if not codex:
         module.fail_json(msg="no grimoires to operate on; add at least one")

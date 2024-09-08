@@ -183,9 +183,7 @@ def get_publishers(module):
         name = values['publisher']
 
         if name not in publishers:
-            publishers[name] = dict(
-                (k, values[k]) for k in ['sticky', 'enabled']
-            )
+            publishers[name] = {k: values[k] for k in ['sticky', 'enabled']}
             publishers[name]['origin'] = []
             publishers[name]['mirror'] = []
 
