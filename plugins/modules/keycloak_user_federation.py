@@ -883,7 +883,7 @@ def main():
 
     # if user federation exists, get associated mappers
     if cid is not None and before_comp:
-        before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
+        before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
 
     # Build a proposed changeset from parameters given to this module
     changeset = {}
@@ -924,6 +924,7 @@ def main():
             if changeset.get('mappers') is None:
                 changeset['mappers'] = list()
             changeset['mappers'].append(new_mapper)
+        changeset['mappers'] = sorted(changeset['mappers'], key=lambda x: x.get('name') or '')
 
         # to keep unspecified existing mappers we add them to the desired mappers list, unless they're already present
         if not module.params['remove_unspecified_mappers'] and 'mappers' in before_comp:
@@ -1039,7 +1040,7 @@ def main():
                     kc.create_component(mapper, realm)
 
             after_comp = kc.get_component(cid, realm)
-            after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+            after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
             after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized
