@@ -189,9 +189,11 @@ def test_runner_context(runner_input, cmd_execution, expected):
     def _extract_path(run_info):
         path = run_info.get("environ_update", {}).get("PATH")
         if path is not None:
-            run_info["environ_update"] = dict((k, v)
-                                              for k, v in run_info["environ_update"].items()
-                                              if k != "PATH")
+            run_info["environ_update"] = {
+                k: v
+                for k, v in run_info["environ_update"].items()
+                if k != "PATH"
+            }
         return run_info, path
 
     def _assert_run_info_env_path(actual, expected):
@@ -199,7 +201,7 @@ def test_runner_context(runner_input, cmd_execution, expected):
         assert expected in actual2, "Missing expected path {0} in output PATH: {1}".format(expected, actual)
 
     def _assert_run_info(actual, expected):
-        reduced = dict((k, actual[k]) for k in expected.keys())
+        reduced = {k: actual[k] for k in expected.keys()}
         reduced, act_path = _extract_path(reduced)
         expected, exp_path = _extract_path(expected)
         if exp_path is not None:

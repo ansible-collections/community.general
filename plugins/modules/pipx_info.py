@@ -196,9 +196,7 @@ class PipXInfo(ModuleHelper):
                     'version': venv['metadata']['main_package']['package_version']
                 }
                 if self.vars.include_injected:
-                    entry['injected'] = dict(
-                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages'].items()
-                    )
+                    entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
                 if self.vars.include_deps:
                     entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
                 results.append(entry)

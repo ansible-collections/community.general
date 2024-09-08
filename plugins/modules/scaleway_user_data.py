@@ -129,10 +129,10 @@ def core(module):
         compute_api.module.fail_json(msg=msg)
 
     present_user_data_keys = user_data_list.json["user_data"]
-    present_user_data = dict(
-        (key, get_user_data(compute_api=compute_api, server_id=server_id, key=key))
+    present_user_data = {
+        key: get_user_data(compute_api=compute_api, server_id=server_id, key=key)
         for key in present_user_data_keys
-    )
+    }
 
     if present_user_data == user_data:
         module.exit_json(changed=changed, msg=user_data_list.json)

@@ -227,7 +227,7 @@ class CacheModule(BaseCacheModule):
 
     def copy(self):
         # TODO: there is probably a better way to do this in redis
-        ret = dict([(k, self.get(k)) for k in self.keys()])
+        ret = {k: self.get(k) for k in self.keys()}
         return ret
 
     def __getstate__(self):
