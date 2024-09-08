@@ -151,7 +151,7 @@ class RedfishUtils(object):
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=timeout, ciphers=self.ciphers)
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
             try:
                 if headers.get('content-encoding') == 'gzip' and LooseVersion(ansible_version) < LooseVersion('2.14'):
                     # Older versions of Ansible do not automatically decompress the data
@@ -206,7 +206,7 @@ class RedfishUtils(object):
             except Exception as e:
                 # No response data; this is okay in many cases
                 data = None
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -610,8 +610,7 @@ class RedfishUtils(object):
                 data = response['data']
                 if 'Parameters' in data:
                     params = data['Parameters']
-                    ai = dict((p['Name'], p)
-                              for p in params if 'Name' in p)
+                    ai = {p['Name']: p for p in params if 'Name' in p}
         if not ai:
             ai = {
                 k[:-24]: {'AllowableValues': v}
