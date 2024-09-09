@@ -1565,3 +1565,33 @@ releases:
       - 8708-homebrew_cask-fix-upgrade-all.yml
       - 8735-keycloak_identity_provider-get-cleartext-secret-from-realm-info.yml
     release_date: '2024-08-12'
+  8.6.5:
+    changes:
+      bugfixes:
+        - gitlab_group_access_token - fix crash in check mode caused by attempted
+          access to a newly created access token (https://github.com/ansible-collections/community.general/pull/8796).
+        - gitlab_project_access_token - fix crash in check mode caused by attempted
+          access to a newly created access token (https://github.com/ansible-collections/community.general/pull/8796).
+        - keycloak_realm_key - fix invalid usage of ``parent_id`` (https://github.com/ansible-collections/community.general/issues/7850,
+          https://github.com/ansible-collections/community.general/pull/8823).
+        - keycloak_user_federation - fix key error when removing mappers during an
+          update and new mappers are specified in the module args (https://github.com/ansible-collections/community.general/pull/8762).
+        - keycloak_user_federation - fix the ``UnboundLocalError`` that occurs when
+          an ID is provided for a user federation mapper (https://github.com/ansible-collections/community.general/pull/8831).
+        - keycloak_user_federation - sort desired and after mapper list by name (analog
+          to before mapper list) to minimize diff and make change detection more accurate
+          (https://github.com/ansible-collections/community.general/pull/8761).
+        - proxmox inventory plugin - fixed a possible error on concatenating responses
+          from proxmox. In case an API call unexpectedly returned an empty result,
+          the inventory failed with a fatal error. Added check for empty response
+          (https://github.com/ansible-collections/community.general/issues/8798, https://github.com/ansible-collections/community.general/pull/8794).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 8.6.5.yml
+      - 8761-keycloak_user_federation-sort-desired-and-after-mappers-by-name.yml
+      - 8762-keycloac_user_federation-fix-key-error-when-updating.yml
+      - 8794-Fixing-possible-concatination-error.yaml
+      - 8796-gitlab-access-token-check-mode.yml
+      - 8823-keycloak-realm-key.yml
+      - 8831-fix-error-when-mapper-id-is-provided.yml
+    release_date: '2024-09-09'
