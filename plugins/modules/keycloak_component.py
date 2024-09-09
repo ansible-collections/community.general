@@ -96,11 +96,6 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-
 end_state:
     description: Representation of the keycloak_component after module execution.
     returned: on success
