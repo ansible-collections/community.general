@@ -32,7 +32,7 @@ attributes:
     check_mode:
         support: full
     diff_mode:
-        support: partial
+        support: full
 
 options:
     state:
