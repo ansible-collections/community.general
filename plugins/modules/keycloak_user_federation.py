@@ -907,7 +907,7 @@ def main():
             if cid is None:
                 old_mapper = {}
             elif change.get('id') is not None:
-                old_mapper = next((before_mapper for before_mapper in before_mapper.get('mappers', []) if before_mapper["id"] == change['id']), None)
+                old_mapper = next((before_mapper for before_mapper in before_comp.get('mappers', []) if before_mapper["id"] == change['id']), None)
                 if old_mapper is None:
                     old_mapper = {}
             else:
