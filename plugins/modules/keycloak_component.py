@@ -60,7 +60,8 @@ options:
         required: true
     provider_type:
         description:
-            - The name of the "provider type" for the key. That is, V(org.keycloak.storage.UserStorageProvider), V(org.keycloak.userprofile.UserProfileProvider), ...
+            - The name of the "provider type" for the key. That is, V(org.keycloak.storage.UserStorageProvider),
+            V(org.keycloak.userprofile.UserProfileProvider), ...
             - See U(https://www.keycloak.org/docs/latest/server_development/index.html#_providers).
         type: str
         required: true
