@@ -10,8 +10,8 @@
     command: start-dev
     env:
       KC_HTTP_RELATIVE_PATH: /auth
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_ADMIN: "{{ admin_user }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ admin_password }}"
     ports:
       - "8080:8080"
     detach: true
