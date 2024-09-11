@@ -149,7 +149,7 @@ def clear(module, url, check, subscription):
     # Test if silence exists before clearing
     (rc, out, changed) = query(module, url, check, subscription)
 
-    d = dict((i['subscription'], i['check']) for i in out)
+    d = {i['subscription']: i['check'] for i in out}
     subscription_exists = subscription in d
     if check and subscription_exists:
         exists = (check == d[subscription])

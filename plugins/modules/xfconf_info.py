@@ -139,6 +139,7 @@ class XFConfInfo(ModuleHelper):
         ),
         supports_check_mode=True,
     )
+    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module, check_rc=True)
@@ -176,7 +177,7 @@ class XFConfInfo(ModuleHelper):
             proc = self._process_list_properties
 
         with self.runner.context('list_arg channel property', output_process=proc) as ctx:
-            result = ctx.run(**self.vars)
+            result = ctx.run(**self.vars.as_dict())
 
         if not self.vars.list_arg and self.vars.is_array:
             output = "value_array"

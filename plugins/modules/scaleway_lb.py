@@ -161,6 +161,7 @@ RETURNS = '''
 import datetime
 import time
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_REGIONS, SCALEWAY_ENDPOINT, scaleway_argument_spec, Scaleway
 
 STABLE_STATES = (
@@ -208,9 +209,9 @@ def wait_to_complete_state_transition(api, lb, force_wait=False):
     wait_timeout = api.module.params["wait_timeout"]
     wait_sleep_time = api.module.params["wait_sleep_time"]
 
-    start = datetime.datetime.utcnow()
+    start = now()
     end = start + datetime.timedelta(seconds=wait_timeout)
-    while datetime.datetime.utcnow() < end:
+    while now() < end:
         api.module.debug("We are going to wait for the load-balancer to finish its transition")
         state = fetch_state(api, lb)
         if state in STABLE_STATES:
@@ -223,10 +224,10 @@ def wait_to_complete_state_transition(api, lb, force_wait=False):
 
 
 def lb_attributes_should_be_changed(target_lb, wished_lb):
-    diff = dict((attr, wished_lb[attr]) for attr in MUTABLE_ATTRIBUTES if target_lb[attr] != wished_lb[attr])
+    diff = {attr: wished_lb[attr] for attr in MUTABLE_ATTRIBUTES if target_lb[attr] != wished_lb[attr]}
 
     if diff:
-        return dict((attr, wished_lb[attr]) for attr in MUTABLE_ATTRIBUTES)
+        return {attr: wished_lb[attr] for attr in MUTABLE_ATTRIBUTES}
     else:
         return diff
 
@@ -240,8 +241,7 @@ def present_strategy(api, wished_lb):
             response.status_code, response.json['message']))
 
     lbs_list = response.json["lbs"]
-    lb_lookup = dict((lb["name"], lb)
-                     for lb in lbs_list)
+    lb_lookup = {lb["name"]: lb for lb in lbs_list}
 
     if wished_lb["name"] not in lb_lookup.keys():
         changed = True
@@ -297,8 +297,7 @@ def absent_strategy(api, wished_lb):
         api.module.fail_json(msg='Error getting load-balancers [{0}: {1}]'.format(
             status_code, response.json['message']))
 
-    lb_lookup = dict((lb["name"], lb)
-                     for lb in lbs_list)
+    lb_lookup = {lb["name"]: lb for lb in lbs_list}
     if wished_lb["name"] not in lb_lookup.keys():
         return changed, {}
 

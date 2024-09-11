@@ -25,14 +25,16 @@ DOCUMENTATION = '''
     options:
       remote_addr:
         description:
-            - vm name
+            - VM name.
+        type: string
         default: inventory_hostname
         vars:
             - name: ansible_host
       remote_user:
         description:
-            - The user to execute as inside the vm.
-        default: The *user* account as default in Qubes OS.
+            - The user to execute as inside the VM.
+        type: string
+        default: The I(user) account as default in Qubes OS.
         vars:
             - name: ansible_user
 #        keyword:

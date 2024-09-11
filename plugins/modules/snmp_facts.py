@@ -300,13 +300,19 @@ def main():
     deps.validate(module)
 
     cmdGen = cmdgen.CommandGenerator()
-    transport_opts = dict((k, m_args[k]) for k in ('timeout', 'retries') if m_args[k] is not None)
+    transport_opts = {
+        k: m_args[k]
+        for k in ('timeout', 'retries')
+        if m_args[k] is not None
+    }
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] in ("v2", "v2c"):
         if m_args['community'] is None:
             module.fail_json(msg='Community not set when using snmp version 2')
 
+    integrity_proto = None
+    privacy_proto = None
     if m_args['version'] == "v3":
         if m_args['username'] is None:
             module.fail_json(msg='Username not set when using snmp version 3')

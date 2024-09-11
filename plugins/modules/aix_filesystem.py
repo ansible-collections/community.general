@@ -242,7 +242,7 @@ def _validate_vg(module, vg):
     if rc != 0:
         module.fail_json(msg="Failed executing %s command." % lsvg_cmd)
 
-    rc, current_all_vgs, err = module.run_command([lsvg_cmd, "%s"])
+    rc, current_all_vgs, err = module.run_command([lsvg_cmd])
     if rc != 0:
         module.fail_json(msg="Failed executing %s command." % lsvg_cmd)
 

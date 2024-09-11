@@ -110,7 +110,10 @@ EXAMPLES = '''
 
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.basic import AnsibleModule
-from datetime import datetime
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 def main():
@@ -161,8 +164,7 @@ def main():
     if module.params['environment']:
         custom_details['environment'] = module.params['environment']
 
-    now = datetime.utcnow()
-    timestamp = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    timestamp = now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     payload = {
         'summary': module.params['summary'],

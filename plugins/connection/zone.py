@@ -16,11 +16,12 @@ DOCUMENTATION = '''
     name: zone
     short_description: Run tasks in a zone instance
     description:
-        - Run commands or put/fetch files to an existing zone
+        - Run commands or put/fetch files to an existing zone.
     options:
       remote_addr:
         description:
             - Zone identifier
+        type: string
         default: inventory_hostname
         vars:
             - name: ansible_host

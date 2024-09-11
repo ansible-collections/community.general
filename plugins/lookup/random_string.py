@@ -104,37 +104,37 @@ EXAMPLES = r"""
 - name: Generate random string
   ansible.builtin.debug:
     var: lookup('community.general.random_string')
-  # Example result: ['DeadBeeF']
+  # Example result: 'DeadBeeF'
 
 - name: Generate random string with length 12
   ansible.builtin.debug:
     var: lookup('community.general.random_string', length=12)
-  # Example result: ['Uan0hUiX5kVG']
+  # Example result: 'Uan0hUiX5kVG'
 
 - name: Generate base64 encoded random string
   ansible.builtin.debug:
     var: lookup('community.general.random_string', base64=True)
-  # Example result: ['NHZ6eWN5Qk0=']
+  # Example result: 'NHZ6eWN5Qk0='
 
 - name: Generate a random string with 1 lower, 1 upper, 1 number and 1 special char (at least)
   ansible.builtin.debug:
     var: lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=1, min_numeric=1)
-  # Example result: ['&Qw2|E[-']
+  # Example result: '&Qw2|E[-'
 
 - name: Generate a random string with all lower case characters
-  debug:
+  ansible.builtin.debug:
     var: query('community.general.random_string', upper=false, numbers=false, special=false)
   # Example result: ['exolxzyz']
 
 - name: Generate random hexadecimal string
-  debug:
+  ansible.builtin.debug:
     var: query('community.general.random_string', upper=false, lower=false, override_special=hex_chars, numbers=false)
   vars:
     hex_chars: '0123456789ABCDEF'
   # Example result: ['D2A40737']
 
 - name: Generate random hexadecimal string with override_all
-  debug:
+  ansible.builtin.debug:
     var: query('community.general.random_string', override_all=hex_chars)
   vars:
     hex_chars: '0123456789ABCDEF'

@@ -171,7 +171,7 @@
     state: latest
   register: install_tox_latest_with_preinstall_again
 
-- name: install application latest tox
+- name: install application latest tox (force)
   community.general.pipx:
     name: tox
     state: latest
@@ -217,125 +217,42 @@
       - "'tox' not in uninstall_tox_again.application"
 
 ##############################################################################
-- name: ensure application ansible-lint is uninstalled
-  community.general.pipx:
-    name: ansible-lint
-    state: absent
 
-- name: install application ansible-lint
-  community.general.pipx:
-    name: ansible-lint
-  register: install_ansible_lint
+- name: Include testcase for inject packages
+  ansible.builtin.include_tasks: testcase-injectpkg.yml
 
-- name: inject packages
-  community.general.pipx:
-    state: inject
-    name: ansible-lint
-    inject_packages:
-      - licenses
-  register: inject_pkgs_ansible_lint
+- name: Include testcase for jupyter
+  ansible.builtin.include_tasks: testcase-jupyter.yml
 
-- name: inject packages with apps
-  community.general.pipx:
-    state: inject
-    name: ansible-lint
-    inject_packages:
-      - black
-    install_apps: true
-  register: inject_pkgs_apps_ansible_lint
+- name: Include testcase for old site-wide
+  ansible.builtin.include_tasks: testcase-oldsitewide.yml
 
-- name: cleanup ansible-lint
-  community.general.pipx:
-    state: absent
-    name: ansible-lint
-  register: uninstall_ansible_lint
+- name: Include testcase for issue 7497
+  ansible.builtin.include_tasks: testcase-7497.yml
 
-- name: check assertions inject_packages
-  assert:
-    that:
-      - install_ansible_lint is changed
-      - inject_pkgs_ansible_lint is changed
-      - '"ansible-lint" in inject_pkgs_ansible_lint.application'
-      - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
-      - inject_pkgs_apps_ansible_lint is changed
-      - '"ansible-lint" in inject_pkgs_apps_ansible_lint.application'
-      - '"black" in inject_pkgs_apps_ansible_lint.application["ansible-lint"]["injected"]'
-      - uninstall_ansible_lint is changed
+- name: Include testcase for issue 8656
+  ansible.builtin.include_tasks: testcase-8656.yml
 
-##############################################################################
-- name: install jupyter - not working smoothly in freebsd
-  when: ansible_system != 'FreeBSD'
+- name: install pipx
+  pip:
+    name: pipx>=1.7.0
+    extra_args: --user
+  ignore_errors: true
+  register: pipx170_install
+
+- name: Recent features
+  when:
+    - pipx170_install is not failed
+    - pipx170_install is changed
   block:
-    - name: ensure application jupyter is uninstalled
-      community.general.pipx:
-        name: jupyter
-        state: absent
+    - name: Include testcase for PR 8793 --global
+      ansible.builtin.include_tasks: testcase-8793-global.yml
 
-    - name: install application jupyter
-      community.general.pipx:
-        name: jupyter
-        install_deps: true
-      register: install_jupyter
+    - name: Include testcase for PR 8809 install-all
+      ansible.builtin.include_tasks: testcase-8809-install-all.yml
 
-    - name: cleanup jupyter
-      community.general.pipx:
-        state: absent
-        name: jupyter
+    - name: Include testcase for PR 8809 pin
+      ansible.builtin.include_tasks: testcase-8809-pin.yml
 
-    - name: check assertions
-      assert:
-        that:
-          - install_jupyter is changed
-          - '"ipython" in install_jupyter.stdout'
-
-##############################################################################
-- name: ensure /opt/pipx
-  ansible.builtin.file:
-    path: /opt/pipx
-    state: directory
-    mode: 0755
-
-- name: install tox site-wide
-  community.general.pipx:
-    name: tox
-    state: latest
-  register: install_tox_sitewide
-  environment:
-    PIPX_HOME: /opt/pipx
-    PIPX_BIN_DIR: /usr/local/bin
-
-- name: stat /usr/local/bin/tox
-  ansible.builtin.stat:
-    path: /usr/local/bin/tox
-  register: usrlocaltox
-
-- name: check assertions
-  ansible.builtin.assert:
-    that:
-      - install_tox_sitewide is changed
-      - usrlocaltox.stat.exists
-
-##############################################################################
-# Test for issue 7497
-- name: ensure application pyinstaller is uninstalled
-  community.general.pipx:
-    name: pyinstaller
-    state: absent
-
-- name: Install Python Package pyinstaller
-  community.general.pipx:
-    name: pyinstaller
-    state: present
-    system_site_packages: true
-    pip_args: "--no-cache-dir"
-  register: install_pyinstaller
-
-- name: cleanup pyinstaller
-  community.general.pipx:
-    name: pyinstaller
-    state: absent
-
-- name: check assertions
-  assert:
-    that:
-      - install_pyinstaller is changed
+    - name: Include testcase for PR 8809 injectpkg
+      ansible.builtin.include_tasks: testcase-8809-uninjectpkg.yml

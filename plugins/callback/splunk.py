@@ -22,6 +22,7 @@ DOCUMENTATION = '''
     options:
       url:
         description: URL to the Splunk HTTP collector source.
+        type: str
         env:
           - name: SPLUNK_URL
         ini:
@@ -29,6 +30,7 @@ DOCUMENTATION = '''
             key: url
       authtoken:
         description: Token to authenticate the connection to the Splunk HTTP collector.
+        type: str
         env:
           - name: SPLUNK_AUTHTOKEN
         ini:
@@ -88,12 +90,15 @@ import uuid
 import socket
 import getpass
 
-from datetime import datetime
 from os.path import basename
 
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 class SplunkHTTPCollectorSource(object):
@@ -134,7 +139,7 @@ class SplunkHTTPCollectorSource(object):
         else:
             time_format = '%Y-%m-%d %H:%M:%S +0000'
 
-        data['timestamp'] = datetime.utcnow().strftime(time_format)
+        data['timestamp'] = now().strftime(time_format)
         data['host'] = self.host
         data['ip_address'] = self.ip_address
         data['user'] = self.user
@@ -181,7 +186,7 @@ class CallbackModule(CallbackBase):
 
     def _runtime(self, result):
         return (
-            datetime.utcnow() -
+            now() -
             self.start_datetimes[result._task._uuid]
         ).total_seconds()
 
@@ -220,10 +225,10 @@ class CallbackModule(CallbackBase):
         self.splunk.ansible_playbook = basename(playbook._file_name)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_playbook_on_handler_task_start(self, task):
-        self.start_datetimes[task._uuid] = datetime.utcnow()
+        self.start_datetimes[task._uuid] = now()
 
     def v2_runner_on_ok(self, result, **kwargs):
         self.splunk.send_event(

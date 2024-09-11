@@ -268,7 +268,6 @@ output:
       errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n"/>
 '''
 
-import datetime
 import os
 import traceback
 
@@ -291,6 +290,10 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.six.moves import zip_longest
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 
 def imc_response(module, rawoutput, rawinput=''):
@@ -320,8 +323,7 @@ def merge(one, two):
     ''' Merge two complex nested datastructures into one'''
     if isinstance(one, dict) and isinstance(two, dict):
         copy = dict(one)
-        # copy.update({key: merge(one.get(key, None), two[key]) for key in two})
-        copy.update(dict((key, merge(one.get(key, None), two[key])) for key in two))
+        copy.update({key: merge(one.get(key, None), two[key]) for key in two})
         return copy
 
     elif isinstance(one, list) and isinstance(two, list):
@@ -375,14 +377,14 @@ def main():
         else:
             module.fail_json(msg='Cannot find/access path:\n%s' % path)
 
-    start = datetime.datetime.utcnow()
+    start = now()
 
     # Perform login first
     url = '%s://%s/nuova' % (protocol, hostname)
     data = '<aaaLogin inName="%s" inPassword="%s"/>' % (username, password)
     resp, auth = fetch_url(module, url, data=data, method='POST', timeout=timeout)
     if resp is None or auth['status'] != 200:
-        result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+        result['elapsed'] = (now() - start).seconds
         module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % auth, **result)
     result.update(imc_response(module, resp.read()))
 
@@ -415,7 +417,7 @@ def main():
             # Perform actual request
             resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
             if resp is None or info['status'] != 200:
-                result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+                result['elapsed'] = (now() - start).seconds
                 module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
 
             # Merge results with previous results
@@ -431,7 +433,7 @@ def main():
             result['changed'] = ('modified' in results)
 
         # Report success
-        result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+        result['elapsed'] = (now() - start).seconds
         module.exit_json(**result)
     finally:
         logout(module, url, cookie, timeout)

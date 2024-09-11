@@ -152,13 +152,16 @@ system:
   type: dict
 '''
 
-import datetime
 import ssl
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.six.moves import xmlrpc_client
 from ansible.module_utils.common.text.converters import to_text
+
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 
 IFPROPS_MAPPING = dict(
     bondingopts='bonding_opts',
@@ -232,7 +235,7 @@ def main():
         changed=False,
     )
 
-    start = datetime.datetime.utcnow()
+    start = now()
 
     ssl_context = None
     if not validate_certs:
@@ -340,7 +343,7 @@ def main():
         if module._diff:
             result['diff'] = dict(before=system, after=result['system'])
 
-    elapsed = datetime.datetime.utcnow() - start
+    elapsed = now() - start
     module.exit_json(elapsed=elapsed.seconds, **result)
 
 

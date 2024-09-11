@@ -79,7 +79,8 @@ options:
     protocol:
         description:
             - Type of client.
-        choices: ['openid-connect', 'saml', 'wsfed']
+            - The V(docker-v2) value was added in community.general 8.6.0.
+        choices: ['openid-connect', 'saml', 'wsfed', 'docker-v2']
         type: str
 
     protocol_mappers:
@@ -95,7 +96,7 @@ options:
                 description:
                     - This specifies for which protocol this protocol mapper.
                     - is active.
-                choices: ['openid-connect', 'saml', 'wsfed']
+                choices: ['openid-connect', 'saml', 'wsfed', 'docker-v2']
                 type: str
 
             protocolMapper:
@@ -300,8 +301,35 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
+
+
+def normalise_cr(clientscoperep, remove_ids=False):
+    """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
+    the change detection is more effective.
+
+    :param clientscoperep: the clientscoperep dict to be sanitized
+    :param remove_ids: If set to true, then the unique ID's of objects is removed to make the diff and checks for changed
+                       not alert when the ID's of objects are not usually known, (e.g. for protocol_mappers)
+    :return: normalised clientscoperep dict
+    """
+    # Avoid the dict passed in to be modified
+    clientscoperep = clientscoperep.copy()
+
+    if 'attributes' in clientscoperep:
+        clientscoperep['attributes'] = list(sorted(clientscoperep['attributes']))
+
+    if 'protocolMappers' in clientscoperep:
+        clientscoperep['protocolMappers'] = sorted(clientscoperep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
+        for mapper in clientscoperep['protocolMappers']:
+            if remove_ids:
+                mapper.pop('id', None)
+
+            # Set to a default value.
+            mapper['consentRequired'] = mapper.get('consentRequired', False)
+
+    return clientscoperep
 
 
 def sanitize_cr(clientscoperep):
@@ -316,7 +344,7 @@ def sanitize_cr(clientscoperep):
     if 'attributes' in result:
         if 'saml.signing.private.key' in result['attributes']:
             result['attributes']['saml.signing.private.key'] = 'no_log'
-    return result
+    return normalise_cr(result)
 
 
 def main():
@@ -330,7 +358,7 @@ def main():
     protmapper_spec = dict(
         id=dict(type='str'),
         name=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed', 'docker-v2']),
         protocolMapper=dict(type='str'),
         config=dict(type='dict'),
     )
@@ -341,7 +369,7 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         description=dict(type='str'),
-        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed']),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed', 'docker-v2']),
         attributes=dict(type='dict'),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
     )
@@ -400,7 +428,7 @@ def main():
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
         if clientscope_param == 'protocol_mappers':
-            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
+            new_param_value = [{k: v for k, v in x.items() if v is not None} for x in new_param_value]
         changeset[camel(clientscope_param)] = new_param_value
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
@@ -444,7 +472,9 @@ def main():
             # Process an update
 
             # no changes
-            if desired_clientscope == before_clientscope:
+            # remove ids for compare, problematic if desired has no ids set (not required),
+            # normalize for consentRequired in protocolMappers
+            if normalise_cr(desired_clientscope, remove_ids=True) == normalise_cr(before_clientscope, remove_ids=True):
                 result['changed'] = False
                 result['end_state'] = sanitize_cr(desired_clientscope)
                 result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
@@ -457,6 +487,13 @@ def main():
                 result['diff'] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(desired_clientscope))
 
             if module.check_mode:
+                # We can only compare the current clientscope with the proposed updates we have
+                before_norm = normalise_cr(before_clientscope, remove_ids=True)
+                desired_norm = normalise_cr(desired_clientscope, remove_ids=True)
+                if module._diff:
+                    result['diff'] = dict(before=sanitize_cr(before_norm),
+                                          after=sanitize_cr(desired_norm))
+                result['changed'] = not is_struct_included(desired_norm, before_norm)
                 module.exit_json(**result)
 
             # do the update

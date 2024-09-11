@@ -21,6 +21,8 @@ attributes:
     support: none
   diff_mode:
     support: none
+  action_group:
+    version_added: 9.0.0
 options:
   archive:
     description:
@@ -172,6 +174,7 @@ options:
       - Allow to force stop VM.
       - Can be used with states V(stopped), V(restarted), and V(absent).
       - This option has no default unless O(proxmox_default_behavior) is set to V(compatibility); then the default is V(false).
+      - Requires parameter O(archive).
     type: bool
   format:
     description:
@@ -517,6 +520,16 @@ options:
         default: '2.0'
     type: dict
     version_added: 7.1.0
+  usb:
+    description:
+      - A hash/dictionary of USB devices for the VM. O(usb='{"key":"value", "key":"value"}').
+      - Keys allowed are - C(usb[n]) where 0 ≤ n ≤ N.
+      - Values allowed are - C(host="value|spice",mapping="value",usb3="1|0").
+      - host is either C(spice) or the USB id/port.
+      - Option C(mapping) is the mapped USB device name.
+      - Option C(usb3) enables USB 3 support.
+    type: dict
+    version_added: 9.0.0
   update:
     description:
       - If V(true), the VM will be updated with new value.
@@ -579,6 +592,7 @@ options:
 seealso:
   - module: community.general.proxmox_vm_info
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
@@ -956,7 +970,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             self.module.fail_json(msg='Getting information for VM with vmid = %s failed with exception: %s' % (vmid, e))
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
@@ -982,7 +996,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         return proxmox_node.qemu(vmid).config.set(**kwargs) is None
 
@@ -1017,8 +1031,8 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         proxmox_node = self.proxmox_api.nodes(node)
 
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
-        kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
-        kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        kwargs.update({k: int(v) for k, v in kwargs.items() if isinstance(v, bool)})
 
         version = self.version()
         pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
@@ -1091,7 +1105,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             )
 
         # Convert all dict in kwargs to elements.
-        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
+        # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n], usb[n]
         for k in list(kwargs.keys()):
             if isinstance(kwargs[k], dict):
                 kwargs.update(kwargs[k])
@@ -1149,7 +1163,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             for param in valid_clone_params:
                 if self.module.params[param] is not None:
                     clone_params[param] = self.module.params[param]
-            clone_params.update(dict([k, int(v)] for k, v in clone_params.items() if isinstance(v, bool)))
+            clone_params.update({k: int(v) for k, v in clone_params.items() if isinstance(v, bool)})
             taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
         else:
             taskid = proxmox_node.qemu.create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
@@ -1308,6 +1322,7 @@ def main():
                            storage=dict(type='str', required=True),
                            version=dict(type='str', choices=['2.0', '1.2'], default='2.0')
                        )),
+        usb=dict(type='dict'),
         update=dict(type='bool', default=False),
         update_unsafe=dict(type='bool', default=False),
         vcpus=dict(type='int'),
@@ -1513,6 +1528,7 @@ def main():
                               tdf=module.params['tdf'],
                               template=module.params['template'],
                               tpmstate0=module.params['tpmstate0'],
+                              usb=module.params['usb'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
                               virtio=module.params['virtio'],

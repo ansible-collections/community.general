@@ -277,7 +277,7 @@ class BalancerMember(object):
                 for valuesset in subsoup[1::1]:
                     if re.search(pattern=self.host, string=str(valuesset)):
                         values = valuesset.findAll('td')
-                        return dict((keys[x].string, values[x].string) for x in range(0, len(keys)))
+                        return {keys[x].string: values[x].string for x in range(0, len(keys))}
 
     def get_member_status(self):
         """ Returns a dictionary of a balancer member's status attributes."""
@@ -286,7 +286,7 @@ class BalancerMember(object):
                           'hot_standby': 'Stby',
                           'ignore_errors': 'Ign'}
         actual_status = str(self.attributes['Status'])
-        status = dict((mode, patt in actual_status) for mode, patt in iteritems(status_mapping))
+        status = {mode: patt in actual_status for mode, patt in iteritems(status_mapping)}
         return status
 
     def set_member_status(self, values):

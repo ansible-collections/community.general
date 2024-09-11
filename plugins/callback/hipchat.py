@@ -18,9 +18,14 @@ DOCUMENTATION = '''
     description:
       - This callback plugin sends status updates to a HipChat channel during playbook execution.
       - Before 2.4 only environment variables were available for configuring this plugin.
+    deprecated:
+      removed_in: 10.0.0
+      why: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
+      alternative: There is none.
     options:
       token:
         description: HipChat API token for v1 or v2 API.
+        type: str
         required: true
         env:
           - name: HIPCHAT_TOKEN
@@ -29,6 +34,10 @@ DOCUMENTATION = '''
             key: token
       api_version:
         description: HipChat API version, v1 or v2.
+        type: str
+        choices:
+          - v1
+          - v2
         required: false
         default: v1
         env:
@@ -38,6 +47,7 @@ DOCUMENTATION = '''
             key: api_version
       room:
         description: HipChat room to post in.
+        type: str
         default: ansible
         env:
           - name: HIPCHAT_ROOM
@@ -46,6 +56,7 @@ DOCUMENTATION = '''
             key: room
       from:
         description:  Name to post as
+        type: str
         default: ansible
         env:
           - name: HIPCHAT_FROM

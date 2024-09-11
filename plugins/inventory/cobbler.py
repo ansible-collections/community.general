@@ -21,20 +21,24 @@ DOCUMENTATION = '''
     options:
       plugin:
         description: The name of this plugin, it should always be set to V(community.general.cobbler) for this plugin to recognize it as it's own.
+        type: string
         required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
+        type: string
         default: 'http://cobbler/cobbler_api'
         env:
             - name: COBBLER_SERVER
       user:
         description: Cobbler authentication user.
+        type: string
         required: false
         env:
             - name: COBBLER_USER
       password:
         description: Cobbler authentication password.
+        type: string
         required: false
         env:
             - name: COBBLER_PASSWORD
@@ -117,7 +121,8 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 from ansible.module_utils.six import text_type
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 # xmlrpc
 try:

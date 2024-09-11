@@ -44,6 +44,8 @@ options:
     type: str
     description:
       - The LDAP scope to use.
+      - V(subordinate) requires the LDAPv3 subordinate feature extension.
+      - V(children) is equivalent to a "subtree" scope.
   filter:
     default: '(objectClass=*)'
     type: str

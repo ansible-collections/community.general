@@ -21,6 +21,8 @@ attributes:
     support: none
   diff_mode:
     support: none
+  action_group:
+    version_added: 9.0.0
 options:
   name:
     description:
@@ -325,6 +327,7 @@ options:
       - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by V(0x).
     type: str
 extends_documentation_fragment:
+  - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
   - community.general.attributes
 '''
@@ -521,8 +524,11 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         # - Remove not defined args
         # - Ensure True and False converted to int.
         # - Remove unnecessary parameters
-        params = dict((k, v) for k, v in self.module.params.items() if v is not None and k in self.create_update_fields)
-        params.update(dict((k, int(v)) for k, v in params.items() if isinstance(v, bool)))
+        params = {
+            k: int(v) if isinstance(v, bool) else v
+            for k, v in self.module.params.items()
+            if v is not None and k in self.create_update_fields
+        }
         return params
 
     def wait_till_complete_or_timeout(self, node_name, task_id):
@@ -541,6 +547,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             # NOOP
             return False, "Disk %s not found in VM %s and creation was disabled in parameters." % (disk, vmid)
 
+        timeout_str = "Reached timeout. Last line in task before timeout: %s"
         if (create == 'regular' and disk not in vm_config) or (create == 'forced'):
             # CREATE
             playbook_config = self.get_create_attributes()
@@ -594,7 +601,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             if iso_image is not None:
                 playbook_config['volume'] = iso_image
             # Values in params are numbers, but strings are needed to compare with disk_config
-            playbook_config = dict((k, str(v)) for k, v in playbook_config.items())
+            playbook_config = {k: str(v) for k, v in playbook_config.items()}
 
             # Now compare old and new config to detect if changes are needed
             if proxmox_config == playbook_config:
@@ -622,7 +629,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         params['format'] = self.module.params['format']
         params['delete'] = 1 if self.module.params.get('delete_moved', False) else 0
         # Remove not defined args
-        params = dict((k, v) for k, v in params.items() if v is not None)
+        params = {k: v for k, v in params.items() if v is not None}
 
         if params.get('storage', False):
             disk_config = disk_conf_str_to_dict(vm_config[disk])

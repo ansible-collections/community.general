@@ -31,7 +31,9 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 * Try committing your changes with an informative but short commit message.
 * Do not squash your commits and force-push to your branch if not needed. Reviews of your pull request are much easier with individual commits to comprehend the pull request history. All commits of your pull request branch will be squashed into one commit by GitHub upon merge.
 * Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the repository checkout.
-* Make sure your PR includes a [changelog fragment](https://docs.ansible.com/ansible/devel/community/development_process.html#creating-changelog-fragments). (You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
+* Make sure your PR includes a [changelog fragment](https://docs.ansible.com/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
+  * You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
+  * Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
 * Avoid reformatting unrelated parts of the codebase in your PR. These types of changes will likely be requested for reversion, create additional work for reviewers, and may cause approval to be delayed.
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
@@ -54,6 +56,8 @@ cd ~/dev/ansible_collections/community/general
 
 Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with Ansible 2.9+.
 
+### Sanity tests
+
 The following commands show how to run sanity tests:
 
 ```.bash
@@ -63,6 +67,8 @@ ansible-test sanity --docker -v
 # Run sanity tests for the given files and directories:
 ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration/targets/pids/
 ```
+
+### Unit tests
 
 The following commands show how to run unit tests:
 
@@ -77,13 +83,32 @@ ansible-test units --docker -v --python 3.8
 ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools/test_nmcli.py
 ```
 
+### Integration tests
+
 The following commands show how to run integration tests:
 
-```.bash
-# Run integration tests for the interfaces_files module in a Docker container using the
-# fedora35 operating system image (the supported images depend on your ansible-core version):
-ansible-test integration --docker fedora35 -v interfaces_file
+#### In Docker
 
+Integration tests on Docker have the following parameters:
+- `image_name` (required): The name of the Docker image. To get the list of supported Docker images, run
+  `ansible-test integration --help` and look for _target docker images_.
+- `test_name` (optional): The name of the integration test.  
+  For modules, this equals the short name of the module; for example, `pacman` in case of `community.general.pacman`.  
+  For plugins, the plugin type is added before the plugin's short name, for example `callback_yaml` for the `community.general.yaml` callback.
+```.bash
+# Test all plugins/modules on fedora40
+ansible-test integration -v --docker fedora40
+
+# Template
+ansible-test integration -v --docker image_name test_name
+
+# Example community.general.ini_file module on fedora40 Docker image:
+ansible-test integration -v --docker fedora40 ini_file
+```
+
+#### Without isolation
+
+```.bash
 # Run integration tests for the flattened lookup **without any isolation**:
 ansible-test integration -v lookup_flattened
 ```

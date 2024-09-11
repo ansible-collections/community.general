@@ -183,6 +183,7 @@ import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.datetime import now
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 
 SCALEWAY_SERVER_STATES = (
@@ -235,9 +236,9 @@ def wait_to_complete_state_transition(compute_api, server, wait=None):
     wait_timeout = compute_api.module.params["wait_timeout"]
     wait_sleep_time = compute_api.module.params["wait_sleep_time"]
 
-    start = datetime.datetime.utcnow()
+    start = now()
     end = start + datetime.timedelta(seconds=wait_timeout)
-    while datetime.datetime.utcnow() < end:
+    while now() < end:
         compute_api.module.debug("We are going to wait for the server to finish its transition")
         if fetch_state(compute_api, server) not in SCALEWAY_TRANSITIONS_STATES:
             compute_api.module.debug("It seems that the server is not in transition anymore.")
@@ -585,9 +586,11 @@ def server_attributes_should_be_changed(compute_api, target_server, wished_serve
     compute_api.module.debug("Checking if server attributes should be changed")
     compute_api.module.debug("Current Server: %s" % target_server)
     compute_api.module.debug("Wished Server: %s" % wished_server)
-    debug_dict = dict((x, (target_server[x], wished_server[x]))
-                      for x in PATCH_MUTABLE_SERVER_ATTRIBUTES
-                      if x in target_server and x in wished_server)
+    debug_dict = {
+        x: (target_server[x], wished_server[x])
+        for x in PATCH_MUTABLE_SERVER_ATTRIBUTES
+        if x in target_server and x in wished_server
+    }
     compute_api.module.debug("Debug dict %s" % debug_dict)
     try:
         for key in PATCH_MUTABLE_SERVER_ATTRIBUTES:
@@ -613,7 +616,7 @@ def server_change_attributes(compute_api, target_server, wished_server):
             # When you are working with dict, only ID matter as we ask user to put only the resource ID in the playbook
             if isinstance(target_server[key], dict) and "id" in target_server[key] and wished_server[key]:
                 # Setting all key to current value except ID
-                key_dict = dict((x, target_server[key][x]) for x in target_server[key].keys() if x != "id")
+                key_dict = {x: target_server[key][x] for x in target_server[key].keys() if x != "id"}
                 # Setting ID to the user specified ID
                 key_dict["id"] = wished_server[key]
                 patch_payload[key] = key_dict

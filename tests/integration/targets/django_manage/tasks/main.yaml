@@ -9,17 +9,10 @@
     suffix: .django_manage
   register: tmp_django_root
 
-- name: Install virtualenv on CentOS 8
+- name: Install virtualenv
   package:
-    name: virtualenv
+    name: "{{ os_package_name.virtualenv }}"
     state: present
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
-
-- name: Install virtualenv on Arch Linux
-  pip:
-    name: virtualenv
-    state: present
-  when: ansible_os_family == 'Archlinux'
 
 - name: Install required library
   pip:
@@ -42,6 +35,11 @@
   command:
     chdir: "{{ tmp_django_root.path }}/startproj"
     cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startapp app1"
+
+- name: Make manage.py executable
+  file:
+    path: "{{ tmp_django_root.path }}/startproj/test_django_manage_1/manage.py"
+    mode: "0755"
 
 - name: Check
   community.general.django_manage:

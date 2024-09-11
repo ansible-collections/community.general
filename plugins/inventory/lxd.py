@@ -20,6 +20,7 @@ DOCUMENTATION = r'''
     options:
         plugin:
             description: Token that ensures this is a source file for the 'lxd' plugin.
+            type: string
             required: true
             choices: [ 'community.general.lxd' ]
         url:
@@ -27,8 +28,8 @@ DOCUMENTATION = r'''
             - The unix domain socket path or the https URL for the lxd server.
             - Sockets in filesystem have to start with C(unix:).
             - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
+            type: string
             default: unix:/var/snap/lxd/common/lxd/unix.socket
-            type: str
         client_key:
             description:
             - The client certificate key file path.
@@ -175,7 +176,7 @@ from ansible.module_utils.six import raise_from
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 try:
     import ipaddress

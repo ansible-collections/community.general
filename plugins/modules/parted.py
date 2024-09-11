@@ -480,12 +480,12 @@ def get_device_info(device, unit):
     if label_needed:
         return get_unlabeled_device_info(device, unit)
 
-    command = "%s -s -m %s -- unit '%s' print" % (parted_exec, device, unit)
+    command = [parted_exec, "-s", "-m", device, "--", "unit", unit, "print"]
     rc, out, err = module.run_command(command)
     if rc != 0 and 'unrecognised disk label' not in err:
         module.fail_json(msg=(
             "Error while getting device information with parted "
-            "script: '%s'" % command),
+            "script: '%s'" % " ".join(command)),
             rc=rc, out=out, err=err
         )
 
@@ -506,7 +506,7 @@ def check_parted_label(device):
         return False
 
     # Older parted versions return a message in the stdout and RC > 0.
-    rc, out, err = module.run_command("%s -s -m %s print" % (parted_exec, device))
+    rc, out, err = module.run_command([parted_exec, "-s", "-m", device, "print"])
     if rc != 0 and 'unrecognised disk label' in out.lower():
         return True
 
@@ -546,7 +546,7 @@ def parted_version():
     """
     global module, parted_exec  # pylint: disable=global-variable-not-assigned
 
-    rc, out, err = module.run_command("%s --version" % parted_exec)
+    rc, out, err = module.run_command([parted_exec, "--version"])
     if rc != 0:
         module.fail_json(
             msg="Failed to get parted version.", rc=rc, out=out, err=err
@@ -580,6 +580,7 @@ def parted(script, device, align):
         script_option = '-s'
 
     if script and not module.check_mode:
+        # TODO: convert run_comand() argument to list!
         command = "%s %s -m %s %s -- %s" % (parted_exec, script_option, align_option, device, script)
         rc, out, err = module.run_command(command)
 

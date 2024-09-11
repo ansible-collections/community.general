@@ -15,17 +15,20 @@ DOCUMENTATION = '''
 module: gitlab_runner
 short_description: Create, modify and delete GitLab Runners
 description:
-  - Register, update and delete runners with the GitLab API.
+  - Register, update and delete runners on GitLab Server side with the GitLab API.
   - All operations are performed using the GitLab API v4.
-  - For details, consult the full API documentation at U(https://docs.gitlab.com/ee/api/runners.html).
+  - For details, consult the full API documentation at U(https://docs.gitlab.com/ee/api/runners.html)
+    and U(https://docs.gitlab.com/ee/api/users.html#create-a-runner-linked-to-a-user).
   - A valid private API token is required for all operations. You can create as many tokens as you like using the GitLab web interface at
     U(https://$GITLAB_URL/profile/personal_access_tokens).
   - A valid registration token is required for registering a new runner.
     To create shared runners, you need to ask your administrator to give you this token.
     It can be found at U(https://$GITLAB_URL/admin/runners/).
+  - This module does not handle the C(gitlab-runner) process part, but only manages the runner on GitLab Server side through its API.
+    Once the module has created the runner, you may use the generated token to run C(gitlab-runner register) command
 notes:
   - To create a new runner at least the O(api_token), O(description) and O(api_url) options are required.
-  - Runners need to have unique descriptions.
+  - Runners need to have unique descriptions, since this attribute is used as key for idempotency
 author:
   - Samy Coenen (@SamyCoenen)
   - Guillaume Martinez (@Lunik)
@@ -153,7 +156,45 @@ options:
 '''
 
 EXAMPLES = '''
-- name: "Register runner"
+- name: Create an instance-level runner
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    state: present
+    active: true
+    tag_list: ['docker']
+    run_untagged: false
+    locked: false
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+
+- name: Create a group-level runner
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    state: present
+    active: true
+    tag_list: ['docker']
+    run_untagged: false
+    locked: false
+    group: top-level-group/subgroup
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+
+- name: Create a project-level runner
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    state: present
+    active: true
+    tag_list: ['docker']
+    run_untagged: false
+    locked: false
+    project: top-level-group/subgroup/project
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
+
+- name: "Register instance-level runner with registration token (deprecated)"
   community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
@@ -164,6 +205,7 @@ EXAMPLES = '''
     tag_list: ['docker']
     run_untagged: false
     locked: false
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
 
 - name: "Delete runner"
   community.general.gitlab_runner:
@@ -180,7 +222,7 @@ EXAMPLES = '''
     owned: true
     state: absent
 
-- name: Register runner for a specific project
+- name: "Register a project-level runner with registration token (deprecated)"
   community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
@@ -188,6 +230,7 @@ EXAMPLES = '''
     description: MyProject runner
     state: present
     project: mygroup/mysubgroup/myproject
+  register: runner # Register module output to run C(gitlab-runner register) command in another task
 '''
 
 RETURN = '''
@@ -423,6 +466,7 @@ def main():
     state = module.params['state']
     runner_description = module.params['description']
     runner_active = module.params['active']
+    runner_paused = module.params['paused']
     tag_list = module.params['tag_list']
     run_untagged = module.params['run_untagged']
     runner_locked = module.params['locked']
@@ -457,7 +501,7 @@ def main():
             module.exit_json(changed=False, msg="Runner deleted or does not exists")
 
     if state == 'present':
-        if gitlab_runner.create_or_update_runner(runner_description, {
+        runner_values = {
             "active": runner_active,
             "tag_list": tag_list,
             "run_untagged": run_untagged,
@@ -467,7 +511,11 @@ def main():
             "registration_token": registration_token,
             "group": group,
             "project": project,
-        }):
+        }
+        if LooseVersion(gitlab_runner._gitlab.version()[0]) >= LooseVersion("14.8.0"):
+            # the paused attribute for runners is available since 14.8
+            runner_values["paused"] = runner_paused
+        if gitlab_runner.create_or_update_runner(runner_description, runner_values):
             module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:

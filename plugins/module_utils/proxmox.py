@@ -29,6 +29,9 @@ def proxmox_auth_argument_spec():
                       required=True,
                       fallback=(env_fallback, ['PROXMOX_HOST'])
                       ),
+        api_port=dict(type='int',
+                      fallback=(env_fallback, ['PROXMOX_PORT'])
+                      ),
         api_user=dict(type='str',
                       required=True,
                       fallback=(env_fallback, ['PROXMOX_USER'])
@@ -82,6 +85,7 @@ class ProxmoxAnsible(object):
 
     def _connect(self):
         api_host = self.module.params['api_host']
+        api_port = self.module.params['api_port']
         api_user = self.module.params['api_user']
         api_password = self.module.params['api_password']
         api_token_id = self.module.params['api_token_id']
@@ -89,6 +93,10 @@ class ProxmoxAnsible(object):
         validate_certs = self.module.params['validate_certs']
 
         auth_args = {'user': api_user}
+
+        if api_port:
+            auth_args['port'] = api_port
+
         if api_password:
             auth_args['password'] = api_password
         else:

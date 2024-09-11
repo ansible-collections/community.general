@@ -32,6 +32,8 @@ attributes:
     details:
       - In check mode the diff will miss operational attributes.
     version_added: 8.3.0
+  action_group:
+    version_added: 8.3.0
 options:
   name:
     description:
@@ -210,7 +212,7 @@ from ansible_collections.community.general.plugins.module_utils.consul import (
 class ConsulRoleModule(_ConsulModule):
     api_endpoint = "acl/role"
     result_key = "role"
-    unique_identifier = "id"
+    unique_identifiers = ["id"]
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:

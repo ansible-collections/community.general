@@ -170,6 +170,9 @@ import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.datetime import (
+    now,
+)
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     Scaleway,
     scaleway_argument_spec,
@@ -189,9 +192,9 @@ def wait_to_complete_state_transition(module, account_api, backup=None):
     if backup is None or backup['status'] in stable_states:
         return backup
 
-    start = datetime.datetime.utcnow()
+    start = now()
     end = start + datetime.timedelta(seconds=wait_timeout)
-    while datetime.datetime.utcnow() < end:
+    while now() < end:
         module.debug('We are going to wait for the backup to finish its transition')
 
         response = account_api.get('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup['id']))

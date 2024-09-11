@@ -11,6 +11,7 @@ import os
 import random
 import string
 import gzip
+import time
 from io import BytesIO
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native
@@ -41,7 +42,7 @@ FAIL_MSG = 'Issuing a data modification command without specifying the '\
 class RedfishUtils(object):
 
     def __init__(self, creds, root_uri, timeout, module, resource_id=None,
-                 data_modification=False, strip_etag_quotes=False):
+                 data_modification=False, strip_etag_quotes=False, ciphers=None):
         self.root_uri = root_uri
         self.creds = creds
         self.timeout = timeout
@@ -52,6 +53,7 @@ class RedfishUtils(object):
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
+        self.ciphers = ciphers
         self._vendor = None
         self._init_session()
 
@@ -132,11 +134,13 @@ class RedfishUtils(object):
         return resp
 
     # The following functions are to send GET/POST/PATCH/DELETE requests
-    def get_request(self, uri, override_headers=None, allow_no_resp=False):
+    def get_request(self, uri, override_headers=None, allow_no_resp=False, timeout=None):
         req_headers = dict(GET_HEADERS)
         if override_headers:
             req_headers.update(override_headers)
         username, password, basic_auth = self._auth_params(req_headers)
+        if timeout is None:
+            timeout = self.timeout
         try:
             # Service root is an unauthenticated resource; remove credentials
             # in case the caller will be using sessions later.
@@ -146,8 +150,8 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+                            use_proxy=True, timeout=timeout, ciphers=self.ciphers)
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
             try:
                 if headers.get('content-encoding') == 'gzip' and LooseVersion(ansible_version) < LooseVersion('2.14'):
                     # Older versions of Ansible do not automatically decompress the data
@@ -196,13 +200,13 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
             try:
                 data = json.loads(to_native(resp.read()))
             except Exception as e:
                 # No response data; this is okay in many cases
                 data = None
-            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
+            headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -250,7 +254,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False, 'changed': False,
@@ -285,7 +289,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -311,7 +315,7 @@ class RedfishUtils(object):
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -606,12 +610,13 @@ class RedfishUtils(object):
                 data = response['data']
                 if 'Parameters' in data:
                     params = data['Parameters']
-                    ai = dict((p['Name'], p)
-                              for p in params if 'Name' in p)
+                    ai = {p['Name']: p for p in params if 'Name' in p}
         if not ai:
-            ai = dict((k[:-24],
-                       {'AllowableValues': v}) for k, v in action.items()
-                      if k.endswith('@Redfish.AllowableValues'))
+            ai = {
+                k[:-24]: {'AllowableValues': v}
+                for k, v in action.items()
+                if k.endswith('@Redfish.AllowableValues')
+            }
         return ai
 
     def _get_allowable_values(self, action, name, default_values=None):
@@ -630,7 +635,25 @@ class RedfishUtils(object):
         else:
             return self.get_logs(self.manager_uri)
 
-    def get_logs(self, manager_uri):
+    def check_service_availability(self):
+        """
+        Checks if the service is accessible.
+
+        :return: dict containing the status of the service
+        """
+
+        # Get the service root
+        # Override the timeout since the service root is expected to be readily
+        # available.
+        service_root = self.get_request(self.root_uri + self.service_root, timeout=10)
+        if service_root['ret'] is False:
+            # Failed, either due to a timeout or HTTP error; not available
+            return {'ret': True, 'available': False}
+
+        # Successfully accessed the service root; available
+        return {'ret': True, 'available': True}
+
+    def get_logs(self):
         log_svcs_uri_list = []
         list_of_logs = []
         properties = ['Severity', 'Created', 'EntryType', 'OemRecordFormat',
@@ -1089,11 +1112,12 @@ class RedfishUtils(object):
         return self.manage_power(command, self.systems_uri,
                                  '#ComputerSystem.Reset')
 
-    def manage_manager_power(self, command):
+    def manage_manager_power(self, command, wait=False, wait_timeout=120):
         return self.manage_power(command, self.manager_uri,
-                                 '#Manager.Reset')
+                                 '#Manager.Reset', wait, wait_timeout)
 
-    def manage_power(self, command, resource_uri, action_name):
+    def manage_power(self, command, resource_uri, action_name, wait=False,
+                     wait_timeout=120):
         key = "Actions"
         reset_type_values = ['On', 'ForceOff', 'GracefulShutdown',
                              'GracefulRestart', 'ForceRestart', 'Nmi',
@@ -1148,6 +1172,78 @@ class RedfishUtils(object):
 
         # define payload
         payload = {'ResetType': reset_type}
+
+        # POST to Action URI
+        response = self.post_request(self.root_uri + action_uri, payload)
+        if response['ret'] is False:
+            return response
+
+        # If requested to wait for the service to be available again, block
+        # until it's ready
+        if wait:
+            elapsed_time = 0
+            start_time = time.time()
+            # Start with a large enough sleep.  Some services will process new
+            # requests while in the middle of shutting down, thus breaking out
+            # early.
+            time.sleep(30)
+
+            # Periodically check for the service's availability.
+            while elapsed_time <= wait_timeout:
+                status = self.check_service_availability()
+                if status['available']:
+                    # It's available; we're done
+                    break
+                time.sleep(5)
+                elapsed_time = time.time() - start_time
+
+            if elapsed_time > wait_timeout:
+                # Exhausted the wait timer; error
+                return {'ret': False, 'changed': True,
+                        'msg': 'The service did not become available after %d seconds' % wait_timeout}
+        return {'ret': True, 'changed': True}
+
+    def manager_reset_to_defaults(self, command):
+        return self.reset_to_defaults(command, self.manager_uri,
+                                      '#Manager.ResetToDefaults')
+
+    def reset_to_defaults(self, command, resource_uri, action_name):
+        key = "Actions"
+        reset_type_values = ['ResetAll',
+                             'PreserveNetworkAndUsers',
+                             'PreserveNetwork']
+
+        if command not in reset_type_values:
+            return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
+
+        # read the resource and get the current power state
+        response = self.get_request(self.root_uri + resource_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+
+        # get the reset Action and target URI
+        if key not in data or action_name not in data[key]:
+            return {'ret': False, 'msg': 'Action %s not found' % action_name}
+        reset_action = data[key][action_name]
+        if 'target' not in reset_action:
+            return {'ret': False,
+                    'msg': 'target URI missing from Action %s' % action_name}
+        action_uri = reset_action['target']
+
+        # get AllowableValues
+        ai = self._get_all_action_info_values(reset_action)
+        allowable_values = ai.get('ResetType', {}).get('AllowableValues', [])
+
+        # map ResetType to an allowable value if needed
+        if allowable_values and command not in allowable_values:
+            return {'ret': False,
+                    'msg': 'Specified reset type (%s) not supported '
+                           'by service. Supported types: %s' %
+                           (command, allowable_values)}
+
+        # define payload
+        payload = {'ResetType': command}
 
         # POST to Action URI
         response = self.post_request(self.root_uri + action_uri, payload)
@@ -1554,6 +1650,8 @@ class RedfishUtils(object):
         result['entries'] = {}
 
         data = response['data']
+
+        result['multipart_supported'] = 'MultipartHttpPushUri' in data
 
         if "Actions" in data:
             actions = data['Actions']
@@ -2151,7 +2249,7 @@ class RedfishUtils(object):
                 continue
 
             # If already set to requested value, remove it from PATCH payload
-            if data[u'Attributes'][attr_name] == attributes[attr_name]:
+            if data[u'Attributes'][attr_name] == attr_value:
                 del attrs_to_patch[attr_name]
 
         warning = ""
@@ -2689,9 +2787,11 @@ class RedfishUtils(object):
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
         # get AllowableValues
-        ai = dict((k[:-24],
-                   {'AllowableValues': v}) for k, v in data.items()
-                  if k.endswith('@Redfish.AllowableValues'))
+        ai = {
+            k[:-24]: {'AllowableValues': v}
+            for k, v in data.items()
+            if k.endswith('@Redfish.AllowableValues')
+        }
         # construct payload
         payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload and not image_only:
@@ -3748,7 +3848,7 @@ class RedfishUtils(object):
         vendor = self._get_vendor()['Vendor']
         rsp_uri = ""
         for loc in resp_data['Location']:
-            if loc['Language'] == "en":
+            if loc['Language'].startswith("en"):
                 rsp_uri = loc['Uri']
                 if vendor == 'HPE':
                     # WORKAROUND

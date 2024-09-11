@@ -437,7 +437,7 @@ def sanitize(idp):
     idpcopy = deepcopy(idp)
     if 'config' in idpcopy:
         if 'clientSecret' in idpcopy['config']:
-            idpcopy['clientSecret'] = '**********'
+            idpcopy['config']['clientSecret'] = '**********'
     return idpcopy
 
 
@@ -445,6 +445,15 @@ def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
     if idp is not None:
         idp['mappers'] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get('name'))
+        # clientSecret returned by API when using `get_identity_provider(alias, realm)` is always **********
+        # to detect changes to the secret, we get the actual cleartext secret from the full realm info
+        if 'config' in idp:
+            if 'clientSecret' in idp['config']:
+                for idp_from_realm in kc.get_realm_by_id(realm).get('identityProviders', []):
+                    if idp_from_realm['internalId'] == idp['internalId']:
+                        cleartext_secret = idp_from_realm.get('config', {}).get('clientSecret')
+                        if cleartext_secret:
+                            idp['config']['clientSecret'] = cleartext_secret
     if idp is None:
         idp = {}
     return idp
@@ -525,7 +534,7 @@ def main():
     # special handling of mappers list to allow change detection
     if module.params.get('mappers') is not None:
         for change in module.params['mappers']:
-            change = dict((k, v) for k, v in change.items() if change[k] is not None)
+            change = {k: v for k, v in change.items() if v is not None}
             if change.get('id') is None and change.get('name') is None:
                 module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
             if before_idp == dict():

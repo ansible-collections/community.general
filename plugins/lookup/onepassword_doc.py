@@ -24,6 +24,8 @@ DOCUMENTATION = '''
       _terms:
         description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
         required: true
+        type: list
+        elements: string
 
     extends_documentation_fragment:
       - community.general.onepassword

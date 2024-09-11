@@ -14,6 +14,7 @@ DOCUMENTATION = '''
     options:
         become_exe:
             description: Sudo executable
+            type: string
             default: pmrun
             ini:
               - section: privilege_escalation
@@ -27,7 +28,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_EXE
               - name: ANSIBLE_PMRUN_EXE
         become_flags:
-            description: Options to pass to pmrun
+            description: Options to pass to pmrun.
+            type: string
             default: ''
             ini:
               - section: privilege_escalation
@@ -41,7 +43,8 @@ DOCUMENTATION = '''
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_PMRUN_FLAGS
         become_pass:
-            description: pmrun password
+            description: pmrun password.
+            type: string
             required: false
             vars:
               - name: ansible_become_password

@@ -33,6 +33,8 @@ files:
     maintainers: $team_ansible_core
   $becomes/pmrun.py:
     maintainers: $team_ansible_core
+  $becomes/run0.py:
+    maintainers: konstruktoid
   $becomes/sesu.py:
     maintainers: nekonyuu
   $becomes/sudosu.py:
@@ -89,6 +91,8 @@ files:
     maintainers: ryancurrah
   $callbacks/syslog_json.py:
     maintainers: imjoseangel
+  $callbacks/timestamp.py:
+    maintainers: kurokobo
   $callbacks/unixy.py:
     labels: unixy
     maintainers: akatch
@@ -117,6 +121,8 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
+  $doc_fragments/django.py:
+    maintainers: russoz
   $doc_fragments/hpe3par.py:
     labels: hpe3par
     maintainers: farhan7500 gautamphegde
@@ -151,6 +157,8 @@ files:
   $filters/jc.py:
     maintainers: kellyjonbrazil
   $filters/json_query.py: {}
+  $filters/keep_keys.py:
+    maintainers: vbotka
   $filters/lists.py:
     maintainers: cfiehe
   $filters/lists_difference.yml:
@@ -164,6 +172,12 @@ files:
   $filters/lists_union.yml:
     maintainers: cfiehe
   $filters/random_mac.py: {}
+  $filters/remove_keys.py:
+    maintainers: vbotka
+  $filters/replace_keys.py:
+    maintainers: vbotka
+  $filters/reveal_ansible_type.py:
+    maintainers: vbotka
   $filters/time.py:
     maintainers: resmo
   $filters/to_days.yml:
@@ -294,7 +308,11 @@ files:
     labels: module_utils
   $module_utils/btrfs.py:
     maintainers: gnfzdz
+  $module_utils/cmd_runner.py:
+    maintainers: russoz
   $module_utils/deps.py:
+    maintainers: russoz
+  $module_utils/django.py:
     maintainers: russoz
   $module_utils/gconftool2.py:
     labels: gconftool2
@@ -338,6 +356,8 @@ files:
     maintainers: $team_oracle
   $module_utils/pipx.py:
     labels: pipx
+    maintainers: russoz
+  $module_utils/python_runner.py:
     maintainers: russoz
   $module_utils/puppet.py:
     labels: puppet
@@ -428,6 +448,8 @@ files:
     maintainers: hkariti
   $modules/bitbucket_:
     maintainers: catcombo
+  $modules/bootc_manage.py:
+    maintainers: cooktheryan
   $modules/bower.py:
     maintainers: mwarkentin
   $modules/btrfs_:
@@ -490,6 +512,12 @@ files:
     maintainers: tintoy
   $modules/discord.py:
     maintainers: cwollinger
+  $modules/django_check.py:
+    maintainers: russoz
+  $modules/django_command.py:
+    maintainers: russoz
+  $modules/django_createcachetable.py:
+    maintainers: russoz
   $modules/django_manage.py:
     ignore: scottanderson42 tastychutney
     labels: django_manage
@@ -532,8 +560,6 @@ files:
     maintainers: $team_flatpak
   $modules/flatpak_remote.py:
     maintainers: $team_flatpak
-  $modules/flowdock.py:
-    ignore: mcodd
   $modules/gandi_livedns.py:
     maintainers: gthiemonge
   $modules/gconftool2.py:
@@ -622,6 +648,11 @@ files:
     labels: homebrew_ macos
     maintainers: $team_macos
     notify: chris-short
+  $modules/homebrew_services.py:
+    ignore: ryansb
+    keywords: brew cask services darwin homebrew macosx macports osx
+    labels: homebrew_ macos
+    maintainers: $team_macos kitizz
   $modules/homectl.py:
     maintainers: jameslivulpi
   $modules/honeybadger_deployment.py:
@@ -778,7 +809,11 @@ files:
     maintainers: elfelip
   $modules/keycloak_user_federation.py:
     maintainers: laurpaum
+  $modules/keycloak_userprofile.py:
+    maintainers: yeoldegrove
   $modules/keycloak_component_info.py:
+    maintainers: desand01
+  $modules/keycloak_client_rolescope.py:
     maintainers: desand01
   $modules/keycloak_user_rolemapping.py:
     maintainers: bratwurzt
@@ -941,6 +976,8 @@ files:
     maintainers: $team_opennebula
   $modules/one_host.py:
     maintainers: rvalle
+  $modules/one_vnet.py:
+    maintainers: abakanovskii
   $modules/oneandone_:
     maintainers: aajdinov edevenport
   $modules/onepassword_info.py:
@@ -1094,46 +1131,6 @@ files:
   $modules/python_requirements_info.py:
     ignore: ryansb
     maintainers: willthames
-  $modules/rax:
-    ignore: ryansb sivel
-  $modules/rax.py:
-    maintainers: omgjlk sivel
-  $modules/rax_cbs.py:
-    maintainers: claco
-  $modules/rax_cbs_attachments.py:
-    maintainers: claco
-  $modules/rax_cdb.py:
-    maintainers: jails
-  $modules/rax_cdb_database.py:
-    maintainers: jails
-  $modules/rax_cdb_user.py:
-    maintainers: jails
-  $modules/rax_clb.py:
-    maintainers: claco
-  $modules/rax_clb_nodes.py:
-    maintainers: neuroid
-  $modules/rax_clb_ssl.py:
-    maintainers: smashwilson
-  $modules/rax_files.py:
-    maintainers: angstwad
-  $modules/rax_files_objects.py:
-    maintainers: angstwad
-  $modules/rax_identity.py:
-    maintainers: claco
-  $modules/rax_mon_alarm.py:
-    maintainers: smashwilson
-  $modules/rax_mon_check.py:
-    maintainers: smashwilson
-  $modules/rax_mon_entity.py:
-    maintainers: smashwilson
-  $modules/rax_mon_notification.py:
-    maintainers: smashwilson
-  $modules/rax_mon_notification_plan.py:
-    maintainers: smashwilson
-  $modules/rax_network.py:
-    maintainers: claco omgjlk
-  $modules/rax_queue.py:
-    maintainers: claco
   $modules/read_csv.py:
     maintainers: dagwieers
   $modules/redfish_:
@@ -1298,8 +1295,6 @@ files:
     maintainers: farhan7500 gautamphegde
   $modules/ssh_config.py:
     maintainers: gaqzi Akasurde
-  $modules/stackdriver.py:
-    maintainers: bwhaley
   $modules/stacki_host.py:
     labels: stacki_host
     maintainers: bsanders bbyhuy
@@ -1392,8 +1387,6 @@ files:
     maintainers: $team_wdc
   $modules/wdc_redfish_info.py:
     maintainers: $team_wdc
-  $modules/webfaction_:
-    maintainers: quentinsf
   $modules/xattr.py:
     labels: xattr
     maintainers: bcoca
@@ -1445,8 +1438,16 @@ files:
     ignore: matze
     labels: zypper
     maintainers: $team_suse
+  $plugin_utils/ansible_type.py:
+    maintainers: vbotka
+  $plugin_utils/keys_filter.py:
+    maintainers: vbotka
+  $plugin_utils/unsafe.py:
+    maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
+  $tests/ansible_type.py:
+    maintainers: vbotka
   $tests/fqdn_valid.py:
     maintainers: vbotka
 #########################
@@ -1460,6 +1461,14 @@ files:
     maintainers: felixfontein
   docs/docsite/rst/filter_guide_abstract_informations_lists_helper.rst:
     maintainers: cfiehe
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-keep_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-remove_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-replace_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries.rst:
+    maintainers: vbotka
   docs/docsite/rst/filter_guide_abstract_informations_merging_lists_of_dictionaries.rst:
     maintainers: vbotka
   docs/docsite/rst/filter_guide_conversions.rst:
@@ -1476,12 +1485,20 @@ files:
     maintainers: ericzolf
   docs/docsite/rst/guide_alicloud.rst:
     maintainers: xiaozhu36
+  docs/docsite/rst/guide_cmdrunner.rst:
+    maintainers: russoz
+  docs/docsite/rst/guide_deps.rst:
+    maintainers: russoz
+  docs/docsite/rst/guide_modulehelper.rst:
+    maintainers: russoz
   docs/docsite/rst/guide_online.rst:
     maintainers: remyleone
   docs/docsite/rst/guide_packet.rst:
     maintainers: baldwinSPC nurfet-becirevic t0mk teebes
   docs/docsite/rst/guide_scaleway.rst:
     maintainers: $team_scaleway
+  docs/docsite/rst/guide_vardict.rst:
+    maintainers: russoz
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
 #########################
@@ -1501,7 +1518,6 @@ macros:
   becomes: plugins/become
   caches: plugins/cache
   callbacks: plugins/callback
-  cliconfs: plugins/cliconf
   connections: plugins/connection
   doc_fragments: plugins/doc_fragments
   filters: plugins/filter
@@ -1509,12 +1525,12 @@ macros:
   lookups: plugins/lookup
   module_utils: plugins/module_utils
   modules: plugins/modules
-  terminals: plugins/terminal
+  plugin_utils: plugins/plugin_utils
   tests: plugins/test
   team_ansible_core:
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
-  team_consul: sgargan apollo13
+  team_consul: sgargan apollo13 Ilgmi
   team_cyberark_conjur: jvanderhoof ryanprior
   team_e_spirit: MatrixCrawler getjack
   team_flatpak: JayKayy oolongbrothers
@@ -1523,7 +1539,7 @@ macros:
   team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
   team_ipa: Akasurde Nosmoht justchris1
   team_jboss: Wolfant jairojunior wbrefvem
-  team_keycloak: eikef ndclt mattock
+  team_keycloak: eikef ndclt mattock thomasbach-dev
   team_linode: InTheCloudDan decentral1se displague rmcintosh Charliekenney23 LBGarber
   team_macos: Akasurde kyleabenson martinm82 danieljaouen indrajitr
   team_manageiq: abellotti cben gtanzillo yaacov zgalor dkorn evertmulder

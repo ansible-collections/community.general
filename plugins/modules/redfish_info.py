@@ -63,15 +63,27 @@ options:
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
-      - The default value for this param is C(10) but that is being deprecated
-        and it will be replaced with C(60) in community.general 9.0.0.
+      - The default value for this parameter changed from V(10) to V(60)
+        in community.general 9.0.0.
     type: int
+    default: 60
   update_handle:
     required: false
     description:
       - Handle to check the status of an update in progress.
     type: str
     version_added: '6.1.0'
+  ciphers:
+    required: false
+    description:
+      - SSL/TLS Ciphers to use for the request.
+      - 'When a list is provided, all ciphers are joined in order with V(:).'
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+        for more details.
+      - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
+    type: list
+    elements: str
+    version_added: 9.2.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -358,6 +370,16 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Check the availability of the service with a timeout of 5 seconds
+    community.general.redfish_info:
+      category: Service
+      command: CheckAvailability
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      timeout: 5
+    register: result
 '''
 
 RETURN = '''
@@ -384,6 +406,7 @@ CATEGORY_COMMANDS_ALL = {
                "GetUpdateStatus"],
     "Manager": ["GetManagerNicInventory", "GetVirtualMedia", "GetLogs", "GetNetworkProtocols",
                 "GetHealthReport", "GetHostInterfaces", "GetManagerInventory", "GetServiceIdentification"],
+    "Service": ["CheckAvailability"],
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
@@ -392,7 +415,8 @@ CATEGORY_COMMANDS_DEFAULT = {
     "Accounts": "ListUsers",
     "Update": "GetFirmwareInventory",
     "Sessions": "GetSessions",
-    "Manager": "GetManagerNicInventory"
+    "Manager": "GetManagerNicInventory",
+    "Service": "CheckAvailability",
 }
 
 
@@ -407,9 +431,10 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
-            timeout=dict(type='int'),
+            timeout=dict(type='int', default=60),
             update_handle=dict(),
             manager=dict(),
+            ciphers=dict(type='list', elements='str'),
         ),
         required_together=[
             ('username', 'password'),
@@ -422,16 +447,6 @@ def main():
         ],
         supports_check_mode=True,
     )
-
-    if module.params['timeout'] is None:
-        timeout = 10
-        module.deprecate(
-            'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
-                10, 60
-            ),
-            version='9.0.0',
-            collection_name='community.general'
-        )
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
@@ -447,9 +462,12 @@ def main():
     # manager
     manager = module.params['manager']
 
+    # ciphers
+    ciphers = module.params['ciphers']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = RedfishUtils(creds, root_uri, timeout, module)
+    rf_utils = RedfishUtils(creds, root_uri, timeout, module, ciphers=ciphers)
 
     # Build Category list
     if "all" in module.params['category']:
@@ -482,7 +500,13 @@ def main():
             module.fail_json(msg="Invalid Category: %s" % category)
 
         # Organize by Categories / Commands
-        if category == "Systems":
+        if category == "Service":
+            # service-level commands are always available
+            for command in command_list:
+                if command == "CheckAvailability":
+                    result["service"] = rf_utils.check_service_availability()
+
+        elif category == "Systems":
             # execute only if we find a Systems resource
             resource = rf_utils._find_systems_resource()
             if resource['ret'] is False:

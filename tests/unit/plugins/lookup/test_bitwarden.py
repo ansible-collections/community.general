@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import re
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
@@ -13,8 +14,10 @@ from ansible.errors import AnsibleError
 from ansible.module_utils import six
 from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.bitwarden import Bitwarden
+from ansible.parsing.ajson import AnsibleJSONEncoder
 
 MOCK_COLLECTION_ID = "3b12a9da-7c49-40b8-ad33-aede017a7ead"
+MOCK_ORGANIZATION_ID = "292ba0c6-f289-11ee-9301-ef7b639ccd2a"
 
 MOCK_RECORDS = [
     {
@@ -48,7 +51,7 @@ MOCK_RECORDS = [
         "name": "a_test",
         "notes": None,
         "object": "item",
-        "organizationId": None,
+        "organizationId": MOCK_ORGANIZATION_ID,
         "passwordHistory": [
             {
                 "lastUsedDate": "2022-07-26T23:03:23.405Z",
@@ -68,9 +71,7 @@ MOCK_RECORDS = [
         "type": 1
     },
     {
-        "collectionIds": [
-            MOCK_COLLECTION_ID
-        ],
+        "collectionIds": [],
         "deletedDate": None,
         "favorite": False,
         "folderId": None,
@@ -106,9 +107,29 @@ MOCK_RECORDS = [
         "name": "dupe_name",
         "notes": None,
         "object": "item",
-        "organizationId": None,
+        "organizationId": MOCK_ORGANIZATION_ID,
         "reprompt": 0,
         "revisionDate": "2022-07-27T03:42:46.673Z",
+        "type": 1
+    },
+    {
+        "collectionIds": [],
+        "deletedDate": None,
+        "favorite": False,
+        "folderId": None,
+        "id": "2bf517be-fb13-11ee-be89-a345aa369a94",
+        "login": {
+            "password": "e",
+            "passwordRevisionDate": None,
+            "totp": None,
+            "username": "f"
+        },
+        "name": "non_collection_org_record",
+        "notes": None,
+        "object": "item",
+        "organizationId": MOCK_ORGANIZATION_ID,
+        "reprompt": 0,
+        "revisionDate": "2024-14-15T11:30:00.000Z",
         "type": 1
     }
 ]
@@ -118,11 +139,41 @@ class MockBitwarden(Bitwarden):
 
     unlocked = True
 
-    def _get_matches(self, search_value=None, search_field="name", collection_id=None):
-        if not search_value and collection_id:
-            return list(filter(lambda record: collection_id in record['collectionIds'], MOCK_RECORDS))
+    def _run(self, args, stdin=None, expected_rc=0):
+        if args[0] == 'get':
+            if args[1] == 'item':
+                for item in MOCK_RECORDS:
+                    if item.get('id') == args[2]:
+                        return AnsibleJSONEncoder().encode(item), ''
+        if args[0] == 'list':
+            if args[1] == 'items':
+                try:
+                    search_value = args[args.index('--search') + 1]
+                except ValueError:
+                    search_value = None
 
-        return list(filter(lambda record: record[search_field] == search_value, MOCK_RECORDS))
+                try:
+                    collection_to_filter = args[args.index('--collectionid') + 1]
+                except ValueError:
+                    collection_to_filter = None
+
+                try:
+                    organization_to_filter = args[args.index('--organizationid') + 1]
+                except ValueError:
+                    organization_to_filter = None
+
+                items = []
+                for item in MOCK_RECORDS:
+                    if search_value and not re.search(search_value, item.get('name')):
+                        continue
+                    if collection_to_filter and collection_to_filter not in item.get('collectionIds', []):
+                        continue
+                    if organization_to_filter and item.get('organizationId') != organization_to_filter:
+                        continue
+                    items.append(item)
+                return AnsibleJSONEncoder().encode(items), ''
+
+        return '[]', ''
 
 
 class LoggedOutMockBitwarden(MockBitwarden):
@@ -194,4 +245,19 @@ class TestLookupModule(unittest.TestCase):
     @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
     def test_bitwarden_plugin_full_collection(self):
         # Try to retrieve the full records of the given collection.
-        self.assertEqual(MOCK_RECORDS, self.lookup.run(None, collection_id=MOCK_COLLECTION_ID)[0])
+        self.assertEqual([MOCK_RECORDS[0], MOCK_RECORDS[2]], self.lookup.run(None, collection_id=MOCK_COLLECTION_ID)[0])
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_full_organization(self):
+        self.assertEqual([MOCK_RECORDS[0], MOCK_RECORDS[2], MOCK_RECORDS[3]],
+                         self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID)[0])
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_filter_organization(self):
+        self.assertEqual([MOCK_RECORDS[2]],
+                         self.lookup.run(['dupe_name'], organization_id=MOCK_ORGANIZATION_ID)[0])
+
+    @patch('ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden', new=MockBitwarden())
+    def test_bitwarden_plugin_full_collection_organization(self):
+        self.assertEqual([MOCK_RECORDS[0], MOCK_RECORDS[2]], self.lookup.run(None,
+                         collection_id=MOCK_COLLECTION_ID, organization_id=MOCK_ORGANIZATION_ID)[0])

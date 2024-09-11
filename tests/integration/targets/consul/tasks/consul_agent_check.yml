@@ -1,0 +1,114 @@
+---
+# Copyright (c) 2024, Michael Ilg (@Ilgmi)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a service
+  community.general.consul_agent_service:
+    name: nginx
+    service_port: 80
+    address: localhost
+    tags:
+      - http
+    meta:
+      nginx_version: 1.25.3
+  register: result
+
+- set_fact:
+    nginx_service: "{{result.service}}"
+
+- assert:
+    that:
+      - result is changed
+      - result.service.ID is defined
+
+- name: Add a check for service
+  community.general.consul_agent_check:
+    name: nginx_check
+    id: nginx_check
+    interval: 30s
+    http: http://localhost:80/morestatus
+    notes: "Nginx Check"
+    service_id: "{{ nginx_service.ID }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.check is defined
+      - result.check.CheckID == 'nginx_check'
+      - result.check.ServiceID == 'nginx'
+      - result.check.Interval == '30s'
+      - result.check.Type == 'http'
+      - result.check.Notes == 'Nginx Check'
+
+- set_fact:
+    nginx_service_check: "{{ result.check }}"
+
+- name: Update check for service
+  community.general.consul_agent_check:
+    name: "{{ nginx_service_check.Name }}"
+    id: "{{ nginx_service_check.CheckID }}"
+    interval: 60s
+    http: http://localhost:80/morestatus
+    notes: "New Nginx Check"
+    service_id: "{{ nginx_service.ID }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.check is defined
+      - result.check.CheckID == 'nginx_check'
+      - result.check.ServiceID == 'nginx'
+      - result.check.Interval == '1m0s'
+      - result.check.Type == 'http'
+      - result.check.Notes == 'New Nginx Check'
+
+- name: Remove check
+  community.general.consul_agent_check:
+    id: "{{ nginx_service_check.Name }}"
+    state: absent
+    service_id: "{{ nginx_service.ID }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result is not failed
+      - result.operation == 'remove'
+
+- name: Add a check
+  community.general.consul_agent_check:
+    name: check
+    id: check
+    interval: 30s
+    tcp: localhost:80
+    notes: "check"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.check is defined
+
+- name: Update a check
+  community.general.consul_agent_check:
+    name: check
+    id: check
+    interval: 60s
+    tcp: localhost:80
+    notes: "check"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.check is defined
+      - result.check.Interval == '1m0s'
+
+- name: Remove check
+  community.general.consul_agent_check:
+    id: check
+    state: absent
+  register: result

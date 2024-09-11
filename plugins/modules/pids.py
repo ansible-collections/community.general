@@ -111,7 +111,7 @@ class PSAdapter(object):
                 attributes['cmdline'] and compare_lower(attributes['cmdline'][0], name))
 
     def _get_proc_attributes(self, proc, *attributes):
-        return dict((attribute, self._get_attribute_from_proc(proc, attribute)) for attribute in attributes)
+        return {attribute: self._get_attribute_from_proc(proc, attribute) for attribute in attributes}
 
     @staticmethod
     @abc.abstractmethod

@@ -64,13 +64,16 @@ options:
             - Type V(infiniband) is added in community.general 2.0.0.
             - Type V(loopback) is added in community.general 8.1.0.
             - Type V(macvlan) is added in community.general 6.6.0.
+            - Type V(ovs-bridge) is added in community.general 8.6.0.
+            - Type V(ovs-interface) is added in community.general 8.6.0.
+            - Type V(ovs-port) is added in community.general 8.6.0.
             - Type V(wireguard) is added in community.general 4.3.0.
             - Type V(vpn) is added in community.general 5.1.0.
             - Using V(bond-slave), V(bridge-slave), or V(team-slave) implies V(ethernet) connection type with corresponding O(slave_type) option.
             - If you want to control non-ethernet connection attached to V(bond), V(bridge), or V(team) consider using O(slave_type) option.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, macvlan, sit, team, team-slave, vlan, vxlan,
-            wifi, gsm, wireguard, vpn, loopback ]
+            wifi, gsm, wireguard, ovs-bridge, ovs-port, ovs-interface, vpn, loopback ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -86,12 +89,13 @@ options:
     slave_type:
         description:
             - Type of the device of this slave's master connection (for example V(bond)).
+            - Type V(ovs-port) is added in community.general 8.6.0.
         type: str
-        choices: [ 'bond', 'bridge', 'team' ]
+        choices: [ 'bond', 'bridge', 'team', 'ovs-port' ]
         version_added: 7.0.0
     master:
         description:
-            - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
+            - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond, ovs-port master connection profile.
             - Mandatory if O(slave_type) is defined.
         type: str
     ip4:
@@ -1505,6 +1509,32 @@ EXAMPLES = r'''
         table: "production"
     routing_rules4:
       - "priority 0 from 192.168.1.50 table 200"
+
+## Creating an OVS bridge and attaching a port
+- name: Create OVS Bridge
+  community.general.nmcli:
+    conn_name: ovs-br-conn
+    ifname: ovs-br
+    type: ovs-bridge
+    state: present
+
+- name: Create OVS Port for OVS Bridge Interface
+  community.general.nmcli:
+    conn_name: ovs-br-interface-port-conn
+    ifname: ovs-br-interface-port
+    master: ovs-br
+    type: ovs-port
+    state: present
+
+## Adding an ethernet interface to an OVS bridge port
+- name: Add Ethernet Interface to OVS Port
+  community.general.nmcli:
+    conn_name: eno1
+    ifname: eno1
+    master: ovs-br-interface-port
+    slave_type: ovs-port
+    type: ethernet
+    state: present
 '''
 
 RETURN = r"""#
@@ -1678,7 +1708,8 @@ class Nmcli(object):
         }
 
         # IP address options.
-        if self.ip_conn_type and not self.master:
+        # The ovs-interface type can be both ip_conn_type and have a master
+        if (self.ip_conn_type and not self.master) or self.type == "ovs-interface":
             options.update({
                 'ipv4.addresses': self.enforce_ipv4_cidr_notation(self.ip4),
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -1939,6 +1970,7 @@ class Nmcli(object):
             'wireguard',
             'vpn',
             'loopback',
+            'ovs-interface',
         )
 
     @property
@@ -2005,6 +2037,8 @@ class Nmcli(object):
             'team-slave',
             'wifi',
             'infiniband',
+            'ovs-port',
+            'ovs-interface',
         )
 
     @property
@@ -2400,7 +2434,7 @@ def main():
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
             master=dict(type='str'),
-            slave_type=dict(type='str', choices=['bond', 'bridge', 'team']),
+            slave_type=dict(type='str', choices=['bond', 'bridge', 'team', 'ovs-port']),
             ifname=dict(type='str'),
             type=dict(type='str',
                       choices=[
@@ -2425,6 +2459,9 @@ def main():
                           'wireguard',
                           'vpn',
                           'loopback',
+                          'ovs-interface',
+                          'ovs-bridge',
+                          'ovs-port',
                       ]),
             ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),

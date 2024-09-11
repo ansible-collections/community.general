@@ -407,8 +407,7 @@ def async_wait_create(config, result, client, timeout):
     path_parameters = {
         "peering_id": ["peering", "id"],
     }
-    data = dict((key, navigate_value(result, path))
-                for key, path in path_parameters.items())
+    data = {key: navigate_value(result, path) for key, path in path_parameters.items()}
 
     url = build_path(module, "v2.0/vpc/peerings/{peering_id}", data)
 

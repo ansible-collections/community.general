@@ -1,0 +1,2 @@
+minor_changes:
+    - openbsd_pkg - adds diff support to show changes in installed package list. This does not yet work for check mode (https://github.com/ansible-collections/community.general/pull/8402).

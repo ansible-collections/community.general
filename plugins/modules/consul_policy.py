@@ -33,6 +33,8 @@ attributes:
     version_added: 8.3.0
     details:
       - In check mode the diff will miss operational attributes.
+  action_group:
+    version_added: 8.3.0
 options:
   state:
     description:
@@ -143,7 +145,7 @@ _ARGUMENT_SPEC.update(AUTH_ARGUMENTS_SPEC)
 class ConsulPolicyModule(_ConsulModule):
     api_endpoint = "acl/policy"
     result_key = "policy"
-    unique_identifier = "id"
+    unique_identifiers = ["id"]
 
     def endpoint_url(self, operation, identifier=None):
         if operation == OPERATION_READ:

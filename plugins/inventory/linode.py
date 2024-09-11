@@ -35,6 +35,7 @@ DOCUMENTATION = r'''
             version_added: 4.5.0
         plugin:
             description: Marks this as an instance of the 'linode' plugin.
+            type: string
             required: true
             choices: ['linode', 'community.general.linode']
         ip_style:
@@ -47,6 +48,7 @@ DOCUMENTATION = r'''
             version_added: 3.6.0
         access_token:
             description: The Linode account personal access token.
+            type: string
             required: true
             env:
                 - name: LINODE_ACCESS_TOKEN
@@ -122,7 +124,8 @@ compose:
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 
 try:

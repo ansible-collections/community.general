@@ -105,6 +105,7 @@ class SnapAlias(StateModuleHelper):
         ],
         supports_check_mode=True,
     )
+    use_old_vardict = False
 
     def _aliases(self):
         n = self.vars.name

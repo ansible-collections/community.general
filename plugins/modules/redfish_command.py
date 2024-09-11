@@ -109,9 +109,10 @@ options:
   timeout:
     description:
       - Timeout in seconds for HTTP requests to OOB controller.
-      - The default value for this param is C(10) but that is being deprecated
-        and it will be replaced with C(60) in community.general 9.0.0.
+      - The default value for this parameter changed from V(10) to V(60)
+        in community.general 9.0.0.
     type: int
+    default: 60
   boot_override_mode:
     description:
       - Boot mode when using an override.
@@ -281,6 +282,37 @@ options:
       - BIOS attributes that needs to be verified in the given server.
     type: dict
     version_added: 6.4.0
+  reset_to_defaults_mode:
+    description:
+      - Mode to apply when reseting to default.
+    type: str
+    choices: [ ResetAll, PreserveNetworkAndUsers, PreserveNetwork ]
+    version_added: 8.6.0
+  wait:
+    required: false
+    description:
+      - Block until the service is ready again.
+    type: bool
+    default: false
+    version_added: 9.1.0
+  wait_timeout:
+    required: false
+    description:
+      - How long to block until the service is ready again before giving up.
+    type: int
+    default: 120
+    version_added: 9.1.0
+  ciphers:
+    required: false
+    description:
+      - SSL/TLS Ciphers to use for the request.
+      - 'When a list is provided, all ciphers are joined in order with V(:).'
+      - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+        for more details.
+      - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
+    type: list
+    elements: str
+    version_added: 9.2.0
 
 author:
   - "Jose Delarosa (@jose-delarosa)"
@@ -678,6 +710,16 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Restart manager power gracefully and wait for it to be available
+    community.general.redfish_command:
+      category: Manager
+      command: GracefulRestart
+      resource_id: BMC
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      wait: True
+
   - name: Restart manager power gracefully
     community.general.redfish_command:
       category: Manager
@@ -713,6 +755,13 @@ EXAMPLES = '''
       category: Manager
       command: PowerReboot
       resource_id: BMC
+
+  - name: Factory reset manager to defaults
+    community.general.redfish_command:
+      category: Manager
+      command: ResetToDefaults
+      resource_id: BMC
+      reset_to_defaults_mode: ResetAll
 
   - name: Verify BIOS attributes
     community.general.redfish_command:
@@ -764,6 +813,7 @@ CATEGORY_COMMANDS_ALL = {
                  "UpdateAccountServiceProperties"],
     "Sessions": ["ClearSessions", "CreateSession", "DeleteSession"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
+                "ResetToDefaults",
                 "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
                 "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
     "Update": ["SimpleUpdate", "MultipartHTTPPushUpdate", "PerformRequestedOperations"],
@@ -791,7 +841,7 @@ def main():
             update_username=dict(type='str', aliases=["account_updatename"]),
             account_properties=dict(type='dict', default={}),
             bootdevice=dict(),
-            timeout=dict(type='int'),
+            timeout=dict(type='int', default=60),
             uefi_target=dict(),
             boot_next=dict(),
             boot_override_mode=dict(choices=['Legacy', 'UEFI']),
@@ -825,7 +875,11 @@ def main():
                 )
             ),
             strip_etag_quotes=dict(type='bool', default=False),
-            bios_attributes=dict(type="dict")
+            reset_to_defaults_mode=dict(choices=['ResetAll', 'PreserveNetworkAndUsers', 'PreserveNetwork']),
+            bios_attributes=dict(type="dict"),
+            wait=dict(type='bool', default=False),
+            wait_timeout=dict(type='int', default=120),
+            ciphers=dict(type='list', elements='str'),
         ),
         required_together=[
             ('username', 'password'),
@@ -838,16 +892,6 @@ def main():
         ],
         supports_check_mode=False
     )
-
-    if module.params['timeout'] is None:
-        timeout = 10
-        module.deprecate(
-            'The default value {0} for parameter param1 is being deprecated and it will be replaced by {1}'.format(
-                10, 60
-            ),
-            version='9.0.0',
-            collection_name='community.general'
-        )
 
     category = module.params['category']
     command_list = module.params['command']
@@ -904,10 +948,14 @@ def main():
     # BIOS Attributes options
     bios_attributes = module.params['bios_attributes']
 
+    # ciphers
+    ciphers = module.params['ciphers']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes)
+                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes,
+                            ciphers=ciphers)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
@@ -1010,13 +1058,15 @@ def main():
                 command = 'PowerGracefulRestart'
 
             if command.startswith('Power'):
-                result = rf_utils.manage_manager_power(command)
+                result = rf_utils.manage_manager_power(command, module.params['wait'], module.params['wait_timeout'])
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
                 result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
                 result = rf_utils.virtual_media_eject(virtual_media, category)
+            elif command == 'ResetToDefaults':
+                result = rf_utils.manager_reset_to_defaults(module.params['reset_to_defaults_mode'])
 
     elif category == "Update":
         # execute only if we find UpdateService resources

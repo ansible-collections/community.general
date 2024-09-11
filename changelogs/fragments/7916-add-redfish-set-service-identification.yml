@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_config - add command ``SetServiceIdentification`` to set service identification (https://github.com/ansible-collections/community.general/issues/7916).

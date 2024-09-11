@@ -187,6 +187,7 @@ class XFConfProperty(StateModuleHelper):
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
     )
+    use_old_vardict = False
 
     default_state = 'present'
 
@@ -196,7 +197,7 @@ class XFConfProperty(StateModuleHelper):
                                                                                  self.vars.channel)
         self.vars.set('previous_value', self._get())
         self.vars.set('type', self.vars.value_type)
-        self.vars.meta('value').set(initial_value=self.vars.previous_value)
+        self.vars.set_meta('value', initial_value=self.vars.previous_value)
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:

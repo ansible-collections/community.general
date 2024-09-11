@@ -24,6 +24,7 @@ DOCUMENTATION = '''
             description:
                 - A token that ensures this is a source file for the plugin.
             required: true
+            type: string
             choices: ['community.general.stackpath_compute']
         client_id:
             description:
@@ -72,7 +73,8 @@ from ansible.plugins.inventory import (
     Cacheable
 )
 from ansible.utils.display import Display
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 
 display = Display()

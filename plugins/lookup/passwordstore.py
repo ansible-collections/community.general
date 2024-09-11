@@ -42,8 +42,9 @@ DOCUMENTATION = '''
         default: false
       umask:
         description:
-          - Sets the umask for the created .gpg files. The first octed must be greater than 3 (user readable).
+          - Sets the umask for the created V(.gpg) files. The first octed must be greater than 3 (user readable).
           - Note pass' default value is V('077').
+        type: string
         env:
           - name: PASSWORD_STORE_UMASK
         version_added: 1.3.0
@@ -139,6 +140,21 @@ DOCUMENTATION = '''
         type: bool
         default: true
         version_added: 8.1.0
+      missing_subkey:
+        description:
+          - Preference about what to do if the password subkey is missing.
+          - If set to V(error), the lookup will error out if the subkey does not exist.
+          - If set to V(empty) or V(warn), will return a V(none) in case the subkey does not exist.
+        version_added: 8.6.0
+        type: str
+        default: empty
+        choices:
+          - error
+          - warn
+          - empty
+        ini:
+          - section: passwordstore_lookup
+            key: missing_subkey
     notes:
       - The lookup supports passing all options as lookup parameters since community.general 6.0.0.
 '''
@@ -147,6 +163,7 @@ ansible.cfg: |
   [passwordstore_lookup]
   lock=readwrite
   locktimeout=45s
+  missing_subkey=warn
 
 tasks.yml: |
   ---
@@ -432,13 +449,28 @@ class LookupModule(LookupBase):
             if self.paramvals['subkey'] in self.passdict:
                 return self.passdict[self.paramvals['subkey']]
             else:
+                if self.paramvals["missing_subkey"] == "error":
+                    raise AnsibleError(
+                        "passwordstore: subkey {0} for passname {1} not found and missing_subkey=error is set".format(
+                            self.paramvals["subkey"], self.passname
+                        )
+                    )
+
+                if self.paramvals["missing_subkey"] == "warn":
+                    display.warning(
+                        "passwordstore: subkey {0} for passname {1} not found".format(
+                            self.paramvals["subkey"], self.passname
+                        )
+                    )
+
                 return None
 
     @contextmanager
     def opt_lock(self, type):
         if self.get_option('lock') == type:
             tmpdir = os.environ.get('TMPDIR', '/tmp')
-            lockfile = os.path.join(tmpdir, '.passwordstore.lock')
+            user = os.environ.get('USER')
+            lockfile = os.path.join(tmpdir, '.{0}.passwordstore.lock'.format(user))
             with FileLock().lock_file(lockfile, tmpdir, self.lock_timeout):
                 self.locked = type
                 yield
@@ -481,6 +513,7 @@ class LookupModule(LookupBase):
             'umask': self.get_option('umask'),
             'timestamp': self.get_option('timestamp'),
             'preserve': self.get_option('preserve'),
+            "missing_subkey": self.get_option("missing_subkey"),
         }
 
     def run(self, terms, variables, **kwargs):

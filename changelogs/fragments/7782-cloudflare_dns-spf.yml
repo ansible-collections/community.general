@@ -1,2 +1,0 @@
-removed_features:
-  - "cloudflare_dns - remove support for SPF records. These are no longer supported by CloudFlare (https://github.com/ansible-collections/community.general/pull/7782)."

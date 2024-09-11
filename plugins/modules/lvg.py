@@ -179,7 +179,7 @@ def parse_vgs(data):
 def find_mapper_device_name(module, dm_device):
     dmsetup_cmd = module.get_bin_path('dmsetup', True)
     mapper_prefix = '/dev/mapper/'
-    rc, dm_name, err = module.run_command("%s info -C --noheadings -o name %s" % (dmsetup_cmd, dm_device))
+    rc, dm_name, err = module.run_command([dmsetup_cmd, "info", "-C", "--noheadings", "-o", "name", dm_device])
     if rc != 0:
         module.fail_json(msg="Failed executing dmsetup command.", rc=rc, err=err)
     mapper_device = mapper_prefix + dm_name.rstrip()
@@ -204,7 +204,7 @@ def find_vg(module, vg):
     if not vg:
         return None
     vgs_cmd = module.get_bin_path('vgs', True)
-    dummy, current_vgs, dummy = module.run_command("%s --noheadings -o vg_name,pv_count,lv_count --separator ';'" % vgs_cmd, check_rc=True)
+    dummy, current_vgs, dummy = module.run_command([vgs_cmd, "--noheadings", "-o", "vg_name,pv_count,lv_count", "--separator", ";"], check_rc=True)
 
     vgs = parse_vgs(current_vgs)
 
@@ -431,10 +431,10 @@ def main():
                 for x in itertools.chain(dev_list, module.params['pvs'])
             )
             pvs_filter_vg_name = 'vg_name = {0}'.format(vg)
-            pvs_filter = "--select '{0} || {1}' ".format(pvs_filter_pv_name, pvs_filter_vg_name)
+            pvs_filter = ["--select", "{0} || {1}".format(pvs_filter_pv_name, pvs_filter_vg_name)]
         else:
-            pvs_filter = ''
-        rc, current_pvs, err = module.run_command("%s --noheadings -o pv_name,vg_name --separator ';' %s" % (pvs_cmd, pvs_filter))
+            pvs_filter = []
+        rc, current_pvs, err = module.run_command([pvs_cmd, "--noheadings", "-o", "pv_name,vg_name", "--separator", ";"] + pvs_filter)
         if rc != 0:
             module.fail_json(msg="Failed executing pvs command.", rc=rc, err=err)
 
@@ -473,7 +473,7 @@ def main():
                 if this_vg['lv_count'] == 0 or force:
                     # remove VG
                     vgremove_cmd = module.get_bin_path('vgremove', True)
-                    rc, dummy, err = module.run_command("%s --force %s" % (vgremove_cmd, vg))
+                    rc, dummy, err = module.run_command([vgremove_cmd, "--force", vg])
                     if rc == 0:
                         module.exit_json(changed=True)
                     else:
@@ -509,7 +509,6 @@ def main():
                     changed = True
                 else:
                     if devs_to_add:
-                        devs_to_add_string = ' '.join(devs_to_add)
                         # create PV
                         pvcreate_cmd = module.get_bin_path('pvcreate', True)
                         for current_dev in devs_to_add:
@@ -520,21 +519,20 @@ def main():
                                 module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
                         # add PV to our VG
                         vgextend_cmd = module.get_bin_path('vgextend', True)
-                        rc, dummy, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
+                        rc, dummy, err = module.run_command([vgextend_cmd, vg] + devs_to_add)
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Unable to extend %s by %s." % (vg, devs_to_add_string), rc=rc, err=err)
+                            module.fail_json(msg="Unable to extend %s by %s." % (vg, ' '.join(devs_to_add)), rc=rc, err=err)
 
                     # remove some PV from our VG
                     if devs_to_remove:
-                        devs_to_remove_string = ' '.join(devs_to_remove)
                         vgreduce_cmd = module.get_bin_path('vgreduce', True)
-                        rc, dummy, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
+                        rc, dummy, err = module.run_command([vgreduce_cmd, "--force", vg] + devs_to_remove)
                         if rc == 0:
                             changed = True
                         else:
-                            module.fail_json(msg="Unable to reduce %s by %s." % (vg, devs_to_remove_string), rc=rc, err=err)
+                            module.fail_json(msg="Unable to reduce %s by %s." % (vg, ' '.join(devs_to_remove)), rc=rc, err=err)
 
     module.exit_json(changed=changed)
 

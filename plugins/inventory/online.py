@@ -16,11 +16,13 @@ DOCUMENTATION = r'''
     options:
         plugin:
             description: token that ensures this is a source file for the 'online' plugin.
+            type: string
             required: true
             choices: ['online', 'community.general.online']
         oauth_token:
             required: true
             description: Online OAuth token.
+            type: string
             env:
                 # in order of precedence
                 - name: ONLINE_TOKEN
@@ -68,7 +70,8 @@ from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.module_utils.six.moves.urllib.parse import urljoin
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
+
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 
 
 class InventoryModule(BaseInventoryPlugin):

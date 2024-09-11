@@ -1559,11 +1559,11 @@ def main():
         one_client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
 
     if attributes:
-        attributes = dict((key.upper(), value) for key, value in attributes.items())
+        attributes = {key.upper(): value for key, value in attributes.items()}
         check_attributes(module, attributes)
 
     if count_attributes:
-        count_attributes = dict((key.upper(), value) for key, value in count_attributes.items())
+        count_attributes = {key.upper(): value for key, value in count_attributes.items()}
         if not attributes:
             import copy
             module.warn('When you pass `count_attributes` without `attributes` option when deploying, `attributes` option will have same values implicitly.')

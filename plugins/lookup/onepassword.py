@@ -23,6 +23,8 @@ DOCUMENTATION = '''
       _terms:
         description: Identifier(s) (case-insensitive UUID or name) of item(s) to retrieve.
         required: true
+        type: list
+        elements: string
       account_id:
         version_added: 7.5.0
       domain:
@@ -133,7 +135,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         self._version = None
 
     def _check_required_params(self, required_params):
-        non_empty_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
+        non_empty_attrs = {param: getattr(self, param) for param in required_params if getattr(self, param, None)}
         missing = set(required_params).difference(non_empty_attrs)
         if missing:
             prefix = "Unable to sign in to 1Password. Missing required parameter"

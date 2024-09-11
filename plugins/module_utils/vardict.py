@@ -100,7 +100,7 @@ class _Variable(object):
         return
 
     def __str__(self):
-        return "<_Variable: value={0!r}, initial={1!r}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
+        return "<Variable: value={0!r}, initial={1!r}, diff={2}, output={3}, change={4}, verbosity={5}>".format(
             self.value, self.initial_value, self.diff, self.output, self.change, self.verbosity
         )
 
@@ -175,18 +175,18 @@ class VarDict(object):
         self.__vars__[name] = var
 
     def output(self, verbosity=0):
-        return dict((n, v.value) for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity))
+        return {n: v.value for n, v in self.__vars__.items() if v.output and v.is_visible(verbosity)}
 
     def diff(self, verbosity=0):
         diff_results = [(n, v.diff_result) for n, v in self.__vars__.items() if v.diff_result and v.is_visible(verbosity)]
         if diff_results:
-            before = dict((n, dr['before']) for n, dr in diff_results)
-            after = dict((n, dr['after']) for n, dr in diff_results)
+            before = {n: dr['before'] for n, dr in diff_results}
+            after = {n: dr['after'] for n, dr in diff_results}
             return {'before': before, 'after': after}
         return None
 
     def facts(self, verbosity=0):
-        facts_result = dict((n, v.value) for n, v in self.__vars__.items() if v.fact and v.is_visible(verbosity))
+        facts_result = {n: v.value for n, v in self.__vars__.items() if v.fact and v.is_visible(verbosity)}
         return facts_result if facts_result else None
 
     @property
@@ -194,4 +194,4 @@ class VarDict(object):
         return any(var.has_changed for var in self.__vars__.values())
 
     def as_dict(self):
-        return dict((name, var.value) for name, var in self.__vars__.items())
+        return {name: var.value for name, var in self.__vars__.items()}

@@ -20,6 +20,7 @@ DOCUMENTATION = r'''
         plugin:
             description: Token that ensures this is a source file for the 'scaleway' plugin.
             required: true
+            type: string
             choices: ['scaleway', 'community.general.scaleway']
         regions:
             description: Filter results on a specific Scaleway region.
@@ -46,6 +47,7 @@ DOCUMENTATION = r'''
             - If not explicitly defined or in environment variables, it will try to lookup in the scaleway-cli configuration file
               (C($SCW_CONFIG_PATH), C($XDG_CONFIG_HOME/scw/config.yaml), or C(~/.config/scw/config.yaml)).
             - More details on L(how to generate token, https://www.scaleway.com/en/docs/generate-api-keys/).
+            type: string
             env:
                 # in order of precedence
                 - name: SCW_TOKEN
@@ -121,10 +123,10 @@ else:
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, parse_pagination_link
+from ansible_collections.community.general.plugins.plugin_utils.unsafe import make_unsafe
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.six import raise_from
-from ansible.utils.unsafe_proxy import wrap_var as make_unsafe
 
 import ansible.module_utils.six.moves.urllib.parse as urllib_parse
 

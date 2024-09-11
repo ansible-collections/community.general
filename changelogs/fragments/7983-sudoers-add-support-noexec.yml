@@ -1,2 +1,0 @@
-minor_changes:
-  - sudoers - add support for the ``NOEXEC`` tag in sudoers rules (https://github.com/ansible-collections/community.general/pull/7983).

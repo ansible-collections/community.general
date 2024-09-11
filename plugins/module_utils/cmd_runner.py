@@ -11,6 +11,7 @@ from functools import wraps
 
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.six import iteritems
+from ansible.module_utils.common.locale import get_best_parsable_locale
 
 
 def _ensure_list(value):
@@ -89,17 +90,30 @@ class FormatError(CmdRunnerException):
 
 
 class _ArgFormat(object):
+    # DEPRECATION: set default value for ignore_none to True in community.general 12.0.0
     def __init__(self, func, ignore_none=None, ignore_missing_value=False):
         self.func = func
         self.ignore_none = ignore_none
         self.ignore_missing_value = ignore_missing_value
 
-    def __call__(self, value, ctx_ignore_none):
+    # DEPRECATION: remove parameter ctx_ignore_none in community.general 12.0.0
+    def __call__(self, value, ctx_ignore_none=True):
+        # DEPRECATION: replace ctx_ignore_none with True in community.general 12.0.0
         ignore_none = self.ignore_none if self.ignore_none is not None else ctx_ignore_none
         if value is None and ignore_none:
             return []
         f = self.func
         return [str(x) for x in f(value)]
+
+    def __str__(self):
+        return "<ArgFormat: func={0}, ignore_none={1}, ignore_missing_value={2}>".format(
+            self.func,
+            self.ignore_none,
+            self.ignore_missing_value,
+        )
+
+    def __repr__(self):
+        return str(self)
 
 
 class _Format(object):
@@ -114,7 +128,7 @@ class _Format(object):
 
     @staticmethod
     def as_bool_not(args):
-        return _ArgFormat(lambda value: [] if value else _ensure_list(args), ignore_none=False)
+        return _Format.as_bool([], args, ignore_none=False)
 
     @staticmethod
     def as_optval(arg, ignore_none=None):
@@ -129,8 +143,15 @@ class _Format(object):
         return _ArgFormat(lambda value: ["{0}={1}".format(arg, value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_list(ignore_none=None):
-        return _ArgFormat(_ensure_list, ignore_none=ignore_none)
+    def as_list(ignore_none=None, min_len=0, max_len=None):
+        def func(value):
+            value = _ensure_list(value)
+            if len(value) < min_len:
+                raise ValueError("Parameter must have at least {0} element(s)".format(min_len))
+            if max_len is not None and len(value) > max_len:
+                raise ValueError("Parameter must have at most {0} element(s)".format(max_len))
+            return value
+        return _ArgFormat(func, ignore_none=ignore_none)
 
     @staticmethod
     def as_fixed(args):
@@ -177,6 +198,19 @@ class _Format(object):
             return func(**v)
         return wrapper
 
+    @staticmethod
+    def stack(fmt):
+        @wraps(fmt)
+        def wrapper(*args, **kwargs):
+            new_func = fmt(ignore_none=True, *args, **kwargs)
+
+            def stacking(value):
+                stack = [new_func(v) for v in value if v]
+                stack = [x for args in stack for x in args]
+                return stack
+            return _ArgFormat(stacking, ignore_none=True)
+        return wrapper
+
 
 class CmdRunner(object):
     """
@@ -197,9 +231,19 @@ class CmdRunner(object):
         self.default_args_order = self._prepare_args_order(default_args_order)
         if arg_formats is None:
             arg_formats = {}
-        self.arg_formats = dict(arg_formats)
+        self.arg_formats = {}
+        for fmt_name, fmt in arg_formats.items():
+            if not isinstance(fmt, _ArgFormat):
+                fmt = _Format.as_func(func=fmt, ignore_none=True)
+            self.arg_formats[fmt_name] = fmt
         self.check_rc = check_rc
-        self.force_lang = force_lang
+        if force_lang == "auto":
+            try:
+                self.force_lang = get_best_parsable_locale()
+            except RuntimeWarning:
+                self.force_lang = "C"
+        else:
+            self.force_lang = force_lang
         self.path_prefix = path_prefix
         if environ_update is None:
             environ_update = {}
@@ -216,7 +260,16 @@ class CmdRunner(object):
     def binary(self):
         return self.command[0]
 
-    def __call__(self, args_order=None, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
+    # remove parameter ignore_value_none in community.general 12.0.0
+    def __call__(self, args_order=None, output_process=None, ignore_value_none=None, check_mode_skip=False, check_mode_return=None, **kwargs):
+        if ignore_value_none is None:
+            ignore_value_none = True
+        else:
+            self.module.deprecate(
+                "Using ignore_value_none when creating the runner context is now deprecated, "
+                "and the parameter will be removed in community.general 12.0.0. ",
+                version="12.0.0", collection_name="community.general"
+            )
         if output_process is None:
             output_process = _process_as_is
         if args_order is None:
@@ -228,7 +281,7 @@ class CmdRunner(object):
         return _CmdRunnerContext(runner=self,
                                  args_order=args_order,
                                  output_process=output_process,
-                                 ignore_value_none=ignore_value_none,
+                                 ignore_value_none=ignore_value_none,           # DEPRECATION: remove in community.general 12.0.0
                                  check_mode_skip=check_mode_skip,
                                  check_mode_return=check_mode_return, **kwargs)
 
@@ -244,6 +297,7 @@ class _CmdRunnerContext(object):
         self.runner = runner
         self.args_order = tuple(args_order)
         self.output_process = output_process
+        # DEPRECATION: parameter ignore_value_none at the context level is deprecated and will be removed in community.general 12.0.0
         self.ignore_value_none = ignore_value_none
         self.check_mode_skip = check_mode_skip
         self.check_mode_return = check_mode_return
@@ -283,6 +337,7 @@ class _CmdRunnerContext(object):
                     value = named_args[arg_name]
                 elif not runner.arg_formats[arg_name].ignore_missing_value:
                     raise MissingArgumentValue(self.args_order, arg_name)
+                # DEPRECATION: remove parameter ctx_ignore_none in 12.0.0
                 self.cmd.extend(runner.arg_formats[arg_name](value, ctx_ignore_none=self.ignore_value_none))
             except MissingArgumentValue:
                 raise
@@ -299,7 +354,7 @@ class _CmdRunnerContext(object):
     @property
     def run_info(self):
         return dict(
-            ignore_value_none=self.ignore_value_none,
+            ignore_value_none=self.ignore_value_none,         # DEPRECATION: remove in community.general 12.0.0
             check_rc=self.check_rc,
             environ_update=self.environ_update,
             args_order=self.args_order,

@@ -56,5 +56,4 @@ attributes:
     support: full
     membership:
       - community.general.consul
-    version_added: 8.3.0
 """

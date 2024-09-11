@@ -1,2 +1,0 @@
-bugfixes:
-  - iptables_state - fix idempotency issues when restoring incomplete iptables dumps (https://github.com/ansible-collections/community.general/issues/8029).

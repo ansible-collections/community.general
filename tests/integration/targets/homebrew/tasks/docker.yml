@@ -1,0 +1,23 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: MACOS | Find brew binary
+  command: which brew
+  register: brew_which
+
+- name: MACOS | Get owner of brew binary
+  stat:
+    path: "{{ brew_which.stdout }}"
+  register: brew_stat
+
+- name: MACOS | Install docker
+  community.general.homebrew:
+    name: docker
+    state: present
+    force_formula: true
+  become: true
+  become_user: "{{ brew_stat.stat.pw_name }}"
+  notify:
+    - uninstall docker
