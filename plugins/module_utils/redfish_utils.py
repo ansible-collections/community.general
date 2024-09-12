@@ -1563,9 +1563,9 @@ class RedfishUtils(object):
         uri = None
         if 'data' in return_data:
             # Find the extended messages in the response payload
-            extended_messages = return_data.get('error', {}).get('@Message.ExtendedInfo', [])
+            extended_messages = return_data['data'].get('error', {}).get('@Message.ExtendedInfo', [])
             if len(extended_messages) == 0:
-                extended_messages = return_data.get('@Message.ExtendedInfo', [])
+                extended_messages = return_data['data'].get('@Message.ExtendedInfo', [])
             # Go through each message and look for Base.1.X.PasswordChangeRequired
             for message in extended_messages:
                 message_id = message.get('MessageId')
