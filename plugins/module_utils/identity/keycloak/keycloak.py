@@ -3056,7 +3056,7 @@ class KeycloakAPI(object):
             return open_url(url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             validate_certs=self.validate_certs)
         except Exception as e:
-            self.fail_open_url(e, msg='Could not delete permission %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
+            self.fail_open_url(e, msg='Could not delete resource %s for client %s in realm %s: %s' % (id, client_id, realm, str(e)))
 
     def update_authz_resource(self, payload, id, client_id, realm):
         """Update a resource for a Keycloak client"""
