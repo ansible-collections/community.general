@@ -57,7 +57,7 @@ options:
         required: false
     client_id:
         description:
-            - The clientId of the keycloak client that should have the authorization scope.
+            - The clientId of the keycloak client that should have the authorization resource.
             - This is usually a human-readable name of the Keycloak client.
         type: str
         required: true
