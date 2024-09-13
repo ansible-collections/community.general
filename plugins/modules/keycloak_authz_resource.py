@@ -227,7 +227,7 @@ def main():
         module.fail_json(msg='Invalid client %s for realm %s' %
                          (client_id, realm))
 
-    # Get current state of the permission using its name as the search
+    # Get current state of the resource using its name as the search
     # filter. This returns False if it is not found.
     resource = kc.get_authz_resource_by_name(
         name=name, client_id=cid, realm=realm)
