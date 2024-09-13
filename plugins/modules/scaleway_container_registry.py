@@ -150,8 +150,7 @@ def absent_strategy(api, wished_cr):
     changed = False
 
     cr_list = api.fetch_all_resources("namespaces")
-    cr_lookup = dict((cr["name"], cr)
-                     for cr in cr_list)
+    cr_lookup = {cr["name"]: cr for cr in cr_list}
 
     if wished_cr["name"] not in cr_lookup:
         return changed, {}
@@ -175,8 +174,7 @@ def present_strategy(api, wished_cr):
     changed = False
 
     cr_list = api.fetch_all_resources("namespaces")
-    cr_lookup = dict((cr["name"], cr)
-                     for cr in cr_list)
+    cr_lookup = {cr["name"]: cr for cr in cr_list}
 
     payload_cr = payload_from_wished_cr(wished_cr)
 
