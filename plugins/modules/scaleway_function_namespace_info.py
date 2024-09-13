@@ -88,8 +88,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def info_strategy(api, wished_fn):
     fn_list = api.fetch_all_resources("namespaces")
-    fn_lookup = dict((fn["name"], fn)
-                     for fn in fn_list)
+    fn_lookup = {fn["name"]: fn for fn in fn_list}
 
     if wished_fn["name"] not in fn_lookup:
         msg = "Error during function namespace lookup: Unable to find function namespace named '%s' in project '%s'" % (wished_fn["name"],
