@@ -3066,7 +3066,7 @@ class KeycloakAPI(object):
             return open_url(url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(payload), validate_certs=self.validate_certs)
         except Exception as e:
-            self.fail_open_url(e, msg='Could not create update permission %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
+            self.fail_open_url(e, msg='Could not create update resource %s for client %s in realm %s: %s' % (payload['name'], client_id, realm, str(e)))
 
     def get_authz_policy_by_name(self, name, client_id, realm):
         """Get authorization policy by name"""
