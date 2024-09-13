@@ -23,5 +23,6 @@ This test suite can run against a fresh unconfigured server instance
 its config changes) as long as it runs through completely. While its active
 it changes the server configuration in the following ways:
 
-  * creating, modifying and deleting some keycloak groups
+  * Creating and deleting a Keycloak client with (human-readable) ID `authz` (configurable in `./vars/main.yml`).
+  * Creating, modifying and deleting resources on that client.
 
