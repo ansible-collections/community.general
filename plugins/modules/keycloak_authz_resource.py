@@ -108,7 +108,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Manage scope-based Keycloak authorization resource
+- name: Manage Keycloak authorization resource
   community.general.keycloak_authz_resource:
     name: test-resource
     state: present
