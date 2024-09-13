@@ -531,7 +531,7 @@ class JIRA(StateModuleHelper):
         ),
         supports_check_mode=False
     )
-    mute_vardict_deprecation = True
+    use_old_vardict = False
     state_param = 'operation'
 
     def __init_module__(self):
