@@ -291,7 +291,7 @@ def main():
         }
 
         if module.check_mode:
-            result['msg'] = 'Would remove permission'
+            result['msg'] = 'Would remove resource'
         else:
             kc.remove_authz_permission(id=resource['_id'], client_id=cid, realm=realm)
             result['msg'] = 'Resource removed'
