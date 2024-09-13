@@ -84,7 +84,7 @@ class GioMime(ModuleHelper):
         ),
         supports_check_mode=True,
     )
-    mute_vardict_deprecation = True
+    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = gio_mime_runner(self.module, check_rc=True)
@@ -92,7 +92,7 @@ class GioMime(ModuleHelper):
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
-        if self.vars.has_changed("handler"):
+        if self.vars.has_changed:
             with self.runner.context(args_order=["mime_type", "handler"], check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out
