@@ -22,6 +22,7 @@ URL_REALM = "{url}/admin/realms/{realm}"
 URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
+URL_USERINFO = "{url}/realms/{realm}/protocol/openid-connect/userinfo"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
 
@@ -161,22 +162,36 @@ def get_token(module_params):
         :return: connection header
     """
     token = module_params.get('token')
+    refresh_token = module_params.get('refresh_token')
     base_url = module_params.get('auth_keycloak_url')
     http_agent = module_params.get('http_agent')
 
     if not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
 
-    if token is None:
-        base_url = module_params.get('auth_keycloak_url')
-        validate_certs = module_params.get('validate_certs')
-        auth_realm = module_params.get('auth_realm')
-        client_id = module_params.get('auth_client_id')
-        auth_username = module_params.get('auth_username')
-        auth_password = module_params.get('auth_password')
-        client_secret = module_params.get('auth_client_secret')
-        connection_timeout = module_params.get('connection_timeout')
-        auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
+    base_url = module_params.get('auth_keycloak_url')
+    validate_certs = module_params.get('validate_certs')
+    auth_realm = module_params.get('auth_realm')
+    client_id = module_params.get('auth_client_id')
+    auth_username = module_params.get('auth_username')
+    auth_password = module_params.get('auth_password')
+    client_secret = module_params.get('auth_client_secret')
+    connection_timeout = module_params.get('connection_timeout')
+    auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
+
+    if token is not None:
+        # Check token is valid via userinfo route
+        userinfo_url = URL_USERINFO(url=base_url, realm=auth_realm)
+        try:
+            r = json.loads(to_native(open_url(userinfo_url, method='GET',
+                                              validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,)))
+        except Exception as e:
+            raise KeycloakError('Could not check access token from %s: %s'
+                                % (userinfo_url, str(e)))
+
+        # if r.StatusCode == 401:
+            # Fall back to refresh token and then re-authentication with username/password
+    else:
         temp_payload = {
             'grant_type': 'password',
             'client_id': client_id,
