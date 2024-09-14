@@ -131,6 +131,8 @@ files:
     maintainers: $team_huawei
   $doc_fragments/nomad.py:
     maintainers: chris93111 apecnascimento
+  $doc_fragments/pipx.py:
+    maintainers: russoz
   $doc_fragments/xenserver.py:
     labels: xenserver
     maintainers: bvitnik
