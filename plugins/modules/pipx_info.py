@@ -120,7 +120,7 @@ cmd:
 import json
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -132,9 +132,8 @@ class PipXInfo(ModuleHelper):
         include_deps=dict(type='bool', default=False),
         include_injected=dict(type='bool', default=False),
         include_raw=dict(type='bool', default=False),
-        executable=dict(type='path'),
     )
-    argument_spec["global"] = dict(type='bool', default=False)
+    argument_spec.update(pipx_common_argspec)
     module = dict(
         argument_spec=argument_spec,
         supports_check_mode=True,

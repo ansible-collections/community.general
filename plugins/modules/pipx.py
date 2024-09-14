@@ -194,7 +194,7 @@ EXAMPLES = '''
 import json
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -221,13 +221,12 @@ class PipX(StateModuleHelper):
         index_url=dict(type='str'),
         python=dict(type='str'),
         system_site_packages=dict(type='bool', default=False),
-        executable=dict(type='path'),
         editable=dict(type='bool', default=False),
         pip_args=dict(type='str'),
         suffix=dict(type='str'),
         spec_metadata=dict(type='path'),
     )
-    argument_spec["global"] = dict(type='bool', default=False)
+    argument_spec.update(pipx_common_argspec)
 
     module = dict(
         argument_spec=argument_spec,
