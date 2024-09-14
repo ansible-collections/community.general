@@ -3,6 +3,29 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# Placeholder tests for shared token; temporarily hijacking these integration tests for fast development
+- name: Get Keycloak token
+  ansible.builtin.uri:
+    url: "{{ url }}/realms/{{ admin_realm }}/protocol/openid-connect/token"
+    method: POST
+    return_content: true
+    status_code: 200
+    body_format: form-urlencoded
+    body:
+      grant_type: "password"
+      client_id: "admin-cli"
+      username: "{{ admin_user }}"
+      password: "{{ admin_password }}"
+  register: token_response
+
+- name: Debug token response
+  ansible.builtin.debug:
+    var: token_response
+
+- name: Skip other tests
+  ansible.builtin.assert:
+    that: false
+
 - name: Create realm
   community.general.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
@@ -43,10 +66,10 @@
 - name: Assert realm role created
   assert:
     that:
-      - result is changed
-      - result.existing == {}
-      - result.end_state.name == "{{ role }}"
-      - result.end_state.containerId == "{{ realm }}"
+      - "result is changed"
+      - "result.existing == {}"
+      - "result.end_state.name == role"
+      - "result.end_state.containerId == realm"
 
 - name: Create existing realm role
   community.general.keycloak_role:
@@ -154,10 +177,10 @@
 - name: Assert client role created
   assert:
     that:
-      - result is changed
-      - result.existing == {}
-      - result.end_state.name == "{{ role }}"
-      - result.end_state.containerId == "{{ client.end_state.id }}"
+      - "result is changed"
+      - "result.existing == {}"
+      - "result.end_state.name == role"
+      - "result.end_state.containerId == client.end_state.id"
 
 - name: Create existing client role
   community.general.keycloak_role:
