@@ -18,6 +18,7 @@ description:
     - Manage Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
     - community.general.attributes
+    - community.general.pipx
 attributes:
     check_mode:
         support: full
@@ -54,17 +55,18 @@ options:
     name:
         type: str
         description:
-            - >
-              The name of the application to be installed. It must to be a simple package name.
-              For passing package specifications or installing from URLs or directories,
-              please use the O(source) option.
+            - The name of the application. In C(pipx) documentation it is also referred to as
+              the name of the virtual environment where the application will be installed.
+            - If O(name) is a simple package name without version specifiers,
+              then that name is used as the Python package name to be installed.
+            - Use O(source) for passing package specifications or installing from URLs or directories.
     source:
         type: str
         description:
-            - >
-              If the application source, such as a package with version specifier, or an URL,
-              directory or any other accepted specification. See C(pipx) documentation for more details.
-            - When specified, the C(pipx) command will use O(source) instead of O(name).
+            - Source for the package. This option is used when O(state=install) or O(state=latest), and it is ignored with other states.
+            - Use O(source) when installing a Python package with version specifier, or from a local path, from a VCS URL or compressed file.
+            - The value of this option is passed as-is to C(pipx).
+            - O(name) is still required when using O(source) to establish the application name without fetching the package from a remote source.
     install_apps:
         description:
             - Add apps from the injected packages.
@@ -114,13 +116,6 @@ options:
         type: bool
         default: false
         version_added: 6.6.0
-    executable:
-        description:
-            - Path to the C(pipx) installed in the system.
-            - >
-              If not specified, the module will use C(python -m pipx) to run the tool,
-              using the same Python interpreter as ansible itself.
-        type: path
     editable:
         description:
             - Install the project in editable mode.
@@ -139,12 +134,6 @@ options:
         type: str
         version_added: 9.3.0
     global:
-        description:
-            - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
-            - The C(--global) is only available in C(pipx>=1.6.0), so make sure to have a compatible version when using this option.
-              Moreover, a nasty bug with C(--global) was fixed in C(pipx==1.7.0), so it is strongly recommended you used that version or newer.
-        type: bool
-        default: false
         version_added: 9.4.0
     spec_metadata:
         description:
@@ -154,19 +143,11 @@ options:
         type: path
         version_added: 9.4.0
 notes:
-    - This module requires C(pipx) version 0.16.2.1 or above. From community.general 11.0.0 onwards, the module will require C(pipx>=1.7.0).
-    - Please note that C(pipx) requires Python 3.6 or above.
-    - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
-    - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
-    - >
-      This module will honor C(pipx) environment variables such as but not limited to C(PIPX_HOME) and C(PIPX_BIN_DIR)
-      passed using the R(environment Ansible keyword, playbooks_environment).
     - >
       This first implementation does not verify whether a specified version constraint has been installed or not.
       Hence, when using version operators, C(pipx) module will always try to execute the operation,
       even when the application was previously installed.
       This feature will be added in the future.
-    - See also the C(pipx) documentation at U(https://pypa.github.io/pipx/).
 author:
     - "Alexei Znamensky (@russoz)"
 '''
@@ -213,7 +194,7 @@ EXAMPLES = '''
 import json
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -240,13 +221,12 @@ class PipX(StateModuleHelper):
         index_url=dict(type='str'),
         python=dict(type='str'),
         system_site_packages=dict(type='bool', default=False),
-        executable=dict(type='path'),
         editable=dict(type='bool', default=False),
         pip_args=dict(type='str'),
         suffix=dict(type='str'),
         spec_metadata=dict(type='path'),
     )
-    argument_spec["global"] = dict(type='bool', default=False)
+    argument_spec.update(pipx_common_argspec)
 
     module = dict(
         argument_spec=argument_spec,
