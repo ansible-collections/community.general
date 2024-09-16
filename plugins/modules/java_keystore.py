@@ -150,13 +150,11 @@ EXAMPLES = '''
     name: example
     certificate: |
       -----BEGIN CERTIFICATE-----
-      h19dUZ2co2fI/ibYiwxWk4aeNE6KWvCaTQOMQ8t6Uo2XKhpL/xnjoAgh1uCQN/69
-      MG+34+RhUWzCfdZH7T8/qDxJw2kEPKluaYh7KnMsba+5jHjmtzix5QIDAQABo4IB
+      h19dUZ2co2f...
       -----END CERTIFICATE-----
     private_key: |
       -----BEGIN RSA PRIVATE KEY-----
-      DBVFTEVDVFJJQ0lURSBERSBGUkFOQ0UxFzAVBgNVBAsMDjAwMDIgNTUyMDgxMzE3
-      GLlDNMw/uHyME7gHFsqJA7O11VY6O5WQ4IDP3m/s5ZV6s+Nn6Lerz17VZ99
+      DBVFTEVDVFJ...
       -----END RSA PRIVATE KEY-----
     password: changeit
     dest: /etc/security/keystore.jks
