@@ -16,7 +16,8 @@ author:
 - "Alexei Znamensky (@russoz)"
 short_description: Edit XFCE4 Configurations
 description:
-- This module allows for the manipulation of Xfce 4 Configuration with the help of xfconf-query. Please see the xfconf-query(1) man page for more details.
+- This module allows for the manipulation of Xfce 4 Configuration with the help of xfconf-query. Please see the xfconf-query(1) man page for more
+  details.
 seealso:
 - name: xfconf-query(1) man page
   description: Manual page of the C(xfconf-query) tool at the XFCE documentation site.
@@ -38,8 +39,8 @@ attributes:
 options:
   channel:
     description:
-    - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location for which all application properties/keys
-      are stored. See man xfconf-query(1).
+    - A Xfconf preference channel is a top-level tree key, inside of the Xfconf repository that corresponds to the location for which all application
+      properties/keys are stored. See man xfconf-query(1).
     required: true
     type: str
   property:
@@ -56,9 +57,10 @@ options:
     description:
     - The type of value being set.
     - When providing more than one O(value_type), the length of the list must be equal to the length of O(value).
-    - If only one O(value_type) is provided, but O(value) contains more than on element, that O(value_type) will be applied to all elements of O(value).
-    - If the O(property) being set is an array and it can possibly have only one element in the array, then O(force_array=true) must be used to ensure that C(xfconf-query)
-      will interpret the value as an array rather than a scalar.
+    - If only one O(value_type) is provided, but O(value) contains more than on element, that O(value_type) will be applied to all elements of
+      O(value).
+    - If the O(property) being set is an array and it can possibly have only one element in the array, then O(force_array=true) must be used to
+      ensure that C(xfconf-query) will interpret the value as an array rather than a scalar.
     - Support for V(uchar), V(char), V(uint64), and V(int64) has been added in community.general 4.8.0.
     type: list
     elements: str
