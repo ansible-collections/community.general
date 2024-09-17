@@ -244,7 +244,7 @@ def main():
     )
 
     # populate the dict with the user-provided vars.
-    args = dict(module.params.items())
+    args = dict(module.params)
     args['check_mode'] = module.check_mode
 
     # validate some API-specific limitations.
