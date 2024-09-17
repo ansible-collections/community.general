@@ -196,8 +196,7 @@ def main():
             else:
                 obj['name'] = name
 
-            for k, v in data.items():
-                obj[k] = v
+            obj.update(data)
             diff = obj.diff()
             changed = obj.diff() != []
             if not module.check_mode:
