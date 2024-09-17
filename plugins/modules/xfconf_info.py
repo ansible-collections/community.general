@@ -7,17 +7,18 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
+---
 module: xfconf_info
 author:
-  - "Alexei Znamensky (@russoz)"
+- "Alexei Znamensky (@russoz)"
 short_description: Retrieve XFCE4 configurations
 version_added: 3.5.0
 description:
-  - This module allows retrieving Xfce 4 configurations with the help of C(xfconf-query).
+- This module allows retrieving Xfce 4 configurations with the help of C(xfconf-query).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+- community.general.attributes
+- community.general.attributes.info_module
 attributes:
   check_mode:
     version_added: 3.3.0
@@ -40,10 +41,11 @@ options:
     - If not provided and a O(channel) is provided, then the module will list all available properties in that O(channel).
     type: str
 notes:
-  - See man xfconf-query(1) for more details.
-'''
+- See man xfconf-query(1) for more details.
+"""
 
 EXAMPLES = """
+---
 - name: Get list of all available channels
   community.general.xfconf_info: {}
   register: result
@@ -66,63 +68,64 @@ EXAMPLES = """
   register: result
 """
 
-RETURN = '''
-  channels:
-    description:
-      - List of available channels.
-      - Returned when the module receives no parameter at all.
-    returned: success
-    type: list
-    elements: str
-    sample:
-    - xfce4-desktop
-    - displays
-    - xsettings
-    - xfwm4
-  properties:
-    description:
-      - List of available properties for a specific channel.
-      - Returned by passing only the O(channel) parameter to the module.
-    returned: success
-    type: list
-    elements: str
-    sample:
-      - /Gdk/WindowScalingFactor
-      - /Gtk/ButtonImages
-      - /Gtk/CursorThemeSize
-      - /Gtk/DecorationLayout
-      - /Gtk/FontName
-      - /Gtk/MenuImages
-      - /Gtk/MonospaceFontName
-      - /Net/DoubleClickTime
-      - /Net/IconThemeName
-      - /Net/ThemeName
-      - /Xft/Antialias
-      - /Xft/Hinting
-      - /Xft/HintStyle
-      - /Xft/RGBA
-  is_array:
-    description:
-      - Flag indicating whether the property is an array or not.
-    returned: success
-    type: bool
-  value:
-    description:
-      - The value of the property. Empty if the property is of array type.
-    returned: success
-    type: str
-    sample: Monospace 10
-  value_array:
-    description:
-      - The array value of the property. Empty if the property is not of array type.
-    returned: success
-    type: list
-    elements: str
-    sample:
-      - Main
-      - Work
-      - Tmp
-'''
+RETURN = """
+---
+channels:
+  description:
+  - List of available channels.
+  - Returned when the module receives no parameter at all.
+  returned: success
+  type: list
+  elements: str
+  sample:
+  - xfce4-desktop
+  - displays
+  - xsettings
+  - xfwm4
+properties:
+  description:
+  - List of available properties for a specific channel.
+  - Returned by passing only the O(channel) parameter to the module.
+  returned: success
+  type: list
+  elements: str
+  sample:
+  - /Gdk/WindowScalingFactor
+  - /Gtk/ButtonImages
+  - /Gtk/CursorThemeSize
+  - /Gtk/DecorationLayout
+  - /Gtk/FontName
+  - /Gtk/MenuImages
+  - /Gtk/MonospaceFontName
+  - /Net/DoubleClickTime
+  - /Net/IconThemeName
+  - /Net/ThemeName
+  - /Xft/Antialias
+  - /Xft/Hinting
+  - /Xft/HintStyle
+  - /Xft/RGBA
+is_array:
+  description:
+  - Flag indicating whether the property is an array or not.
+  returned: success
+  type: bool
+value:
+  description:
+  - The value of the property. Empty if the property is of array type.
+  returned: success
+  type: str
+  sample: Monospace 10
+value_array:
+  description:
+  - The array value of the property. Empty if the property is not of array type.
+  returned: success
+  type: list
+  elements: str
+  sample:
+  - Main
+  - Work
+  - Tmp
+"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
