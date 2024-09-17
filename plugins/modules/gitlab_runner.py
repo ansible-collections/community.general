@@ -33,7 +33,10 @@ author:
   - Samy Coenen (@SamyCoenen)
   - Guillaume Martinez (@Lunik)
 requirements:
-  - python-gitlab >= 1.5.0
+  - python-gitlab >= 1.5.0 for legacy runner registration workflow
+    (runner registration token - U(https://docs.gitlab.com/runner/register/#register-with-a-runner-registration-token-deprecated))
+  - python-gitlab >= 4.0.0 for new runner registration workflow
+    (runner authentication token - U(https://docs.gitlab.com/runner/register/#register-with-a-runner-authentication-token))
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
