@@ -911,6 +911,7 @@ def main():
         'account_oemaccounttypes': module.params['oem_account_types'],
         'account_updatename': module.params['update_username'],
         'account_properties': module.params['account_properties'],
+        'account_passwordchangerequired': None,
     }
 
     # timeout
@@ -983,10 +984,16 @@ def main():
         # execute only if we find an Account service resource
         result = rf_utils._find_accountservice_resource()
         if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
-
-        for command in command_list:
-            result = ACCOUNTS_COMMANDS[command](user)
+            # If a password change is required and the user is attempting to
+            # modify their password, try to proceed.
+            user['account_passwordchangerequired'] = rf_utils.check_password_change_required(result)
+            if len(command_list) == 1 and command_list[0] == "UpdateUserPassword" and user['account_passwordchangerequired']:
+                result = rf_utils.update_user_password(user)
+            else:
+                module.fail_json(msg=to_native(result['msg']))
+        else:
+            for command in command_list:
+                result = ACCOUNTS_COMMANDS[command](user)
 
     elif category == "Systems":
         # execute only if we find a System resource
