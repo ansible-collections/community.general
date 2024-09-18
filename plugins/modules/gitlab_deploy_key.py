@@ -196,9 +196,9 @@ class GitLabDeployKey(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(deploy_key, arg_key) != arguments[arg_key]:
-                    setattr(deploy_key, arg_key, arguments[arg_key])
+            if arg_value is not None:
+                if getattr(deploy_key, arg_key) != arg_value:
+                    setattr(deploy_key, arg_key, arg_value)
                     changed = True
 
         return (changed, deploy_key)

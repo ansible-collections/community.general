@@ -282,9 +282,7 @@ def main():
             'vars.made_by': "ansible"
         }
     }
-
-    for key, value in variables.items():
-        data['attrs']['vars.' + key] = value
+    data['attrs'].update({'vars.' + key: value for key, value in variables.items()})
 
     changed = False
     if icinga.exists(name):

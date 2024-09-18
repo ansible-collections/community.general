@@ -178,9 +178,7 @@ def main():
     )
 
     # populate the dict with the user-provided vars.
-    args = dict()
-    for key, arg in module.params.items():
-        args[key] = arg
+    args = dict(module.params)
 
     retvals = reload_dns(args)
 

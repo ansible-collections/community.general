@@ -1944,7 +1944,7 @@ class Nmcli(object):
                 convert_func = self.list_to_string
 
             if callable(convert_func):
-                options[setting] = convert_func(options[setting])
+                options[setting] = convert_func(value)
 
         return options
 

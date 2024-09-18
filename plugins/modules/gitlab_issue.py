@@ -264,14 +264,14 @@ class GitlabIssue(object):
 
                 if key == 'milestone_id':
                     old_milestone = getattr(issue, 'milestone')['id'] if getattr(issue, 'milestone') else ""
-                    if options[key] != old_milestone:
+                    if value != old_milestone:
                         return True
                 elif key == 'assignee_ids':
-                    if options[key] != sorted([user["id"] for user in getattr(issue, 'assignees')]):
+                    if value != sorted([user["id"] for user in getattr(issue, 'assignees')]):
                         return True
 
                 elif key == 'labels':
-                    if options[key] != sorted(getattr(issue, key)):
+                    if value != sorted(getattr(issue, key)):
                         return True
 
                 elif getattr(issue, key) != value:

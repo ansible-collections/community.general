@@ -149,7 +149,7 @@ def core(module):
 
     # Then we patch keys that are different
     for key, value in user_data.items():
-        if key not in present_user_data or user_data[key] != present_user_data[key]:
+        if key not in present_user_data or value != present_user_data[key]:
 
             changed = True
             if compute_api.module.check_mode:
