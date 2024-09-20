@@ -291,6 +291,7 @@ def get_service(module, auth, pred):
                 found = found + 1
                 found_service = service
                 service_name = service["NAME"]
+
     # fail if there are more services with same name
     if found > 1:
         module.fail_json(msg="There are multiple services with a name: '" +
