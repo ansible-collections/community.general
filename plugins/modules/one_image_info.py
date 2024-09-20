@@ -123,7 +123,6 @@ images:
         permissions:
             description: The image's permissions.
             type: dict
-            returned: when O(state=present)
             contains:
               owner_u:
                 description: The image's owner USAGE permissions.
@@ -173,11 +172,11 @@ images:
               other_a: 0
         type:
             description: The image's type.
-            type: str
+            type: int
             sample: 0
         disk_type:
             description: The image's format type.
-            type: str
+            type: int
             sample: 0
         persistent:
             description: The image's persistence status (1 means true, 0 means false).
@@ -223,7 +222,6 @@ images:
             description: The image's list of vm ID's.
             type: list
             elements: int
-            returned: when O(state=present)
             sample:
               - 1
               - 2
@@ -232,7 +230,6 @@ images:
             description: The image's list of clones ID's.
             type: list
             elements: int
-            returned: when O(state=present)
             sample:
               - 1
               - 2
@@ -241,7 +238,6 @@ images:
             description: The image's list of app_clones ID's.
             type: list
             elements: int
-            returned: when O(state=present)
             sample:
               - 1
               - 2
@@ -249,7 +245,6 @@ images:
         snapshots:
             description: The image's list of snapshots.
             type: list
-            returned: when O(state=present)
             sample:
               - date: 123123
                 parent: 1
