@@ -302,7 +302,7 @@ def main():
         ci=dict(default=False, type='bool'),
         no_optional=dict(default=False, type='bool'),
         no_bin_links=dict(default=False, type='bool'),
-        force=dict(default=False, type='bool')
+        force=dict(default=False, type='bool'),
     )
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
