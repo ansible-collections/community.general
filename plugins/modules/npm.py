@@ -225,7 +225,7 @@ class Npm(object):
             params['name_version'] = self.name_version if add_package_name else None
 
             with self.runner(
-                "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links",
+                "exec_args global_ production ignore_scripts unsafe_perm name_version registry no_optional no_bin_links force",
                 check_rc=check_rc, cwd=cwd
             ) as ctx:
                 rc, out, err = ctx.run(**params)
