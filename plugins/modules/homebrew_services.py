@@ -61,17 +61,17 @@ EXAMPLES = """
     state: present
 
 - name: Start the foo service (equivalent to `brew services start foo`)
-  community.general.homebrew_service:
+  community.general.homebrew_services:
     name: foo
     state: present
 
 - name: Restart the foo service (equivalent to `brew services restart foo`)
-  community.general.homebrew_service:
+  community.general.homebrew_services:
     name: foo
     state: restarted
 
 - name: Remove the foo service (equivalent to `brew services stop foo`)
-  community.general.homebrew_service:
+  community.general.homebrew_services:
     name: foo
     service_state: absent
 """
