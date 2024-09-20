@@ -1,2 +1,2 @@
 minor_changes:
-  - nmp - add force parameter to allow --force (https://github.com/ansible-collections/community.general/pull/8885).
+  - npm - add ``force`` parameter to allow ``--force`` (https://github.com/ansible-collections/community.general/pull/8885).
