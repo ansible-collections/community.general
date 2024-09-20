@@ -17,6 +17,7 @@ description:
 requirements:
   - pyone
 extends_documentation_fragment:
+  - community.general.opennebula
   - community.general.attributes
 attributes:
   check_mode:
@@ -24,6 +25,23 @@ attributes:
   diff_mode:
     support: none
 options:
+  api_url:
+    description:
+      - URL of the OpenNebula RPC server.
+      - It is recommended to use HTTPS so that the username/password are not
+      - transferred over the network unencrypted.
+      - If not set then the value of the E(ONE_URL) environment variable is used.
+    type: str
+  api_username:
+    description:
+      - Name of the user to login into the OpenNebula RPC server. If not set
+      - then the value of the E(ONE_USERNAME) environment variable is used.
+    type: str
+  api_password:
+    description:
+      - Password of the user to login into OpenNebula RPC server. If not set
+      - then the value of the E(ONE_PASSWORD) environment variable is used.
+    type: str
   id:
     description:
       - A O(id) of the image you would like to manage.
