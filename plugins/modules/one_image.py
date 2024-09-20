@@ -25,23 +25,6 @@ attributes:
   diff_mode:
     support: none
 options:
-  api_url:
-    description:
-      - URL of the OpenNebula RPC server.
-      - It is recommended to use HTTPS so that the username/password are not
-      - transferred over the network unencrypted.
-      - If not set then the value of the E(ONE_URL) environment variable is used.
-    type: str
-  api_username:
-    description:
-      - Name of the user to login into the OpenNebula RPC server. If not set
-      - then the value of the E(ONE_USERNAME) environment variable is used.
-    type: str
-  api_password:
-    description:
-      - Password of the user to login into OpenNebula RPC server. If not set
-      - then the value of the E(ONE_PASSWORD) environment variable is used.
-    type: str
   id:
     description:
       - A O(id) of the image you would like to manage.
@@ -124,52 +107,52 @@ RETURN = '''
 id:
     description: image id
     type: int
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: 153
 name:
     description: image name
     type: str
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: app1
 group_id:
     description: image's group id
     type: int
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: 1
 group_name:
     description: image's group name
     type: str
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: one-users
 owner_id:
     description: image's owner id
     type: int
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: 143
 owner_name:
     description: image's owner name
     type: str
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: ansible-test
 state:
     description: state of image instance
     type: str
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: READY
 used:
     description: is image in use
     type: bool
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: true
 running_vms:
     description: count of running vms that use this image
     type: int
-    returned: success
+    returned: when O(state=present, state=cloned, state=renamed)
     sample: 7
 permissions:
     description: The image's permissions.
     type: dict
-    returned: when O(state=present)
+    returned: when O(state=present, state=cloned, state=renamed)
     contains:
         owner_u:
             description: The image's owner USAGE permissions.
@@ -221,55 +204,67 @@ type:
     description: The image's type.
     type: str
     sample: 0
+    returned: when O(state=present, state=cloned, state=renamed)
 disk_type:
     description: The image's format type.
     type: str
     sample: 0
+    returned: when O(state=present, state=cloned, state=renamed)
 persistent:
     description: The image's persistence status (1 means true, 0 means false).
     type: int
     sample: 1
+    returned: when O(state=present, state=cloned, state=renamed)
 source:
     description: The image's source.
     type: str
     sample: /var/lib/one//datastores/100/somerandomstringxd
+    returned: when O(state=present, state=cloned, state=renamed)
 path:
     description: The image's filesystem path.
     type: str
     sample: /var/tmp/hello.qcow2
+    returned: when O(state=present, state=cloned, state=renamed)
 fstype:
     description: The image's filesystem type.
     type: str
     sample: ext4
+    returned: when O(state=present, state=cloned, state=renamed)
 size:
     description: The image's size in MegaBytes.
     type: int
     sample: 10000
+    returned: when O(state=present, state=cloned, state=renamed)
 cloning_ops:
     description: The image's cloning operations per second.
     type: int
     sample: 0
+    returned: when O(state=present, state=cloned, state=renamed)
 cloning_id:
     description: The image's cloning ID.
     type: int
     sample: -1
+    returned: when O(state=present, state=cloned, state=renamed)
 target_snapshot:
     description: The image's target snapshot.
     type: int
     sample: 1
+    returned: when O(state=present, state=cloned, state=renamed)
 datastore_id:
     description: The image's datastore ID.
     type: int
     sample: 100
+    returned: when O(state=present, state=cloned, state=renamed)
 datastore:
     description: The image's datastore name.
     type: int
     sample: image_datastore
+    returned: when O(state=present, state=cloned, state=renamed)
 vms:
     description: The image's list of vm ID's.
     type: list
     elements: int
-    returned: when O(state=present)
+    returned: when O(state=present, state=cloned, state=renamed)
     sample:
         - 1
         - 2
@@ -278,7 +273,7 @@ clones:
     description: The image's list of clones ID's.
     type: list
     elements: int
-    returned: when O(state=present)
+    returned: when O(state=present, state=cloned, state=renamed)
     sample:
         - 1
         - 2
@@ -287,7 +282,7 @@ app_clones:
     description: The image's list of app_clones ID's.
     type: list
     elements: int
-    returned: when O(state=present)
+    returned: when O(state=present, state=cloned, state=renamed)
     sample:
         - 1
         - 2
@@ -295,7 +290,7 @@ app_clones:
 snapshots:
     description: The image's list of snapshots.
     type: list
-    returned: when O(state=present)
+    returned: when O(state=present, state=cloned, state=renamed)
     sample:
       - date: 123123
         parent: 1
