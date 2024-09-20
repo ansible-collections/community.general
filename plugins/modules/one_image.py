@@ -79,6 +79,11 @@ EXAMPLES = '''
     id: 37
     enabled: false
 
+- name: Make the IMAGE persistent
+  community.general.one_image:
+    id: 37
+    persistent: true
+
 - name: Enable the IMAGE by name
   community.general.one_image:
     name: bar-image
