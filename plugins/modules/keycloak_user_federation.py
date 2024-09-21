@@ -721,15 +721,20 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from copy import deepcopy
 
 
+def normalize_kc_comp(comp):
+    # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
+    # to make change detection and diff more accurate we set it again in the kc responses
+    if 'config' in comp:
+        if 'krbPrincipalAttribute' not in comp['config']:
+            comp['config']['krbPrincipalAttribute'] = ['']
+
+
 def sanitize(comp):
     compcopy = deepcopy(comp)
     if 'config' in compcopy:
         compcopy['config'] = {k: v[0] for k, v in compcopy['config'].items()}
         if 'bindCredential' in compcopy['config']:
             compcopy['config']['bindCredential'] = '**********'
-        # an empty string is valid for krbPrincipalAttribute but is filtered out in diff
-        if 'krbPrincipalAttribute' not in compcopy['config']:
-            compcopy['config']['krbPrincipalAttribute'] = ''
     if 'mappers' in compcopy:
         for mapper in compcopy['mappers']:
             if 'config' in mapper:
@@ -885,6 +890,8 @@ def main():
     if cid is not None and before_comp:
         before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
 
+    normalize_kc_comp(before_comp)
+
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
@@ -994,6 +1001,7 @@ def main():
                     kc.delete_component(default_mapper['id'], realm)
 
         after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+        normalize_kc_comp(after_comp)
         if module._diff:
             result['diff'] = dict(before='', after=sanitize(after_comp))
         result['end_state'] = sanitize(after_comp)
@@ -1041,6 +1049,7 @@ def main():
 
             after_comp = kc.get_component(cid, realm)
             after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
+            normalize_kc_comp(after_comp)
             after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized
