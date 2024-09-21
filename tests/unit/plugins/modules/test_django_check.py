@@ -8,7 +8,7 @@ __metaclass__ = type
 
 # pylint: disable=unused-import
 from ansible_collections.community.general.plugins.modules import django_check
-from .helper2 import Helper, RunCommandContext
+from .helper import Helper, RunCommandContext  # pylint: disable=unused-import
 
 
 Helper.from_module(django_check, __name__)

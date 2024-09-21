@@ -28,10 +28,11 @@ class Helper(object):
             return helper
 
     @staticmethod
-    def from_module(module, test_module_name):
-        basename = module.__name__.split(".")[-1]
-        test_spec = "tests/unit/plugins/modules/test_{0}.yaml".format(basename)
-        helper = Helper.from_file(sys.modules[test_module_name], module, test_spec)
+    def from_module(ansible_module, test_module_name, test_spec=None):
+        test_module = sys.modules[test_module_name]
+        if test_spec is None:
+            test_spec = test_module.__file__.replace('.py', '.yaml')
+        helper = Helper.from_file(test_module, ansible_module, test_spec)
 
         return helper
 
@@ -51,11 +52,10 @@ class Helper(object):
         for mtc in self.test_cases:
             mtc.build_contexts(test_module)
 
-        fixtures = {}
+        self.fixtures = {}
         for tc in self.test_cases:
-            fixtures.update(tc.fixtures)
-        self.set_fixtures(fixtures)
-        assert getattr(test_module, "patch_bin") is not None
+            self.fixtures.update(tc.fixtures)
+        self.set_fixtures(self.fixtures)
         setattr(test_module, "test_ansible_module", self.make_test_func())
 
     @property
@@ -71,15 +71,16 @@ class Helper(object):
         return Runner(self)
 
     def make_test_func(self):
+        fixtures = ['patch_ansible_module'] + list(self.fixtures.keys())
+
         @pytest.mark.parametrize('patch_ansible_module, test_case',
                                  self.testcases_params, ids=self.testcases_ids,
                                  indirect=['patch_ansible_module'])
-        @pytest.mark.usefixtures('patch_ansible_module')
+        @pytest.mark.usefixtures(*fixtures)
         def _test_module(mocker, capfd, test_case):
             """
-            Run unit tests for test cases listed in TEST_CASES
+            Run unit tests for each test case in self.test_cases
             """
-
             self.runner.run(mocker, capfd, test_case)
 
         return _test_module
@@ -122,8 +123,10 @@ class ModuleTestCase:
         self.input = input
         self.output = output
         self._contexts = contexts
-        self.contexts = None
+        self.contexts = {}
         self.flags = flags
+
+        self._fixtures = {}
 
     def __str__(self):
         return "<ModuleTestCase: id={id} {input}{output}contexts={contexts} flags={flags}>".format(
@@ -149,11 +152,11 @@ class ModuleTestCase:
         return tc
 
     def build_contexts(self, context_module):
-        built = {}
         for context, context_spec in self._contexts.items():
             context_class = self.get_context_class(context_module, context)
-            built[context] = context_class.build_context(context_spec)
-        self.contexts = built
+            self.contexts[context] = context_class.build_context(context_spec)
+
+            self._fixtures.update(self.contexts[context].fixtures())
 
     @staticmethod
     def get_context_class(context_module, context):
@@ -167,10 +170,7 @@ class ModuleTestCase:
 
     @property
     def fixtures(self):
-        results = {}
-        for context in self.contexts.values():
-            results.update(context.fixtures())
-        return results
+        return dict(self._fixtures)
 
     def setup(self, mocker):
         self.setup_testcase(mocker)
@@ -197,9 +197,9 @@ class ModuleTestCase:
             assert results[test_result] == self.output[test_result], \
                 "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], self.output[test_result])
 
-    def check_contexts(self, testcase, results):
+    def check_contexts(self, test_case, results):
         for context in self.contexts.values():
-            context.check(testcase, results)
+            context.check(test_case, results)
 
 
 class TestCaseContext:
@@ -216,7 +216,7 @@ class TestCaseContext:
     def setup(self, mocker):
         pass
 
-    def check(self, testcase, results):
+    def check(self, test_case, results):
         raise NotImplementedError()
 
 
@@ -228,7 +228,7 @@ class RunCommandContext(TestCaseContext):
         return "RunCommandContext({specs})".format(specs=self.context_specs)
 
     def fixtures(self):
-        @pytest.fixture(autouse=True)
+        @pytest.fixture
         def patch_bin(mocker):
             def mockie(self, path, *args, **kwargs):
                 return "/testbin/{0}".format(path)
@@ -252,7 +252,7 @@ class RunCommandContext(TestCaseContext):
 
         self.mock_run_cmd = mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command', side_effect=side_effect)
 
-    def check(self, testcase, results):
+    def check(self, test_case, results):
         call_args_list = [(item[0][0], item[1]) for item in self.mock_run_cmd.call_args_list]
         expected_call_args_list = [(item['command'], item['environ']) for item in self.context_specs]
         print("call args list =\n%s" % call_args_list)
