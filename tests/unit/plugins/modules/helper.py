@@ -22,8 +22,8 @@ class Helper(object):
     @staticmethod
     def from_file(test_module, ansible_module, filename):
         with open(filename, "r") as test_cases:
-            test_cases = yaml.safe_load(test_cases)
-        return Helper.from_list(test_module, ansible_module, test_cases)
+            test_cases_data = yaml.safe_load(test_cases)
+        return Helper.from_list(test_module, ansible_module, test_cases_data)
 
     @staticmethod
     def from_module(ansible_module, test_module_name, test_spec=None):
