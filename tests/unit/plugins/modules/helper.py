@@ -56,14 +56,14 @@ class Helper(object):
         for tc in self.test_cases:
             self.fixtures.update(tc.fixtures)
         self.set_fixtures(self.fixtures)
-        for count, tc in enumerate(self.test_cases):
-            self.set_test_func(count, tc)
+        for tc in self.test_cases:
+            self.set_test_func(tc)
 
     @property
     def runner(self):
         return Runner(self)
 
-    def set_test_func(self, count, test_case):
+    def set_test_func(self, test_case):
         fixtures = ['patch_ansible_module'] + list(self.fixtures.keys())
 
         @pytest.mark.parametrize('patch_ansible_module',
