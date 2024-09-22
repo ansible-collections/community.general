@@ -618,7 +618,7 @@ class LXDContainerManagement(object):
         data = (self._get_instance_state_json() or {}).get('metadata', None) or {}
         network = {
             k: v
-            for k, v in data.get('network', {}).items()
+            for k, v in (data.get('network') or {}).items()
             if k not in ignore_devices
         }
         addresses = {
@@ -768,7 +768,7 @@ class LXDContainerManagement(object):
             self.old_instance_json = self._get_instance_json()
             self.old_sections = {
                 section: adjust_content(content)
-                for section, content in self.old_instance_json.get('metadata', {}).items()
+                for section, content in (self.old_instance_json.get('metadata') or {}).items()
                 if section in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS)
             }
 
