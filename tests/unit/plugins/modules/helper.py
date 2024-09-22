@@ -14,31 +14,27 @@ import pytest
 
 
 class Helper(object):
-    # @staticmethod
-    # def from_list(module_main, list_):
-    #     # helper = Helper(module_main, test_cases=list_)
-    #     # return helper
-    #     pass
+    @staticmethod
+    def from_list(test_module, ansible_module, test_cases):
+        helper = Helper(test_module, ansible_module, test_cases=test_cases)
+        return helper
 
     @staticmethod
-    def from_file(test_module, module, filename):
+    def from_file(test_module, ansible_module, filename):
         with open(filename, "r") as test_cases:
             test_cases = yaml.safe_load(test_cases)
-            helper = Helper(test_module, module, test_cases=test_cases)
-            return helper
+        return Helper.from_list(test_module, ansible_module, test_cases)
 
     @staticmethod
     def from_module(ansible_module, test_module_name, test_spec=None):
         test_module = sys.modules[test_module_name]
         if test_spec is None:
             test_spec = test_module.__file__.replace('.py', '.yaml')
-        helper = Helper.from_file(test_module, ansible_module, test_spec)
+        return Helper.from_file(test_module, ansible_module, test_spec)
 
-        return helper
-
-    def __init__(self, test_module, module, test_cases):
+    def __init__(self, test_module, ansible_module, test_cases):
         self.test_module = test_module
-        self.module = module
+        self.ansible_module = ansible_module
         self.test_cases = []
         self.fixtures = {}
 
