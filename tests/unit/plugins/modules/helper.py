@@ -56,32 +56,27 @@ class Helper(object):
         for tc in self.test_cases:
             self.fixtures.update(tc.fixtures)
         self.set_fixtures(self.fixtures)
-        setattr(test_module, "test_ansible_module", self.make_test_func())
-
-    @property
-    def testcases_params(self):
-        return [[tc.input, tc] for tc in self.test_cases]
-
-    @property
-    def testcases_ids(self):
-        return [tc.id for tc in self.test_cases]
+        for count, tc in enumerate(self.test_cases):
+            self.set_test_func(count, tc)
 
     @property
     def runner(self):
         return Runner(self)
 
-    def make_test_func(self):
+    def set_test_func(self, count, test_case):
         fixtures = ['patch_ansible_module'] + list(self.fixtures.keys())
 
-        @pytest.mark.parametrize('patch_ansible_module, test_case',
-                                 self.testcases_params, ids=self.testcases_ids,
+        @pytest.mark.parametrize('patch_ansible_module',
+                                 [test_case.input], ids=["testing"],
                                  indirect=['patch_ansible_module'])
         @pytest.mark.usefixtures(*fixtures)
-        def _test_module(mocker, capfd, test_case):
+        def _test_module(mocker, capfd):
             """
             Run unit tests for each test case in self.test_cases
             """
             self.runner.run(mocker, capfd, test_case)
+
+        setattr(self.test_module, "test_" + test_case.id, _test_module)
 
         return _test_module
 
