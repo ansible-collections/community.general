@@ -11,7 +11,8 @@
         a: 1
         b: 2
         c: 3
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/facter, --json]
       environ: &env-def {check_rc: true}
       rc: 0
@@ -21,17 +22,18 @@
 - id: with args
   input:
     arguments:
-      - -p
-      - system_uptime
-      - timezone
-      - is_virtual
+    - -p
+    - system_uptime
+    - timezone
+    - is_virtual
   output:
     ansible_facts:
       facter:
         a: 1
         b: 2
         c: 3
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/facter, --json, -p, system_uptime, timezone, is_virtual]
       environ: *env-def
       rc: 0

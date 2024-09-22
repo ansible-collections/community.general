@@ -8,12 +8,13 @@
   input:
     command: check
     extra_args:
-      - babaloo
-      - yaba
-      - daba
-      - doo
+    - babaloo
+    - yaba
+    - daba
+    - doo
     settings: whatever.settings
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, babaloo, yaba, daba, doo]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
@@ -23,14 +24,15 @@
   input:
     command: check
     extra_args:
-      - babaloo
-      - yaba
-      - daba
-      - doo
+    - babaloo
+    - yaba
+    - daba
+    - doo
     settings: whatever.settings
   output:
     failed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, babaloo, yaba, daba, doo]
       environ: *env-def
       rc: 1

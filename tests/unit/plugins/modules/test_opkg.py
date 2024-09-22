@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import opkg
-from .helper import Helper
+from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
 
 
 Helper.from_module(opkg, __name__)
