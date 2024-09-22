@@ -93,6 +93,16 @@ options:
         default: true
         version_added: 9.4.0
 
+    exclude_bind_credential_from_update_check:
+        description:
+            - The value of the config parameter O(config.bindCredential) is redacted in the Keycloak responses. Comparing
+              the redacted value with the desired value always evaluates to not equal.
+            - Set to V(true) to exclude O(config.bindCredential) when comparing the before state with the desired state to
+              determine wether an update is required.
+        type: bool
+        default: false
+        version_added: 9.5.0
+
     config:
         description:
             - Dict specifying the configuration options for the provider; the contents differ depending on
@@ -822,6 +832,7 @@ def main():
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
         remove_unspecified_mappers=dict(type='bool', default=True),
+        exclude_bind_credential_from_update_check=dict(type='bool', default=False),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
@@ -869,8 +880,9 @@ def main():
 
     # Filter and map the parameters names that apply
     comp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers', 'remove_unspecified_mappers'] and
-                   module.params.get(x) is not None]
+                   if x not in list(keycloak_argument_spec().keys())
+                   + ['state', 'realm', 'mappers', 'remove_unspecified_mappers', 'exclude_bind_credential_from_update_check']
+                   and module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
     if cid is None:
@@ -1012,8 +1024,14 @@ def main():
         if state == 'present':
             # Process an update
 
+            desired_copy = deepcopy(desired_comp)
+            before_copy = deepcopy(before_comp)
+            # exclude bindCredential when checking wether an update is required
+            if module.params['exclude_bind_credential_from_update_check']:
+                desired_copy.get('config', []).pop('bindCredential', None)
+                before_copy.get('config', []).pop('bindCredential', None)
             # no changes
-            if desired_comp == before_comp:
+            if desired_copy == before_copy:
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
