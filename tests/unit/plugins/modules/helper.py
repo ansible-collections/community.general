@@ -39,41 +39,29 @@ class Helper(object):
     def __init__(self, test_module, module, test_cases):
         self.test_module = test_module
         self.module = module
-        self.test_cases = [
-            ModuleTestCase(
-                id=tc["id"],
-                input=tc.get("input", {}),
-                output=tc.get("output", {}),
-                contexts=tc.get("contexts", {}),
-                flags=tc.get("flags", {})
-            )
-            for tc in test_cases
-        ]
-        for mtc in self.test_cases:
-            mtc.build_contexts(test_module)
-
+        self.test_cases = []
         self.fixtures = {}
-        for tc in self.test_cases:
+
+        for test_case in test_cases:
+            tc = ModuleTestCase.make_test_case(test_case, test_module)
+            self.test_cases.append(tc)
             self.fixtures.update(tc.fixtures)
-        self.set_fixtures(self.fixtures)
-        for tc in self.test_cases:
             self.set_test_func(tc)
+        self.set_fixtures(self.fixtures)
 
     @property
     def runner(self):
         return Runner(self)
 
     def set_test_func(self, test_case):
-        fixtures = ['patch_ansible_module'] + list(self.fixtures.keys())
+        fixtures = list(test_case.fixtures.keys())
 
-        @pytest.mark.parametrize('patch_ansible_module',
-                                 [test_case.input], ids=["testing"],
-                                 indirect=['patch_ansible_module'])
         @pytest.mark.usefixtures(*fixtures)
-        def _test_module(mocker, capfd):
+        def _test_module(mocker, capfd, patch_ansible_module):
             """
             Run unit tests for each test case in self.test_cases
             """
+            patch_ansible_module(test_case.input)
             self.runner.run(mocker, capfd, test_case)
 
         setattr(self.test_module, "test_" + test_case.id, _test_module)
@@ -113,55 +101,62 @@ class Runner:
 
 
 class ModuleTestCase:
-    def __init__(self, id, input, output, contexts, flags):
+    def __init__(self, id, input, output, mocks, flags):
         self.id = id
         self.input = input
         self.output = output
-        self._contexts = contexts
-        self.contexts = {}
+        self._mocks = mocks
+        self.mocks = {}
         self.flags = flags
 
         self._fixtures = {}
 
     def __str__(self):
-        return "<ModuleTestCase: id={id} {input}{output}contexts={contexts} flags={flags}>".format(
+        return "<ModuleTestCase: id={id} {input}{output}mocks={mocks} flags={flags}>".format(
             id=self.id,
             input="input " if self.input else "",
             output="output " if self.output else "",
-            contexts="({0})".format(", ".join(self.contexts.keys())),
+            mocks="({0})".format(", ".join(self.mocks.keys())),
             flags=self.flags
         )
 
     def __repr__(self):
-        return "ModuleTestCase(id={id}, input={input}, output={output}, contexts={contexts}, flags={flags})".format(
+        return "ModuleTestCase(id={id}, input={input}, output={output}, mocks={mocks}, flags={flags})".format(
             id=self.id,
             input=self.input,
             output=self.output,
-            contexts=repr(self.contexts),
+            mocks=repr(self.mocks),
             flags=self.flags
         )
 
     @staticmethod
-    def make_test_case(test_case):
-        tc = ModuleTestCase(**test_case)
+    def make_test_case(test_case, test_module):
+        tc = ModuleTestCase(
+            id=test_case["id"],
+            input=test_case.get("input", {}),
+            output=test_case.get("output", {}),
+            mocks=test_case.get("mocks", {}),
+            flags=test_case.get("flags", {})
+        )
+        tc.build_mocks(test_module)
         return tc
 
-    def build_contexts(self, context_module):
-        for context, context_spec in self._contexts.items():
-            context_class = self.get_context_class(context_module, context)
-            self.contexts[context] = context_class.build_context(context_spec)
+    def build_mocks(self, test_module):
+        for mock, mock_spec in self._mocks.items():
+            mock_class = self.get_mock_class(test_module, mock)
+            self.mocks[mock] = mock_class.build_mock(mock_spec)
 
-            self._fixtures.update(self.contexts[context].fixtures())
+            self._fixtures.update(self.mocks[mock].fixtures())
 
     @staticmethod
-    def get_context_class(context_module, context):
+    def get_mock_class(test_module, mock):
         try:
-            class_name = "".join(x.capitalize() for x in context.split("_")) + "Context"
-            plugin_class = getattr(context_module, class_name)
-            assert issubclass(plugin_class, TestCaseContext), "Class {0} is not a subclass of BaseContext".format(class_name)
+            class_name = "".join(x.capitalize() for x in mock.split("_")) + "Mock"
+            plugin_class = getattr(test_module, class_name)
+            assert issubclass(plugin_class, TestCaseMock), "Class {0} is not a subclass of TestCaseMock".format(class_name)
             return plugin_class
         except AttributeError:
-            raise ValueError("Cannot find class {0} for context {1}".format(class_name, context))
+            raise ValueError("Cannot find class {0} for mock {1}".format(class_name, mock))
 
     @property
     def fixtures(self):
@@ -169,18 +164,18 @@ class ModuleTestCase:
 
     def setup(self, mocker):
         self.setup_testcase(mocker)
-        self.setup_contexts(mocker)
+        self.setup_mocks(mocker)
 
     def check(self, results):
         self.check_testcase(results)
-        self.check_contexts(self, results)
+        self.check_mocks(self, results)
 
     def setup_testcase(self, mocker):
         pass
 
-    def setup_contexts(self, mocker):
-        for context in self.contexts.values():
-            context.setup(mocker)
+    def setup_mocks(self, mocker):
+        for mock in self.mocks.values():
+            mock.setup(mocker)
 
     def check_testcase(self, results):
         print("testcase =\n%s" % repr(self))
@@ -192,18 +187,18 @@ class ModuleTestCase:
             assert results[test_result] == self.output[test_result], \
                 "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], self.output[test_result])
 
-    def check_contexts(self, test_case, results):
-        for context in self.contexts.values():
-            context.check(test_case, results)
+    def check_mocks(self, test_case, results):
+        for mock in self.mocks.values():
+            mock.check(test_case, results)
 
 
-class TestCaseContext:
+class TestCaseMock:
     @classmethod
-    def build_context(cls, context_specs):
-        return cls(context_specs)
+    def build_mock(cls, mock_specs):
+        return cls(mock_specs)
 
-    def __init__(self, context_specs):
-        self.context_specs = context_specs
+    def __init__(self, mock_specs):
+        self.mock_specs = mock_specs
 
     def fixtures(self):
         return {}
@@ -215,12 +210,12 @@ class TestCaseContext:
         raise NotImplementedError()
 
 
-class RunCommandContext(TestCaseContext):
+class RunCommandMock(TestCaseMock):
     def __str__(self):
-        return "<RunCommandContext specs={specs}>".format(specs=self.context_specs)
+        return "<RunCommandMock specs={specs}>".format(specs=self.mock_specs)
 
     def __repr__(self):
-        return "RunCommandContext({specs})".format(specs=self.context_specs)
+        return "RunCommandMock({specs})".format(specs=self.mock_specs)
 
     def fixtures(self):
         @pytest.fixture
@@ -233,7 +228,7 @@ class RunCommandContext(TestCaseContext):
 
     def setup(self, mocker):
         def _results():
-            for result in [(x['rc'], x['out'], x['err']) for x in self.context_specs]:
+            for result in [(x['rc'], x['out'], x['err']) for x in self.mock_specs]:
                 yield result
             raise Exception("testcase has not enough run_command calls")
 
@@ -249,10 +244,10 @@ class RunCommandContext(TestCaseContext):
 
     def check(self, test_case, results):
         call_args_list = [(item[0][0], item[1]) for item in self.mock_run_cmd.call_args_list]
-        expected_call_args_list = [(item['command'], item['environ']) for item in self.context_specs]
+        expected_call_args_list = [(item['command'], item['environ']) for item in self.mock_specs]
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
 
-        assert self.mock_run_cmd.call_count == len(self.context_specs), "{0} != {1}".format(self.mock_run_cmd.call_count, len(self.context_specs))
+        assert self.mock_run_cmd.call_count == len(self.mock_specs), "{0} != {1}".format(self.mock_run_cmd.call_count, len(self.mock_specs))
         if self.mock_run_cmd.call_count:
             assert call_args_list == expected_call_args_list
