@@ -47,7 +47,7 @@ class Helper(object):
 
     @property
     def runner(self):
-        return Runner(self)
+        return Runner(self.ansible_module.main)
 
     def set_test_func(self, test_case):
         fixtures = list(test_case.fixtures.keys())
@@ -74,8 +74,8 @@ class Helper(object):
 
 
 class Runner:
-    def __init__(self, helper):
-        self.module_main = helper.module.main
+    def __init__(self, module_main):
+        self.module_main = module_main
         self.results = None
 
     def run(self, mocker, capfd, test_case):
