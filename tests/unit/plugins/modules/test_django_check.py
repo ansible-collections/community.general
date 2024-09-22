@@ -6,9 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-# pylint: disable=unused-import
 from ansible_collections.community.general.plugins.modules import django_check
-from .helper import Helper, RunCommandContext  # pylint: disable=unused-import
+from .helper import Helper
 
 
 Helper.from_module(django_check, __name__)
