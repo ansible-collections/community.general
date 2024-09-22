@@ -2463,7 +2463,7 @@ def main():
         argument_spec=dict(
             ignore_unsupported_suboptions=dict(type='bool', default=False),
             autoconnect=dict(type='bool', default=True),
-            state=dict(type='str', required=True, choices=['absent', 'present']),
+            state=dict(type='str', required=True, choices=['absent', 'present', 'up', 'down']),
             conn_name=dict(type='str', required=True),
             conn_reload=dict(type='bool', required=False, default=False),
             master=dict(type='str'),
