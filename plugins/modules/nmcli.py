@@ -35,8 +35,7 @@ options:
         description:
             - Whether the device should exist or not, taking action if the state is different from what is stated.
             - Using O(state=present) to create connection will automatically bring connection up.
-            - Using O(state=up) and O(state=down) will not modify connection with other parameters.
-            - O(state=up) and O(state=down) have been introduced in community.general 9.5.0.
+            - Using O(state=up) and O(state=down) will not modify connection with other parameters. These states have been added in community.general 9.5.0.
         type: str
         required: true
         choices: [ absent, present, up, down ]
