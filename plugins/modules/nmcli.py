@@ -36,6 +36,7 @@ options:
             - Whether the device should exist or not, taking action if the state is different from what is stated.
             - Using O(state=present) to create connection will automatically bring connection up.
             - Using O(state=up) and O(state=down) will not modify connection with other parameters.
+            - O(state=up) and O(state=down) have been introduced in community.general 9.5.0.
         type: str
         required: true
         choices: [ absent, present, up, down ]
@@ -56,6 +57,7 @@ options:
         type: bool
         required: false
         default: false
+        version_added: 9.5.0
     ifname:
         description:
             - The interface to bind the connection to.
@@ -2465,7 +2467,7 @@ def main():
             autoconnect=dict(type='bool', default=True),
             state=dict(type='str', required=True, choices=['absent', 'present', 'up', 'down']),
             conn_name=dict(type='str', required=True),
-            conn_reload=dict(type='bool', required=False, default=False),
+            conn_reload=dict(type='bool', default=False),
             master=dict(type='str'),
             slave_type=dict(type='str', choices=['bond', 'bridge', 'team', 'ovs-port']),
             ifname=dict(type='str'),
