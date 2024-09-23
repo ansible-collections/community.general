@@ -57,13 +57,14 @@ options:
   state:
     description:
     - State to ensure.
+    - V("absent") and V("disabled") give the same results.
+    - V("present") and V("enabled") give the same results.
     default: "present"
     choices: ["absent", "disabled", "enabled", "present"]
     type: str
 extends_documentation_fragment:
   - community.general.ipa.documentation
   - community.general.attributes
-
 '''
 
 EXAMPLES = r'''
@@ -160,7 +161,7 @@ def ensure(module, client):
     module_hostgroup = get_hostgroup_dict(description=module.params['description'])
 
     changed = False
-    if state == 'present':
+    if state in ['present', 'enabled']:
         if not ipa_hostgroup:
             changed = True
             if not module.check_mode:
