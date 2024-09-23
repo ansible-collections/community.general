@@ -290,7 +290,7 @@ class ImageInfoModule(OpenNebulaModule):
             images = self.get_all_images().IMAGE
 
         self.result = {
-            'images': [self.get_image_info(image) for image in images]
+            'images': [OpenNebulaModule.get_image_info(image) for image in images]
         }
 
         self.exit()
@@ -300,83 +300,6 @@ class ImageInfoModule(OpenNebulaModule):
         # Filter -2 means fetch all images user can Use
 
         return pool
-
-    def get_image_list_id(self, image, element):
-        list_of_id = []
-
-        if element == 'VMS':
-            image_list = image.VMS
-        if element == 'CLONES':
-            image_list = image.CLONES
-        if element == 'APP_CLONES':
-            image_list = image.APP_CLONES
-
-        for iter in image_list.ID:
-            list_of_id.append(
-                # These are optional so firstly check for presence
-                getattr(iter, 'ID', 'Null'),
-            )
-        return list_of_id
-
-    def get_image_snapshots_list(self, image):
-        list_of_snapshots = []
-
-        for iter in image.SNAPSHOTS.SNAPSHOT:
-            list_of_snapshots.append({
-                'date': iter['DATE'],
-                'parent': iter['PARENT'],
-                'size': iter['SIZE'],
-                # These are optional so firstly check for presence
-                'allow_orhans': getattr(image.SNAPSHOTS, 'ALLOW_ORPHANS', 'Null'),
-                'children': getattr(iter, 'CHILDREN', 'Null'),
-                'active': getattr(iter, 'ACTIVE', 'Null'),
-                'name': getattr(iter, 'NAME', 'Null'),
-            })
-        return list_of_snapshots
-
-    def get_image_info(self, image):
-        info = {
-            'id': image.ID,
-            'name': image.NAME,
-            'state': IMAGE_STATES[image.STATE],
-            'running_vms': image.RUNNING_VMS,
-            'used': bool(image.RUNNING_VMS),
-            'user_name': image.UNAME,
-            'user_id': image.UID,
-            'group_name': image.GNAME,
-            'group_id': image.GID,
-            'permissions': {
-                'owner_u': image.PERMISSIONS.OWNER_U,
-                'owner_m': image.PERMISSIONS.OWNER_M,
-                'owner_a': image.PERMISSIONS.OWNER_A,
-                'group_u': image.PERMISSIONS.GROUP_U,
-                'group_m': image.PERMISSIONS.GROUP_M,
-                'group_a': image.PERMISSIONS.GROUP_A,
-                'other_u': image.PERMISSIONS.OTHER_U,
-                'other_m': image.PERMISSIONS.OTHER_M,
-                'other_a': image.PERMISSIONS.OTHER_A
-            },
-            'type': image.TYPE,
-            'disk_type': image.DISK_TYPE,
-            'persistent': image.PERSISTENT,
-            'regtime': image.REGTIME,
-            'source': image.SOURCE,
-            'path': image.PATH,
-            'fstype': getattr(image, 'FSTYPE', 'Null'),
-            'size': image.SIZE,
-            'cloning_ops': image.CLONING_OPS,
-            'cloning_id': image.CLONING_ID,
-            'target_snapshot': image.TARGET_SNAPSHOT,
-            'datastore_id': image.DATASTORE_ID,
-            'datastore': image.DATASTORE,
-            'vms': self.get_image_list_id(image, 'VMS'),
-            'clones': self.get_image_list_id(image, 'CLONES'),
-            'app_clones': self.get_image_list_id(image, 'APP_CLONES'),
-            'snapshots': self.get_image_snapshots_list(image),
-            'template': image.TEMPLATE,
-        }
-
-        return info
 
     def get_images_by_ids(self, ids):
         images = []
