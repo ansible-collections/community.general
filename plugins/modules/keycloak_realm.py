@@ -803,7 +803,7 @@ def main():
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
-                result['changed'] = (before_realm != desired_realm)
+                result['changed'] = (before_norm != desired_norm)
 
                 module.exit_json(**result)
 

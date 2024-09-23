@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_realm - fix change detection in check mode by sorting the lists in the realms beforehand (https://github.com/ansible-collections/community.general/pull/8877).
