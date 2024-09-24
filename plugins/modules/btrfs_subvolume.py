@@ -102,40 +102,40 @@ EXAMPLES = r'''
 - name: Create a @home subvolume under the root subvolume
   community.general.btrfs_subvolume:
     name: /@home
-    device: /dev/vda2
+    filesystem_device: /dev/vda2
 
 - name: Remove the @home subvolume if it exists
   community.general.btrfs_subvolume:
     name: /@home
     state: absent
-    device: /dev/vda2
+    filesystem_device: /dev/vda2
 
 - name: Create a snapshot of the root subvolume named @
   community.general.btrfs_subvolume:
     name: /@
     snapshot_source: /
-    device: /dev/vda2
+    filesystem_device: /dev/vda2
 
 - name: Create a snapshot of the root subvolume and make it the new default subvolume
   community.general.btrfs_subvolume:
     name: /@
     snapshot_source: /
     default: Yes
-    device: /dev/vda2
+    filesystem_device: /dev/vda2
 
 - name: Create a snapshot of the /@ subvolume and recursively creating intermediate subvolumes as required
   community.general.btrfs_subvolume:
     name: /@snapshots/@2022_06_09
     snapshot_source: /@
     recursive: True
-    device: /dev/vda2
+    filesystem_device: /dev/vda2
 
 - name: Remove the /@ subvolume and recursively delete child subvolumes as required
   community.general.btrfs_subvolume:
     name: /@snapshots/@2022_06_09
     snapshot_source: /@
     recursive: True
-    device: /dev/vda2
+    filesystem_device: /dev/vda2
 
 '''
 
