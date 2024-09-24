@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox inventory plugin - clean up authentication code (https://github.com/ansible-collections/community.general/pull/8917).
