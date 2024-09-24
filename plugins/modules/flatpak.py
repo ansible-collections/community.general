@@ -330,7 +330,7 @@ def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method
 
 
 def _is_flatpak_id(part):
-    if not '.' in part:
+    if '.' not in part:
         return False
     sections = part.split('.')
     if len(sections) < 2:
