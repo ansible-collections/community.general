@@ -140,11 +140,6 @@ from copy import deepcopy
 
 
 def main():
-    """
-    Module execution
-
-    :return:
-    """
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
@@ -165,8 +160,6 @@ def main():
                            required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    # Initialize the result object. Only "changed" seems to have special
-    # meaning for Ansible.
     result = dict(changed=False, msg='', end_state={}, diff=dict(before={}, after={}))
 
     # This will include the current state of the component if it is already
