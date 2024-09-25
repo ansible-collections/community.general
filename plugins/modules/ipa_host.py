@@ -81,7 +81,7 @@ options:
     type: str
   force_creation:
     description:
-    - Create host if O("state=disabled") or O("state=enabled") but not present.
+    - Create host if O(state=disabled) or O(state=enabled) but not present.
     default: false
     type: bool
   update_dns:
