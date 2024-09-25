@@ -85,7 +85,7 @@ options:
         was exlusively called O(use_ssl). The latter is now an alias of O(use_tls).
       - B(Note:) for security reasons, you should always set O(use_tls=true) and
         O(validate_certs=true) whenever possible.
-      - The default of this option changed to V(true) i community.general 10.0.0.
+      - The default of this option changed to V(true) in community.general 10.0.0.
     type: bool
     default: true
     aliases:
