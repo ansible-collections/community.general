@@ -75,6 +75,10 @@ plugin_routing:
       deprecation:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
+    hipchat:
+      deprecation:
+        removal_version: 11.0.0
+        warning_text: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
     rax_cbs_attachments:
       tombstone:
         removal_version: 9.0.0
