@@ -1,0 +1,5 @@
+removed_features:
+  - "The hipchat callback plugin has been removed. The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020 (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The consul_acl module has been removed. Use community.general.consul_token and/or community.general.consul_policy instead (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The rhn_channel module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The rhn_register module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
