@@ -3,3 +3,4 @@ removed_features:
   - "The consul_acl module has been removed. Use community.general.consul_token and/or community.general.consul_policy instead (https://github.com/ansible-collections/community.general/pull/8921)."
   - "The rhn_channel module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
   - "The rhn_register module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The redhat module utils has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
