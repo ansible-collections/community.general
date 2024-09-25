@@ -74,7 +74,7 @@ options:
     type: list
     elements: str
   state:
-    description: 
+    description:
     - State to ensure.
     - V("present") and V("enabled") give the same results.
     default: present
@@ -238,7 +238,7 @@ def ensure(module, client):
 
     ipa_host = client.host_find(name=name)
     module_host = get_host_dict(description=module.params['description'],
-                                force=module.params['force'], 
+                                force=module.params['force'],
                                 ip_address=module.params['ip_address'],
                                 ns_host_location=module.params['ns_host_location'],
                                 ns_hardware_platform=module.params['ns_hardware_platform'],
@@ -283,7 +283,7 @@ def ensure(module, client):
                 else:
                     changed = False
         else:
-          module.fail_json(msg="No host with name " + ipa_host + " found")
+            module.fail_json(msg="No host with name " + ipa_host + " found")
 
     return changed, client.host_find(name=name)
 
