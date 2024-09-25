@@ -67,7 +67,8 @@ options:
         required: true
     config:
         description:
-            - Dict specifying the key and its properties. Contents vary depending on the provider type.
+            - Configuration properties for the provider.
+            - Contents vary depending on the provider type.
         type: dict
 
 extends_documentation_fragment:
