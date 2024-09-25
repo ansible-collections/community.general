@@ -74,7 +74,9 @@ options:
     type: list
     elements: str
   state:
-    description: State to ensure.
+    description: 
+    - State to ensure.
+    - V("present") and V("enabled") give the same results.
     default: present
     choices: ["absent", "disabled", "enabled", "present"]
     type: str
@@ -236,16 +238,17 @@ def ensure(module, client):
 
     ipa_host = client.host_find(name=name)
     module_host = get_host_dict(description=module.params['description'],
-                                force=module.params['force'], ip_address=module.params['ip_address'],
+                                force=module.params['force'], 
+                                ip_address=module.params['ip_address'],
                                 ns_host_location=module.params['ns_host_location'],
                                 ns_hardware_platform=module.params['ns_hardware_platform'],
                                 ns_os_version=module.params['ns_os_version'],
                                 user_certificate=module.params['user_certificate'],
                                 mac_address=module.params['mac_address'],
-                                random_password=module.params.get('random_password'),
+                                random_password=module.params['random_password'],
                                 )
     changed = False
-    if state in ['present', 'enabled', 'disabled']:
+    if state in ['present', 'enabled']:
         if not ipa_host:
             changed = True
             if not module.check_mode:
@@ -264,13 +267,23 @@ def ensure(module, client):
                     if ipa_host_show.get('has_keytab', False) and module.params.get('random_password'):
                         client.host_disable(name=name)
                     return changed, client.host_mod(name=name, host=data)
-
-    else:
+    elif state == 'absent':
         if ipa_host:
             changed = True
             update_dns = module.params.get('update_dns', False)
             if not module.check_mode:
                 client.host_del(name=name, update_dns=update_dns)
+    elif state == 'disabled':
+        if ipa_host:
+            changed = True
+            if not module.check_mode:
+                ipa_host_show = client.host_show(name=name)
+                if ipa_host_show.get('has_keytab', True) and module.params.get('random_password'):
+                    client.host_disable(name=name)
+                else:
+                    changed = False
+        else:
+          module.fail_json(msg="No host with name " + ipa_host + " found")
 
     return changed, client.host_find(name=name)
 
