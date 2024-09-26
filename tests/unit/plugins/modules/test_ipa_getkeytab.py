@@ -49,7 +49,13 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
-            call(['/testbin/ipa_getkeytab', '--keytab', '/tmp/test.keytab', '--server', 'freeipa-dc01.ipa.test', '--principal', 'HTTP/freeipa-dc02.ipa.test'], check_rc=False),
+            call(['/testbin/ipa_getkeytab', 
+                  '--keytab', '/tmp/test.keytab', 
+                  '--server', 'freeipa-dc01.ipa.test', 
+                  '--principal', 'HTTP/freeipa-dc02.ipa.test'
+                  ], 
+                 check_rc=False
+                 ),
         ])
 
     def test_absent(self):

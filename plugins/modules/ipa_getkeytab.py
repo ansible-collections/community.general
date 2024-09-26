@@ -39,12 +39,12 @@ options:
         aliases: ["server"]
     ldap_uri:
         description:
-            - LDAP URI. If V(ldap://) is specified, STARTTLS is initiated by default. 
+            - LDAP URI. If V(ldap://) is specified, STARTTLS is initiated by default.
             - Can not be used with the O(ipa_server) option.
         type: str
     bind_dn:
         description:
-            - The LDAP DN to bind as when retrieving a keytab without Kerberos credentials. 
+            - The LDAP DN to bind as when retrieving a keytab without Kerberos credentials.
             - Generally used with the O(bind_pw) option.
         type: str
     bind_pw:
@@ -69,15 +69,15 @@ options:
     retrieve_mode:
         description:
             - Retrieve an existing key from the server instead of generating a new one.
-            - This is incompatible with the O(password), and will work only against a IPA server more recent than version 3.3. 
+            - This is incompatible with the O(password), and will work only against a IPA server more recent than version 3.3.
             - The user requesting the keytab must have access to the keys for this operation to succeed.
-            - Be aware that if set V(true), a new keytab will be generated. 
+            - Be aware that if set V(true), a new keytab will be generated.
             - This invalidates all previously retrieved keytabs for this service principal.
         type: bool
     encryption_types:
         description:
-            - The list of encryption types to use to generate keys. 
-            - M(ipa_getkeytab) will use local client defaults if not provided. 
+            - The list of encryption types to use to generate keys.
+            - M(ipa_getkeytab) will use local client defaults if not provided.
             - Valid values depend on the Kerberos library version and configuration.
         type: str
     state:
@@ -210,19 +210,19 @@ def main():
     force = module.params['force']
 
     keytab = IPAKeytab(module,
-              path=path,
-              state=state,
-              principal=module.params['principal'],
-              ipa_server=module.params['ipa_server'],
-              ldap_uri=module.params['ldap_uri'],
-              bind_dn=module.params['bind_dn'],
-              bind_pw=module.params['bind_pw'],
-              password=module.params['password'],
-              ca_certificate=module.params['ca_certificate'],
-              sasl_mech=module.params['sasl_mech'],
-              retrieve_mode=module.params['retrieve_mode'],
-              encryption_types=module.params['encryption_types'],
-              )
+                       path=path,
+                       state=state,
+                       principal=module.params['principal'],
+                       ipa_server=module.params['ipa_server'],
+                       ldap_uri=module.params['ldap_uri'],
+                       bind_dn=module.params['bind_dn'],
+                       bind_pw=module.params['bind_pw'],
+                       password=module.params['password'],
+                       ca_certificate=module.params['ca_certificate'],
+                       sasl_mech=module.params['sasl_mech'],
+                       retrieve_mode=module.params['retrieve_mode'],
+                       encryption_types=module.params['encryption_types'],
+                      )
 
     changed = False
     if state == 'present':
