@@ -83,8 +83,7 @@ options:
   state:
     description:
       - The state of the keytab file.
-      - V(present) only check for existence of a file, so if you want to recreate keytab
-        with other parameters you should set O(force: true).
+      - V(present) only check for existence of a file, if you want to recreate keytab with other parameters you should set O(force: true).
     type: str
     default: present
     choices: ["present", "absent"]
