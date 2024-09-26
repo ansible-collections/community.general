@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: create copy of /bin/echo ({{ item.name }})
+- name: Create copy of /bin/echo ({{ item.name }})
   ansible.builtin.copy:
     src: /bin/echo
     dest: "{{ item.copy_to }}/echo"
@@ -11,7 +11,7 @@
     remote_src: true
   when: item.copy_to is defined
 
-- name: test cmd_echo module ({{ item.name }})
+- name: Test cmd_echo module ({{ item.name }})
   cmd_echo:
     cmd: "{{ item.cmd | default(omit) }}"
     path_prefix: "{{ item.path_prefix | default(omit) }}"
@@ -24,6 +24,10 @@
   check_mode: "{{ item.check_mode | default(omit) }}"
   ignore_errors: "{{ item.expect_error | default(omit) }}"
 
-- name: check results ({{ item.name }})
+- name: Debug test results ({{ item.name }})
+  ansible.builtin.debug:
+    var: test_result
+
+- name: Check results ({{ item.name }})
   _unsafe_assert:
     that: "{{ item.assertions }}"

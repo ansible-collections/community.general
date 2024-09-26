@@ -1,0 +1,2 @@
+breaking_changes:
+  - cmd_runner module utils - CLI arguments created directly from module parameters are no longer assigned a default formatter (https://github.com/ansible-collections/community.general/pull/8928).
