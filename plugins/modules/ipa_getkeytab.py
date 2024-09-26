@@ -66,7 +66,6 @@ options:
             - SASL mechanism to use if O(bind_dn) and O(bind_pw) are not specified.
         choices: ["GSSAPI", "EXTERNAL"]
         type: str
-        aliases: ["ca_cert"]
     retrieve_mode:
         description:
             - Retrieve an existing key from the server instead of generating a new one.
@@ -189,12 +188,12 @@ def main():
         path=dict(type='path', required=True, aliases=["keytab"]),
         state=dict(default='present', choices=['present', 'absent']),
         principal=dict(type='str', required=True),
-        ipa_server=dict(type='str'),
+        ipa_server=dict(type='str', aliases=["server"]),
         ldap_uri=dict(type='path'),
         bind_dn=dict(type='str'),
         bind_pw=dict(type='str'),
         password=dict(type='str', no_log=True),
-        ca_certificate=dict(type='path'),
+        ca_certificate=dict(type='path', aliases=["ca_cert"]),
         sasl_mech=dict(type='str', choices=["GSSAPI", "EXTERNAL"]),
         retrieve_mode=dict(type='bool'),
         encryption_types=dict(type='str'),
