@@ -4,3 +4,7 @@ removed_features:
   - "The rhn_channel module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
   - "The rhn_register module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
   - "The redhat module utils has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
+breaking_changes:
+  - The collection no longer supports ansible-core 2.13 and ansible-core 2.14.
+    While most (or even all) modules and plugins might still work with these versions, they are no longer tested in CI and breakages regarding them will not be fixed
+    (https://github.com/ansible-collections/community.general/pull/8921)."
