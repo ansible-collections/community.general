@@ -913,7 +913,7 @@ class RedfishUtils(object):
                                             drive_result[property] = data[property]
                             drive_results.append(drive_result)
                     drives = {'Controller': controller_name,
-                              'StorageID': storage_id,
+                              'StorageId': storage_id,
                               'Drives': drive_results}
                     result["entries"].append(drives)
 
