@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from sys import version_info
 from functools import partial
 
 import pytest
@@ -40,10 +39,6 @@ TC_FORMATS = dict(
     simple_list_max_len_ok=(partial(cmd_runner_fmt.as_list, max_len=1), 42, ["42"], None),
     simple_list_max_len_fail=(partial(cmd_runner_fmt.as_list, max_len=2), [42, 42, 42], None, ValueError),
     simple_map=(partial(cmd_runner_fmt.as_map, {'a': 1, 'b': 2, 'c': 3}), 'b', ["2"], None),
-    simple_default_type__list=(partial(cmd_runner_fmt.as_default_type, "list"), [1, 2, 3, 5, 8], ["--1", "--2", "--3", "--5", "--8"], None),
-    simple_default_type__bool_true=(partial(cmd_runner_fmt.as_default_type, "bool", "what"), True, ["--what"], None),
-    simple_default_type__bool_false=(partial(cmd_runner_fmt.as_default_type, "bool", "what"), False, [], None),
-    simple_default_type__potato=(partial(cmd_runner_fmt.as_default_type, "any-other-type", "potato"), "42", ["--potato", "42"], None),
     simple_fixed_true=(partial(cmd_runner_fmt.as_fixed, ["--always-here", "--forever"]), True, ["--always-here", "--forever"], None),
     simple_fixed_false=(partial(cmd_runner_fmt.as_fixed, ["--always-here", "--forever"]), False, ["--always-here", "--forever"], None),
     simple_fixed_none=(partial(cmd_runner_fmt.as_fixed, ["--always-here", "--forever"]), None, ["--always-here", "--forever"], None),
@@ -52,16 +47,6 @@ TC_FORMATS = dict(
     stack_opt_val__str=(partial(cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val), "-t"), ["potatoes", "bananas"], ["-t", "potatoes", "-t", "bananas"], None),
     stack_opt_eq_val__int=(partial(cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_eq_val), "--answer"), [42, 17], ["--answer=42", "--answer=17"], None),
 )
-if tuple(version_info) >= (3, 1):
-    from collections import OrderedDict
-
-    # needs OrderedDict to provide a consistent key order
-    TC_FORMATS["simple_default_type__dict"] = (  # type: ignore
-        partial(cmd_runner_fmt.as_default_type, "dict"),
-        OrderedDict((('a', 1), ('b', 2))),
-        ["--a=1", "--b=2"],
-        None
-    )
 TC_FORMATS_IDS = sorted(TC_FORMATS.keys())
 
 

@@ -10,7 +10,6 @@ import os
 from functools import wraps
 
 from ansible.module_utils.common.collections import is_sequence
-from ansible.module_utils.six import iteritems
 from ansible.module_utils.common.locale import get_best_parsable_locale
 
 
@@ -168,23 +167,6 @@ class _Format(object):
         return _ArgFormat(lambda value: _ensure_list(_map.get(value, default)), ignore_none=ignore_none)
 
     @staticmethod
-    def as_default_type(_type, arg="", ignore_none=None):
-        #
-        # DEPRECATION: This method is deprecated and will be removed in community.general 10.0.0
-        #
-        # Instead of using the implicit formats provided here, use the explicit necessary format method.
-        #
-        fmt = _Format
-        if _type == "dict":
-            return fmt.as_func(lambda d: ["--{0}={1}".format(*a) for a in iteritems(d)], ignore_none=ignore_none)
-        if _type == "list":
-            return fmt.as_func(lambda value: ["--{0}".format(x) for x in value], ignore_none=ignore_none)
-        if _type == "bool":
-            return fmt.as_bool("--{0}".format(arg))
-
-        return fmt.as_opt_val("--{0}".format(arg), ignore_none=ignore_none)
-
-    @staticmethod
     def unpack_args(func):
         @wraps(func)
         def wrapper(v):
@@ -251,10 +233,6 @@ class CmdRunner(object):
 
         _cmd = self.command[0]
         self.command[0] = _cmd if (os.path.isabs(_cmd) or '/' in _cmd) else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
-
-        for mod_param_name, spec in iteritems(module.argument_spec):
-            if mod_param_name not in self.arg_formats:
-                self.arg_formats[mod_param_name] = _Format.as_default_type(spec.get('type', 'str'), mod_param_name)
 
     @property
     def binary(self):
