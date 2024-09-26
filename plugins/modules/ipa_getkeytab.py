@@ -51,7 +51,6 @@ options:
     description:
       - The LDAP password to use when not binding with Kerberos.
     type: str
-    required: true
   password:
     description:
       - Use this password for the key instead of one randomly generated.
@@ -77,13 +76,13 @@ options:
   encryption_types:
     description:
       - The list of encryption types to use to generate keys.
-      - M(ipa_getkeytab) will use local client defaults if not provided.
+      - It will use local client defaults if not provided.
       - Valid values depend on the Kerberos library version and configuration.
     type: str
   state:
     description:
       - The state of the keytab file.
-      - V(present) only check for existence of a file, if you want to recreate keytab with other parameters you should set O(force: true).
+      - V(present) only check for existence of a file, if you want to recreate keytab with other parameters you should set O(force=true).
     type: str
     default: present
     choices: ["present", "absent"]
@@ -187,7 +186,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent']),
         principal=dict(type='str', required=True),
         ipa_server=dict(type='str', aliases=["server"]),
-        ldap_uri=dict(type='path'),
+        ldap_uri=dict(type='str'),
         bind_dn=dict(type='str'),
         bind_pw=dict(type='str'),
         password=dict(type='str', no_log=True),
