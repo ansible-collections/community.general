@@ -330,6 +330,11 @@ def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method
 
 
 def _is_flatpak_id(part):
+    # For guidelines on application IDs, refer to the following resources:
+    # Flatpak:
+    # https://docs.flatpak.org/en/latest/conventions.html#application-ids
+    # Flathub:
+    # https://docs.flathub.org/docs/for-app-authors/requirements#application-id
     if '.' not in part:
         return False
     sections = part.split('.')
