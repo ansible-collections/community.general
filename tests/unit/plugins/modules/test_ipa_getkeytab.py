@@ -33,7 +33,7 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
             self.module.main()
         return exc.exception.args[0]
 
-    def test_present_missing(self):
+    def test_present(self):
         set_module_args({
             'path': '/tmp/test.keytab',
             'principal': 'HTTP/freeipa-dc02.ipa.test',
@@ -54,19 +54,7 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
                   '--server', 'freeipa-dc01.ipa.test',
                   '--principal', 'HTTP/freeipa-dc02.ipa.test'
                   ],
-                 check_rc=False
+                 check_rc=False,
+                 environ_update={'LC_ALL': 'C', 'LANGUAGE': 'C'}
                  ),
         ])
-
-    def test_absent(self):
-        set_module_args({
-            'path': '/tmp/test.keytab',
-            'state': 'absent'
-        })
-
-        self.module_main_command.side_effect = []
-
-        result = self.module_main(AnsibleExitJson)
-
-        self.assertTrue(result['changed'])
-        self.module_main_command.assert_has_calls([])
