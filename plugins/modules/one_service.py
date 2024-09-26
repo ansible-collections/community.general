@@ -522,7 +522,7 @@ def create_service_and_operation(module, auth, template_id, service_name, owner_
     if unique:
         service = get_service_by_name(module, auth, service_name)
 
-    if not service:
+    if not service or service["TEMPLATE"]["BODY"]["state"] == "DONE":
         if not module.check_mode:
             service = create_service(module, auth, template_id, service_name, custom_attrs, unique, wait, wait_timeout)
         changed = True
@@ -637,7 +637,6 @@ def get_service_id_by_name(module, auth, service_name):
 
 
 def get_connection_info(module):
-
     url = module.params.get('api_url')
     username = module.params.get('api_username')
     password = module.params.get('api_password')
