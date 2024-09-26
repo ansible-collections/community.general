@@ -1,0 +1,2 @@
+bugfixes:
+  - cmd_runner module utils - call to ``get_best_parsable_locales()`` was missing parameter (https://github.com/ansible-collections/community.general/pull/8929).
