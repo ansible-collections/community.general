@@ -54,7 +54,7 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
                   '--server', 'freeipa-dc01.ipa.test',
                   '--principal', 'HTTP/freeipa-dc02.ipa.test'
                   ],
-                 check_rc=False,
+                 check_rc=True,
                  environ_update={'LC_ALL': 'C', 'LANGUAGE': 'C'}
                  ),
         ])

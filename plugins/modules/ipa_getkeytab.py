@@ -13,91 +13,91 @@ DOCUMENTATION = r'''
 module: ipa_getkeytab
 short_description: Manage keytab file in FreeIPA
 description:
-    - Manage keytab file with ipa-getkeytab utulity.
+  - Manage keytab file with ipa-getkeytab utulity.
 author: "Alexander Bakanovskii (@abakanovskii)"
 attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: none
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
-    path:
-        description:
-            - The base path where to put generated keytab file.
-        type: path
-        aliases: ["keytab"]
-        required: true
-    principal:
-        description:
-            - The non-realm part of the full principal name.
-        type: str
-        required: true
-    ipa_server:
-        description:
-            - The IPA server to retrieve the keytab from (FQDN).
-        type: str
-        aliases: ["server"]
-    ldap_uri:
-        description:
-            - LDAP URI. If V(ldap://) is specified, STARTTLS is initiated by default.
-            - Can not be used with the O(ipa_server) option.
-        type: str
-    bind_dn:
-        description:
-            - The LDAP DN to bind as when retrieving a keytab without Kerberos credentials.
-            - Generally used with the O(bind_pw) option.
-        type: str
-    bind_pw:
-        description:
-            - The LDAP password to use when not binding with Kerberos.
-        type: str
-        required: true
-    password:
-        description:
-            - Use this password for the key instead of one randomly generated.
-        type: str
-    ca_certificate:
-        description:
-            - The path to the IPA CA certificate used to validate LDAPS/STARTTLS connections.
-        type: path
-        aliases: ["ca_cert"]
-    sasl_mech:
-        description:
-            - SASL mechanism to use if O(bind_dn) and O(bind_pw) are not specified.
-        choices: ["GSSAPI", "EXTERNAL"]
-        type: str
-    retrieve_mode:
-        description:
-            - Retrieve an existing key from the server instead of generating a new one.
-            - This is incompatible with the O(password), and will work only against a IPA server more recent than version 3.3.
-            - The user requesting the keytab must have access to the keys for this operation to succeed.
-            - Be aware that if set V(true), a new keytab will be generated.
-            - This invalidates all previously retrieved keytabs for this service principal.
-        type: bool
-    encryption_types:
-        description:
-            - The list of encryption types to use to generate keys.
-            - M(ipa_getkeytab) will use local client defaults if not provided.
-            - Valid values depend on the Kerberos library version and configuration.
-        type: str
-    state:
-        description:
-            - The state of the keytab file.
-            - V(present) only check for existence of a file, so if you want to recreate keytab
-              with other parameters you should set O(force: true).
-        type: str
-        default: present
-        choices: ["present", "absent"]
-    force:
-        description:
-            - Force recreation if exists already.
-        type: bool
+  path:
+    description:
+      - The base path where to put generated keytab file.
+    type: path
+    aliases: ["keytab"]
+    required: true
+  principal:
+    description:
+      - The non-realm part of the full principal name.
+    type: str
+    required: true
+  ipa_server:
+    description:
+      - The IPA server to retrieve the keytab from (FQDN).
+    type: str
+    aliases: ["server"]
+  ldap_uri:
+    description:
+      - LDAP URI. If V(ldap://) is specified, STARTTLS is initiated by default.
+      - Can not be used with the O(ipa_server) option.
+    type: str
+  bind_dn:
+    description:
+      - The LDAP DN to bind as when retrieving a keytab without Kerberos credentials.
+      - Generally used with the O(bind_pw) option.
+    type: str
+  bind_pw:
+    description:
+      - The LDAP password to use when not binding with Kerberos.
+    type: str
+    required: true
+  password:
+    description:
+      - Use this password for the key instead of one randomly generated.
+    type: str
+  ca_certificate:
+    description:
+      - The path to the IPA CA certificate used to validate LDAPS/STARTTLS connections.
+    type: path
+    aliases: ["ca_cert"]
+  sasl_mech:
+    description:
+      - SASL mechanism to use if O(bind_dn) and O(bind_pw) are not specified.
+    choices: ["GSSAPI", "EXTERNAL"]
+    type: str
+  retrieve_mode:
+    description:
+      - Retrieve an existing key from the server instead of generating a new one.
+      - This is incompatible with the O(password), and will work only against a IPA server more recent than version 3.3.
+      - The user requesting the keytab must have access to the keys for this operation to succeed.
+      - Be aware that if set V(true), a new keytab will be generated.
+      - This invalidates all previously retrieved keytabs for this service principal.
+    type: bool
+  encryption_types:
+    description:
+      - The list of encryption types to use to generate keys.
+      - M(ipa_getkeytab) will use local client defaults if not provided.
+      - Valid values depend on the Kerberos library version and configuration.
+    type: str
+  state:
+    description:
+      - The state of the keytab file.
+      - V(present) only check for existence of a file, so if you want to recreate keytab
+        with other parameters you should set O(force: true).
+    type: str
+    default: present
+    choices: ["present", "absent"]
+  force:
+    description:
+      - Force recreation if exists already.
+    type: bool
 requirements:
-    - freeipa-client
-    - Managed host is FreeIPA client
+  - freeipa-client
+  - Managed host is FreeIPA client
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.ipa.documentation
+  - community.general.attributes
+  - community.general.ipa.documentation
 '''
 
 EXAMPLES = r'''
@@ -222,7 +222,7 @@ def main():
                        sasl_mech=module.params['sasl_mech'],
                        retrieve_mode=module.params['retrieve_mode'],
                        encryption_types=module.params['encryption_types'],
-                      )
+                       )
 
     changed = False
     if state == 'present':
