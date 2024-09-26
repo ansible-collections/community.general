@@ -239,7 +239,7 @@ class CmdRunner(object):
         self.check_rc = check_rc
         if force_lang == "auto":
             try:
-                self.force_lang = get_best_parsable_locale()
+                self.force_lang = get_best_parsable_locale(module)
             except RuntimeWarning:
                 self.force_lang = "C"
         else:
