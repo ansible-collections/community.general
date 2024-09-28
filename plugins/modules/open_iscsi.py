@@ -45,7 +45,7 @@ options:
     login:
         description:
         - Whether the target node should be connected.
-        - When O(target) is omitted, will login to all availabled.
+        - When O(target) is omitted, will login to all available.
         type: bool
         aliases: [ state ]
     node_auth:
@@ -389,6 +389,8 @@ def main():
     if login is not None or automatic is not None:
         if target is None:
             if len(nodes) > 1:
+                # Disable strict return code checking if there are multiple targets
+                # That will allow to skip target where we have no rights to login
                 check_rc = False
         else:
             # check given target is in cache
@@ -403,53 +405,54 @@ def main():
     if show_nodes:
         result['nodes'] = nodes
 
-    if login is not None and not check_rc:
-        result['devicenodes'] = []
-        for index_target in nodes:
-            loggedon = target_loggedon(module, index_target, portal, port)
-            if (login and loggedon) or (not login and not loggedon):
-                result['changed'] |= False
-                if login:
-                    result['devicenodes'] += target_device_node(index_target)
-            elif not check:
-                if login:
-                    login_result = target_login(module, index_target, check_rc, portal, port)
-                    # give udev some time
-                    time.sleep(1)
-                    result['devicenodes'] += target_device_node(index_target)
-                else:
-                    target_logout(module, index_target)
-                # Check if there are multiple targets on a single portal and
-                # do not mark the task changed if host could not login to one of them
-                if len(nodes) > 1 and login_result == 24:
+    if login is not None:
+        # If check_rc=False we will try to login to all available target nodes
+        if not check_rc:
+            result['devicenodes'] = []
+            for index_target in nodes:
+                loggedon = target_loggedon(module, index_target, portal, port)
+                if (login and loggedon) or (not login and not loggedon):
                     result['changed'] |= False
-                    result['connection_changed'] = False
+                    if login:
+                        result['devicenodes'] += target_device_node(index_target)
+                elif not check:
+                    if login:
+                        login_result = target_login(module, index_target, check_rc, portal, port)
+                        # give udev some time
+                        time.sleep(1)
+                        result['devicenodes'] += target_device_node(index_target)
+                    else:
+                        target_logout(module, index_target)
+                    # Check if there are multiple targets on a single portal and
+                    # do not mark the task changed if host could not login to one of them
+                    if len(nodes) > 1 and login_result == 24:
+                        result['changed'] |= False
+                        result['connection_changed'] = False
+                    else:
+                        result['changed'] |= True
+                        result['connection_changed'] = True
                 else:
                     result['changed'] |= True
                     result['connection_changed'] = True
+        else:
+            loggedon = target_loggedon(module, target, portal, port)
+            if (login and loggedon) or (not login and not loggedon):
+                result['changed'] |= False
+                if login:
+                    result['devicenodes'] = target_device_node(target)
+            elif not check:
+                if login:
+                    target_login(module, target, portal, port)
+                    # give udev some time
+                    time.sleep(1)
+                    result['devicenodes'] = target_device_node(target)
+                else:
+                    target_logout(module, target)
+                result['changed'] |= True
+                result['connection_changed'] = True
             else:
                 result['changed'] |= True
                 result['connection_changed'] = True
-
-    if login is not None and check_rc:
-        loggedon = target_loggedon(module, target, portal, port)
-        if (login and loggedon) or (not login and not loggedon):
-            result['changed'] |= False
-            if login:
-                result['devicenodes'] = target_device_node(target)
-        elif not check:
-            if login:
-                target_login(module, target, portal, port)
-                # give udev some time
-                time.sleep(1)
-                result['devicenodes'] = target_device_node(target)
-            else:
-                target_logout(module, target)
-            result['changed'] |= True
-            result['connection_changed'] = True
-        else:
-            result['changed'] |= True
-            result['connection_changed'] = True
 
     if automatic is not None and check_rc:
         isauto = target_isauto(module, target)
