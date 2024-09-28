@@ -170,10 +170,6 @@ options:
         type: str
         description:
           - The token key identifying an ACL rule set. May be required to register services.
-    ack_params_state_absent:
-        type: bool
-        description:
-          - This parameter has no more effect and is deprecated. It will be removed in community.general 10.0.0.
 '''
 
 EXAMPLES = '''
@@ -598,11 +594,6 @@ def main():
             timeout=dict(type='str'),
             tags=dict(type='list', elements='str'),
             token=dict(no_log=True),
-            ack_params_state_absent=dict(
-                type='bool',
-                removed_in_version='10.0.0',
-                removed_from_collection='community.general',
-            ),
         ),
         mutually_exclusive=[
             ('script', 'ttl', 'tcp', 'http'),
