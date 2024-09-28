@@ -8,75 +8,221 @@ __metaclass__ = type
 
 import sys
 import json
-from collections import namedtuple
 
-import pytest
 import yaml
+import pytest
 
 
-ModuleTestCase = namedtuple("ModuleTestCase", ["id", "input", "output", "run_command_calls", "flags"])
-RunCmdCall = namedtuple("RunCmdCall", ["command", "environ", "rc", "out", "err"])
+class Helper(object):
+    @staticmethod
+    def from_list(test_module, ansible_module, test_cases):
+        helper = Helper(test_module, ansible_module, test_cases=test_cases)
+        return helper
+
+    @staticmethod
+    def from_file(test_module, ansible_module, filename):
+        with open(filename, "r") as test_cases:
+            test_cases_data = yaml.safe_load(test_cases)
+        return Helper.from_list(test_module, ansible_module, test_cases_data)
+
+    @staticmethod
+    def from_module(ansible_module, test_module_name, test_spec=None):
+        test_module = sys.modules[test_module_name]
+        if test_spec is None:
+            test_spec = test_module.__file__.replace('.py', '.yaml')
+        return Helper.from_file(test_module, ansible_module, test_spec)
+
+    def add_func_to_test_module(self, name, func):
+        setattr(self.test_module, name, func)
+
+    def __init__(self, test_module, ansible_module, test_cases):
+        self.test_module = test_module
+        self.ansible_module = ansible_module
+        self.test_cases = []
+        self.fixtures = {}
+
+        for test_case in test_cases:
+            tc = ModuleTestCase.make_test_case(test_case, test_module)
+            self.test_cases.append(tc)
+            self.fixtures.update(tc.fixtures)
+        self.set_test_func()
+        self.set_fixtures(self.fixtures)
+
+    @property
+    def runner(self):
+        return Runner(self.ansible_module.main)
+
+    def set_test_func(self):
+        @pytest.mark.parametrize('test_case', self.test_cases, ids=[tc.id for tc in self.test_cases])
+        @pytest.mark.usefixtures(*self.fixtures)
+        def _test_module(mocker, capfd, patch_ansible_module, test_case):
+            """
+            Run unit tests for each test case in self.test_cases
+            """
+            patch_ansible_module(test_case.input)
+            self.runner.run(mocker, capfd, test_case)
+
+        self.add_func_to_test_module("test_module", _test_module)
+
+        return _test_module
+
+    def set_fixtures(self, fixtures):
+        for name, fixture in fixtures.items():
+            self.add_func_to_test_module(name, fixture)
 
 
-class _BaseContext(object):
-    def __init__(self, helper, testcase, mocker, capfd):
-        self.helper = helper
-        self.testcase = testcase
-        self.mocker = mocker
-        self.capfd = capfd
+class Runner:
+    def __init__(self, module_main):
+        self.module_main = module_main
+        self.results = None
 
-    def __enter__(self):
-        return self
+    def run(self, mocker, capfd, test_case):
+        test_case.setup(mocker)
+        self.pytest_module(capfd, test_case.flags)
+        test_case.check(self.results)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        return False
+    def pytest_module(self, capfd, flags):
+        if flags.get("skip"):
+            pytest.skip(flags.get("skip"))
+        if flags.get("xfail"):
+            pytest.xfail(flags.get("xfail"))
 
-    def _run(self):
         with pytest.raises(SystemExit):
-            self.helper.module_main()
+            (self.module_main)()
 
-        out, err = self.capfd.readouterr()
-        results = json.loads(out)
+        out, err = capfd.readouterr()
+        self.results = json.loads(out)
 
-        self.check_results(results)
 
-    def test_flags(self, flag=None):
-        flags = self.testcase.flags
-        if flag:
-            flags = flags.get(flag)
-        return flags
+class ModuleTestCase:
+    def __init__(self, id, input, output, mocks, flags):
+        self.id = id
+        self.input = input
+        self.output = output
+        self._mocks = mocks
+        self.mocks = {}
+        self.flags = flags
 
-    def run(self):
-        func = self._run
+        self._fixtures = {}
 
-        test_flags = self.test_flags()
-        if test_flags.get("skip"):
-            pytest.skip(test_flags.get("skip"))
-        if test_flags.get("xfail"):
-            pytest.xfail(test_flags.get("xfail"))
+    def __str__(self):
+        return "<ModuleTestCase: id={id} {input}{output}mocks={mocks} flags={flags}>".format(
+            id=self.id,
+            input="input " if self.input else "",
+            output="output " if self.output else "",
+            mocks="({0})".format(", ".join(self.mocks.keys())),
+            flags=self.flags
+        )
 
-        func()
+    def __repr__(self):
+        return "ModuleTestCase(id={id}, input={input}, output={output}, mocks={mocks}, flags={flags})".format(
+            id=self.id,
+            input=self.input,
+            output=self.output,
+            mocks=repr(self.mocks),
+            flags=self.flags
+        )
 
-    def check_results(self, results):
-        print("testcase =\n%s" % str(self.testcase))
+    @staticmethod
+    def make_test_case(test_case, test_module):
+        tc = ModuleTestCase(
+            id=test_case["id"],
+            input=test_case.get("input", {}),
+            output=test_case.get("output", {}),
+            mocks=test_case.get("mocks", {}),
+            flags=test_case.get("flags", {})
+        )
+        tc.build_mocks(test_module)
+        return tc
+
+    def build_mocks(self, test_module):
+        for mock, mock_spec in self._mocks.items():
+            mock_class = self.get_mock_class(test_module, mock)
+            self.mocks[mock] = mock_class.build_mock(mock_spec)
+
+            self._fixtures.update(self.mocks[mock].fixtures())
+
+    @staticmethod
+    def get_mock_class(test_module, mock):
+        try:
+            class_name = "".join(x.capitalize() for x in mock.split("_")) + "Mock"
+            plugin_class = getattr(test_module, class_name)
+            assert issubclass(plugin_class, TestCaseMock), "Class {0} is not a subclass of TestCaseMock".format(class_name)
+            return plugin_class
+        except AttributeError:
+            raise ValueError("Cannot find class {0} for mock {1}".format(class_name, mock))
+
+    @property
+    def fixtures(self):
+        return dict(self._fixtures)
+
+    def setup(self, mocker):
+        self.setup_testcase(mocker)
+        self.setup_mocks(mocker)
+
+    def check(self, results):
+        self.check_testcase(results)
+        self.check_mocks(self, results)
+
+    def setup_testcase(self, mocker):
+        pass
+
+    def setup_mocks(self, mocker):
+        for mock in self.mocks.values():
+            mock.setup(mocker)
+
+    def check_testcase(self, results):
+        print("testcase =\n%s" % repr(self))
         print("results =\n%s" % results)
         if 'exception' in results:
             print("exception = \n%s" % results["exception"])
 
-        for test_result in self.testcase.output:
-            assert results[test_result] == self.testcase.output[test_result], \
-                "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], self.testcase.output[test_result])
+        for test_result in self.output:
+            assert results[test_result] == self.output[test_result], \
+                "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], self.output[test_result])
+
+    def check_mocks(self, test_case, results):
+        for mock in self.mocks.values():
+            mock.check(test_case, results)
 
 
-class _RunCmdContext(_BaseContext):
-    def __init__(self, *args, **kwargs):
-        super(_RunCmdContext, self).__init__(*args, **kwargs)
-        self.run_cmd_calls = self.testcase.run_command_calls
-        self.mock_run_cmd = self._make_mock_run_cmd()
+class TestCaseMock:
+    @classmethod
+    def build_mock(cls, mock_specs):
+        return cls(mock_specs)
 
-    def _make_mock_run_cmd(self):
+    def __init__(self, mock_specs):
+        self.mock_specs = mock_specs
+
+    def fixtures(self):
+        return {}
+
+    def setup(self, mocker):
+        pass
+
+    def check(self, test_case, results):
+        raise NotImplementedError()
+
+
+class RunCommandMock(TestCaseMock):
+    def __str__(self):
+        return "<RunCommandMock specs={specs}>".format(specs=self.mock_specs)
+
+    def __repr__(self):
+        return "RunCommandMock({specs})".format(specs=self.mock_specs)
+
+    def fixtures(self):
+        @pytest.fixture
+        def patch_bin(mocker):
+            def mockie(self, path, *args, **kwargs):
+                return "/testbin/{0}".format(path)
+            mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', mockie)
+
+        return {"patch_bin": patch_bin}
+
+    def setup(self, mocker):
         def _results():
-            for result in [(x.rc, x.out, x.err) for x in self.run_cmd_calls]:
+            for result in [(x['rc'], x['out'], x['err']) for x in self.mock_specs]:
                 yield result
             raise Exception("testcase has not enough run_command calls")
 
@@ -88,102 +234,14 @@ class _RunCmdContext(_BaseContext):
                 raise Exception("rc = {0}".format(result[0]))
             return result
 
-        mock_run_command = self.mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command',
-                                             side_effect=side_effect)
-        return mock_run_command
+        self.mock_run_cmd = mocker.patch('ansible.module_utils.basic.AnsibleModule.run_command', side_effect=side_effect)
 
-    def check_results(self, results):
-        super(_RunCmdContext, self).check_results(results)
+    def check(self, test_case, results):
         call_args_list = [(item[0][0], item[1]) for item in self.mock_run_cmd.call_args_list]
-        expected_call_args_list = [(item.command, item.environ) for item in self.run_cmd_calls]
+        expected_call_args_list = [(item['command'], item['environ']) for item in self.mock_specs]
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
 
-        assert self.mock_run_cmd.call_count == len(self.run_cmd_calls), "{0} != {1}".format(self.mock_run_cmd.call_count, len(self.run_cmd_calls))
+        assert self.mock_run_cmd.call_count == len(self.mock_specs), "{0} != {1}".format(self.mock_run_cmd.call_count, len(self.mock_specs))
         if self.mock_run_cmd.call_count:
             assert call_args_list == expected_call_args_list
-
-
-class Helper(object):
-    @staticmethod
-    def from_list(module_main, list_):
-        helper = Helper(module_main, test_cases=list_)
-        return helper
-
-    @staticmethod
-    def from_file(module_main, filename):
-        with open(filename, "r") as test_cases:
-            helper = Helper(module_main, test_cases=test_cases)
-            return helper
-
-    @staticmethod
-    def from_module(module, test_module_name):
-        basename = module.__name__.split(".")[-1]
-        test_spec = "tests/unit/plugins/modules/test_{0}.yaml".format(basename)
-        helper = Helper.from_file(module.main, test_spec)
-
-        setattr(sys.modules[test_module_name], "patch_bin", helper.cmd_fixture)
-        setattr(sys.modules[test_module_name], "test_module", helper.test_module)
-
-    def __init__(self, module_main, test_cases):
-        self.module_main = module_main
-        self._test_cases = test_cases
-        if isinstance(test_cases, (list, tuple)):
-            self.testcases = test_cases
-        else:
-            self.testcases = self._make_test_cases()
-
-    @property
-    def cmd_fixture(self):
-        @pytest.fixture
-        def patch_bin(mocker):
-            def mockie(self, path, *args, **kwargs):
-                return "/testbin/{0}".format(path)
-            mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', mockie)
-
-        return patch_bin
-
-    def _make_test_cases(self):
-        test_cases = yaml.safe_load(self._test_cases)
-
-        results = []
-        for tc in test_cases:
-            for tc_param in ["input", "output", "flags"]:
-                if not tc.get(tc_param):
-                    tc[tc_param] = {}
-            if tc.get("run_command_calls"):
-                tc["run_command_calls"] = [RunCmdCall(**r) for r in tc["run_command_calls"]]
-            else:
-                tc["run_command_calls"] = []
-            results.append(ModuleTestCase(**tc))
-
-        return results
-
-    @property
-    def testcases_params(self):
-        return [[x.input, x] for x in self.testcases]
-
-    @property
-    def testcases_ids(self):
-        return [item.id for item in self.testcases]
-
-    def __call__(self, *args, **kwargs):
-        return _RunCmdContext(self, *args, **kwargs)
-
-    @property
-    def test_module(self):
-        helper = self
-
-        @pytest.mark.parametrize('patch_ansible_module, testcase',
-                                 helper.testcases_params, ids=helper.testcases_ids,
-                                 indirect=['patch_ansible_module'])
-        @pytest.mark.usefixtures('patch_ansible_module')
-        def _test_module(mocker, capfd, patch_bin, testcase):
-            """
-            Run unit tests for test cases listed in TEST_CASES
-            """
-
-            with helper(testcase, mocker, capfd) as testcase_context:
-                testcase_context.run()
-
-        return _test_module

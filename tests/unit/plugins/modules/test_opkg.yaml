@@ -10,7 +10,8 @@
     state: present
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
       rc: 0
@@ -39,7 +40,8 @@
     state: present
   output:
     msg: package(s) already present
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -53,7 +55,8 @@
     force: reinstall
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -80,7 +83,8 @@
     state: present
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -109,7 +113,8 @@
     update_cache: true
   output:
     msg: installed 1 package(s)
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/opkg, update]
       environ: *env-def
       rc: 0

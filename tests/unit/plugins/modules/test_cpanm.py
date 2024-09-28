@@ -14,7 +14,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import cpanm
-from .helper import Helper
+from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
 
 
 Helper.from_module(cpanm, __name__)

@@ -14,7 +14,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import puppet
-from .helper import Helper
+from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
 
 
 Helper.from_module(puppet, __name__)
