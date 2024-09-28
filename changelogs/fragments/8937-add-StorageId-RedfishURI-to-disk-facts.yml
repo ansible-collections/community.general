@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - adds ``RedfishURI`` and ``StorageId`` to Disk inventory (https://github.com/ansible-collections/community.general/pull/8937).

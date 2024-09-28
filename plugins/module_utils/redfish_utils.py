@@ -866,6 +866,7 @@ class RedfishUtils(object):
                         return response
                     data = response['data']
                     controller_name = 'Controller 1'
+                    storage_id = data['Id']
                     if 'Controllers' in data:
                         controllers_uri = data['Controllers'][u'@odata.id']
 
@@ -900,6 +901,7 @@ class RedfishUtils(object):
                             data = response['data']
 
                             drive_result = {}
+                            drive_result['RedfishURI'] = data['@odata.id']
                             for property in properties:
                                 if property in data:
                                     if data[property] is not None:
@@ -911,6 +913,7 @@ class RedfishUtils(object):
                                             drive_result[property] = data[property]
                             drive_results.append(drive_result)
                     drives = {'Controller': controller_name,
+                              'StorageId': storage_id,
                               'Drives': drive_results}
                     result["entries"].append(drives)
 
