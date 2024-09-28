@@ -1,0 +1,5 @@
+release_summary: |-
+  Regular bugfix and feature release.
+
+  Please note that this is the last feature release for community.general 9.x.y.
+  From now on, new features will only go into community.general 10.x.y.
