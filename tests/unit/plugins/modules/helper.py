@@ -32,6 +32,9 @@ class Helper(object):
             test_spec = test_module.__file__.replace('.py', '.yaml')
         return Helper.from_file(test_module, ansible_module, test_spec)
 
+    def add_func_to_test_module(self, name, func):
+        setattr(self.test_module, name, func)
+
     def __init__(self, test_module, ansible_module, test_cases):
         self.test_module = test_module
         self.ansible_module = ansible_module
@@ -42,35 +45,30 @@ class Helper(object):
             tc = ModuleTestCase.make_test_case(test_case, test_module)
             self.test_cases.append(tc)
             self.fixtures.update(tc.fixtures)
-            self.set_test_func(tc)
+        self.set_test_func()
         self.set_fixtures(self.fixtures)
 
     @property
     def runner(self):
         return Runner(self.ansible_module.main)
 
-    def set_test_func(self, test_case):
-        fixtures = list(test_case.fixtures.keys())
-
-        @pytest.mark.usefixtures(*fixtures)
-        def _test_module(mocker, capfd, patch_ansible_module):
+    def set_test_func(self):
+        @pytest.mark.parametrize('test_case', self.test_cases, ids=[tc.id for tc in self.test_cases])
+        @pytest.mark.usefixtures(*self.fixtures)
+        def _test_module(mocker, capfd, patch_ansible_module, test_case):
             """
             Run unit tests for each test case in self.test_cases
             """
             patch_ansible_module(test_case.input)
             self.runner.run(mocker, capfd, test_case)
 
-        setattr(self.test_module, "test_" + test_case.id, _test_module)
+        self.add_func_to_test_module("test_module", _test_module)
 
         return _test_module
 
     def set_fixtures(self, fixtures):
         for name, fixture in fixtures.items():
-            try:
-                getattr(self.test_module, name)
-                # already exists, warning
-            except AttributeError:
-                setattr(self.test_module, name, fixture)
+            self.add_func_to_test_module(name, fixture)
 
 
 class Runner:
