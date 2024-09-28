@@ -156,14 +156,15 @@ class HostModule(OpenNebulaModule):
         Returns: True on success, fails otherwise.
 
         """
-        allocate_results = self.one.host.allocate(self.get_parameter('name'),
-                                                  self.get_parameter('vmm_mad_name'),
-                                                  self.get_parameter('im_mad_name'),
-                                                  self.get_parameter('cluster_id'))
-        if allocate_results or allocate_results == 0:
+        try:
+            self.one.host.allocate(self.get_parameter('name'),
+                                   self.get_parameter('vmm_mad_name'),
+                                   self.get_parameter('im_mad_name'),
+                                   self.get_parameter('cluster_id'))
             self.result['changed'] = True
-        else:
-            self.fail(msg="could not allocate host")
+        except Exception as e:
+            self.fail(msg="Could not allocate host, ERROR: " + str(e))
+
         return True
 
     def wait_for_host_state(self, host, target_states):
