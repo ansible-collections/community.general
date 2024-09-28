@@ -77,7 +77,7 @@ class DjangoCommand(DjangoModuleHelper):
     django_admin_arg_order = "extra_args"
 
     def __init_module__(self):
-      self.vars.command = shlex.split(self.vars.command)
+        self.vars.command = shlex.split(self.vars.command)
 
 
 def main():
