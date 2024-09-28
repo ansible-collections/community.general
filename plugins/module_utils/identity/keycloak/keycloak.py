@@ -22,7 +22,7 @@ URL_REALM = "{url}/admin/realms/{realm}"
 URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
-URL_USERINFO = "{url}/realms/{realm}/protocol/openid-connect/userinfo"
+URL_INTROSPECT = "{url}/realms/{realm}/protocol/openid-connect/token/introspect"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
 
@@ -179,49 +179,97 @@ def get_token(module_params):
     connection_timeout = module_params.get('connection_timeout')
     auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
 
-    if token is not None:
-        # Check token is valid via userinfo route
-        userinfo_url = URL_USERINFO(url=base_url, realm=auth_realm)
+    def extract_token(response):
         try:
-            r = json.loads(to_native(open_url(userinfo_url, method='GET',
-                                              validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,)))
-        except Exception as e:
-            raise KeycloakError('Could not check access token from %s: %s'
-                                % (userinfo_url, str(e)))
+            token = response['access_token']
+        except KeyError:
+            raise KeycloakError(
+                'Could not obtain access token from %s' % auth_url)
 
-        # if r.StatusCode == 401:
-            # Fall back to refresh token and then re-authentication with username/password
-    else:
+        return token
+
+    def wrap_token(token):
+        return {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+
+    def prepare_payload(grant_type,
+                        client_id,
+                        client_secret=None,
+                        refresh_token=None,
+                        username=None,
+                        password=None):
         temp_payload = {
-            'grant_type': 'password',
+            'grant_type': grant_type,
             'client_id': client_id,
             'client_secret': client_secret,
-            'username': auth_username,
-            'password': auth_password,
+            'refresh_token': refresh_token,
+            'username': username,
+            'password': password,
         }
         # Remove empty items, for instance missing client_secret
         payload = {k: v for k, v in temp_payload.items() if v is not None}
+
+        return payload
+
+    # Check existing token if it's provided
+    if token is not None:
+        # Check token is valid via userinfo route
+        userinfo_url = URL_INTROSPECT.format(url=base_url, realm=auth_realm)
+        try:
+            r = json.loads(to_native(open_url(userinfo_url, method='GET', headers=wrap_token(token),
+                                              validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout)))
+        except Exception as e:
+            raise KeycloakError('Could not check access token via %s: %s'
+                                % (userinfo_url, str(e)))
+
+        if r.StatusCode == 200:
+            return wrap_token(token)
+
+    # Try authenticating via refresh token if it's provided
+    if refresh_token is not None:
+        payload = prepare_payload(
+            grant_type="refresh-token",
+            client_id=client_id,
+            client_secret=client_secret,
+            refresh_token=refresh_token,
+        )
+
         try:
             r = json.loads(to_native(open_url(auth_url, method='POST',
                                               validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
                                               data=urlencode(payload)).read()))
-        except ValueError as e:
-            raise KeycloakError(
-                'API returned invalid JSON when trying to obtain access token from %s: %s'
-                % (auth_url, str(e)))
-        except Exception as e:
-            raise KeycloakError('Could not obtain access token from %s: %s'
+        except:
+            raise KeycloakError('Could not refresh token via %s: %s'
                                 % (auth_url, str(e)))
 
-        try:
-            token = r['access_token']
-        except KeyError:
-            raise KeycloakError(
-                'Could not obtain access token from %s' % auth_url)
-    return {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-    }
+        if r.statusCode == 200:
+            return wrap_token(extract_token(r))
+
+    # Access token and refresh token either not provided or not valid,
+    # authenticate via username/password
+    payload = prepare_payload(
+        grant_type="password",
+        client_id=client_id,
+        client_secret=client_secret,
+        username=auth_username,
+        password=auth_password,
+    )
+
+    try:
+        r = json.loads(to_native(open_url(auth_url, method='POST',
+                                            validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
+                                            data=urlencode(payload)).read()))
+    except ValueError as e:
+        raise KeycloakError(
+            'API returned invalid JSON when trying to obtain access token from %s: %s'
+            % (auth_url, str(e)))
+    except Exception as e:
+        raise KeycloakError('Could not obtain access token from %s: %s'
+                            % (auth_url, str(e)))
+
+    return wrap_token(extract_token(r))
 
 
 def is_struct_included(struct1, struct2, exclude=None):
