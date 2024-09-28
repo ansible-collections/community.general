@@ -36,11 +36,9 @@ options:
     description:
       - If state is equal to present or disabled, indicates the desired
         repository state.
-      - |
-        Please note that V(present) and V(absent) are deprecated, and will be
-        removed in community.general 10.0.0; please use V(enabled) and
-        V(disabled) instead.
-    choices: [present, enabled, absent, disabled]
+      - In community.general 10.0.0 the states V(present) and V(absent) have been
+        removed. Please use V(enabled) and V(disabled) instead.
+    choices: [enabled, disabled]
     default: "enabled"
     type: str
   name:
@@ -240,7 +238,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='list', elements='str', required=True),
-            state=dict(choices=['enabled', 'disabled', 'present', 'absent'], default='enabled'),
+            state=dict(choices=['enabled', 'disabled'], default='enabled'),
             purge=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
@@ -256,14 +254,6 @@ def main():
     name = module.params['name']
     state = module.params['state']
     purge = module.params['purge']
-
-    if state in ['present', 'absent']:
-        replacement = 'enabled' if state == 'present' else 'disabled'
-        module.deprecate(
-            'state=%s is deprecated; please use state=%s instead' % (state, replacement),
-            version='10.0.0',
-            collection_name='community.general',
-        )
 
     repository_modify(module, rhsm, state, name, purge)
 

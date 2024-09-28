@@ -648,39 +648,6 @@ TEST_CASES = [
             'repositories': REPOS.copy().disable('awesomeos-99000'),
         }
     ],
-    # disable an enabled repository (using state=absent)
-    [
-        {
-            'name': 'awesomeos-99000',
-            'state': 'absent',
-        },
-        {
-            'id': 'test_disable_single_using_absent',
-            'run_command.calls': [
-                (
-                    [
-                        '/testbin/subscription-manager',
-                        'repos',
-                        '--list',
-                    ],
-                    SUBMAN_KWARGS,
-                    (0, REPOS_LIST_OUTPUT, '')
-                ),
-                (
-                    [
-                        '/testbin/subscription-manager',
-                        'repos',
-                        '--disable',
-                        'awesomeos-99000',
-                    ],
-                    SUBMAN_KWARGS,
-                    (0, '', '')
-                ),
-            ],
-            'changed': True,
-            'repositories': REPOS.copy().disable('awesomeos-99000'),
-        }
-    ],
     # disable an already disabled repository
     [
         {

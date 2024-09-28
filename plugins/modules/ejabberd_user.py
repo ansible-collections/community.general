@@ -41,12 +41,6 @@ options:
         description:
             - the password to assign to the username
         required: false
-    logging:
-        description:
-            - enables or disables the local syslog facility for this module
-        required: false
-        default: false
-        type: bool
     state:
         type: str
         description:
@@ -75,8 +69,6 @@ EXAMPLES = '''
     state: absent
 '''
 
-import syslog
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
@@ -91,7 +83,6 @@ class EjabberdUser(object):
 
     def __init__(self, module):
         self.module = module
-        self.logging = module.params.get('logging')
         self.state = module.params.get('state')
         self.host = module.params.get('host')
         self.user = module.params.get('username')
@@ -125,10 +116,8 @@ class EjabberdUser(object):
         return self.run_command('check_account', 'user host', (lambda rc, out, err: not bool(rc)))
 
     def log(self, entry):
-        """ This method will log information to the local syslog facility """
-        if self.logging:
-            syslog.openlog('ansible-%s' % self.module._name)
-            syslog.syslog(syslog.LOG_NOTICE, entry)
+        """ This method does nothing """
+        pass
 
     def run_command(self, cmd, options, process=None):
         """ This method will run the any command specified and return the
@@ -169,7 +158,6 @@ def main():
             username=dict(required=True, type='str'),
             password=dict(type='str', no_log=True),
             state=dict(default='present', choices=['present', 'absent']),
-            logging=dict(default=False, type='bool', removed_in_version='10.0.0', removed_from_collection='community.general'),
         ),
         required_if=[
             ('state', 'present', ['password']),

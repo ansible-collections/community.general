@@ -39,7 +39,7 @@ notes:
     - Since community.general 6.5.0, credentials (that is, O(username) and O(password),
       O(activationkey), or O(token)) are needed only in case the the system is not registered,
       or O(force_register) is specified; this makes it possible to use the module to tweak an
-      already registered system, for example attaching pools to it (using O(pool), or O(pool_ids)),
+      already registered system, for example attaching pools to it (using O(pool_ids)),
       and modifying the C(syspurpose) attributes (using O(syspurpose)).
 requirements:
     - subscription-manager
@@ -138,29 +138,14 @@ options:
         description:
             - Register with a specific environment in the destination org. Used with Red Hat Satellite or Katello
         type: str
-    pool:
-        description:
-            - |
-              Specify a subscription pool name to consume.  Regular expressions accepted.
-              Mutually exclusive with O(pool_ids).
-            - |
-              Please use O(pool_ids) instead: specifying pool IDs is much faster,
-              and it avoids to match new pools that become available for the
-              system and are not explicitly wanted.  Also, this option does not
-              support quantities.
-            - |
-              This option is deprecated for the reasons mentioned above,
-              and it will be removed in community.general 10.0.0.
-        default: '^$'
-        type: str
     pool_ids:
         description:
             - |
-              Specify subscription pool IDs to consume. Prefer over O(pool) when possible as it is much faster.
+              Specify subscription pool IDs to consume.
               A pool ID may be specified as a C(string) - just the pool ID (for example V(0123456789abcdef0123456789abcdef)),
               or as a C(dict) with the pool ID as the key, and a quantity as the value (for example
               V(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
-              entitlements from a pool (the pool must support this). Mutually exclusive with O(pool).
+              entitlements from a pool (the pool must support this).
         default: []
         type: list
         elements: raw
@@ -260,20 +245,6 @@ EXAMPLES = '''
     username: joe_user
     password: somepass
     consumer_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-- name: Register with activationkey and consume subscriptions matching Red Hat Enterprise Server or Red Hat Virtualization
-  community.general.redhat_subscription:
-    state: present
-    activationkey: 1-222333444
-    org_id: 222333444
-    pool: '^(Red Hat Enterprise Server|Red Hat Virtualization)$'
-
-- name: Update the consumed subscriptions from the previous example (remove Red Hat Virtualization subscription)
-  community.general.redhat_subscription:
-    state: present
-    activationkey: 1-222333444
-    org_id: 222333444
-    pool: '^Red Hat Enterprise Server$'
 
 - name: Register as user credentials into given environment (against Red Hat Satellite or Katello), and auto-subscribe.
   community.general.redhat_subscription:
@@ -783,42 +754,6 @@ class Rhsm(object):
         self.update_plugin_conf('rhnplugin', False)
         self.update_plugin_conf('subscription-manager', False)
 
-    def subscribe(self, regexp):
-        '''
-            Subscribe current system to available pools matching the specified
-            regular expression. It matches regexp against available pool ids first.
-            If any pool ids match, subscribe to those pools and return.
-
-            If no pool ids match, then match regexp against available pool product
-            names. Note this can still easily match many many pools. Then subscribe
-            to those pools.
-
-            Since a pool id is a more specific match, we only fallback to matching
-            against names if we didn't match pool ids.
-
-            Raises:
-              * Exception - if error occurs while running command
-        '''
-        # See https://github.com/ansible/ansible/issues/19466
-
-        # subscribe to pools whose pool id matches regexp (and only the pool id)
-        subscribed_pool_ids = self.subscribe_pool(regexp)
-
-        # If we found any matches, we are done
-        # Don't attempt to match pools by product name
-        if subscribed_pool_ids:
-            return subscribed_pool_ids
-
-        # We didn't match any pool ids.
-        # Now try subscribing to pools based on product name match
-        # Note: This can match lots of product names.
-        subscribed_by_product_pool_ids = self.subscribe_product(regexp)
-        if subscribed_by_product_pool_ids:
-            return subscribed_by_product_pool_ids
-
-        # no matches
-        return []
-
     def subscribe_by_pool_ids(self, pool_ids):
         """
         Try to subscribe to the list of pool IDs
@@ -836,56 +771,6 @@ class Rhsm(object):
             else:
                 self.module.fail_json(msg='Pool ID: %s not in list of available pools' % pool_id)
         return pool_ids
-
-    def subscribe_pool(self, regexp):
-        '''
-            Subscribe current system to available pools matching the specified
-            regular expression
-            Raises:
-              * Exception - if error occurs while running command
-        '''
-
-        # Available pools ready for subscription
-        available_pools = RhsmPools(self.module)
-
-        subscribed_pool_ids = []
-        for pool in available_pools.filter_pools(regexp):
-            pool.subscribe()
-            subscribed_pool_ids.append(pool.get_pool_id())
-        return subscribed_pool_ids
-
-    def subscribe_product(self, regexp):
-        '''
-            Subscribe current system to available pools matching the specified
-            regular expression
-            Raises:
-              * Exception - if error occurs while running command
-        '''
-
-        # Available pools ready for subscription
-        available_pools = RhsmPools(self.module)
-
-        subscribed_pool_ids = []
-        for pool in available_pools.filter_products(regexp):
-            pool.subscribe()
-            subscribed_pool_ids.append(pool.get_pool_id())
-        return subscribed_pool_ids
-
-    def update_subscriptions(self, regexp):
-        changed = False
-        consumed_pools = RhsmPools(self.module, consumed=True)
-        pool_ids_to_keep = [p.get_pool_id() for p in consumed_pools.filter_pools(regexp)]
-        pool_ids_to_keep.extend([p.get_pool_id() for p in consumed_pools.filter_products(regexp)])
-
-        serials_to_remove = [p.Serial for p in consumed_pools if p.get_pool_id() not in pool_ids_to_keep]
-        serials = self.unsubscribe(serials=serials_to_remove)
-
-        subscribed_pool_ids = self.subscribe(regexp)
-
-        if subscribed_pool_ids or serials:
-            changed = True
-        return {'changed': changed, 'subscribed_pool_ids': subscribed_pool_ids,
-                'unsubscribed_serials': serials}
 
     def update_subscriptions_by_pool_ids(self, pool_ids):
         changed = False
@@ -1109,11 +994,6 @@ def main():
             'activationkey': {'no_log': True},
             'org_id': {},
             'environment': {},
-            'pool': {
-                'default': '^$',
-                'removed_in_version': '10.0.0',
-                'removed_from_collection': 'community.general',
-            },
             'pool_ids': {'default': [], 'type': 'list', 'elements': 'raw'},
             'consumer_type': {},
             'consumer_name': {},
@@ -1144,8 +1024,7 @@ def main():
                             ['token', 'username'],
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
-                            ['activationkey', 'auto_attach'],
-                            ['pool', 'pool_ids']],
+                            ['activationkey', 'auto_attach']],
         required_if=[['force_register', True, ['username', 'activationkey', 'token'], True]],
     )
 
@@ -1173,7 +1052,6 @@ def main():
     if activationkey and not org_id:
         module.fail_json(msg='org_id is required when using activationkey')
     environment = module.params['environment']
-    pool = module.params['pool']
     pool_ids = {}
     for value in module.params['pool_ids']:
         if isinstance(value, dict):
@@ -1217,12 +1095,9 @@ def main():
                     rhsm.sync_syspurpose()
                 except Exception as e:
                     module.fail_json(msg="Failed to synchronize syspurpose attributes: %s" % to_native(e))
-            if pool != '^$' or pool_ids:
+            if pool_ids:
                 try:
-                    if pool_ids:
-                        result = rhsm.update_subscriptions_by_pool_ids(pool_ids)
-                    else:
-                        result = rhsm.update_subscriptions(pool)
+                    result = rhsm.update_subscriptions_by_pool_ids(pool_ids)
                 except Exception as e:
                     module.fail_json(msg="Failed to update subscriptions for '%s': %s" % (server_hostname, to_native(e)))
                 else:
@@ -1245,8 +1120,6 @@ def main():
                     rhsm.sync_syspurpose()
                 if pool_ids:
                     subscribed_pool_ids = rhsm.subscribe_by_pool_ids(pool_ids)
-                elif pool != '^$':
-                    subscribed_pool_ids = rhsm.subscribe(pool)
                 else:
                     subscribed_pool_ids = []
             except Exception as e:
