@@ -33,58 +33,9 @@ attributes:
     support: none
 
 options:
-  name:
-    description:
-      - Name of the group you want to create.
-    required: true
-    type: str
-  path:
-    description:
-      - The path of the group you want to create, this will be api_url/group_path
-      - If not supplied, the group_name will be used.
-    type: str
-  description:
-    description:
-      - A description for the group.
-    type: str
-  state:
-    description:
-      - create or delete group.
-      - Possible values are present and absent.
-    default: present
-    type: str
-    choices: ["present", "absent"]
-  parent:
-    description:
-      - Allow to create subgroups
-      - Id or Full path of parent group in the form of group/name
-    type: str
-  visibility:
-    description:
-      - Default visibility of the group
-    choices: ["private", "internal", "public"]
-    default: private
-    type: str
-  project_creation_level:
-    description:
-      - Determine if developers can create projects in the group.
-    choices: ["developer", "maintainer", "noone"]
-    type: str
-    version_added: 3.7.0
   auto_devops_enabled:
     description:
       - Default to Auto DevOps pipeline for all projects within this group.
-    type: bool
-    version_added: 3.7.0
-  subgroup_creation_level:
-    description:
-      - Allowed to create subgroups.
-    choices: ["maintainer", "owner"]
-    type: str
-    version_added: 3.7.0
-  require_two_factor_authentication:
-    description:
-      - Require all users in this group to setup two-factor authentication.
     type: bool
     version_added: 3.7.0
   avatar_path:
@@ -93,6 +44,10 @@ options:
       - This option is only used on creation, not for updates.
     type: path
     version_added: 4.2.0
+  description:
+    description:
+      - A description for the group.
+    type: str
   force_delete:
     description:
       - Force delete group even if projects in it.
@@ -100,6 +55,51 @@ options:
     type: bool
     default: false
     version_added: 7.5.0
+  name:
+    description:
+      - Name of the group you want to create.
+    required: true
+    type: str
+  parent:
+    description:
+      - Allow to create subgroups
+      - Id or Full path of parent group in the form of group/name
+    type: str
+  path:
+    description:
+      - The path of the group you want to create, this will be api_url/group_path
+      - If not supplied, the group_name will be used.
+    type: str
+  project_creation_level:
+    description:
+      - Determine if developers can create projects in the group.
+    choices: ["developer", "maintainer", "noone"]
+    type: str
+    version_added: 3.7.0
+  require_two_factor_authentication:
+    description:
+      - Require all users in this group to setup two-factor authentication.
+    type: bool
+    version_added: 3.7.0
+  state:
+    description:
+      - create or delete group.
+      - Possible values are present and absent.
+    default: present
+    type: str
+    choices: ["present", "absent"]
+  subgroup_creation_level:
+    description:
+      - Allowed to create subgroups.
+    choices: ["maintainer", "owner"]
+    type: str
+    version_added: 3.7.0
+  visibility:
+    description:
+      - Default visibility of the group
+    choices: ["private", "internal", "public"]
+    default: private
+    type: str
 '''
 
 EXAMPLES = '''
@@ -207,13 +207,13 @@ class GitLabGroup(object):
             parent_id = self.get_group_id(parent)
 
             payload = {
-                'name': name,
-                'path': options['path'],
-                'parent_id': parent_id,
-                'visibility': options['visibility'],
-                'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
+                'name': name,
+                'parent_id': parent_id,
+                'path': options['path'],
+                'project_creation_level': options['project_creation_level'],
                 'subgroup_creation_level': options['subgroup_creation_level'],
+                'visibility': options['visibility'],
             }
             if options.get('description'):
                 payload['description'] = options['description']
@@ -230,13 +230,13 @@ class GitLabGroup(object):
             changed = True
         else:
             changed, group = self.update_group(self.group_object, {
-                'name': name,
-                'description': options['description'],
-                'visibility': options['visibility'],
-                'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
-                'subgroup_creation_level': options['subgroup_creation_level'],
+                'description': options['description'],
+                'name': name,
+                'project_creation_level': options['project_creation_level'],
                 'require_two_factor_authentication': options['require_two_factor_authentication'],
+                'subgroup_creation_level': options['subgroup_creation_level'],
+                'visibility': options['visibility'],
             })
 
         self.group_object = group
@@ -322,28 +322,28 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        name=dict(type='str', required=True),
-        path=dict(type='str'),
-        description=dict(type='str'),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
-        parent=dict(type='str'),
-        visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
-        project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
-        subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
-        require_two_factor_authentication=dict(type='bool'),
         avatar_path=dict(type='path'),
+        description=dict(type='str'),
         force_delete=dict(type='bool', default=False),
+        name=dict(type='str', required=True),
+        parent=dict(type='str'),
+        path=dict(type='str'),
+        project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
+        require_two_factor_authentication=dict(type='bool'),
+        state=dict(type='str', default="present", choices=["absent", "present"]),
+        subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
+        visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
     ))
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
-            ['api_username', 'api_token'],
-            ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
-            ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -357,18 +357,18 @@ def main():
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
+    auto_devops_enabled = module.params['auto_devops_enabled']
+    avatar_path = module.params['avatar_path']
+    description = module.params['description']
+    force_delete = module.params['force_delete']
     group_name = module.params['name']
     group_path = module.params['path']
-    description = module.params['description']
-    state = module.params['state']
-    parent_identifier = module.params['parent']
     group_visibility = module.params['visibility']
+    parent_identifier = module.params['parent']
     project_creation_level = module.params['project_creation_level']
-    auto_devops_enabled = module.params['auto_devops_enabled']
-    subgroup_creation_level = module.params['subgroup_creation_level']
     require_two_factor_authentication = module.params['require_two_factor_authentication']
-    avatar_path = module.params['avatar_path']
-    force_delete = module.params['force_delete']
+    state = module.params['state']
+    subgroup_creation_level = module.params['subgroup_creation_level']
 
     # Define default group_path based on group_name
     if group_path is None:
@@ -395,14 +395,14 @@ def main():
 
     if state == 'present':
         if gitlab_group.create_or_update_group(group_name, parent_group, {
-            "path": group_path,
-            "description": description,
-            "visibility": group_visibility,
-            "project_creation_level": project_creation_level,
             "auto_devops_enabled": auto_devops_enabled,
-            "subgroup_creation_level": subgroup_creation_level,
-            "require_two_factor_authentication": require_two_factor_authentication,
             "avatar_path": avatar_path,
+            "description": description,
+            "path": group_path,
+            "project_creation_level": project_creation_level,
+            "require_two_factor_authentication": require_two_factor_authentication,
+            "subgroup_creation_level": subgroup_creation_level,
+            "visibility": group_visibility,
         }):
             module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
         else:
