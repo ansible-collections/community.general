@@ -167,14 +167,14 @@ class IPAKeytab(object):
         )
 
     def _exec(self, check_rc=True):
-          params = dict(self.module.params)
+        params = dict(self.module.params)
 
-          with self.runner(
-              "retrieve_mode path ipa_server principal ldap_uri bind_dn bind_pw password ca_certificate sasl_mech encryption_types",
-              check_rc=check_rc
-          ) as ctx:
-              rc, out, err = ctx.run(**params)
-          return out
+        with self.runner(
+            "retrieve_mode path ipa_server principal ldap_uri bind_dn bind_pw password ca_certificate sasl_mech encryption_types",
+            check_rc=check_rc
+        ) as ctx:
+            rc, out, err = ctx.run(**params)
+        return out
 
 
 def main():
