@@ -442,6 +442,16 @@ options:
                     - Max lifespan of cache entry in milliseconds.
                 type: int
 
+            referral:
+                description:
+                    - Specifies if LDAP referrals should be followed or ignored. Please note that enabling
+                      referrals can slow down authentication as it allows the LDAP server to decide which other
+                      LDAP servers to use. This could potentially include untrusted servers.
+                type: str
+                choices:
+                    - ignore
+                    - follow
+
     mappers:
         description:
             - A list of dicts defining mappers associated with this Identity Provider.
@@ -785,6 +795,7 @@ def main():
         priority=dict(type='int', default=0),
         rdnLDAPAttribute=dict(type='str'),
         readTimeout=dict(type='int'),
+        referral=dict(type='str', choices=['ignore', 'follow']),
         searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
         krbPrincipalAttribute=dict(type='str'),
