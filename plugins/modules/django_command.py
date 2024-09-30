@@ -57,6 +57,8 @@ run_info:
   returned: success and O(verbosity) >= 3
 """
 
+import shlex
+
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt
 
@@ -73,6 +75,9 @@ class DjangoCommand(DjangoModuleHelper):
         extra_args=cmd_runner_fmt.as_list(),
     )
     django_admin_arg_order = "extra_args"
+
+    def __init_module__(self):
+        self.vars.command = shlex.split(self.vars.command)
 
 
 def main():

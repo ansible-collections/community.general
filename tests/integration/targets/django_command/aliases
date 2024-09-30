@@ -1,0 +1,21 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+azp/posix/2
+skip/python2
+skip/freebsd
+skip/macos
+skip/osx
+skip/rhel8.2
+skip/rhel8.3
+skip/rhel8.4
+skip/rhel8.5
+skip/rhel8.6
+skip/rhel8.7
+skip/rhel8.8
+skip/rhel9.0
+skip/rhel9.1
+skip/rhel9.2
+skip/rhel9.3
+skip/rhel9.4
