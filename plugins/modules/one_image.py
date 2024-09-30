@@ -55,6 +55,7 @@ options:
     description:
       - Whether the image should be persistent or non-persistent.
     type: bool
+    version_added: 9.5.0
 author:
     - "Milan Ilic (@ilicmilan)"
 '''
@@ -107,52 +108,53 @@ RETURN = '''
 id:
     description: image id
     type: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: 153
 name:
     description: image name
     type: str
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: app1
 group_id:
     description: image's group id
     type: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: 1
 group_name:
     description: image's group name
     type: str
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: one-users
 owner_id:
     description: image's owner id
     type: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: 143
 owner_name:
     description: image's owner name
     type: str
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: ansible-test
 state:
     description: state of image instance
     type: str
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: READY
 used:
     description: is image in use
     type: bool
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: true
 running_vms:
     description: count of running vms that use this image
     type: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample: 7
 permissions:
     description: The image's permissions.
     type: dict
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
     contains:
         owner_u:
             description: The image's owner USAGE permissions.
@@ -204,93 +206,108 @@ type:
     description: The image's type.
     type: str
     sample: 0
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 disk_type:
     description: The image's format type.
     type: str
     sample: 0
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 persistent:
     description: The image's persistence status (1 means true, 0 means false).
     type: int
     sample: 1
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 source:
     description: The image's source.
     type: str
     sample: /var/lib/one//datastores/100/somerandomstringxd
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
 path:
     description: The image's filesystem path.
     type: str
     sample: /var/tmp/hello.qcow2
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 fstype:
     description: The image's filesystem type.
     type: str
     sample: ext4
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 size:
     description: The image's size in MegaBytes.
     type: int
     sample: 10000
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 cloning_ops:
     description: The image's cloning operations per second.
     type: int
     sample: 0
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 cloning_id:
     description: The image's cloning ID.
     type: int
     sample: -1
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 target_snapshot:
     description: The image's target snapshot.
     type: int
     sample: 1
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 datastore_id:
     description: The image's datastore ID.
     type: int
     sample: 100
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 datastore:
     description: The image's datastore name.
     type: int
     sample: image_datastore
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
 vms:
     description: The image's list of vm ID's.
     type: list
     elements: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample:
         - 1
         - 2
         - 3
+    version_added: 9.5.0
 clones:
     description: The image's list of clones ID's.
     type: list
     elements: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample:
         - 1
         - 2
         - 3
+    version_added: 9.5.0
 app_clones:
     description: The image's list of app_clones ID's.
     type: list
     elements: int
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
     sample:
         - 1
         - 2
         - 3
+    version_added: 9.5.0
 snapshots:
     description: The image's list of snapshots.
     type: list
-    returned: when O(state=present, state=cloned, state=renamed)
+    returned: when O(state=present), O(state=cloned), or O(state=renamed)
+    version_added: 9.5.0
     sample:
       - date: 123123
         parent: 1
