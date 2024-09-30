@@ -225,7 +225,7 @@ class CmdRunner(object):
         return tuple(order) if is_sequence(order) else tuple(order.split())
 
     def __init__(self, module, command, arg_formats=None, default_args_order=(),
-                 check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
+                 check_rc=False, force_lang="C", path_prefix=None, environ_update=None, data=None):
         self.module = module
         self.command = _ensure_list(command)
         self.default_args_order = self._prepare_args_order(default_args_order)
@@ -248,6 +248,7 @@ class CmdRunner(object):
         if environ_update is None:
             environ_update = {}
         self.environ_update = environ_update
+        self.data = data
 
         _cmd = self.command[0]
         self.command[0] = _cmd if (os.path.isabs(_cmd) or '/' in _cmd) else module.get_bin_path(_cmd, opt_dirs=path_prefix, required=True)
