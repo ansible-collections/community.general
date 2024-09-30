@@ -372,6 +372,7 @@ def main():
 
     # return json dict
     result = {'changed': False}
+    login_to_all_nodes = False
     check_rc = True
 
     if discover:
@@ -391,6 +392,7 @@ def main():
             if len(nodes) > 1:
                 # Disable strict return code checking if there are multiple targets
                 # That will allow to skip target where we have no rights to login
+                login_to_all_nodes = True
                 check_rc = False
         else:
             # check given target is in cache
@@ -406,8 +408,7 @@ def main():
         result['nodes'] = nodes
 
     if login is not None:
-        # If check_rc=False we will try to login to all available target nodes
-        if not check_rc:
+        if login_to_all_nodes:
             result['devicenodes'] = []
             for index_target in nodes:
                 loggedon = target_loggedon(module, index_target, portal, port)
@@ -454,7 +455,7 @@ def main():
                 result['changed'] |= True
                 result['connection_changed'] = True
 
-    if automatic is not None and check_rc:
+    if automatic is not None and not login_to_all_nodes:
         isauto = target_isauto(module, target)
         if (automatic and isauto) or (not automatic and not isauto):
             result['changed'] |= False
@@ -470,7 +471,7 @@ def main():
             result['changed'] |= True
             result['automatic_changed'] = True
 
-    if automatic_portal is not None and check_rc:
+    if automatic_portal is not None and not login_to_all_nodes:
         isauto = target_isauto(module, target, portal, port)
         if (automatic_portal and isauto) or (not automatic_portal and not isauto):
             result['changed'] |= False
