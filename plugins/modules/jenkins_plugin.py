@@ -685,7 +685,7 @@ class JenkinsPlugin(object):
 
         # Move the updates file to the right place if we could read it
         if tmp_updates_file != updates_file:
-            self.module.atomic_move(tmp_updates_file, updates_file)
+            self.module.atomic_move(os.path.abspath(tmp_updates_file), os.path.abspath(updates_file))
 
         # Check if we have the plugin data available
         if not data.get('plugins', {}).get(self.params['name']):
@@ -718,7 +718,7 @@ class JenkinsPlugin(object):
                 details=to_native(e))
 
         # Move the file onto the right place
-        self.module.atomic_move(tmp_f, f)
+        self.module.atomic_move(os.path.abspath(tmp_f), os.path.abspath(f))
 
     def uninstall(self):
         changed = False
