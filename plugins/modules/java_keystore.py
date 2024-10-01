@@ -470,7 +470,7 @@ class JavaKeystore:
 
         if self.keystore_type == 'pkcs12':
             # Preserve properties of the destination file, if any.
-            self.module.atomic_move(keystore_p12_path, self.keystore_path)
+            self.module.atomic_move(os.path.abspath(keystore_p12_path), os.path.abspath(self.keystore_path))
             self.update_permissions()
             self.result['changed'] = True
             return self.result
