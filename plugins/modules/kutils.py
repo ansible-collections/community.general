@@ -53,7 +53,7 @@ options:
     type: str
   lifetime:
     description:
-      - Requests a ticket with the lifetime, If the O(liftime) is not specified, the default ticket lifetime is used.
+      - Requests a ticket with the lifetime, If the O(lifetime) is not specified, the default ticket lifetime is used.
       - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
     type: str
   start_time:
