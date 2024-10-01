@@ -569,7 +569,7 @@ def do_ini(module, filename, section=None, section_has_values=None, option=None,
             module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
 
         try:
-            module.atomic_move(tmpfile, target_filename)
+            module.atomic_move(tmpfile, os.path.abspath(target_filename))
         except IOError:
             module.ansible.fail_json(msg='Unable to move temporary \
                                    file %s to %s, IOError' % (tmpfile, target_filename), traceback=traceback.format_exc())
