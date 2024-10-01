@@ -1052,7 +1052,8 @@ def main():
 
             after_comp = kc.get_component(cid, realm)
             after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
-            after_comp_sanitized = sanitize(normalize_kc_comp(after_comp))
+            normalize_kc_comp(after_comp)
+            after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized
             if module._diff:
