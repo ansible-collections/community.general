@@ -731,6 +731,7 @@ def normalize_kc_comp(comp):
         # kc stores a timestamp of the last sync in `lastSync` to time the periodic sync, it is removed to minimize diff/changes
         comp['config'].pop('lastSync', None)
 
+
 def sanitize(comp):
     compcopy = deepcopy(comp)
     if 'config' in compcopy:
