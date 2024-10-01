@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+- id: test_kinit_default
+  input:
+    state: present
+    password: cool_password
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/klist]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 1
+      out: ""
+      err: ""
+    - command: [/testbin/kinit]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+- id: test_kinit_principal
+  input:
+    state: present
+    password: cool_password
+    principal: admin@IPA.TEST
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/klist, -l]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [/testbin/kinit, admin@IPA.TEST]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+- id: test_kdestroy_default
+  input:
+    state: absent
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/klist]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [/testbin/kdestroy]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+- id: test_kdestroy_principal
+  input:
+    state: absent
+    principal: admin@IPA.TEST
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/klist, -l]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [/testbin/kdestroy, -p, admin@IPA.TEST]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+- id: test_kdestroy_cache_name
+  input:
+    state: absent
+    cache_name: KEYRING:persistent:0:0
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/klist, -l]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [/testbin/kdestroy, -c, KEYRING:persistent:0:0]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
+- id: test_kdestroy_all
+  input:
+    state: absent
+    kdestroy_all: true
+  output:
+    changed: true
+  run_command_calls:
+    - command: [/testbin/kdestroy, -A]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: ""
+      err: ""
