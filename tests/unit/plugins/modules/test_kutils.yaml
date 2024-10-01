@@ -30,7 +30,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/klist, -l]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -46,7 +46,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/klist]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -63,7 +63,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/klist, -l]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -80,7 +80,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/klist, -l]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -97,7 +97,7 @@
     changed: true
   run_command_calls:
     - command: [/testbin/kdestroy, -A]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: ""
       err: ""

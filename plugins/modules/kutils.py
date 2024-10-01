@@ -48,16 +48,17 @@ options:
     description:
       - Use V(cache_name) as the ticket cache name and location.
       - If this option is not used, the default cache name and location are used.
-      - The default credentials cache may vary between systems. 
+      - The default credentials cache may vary between systems.
       - If the E(KRB5CCNAME) environment variable is set, its value is used to name the default ticket cache.
+    type: str
   lifetime:
     description:
-      - Requests a ticket with the lifetime, If the O(liftime) is not specified, the default ticket lifetime is used. 
+      - Requests a ticket with the lifetime, If the O(liftime) is not specified, the default ticket lifetime is used.
       - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
     type: str
   start_time:
     description:
-      - Requests a postdated ticket. 
+      - Requests a postdated ticket.
       - Postdated tickets are issued with the invalid flag set, and need to be resubmitted to the KDC for validation before use.
       - O(start_time) specifies the duration of the delay before the ticket can become valid.
     type: str
@@ -91,7 +92,7 @@ options:
     type: bool
   renewal:
     description:
-      - Requests renewal of the ticket-granting ticket. 
+      - Requests renewal of the ticket-granting ticket.
       - Note that an expired ticket cannot be renewed, even if the ticket is still within its renewable life.
     type: bool
   validate:
@@ -102,7 +103,7 @@ options:
   keytab:
     description:
       - Requests a ticket, obtained from a key in the local host's keytab.
-      - If O(keytab_path) is not specified will try to use default client keytab path (C(-i) option). 
+      - If O(keytab_path) is not specified will try to use default client keytab path (C(-i) option).
     type: bool
   keytab_path:
     description:
@@ -219,13 +220,13 @@ class IPAKeytab(object):
         )
 
     def check_for_none(self, param, runner_arg):
-        """ 
+        """
         param is a bool, runner_arg is a string argument (e.g. -a)
         If param=True  -> return -f/-p/-a
         If param=False -> return -F/-P/-A
         if param=None  -> return []
         """
-        if param == None:
+        if param is None:
             return []
         if param:
             return runner_arg.lower()
