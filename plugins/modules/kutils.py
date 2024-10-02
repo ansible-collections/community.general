@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 module: kutils
 short_description: Kerberos utils for managing tickets
 description:
-  - Manage kerberos tickets with kinit, klist and kdestroy base utulities.
+  - Manage Kerberos tickets with C(kinit), C(klist) and C(kdestroy) base utilities.
 author: "Alexander Bakanovskii (@abakanovskii)"
 attributes:
   check_mode:
@@ -33,7 +33,7 @@ options:
     type: str
   state:
     description:
-      - The state of the kerberos ticket.
+      - The state of the Kerberos ticket.
       - V(present) is equivalent of C(kinit) command.
       - V(absent) is equivalent of C(kdestroy) command.
     type: str
@@ -42,18 +42,18 @@ options:
   kdestroy_all:
     description:
       - When O(state=absent) destroys all credential caches in collection.
-      - Equivalent of running C(kdestroy -A)
+      - Equivalent of running C(kdestroy -A).
     type: bool
   cache_name:
     description:
       - Use V(cache_name) as the ticket cache name and location.
       - If this option is not used, the default cache name and location are used.
       - The default credentials cache may vary between systems.
-      - If the E(KRB5CCNAME) environment variable is set, its value is used to name the default ticket cache.
+      - If not set the the value of E(KRB5CCNAME) environment variable will be used instead, its value is used to name the default ticket cache.
     type: str
   lifetime:
     description:
-      - Requests a ticket with the lifetime, If the O(lifetime) is not specified, the default ticket lifetime is used.
+      - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
       - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
     type: str
   start_time:
@@ -107,7 +107,7 @@ options:
     type: bool
   keytab_path:
     description:
-      - Use when O(keytab=True) to specify path to a keytab file.
+      - Use when O(keytab=true) to specify path to a keytab file.
       - It is required to specify O(password) or O(keytab_path).
     type: path
 requirements:
@@ -117,21 +117,21 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: Get kerberos ticket using default principal
+- name: Get Kerberos ticket using default principal
   community.general.kutils:
     password: some_password
 
-- name: Get kerberos ticket using keytab
+- name: Get Kerberos ticket using keytab
   community.general.kutils:
     keytab: true
     keytab_path: /etc/ipa/file.keytab
 
-- name: Get kerberos ticket using principal name
+- name: Get Kerberos ticket using principal name
   community.general.kutils:
     password: some_password
     principal: admin
 
-- name: Get kerberos ticket using principal with realm
+- name: Get Kerberos ticket using principal with realm
   community.general.kutils:
     password: some_password
     principal: admin@IPA.TEST
@@ -195,9 +195,9 @@ class IPAKeytab(object):
                 lifetime=cmd_runner_fmt.as_opt_val('-l'),
                 start_time=cmd_runner_fmt.as_opt_val('-s'),
                 renewable=cmd_runner_fmt.as_opt_val('-r'),
-                forwardable=cmd_runner_fmt.as_func(self.check_for_none(self.address_restricted, '-F')),
-                proxiable=cmd_runner_fmt.as_func(self.check_for_none(self.address_restricted, '-P')),
-                address_restricted=cmd_runner_fmt.as_func(self.check_for_none(self.address_restricted, '-A')),
+                forwardable=cmd_runner_fmt.as_bool('-f', '-F'),
+                proxiable=cmd_runner_fmt.as_bool('-p', '-P'),
+                address_restricted=cmd_runner_fmt.as_bool('-a', '-A'),
                 anonymous=cmd_runner_fmt.as_bool('-n'),
                 canonicalization=cmd_runner_fmt.as_bool('-C'),
                 enterprise=cmd_runner_fmt.as_bool('-E'),

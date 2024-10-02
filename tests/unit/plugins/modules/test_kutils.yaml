@@ -10,7 +10,8 @@
     password: cool_password
   output:
     changed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/klist]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 1
@@ -28,7 +29,8 @@
     principal: admin@IPA.TEST
   output:
     changed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/klist, -l]
       environ: *env-def
       rc: 0
@@ -44,7 +46,8 @@
     state: absent
   output:
     changed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/klist]
       environ: *env-def
       rc: 0
@@ -61,7 +64,8 @@
     principal: admin@IPA.TEST
   output:
     changed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/klist, -l]
       environ: *env-def
       rc: 0
@@ -78,7 +82,8 @@
     cache_name: KEYRING:persistent:0:0
   output:
     changed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/klist, -l]
       environ: *env-def
       rc: 0
@@ -95,7 +100,8 @@
     kdestroy_all: true
   output:
     changed: true
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/kdestroy, -A]
       environ: *env-def
       rc: 0
