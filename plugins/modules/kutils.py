@@ -184,13 +184,9 @@ class IPAKeytab(object):
         self.keytab = kwargs['keytab']
         self.keytab_path = kwargs['keytab_path']
 
-        self.kinit_executable = [module.get_bin_path('kinit', True)]
-        self.kdestroy_executable = [module.get_bin_path('kdestroy', True)]
-        self.klist_executable = [module.get_bin_path('klist', True)]
-
         self.kinit = CmdRunner(
             module,
-            command=self.kinit_executable,
+            command='kinit',
             arg_formats=dict(
                 lifetime=cmd_runner_fmt.as_opt_val('-l'),
                 start_time=cmd_runner_fmt.as_opt_val('-s'),
@@ -211,7 +207,7 @@ class IPAKeytab(object):
 
         self.kdestroy = CmdRunner(
             module,
-            command=self.kdestroy_executable,
+            command='kdestroy',
             arg_formats=dict(
                 kdestroy_all=cmd_runner_fmt.as_bool('-A'),
                 cache_name=cmd_runner_fmt.as_opt_val('-c'),
