@@ -69,7 +69,7 @@
     - command: [/testbin/klist, -l]
       environ: *env-def
       rc: 0
-      out: ""
+      out: "admin@IPA.TEST"
       err: ""
     - command: [/testbin/kdestroy, -p, admin@IPA.TEST]
       environ: *env-norc
@@ -87,7 +87,7 @@
     - command: [/testbin/klist, -l]
       environ: *env-def
       rc: 0
-      out: ""
+      out: "KEYRING:persistent:0:0"
       err: ""
     - command: [/testbin/kdestroy, -c, KEYRING:persistent:0:0]
       environ: *env-norc
