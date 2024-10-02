@@ -1,0 +1,2 @@
+minor_changes:
+  - flatpak - improve the parsing of Flatpak application IDs based on official guidelines (https://github.com/ansible-collections/community.general/pull/8909).
