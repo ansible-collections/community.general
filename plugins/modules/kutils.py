@@ -191,9 +191,9 @@ class IPAKeytab(object):
                 lifetime=cmd_runner_fmt.as_opt_val('-l'),
                 start_time=cmd_runner_fmt.as_opt_val('-s'),
                 renewable=cmd_runner_fmt.as_opt_val('-r'),
-                forwardable=cmd_runner_fmt.as_bool('-f', '-F'),
-                proxiable=cmd_runner_fmt.as_bool('-p', '-P'),
-                address_restricted=cmd_runner_fmt.as_bool('-a', '-A'),
+                forwardable=cmd_runner_fmt.as_func(self.check_for_none(self.address_restricted, '-F')),
+                proxiable=cmd_runner_fmt.as_func(self.check_for_none(self.address_restricted, '-P')),
+                address_restricted=cmd_runner_fmt.as_func(self.check_for_none(self.address_restricted, '-A')),
                 anonymous=cmd_runner_fmt.as_bool('-n'),
                 canonicalization=cmd_runner_fmt.as_bool('-C'),
                 enterprise=cmd_runner_fmt.as_bool('-E'),
@@ -271,6 +271,19 @@ class IPAKeytab(object):
 
         return ticket_present
 
+    def check_for_none(self, param, runner_arg):
+        """
+        param is a bool, runner_arg is a string argument (e.g. -a)
+        If param=True  -> return -f/-p/-a
+        If param=False -> return -F/-P/-A
+        if param=None  -> return []
+        """
+        if param is None:
+            return []
+        if param:
+            return runner_arg.lower()
+        else:
+            return runner_arg
 
 def main():
     arg_spec = dict(
