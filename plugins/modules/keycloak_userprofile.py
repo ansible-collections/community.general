@@ -641,7 +641,7 @@ def main():
     changeset_copy = deepcopy(changeset)
 
     # Get a list of all Keycloak components that are of userprofile provider type.
-    realm_userprofiles = kc.get_components(urlencode(dict(type=provider_type, parent=parent_id)), parent_id)
+    realm_userprofiles = kc.get_components(urlencode(dict(type=provider_type)), parent_id)
 
     # If this component is present get its userprofile ID. Confusingly the userprofile ID is
     # also known as the Provider ID.
