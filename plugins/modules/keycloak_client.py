@@ -108,13 +108,14 @@ options:
 
     client_authenticator_type:
         description:
-            - How do clients authenticate with the auth server? Either V(client-secret) or
-              V(client-jwt) can be chosen. When using V(client-secret), the module parameter
-              O(secret) can set it, while for V(client-jwt), you can use the keys C(use.jwks.url),
+            - How do clients authenticate with the auth server? Either V(client-secret),
+              V(client-jwt) or V(client-x509) can be chosen. When using V(client-secret), the module parameter
+              O(secret) can set it, for V(client-jwt), you can use the keys C(use.jwks.url),
               C(jwks.url), and C(jwt.credential.certificate) in the O(attributes) module parameter
-              to configure its behavior.
+              to configure its behavior. For V(client-x509) you can use the keys C(x509.allow.regex.pattern.comparison) 
+              and C(x509.subjectdn) in the O(attributes) module parameter.
             - This is 'clientAuthenticatorType' in the Keycloak REST API.
-        choices: ['client-secret', 'client-jwt']
+        choices: ['client-secret', 'client-jwt', 'client-x509']
         aliases:
             - clientAuthenticatorType
         type: str
@@ -913,7 +914,7 @@ def main():
         base_url=dict(type='str', aliases=['baseUrl']),
         surrogate_auth_required=dict(type='bool', aliases=['surrogateAuthRequired']),
         enabled=dict(type='bool'),
-        client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt'], aliases=['clientAuthenticatorType']),
+        client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt', 'client-x509'], aliases=['clientAuthenticatorType']),
         secret=dict(type='str', no_log=True),
         registration_access_token=dict(type='str', aliases=['registrationAccessToken'], no_log=True),
         default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
