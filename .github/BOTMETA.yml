@@ -310,6 +310,8 @@ files:
     labels: module_utils
   $module_utils/btrfs.py:
     maintainers: gnfzdz
+  $module_utils/cmd_runner_fmt.py:
+    maintainers: russoz
   $module_utils/cmd_runner.py:
     maintainers: russoz
   $module_utils/deps.py:
