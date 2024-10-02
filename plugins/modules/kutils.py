@@ -245,11 +245,12 @@ class IPAKeytab(object):
     def exec_klist(self, list):
         # Use chech_rc = False because
         # If no tickets present, klist command will always return rc = 1
+        params = dict(list=list)
         with self.klist(
             "list",
             check_rc=False
         ) as ctx:
-            rc, out, err = ctx.run(list)
+            rc, out, err = ctx.run(**params)
         return rc, out, err
 
     def check_ticket_present(self):
