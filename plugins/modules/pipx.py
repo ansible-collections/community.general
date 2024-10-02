@@ -308,7 +308,7 @@ class PipX(StateModuleHelper):
     def state_install_all(self):
         self.changed = True
         with self.runner('state global index_url force python system_site_packages editable pip_args spec_metadata', check_mode_skip=True) as ctx:
-            ctx.run(name_source=[self.vars.name, self.vars.source])
+            ctx.run()
             self._capture_results(ctx)
 
     def state_upgrade(self):
