@@ -214,7 +214,7 @@ def run_module(module, tmpdir, kwriteconfig):
         if module.params['backup'] and os.path.exists(b_path):
             result['backup_file'] = module.backup_local(result['path'])
         try:
-            module.atomic_move(b_tmpfile, b_path)
+            module.atomic_move(b_tmpfile, os.path.abspath(b_path))
         except IOError:
             module.ansible.fail_json(msg='Unable to move temporary file %s to %s, IOError' % (tmpfile, result['path']), traceback=traceback.format_exc())
 
