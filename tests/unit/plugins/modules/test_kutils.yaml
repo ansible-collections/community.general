@@ -13,12 +13,12 @@
   mocks:
     run_command:
     - command: [/testbin/klist]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
       rc: 1
       out: ""
       err: ""
     - command: [/testbin/kinit]
-      environ: *env-def
+      environ: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: ""
       err: ""
@@ -37,7 +37,7 @@
       out: ""
       err: ""
     - command: [/testbin/kinit, admin@IPA.TEST]
-      environ: *env-def
+      environ: *env-norc
       rc: 0
       out: ""
       err: ""
@@ -54,7 +54,7 @@
       out: ""
       err: ""
     - command: [/testbin/kdestroy]
-      environ: *env-def
+      environ: *env-norc
       rc: 0
       out: ""
       err: ""
@@ -72,7 +72,7 @@
       out: ""
       err: ""
     - command: [/testbin/kdestroy, -p, admin@IPA.TEST]
-      environ: *env-def
+      environ: *env-norc
       rc: 0
       out: ""
       err: ""
@@ -90,7 +90,7 @@
       out: ""
       err: ""
     - command: [/testbin/kdestroy, -c, KEYRING:persistent:0:0]
-      environ: *env-def
+      environ: *env-norc
       rc: 0
       out: ""
       err: ""
@@ -103,7 +103,7 @@
   mocks:
     run_command:
     - command: [/testbin/kdestroy, -A]
-      environ: *env-def
+      environ: *env-norc
       rc: 0
       out: ""
       err: ""
