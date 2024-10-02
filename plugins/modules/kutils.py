@@ -219,7 +219,7 @@ class IPAKeytab(object):
             module,
             command='klist',
             arg_formats=dict(
-                list=cmd_runner_fmt.as_bool('-l'),
+                show_list=cmd_runner_fmt.as_bool('-l'),
             )
         )
 
@@ -247,7 +247,7 @@ class IPAKeytab(object):
         # If no tickets present, klist command will always return rc = 1
         params = dict(show_list=show_list)
         with self.klist(
-            "list",
+            "show_list",
             check_rc=False
         ) as ctx:
             rc, out, err = ctx.run(**params)
