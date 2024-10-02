@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import kutils
-from .helper import Helper, RunCommandMock # pylint: disable=unused-import
+from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
 
 
 Helper.from_module(kutils, __name__)
