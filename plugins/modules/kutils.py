@@ -285,6 +285,7 @@ class IPAKeytab(object):
         else:
             return runner_arg
 
+
 def main():
     arg_spec = dict(
         principal=dict(type='str'),
