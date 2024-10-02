@@ -41,7 +41,7 @@ repodatalist:
     description:
         - A list of repository descriptions like it is returned by the command C(zypper repos).
     type: list
-    elements: dict
+    elements: dictionary
     contains:
         alias:
             description: The alias of the repository.
@@ -63,7 +63,7 @@ repodatalist:
             type: int
         url:
             description: the url of the repository on the internet
-            type:str
+            type: str
     sample:
             [
                 {
