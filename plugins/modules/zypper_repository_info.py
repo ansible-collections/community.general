@@ -18,7 +18,7 @@ version_added: 9.4.0
 short_description: List Zypper repositories
 description:
     - List Zypper repositories on SUSE and openSUSE.
-    - Note: for info about packages, use the packages ansible.builtin.package_facts
+    - "Note: for info about packages, use the packages ansible.builtin.package_facts"
 extends_documentation_fragment:
     - community.general.attributes
     - community.general.attributes.info_module
