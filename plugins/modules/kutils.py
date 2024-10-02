@@ -242,10 +242,10 @@ class IPAKeytab(object):
             rc, out, err = ctx.run(**params)
         return out
 
-    def exec_klist(self, list):
+    def exec_klist(self, show_list):
         # Use chech_rc = False because
         # If no tickets present, klist command will always return rc = 1
-        params = dict(list=list)
+        params = dict(show_list=show_list)
         with self.klist(
             "list",
             check_rc=False
@@ -255,15 +255,15 @@ class IPAKeytab(object):
 
     def check_ticket_present(self):
         ticket_present = True
-        list = False
+        show_list = False
 
         if not self.principal and not self.cache_name:
-            rc, out, err = self.exec_klist(list)
+            rc, out, err = self.exec_klist(show_list)
             if rc != 0:
                 ticket_present = False
         else:
-            list = True
-            rc, out, err = self.exec_klist(list)
+            show_list = True
+            rc, out, err = self.exec_klist(show_list)
             if self.principal and self.principal not in str(out):
                 ticket_present = False
             if self.cache_name and self.cache_name not in str(out):
