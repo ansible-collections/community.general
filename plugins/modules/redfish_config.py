@@ -415,6 +415,7 @@ def main():
             hostinterface_id=dict(),
             sessions_config=dict(type='dict', default={}),
             storage_subsystem_id=dict(type='str', default=''),
+            storage_none_volume_deletion=dict(type='bool', default=False),
             volume_ids=dict(type='list', default=[], elements='str'),
             secure_boot_enable=dict(type='bool', default=True),
             volume_details=dict(type='dict', default={}),
@@ -481,6 +482,7 @@ def main():
     # Volume creation options
     volume_details = module.params['volume_details']
     storage_subsystem_id = module.params['storage_subsystem_id']
+    storage_none_volume_deletion = module.params['storage_none_volume_deletion']
 
     # ciphers
     ciphers = module.params['ciphers']
@@ -524,7 +526,7 @@ def main():
             elif command == "DeleteVolumes":
                 result = rf_utils.delete_volumes(storage_subsystem_id, volume_ids)
             elif command == "CreateVolume":
-                result = rf_utils.create_volume(volume_details, storage_subsystem_id)
+                result = rf_utils.create_volume(volume_details, storage_subsystem_id, storage_none_volume_deletion)
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
