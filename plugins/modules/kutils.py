@@ -227,7 +227,8 @@ class IPAKeytab(object):
     def exec_kinit(self):
         params = dict(self.module.params)
         with self.kinit(
-            "lifetime start_time renewable forwardable proxiable address_restricted anonymous canonicalization enterprise renewal validate keytab keytab_path cache_name principal",
+            "lifetime start_time renewable forwardable proxiable address_restricted anonymous "\
+            "canonicalization enterprise renewal validate keytab keytab_path cache_name principal",
             check_rc=True,
             data=self.password,
         ) as ctx:
