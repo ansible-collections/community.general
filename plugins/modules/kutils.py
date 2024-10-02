@@ -356,7 +356,7 @@ def main():
             changed = True
             if not module.check_mode:
                 keytab.exec_kdestroy()
-        if keytab.check_ticket_present():
+        elif keytab.check_ticket_present():
             changed = True
             if not module.check_mode:
                 keytab.exec_kdestroy()
