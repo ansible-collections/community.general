@@ -243,7 +243,7 @@ class IPAKeytab(object):
         return out
 
     def exec_klist(self, list):
-        # Use chech_rc = False because 
+        # Use chech_rc = False because
         # If no tickets present, klist command will always return rc = 1
         with self.klist(
             "list",
