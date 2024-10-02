@@ -82,8 +82,9 @@ options:
   force_creation:
     description:
     - Create host if O(state=disabled) or O(state=enabled) but not present.
-    default: false
+    default: true
     type: bool
+    version_added: 9.5.0
   update_dns:
     description:
     - If set V(true) with O(state=absent), then removes DNS records of the host managed by FreeIPA DNS.
@@ -299,7 +300,7 @@ def main():
                          update_dns=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
                          random_password=dict(type='bool', no_log=False),
-                         force_creation=dict(type='bool', default=False),)
+                         force_creation=dict(type='bool', default=True),)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
