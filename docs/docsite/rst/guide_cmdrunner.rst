@@ -68,6 +68,10 @@ This is meant to be done once, then every time you need to execute the command y
         with runner("version") as ctx:
             dummy, stdout, dummy = ctx.run()
 
+        # passes arg 'data' to AnsibleModule.run_command()
+        with runner("type name", data=stdin_data) as ctx:
+            dummy, stdout, dummy = ctx.run()
+
         # Another way of expressing it
         dummy, stdout, dummy = runner("version").run()
 
@@ -110,7 +114,7 @@ into something formatted for the command line.
 Argument format function
 """"""""""""""""""""""""
 
-An ``arg_format`` function should be of the form:
+An ``arg_format`` function is defined in the form similar to:
 
 .. code-block:: python
 
@@ -155,7 +159,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_list()``
-    - Example:
+    - Examples:
         +----------------------+---------------------+
         | Value                | Outcome             |
         +======================+=====================+
@@ -167,12 +171,11 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 - ``cmd_runner_fmt.as_bool()``
     This method receives two different parameters: ``args_true`` and ``args_false``, latter being optional.
     If the boolean evaluation of ``value`` is ``True``, the format function returns ``args_true``.
-    If the boolean evaluation is ``False``, then the function returns ``args_false``
-    if it was provided, or ``[]`` otherwise.
+    If the boolean evaluation is ``False``, then the function returns ``args_false`` if it was provided, or ``[]`` otherwise.
 
-    - Creation:
+    - Creation (one arg):
         ``cmd_runner_fmt.as_bool("--force")``
-    - Example:
+    - Examples:
         +------------+--------------------+
         | Value      | Outcome            |
         +============+====================+
@@ -180,6 +183,18 @@ In these descriptions ``value`` refers to the single parameter passed to the for
         +------------+--------------------+
         | ``False``  | ``[]``             |
         +------------+--------------------+
+    - Creation (two args):
+        ``cmd_runner_fmt.as_bool("--relax", "--dont-do-it")``
+    - Examples:
+        +------------+----------------------+
+        | Value      | Outcome              |
+        +============+======================+
+        | ``True``   | ``["--relax"]``      |
+        +------------+----------------------+
+        | ``False``  | ``["--dont-do-it"]`` |
+        +------------+----------------------+
+        |            | ``[]``               |
+        +------------+----------------------+
 
 - ``cmd_runner_fmt.as_bool_not()``
     This method receives one parameter, which is returned by the function when the boolean evaluation
@@ -187,7 +202,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_bool_not("--no-deps")``
-    - Example:
+    - Examples:
         +-------------+---------------------+
         | Value       | Outcome             |
         +=============+=====================+
@@ -202,7 +217,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_optval("-i")``
-    - Example:
+    - Examples:
         +---------------+---------------------+
         | Value         | Outcome             |
         +===============+=====================+
@@ -216,7 +231,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_opt_val("--name")``
-    - Example:
+    - Examples:
         +--------------+--------------------------+
         | Value        | Outcome                  |
         +==============+==========================+
@@ -229,7 +244,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_opt_eq_val("--num-cpus")``
-    - Example:
+    - Examples:
         +------------+-------------------------+
         | Value      | Outcome                 |
         +============+=========================+
@@ -243,7 +258,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_fixed("--version")``
-    - Example:
+    - Examples:
         +---------+-----------------------+
         | Value   | Outcome               |
         +=========+=======================+
@@ -265,7 +280,7 @@ In these descriptions ``value`` refers to the single parameter passed to the for
 
     - Creation:
         ``cmd_runner_fmt.as_map(dict(a=1, b=2, c=3), default=42)``
-    - Example:
+    - Examples:
         +---------------------+---------------+
         | Value               | Outcome       |
         +=====================+===============+
@@ -359,6 +374,8 @@ Settings that can be passed to the ``CmdRunner`` constructor are:
     Command to be executed. It can be a single string, the executable name, or a list
     of strings containing the executable name as the first element and, optionally, fixed parameters.
     Those parameters are used in all executions of the runner.
+    The *executable* pointed by this parameter (whether itself when ``str`` or its first element when ``list``) is
+    processed using ``AnsibleModule.get_bin_path()`` *unless* it is an absolute path or contains the character ``/``.
 - ``arg_formats: dict``
     Mapping of argument names to formatting functions.
 - ``default_args_order: str``
@@ -394,6 +411,10 @@ When creating a context, the additional settings that can be passed to the call 
     Defaults to ``False``.
 - ``check_mode_return: any``
     If ``check_mode_skip=True``, then return this value instead.
+- valid named arguments to ``AnsibleModule.run_command()``
+    Other than ``args``, any valid argument to ``run_command()`` can be passed when setting up the run context.
+    For example, ``data`` can be used to send information to the command's standard input.
+    Or ``cwd`` can be used to run the command inside a specific working directory.
 
 Additionally, any other valid parameters for ``AnsibleModule.run_command()`` may be passed, but unexpected behavior
 might occur if redefining options already present in the runner or its context creation. Use with caution.
