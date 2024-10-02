@@ -18,7 +18,7 @@
       out: ""
       err: ""
     - command: [/testbin/kinit]
-      environ: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: &env-data {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true, data: cool_password}
       rc: 0
       out: ""
       err: ""
@@ -37,7 +37,7 @@
       out: ""
       err: ""
     - command: [/testbin/kinit, admin@IPA.TEST]
-      environ: *env-norc
+      environ: *env-data
       rc: 0
       out: ""
       err: ""
@@ -54,7 +54,7 @@
       out: ""
       err: ""
     - command: [/testbin/kdestroy]
-      environ: *env-norc
+      environ: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: ""
       err: ""
