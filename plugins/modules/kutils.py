@@ -215,19 +215,13 @@ class IPAKeytab(object):
             )
         )
 
-    def check_for_none(self, param, runner_arg):
-        """
-        param is a bool, runner_arg is a string argument (e.g. -a)
-        If param=True  -> return -f/-p/-a
-        If param=False -> return -F/-P/-A
-        if param=None  -> return []
-        """
-        if param is None:
-            return []
-        if param:
-            return runner_arg.lower()
-        else:
-            return runner_arg
+        self.klist = CmdRunner(
+            module,
+            command='klist',
+            arg_formats=dict(
+                list=cmd_runner_fmt.as_bool('-l'),
+            )
+        )
 
     def exec_kinit(self):
         params = dict(self.module.params)
@@ -248,17 +242,27 @@ class IPAKeytab(object):
             rc, out, err = ctx.run(**params)
         return out
 
-    def exec_klist(self):
-        # If no tickets present klist command will always return rc=1
+    def exec_klist(self, list):
+        # Use chech_rc = False because 
+        # If no tickets present, klist command will always return rc = 1
+        with self.klist(
+            "list",
+            check_rc=False
+        ) as ctx:
+            rc, out, err = ctx.run(list)
+        return rc, out, err
+
+    def check_ticket_present(self):
         ticket_present = True
+        list = False
+
         if not self.principal and not self.cache_name:
-            cmd = ['klist']
-            rc, out, err = self.module.run_command(cmd, check_rc=False)
+            rc, out, err = self.exec_klist(list)
             if rc != 0:
                 ticket_present = False
         else:
-            cmd = ['klist', '-l']
-            rc, out, err = self.module.run_command(cmd, check_rc=False)
+            list = True
+            rc, out, err = self.exec_klist(list)
             if self.principal and self.principal not in str(out):
                 ticket_present = False
             if self.cache_name and self.cache_name not in str(out):
@@ -325,7 +329,7 @@ def main():
 
     changed = False
     if state == 'present':
-        if not keytab.exec_klist():
+        if not keytab.check_ticket_present():
             changed = True
             if not module.check_mode:
                 keytab.exec_kinit()
@@ -335,7 +339,7 @@ def main():
             changed = True
             if not module.check_mode:
                 keytab.exec_kdestroy()
-        if keytab.exec_klist():
+        if keytab.check_ticket_present():
             changed = True
             if not module.check_mode:
                 keytab.exec_kdestroy()
