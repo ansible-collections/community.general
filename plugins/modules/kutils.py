@@ -202,6 +202,7 @@ class IPAKeytab(object):
                 keytab=cmd_runner_fmt.as_bool('-k'),
                 keytab_path=cmd_runner_fmt.as_func(lambda v: ['-t', v] if v else ['-i']),
                 cache_name=cmd_runner_fmt.as_opt_val('-c'),
+                principal=cmd_runner_fmt.as_list(),
             )
         )
 
