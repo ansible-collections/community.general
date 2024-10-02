@@ -75,16 +75,19 @@ This is meant to be done once, then every time you need to execute the command y
         # Another way of expressing it
         dummy, stdout, dummy = runner("version").run()
 
-Note that you can pass values for the arguments when calling ``run()``,
-otherwise ``CmdRunner`` uses the module options with the exact same names to
-provide values for the runner arguments. If no value is passed and no module option
-is found for the name specified, then an exception is raised, unless the
-argument is using ``cmd_runner_fmt.as_fixed`` as format function like the
-``version`` in the example above. See more about it below.
+Note that you can pass values for the arguments when calling ``run()``, otherwise ``CmdRunner``
+uses the module options with the exact same names to provide values for the runner arguments.
+If no value is passed and no module option is found for the name specified, then an exception is raised, unless
+the argument is using ``cmd_runner_fmt.as_fixed`` as format function like the ``version`` in the example above.
+See more about it below.
 
 In the first example, values of ``type``, ``force``, ``no_deps`` and others
 are taken straight from the module, whilst ``galaxy_cmd`` and ``upgrade`` are
 passed explicitly.
+
+.. note::
+
+    It is not possible to automatically retrieve values of suboptions.
 
 That generates a resulting command line similar to (example taken from the
 output of an integration test):
