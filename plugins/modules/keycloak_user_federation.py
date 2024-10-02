@@ -451,6 +451,7 @@ options:
                 choices:
                     - ignore
                     - follow
+                version_added: 9.5.0
 
     mappers:
         description:
