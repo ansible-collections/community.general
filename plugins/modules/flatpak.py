@@ -329,13 +329,39 @@ def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method
             return row.split()[0]
 
 
+def _is_flatpak_id(part):
+    # For guidelines on application IDs, refer to the following resources:
+    # Flatpak:
+    # https://docs.flatpak.org/en/latest/conventions.html#application-ids
+    # Flathub:
+    # https://docs.flathub.org/docs/for-app-authors/requirements#application-id
+    if '.' not in part:
+        return False
+    sections = part.split('.')
+    if len(sections) < 2:
+        return False
+    domain = sections[0]
+    if not domain.islower():
+        return False
+    for section in sections[1:]:
+        if not section.isalnum():
+            return False
+    return True
+
+
 def _parse_flatpak_name(name):
     if name.startswith('http://') or name.startswith('https://'):
         file_name = urlparse(name).path.split('/')[-1]
         file_name_without_extension = file_name.split('.')[0:-1]
         common_name = ".".join(file_name_without_extension)
     else:
-        common_name = name
+        parts = name.split('/')
+        for part in parts:
+            if _is_flatpak_id(part):
+                common_name = part
+                break
+        else:
+            common_name = name
     return common_name
 
 
