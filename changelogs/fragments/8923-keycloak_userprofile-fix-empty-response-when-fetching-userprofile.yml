@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_userprofile - fix empty response when fetching userprofile component by removing ``parent=parent_id`` filter (https://github.com/ansible-collections/community.general/pull/8923).
