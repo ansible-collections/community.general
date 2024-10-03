@@ -186,8 +186,20 @@ In these descriptions ``value`` refers to the single parameter passed to the for
         +------------+--------------------+
         | ``False``  | ``[]``             |
         +------------+--------------------+
-    - Creation (two args):
+    - Creation (two args, ``None`` treated as ``False``):
         ``cmd_runner_fmt.as_bool("--relax", "--dont-do-it")``
+    - Examples:
+        +------------+----------------------+
+        | Value      | Outcome              |
+        +============+======================+
+        | ``True``   | ``["--relax"]``      |
+        +------------+----------------------+
+        | ``False``  | ``["--dont-do-it"]`` |
+        +------------+----------------------+
+        |            | ``["--dont-do-it"]`` |
+        +------------+----------------------+
+    - Creation (two args, ``None`` is ignored):
+        ``cmd_runner_fmt.as_bool("--relax", "--dont-do-it", ignore_none=True)``
     - Examples:
         +------------+----------------------+
         | Value      | Outcome              |
