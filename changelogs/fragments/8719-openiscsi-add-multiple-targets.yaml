@@ -1,0 +1,2 @@
+minor_changes:
+  - open_iscsi - allow login to a portal with multiple targets without specifying any of them (https://github.com/ansible-collections/community.general/pull/8719).
