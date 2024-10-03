@@ -633,6 +633,22 @@ EXAMPLES = '''
   delegate_to: localhost
 
 
+- name: Create or update a Keycloak client (minimal example), with x509 authentication
+  community.general.keycloak_client:
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    realm: master
+    state: present
+    client_id: test
+    client_authenticator_type: client-x509
+    attributes:
+      x509.subjectdn: "CN=client"
+      x509.allow.regex.pattern.comparison: false
+
+
 - name: Create or update a Keycloak client (with all the bells and whistles)
   community.general.keycloak_client:
     auth_client_id: admin-cli
