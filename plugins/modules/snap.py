@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2024, Lincoln Wallace (locnnil) <lincoln.wallace@canonical.com>
 # Copyright (c) 2021, Alexei Znamensky (russoz) <russoz@gmail.com>
 # Copyright (c) 2021, Marcus Rickert <marcus.rickert@web.de>
 # Copyright (c) 2018, Stanislas Lange (angristan) <angristan@pm.me>
@@ -29,10 +30,12 @@ options:
     name:
         description:
             - Name of the snaps to be installed.
-            - Any named snap accepted by the C(snap) command is valid.
+            - Any named snap accepted by the C(snap install) command is valid.
+              You can verify if a given snap is available on the Snap Store in advance by running: C(snap info <snap-name>).
             - >
-              Notice that snap files might require O(dangerous=true) to ignore the error
-              "cannot find signatures with metadata for snap".
+              When installing locally built `.snap` SquashFS files or downloading them from
+              sources other than the Snap Store, it is necessary to install in dangerous mode
+              with O(dangerous=true) due to the absence of signatures for these snaps.
         required: true
         type: list
         elements: str
@@ -47,10 +50,12 @@ options:
         type: str
     classic:
         description:
-            - Confinement policy. The classic confinement allows a snap to have
-              the same level of access to the system as "classic" packages,
-              like those managed by APT. This option corresponds to the C(--classic) argument.
-              This option can only be specified if there is a single snap in the task.
+            - Confinement policy: This level of confinement is permissive, granting full system access,
+              similar to that of traditionally packaged applications, such as Debian packages (those managed via the C(apt) command-line tool).
+              This option corresponds to the C(--classic) argument of the C(snap install) command.
+              It can only be specified when the task involves a single snap.
+            - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
+
         type: bool
         required: false
         default: false
@@ -66,17 +71,28 @@ options:
         required: false
     options:
         description:
-            - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
-              to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
-              only be applied to active snaps.
+            - Snap options are a way to configure snaps by using the C(key=value) syntax or C(snap:key=value).
+              If a snap name is given, the option will be applied to that snap only.
+              If the snap name is omitted, the options will be applied to all snaps listed in O(name).
+              Options will only be applied to active snaps.
+              Since snap applications run in a sandboxed environment, this is the method used to
+              pass information to snapped applications regarding the desired configurations.
+              These configurations can be applied either at the startup of the application, within the snap (via a configure hook)
+              or during its execution if the application is designed to communicate with the snap API at runtime.
+            - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap options and how to configure snaps.
+            - See U(https://snapcraft.io/docs/supported-snap-hooks) for more details about configure hooks.
+
         required: false
         type: list
         elements: str
         version_added: 4.4.0
     dangerous:
         description:
-            - Install the given snap file even if there are no pre-acknowledged signatures for it,
-              meaning it was not verified and could be dangerous.
+            - An install mode where there are no pre-acknowledged signatures for the given snap file,
+              meaning it was not verified by the Snap Store.
+              This could indicate that the snap is being built and tested locally,
+              but it also implies potential risks.
+            - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
         type: bool
         required: false
         default: false
