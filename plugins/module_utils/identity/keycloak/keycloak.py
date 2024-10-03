@@ -1519,7 +1519,21 @@ class KeycloakAPI(object):
                 if not parent:
                     return None
 
-                all_groups = parent['subGroups']
+                if 'subGroupCount' in parent:
+                    # Since version 23, when GETting a group Keycloak does not
+                    # return subGroups but only a subGroupCount.
+                    # Children must be fetched in a second request.
+                    if parent['subGroupCount'] == 0:
+                        group_children = []
+                    else:
+                        group_children_url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent['id'])
+
+                        group_children = json.loads(to_native(open_url(group_children_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                                       timeout=self.connection_timeout,
+                                                                       validate_certs=self.validate_certs).read()))
+                    all_groups = group_children
+                else:
+                    all_groups = parent['subGroups']
             else:
                 all_groups = self.get_groups(realm=realm)
 
