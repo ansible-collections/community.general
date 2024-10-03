@@ -147,10 +147,9 @@ class IPAKeytab(object):
         self.retrieve_mode = kwargs['retrieve_mode']
         self.encryption_types = kwargs['encryption_types']
 
-        self.executable = [module.get_bin_path('ipa-getkeytab', True)]
         self.runner = CmdRunner(
             module,
-            command=self.executable,
+            command='ipa-getkeytab',
             arg_formats=dict(
                 retrieve_mode=cmd_runner_fmt.as_bool('--retrieve'),
                 path=cmd_runner_fmt.as_opt_val('--keytab'),
@@ -167,13 +166,11 @@ class IPAKeytab(object):
         )
 
     def _exec(self, check_rc=True):
-        params = dict(self.module.params)
-
         with self.runner(
             "retrieve_mode path ipa_server principal ldap_uri bind_dn bind_pw password ca_certificate sasl_mech encryption_types",
             check_rc=check_rc
         ) as ctx:
-            rc, out, err = ctx.run(**params)
+            rc, out, err = ctx.run()
         return out
 
 
