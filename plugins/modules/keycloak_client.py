@@ -112,7 +112,7 @@ options:
               V(client-jwt) or V(client-x509) can be chosen. When using V(client-secret), the module parameter
               O(secret) can set it, for V(client-jwt), you can use the keys C(use.jwks.url),
               C(jwks.url), and C(jwt.credential.certificate) in the O(attributes) module parameter
-              to configure its behavior. For V(client-x509) you can use the keys C(x509.allow.regex.pattern.comparison) 
+              to configure its behavior. For V(client-x509) you can use the keys C(x509.allow.regex.pattern.comparison)
               and C(x509.subjectdn) in the O(attributes) module parameter to configure which certificate(s) to accept.
             - This is 'clientAuthenticatorType' in the Keycloak REST API.
         choices: ['client-secret', 'client-jwt', 'client-x509']
