@@ -582,6 +582,14 @@ options:
                     - For OpenID-Connect clients, client certificate for validating JWT issued by
                       client and signed by its key, base64-encoded.
 
+            x509.subjectdn:
+                description:
+                    - For OpenID-Connect clients, subject which will be used to authenticate the client.
+
+            x509.allow.regex.pattern.comparison:
+                description:
+                    - For OpenID-Connect clients, boolean specifying whether to allow C(x509.subjectdn) as regular expression.
+
 extends_documentation_fragment:
     - community.general.keycloak
     - community.general.attributes
