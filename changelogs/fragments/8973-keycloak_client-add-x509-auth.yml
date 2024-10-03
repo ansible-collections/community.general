@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_client - Add ``client-x509`` choise to ``client_authenticator_type`` (https://github.com/ansible-collections/community.general/pull/8973).
