@@ -31,7 +31,6 @@ options:
         description:
             - Name of the snaps to be installed.
             - Any named snap accepted by the C(snap install) command is valid.
-              You can verify if a given snap is available on the Snap Store in advance by running: C(snap info <snap-name>).
             - >
               When installing locally built `.snap` SquashFS files or downloading them from
               sources other than the Snap Store, it is necessary to install in dangerous mode
