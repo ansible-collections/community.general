@@ -109,7 +109,7 @@ options:
     client_authenticator_type:
         description:
             - How do clients authenticate with the auth server? Either V(client-secret),
-              V(client-jwt) or V(client-x509) can be chosen. When using V(client-secret), the module parameter
+              V(client-jwt), or V(client-x509) can be chosen. When using V(client-secret), the module parameter
               O(secret) can set it, for V(client-jwt), you can use the keys C(use.jwks.url),
               C(jwks.url), and C(jwt.credential.certificate) in the O(attributes) module parameter
               to configure its behavior. For V(client-x509) you can use the keys C(x509.allow.regex.pattern.comparison)
