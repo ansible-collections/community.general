@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_user_federation - remove ``lastSync`` parameter from Keycloak responses to minimize diff/changes (https://github.com/ansible-collections/community.general/pull/8812).

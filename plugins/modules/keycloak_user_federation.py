@@ -722,11 +722,14 @@ from copy import deepcopy
 
 
 def normalize_kc_comp(comp):
-    # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
-    # to make change detection and diff more accurate we set it again in the kc responses
     if 'config' in comp:
+        # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
+        # to make change detection and diff more accurate we set it again in the kc responses
         if 'krbPrincipalAttribute' not in comp['config']:
             comp['config']['krbPrincipalAttribute'] = ['']
+
+        # kc stores a timestamp of the last sync in `lastSync` to time the periodic sync, it is removed to minimize diff/changes
+        comp['config'].pop('lastSync', None)
 
 
 def sanitize(comp):
