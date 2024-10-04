@@ -12,6 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: kutils
 short_description: Kerberos utils for managing tickets
+version_added: 9.5.0
 description:
   - Manage Kerberos tickets with C(kinit), C(klist) and C(kdestroy) base utilities.
 author: "Alexander Bakanovskii (@abakanovskii)"
@@ -46,7 +47,7 @@ options:
     type: bool
   cache_name:
     description:
-      - Use V(cache_name) as the ticket cache name and location.
+      - Use O(cache_name) as the ticket cache name and location.
       - If this option is not used, the default cache name and location are used.
       - The default credentials cache may vary between systems.
       - If not set the the value of E(KRB5CCNAME) environment variable will be used instead, its value is used to name the default ticket cache.
@@ -55,17 +56,25 @@ options:
     description:
       - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
       - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
+      - The value for O(lifetime) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
+      - You cannot mix units; a value of V(3h30m) will result in an error.
     type: str
+    example: 90m
   start_time:
     description:
       - Requests a postdated ticket.
       - Postdated tickets are issued with the invalid flag set, and need to be resubmitted to the KDC for validation before use.
       - O(start_time) specifies the duration of the delay before the ticket can become valid.
+      - You can use absolute time formats, for July 2, 2024, 1:35:30 p.m. you can use V(240702133530) (yymmddhhmm[ss]).
+      - You can also use time duration format similar to O(lifetime) or O(renewable).
     type: str
   renewable:
     description:
       - Requests renewable tickets, with a total lifetime equal to O(renewable).
+      - The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
+      - You cannot mix units; a value of V(3h30m) will result in an error.
     type: str
+    example: 7d
   forwardable:
     description:
       - Request forwardable or non-forwardable tickets.
