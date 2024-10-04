@@ -1509,8 +1509,8 @@ class KeycloakAPI(object):
             else:
                 group_children_url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent['id'])
                 group_children = json.loads(to_native(open_url(group_children_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
-                                                                timeout=self.connection_timeout,
-                                                                validate_certs=self.validate_certs).read()))
+                                                               timeout=self.connection_timeout,
+                                                               validate_certs=self.validate_certs).read()))
             subgroups = group_children
         else:
             subgroups = parent['subGroups']
