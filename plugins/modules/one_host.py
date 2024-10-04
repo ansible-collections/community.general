@@ -225,12 +225,12 @@ class HostModule(OpenNebulaModule):
                 self.fail(msg='absent host cannot be put in disabled state')
             elif current_state in [HOST_STATES.MONITORED, HOST_STATES.OFFLINE]:
                 # returns host ID integer
-                status_results = one.host.status(host.ID, HOST_STATUS.DISABLED)
-                if status_results or status_results == 0:
-                    self.wait_for_host_state(host, [HOST_STATES.DISABLED])
+                try:
+                    one.host.status(host.ID, HOST_STATUS.DISABLED)
                     result['changed'] = True
-                else:
-                    self.fail(msg="could not disable host")
+                except Exception as e:
+                    self.fail(msg="Could not disable host, ERROR: " + str(e))
+                self.wait_for_host_state(host, [HOST_STATES.DISABLED])
             elif current_state in [HOST_STATES.DISABLED]:
                 pass
             else:
@@ -241,12 +241,12 @@ class HostModule(OpenNebulaModule):
                 self.fail(msg='absent host cannot be placed in offline state')
             elif current_state in [HOST_STATES.MONITORED, HOST_STATES.DISABLED]:
                 # returns host ID integer
-                status_results = one.host.status(host.ID, HOST_STATUS.OFFLINE)
-                if status_results or status_results == 0:
-                    self.wait_for_host_state(host, [HOST_STATES.OFFLINE])
+                try:
+                    one.host.status(host.ID, HOST_STATUS.OFFLINE)
                     result['changed'] = True
-                else:
-                    self.fail(msg="could not set host offline")
+                except Exception as e:
+                    self.fail(msg="Could not set host offline, ERROR: " + str(e))
+                self.wait_for_host_state(host, [HOST_STATES.OFFLINE])
             elif current_state in [HOST_STATES.OFFLINE]:
                 pass
             else:
@@ -255,11 +255,11 @@ class HostModule(OpenNebulaModule):
         elif desired_state == 'absent':
             if current_state != HOST_ABSENT:
                 # returns host ID integer
-                delete_results = one.host.delete(host.ID)
-                if delete_results or delete_results == 0:
+                try:
+                    one.host.delete(host.ID)
                     result['changed'] = True
-                else:
-                    self.fail(msg="could not delete host from cluster")
+                except Exception as e:
+                    self.fail(msg="Could not delete host from cluster, ERROR: " + str(e))
 
         # if we reach this point we can assume that the host was taken to the desired state
 
@@ -278,20 +278,20 @@ class HostModule(OpenNebulaModule):
                 # setup the root element so that pyone will generate XML instead of attribute vector
                 desired_template_changes = {"TEMPLATE": desired_template_changes}
                 # merge the template, returns host ID integer
-                update_results = one.host.update(host.ID, desired_template_changes, 1)
-                if update_results or update_results == 0:
+                try:
+                    one.host.update(host.ID, desired_template_changes, 1)
                     result['changed'] = True
-                else:
-                    self.fail(msg="failed to update the host template")
+                except Exception as e:
+                    self.fail(msg="Failed to update the host template, ERROR: " + str(e))
 
             # the cluster
             if host.CLUSTER_ID != self.get_parameter('cluster_id'):
                 # returns cluster id in int
-                cluster_results = one.cluster.addhost(self.get_parameter('cluster_id'), host.ID)
-                if cluster_results and cluster_results == 0:
+                try:
+                    one.cluster.addhost(self.get_parameter('cluster_id'), host.ID)
                     result['changed'] = True
-                else:
-                    self.fail(msg="failed to update the host cluster")
+                except Exception as e:
+                    self.fail(msg="Failed to update the host cluster, ERROR: " + str(e))
 
         # return
         self.exit()
