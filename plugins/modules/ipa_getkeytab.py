@@ -12,8 +12,9 @@ DOCUMENTATION = r'''
 ---
 module: ipa_getkeytab
 short_description: Manage keytab file in FreeIPA
+version_added: 9.5.0
 description:
-  - Manage keytab file with ipa-getkeytab utility.
+  - Manage keytab file with C(ipa-getkeytab) utility.
 author: "Alexander Bakanovskii (@abakanovskii)"
 attributes:
   check_mode:
@@ -32,15 +33,14 @@ options:
       - The non-realm part of the full principal name.
     type: str
     required: true
-  ipa_server:
+  ipa_host:
     description:
       - The IPA server to retrieve the keytab from (FQDN).
     type: str
-    aliases: ["server"]
   ldap_uri:
     description:
       - LDAP URI. If V(ldap://) is specified, STARTTLS is initiated by default.
-      - Can not be used with the O(ipa_server) option.
+      - Can not be used with the O(ipa_host) option.
     type: str
   bind_dn:
     description:
@@ -55,11 +55,10 @@ options:
     description:
       - Use this password for the key instead of one randomly generated.
     type: str
-  ca_certificate:
+  ca_cert:
     description:
       - The path to the IPA CA certificate used to validate LDAPS/STARTTLS connections.
     type: path
-    aliases: ["ca_cert"]
   sasl_mech:
     description:
       - SASL mechanism to use if O(bind_dn) and O(bind_pw) are not specified.
@@ -108,20 +107,20 @@ EXAMPLES = r'''
   community.general.ipa_getkeytab:
     path: /etc/ipa/test.keytab
     principal: HTTP/freeipa-dc02.ipa.test
-    ipa_server: freeipa-dc01.ipa.test
+    ipa_host: freeipa-dc01.ipa.test
 
 - name: Retrieve already existing keytab
   community.general.ipa_getkeytab:
     path: /etc/ipa/test.keytab
     principal: HTTP/freeipa-dc02.ipa.test
-    ipa_server: freeipa-dc01.ipa.test
+    ipa_host: freeipa-dc01.ipa.test
     retrieve_mode: true
 
 - name: Force keytab recreation
   community.general.ipa_getkeytab:
     path: /etc/ipa/test.keytab
     principal: HTTP/freeipa-dc02.ipa.test
-    ipa_server: freeipa-dc01.ipa.test
+    ipa_host: freeipa-dc01.ipa.test
     force: true
 '''
 
@@ -137,12 +136,12 @@ class IPAKeytab(object):
         self.path = kwargs['path']
         self.state = kwargs['state']
         self.principal = kwargs['principal']
-        self.ipa_server = kwargs['ipa_server']
+        self.ipa_host = kwargs['ipa_host']
         self.ldap_uri = kwargs['ldap_uri']
         self.bind_dn = kwargs['bind_dn']
         self.bind_pw = kwargs['bind_pw']
         self.password = kwargs['password']
-        self.ca_certificate = kwargs['ca_certificate']
+        self.ca_cert = kwargs['ca_cert']
         self.sasl_mech = kwargs['sasl_mech']
         self.retrieve_mode = kwargs['retrieve_mode']
         self.encryption_types = kwargs['encryption_types']
@@ -153,13 +152,13 @@ class IPAKeytab(object):
             arg_formats=dict(
                 retrieve_mode=cmd_runner_fmt.as_bool('--retrieve'),
                 path=cmd_runner_fmt.as_opt_val('--keytab'),
-                ipa_server=cmd_runner_fmt.as_opt_val('--server'),
+                ipa_host=cmd_runner_fmt.as_opt_val('--server'),
                 principal=cmd_runner_fmt.as_opt_val('--principal'),
                 ldap_uri=cmd_runner_fmt.as_opt_val('--ldapuri'),
                 bind_dn=cmd_runner_fmt.as_opt_val('--binddn'),
                 bind_pw=cmd_runner_fmt.as_opt_val('--bindpw'),
                 password=cmd_runner_fmt.as_opt_val('--password'),
-                ca_certificate=cmd_runner_fmt.as_opt_val('--cacert'),
+                ca_cert=cmd_runner_fmt.as_opt_val('--cacert'),
                 sasl_mech=cmd_runner_fmt.as_opt_val('--mech'),
                 encryption_types=cmd_runner_fmt.as_opt_val('--enctypes'),
             )
@@ -167,7 +166,7 @@ class IPAKeytab(object):
 
     def _exec(self, check_rc=True):
         with self.runner(
-            "retrieve_mode path ipa_server principal ldap_uri bind_dn bind_pw password ca_certificate sasl_mech encryption_types",
+            "retrieve_mode path ipa_host principal ldap_uri bind_dn bind_pw password ca_cert sasl_mech encryption_types",
             check_rc=check_rc
         ) as ctx:
             rc, out, err = ctx.run()
@@ -179,12 +178,12 @@ def main():
         path=dict(type='path', required=True, aliases=["keytab"]),
         state=dict(default='present', choices=['present', 'absent']),
         principal=dict(type='str', required=True),
-        ipa_server=dict(type='str', aliases=["server"]),
+        ipa_host=dict(type='str'),
         ldap_uri=dict(type='str'),
         bind_dn=dict(type='str'),
         bind_pw=dict(type='str'),
         password=dict(type='str', no_log=True),
-        ca_certificate=dict(type='path', aliases=["ca_cert"]),
+        ca_cert=dict(type='path'),
         sasl_mech=dict(type='str', choices=["GSSAPI", "EXTERNAL"]),
         retrieve_mode=dict(type='bool'),
         encryption_types=dict(type='str'),
@@ -192,7 +191,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=arg_spec,
-        mutually_exclusive=[('ipa_server', 'ldap_uri'), ('retrieve_mode', 'password')],
+        mutually_exclusive=[('ipa_host', 'ldap_uri'), ('retrieve_mode', 'password')],
         supports_check_mode=True,
     )
 
@@ -204,12 +203,12 @@ def main():
                        path=path,
                        state=state,
                        principal=module.params['principal'],
-                       ipa_server=module.params['ipa_server'],
+                       ipa_host=module.params['ipa_host'],
                        ldap_uri=module.params['ldap_uri'],
                        bind_dn=module.params['bind_dn'],
                        bind_pw=module.params['bind_pw'],
                        password=module.params['password'],
-                       ca_certificate=module.params['ca_certificate'],
+                       ca_cert=module.params['ca_cert'],
                        sasl_mech=module.params['sasl_mech'],
                        retrieve_mode=module.params['retrieve_mode'],
                        encryption_types=module.params['encryption_types'],
