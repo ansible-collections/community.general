@@ -32,9 +32,7 @@ options:
             - Name of the snaps to be installed.
             - - Any named snap accepted by the C(snap) command is valid.
             - >
-              When installing locally built `.snap` SquashFS files or downloading them from
-              sources other than the Snap Store, it is necessary to install in dangerous mode
-              with O(dangerous=true) due to the absence of signatures for these snaps.
+              O(dangerous=true) may be necessary when installing `.snap` files. See O(dangerous) for more details.
         required: true
         type: list
         elements: str
