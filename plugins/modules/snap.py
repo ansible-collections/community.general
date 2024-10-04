@@ -49,10 +49,11 @@ options:
         type: str
     classic:
         description:
-            - Confinement policy: This level of confinement is permissive, granting full system access,
-              similar to that of traditionally packaged applications, such as Debian packages (those managed via the C(apt) command-line tool).
+            - Install a snap that has classic confinement.
+            - This level of confinement is permissive, granting full system access,
+              similar to that of traditionally packaged applications that don't use sandboxing mechanisms.
               This option corresponds to the C(--classic) argument of the C(snap install) command.
-              It can only be specified when the task involves a single snap.
+              This option can only be specified when the task involves a single snap.
             - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
 
         type: bool
@@ -73,13 +74,8 @@ options:
             - Snap options are a way to configure snaps by using the C(key=value) syntax or C(snap:key=value).
               If a snap name is given, the option will be applied to that snap only.
               If the snap name is omitted, the options will be applied to all snaps listed in O(name).
-              Options will only be applied to active snaps.
-              Since snap applications run in a sandboxed environment, this is the method used to
-              pass information to snapped applications regarding the desired configurations.
-              These configurations can be applied either at the startup of the application, within the snap (via a configure hook)
-              or during its execution if the application is designed to communicate with the snap API at runtime.
+              Options will only be applied to snaps with the C(state) set to V(present).
             - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap options and how to configure snaps.
-            - See U(https://snapcraft.io/docs/supported-snap-hooks) for more details about configure hooks.
 
         required: false
         type: list
@@ -87,10 +83,11 @@ options:
         version_added: 4.4.0
     dangerous:
         description:
-            - An install mode where there are no pre-acknowledged signatures for the given snap file,
-              meaning it was not verified by the Snap Store.
-              This could indicate that the snap is being built and tested locally,
-              but it also implies potential risks.
+            - Install the snap in dangerous mode, without validating its assertions and signatures.
+            - This is useful when installing local snaps that are either unsigned or have signatures that haven't been acknowledged.
+            - When installing locally built C(.snap) SquashFS files or downloading them from
+              sources other than the Snap Store, it is necessary to install in dangerous mode
+              with O(dangerous=true) due to the absence of signatures for these snaps.
             - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
         type: bool
         required: false
