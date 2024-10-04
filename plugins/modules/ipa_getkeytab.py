@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 module: ipa_getkeytab
 short_description: Manage keytab file in FreeIPA
 description:
-  - Manage keytab file with ipa-getkeytab utulity.
+  - Manage keytab file with ipa-getkeytab utility.
 author: "Alexander Bakanovskii (@abakanovskii)"
 attributes:
   check_mode:
