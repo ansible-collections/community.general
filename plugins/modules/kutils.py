@@ -57,7 +57,7 @@ options:
     description:
       - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
       - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
-      - The value for O(lifetime) must be followed by one of the following delimiters V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
+      - "The value for O(lifetime) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days."
       - You cannot mix units; a value of V(3h30m) will result in an error.
     type: str
   start_time:
@@ -71,7 +71,7 @@ options:
   renewable:
     description:
       - Requests renewable tickets, with a total lifetime equal to O(renewable).
-      - The value for O(renewable) must be followed by one of the following delimiters V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
+      - "The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days."
       - You cannot mix units; a value of V(3h30m) will result in an error.
     type: str
   forwardable:
