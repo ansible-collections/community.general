@@ -15,7 +15,7 @@ module: gitlab_project
 short_description: Creates/updates/deletes GitLab Projects
 description:
   - When the project does not exist in GitLab, it will be created.
-  - When the project does exists and O(state=absent), the project will be deleted.
+  - When the project does exist and O(state=absent), the project will be deleted.
   - When changes are made to the project, the project will be updated.
 author:
   - Werner Dijkerman (@dj-wasabi)
@@ -716,7 +716,7 @@ def main():
     if group_identifier:
         group = find_group(gitlab_instance, group_identifier)
         if group is None:
-            module.fail_json(msg="Failed to create project: group %s doesn't exists" % group_identifier)
+            module.fail_json(msg="Failed to create project: group %s doesn't exist" % group_identifier)
 
         namespace_id = group.id
     else:
