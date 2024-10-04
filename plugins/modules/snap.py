@@ -71,11 +71,13 @@ options:
         required: false
     options:
         description:
-            - Snap options are a way to configure snaps by using the C(key=value) syntax or C(snap:key=value).
-              If a snap name is given, the option will be applied to that snap only.
-              If the snap name is omitted, the options will be applied to all snaps listed in O(name).
-              Options will only be applied to snaps with the C(state) set to V(present).
-            - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap options and how to configure snaps.
+            - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
+              to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
+              only be applied to active snaps.
+            - Options will only be applied when C(state) is set to V(present).
+              This is done after the necessary installation 
+              or refresh (upgrade/downgrade) of all the snaps listed in O(name).
+            - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details snap configuration options.
 
         required: false
         type: list
