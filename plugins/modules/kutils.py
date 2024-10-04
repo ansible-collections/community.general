@@ -56,10 +56,9 @@ options:
     description:
       - Requests a ticket with the lifetime, if the O(lifetime) is not specified, the default ticket lifetime is used.
       - Specifying a ticket lifetime longer than the maximum ticket lifetime (configured by each site) will not override the configured maximum ticket lifetime.
-      - The value for O(lifetime) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
+      - The value for O(lifetime) must be followed by one of the following delimiters V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
       - You cannot mix units; a value of V(3h30m) will result in an error.
     type: str
-    example: 90m
   start_time:
     description:
       - Requests a postdated ticket.
@@ -71,10 +70,9 @@ options:
   renewable:
     description:
       - Requests renewable tickets, with a total lifetime equal to O(renewable).
-      - The value for O(renewable) must be followed by one of the following delimiters: V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
+      - The value for O(renewable) must be followed by one of the following delimiters V(s) - seconds, V(m) - minutes, V(h) - hours, V(d) - days.
       - You cannot mix units; a value of V(3h30m) will result in an error.
     type: str
-    example: 7d
   forwardable:
     description:
       - Request forwardable or non-forwardable tickets.
@@ -134,6 +132,16 @@ EXAMPLES = r'''
   community.general.kutils:
     keytab: true
     keytab_path: /etc/ipa/file.keytab
+
+- name: Get Kerberos ticket with a lifetime of 7 days
+  community.general.kutils:
+    password: some_password
+    lifetime: 7d
+
+- name: Get Kerberos ticket with a starting time of July 2, 2024, 1:35:30 p.m.
+  community.general.kutils:
+    password: some_password
+    start_time: "240702133530"
 
 - name: Get Kerberos ticket using principal name
   community.general.kutils:
