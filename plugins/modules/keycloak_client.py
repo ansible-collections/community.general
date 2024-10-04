@@ -534,7 +534,6 @@ options:
                 description:
                     - SAML Redirect Binding URL for the client's assertion consumer service (login responses).
 
-
             saml_force_name_id_format:
                 description:
                     - For SAML clients, Boolean specifying whether to ignore requested NameID subject format and using the configured one instead.
@@ -585,10 +584,14 @@ options:
             x509.subjectdn:
                 description:
                     - For OpenID-Connect clients, subject which will be used to authenticate the client.
+                type: str
+                version_added: 9.5.0
 
             x509.allow.regex.pattern.comparison:
                 description:
                     - For OpenID-Connect clients, boolean specifying whether to allow C(x509.subjectdn) as regular expression.
+                type: bool
+                version_added: 9.5.0
 
 extends_documentation_fragment:
     - community.general.keycloak
