@@ -37,7 +37,7 @@ class IPAKeytabModuleTestCase(ModuleTestCase):
         set_module_args({
             'path': '/tmp/test.keytab',
             'principal': 'HTTP/freeipa-dc02.ipa.test',
-            'ipa_server': 'freeipa-dc01.ipa.test',
+            'ipa_host': 'freeipa-dc01.ipa.test',
             'state': 'present'
         })
 
