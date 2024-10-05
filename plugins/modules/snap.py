@@ -48,9 +48,9 @@ options:
     classic:
         description:
             - Install a snap that has classic confinement.
+            - This option corresponds to the C(--classic) argument of the C(snap install) command.
             - This level of confinement is permissive, granting full system access,
               similar to that of traditionally packaged applications that don't use sandboxing mechanisms.
-              This option corresponds to the C(--classic) argument of the C(snap install) command.
               This option can only be specified when the task involves a single snap.
             - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
 
@@ -93,6 +93,12 @@ options:
         required: false
         default: false
         version_added: 7.2.0
+notes:
+  - When performing privileged operations, such as installing snap packages or setting snap options,
+    it is necessary to escalate privileges by executing these operations as root.
+    This can be achieved by using V(become: true) in the module.
+  - For more details on privilege escalation in playbooks,
+    refer to U(https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html).
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
