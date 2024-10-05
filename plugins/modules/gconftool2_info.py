@@ -7,17 +7,18 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
+---
 module: gconftool2_info
 author:
-    - "Alexei Znamensky (@russoz)"
+- "Alexei Znamensky (@russoz)"
 short_description: Retrieve GConf configurations
 version_added: 5.1.0
 description:
-  - This module allows retrieving application preferences from the GConf database, with the help of C(gconftool-2).
+- This module allows retrieving application preferences from the GConf database, with the help of C(gconftool-2).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.attributes.info_module
+- community.general.attributes
+- community.general.attributes.info_module
 options:
   key:
     description:
@@ -25,28 +26,30 @@ options:
     type: str
     required: true
 notes:
-  - See man gconftool-2(1) for more details.
+- See man gconftool-2(1) for more details.
 seealso:
-  - name: gconf repository (archived)
-    description: Git repository for the project. It is an archived project, so the repository is read-only.
-    link: https://gitlab.gnome.org/Archive/gconf
-'''
+- name: gconf repository (archived)
+  description: Git repository for the project. It is an archived project, so the repository is read-only.
+  link: https://gitlab.gnome.org/Archive/gconf
+"""
 
 EXAMPLES = """
+---
 - name: Get value for a certain key in the database.
   community.general.gconftool2_info:
     key: /desktop/gnome/background/picture_filename
   register: result
 """
 
-RETURN = '''
-  value:
-    description:
-    - The value of the property.
-    returned: success
-    type: str
-    sample: Monospace 10
-'''
+RETURN = """
+---
+value:
+  description:
+  - The value of the property.
+  returned: success
+  type: str
+  sample: Monospace 10
+"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.gconftool2 import gconftool2_runner
