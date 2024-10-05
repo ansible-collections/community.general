@@ -91,6 +91,11 @@ notes:
     O(mode=new): When using V(new) mode, the module will behave differently. The O(name) parameter may refer to a module name, a distribution file,
     a HTTP URL or a git repository URL as described in C(cpanminus) documentation. C(cpanm) version specifiers are recognized.
     This is the default mode from community.general 9.0.0 onwards.
+
+seealso:
+  - name: C(cpanm) command manual page
+    description: Manual page for the command.
+    link: https://metacpan.org/dist/App-cpanminus/view/bin/cpanm
 author:
   - "Franck Cuny (@fcuny)"
   - "Alexei Znamensky (@russoz)"

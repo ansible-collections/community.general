@@ -17,6 +17,11 @@ short_description: Edit GNOME Configurations
 description:
   - This module allows for the manipulation of GNOME 2 Configuration via
     gconftool-2.  Please see the gconftool-2(1) man pages for more details.
+seealso:
+  - name: C(gconftool-2) command manual page
+    description: Manual page for the command.
+    link: https://help.gnome.org/admin//system-admin-guide/2.32/gconf-6.html.en
+
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

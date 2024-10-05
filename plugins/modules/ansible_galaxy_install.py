@@ -22,6 +22,11 @@ notes:
     The module will try and run using the C(C.UTF-8) locale.
     If that fails, it will try C(en_US.UTF-8).
     If that one also fails, the module will fail.
+seealso:
+  - name: C(ansible-galaxy) command manual page
+    description: Manual page for the command.
+    link: https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html
+
 requirements:
   - ansible-core 2.11 or newer
 extends_documentation_fragment:

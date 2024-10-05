@@ -17,6 +17,11 @@ module: mksysb
 short_description: Generates AIX mksysb rootvg backups
 description:
   - This module manages a basic AIX mksysb (image) of rootvg.
+seealso:
+  - name: C(mksysb) command manual page
+    description: Manual page for the command.
+    link: https://www.ibm.com/docs/en/aix/7.3?topic=m-mksysb-command
+
 extends_documentation_fragment:
   - community.general.attributes
 attributes:

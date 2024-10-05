@@ -17,6 +17,11 @@ description:
   - This module allows configuring the default handler for a specific MIME type, to be used by applications built with th Gnome GIO API.
 extends_documentation_fragment:
   - community.general.attributes
+seealso:
+  - name: C(gio) command manual page
+    description: Manual page for the command.
+    link: https://man.archlinux.org/man/gio.1
+
 attributes:
   check_mode:
     support: full
