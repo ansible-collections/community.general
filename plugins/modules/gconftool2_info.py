@@ -25,9 +25,10 @@ options:
     - The key name for an element in the GConf database.
     type: str
     required: true
-notes:
-- See man gconftool-2(1) for more details.
 seealso:
+- name: C(gconftool-2) command manual page
+  description: Manual page for the command.
+  link: https://help.gnome.org/admin//system-admin-guide/2.32/gconf-6.html.en
 - name: gconf repository (archived)
   description: Git repository for the project. It is an archived project, so the repository is read-only.
   link: https://gitlab.gnome.org/Archive/gconf

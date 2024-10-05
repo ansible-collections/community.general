@@ -33,17 +33,16 @@ options:
   key:
     type: str
     description:
-    - A GConf preference key is an element in the GConf repository that corresponds to an application preference. See man gconftool-2(1).
+    - A GConf preference key is an element in the GConf repository that corresponds to an application preference.
     required: true
   value:
     type: str
     description:
     - Preference keys typically have simple values such as strings, integers, or lists of strings and integers. This is ignored unless O(state=present).
-      See man gconftool-2(1).
   value_type:
     type: str
     description:
-    - The type of value being set. This is ignored unless O(state=present). See man gconftool-2(1).
+    - The type of value being set. This is ignored unless O(state=present).
     choices: [bool, float, int, string]
   state:
     type: str
@@ -54,11 +53,10 @@ options:
   config_source:
     type: str
     description:
-    - Specify a configuration source to use rather than the default path. See man gconftool-2(1).
+    - Specify a configuration source to use rather than the default path.
   direct:
     description:
-    - Access the config database directly, bypassing server.  If O(direct) is specified then the O(config_source) must be specified as well. See
-      man gconftool-2(1).
+    - Access the config database directly, bypassing server.  If O(direct) is specified then the O(config_source) must be specified as well.
     type: bool
     default: false
 """
