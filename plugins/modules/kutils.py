@@ -352,7 +352,7 @@ def main():
                        )
 
     if module.params['keytab_path'] is not None and module.params['keytab'] is not True:
-      module.fail_json(msg="If keytab_path is specified then keytab parameter must be True")
+        module.fail_json(msg="If keytab_path is specified then keytab parameter must be True")
 
     changed = False
     if state == 'present':
