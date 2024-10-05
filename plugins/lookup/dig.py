@@ -330,6 +330,7 @@ class LookupModule(LookupBase):
         myres.use_edns(0, ednsflags=dns.flags.DO, payload=edns_size)
 
         domains = []
+        nameservers = []
         qtype = self.get_option('qtype')
         flat = self.get_option('flat')
         fail_on_error = self.get_option('fail_on_error')
@@ -345,7 +346,6 @@ class LookupModule(LookupBase):
             if t.startswith('@'):       # e.g. "@10.0.1.2,192.0.2.1" is ok.
                 nsset = t[1:].split(',')
                 for ns in nsset:
-                    nameservers = []
                     # Check if we have a valid IP address. If so, use that, otherwise
                     # try to resolve name to address using system's resolver. If that
                     # fails we bail out.
@@ -358,7 +358,6 @@ class LookupModule(LookupBase):
                             nameservers.append(nsaddr)
                         except Exception as e:
                             raise AnsibleError("dns lookup NS: %s" % to_native(e))
-                    myres.nameservers = nameservers
                 continue
             if '=' in t:
                 try:
@@ -396,6 +395,9 @@ class LookupModule(LookupBase):
                 domains.append(t)
 
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
+
+        if len(nameservers) > 0:
+            myres.nameservers = nameservers
 
         if qtype.upper() == 'PTR':
             reversed_domains = []

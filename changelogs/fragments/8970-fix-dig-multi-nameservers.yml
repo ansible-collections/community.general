@@ -1,0 +1,2 @@
+bugfixes:
+  - dig lookup plugin - fix using only the last nameserver specified (https://github.com/ansible-collections/community.general/pull/8970).
