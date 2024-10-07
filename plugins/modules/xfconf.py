@@ -16,8 +16,7 @@ author:
 - "Alexei Znamensky (@russoz)"
 short_description: Edit XFCE4 Configurations
 description:
-- This module allows for the manipulation of Xfce 4 Configuration with the help of xfconf-query. Please see the xfconf-query(1) man page for more
-  details.
+- This module allows for the manipulation of Xfce 4 Configuration with the help of C(xfconf-query).
 seealso:
 - name: xfconf-query(1) man page
   description: Manual page of the C(xfconf-query) tool at the XFCE documentation site.
