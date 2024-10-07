@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_confg - remove ``CapacityBytes`` from required paramaters of the ``CreateVolume`` command (https://github.com/ansible-collections/community.general/pull/8956).
