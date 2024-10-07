@@ -27,7 +27,6 @@ IGNORE_NO_MAINTAINERS = [
     'plugins/callback/cgroup_memory_recap.py',
     'plugins/callback/context_demo.py',
     'plugins/callback/counter_enabled.py',
-    'plugins/callback/hipchat.py',
     'plugins/callback/jabber.py',
     'plugins/callback/log_plays.py',
     'plugins/callback/logdna.py',
