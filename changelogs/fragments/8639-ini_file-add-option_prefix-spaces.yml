@@ -1,0 +1,2 @@
+minor_changes:
+  - ini_file - add ```option_prefix_spaces``` option to prefix option names with a number of spaces defined by this option (https://github.com/ansible-collections/community.general/pull/8639).
