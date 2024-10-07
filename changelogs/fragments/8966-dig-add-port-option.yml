@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - dig lookup plugin - add ``port`` option to specify DNS server port (https://github.com/ansible-collections/community.general/pull/8966).
+...
