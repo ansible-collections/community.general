@@ -164,8 +164,8 @@ options:
     required: false
     description:
       - Setting dict of volume to be created.
-      - If CapacityBytes key is not specified in this dictionary, the size of
-        the volume will be determined by the Redfish service. It's possible the
+      - If C(CapacityBytes) key is not specified in this dictionary, the size of
+        the volume will be determined by the Redfish service. It is possible the
         size will not be the maximum available size.
     type: dict
     default: {}
