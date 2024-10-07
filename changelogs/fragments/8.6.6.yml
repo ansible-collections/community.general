@@ -1,6 +1,0 @@
-release_summary: |-  
-  Regular bugfix release.
-
-  Note that this is the last regular bugfix release of community.general 8.x.y.
-  From now on, there will only be maintenance releases with major bugfixes and
-  security fixes.
