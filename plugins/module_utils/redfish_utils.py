@@ -3742,7 +3742,7 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "The following volumes were deleted: %s" % str(volume_ids)}
 
-    def create_volume(self, volume_details, storage_subsystem_id):
+    def create_volume(self, volume_details, storage_subsystem_id, storage_none_volume_deletion=False):
         # Find the Storage resource from the requested ComputerSystem resource
         response = self.get_request(self.root_uri + self.systems_uri)
         if response['ret'] is False:
@@ -3794,22 +3794,23 @@ class RedfishUtils(object):
         data = response['data']
 
         # Deleting any volumes of RAIDType None present on the Storage Subsystem
-        response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
-        if response['ret'] is False:
-            return response
-        volume_data = response['data']
+        if storage_none_volume_deletion:
+            response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+            if response['ret'] is False:
+                return response
+            volume_data = response['data']
 
-        if "Members" in volume_data:
-            for member in volume_data["Members"]:
-                response = self.get_request(self.root_uri + member['@odata.id'])
-                if response['ret'] is False:
-                    return response
-                member_data = response['data']
-
-                if member_data["RAIDType"] == "None":
-                    response = self.delete_request(self.root_uri + member['@odata.id'])
+            if "Members" in volume_data:
+                for member in volume_data["Members"]:
+                    response = self.get_request(self.root_uri + member['@odata.id'])
                     if response['ret'] is False:
                         return response
+                    member_data = response['data']
+
+                    if member_data["RAIDType"] == "None":
+                        response = self.delete_request(self.root_uri + member['@odata.id'])
+                        if response['ret'] is False:
+                            return response
 
         # Construct payload and issue POST command to create volume
         volume_details["Links"] = {}
