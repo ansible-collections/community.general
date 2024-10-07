@@ -17,6 +17,8 @@ from ansible_collections.community.general.plugins.modules import keycloak_userp
 
 from itertools import count
 
+from json import dumps
+
 from ansible.module_utils.six import StringIO
 
 
@@ -509,7 +511,7 @@ class TestKeycloakUserprofile(ModuleTestCase):
                     "providerType": "org.keycloak.userprofile.UserProfileProvider",
                     "config": {
                         "kc.user.profile.config": [
-                            {
+                            dumps({
                                 "attributes": [
                                     {
                                         "name": "username",
@@ -625,7 +627,7 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                         "displayDescription": "Attributes, which refer to user metadata",
                                     }
                                 ],
-                            }
+                            })
                         ]
                     }
                 }
@@ -714,7 +716,7 @@ class TestKeycloakUserprofile(ModuleTestCase):
                     "providerType": "org.keycloak.userprofile.UserProfileProvider",
                     "config": {
                         "kc.user.profile.config": [
-                            {
+                            dumps({
                                 "attributes": [
                                     {
                                         "name": "username",
@@ -830,7 +832,7 @@ class TestKeycloakUserprofile(ModuleTestCase):
                                         "displayDescription": "Attributes, which refer to user metadata",
                                     }
                                 ],
-                            }
+                            })
                         ]
                     }
                 }
