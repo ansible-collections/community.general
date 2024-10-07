@@ -3777,8 +3777,8 @@ class RedfishUtils(object):
                 'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
 
         # Validate input parameters
-        required_parameters = ['RAIDType', 'Drives', 'CapacityBytes']
-        allowed_parameters = ['DisplayName', 'InitializeMethod', 'MediaSpanCount',
+        required_parameters = ['RAIDType', 'Drives']
+        allowed_parameters = ['CapacityBytes', 'DisplayName', 'InitializeMethod', 'MediaSpanCount',
                               'Name', 'ReadCachePolicy', 'StripSizeBytes', 'VolumeUsage', 'WriteCachePolicy']
 
         for parameter in required_parameters:
