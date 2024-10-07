@@ -1,0 +1,10 @@
+removed_features:
+  - "The hipchat callback plugin has been removed. The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020 (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The consul_acl module has been removed. Use community.general.consul_token and/or community.general.consul_policy instead (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The rhn_channel module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The rhn_register module has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
+  - "The redhat module utils has been removed (https://github.com/ansible-collections/community.general/pull/8921)."
+breaking_changes:
+  - The collection no longer supports ansible-core 2.13 and ansible-core 2.14.
+    While most (or even all) modules and plugins might still work with these versions, they are no longer tested in CI and breakages regarding them will not be fixed
+    (https://github.com/ansible-collections/community.general/pull/8921)."

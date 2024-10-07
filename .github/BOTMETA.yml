@@ -61,7 +61,6 @@ files:
   $callbacks/elastic.py:
     keywords: apm observability
     maintainers: v1v
-  $callbacks/hipchat.py: {}
   $callbacks/jabber.py: {}
   $callbacks/log_plays.py: {}
   $callbacks/loganalytics.py:
@@ -1161,12 +1160,6 @@ files:
     keywords: kvm libvirt proxmox qemu
     labels: rhevm virt
     maintainers: $team_virt TimothyVandenbrande
-  $modules/rhn_channel.py:
-    labels: rhn_channel
-    maintainers: vincentvdk alikins $team_rhn
-  $modules/rhn_register.py:
-    labels: rhn_register
-    maintainers: jlaska $team_rhn
   $modules/rhsm_release.py:
     maintainers: seandst $team_rhsm
   $modules/rhsm_repository.py:
@@ -1554,7 +1547,6 @@ macros:
   team_oracle: manojmeda mross22 nalsaber
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_redfish: mraineri tomasg2012 xmadsen renxulei rajeevkallur bhavya06 jyundt
-  team_rhn: FlossWare alikins barnabycourt vritant
   team_rhsm: cnsnyder ptoscano
   team_scaleway: remyleone abarbare
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l

@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-requires_ansible: '>=2.13.0'
+requires_ansible: '>=2.15.0'
 action_groups:
   consul:
     - consul_agent_check
@@ -44,7 +44,7 @@ plugin_routing:
         warning_text: Use the 'default' callback plugin with 'display_skipped_hosts
           = no' option.
     hipchat:
-      deprecation:
+      tombstone:
         removal_version: 10.0.0
         warning_text: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
     osx_say:
@@ -72,7 +72,7 @@ plugin_routing:
       redirect: infoblox.nios_modules.nios_next_network
   modules:
     consul_acl:
-      deprecation:
+      tombstone:
         removal_version: 10.0.0
         warning_text: Use community.general.consul_token and/or community.general.consul_policy instead.
     hipchat:
@@ -184,12 +184,12 @@ plugin_routing:
         removal_version: 9.0.0
         warning_text: This module relied on the deprecated package pyrax.
     rhn_channel:
-      deprecation:
+      tombstone:
         removal_version: 10.0.0
         warning_text: RHN is EOL, please contact the community.general maintainers
           if still using this; see the module documentation for more details.
     rhn_register:
-      deprecation:
+      tombstone:
         removal_version: 10.0.0
         warning_text: RHN is EOL, please contact the community.general maintainers
           if still using this; see the module documentation for more details.
