@@ -3742,7 +3742,7 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "The following volumes were deleted: %s" % str(volume_ids)}
 
-    def create_volume(self, volume_details, storage_subsystem_id, storage_none_volume_deletion):
+    def create_volume(self, volume_details, storage_subsystem_id, storage_none_volume_deletion=False):
         # Find the Storage resource from the requested ComputerSystem resource
         response = self.get_request(self.root_uri + self.systems_uri)
         if response['ret'] is False:
