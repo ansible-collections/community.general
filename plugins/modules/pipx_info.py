@@ -9,45 +9,46 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: pipx_info
 short_description: Rretrieves information about applications installed with pipx
 version_added: 5.6.0
 description:
-    - Retrieve details about Python applications installed in isolated virtualenvs using pipx.
+- Retrieve details about Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
-    - community.general.pipx
+- community.general.attributes
+- community.general.attributes.info_module
+- community.general.pipx
 options:
-    name:
-        description:
-            - Name of an application installed with C(pipx).
-        type: str
-    include_deps:
-        description:
-            - Include dependent packages in the output.
-        type: bool
-        default: false
-    include_injected:
-        description:
-            - Include injected packages in the output.
-        type: bool
-        default: false
-    include_raw:
-        description:
-            - Returns the raw output of C(pipx list --json).
-            - The raw output is not affected by O(include_deps) or O(include_injected).
-        type: bool
-        default: false
-    global:
-        version_added: 9.3.0
+  name:
+    description:
+    - Name of an application installed with C(pipx).
+    type: str
+  include_deps:
+    description:
+    - Include dependent packages in the output.
+    type: bool
+    default: false
+  include_injected:
+    description:
+    - Include injected packages in the output.
+    type: bool
+    default: false
+  include_raw:
+    description:
+    - Returns the raw output of C(pipx list --json).
+    - The raw output is not affected by O(include_deps) or O(include_injected).
+    type: bool
+    default: false
+  global:
+    version_added: 9.3.0
 author:
-    - "Alexei Znamensky (@russoz)"
-'''
+- "Alexei Znamensky (@russoz)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
+---
 - name: retrieve all installed applications
   community.general.pipx_info: {}
 
@@ -65,9 +66,10 @@ EXAMPLES = '''
   community.general.pipx_info:
     name: ansible-lint
     include_deps: true
-'''
+"""
 
-RETURN = '''
+RETURN = """
+---
 application:
   description: The list of installed applications
   returned: success
@@ -107,15 +109,8 @@ cmd:
   returned: success
   type: list
   elements: str
-  sample: [
-    "/usr/bin/python3.10",
-    "-m",
-    "pipx",
-    "list",
-    "--include-injected",
-    "--json"
-  ]
-'''
+  sample: ["/usr/bin/python3.10", "-m", "pipx", "list", "--include-injected", "--json"]
+"""
 
 import json
 

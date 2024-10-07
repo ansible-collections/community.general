@@ -9,23 +9,29 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = """
+---
 module: ansible_galaxy_install
 author:
-  - "Alexei Znamensky (@russoz)"
+- "Alexei Znamensky (@russoz)"
 short_description: Install Ansible roles or collections using ansible-galaxy
 version_added: 3.5.0
 description:
-  - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
+- This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
 notes:
-  - Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
-  - >
-    The module will try and run using the C(C.UTF-8) locale.
-    If that fails, it will try C(en_US.UTF-8).
-    If that one also fails, the module will fail.
+- Support for B(Ansible 2.9/2.10) was removed in community.general 8.0.0.
+- >
+  The module will try and run using the C(C.UTF-8) locale.
+  If that fails, it will try C(en_US.UTF-8).
+  If that one also fails, the module will fail.
+seealso:
+- name: C(ansible-galaxy) command manual page
+  description: Manual page for the command.
+  link: https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html
+
 requirements:
-  - ansible-core 2.11 or newer
+- ansible-core 2.11 or newer
 extends_documentation_fragment:
-  - community.general.attributes
+- community.general.attributes
 attributes:
   check_mode:
     support: none
@@ -34,62 +40,63 @@ attributes:
 options:
   state:
     description:
-      - >
-        If O(state=present) then the collection or role will be installed.
-        Note that the collections and roles are not updated with this option.
-      - >
-        Currently the O(state=latest) is ignored unless O(type=collection), and it will
-        ensure the collection is installed and updated to the latest available version.
-      - Please note that O(force=true) can be used to perform upgrade regardless of O(type).
+    - >
+      If O(state=present) then the collection or role will be installed.
+      Note that the collections and roles are not updated with this option.
+    - >
+      Currently the O(state=latest) is ignored unless O(type=collection), and it will
+      ensure the collection is installed and updated to the latest available version.
+    - Please note that O(force=true) can be used to perform upgrade regardless of O(type).
     type: str
-    choices: [ present, latest ]
+    choices: [present, latest]
     default: present
     version_added: 9.1.0
   type:
     description:
-      - The type of installation performed by C(ansible-galaxy).
-      - If O(type=both), then O(requirements_file) must be passed and it may contain both roles and collections.
-      - "Note however that the opposite is not true: if using a O(requirements_file), then O(type) can be any of the three choices."
+    - The type of installation performed by C(ansible-galaxy).
+    - If O(type=both), then O(requirements_file) must be passed and it may contain both roles and collections.
+    - "Note however that the opposite is not true: if using a O(requirements_file), then O(type) can be any of the three choices."
     type: str
     choices: [collection, role, both]
     required: true
   name:
     description:
-      - Name of the collection or role being installed.
-      - >
-        Versions can be specified with C(ansible-galaxy) usual formats.
-        For example, the collection V(community.docker:1.6.1) or the role V(ansistrano.deploy,3.8.0).
-      - O(name) and O(requirements_file) are mutually exclusive.
+    - Name of the collection or role being installed.
+    - >
+      Versions can be specified with C(ansible-galaxy) usual formats.
+      For example, the collection V(community.docker:1.6.1) or the role V(ansistrano.deploy,3.8.0).
+    - O(name) and O(requirements_file) are mutually exclusive.
     type: str
   requirements_file:
     description:
-      - Path to a file containing a list of requirements to be installed.
-      - It works for O(type) equals to V(collection) and V(role).
-      - O(name) and O(requirements_file) are mutually exclusive.
+    - Path to a file containing a list of requirements to be installed.
+    - It works for O(type) equals to V(collection) and V(role).
+    - O(name) and O(requirements_file) are mutually exclusive.
     type: path
   dest:
     description:
-      - The path to the directory containing your collections or roles, according to the value of O(type).
-      - >
-        Please notice that C(ansible-galaxy) will not install collections with O(type=both), when O(requirements_file)
-        contains both roles and collections and O(dest) is specified.
+    - The path to the directory containing your collections or roles, according to the value of O(type).
+    - >
+      Please notice that C(ansible-galaxy) will not install collections with O(type=both), when O(requirements_file)
+      contains both roles and collections and O(dest) is specified.
     type: path
   no_deps:
     description:
-      - Refrain from installing dependencies.
+    - Refrain from installing dependencies.
     version_added: 4.5.0
     type: bool
     default: false
   force:
     description:
-      - Force overwriting existing roles and/or collections.
-      - It can be used for upgrading, but the module output will always report C(changed=true).
-      - Using O(force=true) is mandatory when downgrading.
+    - Force overwriting existing roles and/or collections.
+    - It can be used for upgrading, but the module output will always report C(changed=true).
+    - Using O(force=true) is mandatory when downgrading.
     type: bool
     default: false
 """
 
 EXAMPLES = """
+---
 - name: Install collection community.network
   community.general.ansible_galaxy_install:
     type: collection
@@ -111,76 +118,76 @@ EXAMPLES = """
     type: collection
     name: community.network:3.0.2
     force: true
-
 """
 
 RETURN = """
-  type:
-    description: The value of the O(type) parameter.
-    type: str
-    returned: always
-  name:
-    description: The value of the O(name) parameter.
-    type: str
-    returned: always
-  dest:
-    description: The value of the O(dest) parameter.
-    type: str
-    returned: always
-  requirements_file:
-    description: The value of the O(requirements_file) parameter.
-    type: str
-    returned: always
-  force:
-    description: The value of the O(force) parameter.
-    type: bool
-    returned: always
-  installed_roles:
-    description:
-      - If O(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
-      - If O(name) is specified, returns that role name and the version installed per path.
-    type: dict
-    returned: always when installing roles
-    contains:
-      "<path>":
-        description: Roles and versions for that path.
-        type: dict
-    sample:
-      /home/user42/.ansible/roles:
-        ansistrano.deploy: 3.9.0
-        baztian.xfce: v0.0.3
-      /custom/ansible/roles:
-        ansistrano.deploy: 3.8.0
-  installed_collections:
-    description:
-      - If O(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
-      - If O(name) is specified, returns that collection name and the version installed per path.
-    type: dict
-    returned: always when installing collections
-    contains:
-      "<path>":
-        description: Collections and versions for that path
-        type: dict
-    sample:
-      /home/az/.ansible/collections/ansible_collections:
-        community.docker: 1.6.0
-        community.general: 3.0.2
-      /custom/ansible/ansible_collections:
-        community.general: 3.1.0
-  new_collections:
-    description: New collections installed by this module.
-    returned: success
-    type: dict
-    sample:
-      community.general: 3.1.0
-      community.docker: 1.6.1
-  new_roles:
-    description: New roles installed by this module.
-    returned: success
-    type: dict
-    sample:
-      ansistrano.deploy: 3.8.0
+---
+type:
+  description: The value of the O(type) parameter.
+  type: str
+  returned: always
+name:
+  description: The value of the O(name) parameter.
+  type: str
+  returned: always
+dest:
+  description: The value of the O(dest) parameter.
+  type: str
+  returned: always
+requirements_file:
+  description: The value of the O(requirements_file) parameter.
+  type: str
+  returned: always
+force:
+  description: The value of the O(force) parameter.
+  type: bool
+  returned: always
+installed_roles:
+  description:
+  - If O(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
+  - If O(name) is specified, returns that role name and the version installed per path.
+  type: dict
+  returned: always when installing roles
+  contains:
+    "<path>":
+      description: Roles and versions for that path.
+      type: dict
+  sample:
+    /home/user42/.ansible/roles:
+      ansistrano.deploy: 3.9.0
       baztian.xfce: v0.0.3
+    /custom/ansible/roles:
+      ansistrano.deploy: 3.8.0
+installed_collections:
+  description:
+  - If O(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
+  - If O(name) is specified, returns that collection name and the version installed per path.
+  type: dict
+  returned: always when installing collections
+  contains:
+    "<path>":
+      description: Collections and versions for that path
+      type: dict
+  sample:
+    /home/az/.ansible/collections/ansible_collections:
+      community.docker: 1.6.0
+      community.general: 3.0.2
+    /custom/ansible/ansible_collections:
+      community.general: 3.1.0
+new_collections:
+  description: New collections installed by this module.
+  returned: success
+  type: dict
+  sample:
+    community.general: 3.1.0
+    community.docker: 1.6.1
+new_roles:
+  description: New roles installed by this module.
+  returned: success
+  type: dict
+  sample:
+    ansistrano.deploy: 3.8.0
+    baztian.xfce: v0.0.3
 """
 
 import re
