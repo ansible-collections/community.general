@@ -148,7 +148,7 @@ options:
   storage_none_volume_deletion:
     required: false
     description:
-      - Should redfish_config erase 'None' type volumes ?
+      - Indicates if all non-RAID volumes are automatically deleted prior to creating the new volume
     type: bool
     default: false
     version_added: '9.5.0'
