@@ -716,6 +716,8 @@ files:
   $modules/ipa_:
     maintainers: $team_ipa
     ignore: fxfitz
+  $modules/ipa_getkeytab.py:
+    maintainers: abakanovskii
   $modules/ipa_dnsrecord.py:
     maintainers: $team_ipa jwbernin
   $modules/ipbase_info.py:
