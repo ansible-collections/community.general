@@ -93,6 +93,24 @@ options:
         default: true
         version_added: 9.4.0
 
+    bind_credential_update_mode:
+        description:
+            - The value of the config parameter O(config.bindCredential) is redacted in the Keycloak responses.
+              Comparing the redacted value with the desired value always evaluates to not equal. This means
+              the before and desired states are never equal if the parameter is set.
+            - Set to V(always) to include O(config.bindCredential) in the comparison of before and desired state.
+              Because of the redacted value returned by Keycloak the module will always detect a change
+              and make an update if a O(config.bindCredential) value is set.
+            - Set to V(only_indirect) to exclude O(config.bindCredential) when comparing the before state with the
+              desired state. The value of O(config.bindCredential) will only be updated if there are other changes
+              to the user federation that require an update.
+        type: str
+        default: always
+        choices:
+            - always
+            - only_indirect
+        version_added: 9.5.0
+
     config:
         description:
             - Dict specifying the configuration options for the provider; the contents differ depending on
@@ -837,6 +855,7 @@ def main():
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
         remove_unspecified_mappers=dict(type='bool', default=True),
+        bind_credential_update_mode=dict(type='str', default='always', choices=['always', 'only_indirect']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
@@ -884,8 +903,9 @@ def main():
 
     # Filter and map the parameters names that apply
     comp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers', 'remove_unspecified_mappers'] and
-                   module.params.get(x) is not None]
+                   if x not in list(keycloak_argument_spec().keys())
+                   + ['state', 'realm', 'mappers', 'remove_unspecified_mappers', 'bind_credential_update_mode']
+                   and module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
     if cid is None:
@@ -1027,8 +1047,15 @@ def main():
         if state == 'present':
             # Process an update
 
+            desired_copy = deepcopy(desired_comp)
+            before_copy = deepcopy(before_comp)
+            # exclude bindCredential when checking wether an update is required, therefore
+            # updating it only if there are other changes
+            if module.params['bind_credential_update_mode'] == 'only_indirect':
+                desired_copy.get('config', []).pop('bindCredential', None)
+                before_copy.get('config', []).pop('bindCredential', None)
             # no changes
-            if desired_comp == before_comp:
+            if desired_copy == before_copy:
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
