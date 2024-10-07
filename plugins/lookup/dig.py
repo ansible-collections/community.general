@@ -75,6 +75,11 @@ DOCUMENTATION = '''
         default: false
         type: bool
         version_added: 7.5.0
+      port:
+        description: Use port as target port when looking up DNS records.
+        default: 53
+        type: int
+        version_added: 9.5.0
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
@@ -336,6 +341,7 @@ class LookupModule(LookupBase):
         fail_on_error = self.get_option('fail_on_error')
         real_empty = self.get_option('real_empty')
         tcp = self.get_option('tcp')
+        port = self.get_option('port')
         try:
             rdclass = dns.rdataclass.from_text(self.get_option('class'))
         except Exception as e:
@@ -396,6 +402,8 @@ class LookupModule(LookupBase):
 
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
 
+        if port:
+            myres.port = port
         if len(nameservers) > 0:
             myres.nameservers = nameservers
 
