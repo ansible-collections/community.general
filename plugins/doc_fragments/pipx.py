@@ -33,5 +33,10 @@ notes:
     - >
       This module will honor C(pipx) environment variables such as but not limited to E(PIPX_HOME) and E(PIPX_BIN_DIR)
       passed using the R(environment Ansible keyword, playbooks_environment).
-    - See also the C(pipx) documentation at U(https://pypa.github.io/pipx/).
+
+seealso:
+  - name: C(pipx) command manual page
+    description: Manual page for the command.
+    link: https://pipx.pypa.io/latest/docs/
+
 '''
