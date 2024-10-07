@@ -1,0 +1,2 @@
+minor_changes:
+    - keycloak_user_federation - add the user federation config parameter ``referral`` to the module arguments (https://github.com/ansible-collections/community.general/pull/8954).
