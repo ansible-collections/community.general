@@ -21,6 +21,23 @@ from ansible_collections.community.general.plugins.inventory.opennebula import I
 from ansible_collections.community.general.tests.unit.compat.mock import create_autospec
 
 
+class HistoryEntry(object):
+    def __init__(self):
+        self.SEQ = '384'
+        self.HOSTNAME = 'sam-691-sam'
+        self.HID = '10'
+        self.CID = '0'
+        self.DS_ID = '100'
+        self.VM_MAD = 'kvm'
+        self.TM_MAD = '3par'
+        self.ACTION = '0'
+
+
+class HistoryRecords(object):
+    def __init__(self):
+        self.HISTORY = [HistoryEntry()]
+
+
 @pytest.fixture
 def inventory():
     r = InventoryModule()
@@ -58,7 +75,7 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 132,
         'GNAME': 'CSApparelVDC',
-        'HISTORY_RECORDS': {},
+        'HISTORY_RECORDS': HistoryRecords(),
         'ID': 7157,
         'LAST_POLL': 1632762935,
         'LCM_STATE': 3,
@@ -104,7 +121,7 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 0,
         'GNAME': 'oneadmin',
-        'HISTORY_RECORDS': {},
+        'HISTORY_RECORDS': [],
         'ID': 327,
         'LAST_POLL': 1632763543,
         'LCM_STATE': 3,
@@ -167,7 +184,7 @@ def get_vm_pool():
         'ETIME': 0,
         'GID': 0,
         'GNAME': 'oneadmin',
-        'HISTORY_RECORDS': {},
+        'HISTORY_RECORDS': [],
         'ID': 107,
         'LAST_POLL': 1632764186,
         'LCM_STATE': 3,
