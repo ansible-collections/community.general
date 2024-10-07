@@ -145,6 +145,13 @@ options:
     type: str
     default: ''
     version_added: '7.3.0'
+  storage_none_volume_deletion:
+    required: false
+    description:
+      - Should redfish_config erase 'None' type volumes ?
+    type: bool
+    default: false
+    version_added: '9.5.0'
   volume_ids:
     required: false
     description:
