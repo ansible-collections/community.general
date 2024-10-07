@@ -108,13 +108,14 @@ options:
 
     client_authenticator_type:
         description:
-            - How do clients authenticate with the auth server? Either V(client-secret) or
-              V(client-jwt) can be chosen. When using V(client-secret), the module parameter
-              O(secret) can set it, while for V(client-jwt), you can use the keys C(use.jwks.url),
+            - How do clients authenticate with the auth server? Either V(client-secret),
+              V(client-jwt), or V(client-x509) can be chosen. When using V(client-secret), the module parameter
+              O(secret) can set it, for V(client-jwt), you can use the keys C(use.jwks.url),
               C(jwks.url), and C(jwt.credential.certificate) in the O(attributes) module parameter
-              to configure its behavior.
+              to configure its behavior. For V(client-x509) you can use the keys C(x509.allow.regex.pattern.comparison)
+              and C(x509.subjectdn) in the O(attributes) module parameter to configure which certificate(s) to accept.
             - This is 'clientAuthenticatorType' in the Keycloak REST API.
-        choices: ['client-secret', 'client-jwt']
+        choices: ['client-secret', 'client-jwt', 'client-x509']
         aliases:
             - clientAuthenticatorType
         type: str
@@ -533,7 +534,6 @@ options:
                 description:
                     - SAML Redirect Binding URL for the client's assertion consumer service (login responses).
 
-
             saml_force_name_id_format:
                 description:
                     - For SAML clients, Boolean specifying whether to ignore requested NameID subject format and using the configured one instead.
@@ -581,6 +581,18 @@ options:
                     - For OpenID-Connect clients, client certificate for validating JWT issued by
                       client and signed by its key, base64-encoded.
 
+            x509.subjectdn:
+                description:
+                    - For OpenID-Connect clients, subject which will be used to authenticate the client.
+                type: str
+                version_added: 9.5.0
+
+            x509.allow.regex.pattern.comparison:
+                description:
+                    - For OpenID-Connect clients, boolean specifying whether to allow C(x509.subjectdn) as regular expression.
+                type: bool
+                version_added: 9.5.0
+
 extends_documentation_fragment:
     - community.general.keycloak
     - community.general.attributes
@@ -622,6 +634,22 @@ EXAMPLES = '''
     client_id: test
     state: absent
   delegate_to: localhost
+
+
+- name: Create or update a Keycloak client (minimal example), with x509 authentication
+  community.general.keycloak_client:
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    realm: master
+    state: present
+    client_id: test
+    client_authenticator_type: client-x509
+    attributes:
+      x509.subjectdn: "CN=client"
+      x509.allow.regex.pattern.comparison: false
 
 
 - name: Create or update a Keycloak client (with all the bells and whistles)
@@ -913,7 +941,7 @@ def main():
         base_url=dict(type='str', aliases=['baseUrl']),
         surrogate_auth_required=dict(type='bool', aliases=['surrogateAuthRequired']),
         enabled=dict(type='bool'),
-        client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt'], aliases=['clientAuthenticatorType']),
+        client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt', 'client-x509'], aliases=['clientAuthenticatorType']),
         secret=dict(type='str', no_log=True),
         registration_access_token=dict(type='str', aliases=['registrationAccessToken'], no_log=True),
         default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
