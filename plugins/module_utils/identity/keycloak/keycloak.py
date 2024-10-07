@@ -1499,6 +1499,23 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not fetch group %s in realm %s: %s"
                                       % (gid, realm, str(e)))
 
+    def get_subgroups(self, parent, realm="master"):
+        if 'subGroupCount' in parent:
+            # Since version 23, when GETting a group Keycloak does not
+            # return subGroups but only a subGroupCount.
+            # Children must be fetched in a second request.
+            if parent['subGroupCount'] == 0:
+                group_children = []
+            else:
+                group_children_url = URL_GROUP_CHILDREN.format(url=self.baseurl, realm=realm, groupid=parent['id'])
+                group_children = json.loads(to_native(open_url(group_children_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                               timeout=self.connection_timeout,
+                                                               validate_certs=self.validate_certs).read()))
+            subgroups = group_children
+        else:
+            subgroups = parent['subGroups']
+        return subgroups
+
     def get_group_by_name(self, name, realm="master", parents=None):
         """ Fetch a keycloak group within a realm based on its name.
 
@@ -1519,7 +1536,7 @@ class KeycloakAPI(object):
                 if not parent:
                     return None
 
-                all_groups = parent['subGroups']
+                all_groups = self.get_subgroups(parent, realm)
             else:
                 all_groups = self.get_groups(realm=realm)
 
@@ -1568,7 +1585,7 @@ class KeycloakAPI(object):
             return None
 
         for p in name_chain[1:]:
-            for sg in tmp['subGroups']:
+            for sg in self.get_subgroups(tmp):
                 pv, is_id = self._get_normed_group_parent(p)
 
                 if is_id:
