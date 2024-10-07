@@ -18,11 +18,11 @@ version_added: 4.4.0
 description:
     - Manages a user's home directory managed by systemd-homed.
 notes:
-    - This module does B(not) work with Python 3.13 or newer. It uses the deprecated L(crypt Python module,
-      https://docs.python.org/3.12/library/crypt.html) from the Python standard library, which was removed
-      from Python 3.13.
+    - This module requires the deprecated L(crypt Python module,
+      https://docs.python.org/3.12/library/crypt.html) library which was removed from Python 3.13.
+      For Python 3.13 or newer, you need to install L(legacycrypt, https://pypi.org/project/legacycrypt/).
 requirements:
-    - Python 3.12 or earlier
+    - legacycrypt (on Python 3.13 or newer)
 extends_documentation_fragment:
     - community.general.attributes
 attributes:
@@ -283,6 +283,17 @@ except ImportError:
 else:
     HAS_CRYPT = True
     CRYPT_IMPORT_ERROR = None
+
+try:
+    import legacycrypt
+    if not HAS_CRYPT:
+        crypt = legacycrypt
+except ImportError:
+    HAS_LEGACYCRYPT = False
+    LEGACYCRYPT_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_LEGACYCRYPT = True
+    LEGACYCRYPT_IMPORT_ERROR = None
 
 
 class Homectl(object):
@@ -606,9 +617,9 @@ def main():
         ]
     )
 
-    if not HAS_CRYPT:
+    if not HAS_CRYPT and not HAS_LEGACYCRYPT:
         module.fail_json(
-            msg=missing_required_lib('crypt (part of Python 3.13 standard library)'),
+            msg=missing_required_lib('crypt (part of standard library up to Python 3.12) or legacycrypt (PyPI)'),
             exception=CRYPT_IMPORT_ERROR,
         )
 

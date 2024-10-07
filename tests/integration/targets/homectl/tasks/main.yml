@@ -15,6 +15,11 @@
   ignore_errors: true
 
 - block:
+    - name: Install legacycrypt on Python 3.13+
+      pip:
+        name: legacycrypt
+      when: ansible_python_version is version("3.13", ">=")
+
     - name: Check and start systemd-homed service
       service:
         name: systemd-homed.service
