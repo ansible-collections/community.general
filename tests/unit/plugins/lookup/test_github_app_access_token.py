@@ -50,6 +50,7 @@ class TestLookupModule(unittest.TestCase):
                     token_expiry=600
                 )
             )
+
     def test_get_token_with_fact(self):
         with patch.multiple("ansible_collections.community.general.plugins.lookup.github_app_access_token",
                             open_url=MagicMock(return_value=MockResponse()),
