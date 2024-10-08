@@ -10,9 +10,9 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: kutils
+module: krb_ticket
 short_description: Kerberos utils for managing tickets
-version_added: 9.5.0
+version_added: 10.0.0
 description:
   - Manage Kerberos tickets with C(kinit), C(klist) and C(kdestroy) base utilities.
   - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/user/user_commands/index.html) for reference.
@@ -129,54 +129,54 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Get Kerberos ticket using default principal
-  community.general.kutils:
+  community.general.krb_ticket:
     password: some_password
 
 - name: Get Kerberos ticket using keytab
-  community.general.kutils:
+  community.general.krb_ticket:
     keytab: true
     keytab_path: /etc/ipa/file.keytab
 
 - name: Get Kerberos ticket with a lifetime of 7 days
-  community.general.kutils:
+  community.general.krb_ticket:
     password: some_password
     lifetime: 7d
 
 - name: Get Kerberos ticket with a starting time of July 2, 2024, 1:35:30 p.m.
-  community.general.kutils:
+  community.general.krb_ticket:
     password: some_password
     start_time: "240702133530"
 
 - name: Get Kerberos ticket using principal name
-  community.general.kutils:
+  community.general.krb_ticket:
     password: some_password
     principal: admin
 
 - name: Get Kerberos ticket using principal with realm
-  community.general.kutils:
+  community.general.krb_ticket:
     password: some_password
     principal: admin@IPA.TEST
 
 - name: Check for existence by ticket cache
-  community.general.kutils:
+  community.general.krb_ticket:
     cache_name: KEYRING:persistent:0:0
 
 - name: Make sure default ticket is destroyed
-  community.general.kutils:
+  community.general.krb_ticket:
     state: absent
 
 - name: Make sure specific ticket destroyed by principal
-  community.general.kutils:
+  community.general.krb_ticket:
     state: absent
     principal: admin@IPA.TEST
 
 - name: Make sure specific ticket destroyed by cache_name
-  community.general.kutils:
+  community.general.krb_ticket:
     state: absent
     cache_name: KEYRING:persistent:0:0
 
 - name: Make sure all tickets are destroyed
-  community.general.kutils:
+  community.general.krb_ticket:
     state: absent
     kdestroy_all: true
 '''

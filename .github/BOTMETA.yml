@@ -829,7 +829,7 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
-  $modules/kutils.py:
+  $modules/krb_ticket.py:
     maintainers: abakanovskii
   $modules/launchd.py:
     maintainers: martinm82

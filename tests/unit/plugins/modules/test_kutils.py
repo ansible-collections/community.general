@@ -7,8 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-from ansible_collections.community.general.plugins.modules import kutils
+from ansible_collections.community.general.plugins.modules import krb_ticket
 from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
 
 
-Helper.from_module(kutils, __name__)
+Helper.from_module(krb_ticket, __name__)
