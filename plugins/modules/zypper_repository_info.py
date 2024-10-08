@@ -10,6 +10,9 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from ansible_collections.community.general.plugins.module_utils import deps
+
+
 DOCUMENTATION = '''
 ---
 module: zypper_repository_info
@@ -79,13 +82,8 @@ repodatalist:
 
 import traceback
 
-XML_IMP_ERR = None
-try:
+with deps.declare("parseXML"):
     from xml.dom.minidom import parseString as parseXML
-    HAS_XML = True
-except ImportError:
-    XML_IMP_ERR = traceback.format_exc()
-    HAS_XML = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
@@ -106,8 +104,6 @@ def _parse_repos(module):
     """parses the output of zypper --xmlout repos and return a parse repo dictionary"""
     cmd = _get_cmd(module, '--xmlout', 'repos')
 
-    if not HAS_XML:
-        module.fail_json(msg=missing_required_lib("python-xml"), exception=XML_IMP_ERR)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc == 0:
         repos = []
@@ -134,6 +130,8 @@ def main():
         ),
         supports_check_mode=False,
     )
+
+    deps.validate(parseXML)
 
     repodatalist = _parse_repos(module)
     module.exit_json(changed=False, repodatalist=repodatalist)
