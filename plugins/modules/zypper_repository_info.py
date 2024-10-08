@@ -46,7 +46,7 @@ repodatalist:
             description: The alias of the repository.
             type: str
         autorefresh:
-            description: indicates, if autorefresh is enabled on the repository
+            description: Indicates, if autorefresh is enabled on the repository.
             type: int
         enabled:
             description: indicates, if the repository is enabled
