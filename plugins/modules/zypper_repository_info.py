@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: zypper_repository_info
 author: "Tobias Zeuch (@TobiasZeuch181)"
-version_added: 9.4.0
+version_added: 9.5.0
 short_description: List Zypper repositories
 description:
     - List Zypper repositories on SUSE and openSUSE.
