@@ -30,7 +30,7 @@ options:
     name:
         description:
             - Name of the snaps to be installed.
-            - - Any named snap accepted by the C(snap) command is valid.
+            - Any named snap accepted by the C(snap) command is valid.
             - >
               O(dangerous=true) may be necessary when installing `.snap` files. See O(dangerous) for more details.
         required: true
