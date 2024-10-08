@@ -6,13 +6,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-
-from ansible_collections.community.general.plugins.module_utils import deps
-
-
 DOCUMENTATION = '''
 ---
 module: zypper_repository_info
@@ -43,6 +36,7 @@ repodatalist:
     description:
         - A list of repository descriptions like it is returned by the command C(zypper repos).
     type: list
+    returned: always
     elements: dictionary
     contains:
         alias:
@@ -79,15 +73,16 @@ repodatalist:
             ]
 '''
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
-import traceback
+
+from ansible_collections.community.general.plugins.module_utils import deps
 
 with deps.declare("parseXML"):
     from xml.dom.minidom import parseString as parseXML
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+from ansible.module_utils.basic import AnsibleModule
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
