@@ -61,7 +61,7 @@ repodatalist:
             description: the priority of the repository
             type: int
         url:
-            description: the url of the repository on the internet
+            description: The URL of the repository on the internet.
             type: str
     sample: [
                 {
