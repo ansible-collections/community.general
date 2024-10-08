@@ -94,11 +94,11 @@ options:
         default: false
         version_added: 7.2.0
 notes:
-  - When performing privileged operations, such as installing snap packages or setting snap options,
-    it is necessary to escalate privileges by executing these operations as root.
-    This can be achieved by using V(become: true) in the module.
-  - For more details on privilege escalation in playbooks,
-    refer to U(https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html).
+  - Privileged operations, such as installing and configuring snaps, require root priviledges. 
+    This is only the case if the user hasn't logged in to the Snap Store.
+    The privilege can be escalated by setting V(become: true) in the task.
+
+    Refer to R(the documentation on playbook privilege escalation, playbooks_privilege_escalation)
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
