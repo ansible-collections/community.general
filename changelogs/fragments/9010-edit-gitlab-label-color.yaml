@@ -1,2 +1,2 @@
 minor_changes:
-  - Gilab label module - be able to update label's color (https://github.com/ansible-collections/community.general/pull/9010).
+  - gitlab_label - add feature to update label's color (https://github.com/ansible-collections/community.general/pull/9010).
