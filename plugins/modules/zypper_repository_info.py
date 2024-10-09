@@ -6,6 +6,10 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 DOCUMENTATION = '''
 ---
 module: zypper_repository_info
@@ -37,7 +41,7 @@ repodatalist:
         - A list of repository descriptions like it is returned by the command C(zypper repos).
     type: list
     returned: always
-    elements: dictionary
+    elements: dict
     contains:
         alias:
             description: The alias of the repository.
@@ -72,9 +76,6 @@ repodatalist:
                 }
             ]
 '''
-
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.module_utils import deps
