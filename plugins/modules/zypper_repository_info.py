@@ -124,7 +124,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
         ),
-        supports_check_mode=False,
+        supports_check_mode=True
     )
 
     deps.validate(parseXML)
