@@ -98,7 +98,7 @@ notes:
     This is only the case if the user hasn't logged in to the Snap Store.
     The privilege can be escalated by setting V(become: true) in the task.
 
-    Refer to R(the documentation on playbook privilege escalation, playbooks_privilege_escalation)
+    Refer to R(the documentation on playbook privilege escalation, playbooks_privilege_escalation).
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
