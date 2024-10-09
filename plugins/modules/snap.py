@@ -73,7 +73,7 @@ options:
               to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in O(name). Options will
               only be applied to active snaps.
             - Options will only be applied when C(state) is set to V(present).
-              This is done after the necessary installation 
+              This is done after the necessary installation
               or refresh (upgrade/downgrade) of all the snaps listed in O(name).
             - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details snap configuration options.
 
@@ -94,9 +94,9 @@ options:
         default: false
         version_added: 7.2.0
 notes:
-  - Privileged operations, such as installing and configuring snaps, require root priviledges. 
+  - Privileged operations, such as installing and configuring snaps, require root priviledges.
     This is only the case if the user hasn't logged in to the Snap Store.
-    The privilege can be escalated by setting V(become: true) in the task.
+    The privilege can be escalated by setting C(become) to C(true) in the task.
 
     Refer to R(the documentation on playbook privilege escalation, playbooks_privilege_escalation).
 
