@@ -8,13 +8,13 @@ __metaclass__ = type
 import jenkins
 import json
 
-from unittest.mock import patch, call
 from xml.etree import ElementTree as et
 
 import pytest
 
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
+from ansible_collections.community.general.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules import jenkins_node
 from pytest import fixture, raises, mark, param
 
