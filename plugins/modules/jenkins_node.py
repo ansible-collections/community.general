@@ -226,7 +226,7 @@ class JenkinsNode:
                 configured = True
 
         if configured:
-            data = ElementTree.tostring(root, encoding='unicode')
+            data = ElementTree.tostring(root)
             self.instance.reconfig_node(self.name, data)
 
         self.result['configured'] = configured
