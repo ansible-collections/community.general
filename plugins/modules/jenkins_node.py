@@ -134,6 +134,7 @@ configured:
   type: bool
 '''
 
+import sys
 import traceback
 from xml.etree import ElementTree
 
@@ -148,6 +149,9 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+
+IS_PYTHON_2 = sys.version_info[0] <= 2
 
 
 class JenkinsNode:
@@ -226,7 +230,11 @@ class JenkinsNode:
                 configured = True
 
         if configured:
-            data = ElementTree.tostring(root)
+            if IS_PYTHON_2:
+                data = ElementTree.tostring(root)
+            else:
+                data = ElementTree.tostring(root, encoding="unicode")
+
             self.instance.reconfig_node(self.name, data)
 
         self.result['configured'] = configured
