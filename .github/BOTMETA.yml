@@ -830,6 +830,8 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
+  $modules/krb_ticket.py:
+    maintainers: abakanovskii
   $modules/launchd.py:
     maintainers: martinm82
   $modules/layman.py:
