@@ -85,8 +85,6 @@ options:
         description:
             - Install the snap in dangerous mode, without validating its assertions and signatures.
             - This is useful when installing local snaps that are either unsigned or have signatures that haven't been acknowledged.
-            - When installing locally built C(.snap) SquashFS files or downloading them from
-              sources other than the Snap Store, it is necessary to with O(dangerous=true).
             - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
         type: bool
         required: false
