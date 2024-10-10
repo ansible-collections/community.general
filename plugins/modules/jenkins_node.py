@@ -23,6 +23,9 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: partial
+    details:
+      - Check mode is unable to show configuration changes for a node that is not yet
+        present.
   diff_mode:
     support: none
 options:
@@ -58,7 +61,8 @@ options:
   labels:
     description:
       - When specified, sets the Jenkins node labels.
-    type: list[str]
+    type: list
+    elements: str
 '''
 
 EXAMPLES = '''
@@ -193,7 +197,8 @@ class JenkinsNode:
         if not present:
             # Node would only not be present if in check mode and if not present there
             # is no way to know what would and would not be changed.
-            assert self.module.check_mode
+            if not self.module.check_mode:
+                raise Exception("configure_node present is False outside of check mode")
             return
 
         configured = False
@@ -240,7 +245,9 @@ class JenkinsNode:
                     raise e
 
                 # TODO: Remove authorization workaround.
-                self.result['warnings'].append("suppressed 401 Not Authorized on redirect after node created: see https://review.opendev.org/c/jjb/python-jenkins/+/931707")
+                self.result['warnings'].append(
+                    "suppressed 401 Not Authorized on redirect after node created: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
+                )
 
         present = self.instance.node_exists(self.name)
         created = False
@@ -271,7 +278,9 @@ class JenkinsNode:
                     raise e
 
                 # TODO: Remove authorization workaround.
-                self.result['warnings'].append("suppressed 401 Not Authorized on redirect after node deleted: see https://review.opendev.org/c/jjb/python-jenkins/+/931707")
+                self.result['warnings'].append(
+                    "suppressed 401 Not Authorized on redirect after node deleted: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
+                )
 
         present = self.instance.node_exists(self.name)
         deleted = False
@@ -301,7 +310,8 @@ class JenkinsNode:
         else:
             # Would have created node with initial state enabled therefore would not have
             # needed to enable therefore not enabled.
-            assert self.module.check_mode
+            if not self.module.check_mode:
+                raise Exception("enabled_node present is False outside of check mode")
             enabled = False
 
         self.result['enabled'] = enabled
@@ -324,7 +334,8 @@ class JenkinsNode:
         else:
             # Would have created node with initial state enabled therefore would have
             # needed to disable therefore disabled.
-            assert self.module.check_mode
+            if not self.module.check_mode:
+                raise Exception("disabled_node present is False outside of check mode")
             disabled = True
 
         self.result['disabled'] = disabled
@@ -343,7 +354,7 @@ def test_dependencies(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, str='str'),
+            name=dict(required=True, type='str'),
             url=dict(default='http://localhost:8080'),
             user=dict(),
             token=dict(no_log=True),

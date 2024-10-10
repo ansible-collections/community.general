@@ -762,6 +762,8 @@ files:
     maintainers: sermilrod
   $modules/jenkins_job_info.py:
     maintainers: stpierre
+  $modules/jenkins_node.py:
+    maintainers: phyrwork
   $modules/jenkins_plugin.py:
     maintainers: jtyr
   $modules/jenkins_script.py:

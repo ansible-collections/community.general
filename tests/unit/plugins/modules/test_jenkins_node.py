@@ -83,7 +83,7 @@ def exit_json(*args, **kwargs):
 
 
 class AnsibleFailJson(Exception):
-    ...
+    pass
 
 
 def fail_json(*args, **kwargs):
