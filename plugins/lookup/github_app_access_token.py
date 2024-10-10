@@ -19,7 +19,7 @@ DOCUMENTATION = '''
       key_path:
         description:
         - Path to your private key.
-        required: true
+        required: false
         type: path
       app_id:
         description:
@@ -33,6 +33,11 @@ DOCUMENTATION = '''
           configure button is the installation ID.
         - Alternatively, you can use PyGithub (U(https://github.com/PyGithub/PyGithub)) to get your installation ID.
         required: true
+        type: str
+      private_key:
+        description:
+        - GitHub App private key in PEM file format as string
+        required: false
         type: str
       token_expiry:
         description:
@@ -84,8 +89,10 @@ else:
 display = Display()
 
 
-def read_key(path):
+def read_key(path, private_key=None):
     try:
+        if private_key:
+            return jwk_from_pem(private_key.encode())
         with open(path, 'rb') as pem_file:
             return jwk_from_pem(pem_file.read())
     except Exception as e:
@@ -132,8 +139,8 @@ def post_request(generated_jwt, installation_id):
     return json_data.get('token')
 
 
-def get_token(key_path, app_id, installation_id, expiry=600):
-    jwk = read_key(key_path)
+def get_token(key_path, app_id, installation_id, private_key, expiry=600):
+    jwk = read_key(key_path, private_key)
     generated_jwt = encode_jwt(app_id, jwk, exp=expiry)
     return post_request(generated_jwt, installation_id)
 
@@ -150,6 +157,7 @@ class LookupModule(LookupBase):
             self.get_option('key_path'),
             self.get_option('app_id'),
             self.get_option('installation_id'),
+            self.get_option('private_key'),
             self.get_option('token_expiry'),
         )
 
