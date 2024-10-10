@@ -38,3 +38,11 @@
 
     - name: ensure zypper ref still works
       command: zypper -n ref
+
+- block:
+    - include_tasks: 'zypper_repository.yml'
+  always:
+    - name: remove repositories added during test
+      community.general.zypper_repository:
+        name: "test"
+        state: absent
