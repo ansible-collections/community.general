@@ -31,7 +31,7 @@ notes:
 
 EXAMPLES = '''
 - name: List registered repositories and store in variable repositories
-  community.general.zypper_repository_info:
+  community.general.zypper_repository_info: {}
   register: repodatalist
 '''
 
