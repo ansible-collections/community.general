@@ -152,16 +152,19 @@ class HostModule(OpenNebulaModule):
     def allocate_host(self):
         """
         Creates a host entry in OpenNebula
+        self.one.host.allocate returns ID of a host
         Returns: True on success, fails otherwise.
 
         """
-        if not self.one.host.allocate(self.get_parameter('name'),
-                                      self.get_parameter('vmm_mad_name'),
-                                      self.get_parameter('im_mad_name'),
-                                      self.get_parameter('cluster_id')):
-            self.fail(msg="could not allocate host")
-        else:
+        try:
+            self.one.host.allocate(self.get_parameter('name'),
+                                   self.get_parameter('vmm_mad_name'),
+                                   self.get_parameter('im_mad_name'),
+                                   self.get_parameter('cluster_id'))
             self.result['changed'] = True
+        except Exception as e:
+            self.fail(msg="Could not allocate host, ERROR: " + str(e))
+
         return True
 
     def wait_for_host_state(self, host, target_states):
@@ -221,11 +224,13 @@ class HostModule(OpenNebulaModule):
             if current_state == HOST_ABSENT:
                 self.fail(msg='absent host cannot be put in disabled state')
             elif current_state in [HOST_STATES.MONITORED, HOST_STATES.OFFLINE]:
-                if one.host.status(host.ID, HOST_STATUS.DISABLED):
-                    self.wait_for_host_state(host, [HOST_STATES.DISABLED])
+                # returns host ID integer
+                try:
+                    one.host.status(host.ID, HOST_STATUS.DISABLED)
                     result['changed'] = True
-                else:
-                    self.fail(msg="could not disable host")
+                except Exception as e:
+                    self.fail(msg="Could not disable host, ERROR: " + str(e))
+                self.wait_for_host_state(host, [HOST_STATES.DISABLED])
             elif current_state in [HOST_STATES.DISABLED]:
                 pass
             else:
@@ -235,11 +240,13 @@ class HostModule(OpenNebulaModule):
             if current_state == HOST_ABSENT:
                 self.fail(msg='absent host cannot be placed in offline state')
             elif current_state in [HOST_STATES.MONITORED, HOST_STATES.DISABLED]:
-                if one.host.status(host.ID, HOST_STATUS.OFFLINE):
-                    self.wait_for_host_state(host, [HOST_STATES.OFFLINE])
+                # returns host ID integer
+                try:
+                    one.host.status(host.ID, HOST_STATUS.OFFLINE)
                     result['changed'] = True
-                else:
-                    self.fail(msg="could not set host offline")
+                except Exception as e:
+                    self.fail(msg="Could not set host offline, ERROR: " + str(e))
+                self.wait_for_host_state(host, [HOST_STATES.OFFLINE])
             elif current_state in [HOST_STATES.OFFLINE]:
                 pass
             else:
@@ -247,10 +254,12 @@ class HostModule(OpenNebulaModule):
 
         elif desired_state == 'absent':
             if current_state != HOST_ABSENT:
-                if one.host.delete(host.ID):
+                # returns host ID integer
+                try:
+                    one.host.delete(host.ID)
                     result['changed'] = True
-                else:
-                    self.fail(msg="could not delete host from cluster")
+                except Exception as e:
+                    self.fail(msg="Could not delete host from cluster, ERROR: " + str(e))
 
         # if we reach this point we can assume that the host was taken to the desired state
 
@@ -268,17 +277,21 @@ class HostModule(OpenNebulaModule):
             if self.requires_template_update(host.TEMPLATE, desired_template_changes):
                 # setup the root element so that pyone will generate XML instead of attribute vector
                 desired_template_changes = {"TEMPLATE": desired_template_changes}
-                if one.host.update(host.ID, desired_template_changes, 1):  # merge the template
+                # merge the template, returns host ID integer
+                try:
+                    one.host.update(host.ID, desired_template_changes, 1)
                     result['changed'] = True
-                else:
-                    self.fail(msg="failed to update the host template")
+                except Exception as e:
+                    self.fail(msg="Failed to update the host template, ERROR: " + str(e))
 
             # the cluster
             if host.CLUSTER_ID != self.get_parameter('cluster_id'):
-                if one.cluster.addhost(self.get_parameter('cluster_id'), host.ID):
+                # returns cluster id in int
+                try:
+                    one.cluster.addhost(self.get_parameter('cluster_id'), host.ID)
                     result['changed'] = True
-                else:
-                    self.fail(msg="failed to update the host cluster")
+                except Exception as e:
+                    self.fail(msg="Failed to update the host cluster, ERROR: " + str(e))
 
         # return
         self.exit()
