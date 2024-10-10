@@ -93,9 +93,6 @@ options:
 notes:
   - Privileged operations, such as installing and configuring snaps, require root priviledges.
     This is only the case if the user hasn't logged in to the Snap Store.
-    The privilege can be escalated by setting C(become) to C(true) in the task.
-
-    Refer to R(the documentation on playbook privilege escalation, playbooks_privilege_escalation).
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
