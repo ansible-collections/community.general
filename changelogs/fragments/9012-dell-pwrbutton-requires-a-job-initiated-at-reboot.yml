@@ -1,0 +1,4 @@
+minor_changes:
+  - redfish_utils module utils - schedule a BIOS configuration job at next
+    reboot when the BIOS config is changed
+    (https://github.com/ansible-collections/community.general/pull/9012).

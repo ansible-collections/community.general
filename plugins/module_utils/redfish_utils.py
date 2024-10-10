@@ -2311,11 +2311,19 @@ class RedfishUtils(object):
 
         # Construct payload and issue PATCH command
         payload = {"Attributes": attrs_to_patch}
+
+        # WORKAROUND
+        # Dell systems require manually setting the apply time to "OnReset"
+        # to spawn a proprietary job to apply the BIOS settings
+        vendor = self._get_vendor()['Vendor']
+        if vendor == 'Dell':
+            payload.update({"@Redfish.SettingsApplyTime": {"ApplyTime": "OnReset"}})
+
         response = self.patch_request(self.root_uri + set_bios_attr_uri, payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
-                'msg': "Modified BIOS attributes %s" % (attrs_to_patch),
+                'msg': "Modified BIOS attributes %s. A reboot is required" % (attrs_to_patch),
                 'warning': warning}
 
     def set_boot_order(self, boot_list):
