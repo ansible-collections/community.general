@@ -75,7 +75,7 @@ options:
             - Options will only be applied when C(state) is set to V(present).
               This is done after the necessary installation
               or refresh (upgrade/downgrade) of all the snaps listed in O(name).
-            - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details snap configuration options.
+            - See U(https://snapcraft.io/docs/configuration-in-snaps) for more details about snap configuration options.
 
         required: false
         type: list
