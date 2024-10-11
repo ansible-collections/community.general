@@ -268,9 +268,6 @@ class GitlabLabels(object):
             return True, True
         _label = self.gitlab_object.labels.get(var_obj.get('name'))
 
-        if (var_obj.get('new_name') is None) and (var_obj.get('color') is None):
-            self._module.fail_json(msg="Failed to update label, new_name or color must be present: %s " % _label)
-
         if var_obj.get('new_name') is not None:
             _label.new_name = var_obj.get('new_name')
 
