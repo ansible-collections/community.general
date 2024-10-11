@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: jenkins_node
 short_description: Manage Jenkins nodes
+version_added: 10.0.0
 description:
   - Manage Jenkins nodes with Jenkins REST API.
 requirements:
@@ -50,7 +51,7 @@ options:
   state:
     description:
       - Specifies whether the Jenkins node should be V(present) (created), V(absent)
-        (deleted), enabled (online) or disabled (offline).
+        (deleted), V(enabled) (online) or V(disabled) (offline).
     default: present
     choices: ['enabled', 'disabled', 'present', 'absent']
     type: str
@@ -135,20 +136,18 @@ configured:
 '''
 
 import sys
-import traceback
 from xml.etree import ElementTree
 
-JENKINS_IMP_ERR = None
-try:
-    import jenkins
-    python_jenkins_installed = True
-except ImportError:
-    JENKINS_IMP_ERR = traceback.format_exc()
-    python_jenkins_installed = False
-
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils import deps
+
+with deps.declare(
+    "python-jenkins",
+    reason="python-jenkins is required to interact with Jenkins",
+    url="https://opendev.org/jjb/python-jenkins",
+):
+    import jenkins
 
 
 IS_PYTHON_2 = sys.version_info[0] <= 2
@@ -158,13 +157,13 @@ class JenkinsNode:
     def __init__(self, module):
         self.module = module
 
-        self.name = module.params.get('name')
-        self.state = module.params.get('state')
-        self.token = module.params.get('token')
-        self.user = module.params.get('user')
-        self.url = module.params.get('url')
-        self.num_executors = module.params.get('num_executors')
-        self.labels = module.params.get('labels')
+        self.name = module.params['name']
+        self.state = module.params['state']
+        self.token = module.params['token']
+        self.user = module.params['user']
+        self.url = module.params['url']
+        self.num_executors = module.params['num_executors']
+        self.labels = module.params['labels']
 
         if self.labels is not None:
             for label in self.labels:
@@ -351,14 +350,6 @@ class JenkinsNode:
             self.result['changed'] = True
 
 
-def test_dependencies(module):
-    if not python_jenkins_installed:
-        module.fail_json(
-            msg=missing_required_lib("python-jenkins", url="https://python-jenkins.readthedocs.io/en/latest/install.html"),
-            exception=JENKINS_IMP_ERR
-        )
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -373,7 +364,8 @@ def main():
         supports_check_mode=True,
     )
 
-    test_dependencies(module)
+    deps.validate(module)
+
     jenkins_node = JenkinsNode(module)
 
     state = module.params.get('state')
