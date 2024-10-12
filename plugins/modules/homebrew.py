@@ -600,10 +600,11 @@ class Homebrew(object):
             self.message = 'Invalid package: {0}.'.format(self.current_package)
             raise HomebrewException(self.message)
 
-        if not self._current_package_is_installed():
+        current_package_is_installed = self._current_package_is_installed()
+        if not current_package_is_installed:
             command = 'install'
 
-        if self._current_package_is_installed() and not self._current_package_is_outdated():
+        if current_package_is_installed and not self._current_package_is_outdated():
             self.message = 'Package is already upgraded: {0}'.format(
                 self.current_package,
             )
