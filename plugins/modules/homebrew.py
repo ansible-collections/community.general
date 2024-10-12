@@ -572,7 +572,7 @@ class Homebrew(object):
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
-        if self._current_package_is_installed():
+        if rc == 0:
             self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
