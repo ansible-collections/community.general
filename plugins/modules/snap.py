@@ -50,7 +50,7 @@ options:
             - Install a snap that has classic confinement.
             - This option corresponds to the C(--classic) argument of the C(snap install) command.
             - This level of confinement is permissive, granting full system access,
-              similar to that of traditionally packaged applications that don't use sandboxing mechanisms.
+              similar to that of traditionally packaged applications that do not use sandboxing mechanisms.
               This option can only be specified when the task involves a single snap.
             - See U(https://snapcraft.io/docs/snap-confinement) for more details about classic confinement and confinement levels.
 
