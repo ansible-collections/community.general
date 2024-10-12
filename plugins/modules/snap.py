@@ -84,7 +84,7 @@ options:
     dangerous:
         description:
             - Install the snap in dangerous mode, without validating its assertions and signatures.
-            - This is useful when installing local snaps that are either unsigned or have signatures that haven't been acknowledged.
+            - This is useful when installing local snaps that are either unsigned or have signatures that have not been acknowledged.
             - See U(https://snapcraft.io/docs/install-modes) for more details about installation modes.
         type: bool
         required: false
