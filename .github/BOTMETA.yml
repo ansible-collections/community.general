@@ -1441,6 +1441,9 @@ files:
     maintainers: $team_suse
   $plugin_utils/ansible_type.py:
     maintainers: vbotka
+  $modules/zypper_repository_info.py:
+    labels: zypper
+    maintainers: $team_suse TobiasZeuch181
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
