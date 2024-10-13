@@ -1,2 +1,2 @@
 minor_changes:
-  - nmcli - Added support for WireGuard peer configuration with new parameters: ``wgpeer_public_key``, ``wgpeer_allowed_ips``, ``wgpeer_endpoint`` and ``wgpeer_persistent_keepalive`` to enable peer management in WireGuard connections. (https://github.com/ansible-collections/community.general/pull/9024)
+  - "nmcli - added support for WireGuard peer configuration with new parameters: ``wgpeer_public_key``, ``wgpeer_allowed_ips``, ``wgpeer_endpoint`` and ``wgpeer_persistent_keepalive`` to enable peer management in WireGuard connections (https://github.com/ansible-collections/community.general/pull/9024)."
