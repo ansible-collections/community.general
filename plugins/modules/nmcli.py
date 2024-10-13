@@ -2640,11 +2640,14 @@ def main():
                               parent=dict(type='str', required=True),
                               promiscuous=dict(type='bool'),
                               tap=dict(type='bool'))),
-            wireguard=dict(type='dict', suboptions=dict(
-                                wgpeer_public_key=dict(type='str', required=False),
-                                wgpeer_allowed_ips=dict(type='str', required=False),
-                                wgpeer_endpoint=dict(type='str', required=False),
-                                wgpeer_persistent_keepalive=dict(type='int', required=False))),
+            wireguard=dict(type='dict',
+                           suboptions=dict(
+                               wgpeer_public_key=dict(type='str', required=False),
+                               wgpeer_allowed_ips=dict(type='str', required=False),
+                               wgpeer_endpoint=dict(type='str', required=False),
+                               wgpeer_persistent_keepalive=dict(type='int', required=False)
+                            )
+                        ),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),
