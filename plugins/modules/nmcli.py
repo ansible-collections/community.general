@@ -2641,7 +2641,7 @@ def main():
                               promiscuous=dict(type='bool'),
                               tap=dict(type='bool'))),
             wireguard=dict(type='dict',
-                           suboptions=dict(
+                           options=dict(
                                wgpeer_public_key=dict(type='str', required=False),
                                wgpeer_allowed_ips=dict(type='str', required=False),
                                wgpeer_endpoint=dict(type='str', required=False),
