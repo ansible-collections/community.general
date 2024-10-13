@@ -1008,6 +1008,23 @@ options:
                 description: C(NMSettingSecretFlags) indicating how to handle the O(wireguard.private-key) property.
                 type: int
                 choices: [ 0, 1, 2 ]
+            #Attributes for WireGuard Peers
+            wgpeer_public_key:
+                description: Public key of the WireGuard peer.
+                type: str
+                required: false
+            wgpeer_allowed_ips:
+                description: The allowed IPs for the WireGuard peer.
+                type: str
+                required: false
+            wgpeer_endpoint:
+                description: Endpoint address (IP:Port) for the WireGuard peer.
+                type: str
+                required: false
+            wgpeer_persistent_keepalive:
+                description: Time in seconds to keep the connection alive (persistent keep-alive) for the WireGuard peer.
+                type: int
+                required: false
     vpn:
         description:
             - Configuration of a VPN connection (PPTP and L2TP).
@@ -1460,7 +1477,7 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
-- name: Create a wireguard connection
+- name: Create a wireguard connection with peer configuration
   community.general.nmcli:
     type: wireguard
     conn_name: my-wg-provider
@@ -1468,6 +1485,10 @@ EXAMPLES = r'''
     wireguard:
         listen-port: 51820
         private-key: my-private-key
+    wgpeer_public_key: "your_peer_public_key"
+    wgpeer_allowed_ips: "10.0.0.2/32"
+    wgpeer_endpoint: "192.168.1.1:51820"
+    wgpeer_persistent_keepalive: 25
     autoconnect: true
     state: present
 
@@ -1923,6 +1944,23 @@ class Nmcli(object):
                 for name, value in self.wireguard.items():
                     options.update({
                         'wireguard.%s' % name: value,
+                    })
+                # Handle WireGuard peers, if provided
+                if module.params.get('wgpeer_public_key'):
+                    options.update({
+                        'wireguard.peer.key': module.params['wgpeer_public_key']
+                    })
+                if module.params.get('wgpeer_allowed_ips'):
+                    options.update({
+                        'wireguard.peer.allowed-ips': module.params['wgpeer_allowed_ips']
+                    })
+                if module.params.get('wgpeer_endpoint'):
+                    options.update({
+                        'wireguard.peer.endpoint': module.params['wgpeer_endpoint']
+                    })
+                if module.params.get('wgpeer_persistent_keepalive'):
+                    options.update({
+                        'wireguard.peer.persistent-keepalive': str(module.params['wgpeer_persistent_keepalive'])
                     })
         elif self.type == 'vpn':
             if self.vpn:
@@ -2607,6 +2645,11 @@ def main():
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
+            #WireGuard peer attributes
+            wgpeer_public_key=dict(type='str', required=False),
+            wgpeer_allowed_ips=dict(type='str', required=False),
+            wgpeer_endpoint=dict(type='str', required=False),
+            wgpeer_persistent_keepalive=dict(type='int', required=False),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
