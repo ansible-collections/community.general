@@ -155,6 +155,9 @@ class LookupModule(LookupBase):
 
         self.set_options(var_options=variables, direct=kwargs)
 
+        if not (self.get_option("key_path") or self.get_option("private_key")):
+            raise AnsibleOptionsError("One of key_path or private_key is required")
+
         t = get_token(
             self.get_option('key_path'),
             self.get_option('app_id'),
