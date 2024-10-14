@@ -390,7 +390,7 @@ options:
         aliases:
             - organizationsEnabled
         type: bool
-        version_added: 9.5.0
+        version_added: 9.6.0
     permanent_lockout:
         description:
             - The realm permanent lockout.
