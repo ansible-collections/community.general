@@ -19,6 +19,7 @@ DOCUMENTATION = '''
       key_path:
         description:
         - Path to your private key.
+        - Either O(key_path) or O(private_key) must be specified.
         required: false
         type: path
       app_id:
@@ -36,7 +37,8 @@ DOCUMENTATION = '''
         type: str
       private_key:
         description:
-        - GitHub App private key in PEM file format as string
+        - GitHub App private key in PEM file format as string.
+        - Either O(key_path) or O(private_key) must be specified.
         required: false
         type: str
       token_expiry:
