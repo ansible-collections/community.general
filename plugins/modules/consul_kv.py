@@ -116,6 +116,7 @@ options:
           - The name of the datacenter to query. If unspecified, the query will default
             to the datacenter of the Consul agent on O(host).
         type: str
+        version_added: 10.0.0
 '''
 
 
