@@ -122,7 +122,6 @@ class BitwardenSecretsManager(object):
             raise BitwardenSecretsManagerException(to_text(err))
         return out
 
-
     def get_secret(self, secret_id, bws_access_token):
         """Get and return the secret with the given secret_id.
         """
@@ -134,7 +133,7 @@ class BitwardenSecretsManager(object):
             '--access-token', bws_access_token
         ]
 
-		# bws version 0.3.0 introduced a breaking change in the command line syntax:
+		    # bws version 0.3.0 introduced a breaking change in the command line syntax:
         # pre-0.3.0: verb noun
         # 0.3.0 and later: noun verb
         bws_version = self.get_bws_version()
