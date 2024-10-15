@@ -41,8 +41,8 @@ options:
     type: str
     choices: [enabled, disabled]
 notes:
-- When run in check mode, the specified repositories are not changed. This may cause failures in subsequent tasks 
-  in a test-run of a playbook. To force the repository config to be changed, specify C(check_mode: false) on the task.
+- When run in check mode, the specified repositories are not changed. This may cause failures in subsequent tasks
+  in a test-run of a playbook. To force the repository config to be changed, specify V(check_mode: false) on the task.
 seealso:
   - module: ansible.builtin.dnf
   - module: ansible.builtin.yum_repository
