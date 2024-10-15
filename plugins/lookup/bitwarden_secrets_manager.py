@@ -79,6 +79,7 @@ from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
+
 class BitwardenSecretsManagerException(AnsibleLookupError):
     pass
 
