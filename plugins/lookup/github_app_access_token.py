@@ -155,6 +155,8 @@ class LookupModule(LookupBase):
 
         if not (self.get_option("key_path") or self.get_option("private_key")):
             raise AnsibleOptionsError("One of key_path or private_key is required")
+        if self.get_option("key_path") and self.get_option("private_key"):
+            raise AnsibleOptionsError("key_path and private_key are mutually exclusive")
 
         t = get_token(
             self.get_option('key_path'),
