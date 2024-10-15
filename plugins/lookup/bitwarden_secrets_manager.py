@@ -117,7 +117,7 @@ class BitwardenSecretsManager(object):
     def get_bws_version(self):
         """Get the version of the Bitwarden Secrets Manager CLI.
         """
-        out, err, rc = self._run([ '--version' ])
+        out, err, rc = self._run(['--version'])
         if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
         return out
@@ -132,7 +132,7 @@ class BitwardenSecretsManager(object):
             '--color', 'no',
             '--access-token', bws_access_token
         ]
-        
+
         # bws version 0.3.0 introduced a breaking change in the command line syntax:
         # pre-0.3.0: verb noun
         # 0.3.0 and later: noun verb
