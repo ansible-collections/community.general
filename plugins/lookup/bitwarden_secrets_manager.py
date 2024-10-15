@@ -120,7 +120,8 @@ class BitwardenSecretsManager(object):
         out, err, rc = self._run(['--version'])
         if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
-        return out
+        # strip the prefix and grab the last segment, the version number
+        return out.split()[-1]
 
     def get_secret(self, secret_id, bws_access_token):
         """Get and return the secret with the given secret_id.
