@@ -132,8 +132,8 @@ class BitwardenSecretsManager(object):
             '--color', 'no',
             '--access-token', bws_access_token
         ]
-
-		    # bws version 0.3.0 introduced a breaking change in the command line syntax:
+        
+        # bws version 0.3.0 introduced a breaking change in the command line syntax:
         # pre-0.3.0: verb noun
         # 0.3.0 and later: noun verb
         bws_version = self.get_bws_version()
