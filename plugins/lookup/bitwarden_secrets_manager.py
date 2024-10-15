@@ -77,6 +77,7 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 class BitwardenSecretsManagerException(AnsibleLookupError):
     pass
@@ -138,7 +139,7 @@ class BitwardenSecretsManager(object):
         # pre-0.3.0: verb noun
         # 0.3.0 and later: noun verb
         bws_version = self.get_bws_version()
-        if bws_version < '0.3.0':
+        if LooseVersion(bws_version) < LooseVersion('0.3.0'):
             params.extend(['get', 'secret', secret_id])
         else:
             params.extend(['secret', 'get', secret_id])
