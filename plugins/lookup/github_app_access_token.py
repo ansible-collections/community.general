@@ -20,7 +20,6 @@ DOCUMENTATION = '''
         description:
         - Path to your private key.
         - Either O(key_path) or O(private_key) must be specified.
-        required: false
         type: path
       app_id:
         description:
@@ -39,7 +38,6 @@ DOCUMENTATION = '''
         description:
         - GitHub App private key in PEM file format as string.
         - Either O(key_path) or O(private_key) must be specified.
-        required: false
         type: str
       token_expiry:
         description:
@@ -94,7 +92,7 @@ display = Display()
 def read_key(path, private_key=None):
     try:
         if private_key:
-            return jwk_from_pem(private_key.encode())
+            return jwk_from_pem(private_key.encode('utf-8'))
         with open(path, 'rb') as pem_file:
             return jwk_from_pem(pem_file.read())
     except Exception as e:
