@@ -61,7 +61,6 @@ files:
   $callbacks/elastic.py:
     keywords: apm observability
     maintainers: v1v
-  $callbacks/hipchat.py: {}
   $callbacks/jabber.py: {}
   $callbacks/log_plays.py: {}
   $callbacks/loganalytics.py:
@@ -131,6 +130,8 @@ files:
     maintainers: $team_huawei
   $doc_fragments/nomad.py:
     maintainers: chris93111 apecnascimento
+  $doc_fragments/pipx.py:
+    maintainers: russoz
   $doc_fragments/xenserver.py:
     labels: xenserver
     maintainers: bvitnik
@@ -308,6 +309,8 @@ files:
     labels: module_utils
   $module_utils/btrfs.py:
     maintainers: gnfzdz
+  $module_utils/cmd_runner_fmt.py:
+    maintainers: russoz
   $module_utils/cmd_runner.py:
     maintainers: russoz
   $module_utils/deps.py:
@@ -712,6 +715,8 @@ files:
   $modules/ipa_:
     maintainers: $team_ipa
     ignore: fxfitz
+  $modules/ipa_getkeytab.py:
+    maintainers: abakanovskii
   $modules/ipa_dnsrecord.py:
     maintainers: $team_ipa jwbernin
   $modules/ipbase_info.py:
@@ -825,6 +830,8 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
+  $modules/krb_ticket.py:
+    maintainers: abakanovskii
   $modules/launchd.py:
     maintainers: martinm82
   $modules/layman.py:
@@ -1155,12 +1162,6 @@ files:
     keywords: kvm libvirt proxmox qemu
     labels: rhevm virt
     maintainers: $team_virt TimothyVandenbrande
-  $modules/rhn_channel.py:
-    labels: rhn_channel
-    maintainers: vincentvdk alikins $team_rhn
-  $modules/rhn_register.py:
-    labels: rhn_register
-    maintainers: jlaska $team_rhn
   $modules/rhsm_release.py:
     maintainers: seandst $team_rhsm
   $modules/rhsm_repository.py:
@@ -1440,6 +1441,9 @@ files:
     maintainers: $team_suse
   $plugin_utils/ansible_type.py:
     maintainers: vbotka
+  $modules/zypper_repository_info.py:
+    labels: zypper
+    maintainers: $team_suse TobiasZeuch181
   $plugin_utils/keys_filter.py:
     maintainers: vbotka
   $plugin_utils/unsafe.py:
@@ -1548,7 +1552,6 @@ macros:
   team_oracle: manojmeda mross22 nalsaber
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_redfish: mraineri tomasg2012 xmadsen renxulei rajeevkallur bhavya06 jyundt
-  team_rhn: FlossWare alikins barnabycourt vritant
   team_rhsm: cnsnyder ptoscano
   team_scaleway: remyleone abarbare
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l

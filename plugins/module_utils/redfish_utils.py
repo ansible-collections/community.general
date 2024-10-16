@@ -165,11 +165,11 @@ class RedfishUtils(object):
                 if not allow_no_resp:
                     raise
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on GET request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on GET request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -208,11 +208,11 @@ class RedfishUtils(object):
                 data = None
             headers = {k.lower(): v for (k, v) in resp.info().items()}
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on POST request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on POST request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -256,11 +256,11 @@ class RedfishUtils(object):
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False, 'changed': False,
                     'msg': "HTTP Error %s on PATCH request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'changed': False,
                     'msg': "URL Error on PATCH request to '%s': '%s'" % (uri, e.reason)}
@@ -291,11 +291,11 @@ class RedfishUtils(object):
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on PUT request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on PUT request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -317,11 +317,11 @@ class RedfishUtils(object):
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout, ciphers=self.ciphers)
         except HTTPError as e:
-            msg = self._get_extended_message(e)
+            msg, data = self._get_extended_message(e)
             return {'ret': False,
                     'msg': "HTTP Error %s on DELETE request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
-                    'status': e.code}
+                    'status': e.code, 'data': data}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error on DELETE request to '%s': '%s'"
                                          % (uri, e.reason)}
@@ -391,8 +391,10 @@ class RedfishUtils(object):
         :param error: an HTTPError exception
         :type error: HTTPError
         :return: the ExtendedInfo message if present, else standard HTTP error
+        :return: the JSON data of the response if present
         """
         msg = http_client.responses.get(error.code, '')
+        data = None
         if error.code >= 400:
             try:
                 body = error.read().decode('utf-8')
@@ -406,7 +408,7 @@ class RedfishUtils(object):
                     msg = str(data['error']['@Message.ExtendedInfo'])
             except Exception:
                 pass
-        return msg
+        return msg, data
 
     def _init_session(self):
         pass
@@ -864,6 +866,7 @@ class RedfishUtils(object):
                         return response
                     data = response['data']
                     controller_name = 'Controller 1'
+                    storage_id = data['Id']
                     if 'Controllers' in data:
                         controllers_uri = data['Controllers'][u'@odata.id']
 
@@ -898,6 +901,7 @@ class RedfishUtils(object):
                             data = response['data']
 
                             drive_result = {}
+                            drive_result['RedfishURI'] = data['@odata.id']
                             for property in properties:
                                 if property in data:
                                     if data[property] is not None:
@@ -909,6 +913,7 @@ class RedfishUtils(object):
                                             drive_result[property] = data[property]
                             drive_results.append(drive_result)
                     drives = {'Controller': controller_name,
+                              'StorageId': storage_id,
                               'Drives': drive_results}
                     result["entries"].append(drives)
 
@@ -1245,32 +1250,49 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True}
 
-    def _find_account_uri(self, username=None, acct_id=None):
+    def _find_account_uri(self, username=None, acct_id=None, password_change_uri=None):
         if not any((username, acct_id)):
             return {'ret': False, 'msg':
                     'Must provide either account_id or account_username'}
 
-        response = self.get_request(self.root_uri + self.accounts_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-
-        uris = [a.get('@odata.id') for a in data.get('Members', []) if
-                a.get('@odata.id')]
-        for uri in uris:
-            response = self.get_request(self.root_uri + uri)
+        if password_change_uri:
+            # Password change required; go directly to the specified URI
+            response = self.get_request(self.root_uri + password_change_uri)
             if response['ret'] is False:
-                continue
+                return response
             data = response['data']
             headers = response['headers']
             if username:
                 if username == data.get('UserName'):
                     return {'ret': True, 'data': data,
-                            'headers': headers, 'uri': uri}
+                            'headers': headers, 'uri': password_change_uri}
             if acct_id:
                 if acct_id == data.get('Id'):
                     return {'ret': True, 'data': data,
-                            'headers': headers, 'uri': uri}
+                            'headers': headers, 'uri': password_change_uri}
+        else:
+            # Walk the accounts collection to find the desired user
+            response = self.get_request(self.root_uri + self.accounts_uri)
+            if response['ret'] is False:
+                return response
+            data = response['data']
+
+            uris = [a.get('@odata.id') for a in data.get('Members', []) if
+                    a.get('@odata.id')]
+            for uri in uris:
+                response = self.get_request(self.root_uri + uri)
+                if response['ret'] is False:
+                    continue
+                data = response['data']
+                headers = response['headers']
+                if username:
+                    if username == data.get('UserName'):
+                        return {'ret': True, 'data': data,
+                                'headers': headers, 'uri': uri}
+                if acct_id:
+                    if acct_id == data.get('Id'):
+                        return {'ret': True, 'data': data,
+                                'headers': headers, 'uri': uri}
 
         return {'ret': False, 'no_match': True, 'msg':
                 'No account with the given account_id or account_username found'}
@@ -1491,7 +1513,8 @@ class RedfishUtils(object):
                     'Must provide account_password for UpdateUserPassword command'}
 
         response = self._find_account_uri(username=user.get('account_username'),
-                                          acct_id=user.get('account_id'))
+                                          acct_id=user.get('account_id'),
+                                          password_change_uri=user.get('account_passwordchangerequired'))
         if not response['ret']:
             return response
 
@@ -1533,6 +1556,31 @@ class RedfishUtils(object):
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Modified account service'
         return resp
+
+    def check_password_change_required(self, return_data):
+        """
+        Checks a response if a user needs to change their password
+
+        :param return_data: The return data for a failed request
+        :return: None or the URI of the account to update
+        """
+        uri = None
+        if 'data' in return_data:
+            # Find the extended messages in the response payload
+            extended_messages = return_data['data'].get('error', {}).get('@Message.ExtendedInfo', [])
+            if len(extended_messages) == 0:
+                extended_messages = return_data['data'].get('@Message.ExtendedInfo', [])
+            # Go through each message and look for Base.1.X.PasswordChangeRequired
+            for message in extended_messages:
+                message_id = message.get('MessageId')
+                if message_id is None:
+                    # While this is invalid, treat the lack of a MessageId as "no message"
+                    continue
+                if message_id.startswith('Base.1.') and message_id.endswith('.PasswordChangeRequired'):
+                    # Password change required; get the URI of the user account
+                    uri = message['MessageArgs'][0]
+                    break
+        return uri
 
     def get_sessions(self):
         result = {}
@@ -2263,11 +2311,19 @@ class RedfishUtils(object):
 
         # Construct payload and issue PATCH command
         payload = {"Attributes": attrs_to_patch}
+
+        # WORKAROUND
+        # Dell systems require manually setting the apply time to "OnReset"
+        # to spawn a proprietary job to apply the BIOS settings
+        vendor = self._get_vendor()['Vendor']
+        if vendor == 'Dell':
+            payload.update({"@Redfish.SettingsApplyTime": {"ApplyTime": "OnReset"}})
+
         response = self.patch_request(self.root_uri + set_bios_attr_uri, payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
-                'msg': "Modified BIOS attributes %s" % (attrs_to_patch),
+                'msg': "Modified BIOS attributes %s. A reboot is required" % (attrs_to_patch),
                 'warning': warning}
 
     def set_boot_order(self, boot_list):
@@ -3694,7 +3750,7 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "The following volumes were deleted: %s" % str(volume_ids)}
 
-    def create_volume(self, volume_details, storage_subsystem_id):
+    def create_volume(self, volume_details, storage_subsystem_id, storage_none_volume_deletion=False):
         # Find the Storage resource from the requested ComputerSystem resource
         response = self.get_request(self.root_uri + self.systems_uri)
         if response['ret'] is False:
@@ -3729,8 +3785,8 @@ class RedfishUtils(object):
                 'msg': "Provided Storage Subsystem ID %s does not exist on the server" % storage_subsystem_id}
 
         # Validate input parameters
-        required_parameters = ['RAIDType', 'Drives', 'CapacityBytes']
-        allowed_parameters = ['DisplayName', 'InitializeMethod', 'MediaSpanCount',
+        required_parameters = ['RAIDType', 'Drives']
+        allowed_parameters = ['CapacityBytes', 'DisplayName', 'InitializeMethod', 'MediaSpanCount',
                               'Name', 'ReadCachePolicy', 'StripSizeBytes', 'VolumeUsage', 'WriteCachePolicy']
 
         for parameter in required_parameters:
@@ -3746,22 +3802,23 @@ class RedfishUtils(object):
         data = response['data']
 
         # Deleting any volumes of RAIDType None present on the Storage Subsystem
-        response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
-        if response['ret'] is False:
-            return response
-        volume_data = response['data']
+        if storage_none_volume_deletion:
+            response = self.get_request(self.root_uri + data['Volumes']['@odata.id'])
+            if response['ret'] is False:
+                return response
+            volume_data = response['data']
 
-        if "Members" in volume_data:
-            for member in volume_data["Members"]:
-                response = self.get_request(self.root_uri + member['@odata.id'])
-                if response['ret'] is False:
-                    return response
-                member_data = response['data']
-
-                if member_data["RAIDType"] == "None":
-                    response = self.delete_request(self.root_uri + member['@odata.id'])
+            if "Members" in volume_data:
+                for member in volume_data["Members"]:
+                    response = self.get_request(self.root_uri + member['@odata.id'])
                     if response['ret'] is False:
                         return response
+                    member_data = response['data']
+
+                    if member_data["RAIDType"] == "None":
+                        response = self.delete_request(self.root_uri + member['@odata.id'])
+                        if response['ret'] is False:
+                            return response
 
         # Construct payload and issue POST command to create volume
         volume_details["Links"] = {}

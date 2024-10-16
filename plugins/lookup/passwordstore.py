@@ -14,7 +14,7 @@ DOCUMENTATION = '''
     short_description: manage passwords with passwordstore.org's pass utility
     description:
       - Enables Ansible to retrieve, create or update passwords from the passwordstore.org pass utility.
-        It also retrieves YAML style keys stored as multilines in the passwordfile.
+        It can also retrieve, create or update YAML style keys stored as multilines in the passwordfile.
       - To avoid problems when accessing multiple secrets at once, add C(auto-expand-secmem) to
         C(~/.gnupg/gpg-agent.conf). Where this is not possible, consider using O(lock=readwrite) instead.
     options:
@@ -33,11 +33,11 @@ DOCUMENTATION = '''
         env:
           - name: PASSWORD_STORE_DIR
       create:
-        description: Create the password if it does not already exist. Takes precedence over O(missing).
+        description: Create the password or the subkey if it does not already exist. Takes precedence over O(missing).
         type: bool
         default: false
       overwrite:
-        description: Overwrite the password if it does already exist.
+        description: Overwrite the password or the subkey if it does already exist.
         type: bool
         default: false
       umask:
@@ -53,7 +53,9 @@ DOCUMENTATION = '''
         type: bool
         default: false
       subkey:
-        description: Return a specific subkey of the password. When set to V(password), always returns the first line.
+        description:
+          - By default return a specific subkey of the password. When set to V(password), always returns the first line.
+          - With O(overwrite=true), it will create the subkey and return it.
         type: str
         default: password
       userpass:
@@ -64,7 +66,7 @@ DOCUMENTATION = '''
         type: integer
         default: 16
       backup:
-        description: Used with O(overwrite=true). Backup the previous password in a subkey.
+        description: Used with O(overwrite=true). Backup the previous password or subkey in a subkey.
         type: bool
         default: false
       nosymbols:
@@ -188,6 +190,17 @@ tasks.yml: |
       var: mypassword
     vars:
       mypassword: "{{ lookup('community.general.passwordstore', 'example/test', missing='create')}}"
+
+  - name: >-
+      Create a random 16 character password in a subkey. If the password file already exists, just add the subkey in it.
+      If the subkey exists, returns it
+    ansible.builtin.debug:
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', create=true, subkey='foo') }}"
+
+  - name: >-
+      Create a random 16 character password in a subkey. Overwrite if it already exists and backup the old one.
+    ansible.builtin.debug:
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', create=true, subkey='user', overwrite=true, backup=true) }}"
 
   - name: Prints 'abc' if example/test does not exist, just give the password otherwise
     ansible.builtin.debug:
@@ -411,15 +424,48 @@ class LookupModule(LookupBase):
 
     def update_password(self):
         # generate new password, insert old lines from current result and return new password
+        # if the target is a subkey, only modify the subkey
         newpass = self.get_newpass()
         datetime = time.strftime("%d/%m/%Y %H:%M:%S")
-        msg = newpass
-        if self.paramvals['preserve'] or self.paramvals['timestamp']:
-            msg += '\n'
-            if self.paramvals['preserve'] and self.passoutput[1:]:
-                msg += '\n'.join(self.passoutput[1:]) + '\n'
-            if self.paramvals['timestamp'] and self.paramvals['backup']:
-                msg += "lookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
+        subkey = self.paramvals["subkey"]
+
+        if subkey != "password":
+
+            msg_lines = []
+            subkey_exists = False
+            subkey_line = "{0}: {1}".format(subkey, newpass)
+            oldpass = None
+
+            for line in self.passoutput:
+                if line.startswith("{0}: ".format(subkey)):
+                    oldpass = self.passdict[subkey]
+                    line = subkey_line
+                    subkey_exists = True
+
+                msg_lines.append(line)
+
+            if not subkey_exists:
+                msg_lines.insert(2, subkey_line)
+
+            if self.paramvals["timestamp"] and self.paramvals["backup"] and oldpass and oldpass != newpass:
+                msg_lines.append(
+                    "lookup_pass: old subkey '{0}' password was {1} (Updated on {2})\n".format(
+                        subkey, oldpass, datetime
+                    )
+                )
+
+            msg = os.linesep.join(msg_lines)
+
+        else:
+            msg = newpass
+
+            if self.paramvals['preserve'] or self.paramvals['timestamp']:
+                msg += '\n'
+                if self.paramvals['preserve'] and self.passoutput[1:]:
+                    msg += '\n'.join(self.passoutput[1:]) + '\n'
+                if self.paramvals['timestamp'] and self.paramvals['backup']:
+                    msg += "lookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
+
         try:
             check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
@@ -431,13 +477,21 @@ class LookupModule(LookupBase):
         # use pwgen to generate the password and insert values with pass -m
         newpass = self.get_newpass()
         datetime = time.strftime("%d/%m/%Y %H:%M:%S")
-        msg = newpass
+        subkey = self.paramvals["subkey"]
+
+        if subkey != "password":
+            msg = "\n\n{0}: {1}".format(subkey, newpass)
+        else:
+            msg = newpass
+
         if self.paramvals['timestamp']:
             msg += '\n' + "lookup_pass: First generated by ansible on {0}\n".format(datetime)
+
         try:
             check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
             raise AnsibleError('exit code {0} while running {1}. Error output: {2}'.format(e.returncode, e.cmd, e.output))
+
         return newpass
 
     def get_passresult(self):
@@ -525,7 +579,10 @@ class LookupModule(LookupBase):
             self.parse_params(term)   # parse the input into paramvals
             with self.opt_lock('readwrite'):
                 if self.check_pass():     # password exists
-                    if self.paramvals['overwrite'] and self.paramvals['subkey'] == 'password':
+                    if self.paramvals['overwrite']:
+                        with self.opt_lock('write'):
+                            result.append(self.update_password())
+                    elif self.paramvals["subkey"] != "password" and not self.passdict.get(self.paramvals['subkey']):  # password exists but not the subkey
                         with self.opt_lock('write'):
                             result.append(self.update_password())
                     else:

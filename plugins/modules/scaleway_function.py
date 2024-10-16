@@ -245,8 +245,7 @@ def absent_strategy(api, wished_fn):
     changed = False
 
     fn_list = api.fetch_all_resources("functions")
-    fn_lookup = dict((fn["name"], fn)
-                     for fn in fn_list)
+    fn_lookup = {fn["name"]: fn for fn in fn_list}
 
     if wished_fn["name"] not in fn_lookup:
         return changed, {}
@@ -270,8 +269,7 @@ def present_strategy(api, wished_fn):
     changed = False
 
     fn_list = api.fetch_all_resources("functions")
-    fn_lookup = dict((fn["name"], fn)
-                     for fn in fn_list)
+    fn_lookup = {fn["name"]: fn for fn in fn_list}
 
     payload_fn = payload_from_wished_fn(wished_fn)
 

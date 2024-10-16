@@ -1,0 +1,8 @@
+removed_features:
+  - "redhat_subscriptions - removed the ``pool`` option. Use ``pool_ids`` instead (https://github.com/ansible-collections/community.general/pull/8918)."
+  - "proxmox_kvm - removed the ``proxmox_default_behavior`` option. Explicitly specify the old default values if you were using ``proxmox_default_behavior=compatibility``, otherwise simply remove it (https://github.com/ansible-collections/community.general/pull/8918)."
+  - "ejabberd_user - removed the ``logging`` option (https://github.com/ansible-collections/community.general/pull/8918)."
+  - "consul - removed the ``ack_params_state_absent`` option. It had no effect anymore (https://github.com/ansible-collections/community.general/pull/8918)."
+breaking_changes:
+  - "irc - the defaults of ``use_tls`` and ``validate_certs`` changed from ``false`` to ``true`` (https://github.com/ansible-collections/community.general/pull/8918)."
+  - "rhsm_repository - the states ``present`` and ``absent`` have been removed. Use ``enabled`` and ``disabled`` instead (https://github.com/ansible-collections/community.general/pull/8918)."

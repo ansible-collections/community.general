@@ -33,7 +33,10 @@ author:
   - Samy Coenen (@SamyCoenen)
   - Guillaume Martinez (@Lunik)
 requirements:
-  - python-gitlab >= 1.5.0
+  - python-gitlab >= 1.5.0 for legacy runner registration workflow
+    (runner registration token - U(https://docs.gitlab.com/runner/register/#register-with-a-runner-registration-token-deprecated))
+  - python-gitlab >= 4.0.0 for new runner registration workflow
+    (runner authentication token - U(https://docs.gitlab.com/runner/register/#register-with-a-runner-authentication-token))
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
@@ -365,18 +368,18 @@ class GitLabRunner(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if isinstance(arguments[arg_key], list):
+            if arg_value is not None:
+                if isinstance(arg_value, list):
                     list1 = getattr(runner, arg_key)
                     list1.sort()
-                    list2 = arguments[arg_key]
+                    list2 = arg_value
                     list2.sort()
                     if list1 != list2:
-                        setattr(runner, arg_key, arguments[arg_key])
+                        setattr(runner, arg_key, arg_value)
                         changed = True
                 else:
-                    if getattr(runner, arg_key) != arguments[arg_key]:
-                        setattr(runner, arg_key, arguments[arg_key])
+                    if getattr(runner, arg_key) != arg_value:
+                        setattr(runner, arg_key, arg_value)
                         changed = True
 
         return (changed, runner)

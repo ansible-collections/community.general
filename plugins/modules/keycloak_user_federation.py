@@ -93,6 +93,24 @@ options:
         default: true
         version_added: 9.4.0
 
+    bind_credential_update_mode:
+        description:
+            - The value of the config parameter O(config.bindCredential) is redacted in the Keycloak responses.
+              Comparing the redacted value with the desired value always evaluates to not equal. This means
+              the before and desired states are never equal if the parameter is set.
+            - Set to V(always) to include O(config.bindCredential) in the comparison of before and desired state.
+              Because of the redacted value returned by Keycloak the module will always detect a change
+              and make an update if a O(config.bindCredential) value is set.
+            - Set to V(only_indirect) to exclude O(config.bindCredential) when comparing the before state with the
+              desired state. The value of O(config.bindCredential) will only be updated if there are other changes
+              to the user federation that require an update.
+        type: str
+        default: always
+        choices:
+            - always
+            - only_indirect
+        version_added: 9.5.0
+
     config:
         description:
             - Dict specifying the configuration options for the provider; the contents differ depending on
@@ -442,6 +460,17 @@ options:
                     - Max lifespan of cache entry in milliseconds.
                 type: int
 
+            referral:
+                description:
+                    - Specifies if LDAP referrals should be followed or ignored. Please note that enabling
+                      referrals can slow down authentication as it allows the LDAP server to decide which other
+                      LDAP servers to use. This could potentially include untrusted servers.
+                type: str
+                choices:
+                    - ignore
+                    - follow
+                version_added: 9.5.0
+
     mappers:
         description:
             - A list of dicts defining mappers associated with this Identity Provider.
@@ -721,15 +750,23 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from copy import deepcopy
 
 
+def normalize_kc_comp(comp):
+    if 'config' in comp:
+        # kc completely removes the parameter `krbPrincipalAttribute` if it is set to `''`; the unset kc parameter is equivalent to `''`;
+        # to make change detection and diff more accurate we set it again in the kc responses
+        if 'krbPrincipalAttribute' not in comp['config']:
+            comp['config']['krbPrincipalAttribute'] = ['']
+
+        # kc stores a timestamp of the last sync in `lastSync` to time the periodic sync, it is removed to minimize diff/changes
+        comp['config'].pop('lastSync', None)
+
+
 def sanitize(comp):
     compcopy = deepcopy(comp)
     if 'config' in compcopy:
         compcopy['config'] = {k: v[0] for k, v in compcopy['config'].items()}
         if 'bindCredential' in compcopy['config']:
             compcopy['config']['bindCredential'] = '**********'
-        # an empty string is valid for krbPrincipalAttribute but is filtered out in diff
-        if 'krbPrincipalAttribute' not in compcopy['config']:
-            compcopy['config']['krbPrincipalAttribute'] = ''
     if 'mappers' in compcopy:
         for mapper in compcopy['mappers']:
             if 'config' in mapper:
@@ -780,6 +817,7 @@ def main():
         priority=dict(type='int', default=0),
         rdnLDAPAttribute=dict(type='str'),
         readTimeout=dict(type='int'),
+        referral=dict(type='str', choices=['ignore', 'follow']),
         searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
         krbPrincipalAttribute=dict(type='str'),
@@ -817,6 +855,7 @@ def main():
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
         remove_unspecified_mappers=dict(type='bool', default=True),
+        bind_credential_update_mode=dict(type='str', default='always', choices=['always', 'only_indirect']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
@@ -864,8 +903,9 @@ def main():
 
     # Filter and map the parameters names that apply
     comp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers', 'remove_unspecified_mappers'] and
-                   module.params.get(x) is not None]
+                   if x not in list(keycloak_argument_spec().keys())
+                   + ['state', 'realm', 'mappers', 'remove_unspecified_mappers', 'bind_credential_update_mode']
+                   and module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
     if cid is None:
@@ -884,6 +924,8 @@ def main():
     # if user federation exists, get associated mappers
     if cid is not None and before_comp:
         before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
+
+    normalize_kc_comp(before_comp)
 
     # Build a proposed changeset from parameters given to this module
     changeset = {}
@@ -994,6 +1036,7 @@ def main():
                     kc.delete_component(default_mapper['id'], realm)
 
         after_comp['mappers'] = kc.get_components(urlencode(dict(parent=cid)), realm)
+        normalize_kc_comp(after_comp)
         if module._diff:
             result['diff'] = dict(before='', after=sanitize(after_comp))
         result['end_state'] = sanitize(after_comp)
@@ -1004,8 +1047,15 @@ def main():
         if state == 'present':
             # Process an update
 
+            desired_copy = deepcopy(desired_comp)
+            before_copy = deepcopy(before_comp)
+            # exclude bindCredential when checking wether an update is required, therefore
+            # updating it only if there are other changes
+            if module.params['bind_credential_update_mode'] == 'only_indirect':
+                desired_copy.get('config', []).pop('bindCredential', None)
+                before_copy.get('config', []).pop('bindCredential', None)
             # no changes
-            if desired_comp == before_comp:
+            if desired_copy == before_copy:
                 result['changed'] = False
                 result['end_state'] = sanitize(desired_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
@@ -1041,6 +1091,7 @@ def main():
 
             after_comp = kc.get_component(cid, realm)
             after_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name') or '')
+            normalize_kc_comp(after_comp)
             after_comp_sanitized = sanitize(after_comp)
             before_comp_sanitized = sanitize(before_comp)
             result['end_state'] = after_comp_sanitized

@@ -22,10 +22,12 @@ class PythonRunner(CmdRunner):
         if (os.path.isabs(python) or '/' in python):
             self.python = python
         elif self.has_venv:
-            path_prefix = os.path.join(venv, "bin")
+            if path_prefix is None:
+                path_prefix = []
+            path_prefix.append(os.path.join(venv, "bin"))
             if environ_update is None:
                 environ_update = {}
-            environ_update["PATH"] = "%s:%s" % (path_prefix, os.environ["PATH"])
+            environ_update["PATH"] = "%s:%s" % (":".join(path_prefix), os.environ["PATH"])
             environ_update["VIRTUAL_ENV"] = venv
 
         python_cmd = [self.python] + _ensure_list(command)

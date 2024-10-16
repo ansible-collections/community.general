@@ -339,7 +339,7 @@ def main():
                 pass
 
         # Move tempfile to newfile
-        module.atomic_move(nf.name, limits_conf)
+        module.atomic_move(os.path.abspath(nf.name), os.path.abspath(limits_conf))
 
     try:
         nf.close()

@@ -1,0 +1,2 @@
+minor_changes:
+  - gio_mime - adjust code ahead of the old ``VardDict`` deprecation (https://github.com/ansible-collections/community.general/pull/8855).

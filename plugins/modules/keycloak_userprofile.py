@@ -612,9 +612,7 @@ def main():
                                         attribute['validations']['person-name-prohibited-characters'] = (
                                             attribute['validations'].pop('personNameProhibitedCharacters')
                                         )
-                        # special JSON parsing for kc_user_profile_config
-                        value = json.dumps(kc_user_profile_config[0])
-                        changeset[camel(component_param)][config_param].append(value)
+                        changeset[camel(component_param)][config_param].append(kc_user_profile_config[0])
                 # usual camelCase parameters
                 else:
                     changeset[camel(component_param)][camel(config_param)] = []
@@ -641,7 +639,7 @@ def main():
     changeset_copy = deepcopy(changeset)
 
     # Get a list of all Keycloak components that are of userprofile provider type.
-    realm_userprofiles = kc.get_components(urlencode(dict(type=provider_type, parent=parent_id)), parent_id)
+    realm_userprofiles = kc.get_components(urlencode(dict(type=provider_type)), parent_id)
 
     # If this component is present get its userprofile ID. Confusingly the userprofile ID is
     # also known as the Provider ID.
@@ -662,6 +660,10 @@ def main():
             changeset['id'] = userprofile_id
             changeset_copy['id'] = userprofile_id
 
+            # keycloak returns kc.user.profile.config as a single JSON formatted string, so we have to deserialize it
+            if 'config' in userprofile and 'kc.user.profile.config' in userprofile['config']:
+                userprofile['config']['kc.user.profile.config'][0] = json.loads(userprofile['config']['kc.user.profile.config'][0])
+
             # Compare top-level parameters
             for param, value in changeset.items():
                 before_realm_userprofile[param] = userprofile[param]
@@ -680,6 +682,10 @@ def main():
     # Check all the possible states of the resource and do what is needed to
     # converge current state with desired state (create, update or delete
     # the userprofile).
+
+    # keycloak expects kc.user.profile.config as a single JSON formatted string, so we have to serialize it
+    if 'config' in changeset and 'kc.user.profile.config' in changeset['config']:
+        changeset['config']['kc.user.profile.config'][0] = json.dumps(changeset['config']['kc.user.profile.config'][0])
     if userprofile_id and state == 'present':
         if result['changed']:
             if module._diff:

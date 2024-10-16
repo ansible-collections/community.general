@@ -9,66 +9,46 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: pipx_info
 short_description: Rretrieves information about applications installed with pipx
 version_added: 5.6.0
 description:
-    - Retrieve details about Python applications installed in isolated virtualenvs using pipx.
+- Retrieve details about Python applications installed in isolated virtualenvs using pipx.
 extends_documentation_fragment:
-    - community.general.attributes
-    - community.general.attributes.info_module
+- community.general.attributes
+- community.general.attributes.info_module
+- community.general.pipx
 options:
-    name:
-        description:
-            - Name of an application installed with C(pipx).
-        type: str
-    include_deps:
-        description:
-            - Include dependent packages in the output.
-        type: bool
-        default: false
-    include_injected:
-        description:
-            - Include injected packages in the output.
-        type: bool
-        default: false
-    include_raw:
-        description:
-            - Returns the raw output of C(pipx list --json).
-            - The raw output is not affected by O(include_deps) or O(include_injected).
-        type: bool
-        default: false
-    executable:
-        description:
-            - Path to the C(pipx) installed in the system.
-            - >
-              If not specified, the module will use C(python -m pipx) to run the tool,
-              using the same Python interpreter as ansible itself.
-        type: path
-    global:
-        description:
-            - The module will pass the C(--global) argument to C(pipx), to execute actions in global scope.
-            - The C(--global) is only available in C(pipx>=1.6.0), so make sure to have a compatible version when using this option.
-              Moreover, a nasty bug with C(--global) was fixed in C(pipx==1.7.0), so it is strongly recommended you used that version or newer.
-        type: bool
-        default: false
-        version_added: 9.3.0
-notes:
-    - This module requires C(pipx) version 0.16.2.1 or above. From community.general 11.0.0 onwards, the module will require C(pipx>=1.7.0).
-    - Please note that C(pipx) requires Python 3.6 or above.
-    - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
-    - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
-    - >
-      This module will honor C(pipx) environment variables such as but not limited to E(PIPX_HOME) and E(PIPX_BIN_DIR)
-      passed using the R(environment Ansible keyword, playbooks_environment).
-    - See also the C(pipx) documentation at U(https://pypa.github.io/pipx/).
+  name:
+    description:
+    - Name of an application installed with C(pipx).
+    type: str
+  include_deps:
+    description:
+    - Include dependent packages in the output.
+    type: bool
+    default: false
+  include_injected:
+    description:
+    - Include injected packages in the output.
+    type: bool
+    default: false
+  include_raw:
+    description:
+    - Returns the raw output of C(pipx list --json).
+    - The raw output is not affected by O(include_deps) or O(include_injected).
+    type: bool
+    default: false
+  global:
+    version_added: 9.3.0
 author:
-    - "Alexei Znamensky (@russoz)"
-'''
+- "Alexei Znamensky (@russoz)"
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
+---
 - name: retrieve all installed applications
   community.general.pipx_info: {}
 
@@ -86,9 +66,10 @@ EXAMPLES = '''
   community.general.pipx_info:
     name: ansible-lint
     include_deps: true
-'''
+"""
 
-RETURN = '''
+RETURN = """
+---
 application:
   description: The list of installed applications
   returned: success
@@ -128,20 +109,13 @@ cmd:
   returned: success
   type: list
   elements: str
-  sample: [
-    "/usr/bin/python3.10",
-    "-m",
-    "pipx",
-    "list",
-    "--include-injected",
-    "--json"
-  ]
-'''
+  sample: ["/usr/bin/python3.10", "-m", "pipx", "list", "--include-injected", "--json"]
+"""
 
 import json
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -153,9 +127,8 @@ class PipXInfo(ModuleHelper):
         include_deps=dict(type='bool', default=False),
         include_injected=dict(type='bool', default=False),
         include_raw=dict(type='bool', default=False),
-        executable=dict(type='path'),
     )
-    argument_spec["global"] = dict(type='bool', default=False)
+    argument_spec.update(pipx_common_argspec)
     module = dict(
         argument_spec=argument_spec,
         supports_check_mode=True,

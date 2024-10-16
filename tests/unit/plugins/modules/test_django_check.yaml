@@ -7,7 +7,8 @@
 - id: success
   input:
     settings: whatever.settings
-  run_command_calls:
+  mocks:
+    run_command:
     - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
@@ -17,9 +18,10 @@
   input:
     settings: whatever.settings
     database:
-      - abc
-      - def
-  run_command_calls:
+    - abc
+    - def
+  mocks:
+    run_command:
     - command: [/testbin/python, -m, django, check, --no-color, --settings=whatever.settings, --database, abc, --database, def]
       environ: *env-def
       rc: 0

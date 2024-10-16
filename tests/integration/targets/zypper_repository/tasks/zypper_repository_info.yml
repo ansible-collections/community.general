@@ -1,0 +1,26 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Add test repo
+  community.general.zypper_repository:
+    name: test
+    state: present
+    repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+  register: zypper_result
+
+- name: read repositories with zypper_repository_info
+  community.general.zypper_repository_info:
+  register: repositories
+
+- name: verify, that test-repo is returned by the repodatalist
+  assert:
+    that:
+      - "{{ 'test' in repositories.repodatalist|map(attribute='name') | list }}"
+
+- name: Cleanup - Delete test repo
+  community.general.zypper_repository:
+    name: test
+    state: absent
+  register: zypper_result

@@ -9,6 +9,12 @@ __metaclass__ = type
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
 
 
+pipx_common_argspec = {
+    "global": dict(type='bool', default=False),
+    "executable": dict(type='path'),
+}
+
+
 _state_map = dict(
     install='install',
     install_all='install-all',

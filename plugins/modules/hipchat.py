@@ -17,6 +17,10 @@ description:
    - Send a message to a Hipchat room, with options to control the formatting.
 extends_documentation_fragment:
   - community.general.attributes
+deprecated:
+  removed_in: 11.0.0
+  why: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
+  alternative: There is none.
 attributes:
   check_mode:
     support: full

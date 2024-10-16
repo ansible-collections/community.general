@@ -7,16 +7,17 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
+---
 module: gio_mime
 author:
-  - "Alexei Znamensky (@russoz)"
+- "Alexei Znamensky (@russoz)"
 short_description: Set default handler for MIME type, for applications using Gnome GIO
 version_added: 7.5.0
 description:
-  - This module allows configuring the default handler for a specific MIME type, to be used by applications built with th Gnome GIO API.
+- This module allows configuring the default handler for a specific MIME type, to be used by applications built with th Gnome GIO API.
 extends_documentation_fragment:
-  - community.general.attributes
+- community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -25,24 +26,28 @@ attributes:
 options:
   mime_type:
     description:
-      - MIME type for which a default handler will be set.
+    - MIME type for which a default handler will be set.
     type: str
     required: true
   handler:
     description:
-      - Default handler will be set for the MIME type.
+    - Default handler will be set for the MIME type.
     type: str
     required: true
 notes:
-  - This module is a thin wrapper around the C(gio mime) command (and subcommand).
-  - See man gio(1) for more details.
+- This module is a thin wrapper around the C(gio mime) command (and subcommand).
+- See man gio(1) for more details.
 seealso:
-  - name: GIO Documentation
-    description: Reference documentation for the GIO API..
-    link: https://docs.gtk.org/gio/
-'''
+- name: C(gio) command manual page
+  description: Manual page for the command.
+  link: https://man.archlinux.org/man/gio.1
+- name: GIO Documentation
+  description: Reference documentation for the GIO API..
+  link: https://docs.gtk.org/gio/
+"""
 
 EXAMPLES = """
+---
 - name: Set chrome as the default handler for https
   community.general.gio_mime:
     mime_type: x-scheme-handler/https
@@ -50,26 +55,27 @@ EXAMPLES = """
   register: result
 """
 
-RETURN = '''
-  handler:
-    description:
-    - The handler set as default.
-    returned: success
-    type: str
-    sample: google-chrome.desktop
-  stdout:
-    description:
-    - The output of the C(gio) command.
-    returned: success
-    type: str
-    sample: Set google-chrome.desktop as the default for x-scheme-handler/https
-  stderr:
-    description:
-    - The error output of the C(gio) command.
-    returned: failure
-    type: str
-    sample: 'gio: Failed to load info for handler "never-existed.desktop"'
-'''
+RETURN = """
+---
+handler:
+  description:
+  - The handler set as default.
+  returned: success
+  type: str
+  sample: google-chrome.desktop
+stdout:
+  description:
+  - The output of the C(gio) command.
+  returned: success
+  type: str
+  sample: Set google-chrome.desktop as the default for x-scheme-handler/https
+stderr:
+  description:
+  - The error output of the C(gio) command.
+  returned: failure
+  type: str
+  sample: 'gio: Failed to load info for handler "never-existed.desktop"'
+"""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.gio_mime import gio_mime_runner, gio_mime_get
@@ -84,7 +90,7 @@ class GioMime(ModuleHelper):
         ),
         supports_check_mode=True,
     )
-    mute_vardict_deprecation = True
+    use_old_vardict = False
 
     def __init_module__(self):
         self.runner = gio_mime_runner(self.module, check_rc=True)
@@ -92,7 +98,7 @@ class GioMime(ModuleHelper):
 
     def __run__(self):
         check_mode_return = (0, 'Module executed in check mode', '')
-        if self.vars.has_changed("handler"):
+        if self.vars.has_changed:
             with self.runner.context(args_order=["mime_type", "handler"], check_mode_skip=True, check_mode_return=check_mode_return) as ctx:
                 rc, out, err = ctx.run()
                 self.vars.stdout = out

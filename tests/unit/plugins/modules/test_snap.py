@@ -6,8 +6,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from .helper import Helper, ModuleTestCase, RunCmdCall
+import sys
+
 from ansible_collections.community.general.plugins.modules import snap
+from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
 
 
 issue_6803_status_out = """Name    Version      Rev    Tracking         Publisher    Notes
@@ -375,100 +377,102 @@ issue_6803_kubectl_out = (
 )
 
 TEST_CASES = [
-    ModuleTestCase(
+    dict(
         id="simple case",
         input={"name": ["hello-world"]},
         output=dict(changed=True, snaps_installed=["hello-world"]),
         flags={},
-        run_command_calls=[
-            RunCmdCall(
-                command=['/testbin/snap', 'info', 'hello-world'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out='name: hello-world\n',
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'list'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out="",
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'install', 'hello-world'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out="hello-world (12345/stable) v12345 from Canonical** installed\n",
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'list'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=(
-                    "Name    Version      Rev    Tracking         Publisher    Notes"
-                    "core20  20220826     1623   latest/stable    canonical**  base"
-                    "lxd     5.6-794016a  23680  latest/stable/…  canonical**  -"
-                    "hello-world     5.6-794016a  23680  latest/stable/…  canonical**  -"
-                    "snapd   2.57.4       17336  latest/stable    canonical**  snapd"
-                    ""),
-                err="",
-            ),
-        ]
+        mocks=dict(
+            run_command=[
+                dict(
+                    command=['/testbin/snap', 'info', 'hello-world'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out='name: hello-world\n',
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'list'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out="",
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'install', 'hello-world'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out="hello-world (12345/stable) v12345 from Canonical** installed\n",
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'list'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out=(
+                        "Name    Version      Rev    Tracking         Publisher    Notes"
+                        "core20  20220826     1623   latest/stable    canonical**  base"
+                        "lxd     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                        "hello-world     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                        "snapd   2.57.4       17336  latest/stable    canonical**  snapd"
+                        ""),
+                    err="",
+                ),
+            ],
+        ),
     ),
-    ModuleTestCase(
+    dict(
         id="issue_6803",
         input={"name": ["microk8s", "kubectl"], "classic": True},
         output=dict(changed=True, snaps_installed=["microk8s", "kubectl"]),
         flags={},
-        run_command_calls=[
-            RunCmdCall(
-                command=['/testbin/snap', 'info', 'microk8s', 'kubectl'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out='name: microk8s\n---\nname: kubectl\n',
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'list'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=issue_6803_status_out,
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'install', '--classic', 'microk8s'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=issue_6803_microk8s_out,
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'install', '--classic', 'kubectl'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=issue_6803_kubectl_out,
-                err="",
-            ),
-            RunCmdCall(
-                command=['/testbin/snap', 'list'],
-                environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
-                rc=0,
-                out=(
-                    "Name    Version      Rev    Tracking         Publisher    Notes"
-                    "core20  20220826     1623   latest/stable    canonical**  base"
-                    "lxd     5.6-794016a  23680  latest/stable/…  canonical**  -"
-                    "microk8s     5.6-794016a  23680  latest/stable/…  canonical**  -"
-                    "kubectl     5.6-794016a  23680  latest/stable/…  canonical**  -"
-                    "snapd   2.57.4       17336  latest/stable    canonical**  snapd"
-                    ""),
-                err="",
-            ),
-        ]
+        mocks=dict(
+            run_command=[
+                dict(
+                    command=['/testbin/snap', 'info', 'microk8s', 'kubectl'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out='name: microk8s\n---\nname: kubectl\n',
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'list'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out=issue_6803_status_out,
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'install', '--classic', 'microk8s'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out=issue_6803_microk8s_out,
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'install', '--classic', 'kubectl'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out=issue_6803_kubectl_out,
+                    err="",
+                ),
+                dict(
+                    command=['/testbin/snap', 'list'],
+                    environ={'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    rc=0,
+                    out=(
+                        "Name    Version      Rev    Tracking         Publisher    Notes"
+                        "core20  20220826     1623   latest/stable    canonical**  base"
+                        "lxd     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                        "microk8s     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                        "kubectl     5.6-794016a  23680  latest/stable/…  canonical**  -"
+                        "snapd   2.57.4       17336  latest/stable    canonical**  snapd"
+                        ""),
+                    err="",
+                ),
+            ],
+        ),
     ),
 ]
 
-helper = Helper.from_list(snap.main, TEST_CASES)
-patch_bin = helper.cmd_fixture
-test_module = helper.test_module
+Helper.from_list(sys.modules[__name__], snap, TEST_CASES)
