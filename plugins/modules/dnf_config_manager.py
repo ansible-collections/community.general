@@ -41,7 +41,8 @@ options:
     type: str
     choices: [enabled, disabled]
 notes:
-- When run in check mode, the specified repositories are not changed. This may cause failures in subsequent tasks
+- >
+  When run in check mode, the specified repositories are not changed. This may cause failures in subsequent tasks
   in a test-run of a playbook. To force the repository config to be changed, set C(check_mode) to C(false) on the
   task. See R(the documentation on playbook check_mode, playbooks_checkmode).
 seealso:
