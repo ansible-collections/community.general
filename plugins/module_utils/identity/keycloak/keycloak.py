@@ -22,7 +22,6 @@ URL_REALM = "{url}/admin/realms/{realm}"
 URL_REALM_KEYS_METADATA = "{url}/admin/realms/{realm}/keys"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
-URL_INTROSPECT = "{url}/realms/{realm}/protocol/openid-connect/token/introspect"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
 
@@ -162,114 +161,52 @@ def get_token(module_params):
         :return: connection header
     """
     token = module_params.get('token')
-    refresh_token = module_params.get('refresh_token')
     base_url = module_params.get('auth_keycloak_url')
     http_agent = module_params.get('http_agent')
 
     if not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
 
-    base_url = module_params.get('auth_keycloak_url')
-    validate_certs = module_params.get('validate_certs')
-    auth_realm = module_params.get('auth_realm')
-    client_id = module_params.get('auth_client_id')
-    auth_username = module_params.get('auth_username')
-    auth_password = module_params.get('auth_password')
-    client_secret = module_params.get('auth_client_secret')
-    connection_timeout = module_params.get('connection_timeout')
-    auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
-
-    def extract_token(response):
-        try:
-            token = response['access_token']
-        except KeyError:
-            raise KeycloakError(
-                'Could not obtain access token from %s' % auth_url)
-
-        return token
-
-    def wrap_token(token):
-        return {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        }
-
-    def prepare_payload(grant_type,
-                        client_id,
-                        client_secret=None,
-                        refresh_token=None,
-                        username=None,
-                        password=None):
+    if token is None:
+        base_url = module_params.get('auth_keycloak_url')
+        validate_certs = module_params.get('validate_certs')
+        auth_realm = module_params.get('auth_realm')
+        client_id = module_params.get('auth_client_id')
+        auth_username = module_params.get('auth_username')
+        auth_password = module_params.get('auth_password')
+        client_secret = module_params.get('auth_client_secret')
+        connection_timeout = module_params.get('connection_timeout')
+        auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
         temp_payload = {
-            'grant_type': grant_type,
+            'grant_type': 'password',
             'client_id': client_id,
             'client_secret': client_secret,
-            'refresh_token': refresh_token,
-            'username': username,
-            'password': password,
+            'username': auth_username,
+            'password': auth_password,
         }
         # Remove empty items, for instance missing client_secret
         payload = {k: v for k, v in temp_payload.items() if v is not None}
-
-        return payload
-
-    # Check existing token if it's provided
-    if token is not None:
-        # Check token is valid via userinfo route
-        userinfo_url = URL_INTROSPECT.format(url=base_url, realm=auth_realm)
-        try:
-            r = json.loads(to_native(open_url(userinfo_url, method='GET', headers=wrap_token(token),
-                                              validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout)))
-        except Exception as e:
-            raise KeycloakError('Could not check access token via %s: %s'
-                                % (userinfo_url, str(e)))
-
-        if r.StatusCode == 200:
-            return wrap_token(token)
-
-    # Try authenticating via refresh token if it's provided
-    if refresh_token is not None:
-        payload = prepare_payload(
-            grant_type="refresh-token",
-            client_id=client_id,
-            client_secret=client_secret,
-            refresh_token=refresh_token,
-        )
-
         try:
             r = json.loads(to_native(open_url(auth_url, method='POST',
                                               validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
                                               data=urlencode(payload)).read()))
-        except:
-            raise KeycloakError('Could not refresh token via %s: %s'
+        except ValueError as e:
+            raise KeycloakError(
+                'API returned invalid JSON when trying to obtain access token from %s: %s'
+                % (auth_url, str(e)))
+        except Exception as e:
+            raise KeycloakError('Could not obtain access token from %s: %s'
                                 % (auth_url, str(e)))
 
-        if r.statusCode == 200:
-            return wrap_token(extract_token(r))
-
-    # Access token and refresh token either not provided or not valid,
-    # authenticate via username/password
-    payload = prepare_payload(
-        grant_type="password",
-        client_id=client_id,
-        client_secret=client_secret,
-        username=auth_username,
-        password=auth_password,
-    )
-
-    try:
-        r = json.loads(to_native(open_url(auth_url, method='POST',
-                                            validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
-                                            data=urlencode(payload)).read()))
-    except ValueError as e:
-        raise KeycloakError(
-            'API returned invalid JSON when trying to obtain access token from %s: %s'
-            % (auth_url, str(e)))
-    except Exception as e:
-        raise KeycloakError('Could not obtain access token from %s: %s'
-                            % (auth_url, str(e)))
-
-    return wrap_token(extract_token(r))
+        try:
+            token = r['access_token']
+        except KeyError:
+            raise KeycloakError(
+                'Could not obtain access token from %s' % auth_url)
+    return {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+    }
 
 
 def is_struct_included(struct1, struct2, exclude=None):
