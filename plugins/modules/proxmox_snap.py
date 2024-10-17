@@ -231,11 +231,17 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
                 # The correct permissions are required only to reconfig mounts.
                 # Not checking now would allow to remove the configuration BUT
                 # fail later, leaving the container in a misconfigured state.
-                if (
-                    self.module.params['api_user'] != 'root@pam'
-                    or not self.module.params['api_password']
+                if not (
+                    self.module.params['api_user'] == 'root@pam' and (
+                        # Either via API and password,
+                        self.module.params['api_password'] or
+                        # or directly via local backend.
+                        not self.module.params['api_host']
+                    )
                 ):
-                    self.module.fail_json(msg='`unbind=True` requires authentication as `root@pam` with `api_password`, API tokens are not supported.')
+                    self.module.fail_json(
+                        msg='`unbind=True` requires authentication as `root@pam` with `api_password` or local backend, API tokens are not supported.'
+                    )
                     return False
                 mountpoints = self._container_mp_get(vm, vmid)
                 vmstatus = self.vmstatus(vm, vmid).current().get()['status']
