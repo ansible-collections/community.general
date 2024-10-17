@@ -384,6 +384,13 @@ options:
         aliases:
             - passwordPolicy
         type: str
+    organizations_enabled:
+        description:
+            - Enables support for experimental organization feature.
+        aliases:
+            - organizationsEnabled
+        type: bool
+        version_added: 10.0.0
     permanent_lockout:
         description:
             - The realm permanent lockout.
@@ -686,6 +693,7 @@ def main():
         otp_policy_type=dict(type='str', aliases=['otpPolicyType']),
         otp_supported_applications=dict(type='list', elements='str', aliases=['otpSupportedApplications']),
         password_policy=dict(type='str', aliases=['passwordPolicy'], no_log=False),
+        organizations_enabled=dict(type='bool', aliases=['organizationsEnabled']),
         permanent_lockout=dict(type='bool', aliases=['permanentLockout']),
         quick_login_check_milli_seconds=dict(type='int', aliases=['quickLoginCheckMilliSeconds']),
         refresh_token_max_reuse=dict(type='int', aliases=['refreshTokenMaxReuse'], no_log=False),
