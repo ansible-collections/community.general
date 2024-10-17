@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_label - update label's color (https://github.com/ansible-collections/community.general/pull/9010).
