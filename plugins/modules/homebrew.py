@@ -572,7 +572,7 @@ class Homebrew(object):
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
-        if self._current_package_is_installed():
+        if rc == 0:
             self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
@@ -600,10 +600,11 @@ class Homebrew(object):
             self.message = 'Invalid package: {0}.'.format(self.current_package)
             raise HomebrewException(self.message)
 
-        if not self._current_package_is_installed():
+        current_package_is_installed = self._current_package_is_installed()
+        if not current_package_is_installed:
             command = 'install'
 
-        if self._current_package_is_installed() and not self._current_package_is_outdated():
+        if current_package_is_installed and not self._current_package_is_outdated():
             self.message = 'Package is already upgraded: {0}'.format(
                 self.current_package,
             )
@@ -626,7 +627,7 @@ class Homebrew(object):
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
-        if self._current_package_is_installed() and not self._current_package_is_outdated():
+        if rc == 0:
             self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
