@@ -191,8 +191,6 @@ EXAMPLES = """
 """
 
 
-import json
-
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
 
