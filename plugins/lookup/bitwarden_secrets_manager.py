@@ -77,6 +77,8 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
+
 
 class BitwardenSecretsManagerException(AnsibleLookupError):
     pass
@@ -114,6 +116,15 @@ class BitwardenSecretsManager(object):
         rc = p.wait()
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict'), rc
 
+    def get_bws_version(self):
+        """Get the version of the Bitwarden Secrets Manager CLI.
+        """
+        out, err, rc = self._run(['--version'])
+        if rc != 0:
+            raise BitwardenSecretsManagerException(to_text(err))
+        # strip the prefix and grab the last segment, the version number
+        return out.split()[-1]
+
     def get_secret(self, secret_id, bws_access_token):
         """Get and return the secret with the given secret_id.
         """
@@ -122,9 +133,17 @@ class BitwardenSecretsManager(object):
         # Color output was not always disabled correctly with the default 'auto' setting so explicitly disable it.
         params = [
             '--color', 'no',
-            '--access-token', bws_access_token,
-            'get', 'secret', secret_id
+            '--access-token', bws_access_token
         ]
+
+        # bws version 0.3.0 introduced a breaking change in the command line syntax:
+        # pre-0.3.0: verb noun
+        # 0.3.0 and later: noun verb
+        bws_version = self.get_bws_version()
+        if LooseVersion(bws_version) < LooseVersion('0.3.0'):
+            params.extend(['get', 'secret', secret_id])
+        else:
+            params.extend(['secret', 'get', secret_id])
 
         out, err, rc = self._run_with_retry(params)
         if rc != 0:
