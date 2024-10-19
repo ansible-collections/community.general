@@ -14,7 +14,7 @@ module: keycloak_component
 
 short_description: Allows administration of Keycloak components via Keycloak API
 
-version_added: 9.5.0
+version_added: 10.0.0
 
 description:
     - This module allows the administration of Keycloak components via the Keycloak REST API. It
