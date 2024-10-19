@@ -1,5 +1,2 @@
 bugfixes:
-  - one_vnet - fix ``VM_MAD`` to ``VN_MAD`` (https://github.com/ansible-collections/community.general/pull/9019).
-  - one_vnet - fix ``VMTEMPLATE`` to ``VNET`` (https://github.com/ansible-collections/community.general/pull/9019).
-  - one_vnet - fix loop for ``.AR_POOL.AR`` (https://github.com/ansible-collections/community.general/pull/9019).
-  - one_vnet - fix allocate parameter (https://github.com/ansible-collections/community.general/pull/9019).
+  - one_vnet - fix module failing due to a variable typo (https://github.com/ansible-collections/community.general/pull/9019).
