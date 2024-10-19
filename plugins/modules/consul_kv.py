@@ -111,6 +111,12 @@ options:
           - Whether to verify the tls certificate of the consul agent.
         type: bool
         default: true
+    datacenter:
+        description:
+          - The name of the datacenter to query. If unspecified, the query will default
+            to the datacenter of the Consul agent on O(host).
+        type: str
+        version_added: 10.0.0
 '''
 
 
@@ -291,7 +297,8 @@ def get_consul_api(module):
                          port=module.params.get('port'),
                          scheme=module.params.get('scheme'),
                          verify=module.params.get('validate_certs'),
-                         token=module.params.get('token'))
+                         token=module.params.get('token'),
+                         dc=module.params.get('datacenter'))
 
 
 def test_dependencies(module):
@@ -305,6 +312,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             cas=dict(type='str'),
+            datacenter=dict(type='str', default=None),
             flags=dict(type='str'),
             key=dict(type='str', required=True, no_log=False),
             host=dict(type='str', default='localhost'),
