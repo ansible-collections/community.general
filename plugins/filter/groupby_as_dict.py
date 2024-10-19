@@ -13,6 +13,8 @@ DOCUMENTATION = '''
   author: Felix Fontein (@felixfontein)
   description:
     - Transform a sequence of dictionaries to a dictionary where the dictionaries are indexed by an attribute.
+    - This filter is similar to the Jinja2 C(groupby) filter. Use the Jinja2 C(groupby) filter if you have multiple entries with the same value,
+      or when you need a dictionary with list values, or when you need to use deeply nested attributes.
   positional: attribute
   options:
     _input:
