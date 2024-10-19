@@ -70,19 +70,19 @@ def pipx_runner(module, command, **kwargs):
     return runner
 
 
-def make_process_list(mod_helper):
+def make_process_list(mod_helper, **kwargs):
     def process_list(rc, out, err):
         if not out:
             return []
 
         results = []
         raw_data = json.loads(out)
-        if mod_helper.vars.as_dict().get("include_raw"):
+        if kwargs.get("include_raw"):
             mod_helper.vars.raw_output = raw_data
 
-        if mod_helper.vars.name:
-            if mod_helper.vars.name in raw_data['venvs']:
-                data = {mod_helper.vars.name: raw_data['venvs'][mod_helper.vars.name]}
+        if kwargs["name"]:
+            if kwargs["name"] in raw_data['venvs']:
+                data = {kwargs["name"]: raw_data['venvs'][kwargs["name"]]}
             else:
                 data = {}
         else:
@@ -94,9 +94,9 @@ def make_process_list(mod_helper):
                 'version': venv['metadata']['main_package']['package_version'],
                 'pinned': venv['metadata']['main_package']['pinned'],
             }
-            if mod_helper.vars.as_dict().get("include_injected"):
+            if kwargs.get("include_injected"):
                 entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
-            if mod_helper.vars.as_dict().get("include_deps"):
+            if kwargs.get("include_deps"):
                 entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
             results.append(entry)
 
