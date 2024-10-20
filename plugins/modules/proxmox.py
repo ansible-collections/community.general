@@ -1078,7 +1078,6 @@ def main():
             ('state', 'present', ('clone', 'ostemplate', 'update'), True),
         ],
         required_together=[("api_token_id", "api_token_secret")],
-        required_one_of=[("api_password", "api_token_id")],
         mutually_exclusive=[
             (
                 "clone",
