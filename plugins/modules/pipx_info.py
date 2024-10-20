@@ -99,7 +99,9 @@ application:
       sample:
         licenses: "0.6.1"
     pinned:
-      description: Whether the installed application is pinned or not.
+      description:
+      - Whether the installed application is pinned or not.
+      - When using C(pipx<=1.6.0), this returns C(null).
       returned: success
       type: bool
       sample:

@@ -92,7 +92,7 @@ def make_process_list(mod_helper, **kwargs):
             entry = {
                 'name': venv_name,
                 'version': venv['metadata']['main_package']['package_version'],
-                'pinned': venv['metadata']['main_package']['pinned'],
+                'pinned': venv['metadata']['main_package'].get('pinned'),
             }
             if kwargs.get("include_injected"):
                 entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
