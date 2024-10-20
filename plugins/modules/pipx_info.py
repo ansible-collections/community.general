@@ -106,6 +106,7 @@ application:
       type: bool
       sample:
         pinned: true
+      version_added: 10.0.0
 
 raw_output:
   description: The raw output of the C(pipx list) command, when O(include_raw=true). Used for debugging.
