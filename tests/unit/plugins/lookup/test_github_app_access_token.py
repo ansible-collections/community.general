@@ -32,7 +32,7 @@ class MockResponse(MagicMock):
 
 class TestLookupModule(unittest.TestCase):
 
-    def test_get_token(self):
+    def test_get_token_with_file(self):
         with patch.multiple("ansible_collections.community.general.plugins.lookup.github_app_access_token",
                             open=mock_open(read_data="foo_bar"),
                             open_url=MagicMock(return_value=MockResponse()),
@@ -47,6 +47,24 @@ class TestLookupModule(unittest.TestCase):
                     key_path="key",
                     app_id="app_id",
                     installation_id="installation_id",
+                    token_expiry=600
+                )
+            )
+
+    def test_get_token_with_fact(self):
+        with patch.multiple("ansible_collections.community.general.plugins.lookup.github_app_access_token",
+                            open_url=MagicMock(return_value=MockResponse()),
+                            jwk_from_pem=MagicMock(return_value='private_key'),
+                            jwt_instance=MockJWT(),
+                            HAS_JWT=True):
+            lookup = lookup_loader.get('community.general.github_app_access_token')
+            self.assertListEqual(
+                [MockResponse.response_token],
+                lookup.run(
+                    [],
+                    app_id="app_id",
+                    installation_id="installation_id",
+                    private_key="foo_bar",
                     token_expiry=600
                 )
             )
