@@ -1,0 +1,2 @@
+bugfixes:
+  - zfs - fix handling of multi-line values of user-defined ZFS properties (https://github.com/ansible-collections/community.general/pull/6264).
