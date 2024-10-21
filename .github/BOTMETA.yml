@@ -800,6 +800,8 @@ files:
     maintainers: fynncfchen johncant
   $modules/keycloak_clientsecret_regenerate.py:
     maintainers: fynncfchen johncant
+  $modules/keycloak_component.py:
+    maintainers: fivetide
   $modules/keycloak_group.py:
     maintainers: adamgoossens
   $modules/keycloak_identity_provider.py:
