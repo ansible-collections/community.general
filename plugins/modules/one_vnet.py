@@ -213,8 +213,8 @@ parent_network_id:
     type: int
     returned: when O(state=present)
     sample: 1
-vm_mad:
-    description: The network's VM_MAD.
+vn_mad:
+    description: The network's VN_MAD.
     type: str
     returned: when O(state=present)
     sample: bridge
@@ -319,7 +319,7 @@ class NetworksModule(OpenNebulaModule):
         # the other two parameters are used for pagination, -1 for both essentially means "return all"
         pool = self.one.vnpool.info(-2, -1, -1)
 
-        for template in pool.VMTEMPLATE:
+        for template in pool.VNET:
             if predicate(template):
                 return template
 
@@ -339,21 +339,23 @@ class NetworksModule(OpenNebulaModule):
 
     def get_networks_ar_pool(self, template):
         ar_pool = []
-        for ar in template.AR_POOL:
+        template_pool = template.AR_POOL.AR
+        for ar in range(len(template_pool)):
+            template_param = template_pool[ar]
             ar_pool.append({
                 # These params will always be present
-                'ar_id': ar['AR_ID'],
-                'mac': ar['MAC'],
-                'size': ar['SIZE'],
-                'type': ar['TYPE'],
+                'ar_id': template_param.AR_ID,
+                'mac': template_param.MAC,
+                'size': template_param.SIZE,
+                'type': template_param.TYPE,
                 # These are optional so firstly check for presence
                 # and if not present set value to Null
-                'allocated': getattr(ar, 'ALLOCATED', 'Null'),
-                'ip': getattr(ar, 'IP', 'Null'),
-                'global_prefix': getattr(ar, 'GLOBAL_PREFIX', 'Null'),
-                'parent_network_ar_id': getattr(ar, 'PARENT_NETWORK_AR_ID', 'Null'),
-                'ula_prefix': getattr(ar, 'ULA_PREFIX', 'Null'),
-                'vn_mad': getattr(ar, 'VN_MAD', 'Null'),
+                'allocated': getattr(template_param, 'ALLOCATED', 'Null'),
+                'ip': getattr(template_param, 'IP', 'Null'),
+                'global_prefix': getattr(template_param, 'GLOBAL_PREFIX', 'Null'),
+                'parent_network_ar_id': getattr(template_param, 'PARENT_NETWORK_AR_ID', 'Null'),
+                'ula_prefix': getattr(template_param, 'ULA_PREFIX', 'Null'),
+                'vn_mad': getattr(template_param, 'VN_MAD', 'Null'),
             })
         return ar_pool
 
@@ -381,7 +383,7 @@ class NetworksModule(OpenNebulaModule):
             'bridge': template.BRIDGE,
             'bride_type': template.BRIDGE_TYPE,
             'parent_network_id': template.PARENT_NETWORK_ID,
-            'vm_mad': template.VM_MAD,
+            'vn_mad': template.VN_MAD,
             'phydev': template.PHYDEV,
             'vlan_id': template.VLAN_ID,
             'outer_vlan_id': template.OUTER_VLAN_ID,
@@ -394,7 +396,8 @@ class NetworksModule(OpenNebulaModule):
 
     def create_template(self, name, template_data):
         if not self.module.check_mode:
-            self.one.vn.allocate("NAME = \"" + name + "\"\n" + template_data)
+            # -1 means that network won't be added to any cluster which happens by default
+            self.one.vn.allocate("NAME = \"" + name + "\"\n" + template_data, -1)
 
         result = self.get_template_info(self.get_template_by_name(name))
         result['changed'] = True
