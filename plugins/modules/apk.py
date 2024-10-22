@@ -74,6 +74,7 @@ options:
   world:
     description:
       - Use a custom world file when checking for explicitly installed packages.
+        The file is used only when a value is provided for O(name), and O(state) is set to V(present) or V(latest).
     type: str
     default: /etc/apk/world
     version_added: 5.4.0
