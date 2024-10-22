@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_project_members - add ``gitlab_group`` option to share and unshare project with groups  (https://github.com/ansible-collections/community.general/pull/8676).
