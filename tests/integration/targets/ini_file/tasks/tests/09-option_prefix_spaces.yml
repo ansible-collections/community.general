@@ -1,0 +1,107 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## testing support for optional spaces at beginning of option lines
+
+- name: Test-options_start_spaces 1 - update option with prefix spaces - create test file
+  ansible.builtin.copy:  # noqa risky-file-permissions
+    dest: "{{ output_file }}"
+    content: |
+      [foo]
+      ; bar=baz
+
+- name: Test-options_start_spaces 1 - update option with prefix spaces - set new value
+  community.general.ini_file:  # noqa risky-file-permissions
+    path: "{{ output_file }}"
+    section: 'foo'
+    option: bar
+    value: frelt
+    option_prefix_spaces: 2
+  register: result
+
+- name: Test-options_start_spaces 1 - update option with prefix spaces - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: Test-options_start_spaces 1 - update option with prefix spaces - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: |
+      [foo]
+        bar = frelt
+  ansible.builtin.assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'option changed'
+
+- name: Test-options_start_spaces 2 - set same value with prefix spaces - create test file
+  ansible.builtin.copy:  # noqa risky-file-permissions
+    dest: "{{ output_file }}"
+    content: |
+      [foo]
+        bar = baz
+
+- name: Test-options_start_spaces 2 - set same value with prefix spaces - set same value
+  community.general.ini_file:  # noqa risky-file-permissions
+    path: "{{ output_file }}"
+    section: 'foo'
+    option: bar
+    value: baz
+    option_prefix_spaces: 2
+  register: result
+
+- name: Test-options_start_spaces 2 - set same value with prefix spaces - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: Test-options_start_spaces 2 - set same value with prefix spaces - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: |
+      [foo]
+        bar = baz
+  ansible.builtin.assert:
+    that:
+      - actual_content == expected_content
+      - result is not changed
+      - result.msg == 'OK'
+
+- name: Test-options_start_spaces 3 - set new value in new sectio with prefix spaces - create test file
+  ansible.builtin.copy:  # noqa risky-file-permissions
+    dest: "{{ output_file }}"
+    content: |
+      [foo]
+        bar = baz
+
+- name: Test-options_start_spaces 3 - set new value in new sectio with prefix spaces - set same value
+  community.general.ini_file:  # noqa risky-file-permissions
+    path: "{{ output_file }}"
+    section: 'boo'
+    option: url
+    value: daz
+    option_prefix_spaces: 2
+  register: result
+
+- name: Test-options_start_spaces 3 - set new value in new sectio with prefix spaces - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: Test-options_start_spaces 3 - set new value in new sectio with prefix spaces - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: |
+      [foo]
+        bar = baz
+      [boo]
+        url = daz
+  ansible.builtin.assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'section and option added'
