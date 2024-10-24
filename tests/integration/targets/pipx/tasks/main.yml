@@ -8,11 +8,6 @@
     - name: Install pipx>=1.7.0
       pip:
         name: pipx>=1.7.0
-        extra_args: --user
-    - name: Ensure path
-      ansible.builtin.command: "{{ ansible_python_interpreter }} -m pipx ensurepath"
-    - name: Ensure path --global
-      ansible.builtin.command: "{{ ansible_python_interpreter }} -m pipx ensurepath --global"
     - name: Set has_pipx170 fact true
       ansible.builtin.set_fact:
         has_pipx170: true
@@ -23,7 +18,6 @@
     - name: Install pipx (no version spec)
       pip:
         name: pipx
-        extra_args: --user
 
 
 ##############################################################################
