@@ -1,0 +1,6 @@
+minor_changes:
+  - pipx - refactor out parsing of ``pipx list`` output to module utils (https://github.com/ansible-collections/community.general/pull/9044).
+  - pipx_info - refactor out parsing of ``pipx list`` output to module utils (https://github.com/ansible-collections/community.general/pull/9044).
+bugfixes:
+  - pipx module utils - add missing command line formatter for arguement ``spec_metadata`` (https://github.com/ansible-collections/community.general/pull/9044).
+  - pipx - it was ignoring `global` when listing existing applications (https://github.com/ansible-collections/community.general/pull/9044).
