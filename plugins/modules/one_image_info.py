@@ -307,7 +307,7 @@ class ImageInfoModule(OpenNebulaModule):
             images = self.get_all_images().IMAGE
 
         self.result = {
-            'images': [OpenNebulaModule.get_image_info(image) for image in images]
+            'images': [OpenNebulaModule.get_image_info(self, image) for image in images]
         }
 
         self.exit()
