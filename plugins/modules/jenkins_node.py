@@ -64,6 +64,15 @@ options:
       - When specified, sets the Jenkins node labels.
     type: list
     elements: str
+  offline_message:
+    description:
+      - Specifies the offline reason message to be set when setting a Jenkins node state.
+      - If O(offline_message) is given and O(state) is not V(disabled), an error will be
+        raised.
+      - Internally O(offline_message) is set via the V(toggleOffline) API, so updating
+        the message when the node is already offline is not possible. In this case, a
+        warning will be issued.
+    type: str
 '''
 
 EXAMPLES = '''
@@ -89,6 +98,13 @@ EXAMPLES = '''
       - label-1
       - label-2
       - label-3
+
+- name: Set Jenkins node offline with offline message.
+  community.general.jenkins_node:
+    name: my-node
+    state: disabled
+    offline_message: >
+      This node is offline for some reason.
 '''
 
 RETURN = '''
@@ -136,7 +152,7 @@ configured:
 '''
 
 import sys
-from xml.etree import ElementTree
+from xml.etree import ElementTree as et
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
@@ -164,6 +180,13 @@ class JenkinsNode:
         self.url = module.params['url']
         self.num_executors = module.params['num_executors']
         self.labels = module.params['labels']
+        self.offline_message = module.params['offline_message']  # type: str | None
+
+        if self.offline_message is not None:
+            self.offline_message = self.offline_message.rstrip("\n")
+
+            if self.state != "disabled":
+                self.module.fail_json("can not set offline message when state is not disabled")
 
         if self.labels is not None:
             for label in self.labels:
@@ -207,12 +230,12 @@ class JenkinsNode:
         configured = False
 
         data = self.instance.get_node_config(self.name)
-        root = ElementTree.fromstring(data)
+        root = et.fromstring(data)
 
         if self.num_executors is not None:
             elem = root.find('numExecutors')
             if elem is None:
-                elem = ElementTree.SubElement(root, 'numExecutors')
+                elem = et.SubElement(root, 'numExecutors')
             if elem.text is None or int(elem.text) != self.num_executors:
                 elem.text = str(self.num_executors)
                 configured = True
@@ -220,7 +243,7 @@ class JenkinsNode:
         if self.labels is not None:
             elem = root.find('label')
             if elem is None:
-                elem = ElementTree.SubElement(root, 'label')
+                elem = et.SubElement(root, 'label')
             labels = []
             if elem.text:
                 labels = elem.text.split()
@@ -230,9 +253,9 @@ class JenkinsNode:
 
         if configured:
             if IS_PYTHON_2:
-                data = ElementTree.tostring(root)
+                data = et.tostring(root)
             else:
-                data = ElementTree.tostring(root, encoding="unicode")
+                data = et.tostring(root, encoding="unicode")
 
             self.instance.reconfig_node(self.name, data)
 
@@ -240,13 +263,21 @@ class JenkinsNode:
         if configured:
             self.result['changed'] = True
 
-    def present_node(self):
+    def present_node(self, configure=True):  # type: (bool) -> bool
+        """Assert node present.
+
+        Args:
+            configure: If True, run node configuration after asserting node present.
+
+        Returns:
+            True if the node is present, False otherwise (i.e. is check mode).
+        """
         def create_node():
             try:
                 self.instance.create_node(self.name, launcher=jenkins.LAUNCHER_SSH)
             except jenkins.JenkinsException as e:
                 # Some versions of python-jenkins < 1.8.3 has an authorization bug when
-                # handling redirects returned when posting new resources. If the node is
+                # handling redirects returned when posting to resources. If the node is
                 # created OK then can ignore the error.
                 if not self.instance.node_exists(self.name):
                     raise e
@@ -265,7 +296,8 @@ class JenkinsNode:
 
             created = True
 
-        self.configure_node(present)
+        if configure:
+            self.configure_node(present)
 
         self.result['created'] = created
         if created:
@@ -279,7 +311,7 @@ class JenkinsNode:
                 self.instance.delete_node(self.name)
             except jenkins.JenkinsException as e:
                 # Some versions of python-jenkins < 1.8.3 has an authorization bug when
-                # handling redirects returned when posting new resources. If the node is
+                # handling redirects returned when posting to resources. If the node is
                 # deleted OK then can ignore the error.
                 if self.instance.node_exists(self.name):
                     raise e
@@ -302,16 +334,36 @@ class JenkinsNode:
             self.result['changed'] = True
 
     def enabled_node(self):
+        def get_offline():  # type: () -> bool
+            return self.instance.get_node_info(self.name)["offline"]
+
         present = self.present_node()
 
         enabled = False
 
         if present:
-            info = self.instance.get_node_info(self.name)
-
-            if info['offline']:
-                if not self.module.check_mode:
+            def enable_node():
+                try:
                     self.instance.enable_node(self.name)
+                except jenkins.JenkinsException as e:
+                    # Some versions of python-jenkins < 1.8.3 has an authorization bug when
+                    # handling redirects returned when posting to resources. If the node is
+                    # disabled OK then can ignore the error.
+                    offline = get_offline()
+
+                    if offline:
+                        raise e
+
+                    # TODO: Remove authorization workaround.
+                    self.result['warnings'].append(
+                        "suppressed 401 Not Authorized on redirect after node enabled: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
+                    )
+
+            offline = get_offline()
+
+            if offline:
+                if not self.module.check_mode:
+                    enable_node()
 
                 enabled = True
         else:
@@ -326,18 +378,63 @@ class JenkinsNode:
             self.result['changed'] = True
 
     def disabled_node(self):
-        present = self.present_node()
-
-        disabled = False
-
-        if present:
+        def get_offline_info():
             info = self.instance.get_node_info(self.name)
 
-            if not info['offline']:
+            offline = info["offline"]
+            offline_message = info["offlineCauseReason"]
+
+            return offline, offline_message
+
+        # Don't configure until after disabled, in case the change in configuration
+        # causes the node to pick up a job.
+        present = self.present_node(False)
+
+        disabled = False
+        changed = False
+
+        if present:
+            offline, offline_message = get_offline_info()
+
+            if self.offline_message is not None and self.offline_message != offline_message:
+                if offline:
+                    # n.b. Internally disable_node uses toggleOffline gated by a not
+                    # offline condition. This means that disable_node can not be used to
+                    # update an offline message if the node is already offline.
+                    #
+                    # Toggling the node online to set the message when toggling offline
+                    # again is not an option as during this transient online time jobs
+                    # may be scheduled on the node which is not acceptable.
+                    self.result["warnings"].append(
+                        "unable to change offline message when already offline"
+                    )
+                else:
+                    offline_message = self.offline_message
+                    changed = True
+
+            def disable_node():
+                try:
+                    self.instance.disable_node(self.name, offline_message)
+                except jenkins.JenkinsException as e:
+                    # Some versions of python-jenkins < 1.8.3 has an authorization bug when
+                    # handling redirects returned when posting to resources. If the node is
+                    # disabled OK then can ignore the error.
+                    offline, _offline_message = get_offline_info()
+
+                    if not offline:
+                        raise e
+
+                    # TODO: Remove authorization workaround.
+                    self.result['warnings'].append(
+                        "suppressed 401 Not Authorized on redirect after node disabled: see https://review.opendev.org/c/jjb/python-jenkins/+/931707"
+                    )
+
+            if not offline:
                 if not self.module.check_mode:
-                    self.instance.disable_node(self.name)
+                    disable_node()
 
                 disabled = True
+
         else:
             # Would have created node with initial state enabled therefore would have
             # needed to disable therefore disabled.
@@ -345,9 +442,15 @@ class JenkinsNode:
                 raise Exception("disabled_node present is False outside of check mode")
             disabled = True
 
-        self.result['disabled'] = disabled
         if disabled:
+            changed = True
+
+        self.result['disabled'] = disabled
+
+        if changed:
             self.result['changed'] = True
+
+        self.configure_node(present)
 
 
 def main():
@@ -360,6 +463,7 @@ def main():
             state=dict(choices=['enabled', 'disabled', 'present', 'absent'], default='present'),
             num_executors=dict(type='int'),
             labels=dict(type='list', elements='str'),
+            offline_message=dict(type='str'),
         ),
         supports_check_mode=True,
     )
