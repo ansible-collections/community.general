@@ -188,6 +188,12 @@ new_roles:
   sample:
     ansistrano.deploy: 3.8.0
     baztian.xfce: v0.0.3
+version:
+  description: Version of ansible-core for ansible-galaxy.
+  type: str
+  returned: always
+  sample: 2.17.4
+  version_added: 10.0.0
 """
 
 import re
@@ -252,7 +258,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
             if not match:
                 self.do_raise("Unable to determine ansible-galaxy version from: {0}".format(line))
             version = match.group("version")
-            version = tuple(int(x) for x in version.split('.')[:3])
             return version
 
         try:
@@ -265,7 +270,8 @@ class AnsibleGalaxyInstall(ModuleHelper):
                 return runner, ctx.run()
 
     def __init_module__(self):
-        self.runner, self.ansible_version = self._get_ansible_galaxy_version()
+        self.runner, self.vars.version = self._get_ansible_galaxy_version()
+        self.ansible_version = tuple(int(x) for x in self.vars.version.split('.')[:3])
         if self.ansible_version < (2, 11):
             self.module.fail_json(msg="Support for Ansible 2.9 and ansible-base 2.10 has been removed.")
         self.vars.set("new_collections", {}, change=True)
