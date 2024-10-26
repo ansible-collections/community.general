@@ -148,7 +148,7 @@ cpanm_version:
   description: Version of CPANMinus.
   type: str
   returned: always
-  sample: 1.7047
+  sample: "1.7047"
   version_added: 10.0.0
 """
 
