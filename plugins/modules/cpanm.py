@@ -207,10 +207,10 @@ class CPANMinus(ModuleHelper):
         with self.runner("version") as ctx:
             rc, out, err = ctx.run()
             line = out.split('\n')[0]
-                match = re.search("version\s+([\d\.]+)\s+", line)
-                if not match:
-                    self.do_raise("Failed to determine version number. First line of output: {0}".format(line))
-                self.vars.cpanm_version = match.group(1)
+            match = re.search(r"version\s+([\d\.]+)\s+", line)
+            if not match:
+                self.do_raise("Failed to determine version number. First line of output: {0}".format(line))
+            self.vars.cpanm_version = match.group(1)
 
     def _is_package_installed(self, name, locallib, version):
         def process(rc, out, err):
