@@ -187,7 +187,7 @@ class CPANMinus(ModuleHelper):
         mirror_only=cmd_runner_fmt.as_bool("--mirror-only"),
         installdeps=cmd_runner_fmt.as_bool("--installdeps"),
         pkg_spec=cmd_runner_fmt.as_list(),
-        version=cmd_runner_fmt.as_fixed("--version"),
+        cpanm_version=cmd_runner_fmt.as_fixed("--version"),
     )
     use_old_vardict = False
 
@@ -204,7 +204,7 @@ class CPANMinus(ModuleHelper):
         self.runner = CmdRunner(self.module, self.command, self.command_args_formats, check_rc=True)
         self.vars.binary = self.runner.binary
 
-        with self.runner("version") as ctx:
+        with self.runner("cpanm_version") as ctx:
             rc, out, err = ctx.run()
             line = out.split('\n')[0]
             match = re.search(r"version\s+([\d\.]+)\s+", line)
