@@ -9,8 +9,13 @@
     settings: whatever.settings
   mocks:
     run_command:
+    - command: [/testbin/python, -m, django, --version]
+      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: "5.1.2\n"
+      err: ""
     - command: [/testbin/python, -m, django, createcachetable, --no-color, --settings=whatever.settings, --noinput, --database=default]
-      environ: {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "whatever\n"
       err: ""

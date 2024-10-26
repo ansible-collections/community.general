@@ -55,6 +55,12 @@ run_info:
   description: Command-line execution information.
   type: dict
   returned: success and O(verbosity) >= 3
+version:
+  description: Version of Django.
+  type: str
+  returned: always
+  sample: 5.1.2
+  version_added: 10.0.0
 """
 
 import shlex
