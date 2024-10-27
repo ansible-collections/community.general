@@ -16,6 +16,7 @@ def gio_mime_runner(module, **kwargs):
         arg_formats=dict(
             mime_type=cmd_runner_fmt.as_list(),
             handler=cmd_runner_fmt.as_list(),
+            version=cmd_runner_fmt.as_fixed('--version'),
         ),
         **kwargs
     )
