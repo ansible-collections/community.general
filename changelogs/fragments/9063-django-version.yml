@@ -1,0 +1,5 @@
+minor_changes:
+  - django module utils - always retrieve version (https://github.com/ansible-collections/community.general/pull/9063).
+  - django_check - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9063).
+  - django_command - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9063).
+  - django_createcachetable - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9063).
