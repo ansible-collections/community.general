@@ -32,6 +32,7 @@ _django_std_arg_fmts = dict(
     verbosity=cmd_runner_fmt.as_opt_val("--verbosity"),
     no_color=cmd_runner_fmt.as_fixed("--no-color"),
     skip_checks=cmd_runner_fmt.as_bool("--skip-checks"),
+    version=cmd_runner_fmt.as_fixed("--version"),
 )
 
 _django_database_args = dict(
@@ -59,6 +60,9 @@ class _DjangoRunner(PythonRunner):
             ("command", "no_color", "settings", "pythonpath", "traceback", "verbosity", "skip_checks") + self._prepare_args_order(self.default_args_order)
         )
         return super(_DjangoRunner, self).__call__(args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs)
+
+    def bare_context(self, *args, **kwargs):
+        return super(_DjangoRunner, self).__call__(*args, **kwargs)
 
 
 class DjangoModuleHelper(ModuleHelper):
@@ -98,16 +102,20 @@ class DjangoModuleHelper(ModuleHelper):
                                arg_formats=self.arg_formats,
                                venv=self.vars.venv,
                                check_rc=True)
+
+        run_params = self.vars.as_dict()
+        if self._check_mode_arg:
+            run_params.update({self._check_mode_arg: self.check_mode})
+
+        rc, out, err = runner.bare_context("version").run()
+        self.vars.version = out.strip()
+
         with runner() as ctx:
-            run_params = self.vars.as_dict()
-            if self._check_mode_arg:
-                run_params.update({self._check_mode_arg: self.check_mode})
             results = ctx.run(**run_params)
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err
             self.vars.cmd = ctx.cmd
-            if self.verbosity >= 3:
-                self.vars.run_info = ctx.run_info
+            self.vars.set("run_info", ctx.run_info, verbosity=3)
 
         return results
 
