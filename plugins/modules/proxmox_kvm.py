@@ -91,6 +91,7 @@ options:
       - 'cloud-init: do an automatic package upgrade after the first boot.'
     type: bool
     default: true
+    version_added: 10.0.0
   ciuser:
     description:
       - 'cloud-init: username of default user to create.'
