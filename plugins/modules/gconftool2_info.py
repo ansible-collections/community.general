@@ -50,6 +50,12 @@ value:
   returned: success
   type: str
   sample: Monospace 10
+version:
+  description: Version of gconftool-2.
+  type: str
+  returned: always
+  sample: "3.2.6"
+  version_added: 10.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
@@ -68,6 +74,9 @@ class GConftoolInfo(ModuleHelper):
 
     def __init_module__(self):
         self.runner = gconftool2_runner(self.module, check_rc=True)
+        with self.runner("version") as ctx:
+            rc, out, err = ctx.run()
+            self.vars.version = out.strip()
 
     def __run__(self):
         with self.runner.context(args_order=["state", "key"]) as ctx:
