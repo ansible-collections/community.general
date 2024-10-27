@@ -27,6 +27,7 @@ def gconftool2_runner(module, **kwargs):
             value=cmd_runner_fmt.as_list(),
             direct=cmd_runner_fmt.as_bool("--direct"),
             config_source=cmd_runner_fmt.as_opt_val("--config-source"),
+            version=cmd_runner_fmt.as_fixed("--version"),
         ),
         **kwargs
     )
