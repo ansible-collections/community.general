@@ -96,6 +96,12 @@ previous_value:
   returned: success
   type: str
   sample: "Serif 12"
+version:
+  description: Version of gconftool-2.
+  type: str
+  returned: always
+  sample: "3.2.6"
+  version_added: 10.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
@@ -128,6 +134,10 @@ class GConftool(StateModuleHelper):
         self.runner = gconftool2_runner(self.module, check_rc=True)
         if not self.vars.direct and self.vars.config_source is not None:
             self.do_raise('If the "config_source" is specified then "direct" must be "true"')
+
+        with self.runner("version") as ctx:
+            rc, out, err = ctx.run()
+            self.vars.version = out.strip()
 
         self.vars.set('previous_value', self._get(), fact=True)
         self.vars.set('value_type', self.vars.value_type)
