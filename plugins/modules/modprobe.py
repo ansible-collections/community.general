@@ -163,8 +163,9 @@ class Modprobe(object):
     def create_module_file(self):
         file_path = os.path.join(MODULES_LOAD_LOCATION,
                                  self.name + '.conf')
-        with open(file_path, 'w') as file:
-            file.write(self.name + '\n')
+        if not self.check_mode:
+            with open(file_path, 'w') as file:
+                file.write(self.name + '\n')
 
     @property
     def module_options_file_content(self):
@@ -175,8 +176,9 @@ class Modprobe(object):
     def create_module_options_file(self):
         new_file_path = os.path.join(PARAMETERS_FILES_LOCATION,
                                      self.name + '.conf')
-        with open(new_file_path, 'w') as file:
-            file.write(self.module_options_file_content)
+        if not self.check_mode:
+            with open(new_file_path, 'w') as file:
+                file.write(self.module_options_file_content)
 
     def disable_old_params(self):
 
@@ -190,7 +192,7 @@ class Modprobe(object):
                     file_content[index] = '#' + line
                     content_changed = True
 
-            if content_changed:
+            if not self.check_mode and content_changed:
                 with open(modprobe_file, 'w') as file:
                     file.write('\n'.join(file_content))
 
@@ -206,7 +208,7 @@ class Modprobe(object):
                     file_content[index] = '#' + line
                     content_changed = True
 
-            if content_changed:
+            if not self.check_mode and content_changed:
                 with open(module_file, 'w') as file:
                     file.write('\n'.join(file_content))
 
