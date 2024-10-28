@@ -1940,26 +1940,7 @@ class Nmcli(object):
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
-                for name, value in self.wireguard.items():
-                    options.update({
-                        'wireguard.%s' % name: value,
-                    })
-                if self.wireguard.get('wgpeer_public_key'):
-                    options.update({
-                        'wireguard.peer.key': self.wireguard['wgpeer_public_key']
-                    })
-                if self.wireguard.get('wgpeer_allowed_ips'):
-                    options.update({
-                        'wireguard.peer.allowed-ips': self.wireguard['wgpeer_allowed_ips']
-                    })
-                if self.wireguard.get('wgpeer_endpoint'):
-                    options.update({
-                        'wireguard.peer.endpoint': self.wireguard['wgpeer_endpoint']
-                    })
-                if self.wireguard.get('wgpeer_persistent_keepalive'):
-                    options.update({
-                        'wireguard.peer.persistent-keepalive': str(self.wireguard['wgpeer_persistent_keepalive'])
-                    })
+                options.update(self.wireguard)      
         elif self.type == 'vpn':
             if self.vpn:
                 vpn_data_values = ''
@@ -2640,14 +2621,11 @@ def main():
                               parent=dict(type='str', required=True),
                               promiscuous=dict(type='bool'),
                               tap=dict(type='bool'))),
-            wireguard=dict(type='dict',
-                           suboptions=dict(
-                               wgpeer_public_key=dict(type='str', required=False),
-                               wgpeer_allowed_ips=dict(type='str', required=False),
-                               wgpeer_endpoint=dict(type='str', required=False),
-                               wgpeer_persistent_keepalive=dict(type='int', required=False)
-                            )
-            ),
+            wireguard=dict(type='dict', options=dict(
+                              peer_key=dict(type='str', required=False, alias='wireguard.peer.key'),
+                              peer_allowed_ips=dict(type='str', required=False, alias='wireguard.peer.allowed-ips'),
+                              peer_endpoint=dict(type='str', required=False, alias='wireguard.peer.endpoint'),
+                              peer_persistent_keepalive=dict(type='int', required=False, alias='wireguard.peer.persistent-keepalive'))),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),
