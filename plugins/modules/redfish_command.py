@@ -549,6 +549,18 @@ EXAMPLES = '''
         AccountLockoutThreshold: 5
         AccountLockoutDuration: 600
 
+  - name: Update user AccountTypes
+    community.general.redfish_command:
+      category: Accounts
+      command: UpdateUserAccountTypes
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      account_username: "{{ account_username }}"
+      account_types:
+        - Redfish
+        - WebUI
+
   - name: Clear Manager Logs with a timeout of 20 seconds
     community.general.redfish_command:
       category: Manager
@@ -810,7 +822,7 @@ CATEGORY_COMMANDS_ALL = {
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
-                 "UpdateAccountServiceProperties"],
+                 "UpdateUserAccountTypes", "UpdateAccountServiceProperties"],
     "Sessions": ["ClearSessions", "CreateSession", "DeleteSession"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
                 "ResetToDefaults",
@@ -978,6 +990,7 @@ def main():
             "UpdateUserRole": rf_utils.update_user_role,
             "UpdateUserPassword": rf_utils.update_user_password,
             "UpdateUserName": rf_utils.update_user_name,
+            "UpdateUserAccountTypes": rf_utils.update_user_accounttypes,
             "UpdateAccountServiceProperties": rf_utils.update_accountservice_properties
         }
 
