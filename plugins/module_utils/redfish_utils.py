@@ -1557,6 +1557,27 @@ class RedfishUtils(object):
             resp['msg'] = 'Modified account service'
         return resp
 
+    def update_user_accounttypes(self, user):
+        account_types = user.get('account_accounttypes')
+        oemaccount_types = user.get('account_oemaccounttypes')
+        if account_types is None and oemaccount_types is None:
+            return {'ret': False, 'msg':
+                    'Must provide account_accounttypes or account_oemaccounttypes for UpdateUserAccountTypes command'}
+
+        response = self._find_account_uri(username=user.get('account_username'),
+                                          acct_id=user.get('account_id'))
+        if not response['ret']:
+            return response
+
+        uri = response['uri']
+        payload = {}
+        if user.get('account_accounttypes'):
+            payload['AccountTypes'] = user.get('account_accounttypes')
+        if user.get('account_oemaccounttypes'):
+            payload['OEMAccountTypes'] = user.get('account_oemaccounttypes')
+
+        return self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+
     def check_password_change_required(self, return_data):
         """
         Checks a response if a user needs to change their password
