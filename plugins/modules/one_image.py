@@ -462,7 +462,7 @@ class ImageModule(OpenNebulaModule):
         if changed and not self.module.check_mode:
             self.one.image.enable(image.ID, enable)
 
-        result = OpenNebulaModule.get_image_info(image)
+        result = self.get_image_info(image)
         result['changed'] = changed
 
         return result
@@ -486,7 +486,7 @@ class ImageModule(OpenNebulaModule):
         if changed and not self.module.check_mode:
             self.one.image.persistent(image.ID, enable)
 
-        result = OpenNebulaModule.get_image_info(image)
+        result = self.get_image_info(image)
         result['changed'] = changed
 
         return result
@@ -497,7 +497,7 @@ class ImageModule(OpenNebulaModule):
 
         tmp_image = self.get_image_by_name(new_name)
         if tmp_image:
-            result = OpenNebulaModule.get_image_info(tmp_image)
+            result = self.get_image_info(image)
             result['changed'] = False
             return result
 
@@ -509,7 +509,7 @@ class ImageModule(OpenNebulaModule):
             self.wait_for_ready(new_id)
             image = self.one.image.info(new_id)
 
-        result = OpenNebulaModule.get_image_info(image)
+        result = self.get_image_info(image)
         result['changed'] = True
 
         return result
@@ -519,7 +519,7 @@ class ImageModule(OpenNebulaModule):
             self.module.fail_json(msg="'new_name' option has to be specified when the state is 'renamed'")
 
         if new_name == image.NAME:
-            result = OpenNebulaModule.get_image_info(image)
+            result = self.get_image_info(image)
             result['changed'] = False
             return result
 
@@ -530,7 +530,7 @@ class ImageModule(OpenNebulaModule):
         if not self.module.check_mode:
             self.one.image.rename(image.ID, new_name)
 
-        result = OpenNebulaModule.get_image_info(image)
+        result = self.get_image_info(image)
         result['changed'] = True
         return result
 
