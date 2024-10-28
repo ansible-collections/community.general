@@ -2621,12 +2621,21 @@ def main():
                               parent=dict(type='str', required=True),
                               promiscuous=dict(type='bool'),
                               tap=dict(type='bool'))),
-            wireguard=dict(type='dict', options=dict(
-                            peer_key=dict(type='str', required=False, no_log=True),
-                            peer_allowed_ips=dict(type='str', required=False),
-                            peer_endpoint=dict(type='str', required=False),
-                            peer_persistent_keepalive=dict(type='int', required=False)
-                            )),
+            wireguard=dict(
+                type='dict',
+                options=dict(
+                    fwmark=dict(type='int', required=False),
+                    ip4_auto_default_route=dict(type='bool', required=False),
+                    ip6_auto_default_route=dict(type='bool', required=False),
+                    listen_port=dict(type='int', required=False),
+                    mtu=dict(type='int', required=False),
+                    peer_routes=dict(type='bool', required=False),
+                    peer_public_key=dict(type='str', required=False, no_log=True),
+                    private_key=dict(type='str', required=False, no_log=True),
+                    private_key_flags=dict(type='str', required=False),
+                    peer_key=dict(type='str', required=False),
+                )
+            ),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),
