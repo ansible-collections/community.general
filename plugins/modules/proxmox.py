@@ -224,7 +224,7 @@ options:
     default: 30
   update:
     description:
-      - If V(true), the container will be updated with new values.
+      - If V(true), the container will be updated with new values. Only works with V(state: present).
     type: bool
     default: false
     version_added: 8.1.0
