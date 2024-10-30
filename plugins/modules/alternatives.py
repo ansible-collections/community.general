@@ -192,7 +192,7 @@ class AlternativesModule(object):
                 self.install()
 
             # Check if we need to set the preference
-            if self.mode_selected and self.current_path != self.path:
+            if self.mode_selected and (self.current_path != self.path or self.family is not None):
                 self.set()
 
             # Check if we need to reset to auto
@@ -213,6 +213,8 @@ class AlternativesModule(object):
             self.module.fail_json(msg='Needed to install the alternative, but unable to do so as we are missing the link')
 
         cmd = [self.UPDATE_ALTERNATIVES, '--install', self.link, self.name, self.path, str(self.priority)]
+        if self.family is not None:
+            cmd.extend(["--family", self.family])
 
         if self.module.params['subcommands'] is not None:
             subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
@@ -248,9 +250,14 @@ class AlternativesModule(object):
             self.result['diff']['after'] = dict(state=AlternativeState.ABSENT)
 
     def set(self):
-        cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, self.path]
+        if self.family is not None:
+            arg = self.family
+        else:
+            arg = self.path
+
+        cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, arg]
         self.result['changed'] = True
-        self.messages.append("Set alternative '%s' for '%s'." % (self.path, self.name))
+        self.messages.append("Set alternative '%s' for '%s'." % (arg, self.name))
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -276,6 +283,10 @@ class AlternativesModule(object):
     @property
     def path(self):
         return self.module.params.get('path')
+
+    @property
+    def family(self):
+        return self.module.params.get('family')
 
     @property
     def link(self):
@@ -321,7 +332,7 @@ class AlternativesModule(object):
         current_link_regex = re.compile(r'^\s*link \w+ is (.*)$', re.MULTILINE)
         subcmd_path_link_regex = re.compile(r'^\s*(?:slave|follower) (\S+) is (.*)$', re.MULTILINE)
 
-        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority\s(\d+)((?:\s+(?:slave|follower).*)*)', re.MULTILINE)
+        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s(\S+)\s)?priority\s(\d+)((?:\s+(?:slave|follower).*)*)', re.MULTILINE)
         subcmd_regex = re.compile(r'^\s+(?:slave|follower) (.*): (.*)$', re.MULTILINE)
 
         match = current_mode_regex.search(display_output)
@@ -346,9 +357,10 @@ class AlternativesModule(object):
         if not subcmd_path_map and self.subcommands:
             subcmd_path_map = {s['name']: s['link'] for s in self.subcommands}
 
-        for path, prio, subcmd in alternative_regex.findall(display_output):
+        for path, family, prio, subcmd in alternative_regex.findall(display_output):
             self.current_alternatives[path] = dict(
                 priority=int(prio),
+                family=family,
                 subcommands=[dict(
                     name=name,
                     path=spath,
@@ -383,7 +395,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
-            path=dict(type='path', required=True),
+            path=dict(type='path'),
+            family=dict(type='str'),
             link=dict(type='path'),
             priority=dict(type='int'),
             state=dict(
