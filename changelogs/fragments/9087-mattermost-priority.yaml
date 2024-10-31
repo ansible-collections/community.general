@@ -1,2 +1,2 @@
 minor_changes:
-  - mattermost - adds support for message priority (https://github.com/ansible-collections/community.general/issues/9068)
+  - mattermost - adds support for message priority (https://github.com/ansible-collections/community.general/issues/9068).
