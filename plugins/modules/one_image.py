@@ -36,10 +36,10 @@ options:
         type: str
     state:
         description:
-            - V(present) - state that is used to manage the image
-            - V(absent) - delete the image
-            - V(cloned) - clone the image
-            - V(renamed) - rename the image to the O(new_name)
+            - V(present) - state that is used to manage the image.
+            - V(absent) - delete the image.
+            - V(cloned) - clone the image.
+            - V(renamed) - rename the image to the O(new_name).
         choices: ["present", "absent", "cloned", "renamed"]
         default: present
         type: str
@@ -76,7 +76,6 @@ options:
         description:
             - Seconds to wait until image is ready, deleted or cloned.
         type: int
-        required: false
         default: 60
         version_added: 10.0.0
 author:
