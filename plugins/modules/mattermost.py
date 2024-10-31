@@ -72,7 +72,9 @@ options:
   priority:
     type: str
     description:
-      - Set a priority for the message. For supported values, see mattermost doc.
+      - Set a priority for the message.
+    choices: [ important, urgent ]
+    version_added: 10.0.0
   validate_certs:
     description:
       - If V(false), SSL certificates will not be validated. This should only be used
@@ -96,6 +98,7 @@ EXAMPLES = """
     channel: notifications
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
+    priority: important
 
 - name: Send attachments message via Mattermost
   community.general.mattermost:
@@ -139,7 +142,7 @@ def main():
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://docs.ansible.com/favicon.ico'),
-            priority=dict(type='str', default=None),
+            priority=dict(type='str', default=None, choices=['important', 'urgent']),
             validate_certs=dict(default=True, type='bool'),
             attachments=dict(type='list', elements='dict'),
         ),
