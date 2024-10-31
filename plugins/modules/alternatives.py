@@ -179,15 +179,20 @@ class AlternativesModule(object):
 
         if self.mode_present:
             # Check if we need to (re)install
+            if not self.path and not self.family:
+                self.module.fail_json(msg="Either path or family must be specified")
+
             subcommands_parameter = self.module.params['subcommands']
             priority_parameter = self.module.params['priority']
             if (
-                self.path not in self.current_alternatives or
-                (priority_parameter is not None and self.current_alternatives[self.path].get('priority') != priority_parameter) or
-                (subcommands_parameter is not None and (
-                    not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
-                    not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
-                ))
+                self.path is not None and (
+                    self.path not in self.current_alternatives or
+                    (priority_parameter is not None and self.current_alternatives[self.path].get('priority') != priority_parameter) or
+                    (subcommands_parameter is not None and (
+                        not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
+                        not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
+                    ))
+                )
             ):
                 self.install()
 
