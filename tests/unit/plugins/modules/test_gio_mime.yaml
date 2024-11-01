@@ -13,8 +13,13 @@
     changed: true
   mocks:
     run_command:
-    - command: [/testbin/gio, mime, x-scheme-handler/http]
+    - command: [/testbin/gio, mime, --version]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      rc: 0
+      out: "2.80.0\n"
+      err: ""
+    - command: [/testbin/gio, mime, x-scheme-handler/http]
+      environ: *env-def
       rc: 0
       out: ""
       err: >
@@ -35,6 +40,11 @@
     skip: test helper does not support check mode yet
   mocks:
     run_command:
+    - command: [/testbin/gio, mime, --version]
+      environ: *env-def
+      rc: 0
+      out: "2.80.0\n"
+      err: ""
     - command: [/testbin/gio, mime, x-scheme-handler/http]
       environ: *env-def
       rc: 0
@@ -55,6 +65,11 @@
     changed: false
   mocks:
     run_command:
+    - command: [/testbin/gio, mime, --version]
+      environ: *env-def
+      rc: 0
+      out: "2.80.0\n"
+      err: ""
     - command: [/testbin/gio, mime, x-scheme-handler/http]
       environ: *env-def
       rc: 0

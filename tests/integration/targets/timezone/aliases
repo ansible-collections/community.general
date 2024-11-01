@@ -7,3 +7,4 @@ destructive
 skip/aix
 skip/osx
 skip/macos
+skip/rhel7.9  # TODO: '/bin/timedatectl set-local-rtc no' fails with 'Failed to set local RTC: Failed to set RTC to local/UTC: Input/output error'

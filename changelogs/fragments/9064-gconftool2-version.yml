@@ -1,0 +1,4 @@
+minor_changes:
+  - gcontool2 module utils - add argument formatter ``version`` (https://github.com/ansible-collections/community.general/pull/9064).
+  - gcontool2 - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9064).
+  - gcontool2_info - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9064).

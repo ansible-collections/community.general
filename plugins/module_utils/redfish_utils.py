@@ -695,7 +695,7 @@ class RedfishUtils(object):
                         entry[prop] = logEntry.get(prop)
                 if entry:
                     list_of_log_entries.append(entry)
-            log_name = log_svcs_uri.split('/')[-1]
+            log_name = log_svcs_uri.rstrip('/').split('/')[-1]
             logs[log_name] = list_of_log_entries
             list_of_logs.append(logs)
 
@@ -1052,7 +1052,7 @@ class RedfishUtils(object):
                                     if 'Drives' in data[u'Links']:
                                         for link in data[u'Links'][u'Drives']:
                                             drive_id_link = link[u'@odata.id']
-                                            drive_id = drive_id_link.split("/")[-1]
+                                            drive_id = drive_id_link.rstrip('/').split('/')[-1]
                                             drive_id_list.append({'Id': drive_id})
                                         volume_result['Linked_drives'] = drive_id_list
                                 volume_results.append(volume_result)
@@ -1556,6 +1556,27 @@ class RedfishUtils(object):
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Modified account service'
         return resp
+
+    def update_user_accounttypes(self, user):
+        account_types = user.get('account_accounttypes')
+        oemaccount_types = user.get('account_oemaccounttypes')
+        if account_types is None and oemaccount_types is None:
+            return {'ret': False, 'msg':
+                    'Must provide account_accounttypes or account_oemaccounttypes for UpdateUserAccountTypes command'}
+
+        response = self._find_account_uri(username=user.get('account_username'),
+                                          acct_id=user.get('account_id'))
+        if not response['ret']:
+            return response
+
+        uri = response['uri']
+        payload = {}
+        if user.get('account_accounttypes'):
+            payload['AccountTypes'] = user.get('account_accounttypes')
+        if user.get('account_oemaccounttypes'):
+            payload['OEMAccountTypes'] = user.get('account_oemaccounttypes')
+
+        return self.patch_request(self.root_uri + uri, payload, check_pyld=True)
 
     def check_password_change_required(self, return_data):
         """
@@ -3432,7 +3453,7 @@ class RedfishUtils(object):
 
         # Capture list of URIs that match a specified HostInterface resource Id
         if hostinterface_id:
-            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.split('/')[-1]]
+            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.rstrip('/').split('/')[-1]]
         if hostinterface_id and matching_hostinterface_uris:
             hostinterface_uri = list.pop(matching_hostinterface_uris)
         elif hostinterface_id and not matching_hostinterface_uris:
@@ -3551,12 +3572,12 @@ class RedfishUtils(object):
         result = {}
         if manager is None:
             if len(self.manager_uris) == 1:
-                manager = self.manager_uris[0].split('/')[-1]
+                manager = self.manager_uris[0].rstrip('/').split('/')[-1]
             elif len(self.manager_uris) > 1:
                 entries = self.get_multi_manager_inventory()['entries']
                 managers = [m[0]['manager_uri'] for m in entries if m[1].get('ServiceIdentification')]
                 if len(managers) == 1:
-                    manager = managers[0].split('/')[-1]
+                    manager = managers[0].rstrip('/').split('/')[-1]
                 else:
                     self.module.fail_json(msg=[
                         "Multiple managers with ServiceIdentification were found: %s" % str(managers),
@@ -3714,7 +3735,7 @@ class RedfishUtils(object):
         # Matching Storage Subsystem ID with user input
         self.storage_subsystem_uri = ""
         for storage_subsystem_uri in self.storage_subsystems_uris:
-            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+            if storage_subsystem_uri.rstrip('/').split('/')[-1] == storage_subsystem_id:
                 self.storage_subsystem_uri = storage_subsystem_uri
 
         if not self.storage_subsystem_uri:
@@ -3742,7 +3763,7 @@ class RedfishUtils(object):
 
         # Delete each volume
         for volume in self.volume_uris:
-            if volume.split("/")[-1] in volume_ids:
+            if volume.rstrip('/').split('/')[-1] in volume_ids:
                 response = self.delete_request(self.root_uri + volume)
                 if response['ret'] is False:
                     return response
@@ -3776,7 +3797,7 @@ class RedfishUtils(object):
         # Matching Storage Subsystem ID with user input
         self.storage_subsystem_uri = ""
         for storage_subsystem_uri in self.storage_subsystems_uris:
-            if storage_subsystem_uri.split("/")[-2] == storage_subsystem_id:
+            if storage_subsystem_uri.rstrip('/').split('/')[-1] == storage_subsystem_id:
                 self.storage_subsystem_uri = storage_subsystem_uri
 
         if not self.storage_subsystem_uri:

@@ -8,17 +8,18 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = """
+---
 module: django_createcachetable
 author:
-  - Alexei Znamensky (@russoz)
+- Alexei Znamensky (@russoz)
 short_description: Wrapper for C(django-admin createcachetable)
 version_added: 9.1.0
 description:
-  - This module is a wrapper for the execution of C(django-admin createcachetable).
+- This module is a wrapper for the execution of C(django-admin createcachetable).
 extends_documentation_fragment:
-  - community.general.attributes
-  - community.general.django
-  - community.general.django.database
+- community.general.attributes
+- community.general.django
+- community.general.django.database
 attributes:
   check_mode:
     support: full
@@ -27,6 +28,7 @@ attributes:
 """
 
 EXAMPLES = """
+---
 - name: Create cache table in the default database
   community.general.django_createcachetable:
     settings: myproject.settings
@@ -40,10 +42,17 @@ EXAMPLES = """
 """
 
 RETURN = """
+---
 run_info:
   description: Command-line execution information.
   type: dict
   returned: success and O(verbosity) >= 3
+version:
+  description: Version of Django.
+  type: str
+  returned: always
+  sample: 5.1.2
+  version_added: 10.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.django import DjangoModuleHelper

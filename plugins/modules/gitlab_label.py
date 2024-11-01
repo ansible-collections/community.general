@@ -275,6 +275,8 @@ class GitlabLabels(object):
             _label.description = var_obj.get('description')
         if var_obj.get('priority') is not None:
             _label.priority = var_obj.get('priority')
+        if var_obj.get('color') is not None:
+            _label.color = var_obj.get('color')
 
         # save returns None
         _label.save()

@@ -75,6 +75,12 @@ stderr:
   returned: failure
   type: str
   sample: 'gio: Failed to load info for handler "never-existed.desktop"'
+version:
+  description: Version of gio.
+  type: str
+  returned: always
+  sample: "2.80.0"
+  version_added: 10.0.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
@@ -94,6 +100,9 @@ class GioMime(ModuleHelper):
 
     def __init_module__(self):
         self.runner = gio_mime_runner(self.module, check_rc=True)
+        with self.runner("version") as ctx:
+            rc, out, err = ctx.run()
+            self.vars.version = out.strip()
         self.vars.set_meta("handler", initial_value=gio_mime_get(self.runner, self.vars.mime_type), diff=True, change=True)
 
     def __run__(self):
