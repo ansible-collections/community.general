@@ -197,7 +197,13 @@ class AlternativesModule(object):
                 self.install()
 
             # Check if we need to set the preference
-            if self.mode_selected and (self.current_path != self.path or self.family is not None):
+            is_same_path = self.path is not None and self.current_path == self.path
+            is_same_family = False
+            if self.current_path is not None and self.current_path in self.current_alternatives:
+                current_alternative = self.current_alternatives[self.current_path]
+                is_same_family = current_alternative.get('family') == self.family
+
+            if self.mode_selected and not (is_same_path or is_same_family):
                 self.set()
 
             # Check if we need to reset to auto
