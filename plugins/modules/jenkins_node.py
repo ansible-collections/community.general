@@ -66,13 +66,15 @@ options:
     elements: str
   offline_message:
     description:
-      - Specifies the offline reason message to be set when setting a Jenkins node state.
-      - If O(offline_message) is given and O(state) is not V(disabled), an error will be
-        raised.
+      - Specifies the offline reason message to be set when configuring the Jenkins node
+        state.
+      - If O(offline_message) is given and requested O(state) is not V(disabled), an
+        error will be raised.
       - Internally O(offline_message) is set via the V(toggleOffline) API, so updating
-        the message when the node is already offline is not possible. In this case, a
-        warning will be issued.
+        the message when the node is already offline (current state V(disabled)) is not
+        possible. In this case, a warning will be issued.
     type: str
+    version_added: 10.0.0
 '''
 
 EXAMPLES = '''
@@ -152,6 +154,7 @@ configured:
 '''
 
 import sys
+import traceback
 from xml.etree import ElementTree as et
 
 from ansible.module_utils.basic import AnsibleModule
@@ -183,7 +186,7 @@ class JenkinsNode:
         self.offline_message = module.params['offline_message']  # type: str | None
 
         if self.offline_message is not None:
-            self.offline_message = self.offline_message.rstrip("\n")
+            self.offline_message = self.offline_message.strip()
 
             if self.state != "disabled":
                 self.module.fail_json("can not set offline message when state is not disabled")
@@ -280,7 +283,7 @@ class JenkinsNode:
                 # handling redirects returned when posting to resources. If the node is
                 # created OK then can ignore the error.
                 if not self.instance.node_exists(self.name):
-                    raise e
+                    self.module.fail_json(msg="Create node failed: %s" % to_native(e), exception=traceback.format_exc())
 
                 # TODO: Remove authorization workaround.
                 self.result['warnings'].append(
@@ -314,7 +317,7 @@ class JenkinsNode:
                 # handling redirects returned when posting to resources. If the node is
                 # deleted OK then can ignore the error.
                 if self.instance.node_exists(self.name):
-                    raise e
+                    self.module.fail_json(msg="Delete node failed: %s" % to_native(e), exception=traceback.format_exc())
 
                 # TODO: Remove authorization workaround.
                 self.result['warnings'].append(
@@ -352,7 +355,7 @@ class JenkinsNode:
                     offline = get_offline()
 
                     if offline:
-                        raise e
+                        self.module.fail_json(msg="Enable node failed: %s" % to_native(e), exception=traceback.format_exc())
 
                     # TODO: Remove authorization workaround.
                     self.result['warnings'].append(
@@ -422,7 +425,7 @@ class JenkinsNode:
                     offline, _offline_message = get_offline_info()
 
                     if not offline:
-                        raise e
+                        self.module.fail_json(msg="Disable node failed: %s" % to_native(e), exception=traceback.format_exc())
 
                     # TODO: Remove authorization workaround.
                     self.result['warnings'].append(

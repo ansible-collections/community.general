@@ -240,10 +240,12 @@ def test_state_present_when_absent_other_error_raised(get_instance, instance, st
         "state": state,
     })
 
-    with raises(jenkins.JenkinsException):
+    with raises(AnsibleFailJson) as result:
         jenkins_node.main()
 
     assert instance.create_node.call_args == call("my-node", launcher=jenkins.LAUNCHER_SSH)
+
+    assert "Create node failed" in str(result.value)
 
 
 def test_state_present_when_present(get_instance, instance):
@@ -330,10 +332,12 @@ def test_state_absent_when_present_other_error_raised(get_instance, instance):
         "state": "absent",
     })
 
-    with raises(jenkins.JenkinsException):
+    with raises(AnsibleFailJson) as result:
         jenkins_node.main()
 
     assert instance.delete_node.call_args == call("my-node")
+
+    assert "Delete node failed" in str(result.value)
 
 
 def test_state_absent_when_absent(get_instance, instance):
@@ -424,10 +428,12 @@ def test_state_enabled_when_offline_other_error_raised(get_instance, instance):
         "state": "enabled",
     })
 
-    with raises(jenkins.JenkinsException):
+    with raises(AnsibleFailJson) as result:
         jenkins_node.main()
 
     assert instance.enable_node.call_args == call("my-node")
+
+    assert "Enable node failed" in str(result.value)
 
 
 def test_state_enabled_when_not_offline(get_instance, instance):
@@ -522,10 +528,12 @@ def test_state_disabled_when_not_offline_other_error_raised(get_instance, instan
         "state": "disabled",
     })
 
-    with raises(jenkins.JenkinsException):
+    with raises(AnsibleFailJson) as result:
         jenkins_node.main()
 
     assert instance.disable_node.call_args == call("my-node", "")
+
+    assert "Disable node failed" in str(result.value)
 
 
 def test_state_disabled_when_not_offline_check_mode(get_instance, instance):
