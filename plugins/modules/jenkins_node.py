@@ -75,6 +75,62 @@ options:
         possible. In this case, a warning will be issued.
     type: str
     version_added: 10.0.0
+  launch_ssh:
+    description:
+      - When specified, sets the Jenkins node to launch by SSH.
+    type: dict
+    suboptions:
+      host:
+        description:
+          - When specified, sets the SSH host name.
+        type: str
+      port:
+        description:
+          - When specified, sets the SSH port number.
+        type: int
+      credentials_id:
+        description:
+          - When specified, sets the Jenkins credential used for SSH authentication by
+            its ID.
+        type: str
+      host_key_verify_none:
+        description:
+          - When set, sets the SSH host key non-verifying strategy.
+        type: bool
+        choices:
+          - True
+      host_key_verify_known_hosts:
+        description:
+          - When set, sets the SSH host key known hosts file verification strategy.
+        type: bool
+        choices:
+          - True
+      host_key_verify_provided:
+        description:
+          - When specified, sets the SSH host key manually provided verification strategy.
+        type: dict
+        suboptions:
+          algorithm:
+            description:
+              - Key type e.g. V(ssh-rsa).
+            type: str
+            required: true
+          key:
+            description:
+              - Key value.
+            type: str
+            required: true
+      host_key_verify_trusted:
+        description:
+          - When specified, sets the SSH host key manually trusted verification strategy.
+        type: dict
+        suboptions:
+          allow_initial:
+            description:
+              - When specified, enables or disables the requiring manual verification of
+                the first connected host for this node.
+            type: bool
+    version_added: 10.0.0
 '''
 
 EXAMPLES = '''
@@ -101,12 +157,23 @@ EXAMPLES = '''
       - label-2
       - label-3
 
-- name: Set Jenkins node offline with offline message.
+- name: Set Jenkins node offline with offline message
   community.general.jenkins_node:
     name: my-node
     state: disabled
     offline_message: >
       This node is offline for some reason.
+
+- name: >
+    Set Jenkins node to launch via SSH using stored credential and trust host key on
+    initial connection
+  community.general.jenkins_node:
+    name: my-node
+    launch_ssh:
+      host: my-node.test
+      credentials_id: deaddead-dead-dead-dead-deaddeaddead
+      host_key_verify_trusted:
+        allow_initial: yes
 '''
 
 RETURN = '''
@@ -155,6 +222,7 @@ configured:
 
 import sys
 import traceback
+from abc import abstractmethod
 from xml.etree import ElementTree as et
 
 from ansible.module_utils.basic import AnsibleModule
@@ -170,6 +238,384 @@ with deps.declare(
 
 
 IS_PYTHON_2 = sys.version_info[0] <= 2
+
+
+if IS_PYTHON_2:
+    class cached_property(object):  # noqa
+        def __init__(self, func):
+            self.func = func
+
+        def __get__(self, instance, cls):
+            if instance is None:
+                return self
+
+            value = self.func(instance)
+            setattr(instance, self.func.__name__, value)
+
+            return value
+else:
+    from functools import cached_property
+
+
+def bool_to_text(value):  # type: (bool) -> str
+    return "true" if value else "false"
+
+
+def text_to_bool(text):  # type: (str) -> bool
+    if text == "true":
+        return True
+
+    if text == "false":
+        return False
+
+    raise ValueError("unexpected boolean text value '{}'".format(text))
+
+
+class Element:
+    def __init__(self, root):  # type: (et.Element | None) -> None
+        self.root = root
+
+    def get(self, key):  # type: (str) -> str | None
+        return None if self.root is None else self.root.get(key)
+
+    def set(self, key, value):  # type: (str, str) -> None
+        self.root.set(key, value)
+
+    def find(self, path):  # type: (str) -> et.Element | None
+        return None if self.root is None else self.root.find(path)
+
+    def remove(self, element):  # type: (et.Element) -> None
+        self.root.remove(element)
+
+    def append(self, element):  # type: (et.Element) -> None
+        self.root.append(element)
+
+    @property
+    def class_(self):  # type: () -> str | None
+        return self.get("class")
+
+    @class_.setter
+    def class_(self, value):  # (str) -> None
+        self.set("class", value)
+
+
+class Config:
+    @abstractmethod
+    def init(self):  # type: () -> et.Element
+        """Initialize XML element from config.
+
+        Returns:
+            Initialized XML element.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def update(self, root):  # (et.Element) -> bool
+        """Update XML element with config.
+
+        Args:
+            root: XML element to update.
+
+        Returns:
+            True if was updated, False otherwise.
+        """
+        raise NotImplementedError
+
+
+class LauncherElement(Element):
+    TAG = "launcher"
+
+
+class LauncherConfig(Config):
+    CLASS = ""
+
+
+class SSHHostKeyVerifyElement(Element):
+    TAG = "sshHostKeyVerificationStrategy"
+
+
+class SSHHostKeyVerifyConfig(Config):
+    CLASS = ""
+
+    def init(self):  # type: () -> et.Element
+        root = et.Element(SSHHostKeyVerifyElement.TAG)
+
+        Element(root).class_ = self.CLASS
+
+        return root
+
+    def update(self, root):  # type: (et.Element) -> bool
+        class_ = Element(root).class_
+
+        if class_ != self.CLASS:
+            raise ValueError("unexpected class {}: expected {}".format(class_, self.CLASS))
+
+        return False
+
+
+class KnownHostsSSHHostKeyVerifyConfig(SSHHostKeyVerifyConfig):
+    CLASS = "hudson.plugins.sshslaves.verifiers.KnownHostsFileKeyVerificationStrategy"
+
+
+class NoneSSHHostKeyVerifyConfig(SSHHostKeyVerifyConfig):
+    CLASS = "hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy"
+
+
+class TrustedSSHHostKeyVerifyElement(SSHHostKeyVerifyElement):
+    @property
+    def allow_initial(self):  # type: () -> et.Element | None
+        return self.find("requireInitialManualTrust")
+
+
+class TrustedSSHHostKeyVerifyConfig(SSHHostKeyVerifyConfig):
+    CLASS = "hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy"
+
+    TEMPLATE = """
+<sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+    <requireInitialManualTrust>false</requireInitialManualTrust>
+</sshHostKeyVerificationStrategy>
+""".strip()
+
+    def __init__(self, allow_initial=None):  # type: (bool | None) -> None
+        self.allow_initial = allow_initial
+
+    def init(self):  # type: () -> et.Element
+        return et.fromstring(self.TEMPLATE)
+
+    def update(self, root):  # type: (et.Element) -> bool
+        super(TrustedSSHHostKeyVerifyConfig, self).update(root)
+
+        wrapper = TrustedSSHHostKeyVerifyElement(root)
+        updated = False
+
+        if self.allow_initial is not None:
+            if wrapper.allow_initial.text != bool_to_text(self.allow_initial):
+                wrapper.allow_initial.text = bool_to_text(self.allow_initial)
+                updated = True
+
+        return updated
+
+
+class ProvidedSSHHostKeyVerifyElement(SSHHostKeyVerifyElement):
+    class Key(Element):
+        TAG = "key"
+
+        @property
+        def algorithm(self):  # type: () -> et.Element | None
+            return self.find("algorithm")
+
+        @property
+        def key(self):  # type: () -> et.Element | None
+            return self.find("key")
+
+    @property
+    def key(self):  # type: () -> ProvidedSSHHostKeyVerifyElement.Key | None
+        root = self.find('key')
+
+        if root is None:
+            return None
+
+        return ProvidedSSHHostKeyVerifyElement.Key(root)
+
+
+class ProvidedSSHHostKeyVerifyConfig(KnownHostsSSHHostKeyVerifyConfig):
+    CLASS = "hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy"
+
+    TEMPLATE = """
+<sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+    <key>
+        <algorithm/>
+        <key/>
+    </key>
+</sshHostKeyVerificationStrategy>
+""".strip()
+
+    def __init__(self, algorithm, key):  # type: (str, str) -> None
+        self.algorithm = algorithm
+        self.key = key
+
+    def init(self):  # type: () -> et.Element
+        return et.fromstring(self.TEMPLATE)
+
+    def update(self, root):  # type: (et.Element) -> bool
+        super(ProvidedSSHHostKeyVerifyConfig, self).update(root)
+
+        wrapper = ProvidedSSHHostKeyVerifyElement(root)
+        updated = False
+
+        if wrapper.key.algorithm.text != self.algorithm:
+            wrapper.key.algorithm.text = self.algorithm
+            updated = True
+
+        if wrapper.key.key.text != self.key:
+            wrapper.key.key.text = self.key
+            updated = True
+
+        return updated
+
+
+SSH_HOST_KEY_VERIFY_TYPES = {
+    "none": NoneSSHHostKeyVerifyConfig,
+    "known_hosts": KnownHostsSSHHostKeyVerifyConfig,
+    "content": ProvidedSSHHostKeyVerifyConfig,
+    "approve": TrustedSSHHostKeyVerifyConfig,
+}
+
+
+class SSHLauncherElement(LauncherElement):
+    @property
+    def host(self):  # type: () -> et.Element | None
+        return self.find("host")
+
+    @host.setter
+    def host(self, element):
+        if self.host is not None:
+            self.remove(self.host)
+
+        self.append(element)
+
+    def ensure_host(self):
+        if self.host is None:
+            return et.SubElement(self.root, "host")
+
+        return self.host
+
+    @property
+    def port(self):
+        return self.find("port")
+
+    @property
+    def credentials_id(self):
+        return self.find("credentialsId")
+
+    def ensure_credentials_id(self):
+        if self.credentials_id is None:
+            return et.SubElement(self.root, "credentialsId")
+
+        return self.credentials_id
+
+    @property
+    def host_key_verify(self):
+        return self.find(SSHHostKeyVerifyElement.TAG)
+
+    @host_key_verify.setter
+    def host_key_verify(self, element):
+        if self.host_key_verify is not None:
+            self.remove(self.host_key_verify)
+
+        self.append(element)
+
+
+class SSHLauncherConfig(Config):
+    CLASS = "hudson.plugins.sshslaves.SSHLauncher"
+
+    def __init__(
+        self,
+        host=None,
+        port=None,
+        credentials_id=None,
+        host_key_verify=None,
+    ):  # type: (str | None, int | None, str | None, SSHHostKeyVerifyConfig | None) -> None
+        self.host = host
+        self.port = port
+        self.credentials_id = credentials_id
+        self.host_key_verify = host_key_verify
+
+    TEMPLATE = """
+<launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <port>22</port>
+    <credentialsId/>
+    <launchTimeoutSeconds>60</launchTimeoutSeconds>
+    <maxNumRetries>10</maxNumRetries>
+    <retryWaitTime>15</retryWaitTime>
+    <tcpNoDelay>true</tcpNoDelay>
+</launcher>
+""".strip()
+
+    def init(self):  # type: () -> et.Element
+        root = et.fromstring(self.TEMPLATE)
+
+        wrapper = SSHLauncherElement(root)
+
+        if self.host_key_verify is not None:
+            wrapper.host_key_verify = self.host_key_verify.init()
+
+        return root
+
+    def update(self, root):  # type: (et.Element) -> bool
+        wrapper = SSHLauncherElement(root)
+        updated = False
+
+        if self.host is not None:
+            if wrapper.host is None:
+                wrapper.ensure_host()
+                updated = True
+
+            if wrapper.host.text != self.host:
+                wrapper.host.text = self.host
+                updated = True
+
+        if self.port is not None:
+            if wrapper.port.text != str(self.port):
+                wrapper.port.text = str(self.port)
+                updated = True
+
+        if self.credentials_id is not None:
+            if wrapper.credentials_id is None:
+                wrapper.ensure_credentials_id()
+                updated = True
+
+            if wrapper.credentials_id.text != self.credentials_id:
+                wrapper.credentials_id.text = self.credentials_id
+                updated = True
+
+        if self.host_key_verify is not None:
+            if Element(wrapper.host_key_verify).class_ != self.host_key_verify.CLASS:
+                wrapper.host_key_verify = self.host_key_verify.init()
+                updated = True
+
+            if self.host_key_verify.update(wrapper.host_key_verify):
+                updated = True
+
+        return updated
+
+
+def ssh_host_key_verify_config(args):  # type: (dict) -> SSHHostKeyVerifyConfig | None
+    """Get SSH host key verify config from args.
+
+    Args:
+        args: SSH launcher args.
+
+    Returns:
+        SSH host key verify config.
+    """
+    if args.get("host_key_verify_none"):
+        return NoneSSHHostKeyVerifyConfig()
+
+    if args.get('host_key_verify_known_hosts'):
+        return KnownHostsSSHHostKeyVerifyConfig()
+
+    if args.get("host_key_verify_provided"):
+        return ProvidedSSHHostKeyVerifyConfig(
+            args["host_key_verify_provided"]["algorithm"],
+            args["host_key_verify_provided"]["key"],
+        )
+
+    if args.get("host_key_verify_trusted"):
+        return TrustedSSHHostKeyVerifyConfig(
+            allow_initial=args["host_key_verify_trusted"].get("allow_initial")
+        )
+
+    return None
+
+
+def ssh_launcher_args_config(args):  # type: (dict) -> SSHLauncherConfig
+    return SSHLauncherConfig(
+        host=args.get("host"),
+        port=args.get("port"),
+        credentials_id=args.get("credentials_id"),
+        host_key_verify=ssh_host_key_verify_config(args),
+    )
 
 
 class JenkinsNode:
@@ -211,6 +657,13 @@ class JenkinsNode:
             'warnings': [],
         }
 
+    @cached_property
+    def launch(self):  # type: () -> LauncherConfig | None
+        if self.module.params["launch_ssh"]:
+            return ssh_launcher_args_config(self.module.params["launch_ssh"])
+
+        return None
+
     def get_jenkins_instance(self):
         try:
             if self.user and self.token:
@@ -221,6 +674,25 @@ class JenkinsNode:
                 return jenkins.Jenkins(self.url)
         except Exception as e:
             self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
+
+    def configure_launch(self, config):  # type: (et.Element) -> bool
+        configured = False
+
+        launcher = config.find(LauncherElement.TAG)
+
+        if Element(launcher).class_ != self.launch.CLASS:
+            if launcher is not None:
+                config.remove(launcher)
+
+            launcher = self.launch.init()
+            config.append(launcher)
+
+            configured = True
+
+        if self.launch.update(launcher):
+            configured = True
+
+        return configured
 
     def configure_node(self, present):
         if not present:
@@ -234,6 +706,10 @@ class JenkinsNode:
 
         data = self.instance.get_node_config(self.name)
         root = et.fromstring(data)
+
+        if self.launch is not None:
+            if self.configure_launch(root):
+                configured = True
 
         if self.num_executors is not None:
             elem = root.find('numExecutors')
@@ -467,6 +943,41 @@ def main():
             num_executors=dict(type='int'),
             labels=dict(type='list', elements='str'),
             offline_message=dict(type='str'),
+            launch_ssh=dict(
+                type='dict',
+                options=dict(
+                    host=dict(type='str'),
+                    port=dict(type='int'),
+                    credentials_id=dict(type='str'),
+                    host_key_verify_none=dict(type='bool', choices=[True]),
+                    host_key_verify_known_hosts=dict(type='bool', choices=[True]),
+                    host_key_verify_provided=dict(
+                        type='dict',
+                        options=dict(
+                            algorithm=dict(type='str', required=True),
+                            key=dict(
+                                type='str',
+                                required=True,
+                                no_log=False,  # Is public key.
+                            ),
+                        ),
+                        no_log=False,  # Is not sensitive.
+                    ),
+                    host_key_verify_trusted=dict(
+                        type='dict',
+                        options=dict(
+                            allow_initial=dict(type='bool'),
+                        ),
+                        no_log=False,  # Is not sensitive.
+                    ),
+                ),
+                mutually_exclusive=[[
+                    'host_key_verify_none',
+                    'host_key_verify_known_hosts',
+                    'host_key_verify_provided',
+                    'host_key_verify_trusted',
+                ]],
+            ),
         ),
         supports_check_mode=True,
     )
