@@ -1,0 +1,12 @@
+minor_changes:
+  - jenkins_node - Add offline_message parameter for updating a Jenkins node offline cause reason when the state is "disabled" (offline)."
+
+bugfixes:
+  - jenkins_node - Fixed enabled, disable and absent node state redirect authorization issues, same as was present for present.
+
+known_issues:
+  - jenkins_node - Not able to update offline message when node is already offline due to internally using toggleOffline API.
+
+trivial:
+  - jenkins_node - Add unit tests for redirect authorization workarounds.
+  - jenkins_node - Improve error handling - exit with fail_json() instead of raising on create/delete/enable/disable node fail.
