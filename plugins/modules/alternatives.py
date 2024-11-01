@@ -241,6 +241,7 @@ class AlternativesModule(object):
             self.result['diff']['after'] = dict(
                 state=AlternativeState.PRESENT,
                 path=self.path,
+                family=self.family,
                 priority=self.priority,
                 link=self.link,
             )
@@ -261,7 +262,8 @@ class AlternativesModule(object):
             self.result['diff']['after'] = dict(state=AlternativeState.ABSENT)
 
     def set(self):
-        if self.family is not None:
+        # Path takes precedence over family as it is more specific
+        if self.path is None:
             arg = self.family
         else:
             arg = self.path
