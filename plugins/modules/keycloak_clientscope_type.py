@@ -252,11 +252,7 @@ def main():
     default_clientscopes_delete = clientscopes_to_delete(default_clientscopes_existing, default_clientscopes_real)
     optional_clientscopes_delete = clientscopes_to_delete(optional_clientscopes_existing, optional_clientscopes_real)
 
-    result["changed"] = (
-        len(default_clientscopes_add) > 0
-        or len(optional_clientscopes_add) > 0
-        or len(default_clientscopes_delete) > 0
-        or len(optional_clientscopes_delete) > 0
+    result["changed"] = any(len(x) > 0 for x in [default_clientscopes_add, optional_clientscopes_add, default_clientscopes_delete, optional_clientscopes_delete])
     )
 
     if module.check_mode:
