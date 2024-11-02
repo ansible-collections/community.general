@@ -60,6 +60,7 @@ options:
     create:
         description:
             - Whether the image should be created if not present.
+            - This is ignored if O(state=absent).
         type: bool
         version_added: 10.0.0
     template:
