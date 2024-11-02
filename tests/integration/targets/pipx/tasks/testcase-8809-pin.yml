@@ -60,10 +60,10 @@
         - pycowsay
       register: uninstall_all_2
 
-    - name: Assert uninstall-all
+    - name: Assert pin/unpin
       ansible.builtin.assert:
         that:
           - pin_cow is changed
-          - cow_info_1 == "0.0.0.1"
+          - cow_info_1.application.0.version == "0.0.0.1"
           - unpin_cow is changed
-          - cow_info_2 != "0.0.0.1"
+          - cow_info_2.application.0.version != "0.0.0.1"

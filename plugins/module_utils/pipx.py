@@ -6,6 +6,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+
+import json
+
+
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
 
 
@@ -51,6 +55,7 @@ def pipx_runner(module, command, **kwargs):
         editable=fmt.as_bool("--editable"),
         pip_args=fmt.as_opt_eq_val('--pip-args'),
         suffix=fmt.as_opt_val('--suffix'),
+        spec_metadata=fmt.as_list(),
     )
     arg_formats["global"] = fmt.as_bool("--global")
 
@@ -63,3 +68,38 @@ def pipx_runner(module, command, **kwargs):
         **kwargs
     )
     return runner
+
+
+def make_process_list(mod_helper, **kwargs):
+    def process_list(rc, out, err):
+        if not out:
+            return []
+
+        results = []
+        raw_data = json.loads(out)
+        if kwargs.get("include_raw"):
+            mod_helper.vars.raw_output = raw_data
+
+        if kwargs["name"]:
+            if kwargs["name"] in raw_data['venvs']:
+                data = {kwargs["name"]: raw_data['venvs'][kwargs["name"]]}
+            else:
+                data = {}
+        else:
+            data = raw_data['venvs']
+
+        for venv_name, venv in data.items():
+            entry = {
+                'name': venv_name,
+                'version': venv['metadata']['main_package']['package_version'],
+                'pinned': venv['metadata']['main_package'].get('pinned'),
+            }
+            if kwargs.get("include_injected"):
+                entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
+            if kwargs.get("include_deps"):
+                entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
+            results.append(entry)
+
+        return results
+
+    return process_list

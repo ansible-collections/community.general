@@ -191,10 +191,8 @@ EXAMPLES = """
 """
 
 
-import json
-
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -251,26 +249,14 @@ class PipX(StateModuleHelper):
     use_old_vardict = False
 
     def _retrieve_installed(self):
-        def process_list(rc, out, err):
-            if not out:
-                return {}
+        name = _make_name(self.vars.name, self.vars.suffix)
+        output_process = make_process_list(self, include_injected=True, name=name)
+        installed = self.runner('_list global', output_process=output_process).run()
 
-            results = {}
-            raw_data = json.loads(out)
-            for venv_name, venv in raw_data['venvs'].items():
-                results[venv_name] = {
-                    'version': venv['metadata']['main_package']['package_version'],
-                    'injected': {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()},
-                }
-            return results
-
-        installed = self.runner('_list', output_process=process_list).run(_list=1)
-
-        if self.vars.name is not None:
-            name = _make_name(self.vars.name, self.vars.suffix)
-            app_list = installed.get(name)
+        if name is not None:
+            app_list = [app for app in installed if app['name'] == name]
             if app_list:
-                return {name: app_list}
+                return {name: app_list[0]}
             else:
                 return {}
 
