@@ -98,6 +98,15 @@ application:
       type: dict
       sample:
         licenses: "0.6.1"
+    pinned:
+      description:
+      - Whether the installed application is pinned or not.
+      - When using C(pipx<=1.6.0), this returns C(null).
+      returned: success
+      type: bool
+      sample:
+        pinned: true
+      version_added: 10.0.0
 
 raw_output:
   description: The raw output of the C(pipx list) command, when O(include_raw=true). Used for debugging.
@@ -112,10 +121,8 @@ cmd:
   sample: ["/usr/bin/python3.10", "-m", "pipx", "list", "--include-injected", "--json"]
 """
 
-import json
-
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
 
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -143,41 +150,10 @@ class PipXInfo(ModuleHelper):
             self.command = [facts['python']['executable'], '-m', 'pipx']
         self.runner = pipx_runner(self.module, self.command)
 
-        # self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
-
     def __run__(self):
-        def process_list(rc, out, err):
-            if not out:
-                return []
-
-            results = []
-            raw_data = json.loads(out)
-            if self.vars.include_raw:
-                self.vars.raw_output = raw_data
-
-            if self.vars.name:
-                if self.vars.name in raw_data['venvs']:
-                    data = {self.vars.name: raw_data['venvs'][self.vars.name]}
-                else:
-                    data = {}
-            else:
-                data = raw_data['venvs']
-
-            for venv_name, venv in data.items():
-                entry = {
-                    'name': venv_name,
-                    'version': venv['metadata']['main_package']['package_version']
-                }
-                if self.vars.include_injected:
-                    entry['injected'] = {k: v['package_version'] for k, v in venv['metadata']['injected_packages'].items()}
-                if self.vars.include_deps:
-                    entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
-                results.append(entry)
-
-            return results
-
-        with self.runner('_list global', output_process=process_list) as ctx:
-            self.vars.application = ctx.run(_list=1)
+        output_process = make_process_list(self, **self.vars.as_dict())
+        with self.runner('_list global', output_process=output_process) as ctx:
+            self.vars.application = ctx.run()
             self._capture_results(ctx)
 
     def _capture_results(self, ctx):

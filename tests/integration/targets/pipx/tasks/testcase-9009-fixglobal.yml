@@ -1,0 +1,30 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: 9009-Ensure application pylint is uninstalled
+  community.general.pipx:
+    name: pylint
+    state: absent
+    global: true
+
+- name: 9009-Install application pylint
+  community.general.pipx:
+    name: pylint
+    global: true
+  register: install_pylint
+
+- name: 9009-Inject packages
+  community.general.pipx:
+    state: inject
+    name: pylint
+    global: true
+    inject_packages:
+      - licenses
+
+- name: 9009-Ensure application pylint is uninstalled
+  community.general.pipx:
+    name: pylint
+    state: absent
+    global: true
