@@ -12,8 +12,13 @@
     msg: installed 1 package(s)
   mocks:
     run_command:
-    - command: [/testbin/opkg, list-installed, zlib-dev]
+    - command: [/testbin/opkg, --version]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      rc: 0
+      out: ""
+      err: ""
+    - command: [/testbin/opkg, list-installed, zlib-dev]
+      environ: *env-def
       rc: 0
       out: ""
       err: ""
@@ -42,6 +47,11 @@
     msg: package(s) already present
   mocks:
     run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -57,6 +67,11 @@
     msg: installed 1 package(s)
   mocks:
     run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -85,6 +100,11 @@
     msg: installed 1 package(s)
   mocks:
     run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, list-installed, zlib-dev]
       environ: *env-def
       rc: 0
@@ -115,6 +135,11 @@
     msg: installed 1 package(s)
   mocks:
     run_command:
+    - command: [/testbin/opkg, --version]
+      environ: *env-def
+      rc: 0
+      out: ""
+      err: ""
     - command: [/testbin/opkg, update]
       environ: *env-def
       rc: 0
