@@ -188,9 +188,6 @@ class AlternativesModule(object):
 
         if self.mode_present:
             # Check if we need to (re)install
-            if not self.path and not self.family:
-                self.module.fail_json(msg="Either path or family must be specified")
-
             subcommands_parameter = self.module.params['subcommands']
             priority_parameter = self.module.params['priority']
             if (
