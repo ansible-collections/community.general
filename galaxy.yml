@@ -5,7 +5,7 @@
 
 namespace: community
 name: general
-version: 9.5.1
+version: 9.5.2
 readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
