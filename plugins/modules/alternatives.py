@@ -39,7 +39,10 @@ options:
     description:
       - The path to the real executable that the link should point to.
     type: path
-    required: true
+  family:
+    description:
+      - The family groups similar alternatives. This option is available only on RHEL-based distributions.
+    type: str
   link:
     description:
       - The path to the symbolic link that should point to the real executable.
@@ -97,6 +100,12 @@ EXAMPLES = r'''
   community.general.alternatives:
     name: java
     path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+
+- name: Select java-11-openjdk.x86_64 family
+  community.general.alternatives:
+    name: java
+    family: java-11-openjdk.x86_64
+  when: ansible_os_family == 'RedHat'
 
 - name: Alternatives link created
   community.general.alternatives:
