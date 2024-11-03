@@ -20,42 +20,65 @@ extends_documentation_fragment:
   - community.general.opennebula
   - community.general.attributes
 attributes:
-  check_mode:
-    support: full
-  diff_mode:
-    support: none
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
-  id:
-    description:
-      - A O(id) of the image you would like to manage.
-    type: int
-  name:
-    description:
-      - A O(name) of the image you would like to manage.
-    type: str
-  state:
-    description:
-      - V(present) - state that is used to manage the image
-      - V(absent) - delete the image
-      - V(cloned) - clone the image
-      - V(renamed) - rename the image to the O(new_name)
-    choices: ["present", "absent", "cloned", "renamed"]
-    default: present
-    type: str
-  enabled:
-    description:
-      - Whether the image should be enabled or disabled.
-    type: bool
-  new_name:
-    description:
-      - A name that will be assigned to the existing or new image.
-      - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
-    type: str
-  persistent:
-    description:
-      - Whether the image should be persistent or non-persistent.
-    type: bool
-    version_added: 9.5.0
+    id:
+        description:
+            - A O(id) of the image you would like to manage.
+        type: int
+    name:
+        description:
+            - A O(name) of the image you would like to manage.
+            - Required if O(create=true).
+        type: str
+    state:
+        description:
+            - V(present) - state that is used to manage the image.
+            - V(absent) - delete the image.
+            - V(cloned) - clone the image.
+            - V(renamed) - rename the image to the O(new_name).
+        choices: ["present", "absent", "cloned", "renamed"]
+        default: present
+        type: str
+    enabled:
+        description:
+            - Whether the image should be enabled or disabled.
+        type: bool
+    new_name:
+        description:
+            - A name that will be assigned to the existing or new image.
+            - In the case of cloning, by default O(new_name) will take the name of the origin image with the prefix 'Copy of'.
+        type: str
+    persistent:
+        description:
+            - Whether the image should be persistent or non-persistent.
+        type: bool
+        version_added: 9.5.0
+    create:
+        description:
+            - Whether the image should be created if not present.
+            - This is ignored if O(state=absent).
+        type: bool
+        version_added: 10.0.0
+    template:
+        description:
+            - Use with O(create=true) to specify image template.
+        type: str
+        version_added: 10.0.0
+    datastore_id:
+        description:
+            - Use with O(create=true) to specify datastore for image.
+        type: int
+        version_added: 10.0.0
+    wait_timeout:
+        description:
+            - Seconds to wait until image is ready, deleted or cloned.
+        type: int
+        default: 60
+        version_added: 10.0.0
 author:
     - "Milan Ilic (@ilicmilan)"
 '''
@@ -102,6 +125,35 @@ EXAMPLES = '''
   community.general.one_image:
     id: '{{ result.id }}'
     state: absent
+
+- name: Make sure IMAGE is present
+  community.general.one_image:
+    name: myyy-image
+    state: present
+    create: true
+    datastore_id: 100
+    template: |
+      PATH = "/var/tmp/image"
+      TYPE = "OS"
+      SIZE = 20512
+      FORMAT = "qcow2"
+      PERSISTENT = "Yes"
+      DEV_PREFIX = "vd"
+
+- name: Make sure IMAGE is present with a longer timeout
+  community.general.one_image:
+    name: big-image
+    state: present
+    create: true
+    datastore_id: 100
+    wait_timeout: 900
+    template: |
+      PATH = "https://192.0.2.200/repo/tipa_image.raw"
+      TYPE = "OS"
+      SIZE = 82048
+      FORMAT = "raw"
+      PERSISTENT = "Yes"
+      DEV_PREFIX = "vd"
 '''
 
 RETURN = '''
@@ -328,15 +380,20 @@ IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE',
 class ImageModule(OpenNebulaModule):
     def __init__(self):
         argument_spec = dict(
-            id=dict(type='int', required=False),
-            name=dict(type='str', required=False),
+            id=dict(type='int'),
+            name=dict(type='str'),
             state=dict(type='str', choices=['present', 'absent', 'cloned', 'renamed'], default='present'),
-            enabled=dict(type='bool', required=False),
-            new_name=dict(type='str', required=False),
-            persistent=dict(type='bool', required=False),
+            enabled=dict(type='bool'),
+            new_name=dict(type='str'),
+            persistent=dict(type='bool'),
+            create=dict(type='bool'),
+            template=dict(type='str'),
+            datastore_id=dict(type='int'),
+            wait_timeout=dict(type='int', default=60),
         )
         required_if = [
-            ['state', 'renamed', ['id']]
+            ['state', 'renamed', ['id']],
+            ['create', True, ['template', 'datastore_id', 'name']],
         ]
         mutually_exclusive = [
             ['id', 'name'],
@@ -356,26 +413,32 @@ class ImageModule(OpenNebulaModule):
         enabled = params.get('enabled')
         new_name = params.get('new_name')
         persistent = params.get('persistent')
+        create = params.get('create')
+        template = params.get('template')
+        datastore_id = params.get('datastore_id')
+        wait_timeout = params.get('wait_timeout')
 
         self.result = {}
 
         image = self.get_image_instance(id, name)
         if not image and desired_state != 'absent':
+            if create:
+                self.result = self.create_image(name, template, datastore_id, wait_timeout)
             # Using 'if id:' doesn't work properly when id=0
-            if id is not None:
+            elif id is not None:
                 module.fail_json(msg="There is no image with id=" + str(id))
             elif name is not None:
                 module.fail_json(msg="There is no image with name=" + name)
 
         if desired_state == 'absent':
-            self.result = self.delete_image(image)
+            self.result = self.delete_image(image, wait_timeout)
         else:
             if persistent is not None:
                 self.result = self.change_persistence(image, persistent)
             if enabled is not None:
                 self.result = self.enable_image(image, enabled)
             if desired_state == "cloned":
-                self.result = self.clone_image(image, new_name)
+                self.result = self.clone_image(image, new_name, wait_timeout)
             elif desired_state == "renamed":
                 self.result = self.rename_image(image, new_name)
 
@@ -403,6 +466,16 @@ class ImageModule(OpenNebulaModule):
             return self.get_image_by_id(requested_id)
         else:
             return self.get_image_by_name(requested_name)
+
+    def create_image(self, image_name, template, datastore_id, wait_timeout):
+        if not self.module.check_mode:
+            image_id = self.one.image.allocate("NAME = \"" + image_name + "\"\n" + template, datastore_id)
+            self.wait_for_ready(image_id, wait_timeout)
+            image = self.get_image_by_id(image_id)
+            result = self.get_image_info(image)
+
+        result['changed'] = True
+        return result
 
     def wait_for_ready(self, image_id, wait_timeout=60):
         import time
@@ -491,7 +564,7 @@ class ImageModule(OpenNebulaModule):
 
         return result
 
-    def clone_image(self, image, new_name):
+    def clone_image(self, image, new_name, wait_timeout):
         if new_name is None:
             new_name = "Copy of " + image.NAME
 
@@ -506,7 +579,7 @@ class ImageModule(OpenNebulaModule):
 
         if not self.module.check_mode:
             new_id = self.one.image.clone(image.ID, new_name)
-            self.wait_for_ready(new_id)
+            self.wait_for_ready(new_id, wait_timeout)
             image = self.one.image.info(new_id)
 
         result = self.get_image_info(image)
@@ -534,7 +607,7 @@ class ImageModule(OpenNebulaModule):
         result['changed'] = True
         return result
 
-    def delete_image(self, image):
+    def delete_image(self, image, wait_timeout):
         if not image:
             return {'changed': False}
 
@@ -543,7 +616,7 @@ class ImageModule(OpenNebulaModule):
 
         if not self.module.check_mode:
             self.one.image.delete(image.ID)
-            self.wait_for_delete(image.ID)
+            self.wait_for_delete(image.ID, wait_timeout)
 
         return {'changed': True}
 
