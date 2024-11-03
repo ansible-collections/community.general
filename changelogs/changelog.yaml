@@ -1650,3 +1650,17 @@ releases:
       - 8970-fix-dig-multi-nameservers.yml
       - 8987-legacycrypt.yml
     release_date: '2024-10-07'
+  8.6.7:
+    changes:
+      bugfixes:
+        - collection_version lookup plugin - use ``importlib`` directly instead of
+          the deprecated and in ansible-core 2.19 removed ``ansible.module_utils.compat.importlib``
+          (https://github.com/ansible-collections/community.general/pull/9084).
+        - modprobe - fix check mode not being honored for ``persistent`` option (https://github.com/ansible-collections/community.general/issues/9051,
+          https://github.com/ansible-collections/community.general/pull/9052).
+      release_summary: Bugfix release.
+    fragments:
+      - 8.6.7.yml
+      - 9052-modprobe-bugfix.yml
+      - 9084-collection_version-importlib.yml
+    release_date: '2024-11-03'

@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 7.0.0.
 
+v8.6.7
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- collection_version lookup plugin - use ``importlib`` directly instead of the deprecated and in ansible-core 2.19 removed ``ansible.module_utils.compat.importlib`` (https://github.com/ansible-collections/community.general/pull/9084).
+- modprobe - fix check mode not being honored for ``persistent`` option (https://github.com/ansible-collections/community.general/issues/9051, https://github.com/ansible-collections/community.general/pull/9052).
+
 v8.6.6
 ======
 
