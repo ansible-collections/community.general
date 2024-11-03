@@ -62,13 +62,19 @@ options:
   username:
     type: str
     description:
-      - This is the sender of the message (Username Override need to be enabled by mattermost admin, see mattermost doc.
+      - This is the sender of the message (Username Override need to be enabled by mattermost admin, see mattermost doc).
     default: Ansible
   icon_url:
     type: str
     description:
       - URL for the message sender's icon.
     default: https://docs.ansible.com/favicon.ico
+  priority:
+    type: str
+    description:
+      - Set a priority for the message.
+    choices: [ important, urgent ]
+    version_added: 10.0.0
   validate_certs:
     description:
       - If V(false), SSL certificates will not be validated. This should only be used
@@ -92,6 +98,7 @@ EXAMPLES = """
     channel: notifications
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
+    priority: important
 
 - name: Send attachments message via Mattermost
   community.general.mattermost:
@@ -135,6 +142,7 @@ def main():
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://docs.ansible.com/favicon.ico'),
+            priority=dict(type='str', default=None, choices=['important', 'urgent']),
             validate_certs=dict(default=True, type='bool'),
             attachments=dict(type='list', elements='dict'),
         ),
@@ -154,6 +162,8 @@ def main():
     for param in ['text', 'channel', 'username', 'icon_url', 'attachments']:
         if module.params[param] is not None:
             payload[param] = module.params[param]
+    if module.params['priority'] is not None:
+        payload['priority'] = {'priority': module.params['priority']}
 
     payload = module.jsonify(payload)
     result['payload'] = payload
