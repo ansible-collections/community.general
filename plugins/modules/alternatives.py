@@ -433,6 +433,7 @@ def main():
             )),
         ),
         supports_check_mode=True,
+        required_one_of=[('path', 'family')]
     )
 
     AlternativesModule(module)
