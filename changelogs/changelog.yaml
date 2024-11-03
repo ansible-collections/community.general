@@ -1892,3 +1892,34 @@ releases:
       - 8367-fix-close-span-if-no-logs.yaml
       - 8373-honour-disable-logs.yaml
     release_date: '2024-05-20'
+  7.5.9:
+    changes:
+      bugfixes:
+        - ini_file - pass absolute paths to ``module.atomic_move()`` (https://github.com/ansible/ansible/issues/83950,
+          https://github.com/ansible-collections/community.general/pull/8925).
+        - ipa_hostgroup - fix ``enabled `` and ``disabled`` states (https://github.com/ansible-collections/community.general/issues/8408,
+          https://github.com/ansible-collections/community.general/pull/8900).
+        - java_keystore - pass absolute paths to ``module.atomic_move()`` (https://github.com/ansible/ansible/issues/83950,
+          https://github.com/ansible-collections/community.general/pull/8925).
+        - jenkins_plugin - pass absolute paths to ``module.atomic_move()`` (https://github.com/ansible/ansible/issues/83950,
+          https://github.com/ansible-collections/community.general/pull/8925).
+        - kdeconfig - pass absolute paths to ``module.atomic_move()`` (https://github.com/ansible/ansible/issues/83950,
+          https://github.com/ansible-collections/community.general/pull/8925).
+        - modprobe - fix check mode not being honored for ``persistent`` option (https://github.com/ansible-collections/community.general/issues/9051,
+          https://github.com/ansible-collections/community.general/pull/9052).
+        - pam_limits - pass absolute paths to ``module.atomic_move()`` (https://github.com/ansible/ansible/issues/83950,
+          https://github.com/ansible-collections/community.general/pull/8925).
+      release_summary: 'Maintenance release.
+
+
+        This is the last 7.x.y release. The 7.x.y release train is now effectively
+        End of Life.
+
+
+        Thanks to everyone who contributed to the community.general 7.x.y releases!'
+    fragments:
+      - 7.5.9.yml
+      - 8900-ipa-hostgroup-fix-states.yml
+      - 8925-atomic.yml
+      - 9052-modprobe-bugfix.yml
+    release_date: '2024-11-03'
