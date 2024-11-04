@@ -1,0 +1,2 @@
+minor_changes:
+  - jenkins_node - Implement ``launch_ssh`` option which will configure a node to use the SSH launcher if specified and common suboptions.
