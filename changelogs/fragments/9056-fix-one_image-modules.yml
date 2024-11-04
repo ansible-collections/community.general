@@ -1,3 +1,0 @@
-bugfixes:
-  - one_image - fix module failing due to a class method typo (https://github.com/ansible-collections/community.general/pull/9056).
-  - one_image_info - fix module failing due to a class method typo (https://github.com/ansible-collections/community.general/pull/9056).
