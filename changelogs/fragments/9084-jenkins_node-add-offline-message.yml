@@ -1,8 +1,0 @@
-minor_changes:
-  - jenkins_node - add ``offline_message`` parameter for updating a Jenkins node offline cause reason when the state is "disabled" (offline) (https://github.com/ansible-collections/community.general/pull/9084)."
-
-bugfixes:
-  - jenkins_node - fixed ``enabled``, ``disable`` and ``absent`` node state redirect authorization issues, same as was present for ``present`` (https://github.com/ansible-collections/community.general/pull/9084).
-
-known_issues:
-  - jenkins_node - the module is not able to update offline message when node is already offline due to internally using toggleOffline API (https://github.com/ansible-collections/community.general/pull/9084).

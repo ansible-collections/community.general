@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox_kvm - adds the ``ciupgrade`` parameter to specify whether cloud-init should upgrade system packages at first boot (https://github.com/ansible-collections/community.general/pull/9066).
