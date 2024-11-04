@@ -240,7 +240,7 @@ with deps.declare(
 IS_PYTHON_2 = sys.version_info[0] <= 2
 
 
-if IS_PYTHON_2:
+if sys.version_info[0] <= 3 or sys.version_info[1] < 8:
     class cached_property(object):  # noqa
         def __init__(self, func):
             self.func = func
@@ -452,14 +452,6 @@ class ProvidedSSHHostKeyVerifyConfig(KnownHostsSSHHostKeyVerifyConfig):
             updated = True
 
         return updated
-
-
-SSH_HOST_KEY_VERIFY_TYPES = {
-    "none": NoneSSHHostKeyVerifyConfig,
-    "known_hosts": KnownHostsSSHHostKeyVerifyConfig,
-    "content": ProvidedSSHHostKeyVerifyConfig,
-    "approve": TrustedSSHHostKeyVerifyConfig,
-}
 
 
 class SSHLauncherElement(LauncherElement):
