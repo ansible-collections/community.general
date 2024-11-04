@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox inventory plugin - fix urllib3 InsecureRequestWarnings not suppressing when a token is used (https://github.com/ansible-collections/community.general/pull/).
