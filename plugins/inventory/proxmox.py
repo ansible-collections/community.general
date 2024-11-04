@@ -276,15 +276,17 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _get_auth(self):
 
+        validate_certs = self.get_option('validate_certs')
+
+        if validate_certs is False:
+            from requests.packages.urllib3 import disable_warnings
+            disable_warnings()
+
         if self.proxmox_password:
 
             credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password})
 
             a = self._get_session()
-
-            if a.verify is False:
-                from requests.packages.urllib3 import disable_warnings
-                disable_warnings()
 
             ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
 
