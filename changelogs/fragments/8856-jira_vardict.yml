@@ -1,2 +1,0 @@
-minor_changes:
-  - jira - adjust code ahead of the old ``VardDict`` deprecation (https://github.com/ansible-collections/community.general/pull/8856).

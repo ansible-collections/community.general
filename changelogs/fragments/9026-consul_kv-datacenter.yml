@@ -1,2 +1,0 @@
-minor_changes:
-  - consul_kv - add argument for the datacenter option on Consul API (https://github.com/ansible-collections/community.general/pull/9026).

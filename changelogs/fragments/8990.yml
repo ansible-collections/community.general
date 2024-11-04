@@ -1,3 +1,0 @@
-minor_changes:
-  - redfish_config - add parameter ``storage_none_volume_deletion`` to 
-    ``CreateVolume`` command in order to control the automatic deletion of non-RAID volumes (https://github.com/ansible-collections/community.general/pull/8990).

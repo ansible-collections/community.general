@@ -1,4 +1,0 @@
----
-minor_changes:
-  - redfish_* modules - adds ``ciphers`` option for custom cipher selection (https://github.com/ansible-collections/community.general/pull/8533).
-...

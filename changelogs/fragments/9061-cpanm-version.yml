@@ -1,2 +1,0 @@
-minor_changes:
-  - cpanm - add return value ``cpanm_version`` (https://github.com/ansible-collections/community.general/pull/9061).

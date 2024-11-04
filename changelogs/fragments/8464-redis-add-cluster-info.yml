@@ -1,2 +1,0 @@
-minor_changes:
-  - redis_info - adds support for getting cluster info (https://github.com/ansible-collections/community.general/pull/8464).

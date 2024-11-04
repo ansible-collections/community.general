@@ -1,2 +1,0 @@
-bugfixes:
-  - one_vnet - fix module failing due to a variable typo (https://github.com/ansible-collections/community.general/pull/9019).

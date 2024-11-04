@@ -1,2 +1,0 @@
-minor_changes:
-  - ansible_galaxy_install - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9060).

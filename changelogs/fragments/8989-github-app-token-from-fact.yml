@@ -1,2 +1,0 @@
-minor_changes:
-  - github_app_access_token lookup plugin - adds new ``private_key`` parameter (https://github.com/ansible-collections/community.general/pull/8989).
