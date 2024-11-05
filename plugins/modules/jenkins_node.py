@@ -112,7 +112,7 @@ options:
         suboptions:
           algorithm:
             description:
-              - Key type e.g. V(ssh-rsa).
+              - Key type, for example V(ssh-rsa).
             type: str
             required: true
           key:
