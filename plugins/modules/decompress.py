@@ -46,8 +46,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            src=dict(type='str', required=True),
-            dest=dict(type='str', required=True),
+            src=dict(type='path', required=True),
+            dest=dict(type='path', required=True),
             format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz'])
         )
     )
