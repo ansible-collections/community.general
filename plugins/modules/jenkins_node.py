@@ -130,7 +130,7 @@ options:
               - When specified, enables or disables the requiring manual verification of
                 the first connected host for this node.
             type: bool
-    version_added: 10.0.0
+    version_added: 10.1.0
 '''
 
 EXAMPLES = '''
