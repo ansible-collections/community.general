@@ -1,2 +1,2 @@
 minor_changes:
-  - jenkins_node - Implement ``launch_ssh`` option which will configure a node to use the SSH launcher if specified and common suboptions.
+  - jenkins_node - implement ``launch_ssh`` option which will configure a node to use the SSH launcher if specified and common suboptions (https://github.com/ansible-collections/community.general/pull/9101).
