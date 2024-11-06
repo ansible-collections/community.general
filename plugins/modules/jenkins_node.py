@@ -104,7 +104,7 @@ options:
           - When set, sets the SSH host key known hosts file verification strategy.
         type: bool
         choices:
-          - True
+          - true
       host_key_verify_provided:
         description:
           - When specified, sets the SSH host key manually provided verification strategy.
