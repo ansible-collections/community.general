@@ -43,6 +43,7 @@ options:
     description:
       - The family groups similar alternatives. This option is available only on RHEL-based distributions.
     type: str
+    version_added: 10.1.0
   link:
     description:
       - The path to the symbolic link that should point to the real executable.
