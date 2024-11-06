@@ -98,7 +98,7 @@ options:
           - When set, sets the SSH host key non-verifying strategy.
         type: bool
         choices:
-          - True
+          - true
       host_key_verify_known_hosts:
         description:
           - When set, sets the SSH host key known hosts file verification strategy.
