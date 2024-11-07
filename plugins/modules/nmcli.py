@@ -1942,7 +1942,20 @@ class Nmcli(object):
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
-                options.update(self.wireguard)
+                options.update({
+                    'fwmark':self.wireguard['fwmark'],
+                    'ip4-auto-default-route': self.wireguard['ip4_auto_default_route'],
+                    'ip6-auto-default-route': self.wireguard['ip6_auto_default_route'],
+                    'listen-port': self.wireguard['listen_port'],
+                    'mtu': self.wireguard['mtu'],
+                    'peer-routes': self.wireguard['peer_routes'],
+                    'private-key': self.wireguard['private_key'],
+                    'private-key-flags': self.wireguard['private_key_flags'],
+                    'peer-public-key': self.wireguard['peer_public_key'],
+                    'peer-allowed-ips': self.wireguard['peer_allowed_ips'],
+                    'peer-endpoint': self.wireguard['peer_endpoint'],
+                    'peer-persistent-keepalive': self.wireguard['peer_persistent_keepalive'],
+                })
         elif self.type == 'vpn':
             if self.vpn:
                 vpn_data_values = ''
