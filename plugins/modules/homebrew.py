@@ -427,22 +427,6 @@ class Homebrew(object):
 
         return rc != 0
 
-    def _current_package_is_installed_from_head(self):
-        if not self._current_package_is_installed():
-            return False
-
-        rc, out, err = self.module.run_command([
-            self.brew_path,
-            'info',
-            self.current_package,
-        ])
-
-        try:
-            version_info = [line for line in out.split('\n') if line][0]
-        except IndexError:
-            return False
-
-        return version_info.split(' ')[-1] == 'HEAD'
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
