@@ -1484,10 +1484,10 @@ EXAMPLES = r'''
     wireguard:
         listen-port: 51820
         private-key: my-private-key
-        wgpeer_public_key: "your_peer_public_key"
-        wgpeer_allowed_ips: "10.0.0.2/32"
-        wgpeer_endpoint: "192.168.1.1:51820"
-        wgpeer_persistent_keepalive: 25
+        peer_public_key: "your_peer_public_key"
+        peer_allowed_ips: "10.0.0.2/32"
+        peer_endpoint: "192.168.1.1:51820"
+        peer_persistent_keepalive: 25
     autoconnect: true
     state: present
 
@@ -1940,7 +1940,17 @@ class Nmcli(object):
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
-                options.update(self.wireguard)
+                options.update({
+                    'peer_key', self.wireguard.peer.ke
+                })
+        if 'peer_key' in self.wireguard:
+            options['wireguard.peer.key'] = self.wireguard['peer_key']
+        if 'peer_allowed_ips' in self.wireguard:
+            options['wireguard.peer.allowed-ips'] = self.wireguard['peer_allowed_ips']
+        if 'peer_endpoint' in self.wireguard:
+            options['wireguard.peer.endpoint'] = self.wireguard['peer_endpoint']
+        if 'peer_persistent_keepalive' in self.wireguard:
+            options['wireguard.peer.persistent-keepalive'] = str(self.wireguard['peer_persistent_keepalive'])
         elif self.type == 'vpn':
             if self.vpn:
                 vpn_data_values = ''
@@ -2630,8 +2640,8 @@ def main():
                     listen_port=dict(type='int', required=False),
                     mtu=dict(type='int', required=False),
                     peer_routes=dict(type='bool', required=False),
-                    peer_public_key=dict(type='str', required=False, no_log=True),
-                    private_key=dict(type='str', required=False, no_log=True),
+                    peer_public_key=dict(type='str', required=False),
+                    private_key=dict(type='str', required=False),
                     private_key_flags=dict(type='str', required=False),
                     peer_key=dict(type='str', required=False),
                 )
