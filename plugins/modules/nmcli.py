@@ -1008,6 +1008,7 @@ options:
                 description: C(NMSettingSecretFlags) indicating how to handle the O(wireguard.private-key) property.
                 type: int
                 choices: [ 0, 1, 2 ]
+                no_log: true
             peer_public_key:
                 description: Public key of the WireGuard peer.
                 type: str
@@ -1940,17 +1941,7 @@ class Nmcli(object):
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
-                options.update({
-                    'peer_key', self.wireguard.peer.ke
-                })
-        if 'peer_key' in self.wireguard:
-            options['wireguard.peer.key'] = self.wireguard['peer_key']
-        if 'peer_allowed_ips' in self.wireguard:
-            options['wireguard.peer.allowed-ips'] = self.wireguard['peer_allowed_ips']
-        if 'peer_endpoint' in self.wireguard:
-            options['wireguard.peer.endpoint'] = self.wireguard['peer_endpoint']
-        if 'peer_persistent_keepalive' in self.wireguard:
-            options['wireguard.peer.persistent-keepalive'] = str(self.wireguard['peer_persistent_keepalive'])
+                options.update(self.wireguard)
         elif self.type == 'vpn':
             if self.vpn:
                 vpn_data_values = ''
@@ -2640,10 +2631,12 @@ def main():
                     listen_port=dict(type='int', required=False),
                     mtu=dict(type='int', required=False),
                     peer_routes=dict(type='bool', required=False),
-                    peer_public_key=dict(type='str', required=False),
                     private_key=dict(type='str', required=False),
-                    private_key_flags=dict(type='str', required=False),
-                    peer_key=dict(type='str', required=False),
+                    private_key_flags=dict(type='int', required=False,no_log=True),
+                    peer_public_key=dict(type='str', required=False),
+                    peer_allowed_ips=dict(type='str',required=False),
+                    peer_endpoint=dict(type='str',required=False),
+                    peer_persistent_keepalive=dict(type='int',required=False),                    
                 )
             ),
             vpn=dict(type='dict'),
