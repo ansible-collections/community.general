@@ -967,21 +967,21 @@ options:
                 description:
                     - The 32-bit fwmark for outgoing packets.
                     - The use of fwmark is optional and is by default off. Setting it to 0 disables it.
-                    - Note that O(wireguard.ip4-auto-default-route) or O(wireguard.ip6-auto-default-route) enabled, implies to automatically choose a fwmark.
+                    - Note that O(wireguard.ip4_auto_default_route) or O(wireguard.ip6_auto_default_route) enabled, implies to automatically choose a fwmark.
                 type: int
-            ip4-auto-default-route:
+            ip4_auto_default_route:
                 description:
                     - Whether to enable special handling of the IPv4 default route.
-                    - If enabled, the IPv4 default route from O(wireguard.peer-routes) will be placed to a dedicated routing-table and two policy
+                    - If enabled, the IPv4 default route from O(wireguard.peer_routes) will be placed to a dedicated routing-table and two policy
                         routing rules will be added.
                     - The fwmark number is also used as routing-table for the default-route, and if fwmark is zero, an unused fwmark/table is chosen
                         automatically. This corresponds to what wg-quick does with Table=auto and what WireGuard calls "Improved Rule-based Routing"
                 type: bool
-            ip6-auto-default-route:
+            ip6_auto_default_route:
                 description:
-                    - Like O(wireguard.ip4-auto-default-route), but for the IPv6 default route.
+                    - Like O(wireguard.ip4_auto_default_route), but for the IPv6 default route.
                 type: bool
-            listen-port:
+            listen_port:
                 description: The WireGuard connection listen-port. If not specified, the port will be chosen randomly when the
                     interface comes up.
                 type: int
@@ -991,7 +991,7 @@ options:
                     - If zero a default MTU is used. Note that contrary to wg-quick's MTU setting, this does not take into account the current routes
                         at the time of activation.
                 type: int
-            peer-routes:
+            peer_routes:
                 description:
                     - Whether to automatically add routes for the AllowedIPs ranges of the peers.
                     - If V(true) (the default), NetworkManager will automatically add routes in the routing tables according to C(ipv4.route-table) and
@@ -1001,11 +1001,12 @@ options:
                     - Note that if the peer's AllowedIPs is V(0.0.0.0/0) or V(::/0) and the profile's C(ipv4.never-default) or C(ipv6.never-default)
                         setting is enabled, the peer route for this peer won't be added automatically.
                 type: bool
-            private-key:
+            private_key:
                 description: The 256 bit private-key in base64 encoding.
                 type: str
-            private-key-flags:
-                description: C(NMSettingSecretFlags) indicating how to handle the O(wireguard.private-key) property.
+                no_log=True)
+            private_key_flags:
+                description: C(NMSettingSecretFlags) indicating how to handle the O(wireguard.private_key) property.
                 type: int
                 choices: [ 0, 1, 2 ]
                 no_log: true
@@ -1483,8 +1484,8 @@ EXAMPLES = r'''
     conn_name: my-wg-provider
     ifname: mywg0
     wireguard:
-        listen-port: 51820
-        private-key: my-private-key
+        listen_port: 51820
+        private_key: my-private-key
         peer_public_key: "your_peer_public_key"
         peer_allowed_ips: "10.0.0.2/32"
         peer_endpoint: "192.168.1.1:51820"
@@ -2631,12 +2632,12 @@ def main():
                     listen_port=dict(type='int', required=False),
                     mtu=dict(type='int', required=False),
                     peer_routes=dict(type='bool', required=False),
-                    private_key=dict(type='str', required=False),
-                    private_key_flags=dict(type='int', required=False,no_log=True),
+                    private_key=dict(type='str', required=False, no_log=True),
+                    private_key_flags=dict(type='int', required=False, no_log=True),
                     peer_public_key=dict(type='str', required=False),
-                    peer_allowed_ips=dict(type='str',required=False),
-                    peer_endpoint=dict(type='str',required=False),
-                    peer_persistent_keepalive=dict(type='int',required=False),                    
+                    peer_allowed_ips=dict(type='str', required=False),
+                    peer_endpoint=dict(type='str', required=False),
+                    peer_persistent_keepalive=dict(type='int', required=False),           
                 )
             ),
             vpn=dict(type='dict'),
