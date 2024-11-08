@@ -357,17 +357,17 @@ def main():
         'priority': module.params['priority'],
     }
     # rewrite bools in the language that zypper lr -x provides for easier comparison
-    if 'enabled' in module.params 
+    if 'enabled' in module.params:
         if module.params['enabled']:
             repodata['enabled'] = '1'
         else:
             repodata['enabled'] = '0'
-    if 'disable_gpg_check' in module.params
+    if 'disable_gpg_check' in module.params:
         if module.params['disable_gpg_check']:
             repodata['gpgcheck'] = '0'
         else:
             repodata['gpgcheck'] = '1'
-    if 'autorefresh' in module.params
+    if 'autorefresh' in module.params:
         if module.params['autorefresh']:
             repodata['autorefresh'] = '1'
         else:
@@ -438,17 +438,25 @@ def main():
 
         # Map additional values, if available
         if 'name' in repofile_items:
-            if 'name' not in repodata
+            if 'name' not in repodata:
                 repodata['name'] = repofile_items['name']
         if 'enabled' in repofile_items:
-            if 'enabled' not in repodata
+            if 'enabled' not in repodata:
                 repodata['enabled'] = repofile_items['enabled']
         if 'autorefresh' in repofile_items:
-            if 'autorefresh' not in repodata
+            if 'autorefresh' not in repodata:
                 repodata['autorefresh'] = repofile_items['autorefresh']
         if 'gpgcheck' in repofile_items:
-            if 'gpgcheck' not in repodata
+            if 'gpgcheck' not in repodata:
                 repodata['gpgcheck'] = repofile_items['gpgcheck']
+
+    # finally, fill empty attributes with defaults
+    if 'enabled' not in repodata:
+        repodata['enabled'] = '0'
+    if 'autorefresh' not in repodata:
+        repodata['autorefresh'] = '0'
+    if 'gpgcheck' not in repodata:
+        repodata['gpgcheck'] = '0'
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
