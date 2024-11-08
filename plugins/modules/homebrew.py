@@ -347,8 +347,6 @@ class Homebrew(object):
     def _setup_status_vars(self):
         self.failed = False
         self.changed = False
-        self.changed_count = 0
-        self.unchanged_count = 0
         self.changed_pkgs = []
         self.unchanged_pkgs = []
         self.message = ''
@@ -389,11 +387,12 @@ class Homebrew(object):
             self._run()
         except HomebrewException:
             pass
-
-        if not self.failed and (self.changed_count + self.unchanged_count > 1):
+        changed_count = len(self.changed_pkgs)
+        unchanged_count = len(self.unchanged_pkgs)
+        if not self.failed and (changed_count + unchanged_count > 1):
             self.message = "Changed: %d, Unchanged: %d" % (
-                self.changed_count,
-                self.unchanged_count,
+                changed_count,
+                unchanged_count,
             )
         (failed, changed, message) = self._status()
 
@@ -509,7 +508,6 @@ class Homebrew(object):
     # installed ------------------------------ {{{
     def _install_current_package(self):
         if self._current_package_is_installed():
-            self.unchanged_count += 1
             self.unchanged_pkgs.append(self.current_package)
             self.message = 'Package already installed: {0}'.format(
                 self.current_package,
@@ -542,7 +540,6 @@ class Homebrew(object):
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
             self.message = 'Package installed: {0}'.format(self.current_package)
@@ -572,7 +569,6 @@ class Homebrew(object):
             self.message = 'Package is already upgraded: {0}'.format(
                 self.current_package,
             )
-            self.unchanged_count += 1
             self.unchanged_pkgs.append(self.current_package)
             return True
 
@@ -592,7 +588,6 @@ class Homebrew(object):
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
             self.message = 'Package upgraded: {0}'.format(self.current_package)
@@ -632,7 +627,6 @@ class Homebrew(object):
     # uninstalled ---------------------------- {{{
     def _uninstall_current_package(self):
         if not self._current_package_is_installed():
-            self.unchanged_count += 1
             self.unchanged_pkgs.append(self.current_package)
             self.message = 'Package already uninstalled: {0}'.format(
                 self.current_package,
@@ -655,7 +649,6 @@ class Homebrew(object):
         rc, out, err = self.module.run_command(cmd)
 
         if not self._current_package_is_installed():
-            self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
             self.message = 'Package uninstalled: {0}'.format(self.current_package)
@@ -696,7 +689,6 @@ class Homebrew(object):
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
             self.message = 'Package linked: {0}'.format(self.current_package)
@@ -738,7 +730,6 @@ class Homebrew(object):
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
             self.message = 'Package unlinked: {0}'.format(self.current_package)
