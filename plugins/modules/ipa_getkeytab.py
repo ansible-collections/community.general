@@ -98,11 +98,9 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: Get kerberos ticket
-  ansible.builtin.shell: kinit admin
-  args:
-    stdin: "{{ aldpro_admin_password }}"
-  changed_when: true
+- name: Get Kerberos ticket using default principal
+  community.general.krb_ticket:
+    password: "{{ aldpro_admin_password }}"
 
 - name: Create keytab
   community.general.ipa_getkeytab:
