@@ -345,7 +345,6 @@ class JenkinsPlugin(object):
     def __init__(self, module):
         # To be able to call fail_json
         self.module = module
-        self.force_basic_auth = self.module.params['force_basic_auth']
 
         # Shortcuts for the params
         self.params = self.module.params
@@ -353,6 +352,7 @@ class JenkinsPlugin(object):
         self.timeout = self.params['timeout']
         self.username = self.params['username']
         self.password = self.params['password']
+        self.force_basic_auth = self.params['force_basic_auth']
 
         # Crumb
         self.crumb = {}
@@ -844,7 +844,7 @@ def main():
         url_password=dict(no_log=True),
         version=dict(),
         with_dependencies=dict(default=True, type='bool'),
-        force_basic_auth=dict(default=True, type='bool')  # Add force_basic_auth to arguments
+        force_basic_auth=dict(default=False, type='bool')  # Add force_basic_auth to arguments
     )
     # Module settings
     module = AnsibleModule(
@@ -852,9 +852,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    # Force basic authentication
-    module.params['force_basic_auth'] = True
 
     # Convert timeout to float
     try:
