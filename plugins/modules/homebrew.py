@@ -532,18 +532,22 @@ class Homebrew(object):
     # /_upgrade_all -------------------------- }}}
 
     # installed ------------------------------ {{{
-    def _install_current_package(self):
-        if self._current_package_is_installed():
-            self.unchanged_pkgs.append(self.current_package)
-            self.message = 'Package already installed: {0}'.format(
-                self.current_package,
+    def _install_packages(self):
+        packages_to_install = set(self.packages) - self.installed_packages
+
+        if len(packages_to_install) == 0:
+            self.unchanged_pkgs.extend(self.packages)
+            self.message = 'Package{0} already installed: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages),
             )
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be installed: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be installed: {1}'.format(
+                "s" if len(packages_to_install) > 1 else "",
+                ", ".join(packages_to_install)
             )
             raise HomebrewException(self.message)
 
@@ -560,27 +564,25 @@ class Homebrew(object):
         opts = (
             [self.brew_path, 'install']
             + self.install_options
-            + [self.current_package, head, formula]
+            + list(packages_to_install)
+            + [head, formula]
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_pkgs.append(self.current_package)
+            self.changed_pkgs.extend(packages_to_install)
+            self.unchanged_pkgs.extend(self.installed_packages)
             self.changed = True
-            self.message = 'Package installed: {0}'.format(self.current_package)
+            self.message = 'Package{0} installed: {1}'.format(
+                "s" if len(packages_to_install) > 1 else "",
+                ", ".join(packages_to_install)
+            )
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
-
-    def _install_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._install_current_package()
-
-        return True
     # /installed ----------------------------- }}}
 
     # upgraded ------------------------------- {{{
