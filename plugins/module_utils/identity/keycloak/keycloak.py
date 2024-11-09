@@ -154,30 +154,16 @@ class KeycloakError(Exception):
     pass
 
 
-def _get_token_with_credentials(module_params):
+def _token_request(module_params, payload):
     base_url = module_params.get('auth_keycloak_url')
     if not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
-
+    auth_realm = module_params.get('auth_realm')
+    auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
     http_agent = module_params.get('http_agent')
     validate_certs = module_params.get('validate_certs')
-    auth_realm = module_params.get('auth_realm')
-    client_id = module_params.get('auth_client_id')
-    auth_username = module_params.get('auth_username')
-    auth_password = module_params.get('auth_password')
-    client_secret = module_params.get('auth_client_secret')
     connection_timeout = module_params.get('connection_timeout')
-    auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
 
-    temp_payload = {
-        'grant_type': 'password',
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'username': auth_username,
-        'password': auth_password,
-    }
-    # Remove empty items, for instance missing client_secret
-    payload = {k: v for k, v in temp_payload.items() if v is not None}
     try:
         r = json.loads(to_native(open_url(auth_url, method='POST',
                                           validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
@@ -199,6 +185,25 @@ def _get_token_with_credentials(module_params):
     return token
 
 
+def _get_token_using_credentials(module_params):
+    client_id = module_params.get('auth_client_id')
+    auth_username = module_params.get('auth_username')
+    auth_password = module_params.get('auth_password')
+    client_secret = module_params.get('auth_client_secret')
+
+    temp_payload = {
+        'grant_type': 'password',
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'username': auth_username,
+        'password': auth_password,
+    }
+    # Remove empty items, for instance missing client_secret
+    payload = {k: v for k, v in temp_payload.items() if v is not None}
+
+    return _token_request(module_params, payload)
+
+
 def get_token(module_params):
     """ Obtains connection header with token for the authentication,
         token already given or obtained from credentials
@@ -208,7 +213,7 @@ def get_token(module_params):
     token = module_params.get('token')
 
     if token is None:
-        token = _get_token_with_credentials(module_params)
+        token = _get_token_using_credentials(module_params)
 
     return {
         'Authorization': 'Bearer ' + token,
