@@ -196,6 +196,8 @@ stages:
               test: rhel/9.4
             - name: FreeBSD 14.1
               test: freebsd/14.1
+            - name: FreeBSD 13.4
+              test: freebsd/13.4
           groups:
             - 1
             - 2
