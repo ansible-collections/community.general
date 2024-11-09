@@ -352,6 +352,8 @@ class Homebrew(object):
         self.message = ''
 
     def _setup_instance_vars(self, **kwargs):
+        self.installed_packages = set()
+        self.outdated_packages = set()
         for key, val in iteritems(kwargs):
             setattr(self, key, val)
 
@@ -380,6 +382,29 @@ class Homebrew(object):
 
     def _status(self):
         return (self.failed, self.changed, self.message)
+
+    def _get_packages_info(self):
+        cmd = [
+            "{brew_path}".format(brew_path=self.brew_path),
+            "info",
+            "--json=v2",
+        ]
+        cmd.extend(self.packages)
+        if self.force_formula:
+            cmd.append("--formula")
+
+        rc, out, err = self.module.run_command(cmd)
+        if rc != 0:
+            self.failed = True
+            self.message = err.strip() or ("Unknown failure with exit code %d" % rc)
+            raise HomebrewException(self.message)
+
+        data = json.loads(out)
+        for package_detail in data.get("formulae", []) + data.get("casks", []):
+            if bool(package_detail.get("installed")):
+                self.installed_packages.add(package_detail["name"])
+            if bool(package_detail.get("outdated")):
+                self.outdated_packages.add(package_detail["name"])
     # /prep -------------------------------------------------------- }}}
 
     def run(self):
@@ -437,6 +462,7 @@ class Homebrew(object):
             self._upgrade_all()
 
         if self.packages:
+            self._get_packages_info()
             if self.state == 'installed':
                 return self._install_packages()
             elif self.state == 'upgraded':
