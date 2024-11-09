@@ -653,45 +653,46 @@ class Homebrew(object):
     # /upgraded ------------------------------ }}}
 
     # uninstalled ---------------------------- {{{
-    def _uninstall_current_package(self):
-        if not self._current_package_is_installed():
-            self.unchanged_pkgs.append(self.current_package)
-            self.message = 'Package already uninstalled: {0}'.format(
-                self.current_package,
+    def _uninstall_packages(self):
+        packages_to_uninstall = self.installed_packages & set(self.packages)
+
+        if len(packages_to_uninstall) == 0:
+            self.unchanged_pkgs.extend(self.packages)
+            self.message = 'Package{0} already uninstalled: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages),
             )
             return True
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be uninstalled: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be uninstalled: {1}'.format(
+                "s" if len(packages_to_uninstall) > 1 else "",
+                ", ".join(packages_to_uninstall)
             )
             raise HomebrewException(self.message)
 
         opts = (
             [self.brew_path, 'uninstall', '--force']
             + self.install_options
-            + [self.current_package]
+            + list(packages_to_uninstall)
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
-        if not self._current_package_is_installed():
-            self.changed_pkgs.append(self.current_package)
+        if rc == 0:
+            self.changed_pkgs.extend(packages_to_uninstall)
+            self.unchanged_pkgs.extend(set(self.packages) - self.installed_packages)
             self.changed = True
-            self.message = 'Package uninstalled: {0}'.format(self.current_package)
+            self.message = 'Package{0} uninstalled: {1}'.format(
+                "s" if len(packages_to_uninstall) > 1 else "",
+                ", ".join(packages_to_uninstall)
+            )
             return True
         else:
             self.failed = True
             self.message = err.strip()
             raise HomebrewException(self.message)
-
-    def _uninstall_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._uninstall_current_package()
-
-        return True
     # /uninstalled ----------------------------- }}}
 
     # linked --------------------------------- {{{
