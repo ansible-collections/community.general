@@ -1,0 +1,104 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+  register: client
+
+- name: Create new realm role with username/password authentication
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Remove created realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Get Keycloak token
+  ansible.builtin.uri:
+    url: "{{ url }}/realms/{{ admin_realm }}/protocol/openid-connect/token"
+    method: POST
+    return_content: true
+    status_code: 200
+    body_format: form-urlencoded
+    body:
+      grant_type: "password"
+      client_id: "admin-cli"
+      username: "{{ admin_user }}"
+      password: "{{ admin_password }}"
+  register: token_response
+
+- name: Extract tokens
+  ansible.builtin.set_fact:
+    access_token: "{{ token_response.json | json_query('access_token') }}"
+    refresh_token: "{{ token_response.json | json_query('refresh_token') }}"
+
+- name: Create new realm role with provided token authentication
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    token: "{{ access_token }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ keycloak_role_description }}"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Remove created realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
