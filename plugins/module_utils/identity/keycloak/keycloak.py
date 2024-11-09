@@ -280,14 +280,14 @@ class KeycloakAPI(object):
         self.restheaders = connection_header
         self.http_agent = self.module.params.get('http_agent')
 
-    def _request(self, url, method, data):
+    def _request(self, url, method, data=None):
         return open_url(url, method=method, data=data,
                         http_agent=self.http_agent, headers=self.restheaders,
                         timeout=self.connection_timeout,
                         validate_certs=self.validate_certs)
 
-    def _request_and_deserialize(self, url, method, data):
-        return json.loads(to_native(self._request(self, url, method, data).read()))
+    def _request_and_deserialize(self, url, method, data=None):
+        return json.loads(to_native(self._request(url, method, data).read()))
 
     def get_realm_info_by_id(self, realm='master'):
         """ Obtain realm public info by id
