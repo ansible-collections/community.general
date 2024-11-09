@@ -696,44 +696,47 @@ class Homebrew(object):
     # /uninstalled ----------------------------- }}}
 
     # linked --------------------------------- {{{
-    def _link_current_package(self):
-        if not self._current_package_is_installed():
+    def _link_packages(self):
+        missing_packages = set(self.packages) - self.installed_packages
+        if missing_packages:
             self.failed = True
-            self.message = 'Package not installed: {0}.'.format(self.current_package)
+            self.message = 'Package{0} not installed: {1}.'.format(
+                "s" if len(missing_packages) > 1 else "",
+                ", ".join(missing_packages),
+            )
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
             self.changed = True
-            self.message = 'Package would be linked: {0}'.format(
-                self.current_package
+            self.message = 'Package{0} would be linked: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
             )
             raise HomebrewException(self.message)
 
         opts = (
             [self.brew_path, 'link']
             + self.install_options
-            + [self.current_package]
+            + self.packages
         )
         cmd = [opt for opt in opts if opt]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
-            self.changed_pkgs.append(self.current_package)
+            self.changed_pkgs.extend(self.packages)
             self.changed = True
-            self.message = 'Package linked: {0}'.format(self.current_package)
-
+            self.message = 'Package{0} linked: {1}'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
+            )
             return True
         else:
             self.failed = True
-            self.message = 'Package could not be linked: {0}.'.format(self.current_package)
+            self.message = 'Package{0} could not be linked: {1}.'.format(
+                "s" if len(self.packages) > 1 else "",
+                ", ".join(self.packages)
+            )
             raise HomebrewException(self.message)
-
-    def _link_packages(self):
-        for package in self.packages:
-            self.current_package = package
-            self._link_current_package()
-
-        return True
     # /linked -------------------------------- }}}
 
     # unlinked ------------------------------- {{{
