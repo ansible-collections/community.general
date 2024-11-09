@@ -29,14 +29,14 @@ schedules:
     always: true
     branches:
       include:
+        - stable-10
         - stable-9
-        - stable-8
   - cron: 0 11 * * 0
     displayName: Weekly (old stable branches)
     always: true
     branches:
       include:
-        - stable-7
+        - stable-8
 
 variables:
   - name: checkoutPath
@@ -196,6 +196,8 @@ stages:
               test: rhel/9.4
             - name: FreeBSD 14.1
               test: freebsd/14.1
+            - name: FreeBSD 13.4
+              test: freebsd/13.4
           groups:
             - 1
             - 2

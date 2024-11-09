@@ -1,2 +1,0 @@
-removed_features:
-  - gitlab modules - remove basic auth feature (https://github.com/ansible-collections/community.general/pull/8405).
