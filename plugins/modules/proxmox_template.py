@@ -30,13 +30,14 @@ options:
   src:
     description:
       - Path to uploaded file.
-      - src or url required for O(state=present).
+      - Exactly one of O(src) or O(url) is required for O(state=present).
     type: path
   url:
     description:
       - URL to file to download
-      - src or url required for O(state=present).
+      - Exactly one of O(src) or O(url) is required for O(state=present).
     type: str
+    version_added: 10.1.0
   template:
     description:
       - The template name.
@@ -255,7 +256,7 @@ def main():
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
         required_if=[('state', 'absent', ['template'])],
-        mutually_exclusive=[("src", "url")]
+        mutually_exclusive=[("src", "url")],
     )
 
     proxmox = ProxmoxTemplateAnsible(module)

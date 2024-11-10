@@ -1,2 +1,2 @@
 minor_changes:
-  - proxmox_template - add server side artifact fetching support to proxmox_template module
+  - proxmox_template - add server side artifact fetching support (https://github.com/ansible-collections/community.general/pull/9113).
