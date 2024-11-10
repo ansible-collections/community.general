@@ -422,36 +422,6 @@ class Homebrew(object):
 
         return (failed, changed, message)
 
-    # checks ------------------------------------------------------- {{{
-    def _current_package_is_installed(self):
-        cmd = [
-            "{brew_path}".format(brew_path=self.brew_path),
-            "info",
-            "--json=v2",
-            self.current_package,
-        ]
-        if self.force_formula:
-            cmd.append("--formula")
-        rc, out, err = self.module.run_command(cmd)
-        if rc != 0:
-            self.failed = True
-            self.message = err.strip() or ("Unknown failure with exit code %d" % rc)
-            raise HomebrewException(self.message)
-        data = json.loads(out)
-
-        return _check_package_in_json(data, "formulae") or _check_package_in_json(data, "casks")
-
-    def _current_package_is_outdated(self):
-        rc, out, err = self.module.run_command([
-            self.brew_path,
-            'outdated',
-            self.current_package,
-        ])
-
-        return rc != 0
-
-    # /checks ------------------------------------------------------ }}}
-
     # commands ----------------------------------------------------- {{{
     def _run(self):
         if self.update_homebrew:
