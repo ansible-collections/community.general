@@ -308,21 +308,6 @@ class Homebrew(object):
         self._params = self.module.params
         return self._params
 
-    @property
-    def current_package(self):
-        return self._current_package
-
-    @current_package.setter
-    def current_package(self, package):
-        if not HomebrewValidate.valid_package(package):
-            self._current_package = None
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(package)
-            raise HomebrewException(self.message)
-
-        else:
-            self._current_package = package
-            return package
     # /class properties -------------------------------------------- }}}
 
     def __init__(self, module, path, packages=None, state=None,
@@ -382,6 +367,20 @@ class Homebrew(object):
 
     def _status(self):
         return (self.failed, self.changed, self.message)
+
+    def _validate_packages_names(self):
+        invalid_packages = []
+        for package in self.packages:
+            if not HomebrewValidate.valid_package(package):
+                invalid_packages.append(package)
+
+        if invalid_packages:
+            self.failed = True
+            self.message = 'Invalid package{0}: {0}'.format(
+                "s" if len(invalid_packages) > 1 else "",
+                ", ".join(invalid_packages),
+            )
+            raise HomebrewException(self.message)
 
     def _get_packages_info(self):
         cmd = [
@@ -462,6 +461,7 @@ class Homebrew(object):
             self._upgrade_all()
 
         if self.packages:
+            self._validate_packages_names()
             self._get_packages_info()
             if self.state == 'installed':
                 return self._install_packages()
