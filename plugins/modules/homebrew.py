@@ -586,45 +586,6 @@ class Homebrew(object):
     # /installed ----------------------------- }}}
 
     # upgraded ------------------------------- {{{
-    def _upgrade_current_package(self):
-        command = 'upgrade'
-
-        current_package_is_installed = self._current_package_is_installed()
-        if not current_package_is_installed:
-            command = 'install'
-
-        if current_package_is_installed and not self._current_package_is_outdated():
-            self.message = 'Package is already upgraded: {0}'.format(
-                self.current_package,
-            )
-            self.unchanged_pkgs.append(self.current_package)
-            return True
-
-        if self.module.check_mode:
-            self.changed = True
-            self.message = 'Package would be upgraded: {0}'.format(
-                self.current_package
-            )
-            raise HomebrewException(self.message)
-
-        opts = (
-            [self.brew_path, command]
-            + self.install_options
-            + [self.current_package]
-        )
-        cmd = [opt for opt in opts if opt]
-        rc, out, err = self.module.run_command(cmd)
-
-        if rc == 0:
-            self.changed_pkgs.append(self.current_package)
-            self.changed = True
-            self.message = 'Package upgraded: {0}'.format(self.current_package)
-            return True
-        else:
-            self.failed = True
-            self.message = err.strip()
-            raise HomebrewException(self.message)
-
     def _upgrade_all_packages(self):
         opts = (
             [self.brew_path, 'upgrade']
@@ -646,10 +607,57 @@ class Homebrew(object):
         if not self.packages:
             self._upgrade_all_packages()
         else:
-            for package in self.packages:
-                self.current_package = package
-                self._upgrade_current_package()
-            return True
+            # There are 3 action possible here depending on installed and outdated states:
+            #   - not installed -> 'install'
+            #   - installed and outdated -> 'upgrade'
+            #   - installed and NOT outdated -> Nothing to do!
+            packages_to_install = set(self.packages) - self.installed_packages
+            packages_to_upgrade = self.installed_packages & self.outdated_packages
+            packages_to_install_or_upgrade = packages_to_install | packages_to_upgrade
+
+            if len(packages_to_install_or_upgrade) == 0:
+                self.unchanged_pkgs.extend(self.packages)
+                self.message = 'Package{0} already upgraded: {1}'.format(
+                    "s" if len(self.packages) > 1 else "",
+                    ", ".join(self.packages),
+                )
+                return True
+
+            if self.module.check_mode:
+                self.changed = True
+                self.message = 'Package{0} would be upgraded: {1}'.format(
+                    "s" if len(packages_to_install_or_upgrade) > 1 else "",
+                    ", ".join(packages_to_install_or_upgrade)
+                )
+                raise HomebrewException(self.message)
+
+            for command, packages in [
+                ("install", packages_to_install),
+                ("upgrade", packages_to_upgrade)
+            ]:
+                if not packages:
+                    continue
+
+                opts = (
+                    [self.brew_path, command]
+                    + self.install_options
+                    + list(packages)
+                )
+                cmd = [opt for opt in opts if opt]
+                rc, out, err = self.module.run_command(cmd)
+
+                if rc != 0:
+                    self.failed = True
+                    self.message = err.strip()
+                    raise HomebrewException(self.message)
+
+            self.changed_pkgs.extend(packages_to_install_or_upgrade)
+            self.unchanged_pkgs.extend(set(self.packages) - packages_to_install_or_upgrade)
+            self.changed = True
+            self.message = 'Package{0} upgraded: {1}'.format(
+                "s" if len(packages_to_install_or_upgrade) > 1 else "",
+                ", ".join(packages_to_install_or_upgrade),
+            )
     # /upgraded ------------------------------ }}}
 
     # uninstalled ---------------------------- {{{
