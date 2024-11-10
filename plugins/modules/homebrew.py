@@ -365,9 +365,6 @@ class Homebrew(object):
 
         return self.brew_path
 
-    def _status(self):
-        return (self.failed, self.changed, self.message)
-
     def _validate_packages_names(self):
         invalid_packages = []
         for package in self.packages:
@@ -411,6 +408,7 @@ class Homebrew(object):
             self._run()
         except HomebrewException:
             pass
+
         changed_count = len(self.changed_pkgs)
         unchanged_count = len(self.unchanged_pkgs)
         if not self.failed and (changed_count + unchanged_count > 1):
@@ -418,9 +416,7 @@ class Homebrew(object):
                 changed_count,
                 unchanged_count,
             )
-        (failed, changed, message) = self._status()
-
-        return (failed, changed, message)
+        return (self.failed, self.changed, self.message)
 
     # commands ----------------------------------------------------- {{{
     def _run(self):
