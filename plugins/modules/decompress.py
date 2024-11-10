@@ -11,32 +11,30 @@ from ansible.module_utils.basic import AnsibleModule
 
 @six.add_metaclass(abc.ABCMeta)
 class Decompress(abc.ABC):
-    @abc.abstractmethod
     def decompress(self, src, dest):
+        with self._compression_file(src) as src_file:
+            with open(dest, "wb") as dest_file:
+                shutil.copyfileobj(src_file, dest_file)
+
+    @abc.abstractmethod
+    def _compression_file(self, src):
         pass
 
 
 class GzDecompress(Decompress):
-    def decompress(self, src, dest):
-        with gzip.open(src, "rb") as src_file:
-            with open(dest, "wb") as dest_file:
-                shutil.copyfileobj(src_file, dest_file)
+    def _compression_file(self, src):
+        return gzip.open(src, "rb")
 
 
 class Bz2Decompress(Decompress):
 
-    def decompress(self, src, dest):
-        with bz2.open(src, "rb") as src_file:
-            with open(dest, "wb") as dest_file:
-                shutil.copyfileobj(src_file, dest_file)
+    def _compression_file(self, src):
+        return bz2.open(src, "rb")
 
 
 class LZMADecompress(Decompress):
-
-    def decompress(self, src, dest):
-        with lzma.open(src, "rb") as src_file:
-            with open(dest, "wb") as dest_file:
-                shutil.copyfileobj(src_file, dest_file)
+    def _compression_file(self, src):
+        return lzma.open(src, "rb")
 
 
 def main():
