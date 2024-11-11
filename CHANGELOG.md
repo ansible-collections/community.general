@@ -2,13 +2,16 @@
 
 **Topics**
 
-- <a href="#v10-0-0">v10\.0\.0</a>
+- <a href="#v10-0-1">v10\.0\.1</a>
     - <a href="#release-summary">Release Summary</a>
+    - <a href="#bugfixes">Bugfixes</a>
+- <a href="#v10-0-0">v10\.0\.0</a>
+    - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
     - <a href="#known-issues">Known Issues</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#filter">Filter</a>
@@ -16,10 +19,25 @@
     - <a href="#new-modules">New Modules</a>
 This changelog describes changes after version 9\.0\.0\.
 
+<a id="v10-0-1"></a>
+## v10\.0\.1
+
+<a id="release-summary"></a>
+### Release Summary
+
+Bugfix release for inclusion in Ansible 11\.0\.0rc1\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* keycloak\_client \- fix diff by removing code that turns the attributes dict which contains additional settings into a list \([https\://github\.com/ansible\-collections/community\.general/pull/9077](https\://github\.com/ansible\-collections/community\.general/pull/9077)\)\.
+* keycloak\_clientscope \- fix diff and <code>end\_state</code> by removing the code that turns the attributes dict\, which contains additional config items\, into a list \([https\://github\.com/ansible\-collections/community\.general/pull/9082](https\://github\.com/ansible\-collections/community\.general/pull/9082)\)\.
+* redfish\_utils module utils \- remove undocumented default applytime \([https\://github\.com/ansible\-collections/community\.general/pull/9114](https\://github\.com/ansible\-collections/community\.general/pull/9114)\)\.
+
 <a id="v10-0-0"></a>
 ## v10\.0\.0
 
-<a id="release-summary"></a>
+<a id="release-summary-1"></a>
 ### Release Summary
 
 This is release 10\.0\.0 of <code>community\.general</code>\, released on 2024\-11\-04\.
@@ -254,7 +272,7 @@ This is release 10\.0\.0 of <code>community\.general</code>\, released on 2024\-
 * proxmox\_kvm \- removed the <code>proxmox\_default\_behavior</code> option\. Explicitly specify the old default values if you were using <code>proxmox\_default\_behavior\=compatibility</code>\, otherwise simply remove it \([https\://github\.com/ansible\-collections/community\.general/pull/8918](https\://github\.com/ansible\-collections/community\.general/pull/8918)\)\.
 * redhat\_subscriptions \- removed the <code>pool</code> option\. Use <code>pool\_ids</code> instead \([https\://github\.com/ansible\-collections/community\.general/pull/8918](https\://github\.com/ansible\-collections/community\.general/pull/8918)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * bitwarden lookup plugin \- fix <code>KeyError</code> in <code>search\_field</code> \([https\://github\.com/ansible\-collections/community\.general/issues/8549](https\://github\.com/ansible\-collections/community\.general/issues/8549)\, [https\://github\.com/ansible\-collections/community\.general/pull/8557](https\://github\.com/ansible\-collections/community\.general/pull/8557)\)\.

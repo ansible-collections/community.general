@@ -6,6 +6,21 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.0.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release for inclusion in Ansible 11.0.0rc1.
+
+Bugfixes
+--------
+
+- keycloak_client - fix diff by removing code that turns the attributes dict which contains additional settings into a list (https://github.com/ansible-collections/community.general/pull/9077).
+- keycloak_clientscope - fix diff and ``end_state`` by removing the code that turns the attributes dict, which contains additional config items, into a list (https://github.com/ansible-collections/community.general/pull/9082).
+- redfish_utils module utils - remove undocumented default applytime (https://github.com/ansible-collections/community.general/pull/9114).
+
 v10.0.0
 =======
 
