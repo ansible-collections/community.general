@@ -317,9 +317,6 @@ def normalise_cr(clientscoperep, remove_ids=False):
     # Avoid the dict passed in to be modified
     clientscoperep = clientscoperep.copy()
 
-    if 'attributes' in clientscoperep:
-        clientscoperep['attributes'] = list(sorted(clientscoperep['attributes']))
-
     if 'protocolMappers' in clientscoperep:
         clientscoperep['protocolMappers'] = sorted(clientscoperep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
         for mapper in clientscoperep['protocolMappers']:
@@ -418,13 +415,6 @@ def main():
     for clientscope_param in clientscope_params:
         new_param_value = module.params.get(clientscope_param)
 
-        # some lists in the Keycloak API are sorted, some are not.
-        if isinstance(new_param_value, list):
-            if clientscope_param in ['attributes']:
-                try:
-                    new_param_value = sorted(new_param_value)
-                except TypeError:
-                    pass
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
         if clientscope_param == 'protocol_mappers':
