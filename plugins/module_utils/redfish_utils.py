@@ -1958,7 +1958,7 @@ class RedfishUtils(object):
         update_uri = data['MultipartHttpPushUri']
 
         # Assemble the JSON payload portion of the request
-        payload = {"@Redfish.OperationApplyTime": "Immediate"}
+        payload = {}
         if targets:
             payload["Targets"] = targets
         if apply_time:
