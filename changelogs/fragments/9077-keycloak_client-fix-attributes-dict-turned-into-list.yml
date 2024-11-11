@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_client - fix diff by removing code that turns the attributes dict which contains additional settings into a list (https://github.com/ansible-collections/community.general/pull/9077).
