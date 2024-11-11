@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_utils module utils - remove undocumented default applytime (https://github.com/ansible-collections/community.general/pull/9114).
