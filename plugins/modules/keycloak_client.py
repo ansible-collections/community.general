@@ -805,9 +805,6 @@ def normalise_cr(clientrep, remove_ids=False):
     # Avoid the dict passed in to be modified
     clientrep = clientrep.copy()
 
-    if 'attributes' in clientrep:
-        clientrep['attributes'] = list(sorted(clientrep['attributes']))
-
     if 'defaultClientScopes' in clientrep:
         clientrep['defaultClientScopes'] = list(sorted(clientrep['defaultClientScopes']))
 
@@ -1024,13 +1021,6 @@ def main():
     for client_param in client_params:
         new_param_value = module.params.get(client_param)
 
-        # some lists in the Keycloak API are sorted, some are not.
-        if isinstance(new_param_value, list):
-            if client_param in ['attributes']:
-                try:
-                    new_param_value = sorted(new_param_value)
-                except TypeError:
-                    pass
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
         if client_param == 'protocol_mappers':
