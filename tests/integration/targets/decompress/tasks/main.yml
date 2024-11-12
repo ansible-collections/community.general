@@ -1,0 +1,44 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Copy original file
+  copy:
+    src: file.txt
+    dest: "{{ remote_tmp_dir }}"
+
+- name: Calculate original file checksum
+  stat:
+    path: "{{ remote_tmp_dir }}/file.txt"
+  register: orig_file_stat
+
+- name: Copy test files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ remote_tmp_dir }}/{{ item }}"
+  with_items:
+    - file.txt.bz2
+    - file.txt.gz
+    - file.txt.xz
+
+- name: Simple decompress
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
+    format: gz
+
+- name: Assert that file exists
+  file:
+    path: "{{ remote_tmp_dir }}/file_from_gz.txt"
+    state: file
+
+- name: Calculate file checksum
+  stat:
+    path: "{{ remote_tmp_dir }}/file_from_gz.txt"
+  register: decompressed_file_stat
+
+- name: Check that file was decompressed correctly
+  assert:
+    that: orig_file_stat.stat.checksum == decompressed_file_stat.stat.checksum
+

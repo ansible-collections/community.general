@@ -46,26 +46,28 @@ def main():
         argument_spec=dict(
             src=dict(type='path', required=True),
             dest=dict(type='path', required=True),
-            format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz'])
-        )
+            format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz']),
+        ),
+        add_file_common_args=True
     )
 
     src = module.params['src']
     dest = module.params['dest']
     format = module.params['format']
-
-    src = os.path.abspath(src)
     dest = os.path.abspath(dest)
 
-    compressor = compressors[format]
+    changed = False
 
-    if compressor is not None:
-        obj = compressor()
-        obj.decompress(src, dest)
-        result['msg'] = 'success'
-        module.exit_json(**result)
-    else:
-        module.fail_json(msg="Compressor not found.")
+    file_args = module.load_file_common_arguments(module.params, path=dest)
+    compressor = compressors[format]
+    if compressor is None:
+        module.fail_json(msg=f"Couldn't decompress '{format}' format.")
+
+    obj = compressor()
+    obj.decompress(src, dest)
+    result['msg'] = 'success'
+    result['changed'] = module.set_fs_attributes_if_different(file_args, changed)
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
