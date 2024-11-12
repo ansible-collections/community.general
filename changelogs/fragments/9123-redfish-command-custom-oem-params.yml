@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_command - add update_custom_oem_header and update_custom_oem_params options (https://github.com/ansible-collections/community.general/pull/9123).

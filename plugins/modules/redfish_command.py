@@ -216,6 +216,24 @@ options:
       - Handle to check the status of an update in progress.
     type: str
     version_added: '6.1.0'
+  update_custom_oem_header:
+    required: false
+    description:
+      - Optional OEM header, sent as separate form-data for
+        the Multipart HTTP push update.
+      - The header shall start with "Oem" according to DMTF
+        Redfish spec 12.6.2.2.
+      - If set, then `update_custom_oem_params` is required too.
+    type: str
+    version_added: '10.1.0'
+  update_custom_oem_params:
+    required: false
+    description:
+      - Custom OEM properties for HTTP Multipart Push Updates.
+      - If set, then `update_custom_oem_header` is required too.
+      - The content will be sent as JSON with application/json MIME type.
+    type: dict
+    version_added: '10.1.0'
   virtual_media:
     required: false
     description:
@@ -654,6 +672,22 @@ EXAMPLES = '''
       update_oem_params:
         PreserveConfiguration: false
 
+  - name: Multipart HTTP push with custom OEM options
+    community.general.redfish_command:
+      category: Update
+      command: MultipartHTTPPushUpdate
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      update_image_file: ~/images/myupdate.img
+      update_targets:
+        - /redfish/v1/UpdateService/FirmwareInventory/BMC
+      update_oem_params:
+        PreserveConfiguration: false
+      update_custom_oem_header: OemParameters
+      update_custom_oem_params:
+        ImageType: BMC
+
   - name: Perform requested operations to continue the update
     community.general.redfish_command:
       category: Update
@@ -863,6 +897,8 @@ def main():
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
             update_oem_params=dict(type='dict'),
+            update_custom_oem_header=dict(type='str'),
+            update_custom_oem_params=dict(type='dict'),
             update_creds=dict(
                 type='dict',
                 options=dict(
@@ -895,6 +931,7 @@ def main():
         ),
         required_together=[
             ('username', 'password'),
+            ('update_custom_oem_header', 'update_custom_oem_params'),
         ],
         required_one_of=[
             ('username', 'auth_token'),
@@ -941,6 +978,8 @@ def main():
         'update_creds': module.params['update_creds'],
         'update_apply_time': module.params['update_apply_time'],
         'update_oem_params': module.params['update_oem_params'],
+        'update_custom_oem_header': module.params['update_custom_oem_header'],
+        'update_custom_oem_params': module.params['update_custom_oem_params'],
         'update_handle': module.params['update_handle'],
     }
 
