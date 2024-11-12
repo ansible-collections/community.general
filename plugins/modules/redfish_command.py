@@ -229,10 +229,21 @@ options:
   update_custom_oem_params:
     required: false
     description:
-      - Custom OEM properties for HTTP Multipart Push Updates.
+      - Custom OEM properties for HTTP Multipart Push updates.
       - If set, then `update_custom_oem_header` is required too.
-      - The content will be sent as JSON with application/json MIME type.
-    type: dict
+      - The properties will be passed raw without any validation or conversion by Ansible.
+        This means the content can be a file, a string, or any other data.
+        If the content is a dict that should be converted to JSON, then the
+        content must be converted to JSON before passing it to this module using the
+        `to_json` filter.
+    type: raw
+    version_added: '10.1.0'
+  update_custom_oem_mime_type:
+    required: false
+    description:
+      - MIME Type for custom OEM properties for HTTP Multipart
+        Push updates.
+    type: str
     version_added: '10.1.0'
   virtual_media:
     required: false
@@ -673,6 +684,9 @@ EXAMPLES = '''
         PreserveConfiguration: false
 
   - name: Multipart HTTP push with custom OEM options
+    vars:
+      oem_payload:
+        ImageType: BMC
     community.general.redfish_command:
       category: Update
       command: MultipartHTTPPushUpdate
@@ -682,11 +696,9 @@ EXAMPLES = '''
       update_image_file: ~/images/myupdate.img
       update_targets:
         - /redfish/v1/UpdateService/FirmwareInventory/BMC
-      update_oem_params:
-        PreserveConfiguration: false
       update_custom_oem_header: OemParameters
-      update_custom_oem_params:
-        ImageType: BMC
+      update_custom_oem_mime_type: "application/json"
+      update_custom_oem_params: "{{ oem_payload | to_json }}"
 
   - name: Perform requested operations to continue the update
     community.general.redfish_command:
@@ -898,7 +910,8 @@ def main():
             update_targets=dict(type='list', elements='str', default=[]),
             update_oem_params=dict(type='dict'),
             update_custom_oem_header=dict(type='str'),
-            update_custom_oem_params=dict(type='dict'),
+            update_custom_oem_mime_type=dict(type='str'),
+            update_custom_oem_params=dict(type='raw'),
             update_creds=dict(
                 type='dict',
                 options=dict(
@@ -980,6 +993,7 @@ def main():
         'update_oem_params': module.params['update_oem_params'],
         'update_custom_oem_header': module.params['update_custom_oem_header'],
         'update_custom_oem_params': module.params['update_custom_oem_params'],
+        'update_custom_oem_mime_type': module.params['update_custom_oem_mime_type'],
         'update_handle': module.params['update_handle'],
     }
 
