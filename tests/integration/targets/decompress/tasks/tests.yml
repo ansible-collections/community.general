@@ -1,0 +1,24 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Simple decompress ({{ format }} test)
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.{{ format }}"
+    dest: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+    format: "{{ format }}"
+
+- name: Assert that file exists ({{ format }} test)
+  file:
+    path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+    state: file
+
+- name: Calculate file checksums ({{ format }} test)
+  stat:
+    path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+  register: decompressed_file_stat
+
+- name: Check that file was decompressed correctly ({{ format }} test)
+  assert:
+    that: orig_file_stat.stat.checksum == decompressed_file_stat.stat.checksum

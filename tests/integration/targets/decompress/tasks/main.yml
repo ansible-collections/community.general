@@ -22,23 +22,17 @@
     - file.txt.gz
     - file.txt.xz
 
-- name: Simple decompress
-  community.general.decompress:
-    src: "{{ remote_tmp_dir }}/file.txt.gz"
-    dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
-    format: gz
+- name: Set supported formats
+  set_fact:
+    formats:
+      - bz2
+      - gz
+      - xz
 
-- name: Assert that file exists
-  file:
-    path: "{{ remote_tmp_dir }}/file_from_gz.txt"
-    state: file
-
-- name: Calculate file checksum
-  stat:
-    path: "{{ remote_tmp_dir }}/file_from_gz.txt"
-  register: decompressed_file_stat
-
-- name: Check that file was decompressed correctly
-  assert:
-    that: orig_file_stat.stat.checksum == decompressed_file_stat.stat.checksum
-
+# Run tests
+- name: Run tests
+  include_tasks:
+    file: tests.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
