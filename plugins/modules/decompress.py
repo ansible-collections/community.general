@@ -4,9 +4,11 @@ import gzip
 import lzma
 import os
 import shutil
+import tempfile
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_native
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -66,7 +68,16 @@ def main():
         module.fail_json(msg=f"Couldn't decompress '{format}' format.")
 
     obj = compressor()
-    obj.decompress(src, dest)
+    try:
+        tempd, temppath = tempfile.mkstemp()
+        obj.decompress(src, tempd)
+    except OSError as e:
+        module.fail_json(msg="Unable to create temporary file %s" % to_native(e))
+
+    try:
+        module.atomic_move(temppath, dest)
+    except OSError:
+        module.fail_json(msg="Unable to move temporary file %s to %s" % (temppath, dest))
     result['msg'] = 'success'
     result['changed'] = module.set_fs_attributes_if_different(file_args, changed)
     module.exit_json(**result)
