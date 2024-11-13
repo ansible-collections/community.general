@@ -52,6 +52,8 @@ def main():
     )
 
     src = module.params['src']
+    if not os.path.exists(src):
+        module.fail_json(msg="Path does not exist: %s" % src)
     dest = module.params['dest']
     format = module.params['format']
     dest = os.path.abspath(dest)
