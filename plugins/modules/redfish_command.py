@@ -223,19 +223,20 @@ options:
         the Multipart HTTP push update.
       - The header shall start with "Oem" according to DMTF
         Redfish spec 12.6.2.2.
-      - If set, then `update_custom_oem_params` is required too.
+      - For more details, see U(https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.21.0.html)
+      - If set, then O(update_custom_oem_params) is required too.
     type: str
     version_added: '10.1.0'
   update_custom_oem_params:
     required: false
     description:
       - Custom OEM properties for HTTP Multipart Push updates.
-      - If set, then `update_custom_oem_header` is required too.
+      - If set, then O(update_custom_oem_header) is required too.
       - The properties will be passed raw without any validation or conversion by Ansible.
         This means the content can be a file, a string, or any other data.
         If the content is a dict that should be converted to JSON, then the
         content must be converted to JSON before passing it to this module using the
-        `to_json` filter.
+        P(ansible.builtin.to_json#filter) filter.
     type: raw
     version_added: '10.1.0'
   update_custom_oem_mime_type:
