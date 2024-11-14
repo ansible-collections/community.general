@@ -350,8 +350,8 @@ class JenkinsPlugin(object):
         self.params = self.module.params
         self.url = self.params['url']
         self.timeout = self.params['timeout']
-        self.username = self.params['username']
-        self.password = self.params['password']
+        self.username = self.params['url_username']
+        self.password = self.params['url_password']
         self.force_basic_auth = self.params['force_basic_auth']
 
         # Crumb
@@ -366,8 +366,8 @@ class JenkinsPlugin(object):
         # Get list of installed plugins
         self._get_installed_plugins()
 
-    def _create_basic_auth_header(username, password):
-        credentials = f"{username}:{password}"
+    def _create_basic_auth_header(self):
+        credentials = f"{self.username}:{self.password}"
 
         encoded_credentials = base64.b64encode(credentials.encode("utf-8")).decode("utf-8")
 
@@ -451,7 +451,7 @@ class JenkinsPlugin(object):
 
         # If force_basic_auth is True, add the Authorization header
         if self.force_basic_auth:
-            headers["Authorization"] = self._create_basic_auth_header(self.username, self.password)
+            headers["Authorization"] = self._create_basic_auth_header()
 
         # Get the URL data
         try:
