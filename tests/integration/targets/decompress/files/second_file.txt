@@ -1,0 +1,1 @@
+Content of this file must differ from the 'file.txt'

@@ -1,5 +1,6 @@
 import abc
 import bz2
+import filecmp
 import gzip
 import lzma
 import os
@@ -39,6 +40,10 @@ class LZMADecompress(Decompress):
         return lzma.open(src, "rb")
 
 
+def is_dest_changed(src, dest):
+    return not filecmp.cmp(src, dest, shallow=False)
+
+
 def main():
     result = dict(changed=False, diff=dict(before=dict(), after=dict()))
 
@@ -60,8 +65,6 @@ def main():
     format = module.params['format']
     dest = os.path.abspath(dest)
 
-    changed = False
-
     file_args = module.load_file_common_arguments(module.params, path=dest)
     compressor = compressors[format]
     if compressor is None:
@@ -69,15 +72,23 @@ def main():
 
     obj = compressor()
     try:
-        tempd, temppath = tempfile.mkstemp()
+        tempd, temppath = tempfile.mkstemp(dir=module.tmpdir)
         obj.decompress(src, tempd)
     except OSError as e:
         module.fail_json(msg="Unable to create temporary file %s" % to_native(e))
 
-    try:
-        module.atomic_move(temppath, dest)
-    except OSError:
-        module.fail_json(msg="Unable to move temporary file %s to %s" % (temppath, dest))
+    if os.path.exists(dest):
+        changed = is_dest_changed(temppath, dest)
+    else:
+        changed = True
+    if changed:
+        try:
+            module.atomic_move(temppath, dest)
+        except OSError:
+            module.fail_json(msg="Unable to move temporary file %s to %s" % (temppath, dest))
+
+    if os.path.exists(temppath):
+        os.unlink(temppath)
     result['msg'] = 'success'
     result['changed'] = module.set_fs_attributes_if_different(file_args, changed)
     module.exit_json(**result)

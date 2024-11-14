@@ -3,24 +3,15 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Copy original file
+- name: Copy test files
   copy:
-    src: file.txt
+    src: "files/"
     dest: "{{ remote_tmp_dir }}"
 
-- name: Calculate original file checksum
+- name: Get original file stat
   stat:
     path: "{{ remote_tmp_dir }}/file.txt"
   register: orig_file_stat
-
-- name: Copy test files
-  copy:
-    src: "{{ item }}"
-    dest: "{{ remote_tmp_dir }}/{{ item }}"
-  with_items:
-    - file.txt.bz2
-    - file.txt.gz
-    - file.txt.xz
 
 - name: Set supported formats
   set_fact:
