@@ -1,4 +1,3 @@
-import abc
 import bz2
 import filecmp
 import gzip
@@ -7,37 +6,26 @@ import os
 import shutil
 import tempfile
 
-from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Decompress(abc.ABC):
-    def decompress(self, src, dest):
-        with self._compression_file(src) as src_file:
-            with open(dest, "wb") as dest_file:
-                shutil.copyfileobj(src_file, dest_file)
-
-    @abc.abstractmethod
-    def _compression_file(self, src):
-        pass
+def lzma_decompress(src):
+    return lzma.open(src, "rb")
 
 
-class GzDecompress(Decompress):
-    def _compression_file(self, src):
-        return gzip.open(src, "rb")
+def bz2_decompress(src):
+    return bz2.open(src, "rb")
 
 
-class Bz2Decompress(Decompress):
-
-    def _compression_file(self, src):
-        return bz2.open(src, "rb")
+def gzip_decompress(src):
+    return gzip.open(src, "rb")
 
 
-class LZMADecompress(Decompress):
-    def _compression_file(self, src):
-        return lzma.open(src, "rb")
+def decompress(src, dest, handler):
+    with handler(src) as src_file:
+        with open(dest, "wb") as dest_file:
+            shutil.copyfileobj(src_file, dest_file)
 
 
 def is_dest_changed(src, dest):
@@ -47,7 +35,7 @@ def is_dest_changed(src, dest):
 def main():
     result = dict(changed=False, diff=dict(before=dict(), after=dict()))
 
-    compressors = {"gz": GzDecompress, "bz2": Bz2Decompress, "xz": LZMADecompress}
+    compressors = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
 
     module = AnsibleModule(
         argument_spec=dict(
@@ -63,17 +51,15 @@ def main():
         module.fail_json(msg="Path does not exist: %s" % src)
     dest = module.params['dest']
     format = module.params['format']
+    if format not in compressors:
+        module.fail_json(msg=f"Couldn't decompress '%s' format." % format)
     dest = os.path.abspath(dest)
 
     file_args = module.load_file_common_arguments(module.params, path=dest)
-    compressor = compressors[format]
-    if compressor is None:
-        module.fail_json(msg=f"Couldn't decompress '{format}' format.")
-
-    obj = compressor()
+    handler = compressors[format]
     try:
         tempd, temppath = tempfile.mkstemp(dir=module.tmpdir)
-        obj.decompress(src, tempd)
+        decompress(src, tempd, handler)
     except OSError as e:
         module.fail_json(msg="Unable to create temporary file %s" % to_native(e))
 
