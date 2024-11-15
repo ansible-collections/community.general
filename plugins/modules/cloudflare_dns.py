@@ -324,6 +324,16 @@ record:
     returned: success, except on record deletion
     type: complex
     contains:
+        comment:
+            description: Comments or notes about the DNS record.
+            returned: success
+            type: str
+            sample: Domain verification record
+        comment_modified_on:
+            description: When the record comment was last modified. Omitted if there is no comment.
+            returned: success
+            type: str
+            sample: 2024-01-01T05:20:00.12345Z
         content:
             description: The record content (details depend on record type).
             returned: success
@@ -358,7 +368,7 @@ record:
             type: bool
             sample: false
         meta:
-            description: No documentation available.
+            description: Extra Cloudflare-specific information about the record.
             returned: success
             type: dict
             sample: { auto_added: false }
@@ -387,6 +397,17 @@ record:
             returned: success
             type: bool
             sample: false
+        tags:
+            description: Custom tags for the DNS record.
+            returned: success
+            type: list
+            elements: str
+            sample: ['production', 'app']
+        tags_modified_on:
+            description: When the record tags were last modified. Omitted if there are no tags.
+            returned: success
+            type: str
+            sample: 2025-01-01T05:20:00.12345Z
         ttl:
             description: The time-to-live for the record.
             returned: success
