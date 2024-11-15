@@ -57,6 +57,12 @@ options:
     - Required for O(type=TLSA) when O(state=present).
     type: int
     choices: [ 0, 1, 2, 3 ]
+  comment:
+    description:
+    - Comments or notes about the DNS record.
+    type: str
+    required: false
+    version_added: 10.1.0
   flag:
     description:
     - Issuer Critical Flag.
@@ -134,6 +140,13 @@ options:
     type: str
     choices: [ absent, present ]
     default: present
+  tags:
+    description:
+    - Custom tags for the DNS record.
+    type: list
+    elements: str
+    required: false
+    version_added: 10.1.0
   timeout:
     description:
     - Timeout for Cloudflare API calls.
@@ -189,6 +202,18 @@ EXAMPLES = r'''
     record: test
     type: A
     value: 127.0.0.1
+    api_token: dummyapitoken
+
+- name: Create a record with comment and tags
+  community.general.cloudflare_dns:
+    zone: example.net
+    record: test
+    type: A
+    value: 127.0.0.1
+    comment: Local test website
+    tags:
+    - test
+    - local
     api_token: dummyapitoken
 
 - name: Create a example.net CNAME record to example.com
@@ -410,9 +435,11 @@ class CloudflareAPI(object):
         self.account_email = module.params['account_email']
         self.algorithm = module.params['algorithm']
         self.cert_usage = module.params['cert_usage']
+        self.comment = module.params['comment']
         self.hash_type = module.params['hash_type']
         self.flag = module.params['flag']
         self.tag = module.params['tag']
+        self.tags = module.params['tags']
         self.key_tag = module.params['key_tag']
         self.port = module.params['port']
         self.priority = module.params['priority']
@@ -662,7 +689,7 @@ class CloudflareAPI(object):
     def ensure_dns_record(self, **kwargs):
         params = {}
         for param in ['port', 'priority', 'proto', 'proxied', 'service', 'ttl', 'type', 'record', 'value', 'weight', 'zone',
-                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'flag', 'tag']:
+                      'algorithm', 'cert_usage', 'hash_type', 'selector', 'key_tag', 'flag', 'tag', 'tags', 'comment']:
             if param in kwargs:
                 params[param] = kwargs[param]
             else:
@@ -798,6 +825,9 @@ class CloudflareAPI(object):
             }
             search_value = None
 
+        new_record['comment'] = params['comment'] or ""
+        new_record['tags'] = params['tags'] or []
+
         zone_id = self._get_zone_id(params['zone'])
         records = self.get_dns_records(params['zone'], params['type'], search_record, search_value)
         # in theory this should be impossible as cloudflare does not allow
@@ -825,6 +855,10 @@ class CloudflareAPI(object):
                 if (cur_record['data'] != new_record['data']):
                     do_update = True
             if (params['type'] == 'CNAME') and (cur_record['content'] != new_record['content']):
+                do_update = True
+            if cur_record['comment'] != new_record['comment']:
+                do_update = True
+            if sorted(cur_record['tags']) != sorted(new_record['tags']):
                 do_update = True
             if do_update:
                 if self.module.check_mode:
@@ -856,11 +890,13 @@ def main():
             account_email=dict(type='str', required=False),
             algorithm=dict(type='int'),
             cert_usage=dict(type='int', choices=[0, 1, 2, 3]),
+            comment=dict(type='str'),
             hash_type=dict(type='int', choices=[1, 2]),
             key_tag=dict(type='int', no_log=False),
             port=dict(type='int'),
             flag=dict(type='int', choices=[0, 1]),
             tag=dict(type='str', choices=['issue', 'issuewild', 'iodef']),
+            tags=dict(type='list', elements='str'),
             priority=dict(type='int', default=1),
             proto=dict(type='str'),
             proxied=dict(type='bool', default=False),
