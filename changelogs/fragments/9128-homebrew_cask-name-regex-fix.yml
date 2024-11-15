@@ -1,2 +1,2 @@
 bugfixes:
-  - homebrew_cask - allow ``+`` symbol in homebrew cask name validation regex (https://github.com/ansible-collections/community.general/pull/9128).
+  - homebrew_cask - allow ``+`` symbol in Homebrew cask name validation regex (https://github.com/ansible-collections/community.general/pull/9128).
