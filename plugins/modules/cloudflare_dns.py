@@ -333,7 +333,7 @@ record:
             description: When the record comment was last modified. Omitted if there is no comment.
             returned: success
             type: str
-            sample: 2024-01-01T05:20:00.12345Z
+            sample: "2024-01-01T05:20:00.12345Z"
         content:
             description: The record content (details depend on record type).
             returned: success
@@ -407,7 +407,7 @@ record:
             description: When the record tags were last modified. Omitted if there are no tags.
             returned: success
             type: str
-            sample: 2025-01-01T05:20:00.12345Z
+            sample: "2025-01-01T05:20:00.12345Z"
         ttl:
             description: The time-to-live for the record.
             returned: success
