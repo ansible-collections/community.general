@@ -31,7 +31,6 @@ options:
     - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
     - Can be specified in E(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
     type: str
-    required: false
     version_added: '0.2.0'
   account_api_key:
     description:
@@ -39,13 +38,11 @@ options:
     - Required for api keys authentication.
     - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
     type: str
-    required: false
     aliases: [ account_api_token ]
   account_email:
     description:
     - Account email. Required for API keys authentication.
     type: str
-    required: false
   algorithm:
     description:
     - Algorithm number.
@@ -61,7 +58,6 @@ options:
     description:
     - Comments or notes about the DNS record.
     type: str
-    required: false
     version_added: 10.1.0
   flag:
     description:
@@ -145,7 +141,6 @@ options:
     - Custom tags for the DNS record.
     type: list
     elements: str
-    required: false
     version_added: 10.1.0
   timeout:
     description:
