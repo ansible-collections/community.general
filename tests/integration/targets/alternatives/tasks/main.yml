@@ -58,6 +58,12 @@
     - include_tasks: remove_links.yml
     - include_tasks: tests_state.yml
 
+  # Test for the family parameter
+  - block:
+      - include_tasks: remove_links.yml
+      - include_tasks: tests_family.yml
+    when: ansible_os_family == 'RedHat'
+
   # Cleanup
   always:
     - include_tasks: remove_links.yml
