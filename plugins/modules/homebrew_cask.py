@@ -190,6 +190,7 @@ class HomebrewCask(object):
         /                   # slash (for taps)
         \-                  # dashes
         @                   # at symbol
+        \+                  # plus symbol
     '''
 
     INVALID_CASK_REGEX = _create_regex_group_complement(VALID_CASK_CHARS)
