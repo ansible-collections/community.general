@@ -216,6 +216,36 @@ options:
       - Handle to check the status of an update in progress.
     type: str
     version_added: '6.1.0'
+  update_custom_oem_header:
+    required: false
+    description:
+      - Optional OEM header, sent as separate form-data for
+        the Multipart HTTP push update.
+      - The header shall start with "Oem" according to DMTF
+        Redfish spec 12.6.2.2.
+      - For more details, see U(https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.21.0.html)
+      - If set, then O(update_custom_oem_params) is required too.
+    type: str
+    version_added: '10.1.0'
+  update_custom_oem_params:
+    required: false
+    description:
+      - Custom OEM properties for HTTP Multipart Push updates.
+      - If set, then O(update_custom_oem_header) is required too.
+      - The properties will be passed raw without any validation or conversion by Ansible.
+        This means the content can be a file, a string, or any other data.
+        If the content is a dict that should be converted to JSON, then the
+        content must be converted to JSON before passing it to this module using the
+        P(ansible.builtin.to_json#filter) filter.
+    type: raw
+    version_added: '10.1.0'
+  update_custom_oem_mime_type:
+    required: false
+    description:
+      - MIME Type for custom OEM properties for HTTP Multipart
+        Push updates.
+    type: str
+    version_added: '10.1.0'
   virtual_media:
     required: false
     description:
@@ -654,6 +684,23 @@ EXAMPLES = '''
       update_oem_params:
         PreserveConfiguration: false
 
+  - name: Multipart HTTP push with custom OEM options
+    vars:
+      oem_payload:
+        ImageType: BMC
+    community.general.redfish_command:
+      category: Update
+      command: MultipartHTTPPushUpdate
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      update_image_file: ~/images/myupdate.img
+      update_targets:
+        - /redfish/v1/UpdateService/FirmwareInventory/BMC
+      update_custom_oem_header: OemParameters
+      update_custom_oem_mime_type: "application/json"
+      update_custom_oem_params: "{{ oem_payload | to_json }}"
+
   - name: Perform requested operations to continue the update
     community.general.redfish_command:
       category: Update
@@ -863,6 +910,9 @@ def main():
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
             update_oem_params=dict(type='dict'),
+            update_custom_oem_header=dict(type='str'),
+            update_custom_oem_mime_type=dict(type='str'),
+            update_custom_oem_params=dict(type='raw'),
             update_creds=dict(
                 type='dict',
                 options=dict(
@@ -895,6 +945,7 @@ def main():
         ),
         required_together=[
             ('username', 'password'),
+            ('update_custom_oem_header', 'update_custom_oem_params'),
         ],
         required_one_of=[
             ('username', 'auth_token'),
@@ -941,6 +992,9 @@ def main():
         'update_creds': module.params['update_creds'],
         'update_apply_time': module.params['update_apply_time'],
         'update_oem_params': module.params['update_oem_params'],
+        'update_custom_oem_header': module.params['update_custom_oem_header'],
+        'update_custom_oem_params': module.params['update_custom_oem_params'],
+        'update_custom_oem_mime_type': module.params['update_custom_oem_mime_type'],
         'update_handle': module.params['update_handle'],
     }
 
