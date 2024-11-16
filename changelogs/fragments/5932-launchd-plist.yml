@@ -1,0 +1,2 @@
+minor_changes:
+  - launchd - add ``plist`` option for services such as sshd, where the plist filename doesn't match the service name (https://github.com/ansible-collections/community.general/pull/9102).
