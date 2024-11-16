@@ -329,11 +329,13 @@ record:
             returned: success
             type: str
             sample: Domain verification record
+            version_added: 10.1.0
         comment_modified_on:
             description: When the record comment was last modified. Omitted if there is no comment.
             returned: success
             type: str
             sample: "2024-01-01T05:20:00.12345Z"
+            version_added: 10.1.0
         content:
             description: The record content (details depend on record type).
             returned: success
@@ -403,11 +405,13 @@ record:
             type: list
             elements: str
             sample: ['production', 'app']
+            version_added: 10.1.0
         tags_modified_on:
             description: When the record tags were last modified. Omitted if there are no tags.
             returned: success
             type: str
             sample: "2025-01-01T05:20:00.12345Z"
+            version_added: 10.1.0
         ttl:
             description: The time-to-live for the record.
             returned: success
