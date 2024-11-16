@@ -30,6 +30,12 @@ options:
       - Name of the service.
       type: str
       required: true
+    plist:
+      description:
+      - Name of the V(.plist) file for the service.
+      - Defaults to V({name}.plist).
+      type: str
+      version_added: 10.1.0
     state:
       description:
       - V(started)/V(stopped) are idempotent actions that will not run
@@ -100,6 +106,12 @@ EXAMPLES = r'''
   community.general.launchd:
     name: org.memcached
     state: unloaded
+
+- name: restart sshd
+  community.general.launchd:
+    name: com.openssh.sshd
+    plist: ssh.plist
+    state: restarted
 '''
 
 RETURN = r'''
@@ -145,25 +157,31 @@ class ServiceState:
 
 
 class Plist:
-    def __init__(self, module, service):
+    def __init__(self, module, service, filename=None):
         self.__changed = False
         self.__service = service
+        if filename is not None:
+            self.__filename = filename
+        else:
+            self.__filename = '%s.plist' % service
 
         state, pid, dummy, dummy = LaunchCtlList(module, self.__service).run()
 
         # Check if readPlist is available or not
         self.old_plistlib = hasattr(plistlib, 'readPlist')
 
-        self.__file = self.__find_service_plist(self.__service)
+        self.__file = self.__find_service_plist(self.__filename)
         if self.__file is None:
-            msg = 'Unable to infer the path of %s service plist file' % self.__service
+            msg = 'Unable to find the plist file %s for service %s' % (
+                self.__filename, self.__service,
+            )
             if pid is None and state == ServiceState.UNLOADED:
                 msg += ' and it was not found among active services'
             module.fail_json(msg=msg)
         self.__update(module)
 
     @staticmethod
-    def __find_service_plist(service_name):
+    def __find_service_plist(filename):
         """Finds the plist file associated with a service"""
 
         launchd_paths = [
@@ -180,7 +198,6 @@ class Plist:
             except OSError:
                 continue
 
-            filename = '%s.plist' % service_name
             if filename in files:
                 return os.path.join(path, filename)
         return None
@@ -461,6 +478,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
+            plist=dict(type='str'),
             state=dict(type='str', choices=['reloaded', 'restarted', 'started', 'stopped', 'unloaded']),
             enabled=dict(type='bool'),
             force_stop=dict(type='bool', default=False),
@@ -472,6 +490,7 @@ def main():
     )
 
     service = module.params['name']
+    plist_filename = module.params['plist']
     action = module.params['state']
     rc = 0
     out = err = ''
@@ -483,7 +502,7 @@ def main():
 
     # We will tailor the plist file in case one of the options
     # (enabled, force_stop) was specified.
-    plist = Plist(module, service)
+    plist = Plist(module, service, plist_filename)
     result['changed'] = plist.is_changed()
 
     # Gather information about the service to be controlled.
