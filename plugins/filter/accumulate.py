@@ -4,16 +4,16 @@
 
 DOCUMENTATION = '''
   name: accumulate
-  short_description: Produce a list of accumulated sums of the input list contents.
-  version_added: 10.0.0
+  short_description: Produce a list of accumulated sums of the input list contents
+  version_added: 10.1.0
   author: Max Gautier (@VannTen)
   description:
-    - Passthrough to L(python itertools.accumulate function,https://docs.python.org/3/library/itertools.html#itertools.accumulate).
+    - Passthrough to the L(Python itertools.accumulate function,https://docs.python.org/3/library/itertools.html#itertools.accumulate).
     - Transforms an input list into the cumulative list of results from applying addition to the elements of the input list.
-    - Addition means the default python implementation of '+' for input list elements type.
+    - Addition means the default Python implementation of C('+') for input list elements type.
   options:
     _input:
-      description: A list
+      description: A list.
       type: list
       elements: any
       required: true
@@ -21,8 +21,9 @@ DOCUMENTATION = '''
 
 RETURN = '''
   _value:
-    description: A list of cumulated sums of the elements of the input list
+    description: A list of cumulated sums of the elements of the input list.
     type: list
+    elements: any
 '''
 
 EXAMPLES = '''
@@ -31,7 +32,7 @@ EXAMPLES = '''
     var: >
        "/some/path/to/my/file"
        | split('/') | map('split', '/')
-       | community.general.enumerate | map('join', '/')
+       | community.general.accumulate | map('join', '/')
     # Produces: ['', '/some', '/some/path', '/some/path/to', '/some/path/to/my', '/some/path/to/my/file']
 '''
 
