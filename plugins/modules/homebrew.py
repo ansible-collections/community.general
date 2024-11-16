@@ -401,11 +401,6 @@ class Homebrew(object):
 
     # checks ------------------------------------------------------- {{{
     def _current_package_is_installed(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
         cmd = [
             "{brew_path}".format(brew_path=self.brew_path),
             "info",
@@ -424,9 +419,6 @@ class Homebrew(object):
         return _check_package_in_json(data, "formulae") or _check_package_in_json(data, "casks")
 
     def _current_package_is_outdated(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            return False
-
         rc, out, err = self.module.run_command([
             self.brew_path,
             'outdated',
@@ -436,9 +428,7 @@ class Homebrew(object):
         return rc != 0
 
     def _current_package_is_installed_from_head(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            return False
-        elif not self._current_package_is_installed():
+        if not self._current_package_is_installed():
             return False
 
         rc, out, err = self.module.run_command([
@@ -534,11 +524,6 @@ class Homebrew(object):
 
     # installed ------------------------------ {{{
     def _install_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
         if self._current_package_is_installed():
             self.unchanged_count += 1
             self.unchanged_pkgs.append(self.current_package)
@@ -594,11 +579,6 @@ class Homebrew(object):
     # upgraded ------------------------------- {{{
     def _upgrade_current_package(self):
         command = 'upgrade'
-
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
 
         current_package_is_installed = self._current_package_is_installed()
         if not current_package_is_installed:
@@ -667,11 +647,6 @@ class Homebrew(object):
 
     # uninstalled ---------------------------- {{{
     def _uninstall_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
         if not self._current_package_is_installed():
             self.unchanged_count += 1
             self.unchanged_pkgs.append(self.current_package)
@@ -716,11 +691,6 @@ class Homebrew(object):
 
     # linked --------------------------------- {{{
     def _link_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
         if not self._current_package_is_installed():
             self.failed = True
             self.message = 'Package not installed: {0}.'.format(self.current_package)
@@ -763,11 +733,6 @@ class Homebrew(object):
 
     # unlinked ------------------------------- {{{
     def _unlink_current_package(self):
-        if not HomebrewValidate.valid_package(self.current_package):
-            self.failed = True
-            self.message = 'Invalid package: {0}.'.format(self.current_package)
-            raise HomebrewException(self.message)
-
         if not self._current_package_is_installed():
             self.failed = True
             self.message = 'Package not installed: {0}.'.format(self.current_package)

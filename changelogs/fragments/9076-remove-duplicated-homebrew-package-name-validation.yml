@@ -1,0 +1,2 @@
+minor_changes:
+  - homebrew - remove duplicated package name validation (https://github.com/ansible-collections/community.general/pull/9076).
