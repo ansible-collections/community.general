@@ -961,6 +961,7 @@ options:
             - 'For instance to configure a listen port:
               V({listen-port: 12345}).'
         type: dict
+        required: false
         version_added: 4.3.0
         suboptions:
             fwmark:
@@ -1483,11 +1484,11 @@ EXAMPLES = r'''
     ifname: mywg0
     wireguard:
         listen-port: 51820
-        private-key: my-private-key
-        peer-public-key: "your_peer_public_key"
-        peer-allowed-ips: "10.0.0.2/32"
-        peer-endpoint: "192.168.1.1:51820"
-        peer-persistent-keepalive: 25
+        private_key: my-private-key
+        peer_public_key: "{{ peer_public_key }}"
+        peer_allowed_ips: "10.0.0.2/32"
+        peer_endpoint: "192.168.1.1:51820"
+        peer_persistent_keepalive: 25
     autoconnect: true
     state: present
 
@@ -1938,12 +1939,12 @@ class Nmcli(object):
                     })
             elif self.state == 'present':
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
-        elif self.type == 'wireguard':
+        elif self.type == 'wireguard':        
             if self.wireguard:
-                for name, value in self.wireguard.items():
-                    options.update({
-                        'wireguard.%s' % name: value,
-                    })
+                for key, value in self.wireguard.items():
+                    if value is not None:
+                        nmcli_key = 'wireguard.%s' % key.replace('_', '-')
+                        options[nmcli_key] = value
         elif self.type == 'vpn':
             if self.vpn:
                 vpn_data_values = ''
@@ -2624,7 +2625,7 @@ def main():
                               parent=dict(type='str', required=True),
                               promiscuous=dict(type='bool'),
                               tap=dict(type='bool'))),
-            wireguard=dict(type='dict'),
+            wireguard=dict(type='dict', required=False),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),

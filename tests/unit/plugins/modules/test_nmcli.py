@@ -1350,6 +1350,10 @@ TESTCASE_WIREGUARD = [
         'wireguard': {
             'listen-port': '51820',
             'private-key': '<hidden>',
+            'peer_public_key': 'publickey123',
+            'peer_allowed_ips': '10.0.0.2/32',
+            'peer_endpoint': '192.168.1.1:51820',
+            'peer_persistent_keepalive': 25
         },
         'method4': 'manual',
         'ip4': '10.10.10.10/24',
@@ -4038,7 +4042,11 @@ def test_create_wireguard(mocked_generic_connection_create, capfd):
                   'ipv6.method', 'manual',
                   'ipv6.addresses', '2001:db8::1/128',
                   'wireguard.listen-port', '51820',
-                  'wireguard.private-key', '<hidden>']:
+                  'wireguard.private-key', '<hidden>',
+                  'wireguard.peer-public-key', 'publickey123',
+                  'wireguard.peer-allowed-ips', '10.0.0.2/32',
+                  'wireguard.peer-endpoint', '192.168.1.1:51820',
+                  'wireguard.peer-persistent-keepalive', '25']:
         assert param in add_args_text
 
     out, err = capfd.readouterr()
