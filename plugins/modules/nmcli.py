@@ -1939,7 +1939,7 @@ class Nmcli(object):
                     })
             elif self.state == 'present':
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
-        elif self.type == 'wireguard':        
+        elif self.type == 'wireguard':
             if self.wireguard:
                 for key, value in self.wireguard.items():
                     if value is not None:
