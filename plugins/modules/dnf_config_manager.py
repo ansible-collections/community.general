@@ -153,7 +153,7 @@ def get_repo_states(module):
 
 
 def set_repo_states(module, repo_ids, state):
-    module.run_command([DNF_BIN, 'config-manager', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
+    module.run_command([DNF_BIN, 'config-manager', '--assumeyes', '--set-{0}'.format(state)] + repo_ids, check_rc=True)
 
 
 def pack_repo_states_for_return(states):

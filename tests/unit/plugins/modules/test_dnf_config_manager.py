@@ -254,8 +254,8 @@ expected_repo_states_crb_disabled = {'disabled': ['appstream-debuginfo',
                                                  'rpmfusion-nonfree-updates']}
 
 call_get_repo_states = call(['/usr/bin/dnf', 'repolist', '--all', '--verbose'], check_rc=True)
-call_disable_crb = call(['/usr/bin/dnf', 'config-manager', '--set-disabled', 'crb'], check_rc=True)
-call_enable_crb = call(['/usr/bin/dnf', 'config-manager', '--set-enabled', 'crb'], check_rc=True)
+call_disable_crb = call(['/usr/bin/dnf', 'config-manager', '--assumeyes', '--set-disabled', 'crb'], check_rc=True)
+call_enable_crb = call(['/usr/bin/dnf', 'config-manager', '--assumeyes', '--set-enabled', 'crb'], check_rc=True)
 
 
 class TestDNFConfigManager(ModuleTestCase):
