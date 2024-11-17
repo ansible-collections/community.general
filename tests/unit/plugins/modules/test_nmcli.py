@@ -4065,6 +4065,7 @@ def test_wireguard_connection_unchanged(mocked_wireguard_connection_unchanged, c
 
     out, err = capfd.readouterr()
     results = json.loads(out)
+    print("Results:", results)
     assert not results.get('failed')
     assert not results['changed']
 
