@@ -43,7 +43,8 @@ def main():
             dest=dict(type='path', required=True),
             format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz']),
         ),
-        add_file_common_args=True
+        add_file_common_args=True,
+        supports_check_mode=True
     )
 
     src = module.params['src']
@@ -67,7 +68,7 @@ def main():
         changed = is_dest_changed(temppath, dest)
     else:
         changed = True
-    if changed:
+    if changed and not module.check_mode:
         try:
             module.atomic_move(temppath, dest)
         except OSError:

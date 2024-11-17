@@ -49,3 +49,38 @@
     that:
       - not same_file_decompression.changed
       - new_file_decompression.changed
+
+- name: Delete decompressed files
+  file:
+    path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+    state: absent
+
+- name: Decompress with check mode enabled
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.{{ format }}"
+    dest: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+    format: "{{ format }}"
+    mode: "{{ decompressed_mode }}"
+  check_mode: true
+  register: decompressed_check_mode
+
+- name: Decompress second time with check mode enabled
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.{{ format }}"
+    dest: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+    format: "{{ format }}"
+    mode: "{{ decompressed_mode }}"
+  check_mode: true
+  register: decompressed_check_mode_2
+
+- name: Stat non-existing file
+  stat:
+    path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+  register: nonexisting_stat
+
+- name: Check mode test
+  assert:
+    that:
+      - decompressed_check_mode.changed
+      - decompressed_check_mode_2.changed
+      - not nonexisting_stat.stat.exists
