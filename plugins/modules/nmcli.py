@@ -1004,12 +1004,10 @@ options:
             private-key:
                 description: The 256 bit private-key in base64 encoding.
                 type: str
-                no_log: True
             private-key-flags:
                 description: C(NMSettingSecretFlags) indicating how to handle the O(wireguard.private-key) property.
                 type: int
                 choices: [ 0, 1, 2 ]
-                no_log: true
             peer-public-key:
                 description: Public key of the WireGuard peer.
                 type: str
@@ -1942,20 +1940,10 @@ class Nmcli(object):
                 raise NmcliModuleError('type is macvlan but all of the following are missing: macvlan')
         elif self.type == 'wireguard':
             if self.wireguard:
-                options.update({
-                    'fwmark':self.wireguard['fwmark'],
-                    'ip4-auto-default-route': self.wireguard['ip4_auto_default_route'],
-                    'ip6-auto-default-route': self.wireguard['ip6_auto_default_route'],
-                    'listen-port': self.wireguard['listen_port'],
-                    'mtu': self.wireguard['mtu'],
-                    'peer-routes': self.wireguard['peer_routes'],
-                    'private-key': self.wireguard['private_key'],
-                    'private-key-flags': self.wireguard['private_key_flags'],
-                    'peer-public-key': self.wireguard['peer_public_key'],
-                    'peer-allowed-ips': self.wireguard['peer_allowed_ips'],
-                    'peer-endpoint': self.wireguard['peer_endpoint'],
-                    'peer-persistent-keepalive': self.wireguard['peer_persistent_keepalive'],
-                })
+                for name, value in self.wireguard.items():
+                    options.update({
+                        'wireguard.%s' % name: value,
+                    })
         elif self.type == 'vpn':
             if self.vpn:
                 vpn_data_values = ''
@@ -2636,23 +2624,7 @@ def main():
                               parent=dict(type='str', required=True),
                               promiscuous=dict(type='bool'),
                               tap=dict(type='bool'))),
-            wireguard=dict(
-                type='dict',
-                options=dict(
-                    fwmark=dict(type='int', required=False),
-                    ip4_auto_default_route=dict(type='bool', required=False),
-                    ip6_auto_default_route=dict(type='bool', required=False),
-                    listen_port=dict(type='int', required=False),
-                    mtu=dict(type='int', required=False),
-                    peer_routes=dict(type='bool', required=False),
-                    private_key=dict(type='str', required=False, no_log=True),
-                    private_key_flags=dict(type='int', required=False, no_log=True),
-                    peer_public_key=dict(type='str', required=False),
-                    peer_allowed_ips=dict(type='str', required=False),
-                    peer_endpoint=dict(type='str', required=False),
-                    peer_persistent_keepalive=dict(type='int', required=False),           
-                )
-            ),
+            wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),
