@@ -1942,6 +1942,28 @@ def mocked_gsm_connection_unchanged(mocker):
 
 @pytest.fixture
 def mocked_wireguard_connection_unchanged(mocker):
+    TESTCASE_WIREGUARD_SHOW_OUTPUT = '''
+[connection]
+id=non_existent_nw_device
+type=wireguard
+interface-name=wg_non_existant
+
+[ipv4]
+method=manual
+addresses=10.10.10.10/24
+
+[ipv6]
+method=manual
+addresses=2001:db8::1/128
+
+[wireguard]
+listen-port=51820
+private-key=<hidden>
+peer-public-key=publickey123
+peer-allowed-ips=10.0.0.2/32
+peer-endpoint=192.168.1.1:51820
+peer-persistent-keepalive=25
+'''
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_WIREGUARD_SHOW_OUTPUT, ""))
@@ -4065,7 +4087,6 @@ def test_wireguard_connection_unchanged(mocked_wireguard_connection_unchanged, c
 
     out, err = capfd.readouterr()
     results = json.loads(out)
-    print("Results:", results)
     assert not results.get('failed')
     assert not results['changed']
 
