@@ -48,9 +48,13 @@ def main():
     )
 
     src = module.params['src']
-    if not os.path.exists(src):
-        module.fail_json(msg="Path does not exist: %s" % src)
     dest = module.params['dest']
+    if not os.path.exists(src):
+        module.fail_json(msg="Path does not exist: '%s'" % src)
+    if os.path.isdir(src):
+        module.fail_json(msg="Cannot decompress directory '%s'" % src)
+    if os.path.exists(dest) and os.path.isdir(dest):
+        module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % dest)
     format = module.params['format']
     if format not in compressors:
         module.fail_json(msg=f"Couldn't decompress '%s' format." % format)
@@ -62,7 +66,7 @@ def main():
         tempd, temppath = tempfile.mkstemp(dir=module.tmpdir)
         decompress(src, tempd, handler)
     except OSError as e:
-        module.fail_json(msg="Unable to create temporary file %s" % to_native(e))
+        module.fail_json(msg="Unable to create temporary file '%s'" % to_native(e))
 
     if os.path.exists(dest):
         changed = is_dest_changed(temppath, dest)
@@ -72,7 +76,7 @@ def main():
         try:
             module.atomic_move(temppath, dest)
         except OSError:
-            module.fail_json(msg="Unable to move temporary file %s to %s" % (temppath, dest))
+            module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (temppath, dest))
 
     if os.path.exists(temppath):
         os.unlink(temppath)
