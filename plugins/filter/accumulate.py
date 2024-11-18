@@ -10,7 +10,7 @@ DOCUMENTATION = '''
   description:
     - Passthrough to the L(Python itertools.accumulate function,https://docs.python.org/3/library/itertools.html#itertools.accumulate).
     - Transforms an input list into the cumulative list of results from applying addition to the elements of the input list.
-    - Addition means the default Python implementation of C('+') for input list elements type.
+    - Addition means the default Python implementation of C(+) for input list elements type.
   options:
     _input:
       description: A list.
