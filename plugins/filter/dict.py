@@ -57,8 +57,8 @@ EXAMPLES = '''
 
 RETURN = '''
   _value:
-    description: The dictionary having the provided key-value pairs.
-    type: boolean
+    description: A dictionary with the provided key-value pairs.
+    type: dictionary
 '''
 
 
