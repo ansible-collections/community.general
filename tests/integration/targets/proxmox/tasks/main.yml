@@ -612,3 +612,24 @@
     - results.proxmox_nodes is defined
     - results.proxmox_nodes|length >= 1
     - results.proxmox_nodes[0].type == 'node'
+
+# TODO
+- name: Backup creation
+  tags: [ 'create' ]
+  block:
+    - name: Create test vm test-instance
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        storage: "{{ storage }}"
+        vmid: "{{ from_vmid }}"
+        name: test-instance
+        clone: 'yes'
+        state: present
+        timeout: 500
+      register: results_kvm
