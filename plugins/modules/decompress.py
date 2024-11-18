@@ -28,15 +28,57 @@ def decompress(src, dest, handler):
             shutil.copyfileobj(src_file, dest_file)
 
 
-def is_dest_changed(src, dest):
-    return not filecmp.cmp(src, dest, shallow=False)
+class Decompress(object):
+    def __init__(self, module):
+        self.src = module.params['src']
+        self.dest = module.params['dest']
+        self.fmt = module.params['format']
+        self.check_mode = module.check_mode
+        self.module = module
+        self.changed = False
+        self.msg = ""
+        self.handlers = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
+
+    def configure(self):
+        if not os.path.exists(self.src):
+            self.module.fail_json(msg="Path does not exist: '%s'" % self.src)
+        if os.path.isdir(self.src):
+            self.module.fail_json(msg="Cannot decompress directory '%s'" % self.src)
+        if os.path.exists(self.dest) and os.path.isdir(self.dest):
+            self.module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % self.dest)
+        self.fmt = self.module.params['format']
+        if self.fmt not in self.handlers:
+            self.module.fail_json(msg="Couldn't decompress '%s' format" % self.fmt)
+
+    def run(self):
+        self.configure()
+        file_args = self.module.load_file_common_arguments(self.module.params, path=self.dest)
+        handler = self.handlers[self.fmt]
+        try:
+            tempfd, temppath = tempfile.mkstemp(dir=self.module.tmpdir)
+            decompress(self.src, tempfd, handler)
+        except OSError as e:
+            self.module.fail_json(msg="Unable to create temporary file '%s'" % to_native(e))
+
+        if os.path.exists(self.dest):
+            self.changed = not filecmp.cmp(temppath, self.dest, shallow=False)
+        else:
+            self.changed = True
+
+        if self.changed and not self.module.check_mode:
+            try:
+                self.module.atomic_move(temppath, self.dest)
+            except OSError:
+                self.module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (temppath, self.dest))
+
+        if os.path.exists(temppath):
+            os.unlink(temppath)
+
+        self.msg = "success"
+        self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
 
 
 def main():
-    result = dict(changed=False, diff=dict(before=dict(), after=dict()))
-
-    compressors = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
-
     module = AnsibleModule(
         argument_spec=dict(
             src=dict(type='path', required=True),
@@ -46,43 +88,10 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True
     )
+    d = Decompress(module)
+    d.run()
 
-    src = module.params['src']
-    dest = module.params['dest']
-    if not os.path.exists(src):
-        module.fail_json(msg="Path does not exist: '%s'" % src)
-    if os.path.isdir(src):
-        module.fail_json(msg="Cannot decompress directory '%s'" % src)
-    if os.path.exists(dest) and os.path.isdir(dest):
-        module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % dest)
-    format = module.params['format']
-    if format not in compressors:
-        module.fail_json(msg=f"Couldn't decompress '%s' format." % format)
-    dest = os.path.abspath(dest)
-
-    file_args = module.load_file_common_arguments(module.params, path=dest)
-    handler = compressors[format]
-    try:
-        tempd, temppath = tempfile.mkstemp(dir=module.tmpdir)
-        decompress(src, tempd, handler)
-    except OSError as e:
-        module.fail_json(msg="Unable to create temporary file '%s'" % to_native(e))
-
-    if os.path.exists(dest):
-        changed = is_dest_changed(temppath, dest)
-    else:
-        changed = True
-    if changed and not module.check_mode:
-        try:
-            module.atomic_move(temppath, dest)
-        except OSError:
-            module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (temppath, dest))
-
-    if os.path.exists(temppath):
-        os.unlink(temppath)
-    result['msg'] = 'success'
-    result['changed'] = module.set_fs_attributes_if_different(file_args, changed)
-    module.exit_json(**result)
+    module.exit_json(changed=d.changed, msg=d.msg)
 
 
 if __name__ == '__main__':

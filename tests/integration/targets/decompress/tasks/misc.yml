@@ -1,0 +1,28 @@
+---
+- name: Decompress with check mode enabled
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
+    format: gz
+  check_mode: true
+  register: decompressed_check_mode
+
+- name: Decompress second time with check mode enabled
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
+    format: gz
+  check_mode: true
+  register: decompressed_check_mode_2
+
+- name: Stat non-existing file
+  stat:
+    path: "{{ remote_tmp_dir }}/file_from_gz.txt"
+  register: nonexisting_stat
+
+- name: Check mode test
+  assert:
+    that:
+      - decompressed_check_mode.changed
+      - decompressed_check_mode_2.changed
+      - not nonexisting_stat.stat.exists
