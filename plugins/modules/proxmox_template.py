@@ -209,8 +209,9 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         """Fetch a template from a web url source using the proxmox download-url endpoint
         """
         try:
-            taskid = self.proxmox_api.nodes(node).storage(storage)("download-url") \
-                .post(url=url, content=content_type, filename=os.path.basename(url))
+            taskid = self.proxmox_api.nodes(node).storage(storage)("download-url").post(
+                url=url, content=content_type, filename=os.path.basename(url)
+            )
             return self.task_status(node, taskid, timeout)
         except Exception as e:
             self.module.fail_json(msg="Fetching template from url %s failed with error: %s" % (url, e))
