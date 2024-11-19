@@ -46,6 +46,7 @@ options:
         type: str
         choices: [ disabled, absent, present ]
         default: disabled
+        version_added: 7.0.0
         description:
             - Persistency between reboots for configured module.
             - This option creates files in C(/etc/modules-load.d/) and C(/etc/modprobe.d/) that make your module configuration persistent during reboots.
