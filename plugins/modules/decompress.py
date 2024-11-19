@@ -143,7 +143,7 @@ class Decompress(object):
 
         if os.path.exists(temppath):
             os.unlink(temppath)
-        if self.remove:
+        if self.remove and not self.check_mode:
             os.remove(self.src)
         self.msg = "success"
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)

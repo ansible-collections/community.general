@@ -12,8 +12,14 @@
     src: "{{ remote_tmp_dir }}/file.txt.gz"
     dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
     format: gz
+    remove: true
   check_mode: true
   register: decompressed_check_mode_2
+
+- name: Stat original compressed file
+  stat:
+    path: "{{ remote_tmp_dir }}/file.txt.gz"
+  register: original_file
 
 - name: Stat non-existing file
   stat:
@@ -25,6 +31,7 @@
     that:
       - decompressed_check_mode.changed
       - decompressed_check_mode_2.changed
+      - original_file.stat.exists
       - not nonexisting_stat.stat.exists
 
 - name: Copy compressed file
