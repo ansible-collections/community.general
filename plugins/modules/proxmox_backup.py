@@ -40,15 +40,15 @@ options:
   compress:
     description:
       - Enable additional compression of the backup archive.
-      - O(0) will use the proxmox recommended value (currently zstd).
-      - If a proxmox backup server is the storage backend, O(0) or O(zstd) is required.
+      - V(0) will use the proxmox recommended value (currently zstd).
+      - If a proxmox backup server is the storage backend, V(0) or V(zstd) is required.
     type: str
     choices: [ '0', '1', 'gzip', 'lzo', 'zstd' ]
-  compression_threads: # zstd
+  compression_threads:
     description:
       - The number of threads zstd will use to compress the backup.
       - 0 uses 50% of the available cores, anything larger then 0 will use exactly as many threads.
-      - Requires O(compress) to be zstd.
+      - Requires V(compress) to be zstd.
     type: int
   description:
     description:
@@ -80,8 +80,7 @@ options:
     required: true
   node:
     description:
-      - Only execute the backup job for the given node. 
-      - Will fail if you specify vmids, which reside on different nodes.
+      - Only execute the backup job for the given node.
     type: str
   performance_tweaks:
     description:
@@ -170,6 +169,15 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def _get_resources(self, resource_type=None) -> dict:
         return self.proxmox_api.cluster.resources.get(type=resource_type)
 
+    def _get_relevant_nodes(self, node):
+        nodes = [item['node'] for item in self._get_resources("node") if item['status'] == "online"]
+        if node and node not in nodes:
+            self.module.fail_json(msg=f'Node {node} was specified, but does not exist on the cluster')
+        elif node:
+            return [node]
+        else:
+            return nodes
+
     def _check_storage_permissions(self,permissions, storage,bandwidth,performance,retention):
         # Check for Datastore.AllocateSpace in the permission tree
         if "/" in permissions.keys() and permissions["/"].get("Datastore.AllocateSpace", 0) == 1:
@@ -208,6 +216,9 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 "VM.Backup", 0) == 1:
             sufficient_permissions = True
         elif pool and f"/pool/{pool}" in permissions.keys() and permissions[f"/pool/{pool}"].get(
+                "VM.Backup", 0) == 1:
+            sufficient_permissions = True
+        elif pool and f"/pool/{pool}/vms" in permissions.keys() and permissions[f"/pool/{pool}/vms"].get(
                 "VM.Backup", 0) == 1:
             sufficient_permissions = True
 
@@ -255,11 +266,14 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             if node not in validated_storagepath[0].get('nodes').split(","):
                 self.module.exit_json(changed=False,
                                       msg="The storage %s is not accessible for node %s" % (storage,node))
-    def _check_vmids(self,vmids):
+
+    def _check_vmids(self, vmids):
         vm_resources = self._get_resources("vm")
         if not vm_resources:
-            self.module.warn(msg="No VMIDs could be obtained from the API, no sanity checks are performed")
-            return
+            self.module.warn(msg="VM.Audit permission is missing or there are no VMs. This task will fail if one VMID does not exist.")
+        vmids_not_found = [ vm for vm in vmids if vm not in [current_vm['vmid'] for current_vm in vm_resources] ]
+        if vmids_not_found:
+            self.module.warn(msg=f"VMIDs {', '.join(vmids_not_found)} not found. This task will fail if one VMID does not exist.")
 
 
     def permission_check(self, storage, mode, node, bandwidth, performance_tweaks, retention, pool, vmids):
@@ -279,7 +293,6 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                        ("compress", "compress"),
                        ("fleecing", "fleecing"),
                        ("mode", "backup_mode"),
-                       ("node", "node"),
                        ("notes-template", "description"),
                        ("notification-mode", "notification_mode"),
                        ("performance", "performance_tweaks"),
@@ -297,8 +310,6 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         # Create comma separated list from vmids, the API expects so
         if request_body.get("vmid"):
             request_body.update({"vmid": ",".join(request_body.get("vmid"))})
-
-        if module_arguments.get("mode") ==
 
         # remove pool option
         if request_body.get("vmid") or request_body.get("all"):
@@ -320,8 +331,12 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def backup_create(self, module_arguments):
         request_body = self.prepare_request_parameters(module_arguments)
         if module_arguments['mode'] == "include":
-            self._check_vmids():
-                pass
+            self._check_vmids(module_arguments['vmid'])
+
+        node_endpoints = self._get_relevant_nodes(module_arguments['node'])
+        for endpoint in node_endpoints:
+            backup_request = self.proxmox_api.node(endpoint).vzdump.post(**request_body)
+
         # while params['timeout']:
         #     if self.api_task_ok(vm['node'], taskid):
         #         break
