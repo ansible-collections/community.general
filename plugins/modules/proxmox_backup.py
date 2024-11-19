@@ -17,6 +17,7 @@ description:
   - Allows you to create/delete/restore backups for a given instance in Proxmox VE cluster.
   - Supports both KVM and LXC.
   - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup.
+  - The mininum required privileges to use this module are VM.Backup and Datastore.AllocateSpace
 attributes:
   check_mode:
     support: full
@@ -25,11 +26,11 @@ attributes:
   action_group:
     version_added: 10.0.0
 options:
-  bandwidth: # bwlimit
+  bandwidth:
     description:
       - Limit I/O bandwidth (in KiB/s). V(0) is unlimited.
     type: int
-  backup_mode: # mode
+  backup_mode:
     description:
       - The mode how proxmox performs backups.
       - Check U(https://pve.proxmox.com/pve-docs/chapter-vzdump.html#_backup_modes) for an explanation of the differences.
@@ -49,7 +50,7 @@ options:
       - 0 uses 50% of the available cores, anything larger then 0 will use exactly as many threads.
       - Requires O(compress) to be zstd.
     type: int
-  description: # notes-template
+  description:
     description:
       - Specify the description for the backup.
       - Template string for generating notes for the backup(s). 
@@ -64,12 +65,6 @@ options:
       - Must be entered as a string, containing key-value pairs in a list:
       - [[enabled=]<1|0>] [,storage=<storage ID>]]
     type: str
-  hostnames:
-    description:
-      - Instance names to be backed up or to exclude.
-      - Will be ignored if vmids are provided.
-    type: list
-    contains: str
   notification_mode:
     description:
       - Determine which notification system to use.
@@ -88,15 +83,15 @@ options:
       - Only execute the backup job for the given node. 
       - Will fail if you specify vmids, which reside on different nodes.
     type: str
-  performance_tweaks: # performance
+  performance_tweaks:
     description:
       - Enable other performance-related settings.
       - Must be entered as a string, containing comma separated key-value pairs:
       - [max-workers=<integer>] [,pbs-entries-max=<integer>]
     type: str
-  poolname: #pool
+  pool:
     description:
-      - Specify a poolname for the of guests to the given pool.
+      - Specify a pool name for the of guests to the given pool.
       - Required, when O(mode) is V(pool).
       - Also required, when your user only has VM.Backup permission for this single pool.
     type: str
@@ -104,7 +99,7 @@ options:
     description:
       - Mark backups as protected.
     type: bool
-  retention: # prune-backups
+  retention:
     description:
       - Use these retention options instead of those from the storage configuration.
       - Enter as a comma-separated list of key-value pairs. Options are:
@@ -123,8 +118,8 @@ options:
       default: 10
   vmids:
     description:
-      - The instance ids to be backed up or to exclude.
-      - If not set, vmids will be fetched from PromoxAPI based on the hostnames. 
+      - The instance ids to be backed up.
+      - Only valid, if O(mode) is V(include).
     type: list
     contains: int
 
@@ -168,103 +163,14 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
 
 
 class ProxmoxBackupAnsible(ProxmoxAnsible):
-    # def snapshot(self, vm, vmid):
-    #     return getattr(self.proxmox_api.nodes(vm['node']), vm['type'])(vmid).snapshot
-    #
-    # def vmconfig(self, vm, vmid):
-    #     return getattr(self.proxmox_api.nodes(vm['node']), vm['type'])(vmid).config
-    #
-    # def vmstatus(self, vm, vmid):
-    #     return getattr(self.proxmox_api.nodes(vm['node']), vm['type'])(vmid).status
-    # def _container_mp_get(self, vm, vmid):
-    #     cfg = self.vmconfig(vm, vmid).get()
-    #     mountpoints = {}
-    #     for key, value in cfg.items():
-    #         if key.startswith('mp'):
-    #             mountpoints[key] = value
-    #     return mountpoints
-    #
-    # def _container_mp_disable(self, vm, vmid, timeout, unbind, mountpoints, vmstatus):
-    #     # shutdown container if running
-    #     if vmstatus == 'running':
-    #         self.shutdown_instance(vm, vmid, timeout)
-    #     # delete all mountpoints configs
-    #     self.vmconfig(vm, vmid).put(delete=' '.join(mountpoints))
-    #
-    # def _container_mp_restore(self, vm, vmid, timeout, unbind, mountpoints, vmstatus):
-    #     # NOTE: requires auth as `root@pam`, API tokens are not supported
-    #     # see https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config
-    #     # restore original config
-    #     self.vmconfig(vm, vmid).put(**mountpoints)
-    #     # start container (if was running before snap)
-    #     if vmstatus == 'running':
-    #         self.start_instance(vm, vmid, timeout)
-    #
-    # def start_instance(self, vm, vmid, timeout):
-    #     taskid = self.vmstatus(vm, vmid).start.post()
-    #     while timeout:
-    #         if self.api_task_ok(vm['node'], taskid):
-    #             return True
-    #         timeout -= 1
-    #         if timeout == 0:
-    #             self.module.fail_json(msg='Reached timeout while waiting for VM to start. Last line in task before timeout: %s' %
-    #                                   self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-    #         time.sleep(1)
-    #     return False
-    #
-    # def shutdown_instance(self, vm, vmid, timeout):
-    #     taskid = self.vmstatus(vm, vmid).shutdown.post()
-    #     while timeout:
-    #         if self.api_task_ok(vm['node'], taskid):
-    #             return True
-    #         timeout -= 1
-    #         if timeout == 0:
-    #             self.module.fail_json(msg='Reached timeout while waiting for VM to stop. Last line in task before timeout: %s' %
-    #                                   self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-    #         time.sleep(1)
-    #     return False
-    #
-    # def snapshot_retention(self, vm, vmid, retention):
-    #     # ignore the last snapshot, which is the current state
-    #     snapshots = self.snapshot(vm, vmid).get()[:-1]
-    #     if retention > 0 and len(snapshots) > retention:
-    #         # sort by age, oldest first
-    #         for snap in sorted(snapshots, key=lambda x: x['snaptime'])[:len(snapshots) - retention]:
-    #             self.snapshot(vm, vmid)(snap['name']).delete()
-    # def snapshot_remove(self, vm, vmid, timeout, snapname, force):
-    #     if self.module.check_mode:
-    #         return True
-    #
-    #     taskid = self.snapshot(vm, vmid).delete(snapname, force=int(force))
-    #     while timeout:
-    #         if self.api_task_ok(vm['node'], taskid):
-    #             return True
-    #         if timeout == 0:
-    #             self.module.fail_json(msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
-    #                                   self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-    #
-    #         time.sleep(1)
-    #         timeout -= 1
-    #     return False
-    #
-    # def snapshot_rollback(self, vm, vmid, timeout, snapname):
-    #     if self.module.check_mode:
-    #         return True
-    #
-    #     taskid = self.snapshot(vm, vmid)(snapname).post("rollback")
-    #     while timeout:
-    #         if self.api_task_ok(vm['node'], taskid):
-    #             return True
-    #         if timeout == 0:
-    #             self.module.fail_json(msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
-    #                                   self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-    #
-    #         time.sleep(1)
-    #         timeout -= 1
-    #     return False
 
-    def check_permissions(self,storage,bandwidth,performance,retention) -> dict:
-        permissions = self.proxmox_api.access.permissions.get()
+    def _get_permissions(self) -> dict:
+        return self.proxmox_api.access.permissions.get()
+
+    def _get_resources(self, resource_type=None) -> dict:
+        return self.proxmox_api.cluster.resources.get(type=resource_type)
+
+    def _check_storage_permissions(self,permissions, storage,bandwidth,performance,retention):
         # Check for Datastore.AllocateSpace in the permission tree
         if "/" in permissions.keys() and permissions["/"].get("Datastore.AllocateSpace", 0) == 1:
             pass
@@ -293,7 +199,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                                       msg="Insufficient permissions: Custom retention was requested, but Datastore.Allocate is missing.")
         return permissions
 
-    def check_vmid_permissions(self, permissions, vmids, poolname):
+    def _check_vmid_backup_permission(self, permissions, vmids, pool):
         sufficient_permissions = False
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
@@ -301,7 +207,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         elif "/vms" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
             sufficient_permissions = True
-        elif poolname and f"/pool/{poolname}" in permissions.keys() and permissions[f"/pool/{poolname}"].get(
+        elif pool and f"/pool/{pool}" in permissions.keys() and permissions[f"/pool/{pool}"].get(
                 "VM.Backup", 0) == 1:
             sufficient_permissions = True
 
@@ -310,111 +216,141 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             # and check, if the permission is set
             failed_vmids = []
             for vm in vmids:
-                if f"/vms/{str(vm)}" in permissions.keys() and permissions[
-                    f"/vms/{str(vm)}"].get("VM.Backup", 1) == 0:
+                if f"/vms/{str(vm)}" in permissions.keys() and permissions[f"/vms/{str(vm)}"].get("VM.Backup", 1) == 0:
                     failed_vmids.append(str(vm))
             if failed_vmids:
                 self.module.exit_json(changed=False,
-                                      msg=f"Insufficient permissions: You dont have the VM.Backup permission for VMIDs {', '.join(failed_vmids)}.")
+                                      msg=f"Insufficient permissions: You dont have the VM.Backup permission for VMID {', '.join(failed_vmids)}.")
             sufficient_permissions = True
-        # Finally, when not check succeeded, fail this check
+        # Finally, when no check succeeded, fail
         if not sufficient_permissions:
             self.module.exit_json(changed=False,
                                   msg=f"Insufficient permissions: You dont have the VM.Backup permission.")
 
-    def check_pool_permissions(self, permissions, poolname):
+    def _check_general_backup_permission(self, permissions, pool):
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
             pass
         elif "/vms" and "/vms" in permissions.keys() and permissions["vms"].get(
                 "VM.Backup", 0) == 1:
             pass
-        elif poolname and f"/pool/{poolname}" in permissions.keys() and permissions[f"/pool/{poolname}"].get(
+        elif pool and f"/pool/{pool}" in permissions.keys() and permissions[f"/pool/{pool}"].get(
                 "VM.Backup", 0) == 1:
             pass
         else:
             self.module.exit_json(changed=False,
                                   msg=f"Insufficient permissions: You dont have the VM.Backup permission.")
 
-    def check_all_permissions(self, permissions, poolname):
-        if "/" in permissions.keys() and permissions["/"].get(
-                "VM.Backup", 0) == 1:
-            pass
-        elif "/vms" and "/vms" in permissions.keys() and permissions["vms"].get(
-                "VM.Backup", 0) == 1:
-            pass
-        elif poolname and f"/pool/{poolname}" in permissions.keys() and permissions[f"/pool/{poolname}"].get(
-                "VM.Backup", 0) == 1:
-            pass
-        else:
-            self.module.exit_json(changed=False,
-                                  msg=f"Insufficient permissions: You dont have the VM.Backup permission."
-
-    def check_vmids_for_consistency(self,vmids,hostnames,node) -> list:
-        # derive vmid from hostnames
-        if not vmids and hostnames:
-            vmids = []
-            for host in hostnames:
-                vmids.append(self.get_vmid(host))
-        if not vmids:
-            self.module.exit_json(changed=False, msg="A vmid-specific mode was specified, but no vmids for filtering could be obtained")
-        # Check, that the vms exist - get_vm() will throw and error if it does not
-        for vm in vmids:
-            vminfo = self.get_vm(vm)
-            # TODO - verify with breakpoint, that this actually returns the expected dict
-            if node and vminfo['node'] != node:
-                self.module.exit_json(changed=False, msg="Node %s was specified, but vmid %s does not reside there" % (node, vm))
-        return vmids
-
-    def check_if_storage_exists(self, storage, node):
+    def _check_if_storage_exists(self, storage, node):
         storages = self.get_storages(type=None)
         # Loop through all cluster storages and find out, if one has the correct name
         validated_storagepath = [storageentry for storageentry in storages if storageentry['storage'] == storage]
         if not validated_storagepath:
             self.module.exit_json(changed=False,
                                   msg="The storage %s does not exist in the cluster" % storage)
+
         # Check if the node specified for backups has access to the configured storage
         # validated_storagepath[0].get('shared') will be either 0 if unshared, None if unset or 1 if shared
         if node and not validated_storagepath[0].get('shared'):
-            if not node in validated_storagepath[0].get('nodes').split(","):
+            if node not in validated_storagepath[0].get('nodes').split(","):
                 self.module.exit_json(changed=False,
-                                      msg="The storage %s is not accessible for node" % (storage,node))
-
-    def backup_create(self,params: dict):
-
-        while params['timeout']:
-            if self.api_task_ok(vm['node'], taskid):
-                break
-            if timeout == 0:
-                self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-
-            time.sleep(1)
-            timeout -= 1
-        if vm['type'] == 'lxc' and unbind is True and mountpoints:
-            self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
-
-        self.snapshot_retention(vm, vmid, retention)
-        return timeout > 0
+                                      msg="The storage %s is not accessible for node %s" % (storage,node))
+    def _check_vmids(self,vmids):
+        vm_resources = self._get_resources("vm")
+        if not vm_resources:
+            self.module.warn(msg="No VMIDs could be obtained from the API, no sanity checks are performed")
+            return
 
 
+    def permission_check(self, storage, mode, node, bandwidth, performance_tweaks, retention, pool, vmids):
+        permissions = self._get_permissions()
+        self._check_if_storage_exists(storage, node)
+        self._check_storage_permissions(permissions, storage, bandwidth, performance_tweaks, retention)
 
+        if mode == "include":
+            self._check_vmid_backup_permission(permissions, vmids, pool)
+        else:
+            self._check_general_backup_permission(permissions, pool)
+
+    def prepare_request_parameters(self, module_arguments):
+        # ensure only valid post parameters are passed to proxmox
+        # list of dict items to replace with (new_val, old_val)
+        post_params = [("bwlimit", "bandwidth"),
+                       ("compress", "compress"),
+                       ("fleecing", "fleecing"),
+                       ("mode", "backup_mode"),
+                       ("node", "node"),
+                       ("notes-template", "description"),
+                       ("notification-mode", "notification_mode"),
+                       ("performance", "performance_tweaks"),
+                       ("pool", "pool"),
+                       ("protected", "protected"),
+                       ("prune-backups", "retention"),
+                       ("storage", "storage"),
+                       ("zstd", "compression_threads"),
+                       ("vmid", "vmids")
+                       ]
+        request_body = {}
+        for new, old in post_params:
+            if module_arguments.get(old):
+                request_body.update({new: module_arguments[old]})
+        # Create comma separated list from vmids, the API expects so
+        if request_body.get("vmid"):
+            request_body.update({"vmid": ",".join(request_body.get("vmid"))})
+
+        if module_arguments.get("mode") ==
+
+        # remove pool option
+        if request_body.get("vmid") or request_body.get("all"):
+            if request_body.get("pool"):
+                request_body.pop("pool")
+
+        # remove whitespaces from option strings
+        for key in ["prune-backups", "performance"]:
+            if request_body.get(key):
+                request_body.update(
+                    {key: request_body.get(key).replace(" ", "")})
+        # convert booleans to 0/1
+        for key in ["all", "protected"]:
+            if request_body.get(key):
+                request_body.update({key: 1})
+
+        return request_body
+
+    def backup_create(self, module_arguments):
+        request_body = self.prepare_request_parameters(module_arguments)
+        if module_arguments['mode'] == "include":
+            self._check_vmids():
+                pass
+        # while params['timeout']:
+        #     if self.api_task_ok(vm['node'], taskid):
+        #         break
+        #     if timeout == 0:
+        #         self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
+        #                               self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+        #
+        #     time.sleep(1)
+        #     timeout -= 1
+        # if vm['type'] == 'lxc' and unbind is True and mountpoints:
+        #     self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
+        #
+        # self.snapshot_retention(vm, vmid, retention)
+        # return timeout > 0
 
 def main():
     module_args = proxmox_auth_argument_spec()
     backup_args = dict(
         bandwidth=dict(type='int'),
         backup_mode=dict(type='str', choices=['snapshot', 'suspend', 'stop'], default="snapshot"),
-        compress=dict(type='str' ,default='0', choices=['0', '1', 'gzip', 'lzo', 'zstd']),
-        compression_threads=dict(type='int', default=1),
+        compress=dict(type='str', choices=['0', '1', 'gzip', 'lzo', 'zstd']),
+        compression_threads=dict(type='int'),
         description=dict(type='str', default='{{guestname}}'),
-        fleecing=dict(type='str', default=None),
-        hostnames=dict(type='list', elements='str',default=None),
-        notification_mode=dict(type='str', default='auto', choices=['auto','legacy-sendmail', 'notification-system']),
-        mode=dict(type='str', required=True, choices=['include', 'exclude', 'all', 'pool']),
+        fleecing=dict(type='str'),
+        notification_mode=dict(type='str', default='auto', choices=['auto', 'legacy-sendmail', 'notification-system']),
+        mode=dict(type='str', required=True, choices=['include', 'all', 'pool']),
         node=dict(type='str'),
         performance_tweaks=dict(type='str'),
-        poolname=dict(type='str'),
+        pool=dict(type='str'),
         protected=dict(type='bool'),
         retention=dict(type='str'),
         storage=dict(type='str', required=True),
@@ -425,30 +361,23 @@ def main():
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        mutually_exclusive=[('vmids','hostnames')]
-    )
+        required_if = [
+            ('mode', 'include', ('vmids',), True),
+            ('mode', 'pool', ('pool',))]
+        )
 
     proxmox = ProxmoxBackupAnsible(module)
     bandwidth = module.params['bandwidth']
-    hostnames = module.params['hostnames']
     mode = module.params['mode']
     node = module.params['node']
     performance_tweaks = module.params['performance_tweaks']
-    poolname = module.params['poolname']
+    pool = module.params['pool']
     retention = module.params['retention']
     storage = module.params['storage']
     vmids = module.params['vmids']
 
-    proxmox.check_if_storage_exists(storage, node)
-    all_permissions = proxmox.check_permissions(storage,bandwidth,performance_tweaks,retention)
+    proxmox.permission_check(storage, mode, node, bandwidth, performance_tweaks, retention, pool, vmids)
 
-    if mode == "include":
-        vmids = proxmox.check_vmids_for_consistency(vmids, hostnames, node)
-        proxmox.check_vmid_permissions(all_permissions,vmids,poolname)
-    elif mode == "all":
-        proxmox.check_all_permissions(all_permissions,poolname)
-    else:
-        proxmox.check_pool_permissions(all_permissions,poolname)
 
     try:
         if proxmox.backup_create(dict(module.params)):
