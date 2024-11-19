@@ -1,3 +1,72 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2024, Stanislav Shamilov <shamilovstas@protonmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
+DOCUMENTATION = '''
+---
+module: decompress
+short_description: Decompresses compressed files.
+description: 
+    - Decompresses compressed files.
+    - The source (compressed) file and destination (decompressed) files are on the remote host.
+    - Source file can be deleted after decompression.
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  src:
+    description:
+      - Remote absolute path for the file to decompress.
+    type: path
+    required: true
+  dest:
+    description:
+      - The file name of the destination file where the compressed file will be decompressed.
+      - If the destination file exists, it will be truncated and overwritten.
+    type: path
+    required: true
+  format:
+    description:
+      - The type of compression to use to decompress.
+    type: str
+    choices: [ gz, bz2, xz ]
+    default: gz
+  remove:
+    description:
+      - Remove original compressed file after decompression
+    type: bool
+    default: false
+  author:
+    - Stanislav Shamilov (@shamilovstas)
+'''
+
+EXAMPLES = '''
+- name: Decompress file /path/to/file.txt.gz into /path/to/file.txt (gz compression is used by default)
+  community.general.decompress:
+    src: /path/to/file.txt.gz
+    dest: /path/to/file.txt
+    
+- name: Decompress file compressed with bzip2
+  community.general.decompress:
+    src: /path/to/file.txt.bz2
+    dest: /path/to/file.bz2
+    format: bz2
+    
+- name: Decompress file and delete the compressed file afterwards
+  community.general.decompress:
+    src: /path/to/file.txt.gz
+    dest: /path/to/file.txt
+    remove: true
+'''
+
 import bz2
 import filecmp
 import gzip
@@ -33,6 +102,7 @@ class Decompress(object):
         self.src = module.params['src']
         self.dest = module.params['dest']
         self.fmt = module.params['format']
+        self.remove = module.params['remove']
         self.check_mode = module.check_mode
         self.module = module
         self.changed = False
