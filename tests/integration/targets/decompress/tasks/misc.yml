@@ -26,3 +26,29 @@
       - decompressed_check_mode.changed
       - decompressed_check_mode_2.changed
       - not nonexisting_stat.stat.exists
+
+- name: Copy compressed file
+  copy:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+    remote_src: true
+
+- name: Decompress, deleting original file
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_copied.txt"
+    remove: true
+
+- name: Stat compressed file
+  stat:
+    path: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+  register: compressed_stat
+
+- name: Check that original file was deleted
+  assert:
+    that: not compressed_stat.stat.exists
+
+- name: Delete decompressed file
+  file:
+    path: "{{ remote_tmp_dir }}/file_copied.txt"
+    state: absent

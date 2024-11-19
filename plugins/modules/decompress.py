@@ -73,7 +73,8 @@ class Decompress(object):
 
         if os.path.exists(temppath):
             os.unlink(temppath)
-
+        if self.remove:
+            os.remove(self.src)
         self.msg = "success"
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
 
@@ -84,6 +85,7 @@ def main():
             src=dict(type='path', required=True),
             dest=dict(type='path', required=True),
             format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz']),
+            remove=dict(type='bool', default=False)
         ),
         add_file_common_args=True,
         supports_check_mode=True
