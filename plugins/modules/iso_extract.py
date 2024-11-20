@@ -67,6 +67,11 @@ options:
     - The path to the C(7z) executable to use for extracting files from the ISO.
     - If not provided, it will assume the value V(7z).
     type: path
+  password:
+    description:
+    - Password used to decrypt files from the ISO.
+    type: str
+    default: ''
 notes:
 - Only the file checksum (content) is taken into account when extracting files
   from the ISO image. If O(force=false), only checks the presence of the file.
@@ -100,6 +105,8 @@ def main():
             dest=dict(type='path', required=True),
             files=dict(type='list', elements='str', required=True),
             force=dict(type='bool', default=True),
+            dest=dict(type='path', required=True),
+            password=dict(type='str', default=""),
             executable=dict(type='path'),  # No default on purpose
         ),
         supports_check_mode=True,
@@ -108,6 +115,7 @@ def main():
     dest = module.params['dest']
     files = module.params['files']
     force = module.params['force']
+    password = module.params['password']
     executable = module.params['executable']
 
     result = dict(
@@ -157,7 +165,8 @@ def main():
         cmd = [binary, 'x', image, '-o%s' % tmp_dir] + extract_files
     else:
         cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
-
+    if password:
+        cmd += f"-p{password}"
     rc, out, err = module.run_command(cmd)
     if rc != 0:
         result.update(dict(
