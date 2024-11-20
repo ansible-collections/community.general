@@ -49,8 +49,8 @@ EXAMPLES = '''
     dest: /srv/checkout
   vars:
     github_token: >-
-      lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
-             app_id='123456', installation_id='64209')
+      {{ lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
+                app_id='123456', installation_id='64209') }}
 '''
 
 RETURN = '''
