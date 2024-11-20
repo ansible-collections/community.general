@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2020, Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
+# Copyright (c) 2024, IamLunchbox <r.grieger@hotmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,13 +11,13 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: proxmox_backup
-short_description: Backup management of instances in Proxmox VE cluster
+short_description: Start a VM backup in Proxmox VE cluster
 version_added: 10.0.0
 description:
-  - Allows you to create/delete/restore backups for a given instance in Proxmox VE cluster.
-  - Supports both KVM and LXC.
-  - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup.
-  - The mininum required privileges to use this module are VM.Backup and Datastore.AllocateSpace
+  - Allows you to create backups of KVM and LXC guests in Proxmox VE cluster.
+  - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup schedule.
+  - The mininum required privileges to use this module are VM.Backup and Datastore.AllocateSpace.
+  - Most options are optional and if unspecified will be chosen by the Cluster and its default values.
 attributes:
   check_mode:
     support: full
@@ -28,11 +28,11 @@ attributes:
 options:
   bandwidth:
     description:
-      - Limit I/O bandwidth (in KiB/s). V(0) is unlimited.
+      - Limit the I/O bandwidth (in KiB/s) to send the . 0 is unlimited.
     type: int
   backup_mode:
     description:
-      - The mode how proxmox performs backups.
+      - The mode how proxmox performs backups. The default is, to create a runtime snapshot including memory.
       - Check U(https://pve.proxmox.com/pve-docs/chapter-vzdump.html#_backup_modes) for an explanation of the differences.
     type: str
     choices: ['snapshot', 'suspend', 'stop']
@@ -40,15 +40,13 @@ options:
   compress:
     description:
       - Enable additional compression of the backup archive.
-      - V(0) will use the proxmox recommended value (currently zstd).
-      - If a proxmox backup server is the storage backend, V(0) or V(zstd) is required.
+      - 0 will use the proxmox recommended value, depending on your storage target.
     type: str
     choices: [ '0', '1', 'gzip', 'lzo', 'zstd' ]
   compression_threads:
     description:
       - The number of threads zstd will use to compress the backup.
       - 0 uses 50% of the available cores, anything larger then 0 will use exactly as many threads.
-      - Requires V(compress) to be zstd.
     type: int
   description:
     description:
@@ -56,14 +54,13 @@ options:
       - Template string for generating notes for the backup(s). 
       - Can contain variables which will be replaced by their values. 
       - Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. 
-      - Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.
+      - Needs to be a single line, newline and backslash need to be escaped as `\n` and `\\` respectively.
     default: '{{guestname}}'
     type: str
   fleecing:
     description:
       - Enable backup fleecing. Works only for virtual machines and their disks.
-      - Must be entered as a string, containing key-value pairs in a list:
-      - [[enabled=]<1|0>] [,storage=<storage ID>]]
+      - Must be entered as a string, containing key-value pairs in a list.
     type: str
   notification_mode:
     description:
@@ -74,10 +71,9 @@ options:
   mode:
     description:
       - Specifices the mode to select backup targets.
-    type: list
-    contains: str
     choices: ['include', 'all', 'pool']
     required: true
+    type: str
   node:
     description:
       - Only execute the backup job for the given node.
@@ -85,13 +81,12 @@ options:
   performance_tweaks:
     description:
       - Enable other performance-related settings.
-      - Must be entered as a string, containing comma separated key-value pairs:
-      - [max-workers=<integer>] [,pbs-entries-max=<integer>]
+      - Must be entered as a string, containing comma separated key-value pairs.
     type: str
   pool:
     description:
-      - Specify a pool name for the of guests to the given pool.
-      - Required, when O(mode) is V(pool).
+      - Specify a pool name to limit backups to guests to the given pool.
+      - Required, when O(mode=pool).
       - Also required, when your user only has VM.Backup permission for this single pool.
     type: str
   protected:
@@ -100,9 +95,7 @@ options:
     type: bool
   retention:
     description:
-      - Use these retention options instead of those from the storage configuration.
-      - Enter as a comma-separated list of key-value pairs. Options are:
-      - [keep-all=<1|0>] [,keep-daily=<N>] [,keep-hourly=<N>] [,keep-last=<N>] [,keep-monthly=<N>] [,keep-weekly=<N>] [,keep-yearly=<N>]
+      - Use custom retention options instead of those from the storage configuration.
       - Requires Datastore.Allocate permission for the storage endpoint.
     type: str
   storage:
@@ -113,9 +106,9 @@ options:
   vmids:
     description:
       - The instance ids to be backed up.
-      - Only valid, if O(mode) is V(include).
+      - Only valid, if O(mode=include).
     type: list
-    contains: int
+    elements: int
   wait:
     description:
       - Wait for the backup to be finished.
@@ -124,12 +117,12 @@ options:
   wait_timeout:
     description:
       - Seconds to wait for the backup to be finished.
-      - Will only be evaluated, if O(wait) is V(true)
+      - Will only be evaluated, if O(wait=true).
     type: int
     default: 10
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
-requirements: [ "proxmoxer", "requests" ]
+requirements: ["proxmoxer", "requests"]
 author: IamLunchbox
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
