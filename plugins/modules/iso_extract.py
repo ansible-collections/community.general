@@ -105,7 +105,7 @@ def main():
             dest=dict(type='path', required=True),
             files=dict(type='list', elements='str', required=True),
             force=dict(type='bool', default=True),
-            password=dict(type='str', default=""),
+            password=dict(type='str', default="", no_log=True),
             executable=dict(type='path'),  # No default on purpose
         ),
         supports_check_mode=True,
@@ -165,7 +165,7 @@ def main():
     else:
         cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
     if password:
-        cmd += f"-p{password}"
+        cmd += "-p%s" % password
     rc, out, err = module.run_command(cmd)
     if rc != 0:
         result.update(dict(
