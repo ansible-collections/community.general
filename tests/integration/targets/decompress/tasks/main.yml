@@ -22,20 +22,20 @@
 
 # Run tests
 - name: Run core tests
-  include_tasks:
-    file: core.yml
-  loop: "{{ formats }}"
-  loop_control:
-    loop_var: format
+  block:
+    - include_tasks: core.yml
+      loop: "{{ formats }}"
+      loop_control:
+        loop_var: format
+    - import_tasks: cleanup.yml
 
-- name: Delete decompressed files
-  file:
-    path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
-    state: absent
-  loop: "{{ formats }}"
-  loop_control:
-    loop_var: format
 
 - name: Run idempotency and check mode tests
-  include_tasks:
-    file: misc.yml
+  block:
+    - import_tasks: misc.yml
+    - import_tasks: cleanup.yml
+
+- name: Run tests for destination file
+  block:
+    - import_tasks: dest.yml
+    - import_tasks: cleanup.yml

@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -31,8 +32,11 @@ options:
     description:
       - The file name of the destination file where the compressed file will be decompressed.
       - If the destination file exists, it will be truncated and overwritten.
+      - If not specified, the destination filename will be O(src) without the compression format extension (for 
+        instance, if O(src) was /path/to/file.txt.gz, O(dest) will be /path/to/file.txt). If O(src) file does not end 
+        with the O(format) extension, the O(dest) filename will have the form O(src)_decompressed (for instance, if 
+        O(src) was /path/to/file.myextension, O(dest) will be /path/to/file.myextension_decompressed).
     type: path
-    required: true
   format:
     description:
       - The type of compression to use to decompress.
@@ -53,6 +57,10 @@ EXAMPLES = '''
   community.general.decompress:
     src: /path/to/file.txt.gz
     dest: /path/to/file.txt
+    
+- name: Decompress file /path/to/file.txt.gz into /path/to/file.txt 
+  community.general.decompress:
+    src: /path/to/file.txt.gz
     
 - name: Decompress file compressed with bzip2
   community.general.decompress:
@@ -98,9 +106,10 @@ def decompress(src, dest, handler):
 
 
 class Decompress(object):
+    destination_filename_template = "%s_decompressed"
+
     def __init__(self, module):
         self.src = module.params['src']
-        self.dest = module.params['dest']
         self.fmt = module.params['format']
         self.remove = module.params['remove']
         self.check_mode = module.check_mode
@@ -108,6 +117,12 @@ class Decompress(object):
         self.changed = False
         self.msg = ""
         self.handlers = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
+
+        dest = module.params['dest']
+        if dest is None:
+            self.dest = self.get_destination_filename()
+        else:
+            self.dest = dest
 
     def configure(self):
         if not os.path.exists(self.src):
@@ -118,7 +133,7 @@ class Decompress(object):
             self.module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % self.dest)
         self.fmt = self.module.params['format']
         if self.fmt not in self.handlers:
-            self.module.fail_json(msg="Couldn't decompress '%s' format" % self.fmt)
+            self.module.fail_json(msg="Could not decompress '%s' format" % self.fmt)
 
     def run(self):
         self.configure()
@@ -148,12 +163,21 @@ class Decompress(object):
         self.msg = "success"
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
 
+    def get_destination_filename(self):
+        src = self.src
+        fmt_extension = ".%s" % self.fmt
+        if src.endswith(fmt_extension) and len(src) > len(fmt_extension):
+            filename = src[:-len(fmt_extension)]
+        else:
+            filename = Decompress.destination_filename_template % src
+        return filename
+
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             src=dict(type='path', required=True),
-            dest=dict(type='path', required=True),
+            dest=dict(type='path'),
             format=dict(type='str', default='gz', choices=['gz', 'bz2', 'xz']),
             remove=dict(type='bool', default=False)
         ),
