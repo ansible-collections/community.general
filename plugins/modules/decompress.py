@@ -187,7 +187,7 @@ def main():
     d = Decompress(module)
     d.run()
 
-    module.exit_json(changed=d.changed, msg=d.msg)
+    module.exit_json(changed=d.changed, dest=d.dest)
 
 
 if __name__ == '__main__':
