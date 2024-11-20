@@ -907,6 +907,7 @@ msg:
   sample: "VM kropta with vmid = 110 is running"
 '''
 
+import json
 import re
 import time
 from ansible.module_utils.six.moves.urllib.parse import quote
@@ -1117,14 +1118,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                     self.module.fail_json(msg='%s is not a valid tag' % tag)
             kwargs['tags'] = ",".join(kwargs['tags'])
 
-        # -args and skiplock require root@pam user - but can not use api tokens
-        if self.module.params['api_user'] == "root@pam" and self.module.params['args'] is not None:
-            kwargs['args'] = self.module.params['args']
-        elif self.module.params['api_user'] != "root@pam" and self.module.params['args'] is not None:
-            self.module.fail_json(msg='args parameter require root@pam user. ')
+        # -args and skiplock require root@pam user but cannot use API tokens
+        if self.module.params['api_user'] == 'root@pam':
+            if self.module.params['args'] is not None:
+                kwargs['args'] = self.module.params['args']
+        else:
+            if self.module.params['args'] is not None:
+                self.module.fail_json(msg='args parameter require root@pam user. ')
 
-        if self.module.params['api_user'] != "root@pam" and self.module.params['skiplock'] is not None:
-            self.module.fail_json(msg='skiplock parameter require root@pam user. ')
+            if self.module.params['skiplock'] is not None:
+                self.module.fail_json(msg='skiplock parameter require root@pam user. ')
 
         if update:
             if proxmox_node.qemu(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:
@@ -1139,6 +1142,10 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
         else:
             taskid = proxmox_node.qemu.create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
+
+            # FIXME: Workaround for https://forum.proxmox.com/threads/api-bug-pvesh-create-nodes-node-qemu-output-format-json-response-format-broken.111469/.
+            if 'errors' in taskid:
+                taskid = json.loads(taskid['errors'].splitlines()[-1])
 
         if not self.wait_for_task(node, taskid):
             self.module.fail_json(msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
@@ -1310,7 +1317,7 @@ def main():
         argument_spec=module_args,
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_together=[('api_token_id', 'api_token_secret')],
-        required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
+        required_one_of=[('name', 'vmid')],
         required_if=[('state', 'present', ['node'])],
     )
 
