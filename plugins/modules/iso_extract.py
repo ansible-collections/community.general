@@ -70,6 +70,7 @@ options:
   password:
     description:
     - Password used to decrypt files from the ISO.
+    - Will only be used if 7z is used.
     type: str
     version_added: 10.1.0
 notes:
