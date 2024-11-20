@@ -161,11 +161,13 @@ def main():
 
     # Use 7zip when we have a binary, otherwise try to mount
     if binary:
-        cmd = [binary, 'x', image, '-o%s' % tmp_dir] + extract_files
+        cmd = [binary, 'x', image, '-o%s' % tmp_dir]
+        if password:
+          cmd += "-p%s" % password
+        cmd += extract_files
     else:
         cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
-    if password:
-        cmd += "-p%s" % password
+
     rc, out, err = module.run_command(cmd)
     if rc != 0:
         result.update(dict(
