@@ -845,7 +845,7 @@ class CloudflareAPI(object):
             }
             search_value = None
 
-        new_record['comment'] = params['comment'] or ""
+        new_record['comment'] = params['comment'] or None
         new_record['tags'] = params['tags'] or []
 
         zone_id = self._get_zone_id(params['zone'])
