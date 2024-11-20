@@ -71,7 +71,7 @@ options:
     description:
     - Password used to decrypt files from the ISO.
     type: str
-    default: ''
+    version_added: 10.1.0
 notes:
 - Only the file checksum (content) is taken into account when extracting files
   from the ISO image. If O(force=false), only checks the presence of the file.
