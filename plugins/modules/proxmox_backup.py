@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: proxmox_backup
+author: "Raphael Grieger (@IamLunchbox) <r.grieger@hotmail.com>"
 short_description: Start a VM backup in Proxmox VE cluster
 version_added: 10.0.0
 description:
@@ -51,9 +52,9 @@ options:
   description:
     description:
       - Specify the description for the backup.
-      - Template string for generating notes for the backup(s). 
-      - Can contain variables which will be replaced by their values. 
-      - Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. 
+      - Template string for generating notes for the backup(s).
+      - Can contain variables which will be replaced by their values.
+      - Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future.
       - Needs to be a single line, newline and backslash need to be escaped as `\n` and `\\` respectively.
     default: '{{guestname}}'
     type: str
@@ -123,7 +124,6 @@ options:
 notes:
   - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
 requirements: ["proxmoxer", "requests"]
-author: IamLunchbox
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
   - community.general.proxmox.documentation
@@ -376,7 +376,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 def main():
     module_args = proxmox_auth_argument_spec()
     backup_args = {'bandwidth': {'type': 'int'},
-                   'backup_mode': {'type': 'str','choices': ['snapshot', 'suspend', 'stop'],'default': 'snapshot'},
+                   'backup_mode': {'type': 'str', 'choices': ['snapshot', 'suspend', 'stop'], 'default': 'snapshot'},
                    'compress': {'type': 'str', 'choices': ['0', '1', 'gzip', 'lzo', 'zstd']},
                    'compression_threads': {'type': 'int'},
                    'description': {'type': 'str', 'default': '{{guestname}}'},
@@ -399,8 +399,9 @@ def main():
         supports_check_mode=True,
         required_if=[
             ('mode', 'include', ('vmids',), True),
-            ('mode', 'pool', ('pool',))]
-        )
+            ('mode', 'pool', ('pool',))
+        ]
+    )
     proxmox = ProxmoxBackupAnsible(module)
 
     bandwidth = module.params['bandwidth']
