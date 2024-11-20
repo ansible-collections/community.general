@@ -105,7 +105,7 @@ def main():
             dest=dict(type='path', required=True),
             files=dict(type='list', elements='str', required=True),
             force=dict(type='bool', default=True),
-            password=dict(type='str', default="", no_log=True),
+            password=dict(type='str', no_log=True),
             executable=dict(type='path'),  # No default on purpose
         ),
         supports_check_mode=True,
