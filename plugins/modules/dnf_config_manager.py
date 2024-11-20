@@ -186,6 +186,7 @@ def main():
         argument_spec=module_args,
         supports_check_mode=True
     )
+    module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
 
     if not os.path.exists(DNF_BIN):
         module.fail_json(msg="%s was not found" % DNF_BIN)
