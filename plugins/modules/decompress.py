@@ -9,14 +9,17 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: decompress
 short_description: Decompresses compressed files.
-description: 
+description:
     - Decompresses compressed files.
     - The source (compressed) file and destination (decompressed) files are on the remote host.
     - Source file can be deleted after decompression.
+extends_documentation_fragment:
+    - files
+    - community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -32,10 +35,11 @@ options:
     description:
       - The file name of the destination file where the compressed file will be decompressed.
       - If the destination file exists, it will be truncated and overwritten.
-      - If not specified, the destination filename will be O(src) without the compression format extension (for 
-        instance, if O(src) was /path/to/file.txt.gz, O(dest) will be /path/to/file.txt). If O(src) file does not end 
-        with the O(format) extension, the O(dest) filename will have the form O(src)_decompressed (for instance, if 
-        O(src) was /path/to/file.myextension, O(dest) will be /path/to/file.myextension_decompressed).
+      - If not specified, the destination filename will be derived from O(src) by removing the compression format
+        extension. For example, if O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) will be 
+        V(/path/to/file.txt). If the O(src) file does not have an extension for the current O(format), the O(dest) 
+        filename will be made by appending V(_decompressed) to the O(src) filename. For instance, if O(src) is 
+        V(/path/to/file.myextension), the (dest) filename will be V(/path/to/file.myextension_decompressed).
     type: path
   format:
     description:
@@ -48,31 +52,39 @@ options:
       - Remove original compressed file after decompression
     type: bool
     default: false
-  author:
-    - Stanislav Shamilov (@shamilovstas)
+author:
+  - Stanislav Shamilov (@shamilovstas)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Decompress file /path/to/file.txt.gz into /path/to/file.txt (gz compression is used by default)
   community.general.decompress:
     src: /path/to/file.txt.gz
     dest: /path/to/file.txt
-    
-- name: Decompress file /path/to/file.txt.gz into /path/to/file.txt 
+
+- name: Decompress file /path/to/file.txt.gz into /path/to/file.txt
   community.general.decompress:
     src: /path/to/file.txt.gz
-    
+
 - name: Decompress file compressed with bzip2
   community.general.decompress:
     src: /path/to/file.txt.bz2
     dest: /path/to/file.bz2
     format: bz2
-    
+
 - name: Decompress file and delete the compressed file afterwards
   community.general.decompress:
     src: /path/to/file.txt.gz
     dest: /path/to/file.txt
     remove: true
+'''
+
+RETURN = r'''
+dest:
+  description: Path to decompressed file
+  type: str
+  returned: success
+  sample: /path/to/file.txt
 '''
 
 import bz2
@@ -115,7 +127,6 @@ class Decompress(object):
         self.check_mode = module.check_mode
         self.module = module
         self.changed = False
-        self.msg = ""
         self.handlers = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
 
         dest = module.params['dest']
@@ -160,7 +171,6 @@ class Decompress(object):
             os.unlink(temppath)
         if self.remove and not self.check_mode:
             os.remove(self.src)
-        self.msg = "success"
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
 
     def get_destination_filename(self):
