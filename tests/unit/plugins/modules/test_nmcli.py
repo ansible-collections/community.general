@@ -4384,6 +4384,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
+            sriov=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
