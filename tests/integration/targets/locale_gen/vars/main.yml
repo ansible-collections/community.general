@@ -24,3 +24,6 @@ locale_list_basic:
       - tr_CY.UTF-8
       - tr_CY.utf8
     skip_removal: false
+  - localegen: de_CH.UTF-8
+    locales: [de_CH.utf8]
+    skip_removal: false
