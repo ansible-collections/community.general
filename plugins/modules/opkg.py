@@ -151,6 +151,7 @@ class Opkg(StateModuleHelper):
         )
 
         def _force(value):
+            # 12.0.0 function _force() to be removed entirely
             if value == "":
                 self.deprecate('Value "" is deprecated. Simply omit the parameter "force" to prevent any --force-X argument when running opkg',
                                version="12.0.0",
@@ -166,7 +167,7 @@ class Opkg(StateModuleHelper):
             arg_formats=dict(
                 package=cmd_runner_fmt.as_list(),
                 state=cmd_runner_fmt.as_map(state_map),
-                force=cmd_runner_fmt.as_func(_force),
+                force=cmd_runner_fmt.as_func(_force),  # 12.0.0 replace with cmd_runner_fmt.as_optval("--force-")
                 update_cache=cmd_runner_fmt.as_bool("update"),
                 version=cmd_runner_fmt.as_fixed("--version"),
             ),
