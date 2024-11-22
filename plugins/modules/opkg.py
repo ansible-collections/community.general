@@ -152,10 +152,9 @@ class Opkg(StateModuleHelper):
 
         def _force(value):
             if value == "":
-                self.deprecate('Value "" is deprecated. Omit the parameter "force" to have the exact same behavior.',
+                self.deprecate('Value "" is deprecated. Simply omit the parameter "force" to prevent any --force-X argument when running opkg',
                                version="12.0.0",
-                               collection_name="community.general"
-                )
+                               collection_name="community.general")
                 value = None
             return cmd_runner_fmt.as_optval("--force-")(value, ctx_ignore_none=True)
 
