@@ -71,16 +71,17 @@ options:
         description:
             - The full path for the target root directory.
         type: str
-        version_added: '10.0.2'
+        version_added: '10.1.0'
     repository:
         description:
             - Repository URL(s) to prepend to the repository list for the
               package installation.
               The URL can be a URL to a repository for
               remote repositories or a path for local repositories.
+        aliases: [repositories]
         type: list
         elements: str
-        version_added: '10.0.2'
+        version_added: '10.1.0'
 '''
 
 EXAMPLES = '''
