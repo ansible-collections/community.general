@@ -20,6 +20,20 @@
       - gz
       - xz
 
+- name: Ensure xz is present to create compressed files (yum)
+  yum: name=xz state=latest
+  when: ansible_facts.pkg_mgr == 'yum'
+
+- name: Ensure xz is present to create compressed files (apt)
+  apt: name=xz-utils state=latest
+  when: ansible_facts.pkg_mgr == 'apt'
+
+- name: Generate compressed files
+  shell: gzip -k {{ item }} && bzip2 -k {{ item }} && xz -k {{ item }}
+  loop:
+    - "{{ remote_tmp_dir }}/file.txt"
+    - "{{ remote_tmp_dir }}/second_file.txt"
+
 # Run tests
 - name: Run core tests
   block:
