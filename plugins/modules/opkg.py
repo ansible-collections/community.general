@@ -46,8 +46,7 @@ options:
     force:
         description:
             - The C(opkg --force) parameter used.
-            - Passing V("") as value and not passing any value at all have both
-              the same effect of B(not) using any C(--force-) parameter.
+            - State V("") is deprecated and will be removed in community.general 12.0.0. Please omit the parameter O(force) to obtain the same behavior.
         choices:
             - ""
             - "depends"
@@ -153,6 +152,10 @@ class Opkg(StateModuleHelper):
 
         def _force(value):
             if value == "":
+                self.deprecate('Value "" is deprecated. Omit the parameter "force" to have the exact same behavior.',
+                               version="12.0.0",
+                               collection_name="community.general"
+                )
                 value = None
             return cmd_runner_fmt.as_optval("--force-")(value, ctx_ignore_none=True)
 
