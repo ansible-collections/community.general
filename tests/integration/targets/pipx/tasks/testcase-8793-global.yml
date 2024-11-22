@@ -5,7 +5,7 @@
 
 - name: Set up environment
   environment:
-    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+    PATH: /root/.local/bin:/usr/local/bin:{{ ansible_env.PATH }}
   block:
     - name: Remove global pipx dir
       ansible.builtin.file:
