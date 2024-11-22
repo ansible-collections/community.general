@@ -36,9 +36,9 @@ options:
       - The file name of the destination file where the compressed file will be decompressed.
       - If the destination file exists, it will be truncated and overwritten.
       - If not specified, the destination filename will be derived from O(src) by removing the compression format
-        extension. For example, if O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) will be 
-        V(/path/to/file.txt). If the O(src) file does not have an extension for the current O(format), the O(dest) 
-        filename will be made by appending V(_decompressed) to the O(src) filename. For instance, if O(src) is 
+        extension. For example, if O(src) is V(/path/to/file.txt.gz) and O(format) is V(gz), O(dest) will be
+        V(/path/to/file.txt). If the O(src) file does not have an extension for the current O(format), the O(dest)
+        filename will be made by appending C(_decompressed) to the O(src) filename. For instance, if O(src) is
         V(/path/to/file.myextension), the (dest) filename will be V(/path/to/file.myextension_decompressed).
     type: path
   format:
@@ -52,6 +52,8 @@ options:
       - Remove original compressed file after decompression
     type: bool
     default: false
+requirements:
+    - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python 2) if using C(xz) format.
 author:
   - Stanislav Shamilov (@shamilovstas)
 '''
@@ -90,13 +92,32 @@ dest:
 import bz2
 import filecmp
 import gzip
-import lzma
 import os
 import shutil
 import tempfile
 
-from ansible.module_utils.basic import AnsibleModule
+from traceback import format_exc
+from ansible.module_utils import six
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+LZMA_IMP_ERR = None
+if six.PY3:
+    try:
+        import lzma
+
+        HAS_LZMA = True
+    except ImportError:
+        LZMA_IMP_ERR = format_exc()
+        HAS_LZMA = False
+else:
+    try:
+        from backports import lzma
+
+        HAS_LZMA = True
+    except ImportError:
+        LZMA_IMP_ERR = format_exc()
+        HAS_LZMA = False
 
 
 def lzma_decompress(src):
@@ -112,8 +133,10 @@ def gzip_decompress(src):
 
 
 def decompress(src, dest, handler):
-    with handler(src) as src_file:
-        with open(dest, "wb") as dest_file:
+    b_src = to_native(src, errors='surrogate_or_strict')
+    b_dest = to_native(dest, errors='surrogate_or_strict')
+    with handler(b_src) as src_file:
+        with open(b_dest, "wb") as dest_file:
             shutil.copyfileobj(src_file, dest_file)
 
 
@@ -134,14 +157,16 @@ class Decompress(object):
             self.dest = self.get_destination_filename()
         else:
             self.dest = dest
+        self.b_dest = to_native(self.dest, errors='surrogate_or_strict')
+        self.b_src = to_native(self.src, errors='surrogate_or_strict')
 
     def configure(self):
-        if not os.path.exists(self.src):
-            self.module.fail_json(msg="Path does not exist: '%s'" % self.src)
-        if os.path.isdir(self.src):
-            self.module.fail_json(msg="Cannot decompress directory '%s'" % self.src)
-        if os.path.exists(self.dest) and os.path.isdir(self.dest):
-            self.module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % self.dest)
+        if not os.path.exists(self.b_src):
+            self.module.fail_json(msg="Path does not exist: '%s'" % self.b_src)
+        if os.path.isdir(self.b_src):
+            self.module.fail_json(msg="Cannot decompress directory '%s'" % self.b_src)
+        if os.path.exists(self.b_src) and os.path.isdir(self.b_src):
+            self.module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % self.b_src)
         self.fmt = self.module.params['format']
         if self.fmt not in self.handlers:
             self.module.fail_json(msg="Could not decompress '%s' format" % self.fmt)
@@ -152,25 +177,26 @@ class Decompress(object):
         handler = self.handlers[self.fmt]
         try:
             tempfd, temppath = tempfile.mkstemp(dir=self.module.tmpdir)
-            decompress(self.src, tempfd, handler)
+            b_temppath = to_native(temppath, errors='surrogate_or_strict')
+            decompress(self.b_src, b_temppath, handler)
         except OSError as e:
             self.module.fail_json(msg="Unable to create temporary file '%s'" % to_native(e))
 
-        if os.path.exists(self.dest):
-            self.changed = not filecmp.cmp(temppath, self.dest, shallow=False)
+        if os.path.exists(self.b_dest):
+            self.changed = not filecmp.cmp(b_temppath, self.b_dest, shallow=False)
         else:
             self.changed = True
 
         if self.changed and not self.module.check_mode:
             try:
-                self.module.atomic_move(temppath, self.dest)
+                self.module.atomic_move(b_temppath, self.b_dest)
             except OSError:
-                self.module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (temppath, self.dest))
+                self.module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (b_temppath, self.dest))
 
-        if os.path.exists(temppath):
-            os.unlink(temppath)
+        if os.path.exists(b_temppath):
+            os.unlink(b_temppath)
         if self.remove and not self.check_mode:
-            os.remove(self.src)
+            os.remove(self.b_src)
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
 
     def get_destination_filename(self):
@@ -194,6 +220,11 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True
     )
+    if not HAS_LZMA and module.params['format'] == 'xz':
+        module.fail_json(
+            msg=missing_required_lib("lzma or backports.lzma", reason="when using xz format"), exception=LZMA_IMP_ERR
+        )
+
     d = Decompress(module)
     d.run()
 
