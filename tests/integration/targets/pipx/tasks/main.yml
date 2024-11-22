@@ -263,3 +263,6 @@
 
     - name: Include testcase for PR 9009 injectpkg --global
       ansible.builtin.include_tasks: testcase-9009-fixglobal.yml
+
+    - name: Include testcase for PR 9103 upgrade --global
+      ansible.builtin.include_tasks: testcase-9103-upgrade-global.yml
