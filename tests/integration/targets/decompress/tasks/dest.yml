@@ -27,7 +27,7 @@
     path: "{{ remote_tmp_dir }}/{{ filename }}"
   loop:
     - dest.txt
-    - dest
+    - dest_decompressed
   loop_control:
     loop_var: filename
   register: result_files_stat
@@ -46,6 +46,6 @@
     state: absent
   loop:
     - "dest.txt"
-    - "dest"
+    - "dest_decompressed"
   loop_control:
     loop_var: filename
