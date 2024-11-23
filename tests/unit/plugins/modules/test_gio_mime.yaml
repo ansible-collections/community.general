@@ -13,7 +13,7 @@
     changed: true
   mocks:
     run_command:
-    - command: [/testbin/gio, mime, --version]
+    - command: [/testbin/gio, --version]
       environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
       rc: 0
       out: "2.80.0\n"
@@ -40,7 +40,7 @@
     skip: test helper does not support check mode yet
   mocks:
     run_command:
-    - command: [/testbin/gio, mime, --version]
+    - command: [/testbin/gio, --version]
       environ: *env-def
       rc: 0
       out: "2.80.0\n"
@@ -65,7 +65,7 @@
     changed: false
   mocks:
     run_command:
-    - command: [/testbin/gio, mime, --version]
+    - command: [/testbin/gio, --version]
       environ: *env-def
       rc: 0
       out: "2.80.0\n"
