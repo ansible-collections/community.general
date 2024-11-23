@@ -363,7 +363,6 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         permissions = self._get_permissions()
         self._check_if_storage_exists(storage, node)
         self._check_storage_permissions(permissions, storage, bandwidth, performance_tweaks, retention)
-
         if mode == "include":
             self._check_vmid_backup_permission(permissions, vmids, pool)
         else:
