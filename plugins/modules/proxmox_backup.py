@@ -346,6 +346,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                     msg="Reached timeout while waiting for creating VM snapshot. "
                         "Nodes who reached the timeout: %s." % (
                         ', '.join(timeouted_nodes)))
+            time.sleep(1)
         error_logs = []
         for node in tasks:
             if tasks[node]["status"] == "failed":
