@@ -50,6 +50,7 @@ options:
     description:
       - The number of threads zstd will use to compress the backup.
       - 0 uses 50% of the available cores, anything larger then 0 will use exactly as many threads.
+      - Is ignored if you specify O(compress=gzip) or O(compress=lzo)
     type: int
   description:
     description:
@@ -80,6 +81,8 @@ options:
   node:
     description:
       - Only execute the backup job for the given node.
+      - This option is usually used if O(mode=all). 
+      - If you specify a node id and your vmids or pool do not reside there, they will not be backed up!
     type: str
   performance_tweaks:
     description:
@@ -99,8 +102,17 @@ options:
     type: bool
   retention:
     description:
-      - Use custom retention options instead of those from the storage configuration.
-      - Requires Datastore.Allocate permission for the storage endpoint.
+      - > 
+        Use custom retention options instead of those from the default cluster 
+        configuration (which is usually 'keep-all').
+      - Requires Datastore.Allocate permission at the storage endpoint.
+      - > 
+        Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore,
+        if an existing backup would be pruned due to your specified timeframe and 
+        will need Datastore.Modify or Datastore.Prune permissions on the backup storage.
+      - >
+        If you are unsure, if your cluster uses keep-all as a default, you can set
+        V(keep-all=1) to safeguard against unintended pruning or permission errors. 
     type: str
   storage:
     description:
