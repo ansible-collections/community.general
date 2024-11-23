@@ -100,7 +100,7 @@ import tempfile
 from traceback import format_exc
 from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.text.converters import to_native, to_bytes
 
 LZMA_IMP_ERR = None
 if six.PY3:
@@ -133,9 +133,7 @@ def gzip_decompress(src):
     return gzip.open(src, "rb")
 
 
-def decompress(src, dest, handler):
-    b_src = to_native(src, errors='surrogate_or_strict')
-    b_dest = to_native(dest, errors='surrogate_or_strict')
+def decompress(b_src, b_dest, handler):
     with handler(b_src) as src_file:
         with open(b_dest, "wb") as dest_file:
             shutil.copyfileobj(src_file, dest_file)
@@ -158,15 +156,20 @@ class Decompress(object):
             self.dest = self.get_destination_filename()
         else:
             self.dest = dest
-        self.b_dest = to_native(self.dest, errors='surrogate_or_strict')
-        self.b_src = to_native(self.src, errors='surrogate_or_strict')
+        self.b_dest = to_bytes(self.dest, errors='surrogate_or_strict')
+        self.b_src = to_bytes(self.src, errors='surrogate_or_strict')
 
     def configure(self):
         if not os.path.exists(self.b_src):
-            self.module.fail_json(msg="Path does not exist: '%s'" % self.b_src)
+            msg = "Path does not exist: '%s'" % self.b_src
+            if self.remove and os.path.exists(self.b_dest):
+                self.module.warn(msg)
+                self.module.exit_json(changed=False)
+            else:
+                self.module.fail_json(msg=msg)
         if os.path.isdir(self.b_src):
             self.module.fail_json(msg="Cannot decompress directory '%s'" % self.b_src)
-        if os.path.exists(self.b_src) and os.path.isdir(self.b_src):
+        if os.path.isdir(self.b_dest):
             self.module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % self.b_src)
         self.fmt = self.module.params['format']
         if self.fmt not in self.handlers:
@@ -178,7 +181,8 @@ class Decompress(object):
         handler = self.handlers[self.fmt]
         try:
             tempfd, temppath = tempfile.mkstemp(dir=self.module.tmpdir)
-            b_temppath = to_native(temppath, errors='surrogate_or_strict')
+            self.module.add_cleanup_file(temppath)
+            b_temppath = to_bytes(temppath, errors='surrogate_or_strict')
             decompress(self.b_src, b_temppath, handler)
         except OSError as e:
             self.module.fail_json(msg="Unable to create temporary file '%s'" % to_native(e))
@@ -194,8 +198,6 @@ class Decompress(object):
             except OSError:
                 self.module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (b_temppath, self.dest))
 
-        if os.path.exists(b_temppath):
-            os.unlink(b_temppath)
         if self.remove and not self.check_mode:
             os.remove(self.b_src)
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)

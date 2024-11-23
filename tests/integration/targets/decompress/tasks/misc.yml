@@ -50,14 +50,23 @@
     dest: "{{ remote_tmp_dir }}/file_copied.txt"
     remove: true
 
+- name: Decompress non existing src
+  community.general.decompress:
+    src: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_copied.txt"
+    remove: true
+  register: decompress_non_existing_src
+
 - name: Stat compressed file
   stat:
     path: "{{ remote_tmp_dir }}/file_copied.txt.gz"
   register: compressed_stat
 
-- name: Check that original file was deleted
+- name: Run tests
   assert:
-    that: not compressed_stat.stat.exists
+    that:
+      - not compressed_stat.stat.exists
+      - not decompress_non_existing_src.changed
 
 - name: Delete decompressed file
   file:
