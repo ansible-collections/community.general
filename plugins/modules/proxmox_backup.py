@@ -80,7 +80,7 @@ options:
   node:
     description:
       - Only execute the backup job for the given node.
-      - This option is usually used if O(mode=all). 
+      - This option is usually used if O(mode=all).
       - If you specify a node id and your vmids or pool do not reside there, they will not be backed up!
     type: str
   performance_tweaks:
@@ -97,21 +97,21 @@ options:
   protected:
     description:
       - Mark backups as protected.
-      - Might fail the task due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)
+      - "Might fail the task due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)"
     type: bool
   retention:
     description:
-      - > 
-        Use custom retention options instead of those from the default cluster 
+      - >
+        Use custom retention options instead of those from the default cluster
         configuration (which is usually 'keep-all').
       - Requires Datastore.Allocate permission at the storage endpoint.
-      - > 
+      - >
         Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore,
-        if an existing backup would be pruned due to your specified timeframe and 
+        if an existing backup would be pruned due to your specified timeframe and
         will need Datastore.Modify or Datastore.Prune permissions on the backup storage.
       - >
         If you are unsure, if your cluster uses keep-all as a default, you can set
-        V(keep-all=1) to safeguard against unintended pruning or permission errors. 
+        V(keep-all=1) to safeguard against unintended pruning or permission errors.
     type: str
   storage:
     description:
@@ -343,8 +343,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                             "Nodes, which failed: %s" % (', '.join(timeouted_nodes), ', '.join(failed_nodes)))
                 self.module.fail_json(
                     msg="Reached timeout while waiting for creating VM snapshot. "
-                        "Nodes who reached the timeout: %s." % (
-                        ', '.join(timeouted_nodes)))
+                        "Nodes who reached the timeout: %s." % (', '.join(timeouted_nodes)))
             time.sleep(1)
         error_logs = []
         for node in tasks:
