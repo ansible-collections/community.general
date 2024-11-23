@@ -12,13 +12,14 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: decompress
-short_description: Decompresses compressed files.
+short_description: Decompresses compressed files
+version_added: 10.1.0
 description:
     - Decompresses compressed files.
     - The source (compressed) file and destination (decompressed) files are on the remote host.
     - Source file can be deleted after decompression.
 extends_documentation_fragment:
-    - files
+    - ansible.builtin.files
     - community.general.attributes
 attributes:
   check_mode:
@@ -49,7 +50,7 @@ options:
     default: gz
   remove:
     description:
-      - Remove original compressed file after decompression
+      - Remove original compressed file after decompression.
     type: bool
     default: false
 requirements:
