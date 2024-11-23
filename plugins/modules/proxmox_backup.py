@@ -194,7 +194,27 @@ EXAMPLES = r'''
     wait_timeout: 30
 '''
 
-RETURN = r'''#'''
+RETURN = r'''
+backups:
+  description: List of nodes and their task IDs.
+  returned: on success
+  type: list
+  elements: dict
+  contains:
+    node:
+      description: Node id.
+      returned: on success
+      type: str
+    status:
+      description: Last known task status. Will be unknown, if O(wait=false).
+      returned: on success
+      type: str
+      choices: ['unknown', 'success', 'failed']
+    upid:
+      description: Proxmox cluster UPID, which is needed to lookup task info.
+      returned: on success
+      type: str
+'''
 
 import time
 
@@ -211,7 +231,15 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def _get_resources(self, resource_type=None) -> dict:
         return self.proxmox_api.cluster.resources.get(type=resource_type)
 
-    def _get_relevant_nodes(self, node) -> list:
+    def _post_backup_request(self, request_body: dict, node_endpoints: list) -> list:
+        task_ids = []
+
+        for node in node_endpoints:
+            upid = self.proxmox_api.nodes(node).vzdump.post(**request_body)
+            task_ids.extend([{"node": node, "upid": upid, "status": "unknown", "log": "%s" % self.proxmox_api.nodes(node).tasks(upid).log.get()[-4:]}])
+        return task_ids
+
+    def _check_relevant_nodes(self, node: str) -> list:
         nodes = [item["node"] for item in self._get_resources("node") if item["status"] == "online"]
         if node and node not in nodes:
             self.module.fail_json(msg="Node %s was specified, but does not exist on the cluster" % node)
@@ -310,32 +338,34 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         if vmids_not_found:
             self.module.warn(msg="VMIDs %s not found. This task will fail if one VMID does not exist." % ', '.join(vmids_not_found))
 
-    def _wait_for_timeout(self, timeout: int, raw_tasks: dict) -> list:
+    def _wait_for_timeout(self, timeout: int, raw_tasks: list) -> list:
+
         # filter all entries, which did not get a task id from the Cluster
-        tasks = {}
+        tasks = []
         for node in raw_tasks:
-            if raw_tasks[node]["upid"] != "OK":
-                tasks.update({node: raw_tasks[node]})
+            if node["upid"] != "OK":
+                tasks.append(node)
+
         start_time = time.time()
         # iterate through the task ids and check their values
         while True:
             for node in tasks:
-                if not tasks[node]["status"]:
+                if node["status"] == "unknown":
                     try:
-                        status = self.proxmox_api.nodes(node).tasks(tasks[node]["upid"]).status.get()
+                        # proxmox.api_task_ok does not suffice, since it only is true at `stopped` and `ok`
+                        status = self.proxmox_api.nodes(node["node"]).tasks(node["upid"]).status.get()
                         if status["status"] == "stopped" and status["exitstatus"] == "OK":
-                            tasks[node]["status"] = "success"
+                            node["status"] = "success"
                         if status["status"] == "stopped" and status["exitstatus"] in ("job errors",):
-                            tasks[node]["status"] = "failed"
+                            node["status"] = "failed"
                     except Exception as e:
                         self.module.fail_json(
-                            msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
-
-            if len({item for item in tasks if tasks[item]["status"]}) == len(tasks):
+                            msg='Unable to retrieve API task ID from node %s: %s' % (node["node"], e))
+            if len([item for item in tasks if item["status"] != "unknown"]) == len(tasks):
                 break
             if time.time() > start_time + timeout:
-                timeouted_nodes = [node for node in tasks if not tasks[node]["status"]]
-                failed_nodes = [node for node in tasks if tasks[node]["status"] == "failed"]
+                timeouted_nodes = [node["node"] for node in tasks if node["status"] == "unknown"]
+                failed_nodes = [node["node"] for node in tasks if node["status"] == "failed"]
                 if failed_nodes:
                     self.module.fail_json(
                         msg="Reached timeout while waiting for backup task. "
@@ -347,16 +377,15 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             time.sleep(1)
         error_logs = []
         for node in tasks:
-            if tasks[node]["status"] == "failed":
-                error_logs.append("%s: %s" % (node, self.proxmox_api.nodes(node).tasks(tasks[node]['upid']).log.get()[-4:]))
+            if node["status"] == "failed":
+                error_logs.append("%s: %s" % (node, self.proxmox_api.nodes(node["node"]).tasks(node["upid"]).log.get()[-4:]))
         if error_logs:
             self.module.fail_json(msg="An error occured creating the backups. "
                                       "These are the last log lines from the failed nodes: %s" % ', '.join(error_logs))
-        succes_logs = []
+
         for node in tasks:
-            if tasks[node]["status"] == "success":
-                succes_logs.append("%s: %s" % (node, self.proxmox_api.nodes(node).tasks(tasks[node]['upid']).log.get()[-4:]))
-        return succes_logs
+            node["log"] = "%s" % self.proxmox_api.nodes(node["node"]).tasks(node['upid']).log.get()[-4:]
+        return tasks
 
     def permission_check(self, storage: str, mode: str, node: str, bandwidth: int, performance_tweaks: str, retention: bool, pool: str, vmids: list) -> None:
         permissions = self._get_permissions()
@@ -414,24 +443,20 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 request_body[key] = 1
         return request_body
 
-    def backup_create(self, module_arguments: dict, check_mode: bool) -> bool:
+    def backup_create(self, module_arguments: dict, check_mode: bool) -> list:
         request_body = self.prepare_request_parameters(module_arguments)
-        if module_arguments['mode'] == "include":
-            self._check_vmids(module_arguments['vmids'])
-        node_endpoints = self._get_relevant_nodes(module_arguments['node'])
+        if module_arguments["mode"] == "include":
+            self._check_vmids(module_arguments["vmids"])
+        node_endpoints = self._check_relevant_nodes(module_arguments["node"])
         # stop here, before anything gets changed
         if check_mode:
-            return True
+            return []
 
-        task_ids = {}
-        for node in node_endpoints:
-            upid = self.proxmox_api.nodes(node).vzdump.post(**request_body)
-            task_ids.update({node: {"upid": upid, "status": None}})
-
-        # proxmox.api_task_ok does not suffice, since it only is true at `stopped` and `ok`
-        if module_arguments['wait']:
-            self._wait_for_timeout(module_arguments['wait_timeout'], task_ids)
-        return True
+        task_ids = self._post_backup_request(request_body, node_endpoints)
+        updated_task_ids = []
+        if module_arguments["wait"]:
+            updated_task_ids = self._wait_for_timeout(module_arguments["wait_timeout"], task_ids)
+        return updated_task_ids if updated_task_ids else task_ids
 
 
 def main():
@@ -476,13 +501,13 @@ def main():
 
     proxmox.permission_check(storage, mode, node, bandwidth, performance_tweaks, retention, pool, vmids)
     try:
-        if proxmox.backup_create(dict(module.params), check_mode=module.check_mode):
-            if module.check_mode:
-                module.exit_json(changed=False, msg="Backups would be created")
-            elif module.params['wait']:
-                module.exit_json(changed=True, msg="Backups created and no errors reported")
-            else:
-                module.exit_json(changed=True, msg="Backups issued towards proxmox")
+        result = proxmox.backup_create(dict(module.params), check_mode=module.check_mode)
+        if module.check_mode:
+            module.exit_json(changed=False, msg="Backups would be created")
+        elif module.params['wait']:
+            module.exit_json(backups=result, changed=True, msg="Backups created and no errors reported")
+        else:
+            module.exit_json(backups=result, changed=True, msg="Backups issued towards proxmox")
 
     except Exception as e:
         module.fail_json(msg="Creating backups failed with exception: %s" % to_native(e))
