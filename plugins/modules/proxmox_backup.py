@@ -8,6 +8,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import epdb
+
 DOCUMENTATION = r'''
 ---
 module: proxmox_backup
@@ -29,7 +31,7 @@ attributes:
 options:
   bandwidth:
     description:
-      - Limit the I/O bandwidth (in KiB/s) to send the . 0 is unlimited.
+      - Limit the I/O bandwidth (in KiB/s) to send the backup. 0 is unlimited.
     type: int
   backup_mode:
     description:
@@ -93,6 +95,7 @@ options:
   protected:
     description:
       - Mark backups as protected.
+      - Might fail the task due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)
     type: bool
   retention:
     description:
@@ -159,6 +162,25 @@ EXAMPLES = r'''
     mode: all
     node: mynode
 
+- name: Use all the options, since you have all permissions
+  community.general.proxmox_backup:
+    api_user: root@pam
+    api_password: rootpassword
+    api_host: node1
+    bandwidth: 1000
+    backup_mode: suspend
+    compress: zstd
+    compression_threads: 0
+    description: test123
+    mode: include
+    node: node1
+    notification_mode: notification-system
+    protected: true
+    retention: keep-monthly=1 ,keep-weekly=1
+    storage: mypbs
+    vmids: [100]
+    wait: true
+    wait_timeout: 30
 '''
 
 RETURN = r'''#'''
@@ -199,7 +221,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                                   msg="Insufficient permission: Datastore.AllocateSpace is missing.")
         if (bandwidth or performance) and permissions["/"].get("Sys.Modify", 0) == 0:
             self.module.fail_json(changed=False,
-                                  msg="Insufficient permission: Requested performance tweaks or bandwidth settings require Sys.Modify /.")
+                                  msg="Insufficient permission: Performance_tweaks and bandwidth require 'Sys.Modify' permission for '/'.")
         if retention:
             if "/" in permissions.keys() and permissions["/"].get(
                     "Datastore.Allocate", 0) == 1:
@@ -297,7 +319,8 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                     except Exception as e:
                         self.module.fail_json(
                             msg='Unable to retrieve API task ID from node %s: %s' % (node, e))
-            if all({item for item in tasks if tasks[item]["status"] == "success"}):
+
+            if len({item for item in tasks if tasks[item]["status"]}) == len(tasks):
                 break
             if time.time() > start_time + timeout:
                 timeouted_nodes = [node for node in tasks if not tasks[node]["status"]]
@@ -370,13 +393,11 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         # remove whitespaces from option strings
         for key in ("prune-backups", "performance"):
             if request_body.get(key):
-                request_body.update(
-                    {key: request_body.get(key).replace(" ", "")})
+                request_body[key] = request_body[key].replace(" ", "")
         # convert booleans to 0/1
-        for key in ("protected"):
+        for key in ("protected",):
             if request_body.get(key):
-                request_body.update({key: 1})
-
+                request_body[key] = 1
         return request_body
 
     def backup_create(self, module_arguments: dict, check_mode: bool) -> bool:
