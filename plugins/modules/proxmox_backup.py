@@ -337,11 +337,15 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             if time.time() > start_time + timeout:
                 timeouted_nodes = [node for node in tasks if not tasks[node]["status"]]
                 failed_nodes = [node for node in tasks if tasks[node]["status"] == "failed"]
+                if failed_nodes:
+                    self.module.fail_json(
+                        msg="Reached timeout while waiting for backup task. "
+                            "Nodes, who reached the timeout: %s. "
+                            "Nodes, which failed: %s" % (', '.join(timeouted_nodes), ', '.join(failed_nodes)))
                 self.module.fail_json(
                     msg="Reached timeout while waiting for creating VM snapshot. "
-                        "Nodes who reached the timeout: %s; "
-                        "Nodes, which failed: %s" % (', '.join(timeouted_nodes), ', '.join(failed_nodes)))
-            time.sleep(1)
+                        "Nodes who reached the timeout: %s." % (
+                        ', '.join(timeouted_nodes)))
         error_logs = []
         for node in tasks:
             if tasks[node]["status"] == "failed":
