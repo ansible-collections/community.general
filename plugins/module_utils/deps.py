@@ -99,4 +99,4 @@ def failed(spec=None):
 
 
 def clear():
-    _deps = {}
+    _deps.clear()
