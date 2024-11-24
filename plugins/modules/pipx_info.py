@@ -119,6 +119,13 @@ cmd:
   type: list
   elements: str
   sample: ["/usr/bin/python3.10", "-m", "pipx", "list", "--include-injected", "--json"]
+
+version:
+  description: Version of pipx.
+  type: str
+  returned: always
+  sample: "1.7.1"
+  version_added: 10.1.0
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
@@ -149,6 +156,9 @@ class PipXInfo(ModuleHelper):
             facts = ansible_facts(self.module, gather_subset=['python'])
             self.command = [facts['python']['executable'], '-m', 'pipx']
         self.runner = pipx_runner(self.module, self.command)
+        with self.runner("version") as ctx:
+            rc, out, err = ctx.run()
+            self.vars.version = out.strip()
 
     def __run__(self):
         output_process = make_process_list(self, **self.vars.as_dict())

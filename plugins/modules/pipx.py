@@ -190,6 +190,15 @@ EXAMPLES = """
   with_items: "{{ pipx_packages }}"
 """
 
+RETURN = """
+version:
+  description: Version of pipx.
+  type: str
+  returned: always
+  sample: "1.7.1"
+  version_added: 10.1.0
+"""
+
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner, pipx_common_argspec, make_process_list
@@ -271,6 +280,10 @@ class PipX(StateModuleHelper):
         self.runner = pipx_runner(self.module, self.command)
 
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
+
+        with self.runner("version") as ctx:
+            rc, out, err = ctx.run()
+            self.vars.version = out.strip()
 
     def __quit_module__(self):
         self.vars.application = self._retrieve_installed()

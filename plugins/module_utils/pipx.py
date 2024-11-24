@@ -10,7 +10,7 @@ __metaclass__ = type
 import json
 
 
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 
 pipx_common_argspec = {
@@ -40,24 +40,25 @@ _state_map = dict(
 
 def pipx_runner(module, command, **kwargs):
     arg_formats = dict(
-        state=fmt.as_map(_state_map),
-        name=fmt.as_list(),
-        name_source=fmt.as_func(fmt.unpack_args(lambda n, s: [s] if s else [n])),
-        install_apps=fmt.as_bool("--include-apps"),
-        install_deps=fmt.as_bool("--include-deps"),
-        inject_packages=fmt.as_list(),
-        force=fmt.as_bool("--force"),
-        include_injected=fmt.as_bool("--include-injected"),
-        index_url=fmt.as_opt_val('--index-url'),
-        python=fmt.as_opt_val('--python'),
-        system_site_packages=fmt.as_bool("--system-site-packages"),
-        _list=fmt.as_fixed(['list', '--include-injected', '--json']),
-        editable=fmt.as_bool("--editable"),
-        pip_args=fmt.as_opt_eq_val('--pip-args'),
-        suffix=fmt.as_opt_val('--suffix'),
-        spec_metadata=fmt.as_list(),
+        state=cmd_runner_fmt.as_map(_state_map),
+        name=cmd_runner_fmt.as_list(),
+        name_source=cmd_runner_fmt.as_func(cmd_runner_fmt.unpack_args(lambda n, s: [s] if s else [n])),
+        install_apps=cmd_runner_fmt.as_bool("--include-apps"),
+        install_deps=cmd_runner_fmt.as_bool("--include-deps"),
+        inject_packages=cmd_runner_fmt.as_list(),
+        force=cmd_runner_fmt.as_bool("--force"),
+        include_injected=cmd_runner_fmt.as_bool("--include-injected"),
+        index_url=cmd_runner_fmt.as_opt_val('--index-url'),
+        python=cmd_runner_fmt.as_opt_val('--python'),
+        system_site_packages=cmd_runner_fmt.as_bool("--system-site-packages"),
+        _list=cmd_runner_fmt.as_fixed(['list', '--include-injected', '--json']),
+        editable=cmd_runner_fmt.as_bool("--editable"),
+        pip_args=cmd_runner_fmt.as_opt_eq_val('--pip-args'),
+        suffix=cmd_runner_fmt.as_opt_val('--suffix'),
+        spec_metadata=cmd_runner_fmt.as_list(),
+        version=cmd_runner_fmt.as_fixed('--version'),
     )
-    arg_formats["global"] = fmt.as_bool("--global")
+    arg_formats["global"] = cmd_runner_fmt.as_bool("--global")
 
     runner = CmdRunner(
         module,

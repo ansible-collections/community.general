@@ -1,0 +1,3 @@
+minor_changes:
+  - pipx - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9180).
+  - pipx_info - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9180).
