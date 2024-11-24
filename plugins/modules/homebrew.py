@@ -373,7 +373,7 @@ class Homebrew(object):
 
         if invalid_packages:
             self.failed = True
-            self.message = 'Invalid package{0}: {0}'.format(
+            self.message = 'Invalid package{0}: {1}'.format(
                 "s" if len(invalid_packages) > 1 else "",
                 ", ".join(invalid_packages),
             )
