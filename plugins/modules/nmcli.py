@@ -1064,7 +1064,7 @@ options:
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.pages.freedesktop.org/NetworkManager/NetworkManager/settings-sriov.html).'
         type: dict
-        version_added: 10.0.0
+        version_added: 10.1.0
         suboptions:
             autoprobe-drivers:
                 description:
