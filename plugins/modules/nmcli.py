@@ -1985,6 +1985,13 @@ class Nmcli(object):
                 'infiniband.transport-mode': self.transport_mode,
             })
 
+        if self.type == 'ethernet':
+            if self.sriov:
+                for name, value in self.sriov.items():
+                    options.update({
+                        'sriov.%s' % name: value,
+                    })
+
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)

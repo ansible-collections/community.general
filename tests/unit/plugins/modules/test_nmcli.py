@@ -364,7 +364,7 @@ TESTCASE_ETHERNET_ADD_SRIOV_VFS = [
         'ifname': 'ethernet_non_existant',
         'sriov': {
             'total-vfs': 16,
-            'vfs': '0 spoof-check=true vlans=100'
+            'vfs': '0 spoof-check=true vlans=100',
         },
         'state': 'present',
         '_ansible_check_mode': False,
