@@ -1060,7 +1060,7 @@ options:
                 type: str
     sriov:
         description:
-            - SR-IOV settings
+            - Allow to configure SR-IOV settings.
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.pages.freedesktop.org/NetworkManager/NetworkManager/settings-sriov.html).'
         type: dict
