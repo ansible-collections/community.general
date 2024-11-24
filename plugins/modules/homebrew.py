@@ -396,11 +396,17 @@ class Homebrew(object):
             raise HomebrewException(self.message)
 
         data = json.loads(out)
-        for package_detail in data.get("formulae", []) + data.get("casks", []):
+        for package_detail in data.get("formulae", []):
             if bool(package_detail.get("installed")):
                 self.installed_packages.add(package_detail["name"])
             if bool(package_detail.get("outdated")):
                 self.outdated_packages.add(package_detail["name"])
+
+        for package_detail in data.get("casks", []):
+            if bool(package_detail.get("installed")):
+                self.installed_packages.add(package_detail["token"])
+            if bool(package_detail.get("outdated")):
+                self.outdated_packages.add(package_detail["token"])
     # /prep -------------------------------------------------------- }}}
 
     def run(self):
