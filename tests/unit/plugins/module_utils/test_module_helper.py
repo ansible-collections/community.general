@@ -14,6 +14,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 )
 
 
+# remove in 11.0.0
 def test_dependency_ctxmgr():
     ctx = DependencyCtxMgr("POTATOES", "Potatoes must be installed")
     with ctx:
@@ -36,6 +37,7 @@ def test_dependency_ctxmgr():
     assert ctx.has_it
 
 
+# remove in 11.0.0
 def test_variable_meta():
     meta = VarMeta()
     assert meta.output is True
@@ -51,6 +53,7 @@ def test_variable_meta():
     assert meta.diff_result is None
 
 
+# remove in 11.0.0
 def test_variable_meta_diff():
     meta = VarMeta(diff=True)
     assert meta.output is True
@@ -70,6 +73,7 @@ def test_variable_meta_diff():
     assert meta.diff_result == {"before": "abc", "after": "ghi"}
 
 
+# remove in 11.0.0
 def test_vardict():
     vd = VarDict()
     vd.set('a', 123)
@@ -99,6 +103,7 @@ def test_vardict():
     assert vd.diff() == {'before': {'a': 123}, 'after': {'a': 'new_a'}}, "diff={0}".format(vd.diff())
 
 
+# remove in 11.0.0
 def test_variable_meta_change():
     vd = VarDict()
     vd.set('a', 123, change=True)

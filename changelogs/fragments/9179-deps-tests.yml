@@ -1,0 +1,2 @@
+minor_changes:
+  - deps module utils - add ``deps.clear()`` to clear out previously declared dependencies (https://github.com/ansible-collections/community.general/pull/9179).
