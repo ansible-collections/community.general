@@ -96,3 +96,7 @@ def validate(module, spec=None):
 
 def failed(spec=None):
     return any(_deps[d].failed for d in _select_names(spec))
+
+
+def clear():
+    _deps.clear()
