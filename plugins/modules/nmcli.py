@@ -1087,8 +1087,8 @@ options:
                 type: int
             vfs:
                 description:
-                    - 'Virtual function descriptors in the form: "INDEX [ATTR=VALUE[ ATTR=VALUE]...]".'
-                    - Multiple VFs can be specified using a comma as separator e.g. "2 mac=00:11:22:33:44:55 spoof-check=true,3 vlans=100".
+                    - 'Virtual function descriptors in the form: V(INDEX [ATTR=VALUE[ ATTR=VALUE]...]).'
+                    - Multiple VFs can be specified using a comma as separator, for example V(2 mac=00:11:22:33:44:55 spoof-check=true,3 vlans=100).
                 type: str
 '''
 
