@@ -1,0 +1,2 @@
+minor_changes:
+  - cloudflare_dns - add support for ``comment`` and ``tags`` (https://github.com/ansible-collections/community.general/pull/9132).
