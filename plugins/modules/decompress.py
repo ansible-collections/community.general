@@ -102,11 +102,10 @@ from ansible_collections.community.general.plugins.module_utils.mh.module_helper
 from ansible.module_utils.common.text.converters import to_native, to_bytes
 from ansible_collections.community.general.plugins.module_utils import deps
 
-if six.PY3:
-    with deps.declare("lzma"):
+with deps.declare("lzma"):
+    if six.PY3:
         import lzma
-else:
-    with deps.declare("lzma"):
+    else:
         from backports import lzma
 
 
