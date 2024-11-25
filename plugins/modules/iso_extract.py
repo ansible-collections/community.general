@@ -164,7 +164,7 @@ def main():
     if binary:
         cmd = [binary, 'x', image, '-o%s' % tmp_dir]
         if password:
-            cmd += "-p%s" % password
+            cmd += ["-p%s" % password]
         cmd += extract_files
     else:
         cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
