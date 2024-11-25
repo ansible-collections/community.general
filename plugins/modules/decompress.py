@@ -97,29 +97,17 @@ import os
 import shutil
 import tempfile
 
-from traceback import format_exc
 from ansible.module_utils import six
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
-from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
+from ansible_collections.community.general.plugins.module_utils import deps
 
-LZMA_IMP_ERR = None
 if six.PY3:
-    try:
+    with deps.declare("lzma"):
         import lzma
-
-        HAS_LZMA = True
-    except ImportError:
-        LZMA_IMP_ERR = format_exc()
-        HAS_LZMA = False
 else:
-    try:
+    with deps.declare("lzma"):
         from backports import lzma
-
-        HAS_LZMA = True
-    except ImportError:
-        LZMA_IMP_ERR = format_exc()
-        HAS_LZMA = False
 
 
 def lzma_decompress(src):
@@ -160,11 +148,7 @@ class Decompress(ModuleHelper):
         self.handlers = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
         if self.vars.dest is None:
             self.vars.dest = self.get_destination_filename()
-        if not HAS_LZMA and self.vars.format == 'xz':
-            self.do_raise(
-                msg="%s: %s" % (missing_required_lib("lzma or backports.lzma", reason="when using xz format"),
-                                LZMA_IMP_ERR)
-            )
+        deps.validate(self.module)
         self.configure()
 
     def configure(self):
