@@ -165,8 +165,6 @@ class Decompress(ModuleHelper):
             self.do_raise(msg="Cannot decompress directory '%s'" % b_src)
         if os.path.isdir(b_dest):
             self.do_raise(msg="Destination is a directory, cannot decompress: '%s'" % b_dest)
-        if self.vars.format not in self.handlers:
-            self.do_raise(msg="Could not decompress '%s' format" % self.vars.format)
 
     def __run__(self):
         b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
