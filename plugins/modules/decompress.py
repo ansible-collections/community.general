@@ -99,7 +99,8 @@ import tempfile
 
 from traceback import format_exc
 from ansible.module_utils import six
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
+from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
 
 LZMA_IMP_ERR = None
@@ -139,81 +140,12 @@ def decompress(b_src, b_dest, handler):
             shutil.copyfileobj(src_file, dest_file)
 
 
-class Decompress(object):
+class Decompress(ModuleHelper):
     destination_filename_template = "%s_decompressed"
+    use_old_vardict = False
+    output_params = 'dest'
 
-    def __init__(self, module):
-        self.src = module.params['src']
-        self.fmt = module.params['format']
-        self.remove = module.params['remove']
-        self.check_mode = module.check_mode
-        self.module = module
-        self.changed = False
-        self.handlers = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
-
-        dest = module.params['dest']
-        if dest is None:
-            self.dest = self.get_destination_filename()
-        else:
-            self.dest = dest
-        self.b_dest = to_bytes(self.dest, errors='surrogate_or_strict')
-        self.b_src = to_bytes(self.src, errors='surrogate_or_strict')
-
-    def configure(self):
-        if not os.path.exists(self.b_src):
-            msg = "Path does not exist: '%s'" % self.b_src
-            if self.remove and os.path.exists(self.b_dest):
-                self.module.warn(msg)
-                self.module.exit_json(changed=False)
-            else:
-                self.module.fail_json(msg=msg)
-        if os.path.isdir(self.b_src):
-            self.module.fail_json(msg="Cannot decompress directory '%s'" % self.b_src)
-        if os.path.isdir(self.b_dest):
-            self.module.fail_json(msg="Destination is a directory, cannot decompress: '%s'" % self.b_src)
-        self.fmt = self.module.params['format']
-        if self.fmt not in self.handlers:
-            self.module.fail_json(msg="Could not decompress '%s' format" % self.fmt)
-
-    def run(self):
-        self.configure()
-        file_args = self.module.load_file_common_arguments(self.module.params, path=self.dest)
-        handler = self.handlers[self.fmt]
-        try:
-            tempfd, temppath = tempfile.mkstemp(dir=self.module.tmpdir)
-            self.module.add_cleanup_file(temppath)
-            b_temppath = to_bytes(temppath, errors='surrogate_or_strict')
-            decompress(self.b_src, b_temppath, handler)
-        except OSError as e:
-            self.module.fail_json(msg="Unable to create temporary file '%s'" % to_native(e))
-
-        if os.path.exists(self.b_dest):
-            self.changed = not filecmp.cmp(b_temppath, self.b_dest, shallow=False)
-        else:
-            self.changed = True
-
-        if self.changed and not self.module.check_mode:
-            try:
-                self.module.atomic_move(b_temppath, self.b_dest)
-            except OSError:
-                self.module.fail_json(msg="Unable to move temporary file '%s' to '%s'" % (b_temppath, self.dest))
-
-        if self.remove and not self.check_mode:
-            os.remove(self.b_src)
-        self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
-
-    def get_destination_filename(self):
-        src = self.src
-        fmt_extension = ".%s" % self.fmt
-        if src.endswith(fmt_extension) and len(src) > len(fmt_extension):
-            filename = src[:-len(fmt_extension)]
-        else:
-            filename = Decompress.destination_filename_template % src
-        return filename
-
-
-def main():
-    module = AnsibleModule(
+    module = dict(
         argument_spec=dict(
             src=dict(type='path', required=True),
             dest=dict(type='path'),
@@ -223,15 +155,76 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True
     )
-    if not HAS_LZMA and module.params['format'] == 'xz':
-        module.fail_json(
-            msg=missing_required_lib("lzma or backports.lzma", reason="when using xz format"), exception=LZMA_IMP_ERR
-        )
 
-    d = Decompress(module)
-    d.run()
+    def __init_module__(self):
+        self.handlers = {"gz": gzip_decompress, "bz2": bz2_decompress, "xz": lzma_decompress}
+        if self.vars.dest is None:
+            self.vars.dest = self.get_destination_filename()
+        if not HAS_LZMA and self.vars.format == 'xz':
+            self.do_raise(
+                msg="%s: %s" % (missing_required_lib("lzma or backports.lzma", reason="when using xz format"),
+                                LZMA_IMP_ERR)
+            )
+        self.configure()
 
-    module.exit_json(changed=d.changed, dest=d.dest)
+    def configure(self):
+        b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
+        b_src = to_bytes(self.vars.src, errors='surrogate_or_strict')
+        if not os.path.exists(b_src):
+            msg = "Path does not exist: '%s'" % b_src
+            if self.vars.remove and os.path.exists(b_dest):
+                self.warn(msg)
+                self.module.exit_json(changed=False)
+            else:
+                self.do_raise(msg=msg)
+        if os.path.isdir(b_src):
+            self.do_raise(msg="Cannot decompress directory '%s'" % b_src)
+        if os.path.isdir(b_dest):
+            self.do_raise(msg="Destination is a directory, cannot decompress: '%s'" % b_src)
+        if self.vars.format not in self.handlers:
+            self.do_raise(msg="Could not decompress '%s' format" % self.vars.format)
+
+    def __run__(self):
+        b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
+        b_src = to_bytes(self.vars.src, errors='surrogate_or_strict')
+
+        file_args = self.module.load_file_common_arguments(self.module.params, path=self.vars.dest)
+        handler = self.handlers[self.vars.format]
+        try:
+            tempfd, temppath = tempfile.mkstemp(dir=self.module.tmpdir)
+            self.module.add_cleanup_file(temppath)
+            b_temppath = to_bytes(temppath, errors='surrogate_or_strict')
+            decompress(b_src, b_temppath, handler)
+        except OSError as e:
+            self.do_raise(msg="Unable to create temporary file '%s'" % to_native(e))
+
+        if os.path.exists(b_dest):
+            self.changed = not filecmp.cmp(b_temppath, b_dest, shallow=False)
+        else:
+            self.changed = True
+
+        if self.changed and not self.module.check_mode:
+            try:
+                self.module.atomic_move(b_temppath, b_dest)
+            except OSError:
+                self.do_raise(msg="Unable to move temporary file '%s' to '%s'" % (b_temppath, self.vars.dest))
+
+        if self.vars.remove and not self.check_mode:
+            os.remove(b_src)
+        self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
+
+    def get_destination_filename(self):
+        src = self.vars.src
+        fmt_extension = ".%s" % self.vars.format
+        if src.endswith(fmt_extension) and len(src) > len(fmt_extension):
+            filename = src[:-len(fmt_extension)]
+        else:
+            filename = Decompress.destination_filename_template % src
+        return filename
+
+
+def main():
+    Decompress.execute()
 
 
 if __name__ == '__main__':
