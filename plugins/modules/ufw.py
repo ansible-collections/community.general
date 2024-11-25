@@ -23,6 +23,10 @@ author:
     - Ahti Kitsik (@ahtik)
 notes:
     - See C(man ufw) for more examples.
+    - >
+      B(Warning:) whilst the module itself can be run using concurrent strategies, C(ufw) does not support concurrency,
+      as firewall rules are meant to be ordered and concurrent executions do not guarantee order. B(Do not use concurrency).
+      The results are unpredictable and the module may fail silently if used with concurreny.
 requirements:
     - C(ufw) package
 extends_documentation_fragment:
