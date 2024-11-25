@@ -22,9 +22,13 @@
 
 - name: Ensure xz is present to create compressed files (not Debian)
   package:
-    name: xz
+    name:
+      - xz
+      - bzip2
     state: latest
-  when: ansible_os_family != 'Debian'
+  when:
+    - ansible_system != 'FreeBSD'
+    - ansible_os_family != 'Debian'
 
 - name: Ensure xz is present to create compressed files (Debian)
   package:
