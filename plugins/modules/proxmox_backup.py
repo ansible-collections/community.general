@@ -231,12 +231,19 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def _get_resources(self, resource_type=None) -> dict:
         return self.proxmox_api.cluster.resources.get(type=resource_type)
 
-    def _post_backup_request(self, request_body: dict, node_endpoints: list) -> list:
+    def _get_tasklog(self, node, upid):
+        return self.proxmox_api.nodes(node).tasks(upid).log.get()
+
+    def _post_vzdump(self, node, request_body):
+        return self.proxmox_api.nodes(node).vzdump.post(**request_body)
+
+    def do_backup_request(self, request_body: dict, node_endpoints: list) -> list:
         task_ids = []
 
         for node in node_endpoints:
-            upid = self.proxmox_api.nodes(node).vzdump.post(**request_body)
-            task_ids.extend([{"node": node, "upid": upid, "status": "unknown", "log": "%s" % self.proxmox_api.nodes(node).tasks(upid).log.get()[-4:]}])
+            upid = self._post_vzdump(node, request_body)
+            tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(node, upid)[-4:]])
+            task_ids.extend([{"node": node, "upid": upid, "status": "unknown", "log": "%s" % tasklog}])
         return task_ids
 
     def _check_relevant_nodes(self, node: str) -> list:
@@ -452,11 +459,15 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         if check_mode:
             return []
 
-        task_ids = self._post_backup_request(request_body, node_endpoints)
+        task_ids = self.do_backup_request(request_body, node_endpoints)
         updated_task_ids = []
         if module_arguments["wait"]:
             updated_task_ids = self._wait_for_timeout(module_arguments["wait_timeout"], task_ids)
-        return updated_task_ids if updated_task_ids else task_ids
+        else:
+            for node in task_ids:
+                if node["upid"] != "OK":
+                    updated_task_ids.append(node)
+        return updated_task_ids
 
 
 def main():
@@ -489,7 +500,6 @@ def main():
         ]
     )
     proxmox = ProxmoxBackupAnsible(module)
-
     bandwidth = module.params['bandwidth']
     mode = module.params['mode']
     node = module.params['node']
@@ -501,16 +511,15 @@ def main():
 
     proxmox.permission_check(storage, mode, node, bandwidth, performance_tweaks, retention, pool, vmids)
     try:
-        result = proxmox.backup_create(dict(module.params), check_mode=module.check_mode)
-        if module.check_mode:
-            module.exit_json(changed=False, msg="Backups would be created")
-        elif module.params['wait']:
-            module.exit_json(backups=result, changed=True, msg="Backups created and no errors reported")
-        else:
-            module.exit_json(backups=result, changed=True, msg="Backups issued towards proxmox")
-
+        result = proxmox.backup_create(module.params, check_mode=module.check_mode)
     except Exception as e:
         module.fail_json(msg="Creating backups failed with exception: %s" % to_native(e))
+    if module.check_mode:
+        module.exit_json(backups=result, changed=True, msg="Backups would be created")
+    elif module.params['wait']:
+        module.exit_json(backups=result, changed=True, msg="Backups created and no errors reported")
+    else:
+        module.exit_json(backups=result, changed=True, msg="Backups issued towards proxmox")
 
 
 if __name__ == '__main__':
