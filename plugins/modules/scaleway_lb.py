@@ -228,8 +228,8 @@ def lb_attributes_should_be_changed(target_lb, wished_lb):
 
     if diff:
         return {attr: wished_lb[attr] for attr in MUTABLE_ATTRIBUTES}
-    else:
-        return diff
+
+    return {}
 
 
 def present_strategy(api, wished_lb):
