@@ -20,13 +20,17 @@
       - gz
       - xz
 
-- name: Ensure xz is present to create compressed files (yum)
-  yum: name=xz state=latest
-  when: ansible_facts.pkg_mgr == 'yum'
+- name: Ensure xz is present to create compressed files (not Debian)
+  package:
+    name: xz
+    state: latest
+  when: ansible_os_family != 'Debian'
 
-- name: Ensure xz is present to create compressed files (apt)
-  apt: name=xz-utils state=latest
-  when: ansible_facts.pkg_mgr == 'apt'
+- name: Ensure xz is present to create compressed files (Debian)
+  package:
+    name: xz-utils
+    state: latest
+  when: ansible_os_family == 'Debian'
 
 - name: Generate compressed files
   shell: gzip -k {{ item }} && bzip2 -k {{ item }} && xz -k {{ item }}
