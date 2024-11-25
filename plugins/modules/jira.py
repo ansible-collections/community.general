@@ -672,9 +672,6 @@ class JIRA(StateModuleHelper):
         v = self.vars
         filename = v.attachment.get('filename')
         content = v.attachment.get('content')
-
-        if not any((filename, content)):
-            raise ValueError('at least one of filename or content must be provided')
         mime = v.attachment.get('mimetype')
 
         if not os.path.isfile(filename):
