@@ -234,6 +234,9 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def _get_tasklog(self, node, upid):
         return self.proxmox_api.nodes(node).tasks(upid).log.get()
 
+    def _get_taskok(self, node, upid):
+        return self.proxmox_api.nodes(node).tasks(upid).status.get()
+
     def _post_vzdump(self, node, request_body):
         return self.proxmox_api.nodes(node).vzdump.post(**request_body)
 
@@ -349,9 +352,12 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
         # filter all entries, which did not get a task id from the Cluster
         tasks = []
+        ok_tasks = []
         for node in raw_tasks:
             if node["upid"] != "OK":
                 tasks.append(node)
+            else:
+                ok_tasks.append(node)
 
         start_time = time.time()
         # iterate through the task ids and check their values
@@ -360,7 +366,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 if node["status"] == "unknown":
                     try:
                         # proxmox.api_task_ok does not suffice, since it only is true at `stopped` and `ok`
-                        status = self.proxmox_api.nodes(node["node"]).tasks(node["upid"]).status.get()
+                        status = self._get_taskok(node["node"], node["upid"])
                         if status["status"] == "stopped" and status["exitstatus"] == "OK":
                             node["status"] = "success"
                         if status["status"] == "stopped" and status["exitstatus"] in ("job errors",):
@@ -385,13 +391,20 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         error_logs = []
         for node in tasks:
             if node["status"] == "failed":
-                error_logs.append("%s: %s" % (node, self.proxmox_api.nodes(node["node"]).tasks(node["upid"]).log.get()[-4:]))
+                tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(node["node"], node["upid"])[-4:]])
+                error_logs.append("%s: %s" % (node, tasklog))
         if error_logs:
             self.module.fail_json(msg="An error occured creating the backups. "
                                       "These are the last log lines from the failed nodes: %s" % ', '.join(error_logs))
 
         for node in tasks:
-            node["log"] = "%s" % self.proxmox_api.nodes(node["node"]).tasks(node['upid']).log.get()[-4:]
+            tasklog = ", ".join([logentry["t"] for logentry in
+                                 self._get_tasklog(node["node"], node["upid"])[
+                                 -4:]])
+            node["log"] = "%s" % tasklog
+
+        # Finally, reattach ok tasks to show, which nodes were contacted
+        tasks.extend(ok_tasks)
         return tasks
 
     def permission_check(self, storage: str, mode: str, node: str, bandwidth: int, performance_tweaks: str, retention: bool, pool: str, vmids: list) -> None:
@@ -463,11 +476,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         updated_task_ids = []
         if module_arguments["wait"]:
             updated_task_ids = self._wait_for_timeout(module_arguments["wait_timeout"], task_ids)
-        else:
-            for node in task_ids:
-                if node["upid"] != "OK":
-                    updated_task_ids.append(node)
-        return updated_task_ids
+        return updated_task_ids if updated_task_ids else task_ids
 
 
 def main():
