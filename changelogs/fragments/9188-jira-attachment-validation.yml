@@ -1,0 +1,2 @@
+bugfixes:
+  - jira - remove unnecessary validation when attaching files (https://github.com/ansible-collections/community.general/pull/9188).
