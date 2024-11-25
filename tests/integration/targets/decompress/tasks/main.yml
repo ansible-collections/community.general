@@ -28,6 +28,7 @@
     state: latest
   when:
     - ansible_system != 'FreeBSD'
+    - ansible_os_family != 'Darwin'
     - ansible_os_family != 'Debian'
 
 - name: Ensure xz is present to create compressed files (Debian)
@@ -37,7 +38,10 @@
   when: ansible_os_family == 'Debian'
 
 - name: Generate compressed files
-  shell: gzip -k {{ item }} && bzip2 -k {{ item }} && xz -k {{ item }}
+  shell: |
+    gzip < {{ item }} > {{ item }}.gz
+    bzip2 < {{ item }} > {{ item }}.bz2
+    xz < {{ item }} > {{ item }}.xz
   loop:
     - "{{ remote_tmp_dir }}/file.txt"
     - "{{ remote_tmp_dir }}/second_file.txt"

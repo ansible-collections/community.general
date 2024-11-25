@@ -5,4 +5,3 @@
 azp/posix/2
 needs/root
 destructive
-skip/osx
