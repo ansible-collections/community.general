@@ -37,6 +37,21 @@
     state: latest
   when: ansible_os_family == 'Debian'
 
+- name: Install prerequisites for backports.lzma when using python2 (non OSX)
+  block:
+    - name: Set liblzma package name depending on the OS
+      set_fact:
+        liblzma_dev_package:
+          Debian: liblzma-dev
+          RedHat: xz-devel
+          Suse: xz-devel
+    - name: Ensure liblzma-dev is present to install backports-lzma
+      package: name={{ liblzma_dev_package[ansible_os_family] }} state=latest
+      when: ansible_os_family in liblzma_dev_package.keys()
+  when:
+    - ansible_python_version.split('.')[0] == '2'
+    - ansible_os_family != 'Darwin'
+
 - name: Generate compressed files
   shell: |
     gzip < {{ item }} > {{ item }}.gz
