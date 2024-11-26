@@ -6,11 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    proxmox_auth_argument_spec, ProxmoxAnsible)
-from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.basic import AnsibleModule
-import time
 __metaclass__ = type
 
 
@@ -221,6 +216,13 @@ backups:
       returned: on success
       type: str
 '''
+
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    proxmox_auth_argument_spec, ProxmoxAnsible)
+from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule
+
+import time
 
 
 class ProxmoxBackupAnsible(ProxmoxAnsible):
