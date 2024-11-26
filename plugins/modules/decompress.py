@@ -114,7 +114,10 @@ def lzma_decompress(src):
 
 
 def bz2_decompress(src):
-    return bz2.open(src, "rb")
+    if six.PY3:
+        return bz2.open(src, "rb")
+    else:
+        return bz2.BZ2File(src, "rb")
 
 
 def gzip_decompress(src):
