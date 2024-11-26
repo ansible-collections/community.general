@@ -6,6 +6,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    proxmox_auth_argument_spec, ProxmoxAnsible)
+from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule
+import time
 __metaclass__ = type
 
 
@@ -87,6 +92,7 @@ options:
     description:
       - Enable other performance-related settings.
       - Must be entered as a string, containing comma separated key-value pairs.
+      - For example: max-workers=2,pbs-entries-max=2.
     type: str
   pool:
     description:
@@ -96,26 +102,25 @@ options:
     type: str
   protected:
     description:
-      - Mark backups as protected.
-      - "Might fail the task due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)"
+      - Marks backups as protected.
+      - >
+        "Might fail, when the PBS backend has verify enabled
+         due to this bug: U(https://bugzilla.proxmox.com/show_bug.cgi?id=4289)"
     type: bool
   retention:
     description:
       - >
         Use custom retention options instead of those from the default cluster
         configuration (which is usually 'keep-all').
-      - Requires Datastore.Allocate permission at the storage endpoint.
+      - Always requires Datastore.Allocate permission at the storage endpoint.
       - >
         Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore,
-        if an existing backup would be pruned due to your specified timeframe and
-        will need Datastore.Modify or Datastore.Prune permissions on the backup storage.
-      - >
-        If you are unsure, if your cluster uses keep-all as a default, you can set
-        V(keep-all=1) to safeguard against unintended pruning or permission errors.
+        if an existing backup should be deleted target due to your specified timeframe.
+      - Deleting requires Datastore.Modify or Datastore.Prune permissions on the backup storage.
     type: str
   storage:
     description:
-      - Store the backup archive on this storage on the proxmox host.
+      - Store the backup archive on this storage.
     type: str
     required: true
   vmids:
@@ -148,7 +153,7 @@ EXAMPLES = r'''
 - name: Backup all vms in the proxmox cluster to storage mypbs
   community.general.proxmox_backup:
     api_user: root@pam
-    api_password: 1q2w3e
+    api_password: secret
     api_host: node1
     storage: mypbs
     mode: all
@@ -156,7 +161,7 @@ EXAMPLES = r'''
 - name: Backup VMID 100 by stopping it and set an individual retention
   community.general.proxmox_backup:
     api_user: root@pam
-    api_password: 1q2w3e
+    api_password: secret
     api_host: node1
     backup-mode: stop
     mode: include
@@ -164,34 +169,35 @@ EXAMPLES = r'''
     storage: mypbs
     vmid: [100]
 
-- name: Backup all vms on node mynode to storage mypbs
+- name: Backup all vms on node node2 to storage mypbs and wait for the task to finish
   community.general.proxmox_backup:
-    api_user: root@pam
+    api_user: test@pve
     api_password: 1q2w3e
-    api_host: anotherclusternode
+    api_host: node2
     storage: mypbs
     mode: all
-    node: mynode
+    node: node2
+    wait: true
+    wait_timeout: 30
 
-- name: Use all the options, since you have all permissions
+- name: Use all the options
   community.general.proxmox_backup:
     api_user: root@pam
-    api_password: rootpassword
+    api_password: secret
     api_host: node1
     bandwidth: 1000
     backup_mode: suspend
     compress: zstd
     compression_threads: 0
-    description: test123
+    description: A single backup for {% raw %}{{ guestname }}{% endraw %}
     mode: include
-    node: node1
     notification_mode: notification-system
     protected: true
-    retention: keep-monthly=1 ,keep-weekly=1
+    retention: keep-monthly=1, keep-weekly=1
     storage: mypbs
-    vmids: [100]
-    wait: true
-    wait_timeout: 30
+    vmids:
+      - 100
+      - 101
 '''
 
 RETURN = r'''
@@ -216,12 +222,6 @@ backups:
       type: str
 '''
 
-import time
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
-
 
 class ProxmoxBackupAnsible(ProxmoxAnsible):
 
@@ -240,37 +240,58 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def _post_vzdump(self, node, request_body):
         return self.proxmox_api.nodes(node).vzdump.post(**request_body)
 
-    def do_backup_request(self, request_body: dict, node_endpoints: list) -> list:
+    def request_backup(
+            self,
+            request_body: dict,
+            node_endpoints: list) -> list:
         task_ids = []
 
         for node in node_endpoints:
             upid = self._post_vzdump(node, request_body)
-            tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(node, upid)[-4:]])
-            task_ids.extend([{"node": node, "upid": upid, "status": "unknown", "log": "%s" % tasklog}])
+            if upid != "OK":
+                tasklog = ", ".join(
+                    [logentry["t"] for logentry in self._get_tasklog(node, upid)[-4:]])
+            else:
+                tasklog = ""
+            task_ids.extend(
+                [{"node": node, "upid": upid, "status": "unknown", "log": "%s" % tasklog}])
         return task_ids
 
-    def _check_relevant_nodes(self, node: str) -> list:
-        nodes = [item["node"] for item in self._get_resources("node") if item["status"] == "online"]
+    def check_relevant_nodes(self, node: str) -> list:
+        nodes = [item["node"] for item in self._get_resources(
+            "node") if item["status"] == "online"]
         if node and node not in nodes:
-            self.module.fail_json(msg="Node %s was specified, but does not exist on the cluster" % node)
+            self.module.fail_json(
+                msg="Node %s was specified, but does not exist on the cluster" %
+                node)
         elif node:
             return [node]
         return nodes
 
-    def _check_storage_permissions(self, permissions: dict, storage: str, bandwidth: int, performance: str, retention: bool) -> None:
+    def check_storage_permissions(
+            self,
+            permissions: dict,
+            storage: str,
+            bandwidth: int,
+            performance: str,
+            retention: bool) -> None:
         # Check for Datastore.AllocateSpace in the permission tree
-        if "/" in permissions.keys() and permissions["/"].get("Datastore.AllocateSpace", 0) == 1:
+        if "/" in permissions.keys() and permissions["/"].get(
+                "Datastore.AllocateSpace", 0) == 1:
             pass
         elif "/storage" in permissions.keys() and permissions["/storage"].get("Datastore.AllocateSpace", 0) == 1:
             pass
         elif "/storage/" + storage in permissions.keys() and permissions["/storage/" + storage].get("Datastore.AllocateSpace", 0) == 1:
             pass
         else:
-            self.module.fail_json(changed=False,
-                                  msg="Insufficient permission: Datastore.AllocateSpace is missing.")
-        if (bandwidth or performance) and permissions["/"].get("Sys.Modify", 0) == 0:
-            self.module.fail_json(changed=False,
-                                  msg="Insufficient permission: Performance_tweaks and bandwidth require 'Sys.Modify' permission for '/'.")
+            self.module.fail_json(
+                changed=False,
+                msg="Insufficient permission: Datastore.AllocateSpace is missing")
+        if (bandwidth or performance) and permissions["/"].get(
+                "Sys.Modify", 0) == 0:
+            self.module.fail_json(
+                changed=False,
+                msg="Insufficient permission: Performance_tweaks and bandwidth require 'Sys.Modify' permission for '/'")
         if retention:
             if "/" in permissions.keys() and permissions["/"].get(
                     "Datastore.Allocate", 0) == 1:
@@ -280,10 +301,11 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             elif "/storage/" + storage in permissions.keys() and permissions["/storage/" + storage].get("Datastore.Allocate", 0) == 1:
                 pass
             else:
-                self.module.fail_json(changed=False,
-                                      msg="Insufficient permissions: Custom retention was requested, but Datastore.Allocate is missing.")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Insufficient permissions: Custom retention was requested, but Datastore.Allocate is missing")
 
-    def _check_vmid_backup_permission(self, permissions, vmids, pool) -> None:
+    def check_vmid_backup_permission(self, permissions, vmids, pool) -> None:
         sufficient_permissions = False
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
@@ -303,18 +325,22 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             # and check, if the permission is set
             failed_vmids = []
             for vm in vmids:
-                if "/vms/" + str(vm) in permissions.keys() and permissions["/vms/" + str(vm)].get("VM.Backup", 1) == 0:
+                if "/vms/" + \
+                        str(vm) in permissions.keys() and permissions["/vms/" + str(vm)].get("VM.Backup", 1) == 0:
                     failed_vmids.append(str(vm))
             if failed_vmids:
-                self.module.fail_json(changed=False, msg="Insufficient permissions: "
-                                                         "You dont have the VM.Backup permission for VMID %s."
-                                                         % ', '.join(failed_vmids))
+                self.module.fail_json(
+                    changed=False, msg="Insufficient permissions: "
+                    "You dont have the VM.Backup permission for VMID %s" %
+                    ', '.join(failed_vmids))
             sufficient_permissions = True
         # Finally, when no check succeeded, fail
         if not sufficient_permissions:
-            self.module.fail_json(changed=False, msg="Insufficient permissions: You dont have the VM.Backup permission.")
+            self.module.fail_json(
+                changed=False,
+                msg="Insufficient permissions: You do not have the VM.Backup permission")
 
-    def _check_general_backup_permission(self, permissions, pool) -> None:
+    def check_general_backup_permission(self, permissions, pool) -> None:
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
             pass
@@ -324,31 +350,47 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 "VM.Backup", 0) == 1:
             pass
         else:
-            self.module.fail_json(changed=False, msg="Insufficient permissions: You dont have the VM.Backup permission.")
+            self.module.fail_json(
+                changed=False,
+                msg="Insufficient permissions: You dont have the VM.Backup permission")
 
-    def _check_if_storage_exists(self, storage: str, node: str) -> None:
+    def check_if_storage_exists(self, storage: str, node: str) -> None:
         storages = self.get_storages(type=None)
-        # Loop through all cluster storages and find out, if one has the correct name
-        validated_storagepath = [storageentry for storageentry in storages if storageentry['storage'] == storage]
+        # Loop through all cluster storages and get all matching storages
+        validated_storagepath = [
+            storageentry for storageentry in storages if storageentry["storage"] == storage]
         if not validated_storagepath:
-            self.module.fail_json(changed=False,
-                                  msg="The storage %s does not exist in the cluster." % storage)
+            self.module.fail_json(
+                changed=False,
+                msg="Storage %s does not exist in the cluster" %
+                storage)
 
-        # Check if the node specified for backups has access to the configured storage
-        # validated_storagepath[0].get('shared') will be either 0 if unshared, None if unset or 1 if shared
-        if node and not validated_storagepath[0].get('shared'):
-            if node not in validated_storagepath[0].get('nodes').split(","):
-                self.module.fail_json(changed=False, msg="The storage %s is not accessible for node %s." % (storage, node))
+        # Check if the node specified for backups has access to the storage
+        if node:
+            for storageentry in validated_storagepath:
+                if node in storageentry.get(
+                        "nodes",
+                        "").split(",") or storageentry.get(
+                        "shared",
+                        0) == 1:
+                    return
+            self.module.fail_json(
+                changed=False, msg="Storage %s is not accessible for node %s" %
+                (storage, node))
 
-    def _check_vmids(self, vmids: list) -> None:
-        vm_resources = [vm['vmid'] for vm in self._get_resources("vm")]
-        if not vm_resources:
-            self.module.warn(msg="VM.Audit permission is missing or there are no VMs. This task will fail if one VMID does not exist.")
-        vmids_not_found = [vm for vm in vmids if vm not in vm_resources]
+    def check_vmids(self, vmids: list) -> None:
+        cluster_vmids = [vm['vmid'] for vm in self._get_resources("vm")]
+        if not cluster_vmids:
+            self.module.warn(
+                "VM.Audit permission is missing or there are no VMs. This task might fail if one VMID does not exist")
+            return
+        vmids_not_found = [str(vm) for vm in vmids if vm not in cluster_vmids]
         if vmids_not_found:
-            self.module.warn(msg="VMIDs %s not found. This task will fail if one VMID does not exist." % ', '.join(vmids_not_found))
+            self.module.warn(
+                "VMIDs %s not found. This task will fail if one VMID does not exist" %
+                ', '.join(vmids_not_found))
 
-    def _wait_for_timeout(self, timeout: int, raw_tasks: list) -> list:
+    def wait_for_timeout(self, timeout: int, raw_tasks: list) -> list:
 
         # filter all entries, which did not get a task id from the Cluster
         tasks = []
@@ -365,56 +407,77 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             for node in tasks:
                 if node["status"] == "unknown":
                     try:
-                        # proxmox.api_task_ok does not suffice, since it only is true at `stopped` and `ok`
+                        # proxmox.api_task_ok does not suffice, since it only
+                        # is true at `stopped` and `ok`
                         status = self._get_taskok(node["node"], node["upid"])
                         if status["status"] == "stopped" and status["exitstatus"] == "OK":
                             node["status"] = "success"
-                        if status["status"] == "stopped" and status["exitstatus"] in ("job errors",):
+                        if status["status"] == "stopped" and status["exitstatus"] in (
+                                "job errors",):
                             node["status"] = "failed"
                     except Exception as e:
                         self.module.fail_json(
-                            msg='Unable to retrieve API task ID from node %s: %s' % (node["node"], e))
-            if len([item for item in tasks if item["status"] != "unknown"]) == len(tasks):
+                            msg='Unable to retrieve API task ID from node %s: %s' %
+                            (node["node"], e))
+            if len([item for item in tasks if item["status"]
+                   != "unknown"]) == len(tasks):
                 break
             if time.time() > start_time + timeout:
-                timeouted_nodes = [node["node"] for node in tasks if node["status"] == "unknown"]
-                failed_nodes = [node["node"] for node in tasks if node["status"] == "failed"]
+                timeouted_nodes = [node["node"]
+                                   for node in tasks if node["status"] == "unknown"]
+                failed_nodes = [node["node"]
+                                for node in tasks if node["status"] == "failed"]
                 if failed_nodes:
                     self.module.fail_json(
                         msg="Reached timeout while waiting for backup task. "
-                            "Nodes, who reached the timeout: %s. "
-                            "Nodes, which failed: %s" % (', '.join(timeouted_nodes), ', '.join(failed_nodes)))
+                        "Nodes, who reached the timeout: %s. "
+                        "Nodes, which failed: %s" %
+                        (', '.join(timeouted_nodes), ', '.join(failed_nodes)))
                 self.module.fail_json(
                     msg="Reached timeout while waiting for creating VM snapshot. "
-                        "Nodes who reached the timeout: %s." % (', '.join(timeouted_nodes)))
+                    "Nodes who reached the timeout: %s" %
+                    ', '.join(timeouted_nodes))
             time.sleep(1)
+
         error_logs = []
         for node in tasks:
             if node["status"] == "failed":
-                tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(node["node"], node["upid"])[-4:]])
+                tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(
+                    node["node"], node["upid"])[-4:]])
                 error_logs.append("%s: %s" % (node, tasklog))
         if error_logs:
-            self.module.fail_json(msg="An error occured creating the backups. "
-                                      "These are the last log lines from the failed nodes: %s" % ', '.join(error_logs))
+            self.module.fail_json(
+                msg="An error occured creating the backups. "
+                "These are the last log lines from the failed nodes: %s" %
+                ', '.join(error_logs))
 
         for node in tasks:
-            tasklog = ", ".join([logentry["t"] for logentry in
-                                 self._get_tasklog(node["node"], node["upid"])[
-                                 -4:]])
+            tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(
+                node["node"], node["upid"])[-4:]])
             node["log"] = "%s" % tasklog
 
-        # Finally, reattach ok tasks to show, which nodes were contacted
+        # Finally, reattach ok tasks to show, that all nodes were contacted
         tasks.extend(ok_tasks)
         return tasks
 
-    def permission_check(self, storage: str, mode: str, node: str, bandwidth: int, performance_tweaks: str, retention: bool, pool: str, vmids: list) -> None:
+    def permission_check(
+            self,
+            storage: str,
+            mode: str,
+            node: str,
+            bandwidth: int,
+            performance_tweaks: str,
+            retention: bool,
+            pool: str,
+            vmids: list) -> None:
         permissions = self._get_permissions()
-        self._check_if_storage_exists(storage, node)
-        self._check_storage_permissions(permissions, storage, bandwidth, performance_tweaks, retention)
+        self.check_if_storage_exists(storage, node)
+        self.check_storage_permissions(
+            permissions, storage, bandwidth, performance_tweaks, retention)
         if mode == "include":
-            self._check_vmid_backup_permission(permissions, vmids, pool)
+            self.check_vmid_backup_permission(permissions, vmids, pool)
         else:
-            self._check_general_backup_permission(permissions, pool)
+            self.check_general_backup_permission(permissions, pool)
 
     def prepare_request_parameters(self, module_arguments: dict) -> dict:
         # ensure only valid post parameters are passed to proxmox
@@ -451,7 +514,8 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
         # Create comma separated list from vmids, the API expects so
         if request_body.get("vmid"):
-            request_body.update({"vmid": ",".join([str(vmid) for vmid in request_body.get("vmid")])})
+            request_body.update(
+                {"vmid": ",".join([str(vmid) for vmid in request_body.get("vmid")])})
 
         # remove whitespaces from option strings
         for key in ("prune-backups", "performance"):
@@ -463,41 +527,49 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 request_body[key] = 1
         return request_body
 
-    def backup_create(self, module_arguments: dict, check_mode: bool) -> list:
+    def backup_create(
+            self,
+            module_arguments: dict,
+            check_mode: bool,
+            node_endpoints: list) -> list:
         request_body = self.prepare_request_parameters(module_arguments)
-        if module_arguments["mode"] == "include":
-            self._check_vmids(module_arguments["vmids"])
-        node_endpoints = self._check_relevant_nodes(module_arguments["node"])
         # stop here, before anything gets changed
         if check_mode:
             return []
 
-        task_ids = self.do_backup_request(request_body, node_endpoints)
+        task_ids = self.request_backup(request_body, node_endpoints)
         updated_task_ids = []
         if module_arguments["wait"]:
-            updated_task_ids = self._wait_for_timeout(module_arguments["wait_timeout"], task_ids)
+            updated_task_ids = self.wait_for_timeout(
+                module_arguments["wait_timeout"], task_ids)
         return updated_task_ids if updated_task_ids else task_ids
 
 
 def main():
     module_args = proxmox_auth_argument_spec()
-    backup_args = {'bandwidth': {'type': 'int'},
-                   'backup_mode': {'type': 'str', 'choices': ['snapshot', 'suspend', 'stop'], 'default': 'snapshot'},
-                   'compress': {'type': 'str', 'choices': ['0', '1', 'gzip', 'lzo', 'zstd']},
-                   'compression_threads': {'type': 'int'},
-                   'description': {'type': 'str', 'default': '{{guestname}}'},
-                   'fleecing': {'type': 'str'},
-                   'notification_mode': {'type': 'str', 'default': 'auto', 'choices': ['auto', 'legacy-sendmail', 'notification-system']},
-                   'mode': {'type': 'str', 'required': True, 'choices': ['include', 'all', 'pool']},
-                   'node': {'type': 'str'},
-                   'performance_tweaks': {'type': 'str'},
-                   'pool': {'type': 'str'},
-                   'protected': {'type': 'bool'},
-                   'retention': {'type': 'str'},
-                   'storage': {'type': 'str', 'required': True},
-                   'vmids': {'type': 'list', 'elements': 'int'},
-                   'wait': {'type': 'bool', 'default': False},
-                   'wait_timeout': {'type': 'int', 'default': 10}}
+    backup_args = {
+        'bandwidth': {
+            'type': 'int'}, 'backup_mode': {
+            'type': 'str', 'choices': [
+                'snapshot', 'suspend', 'stop'], 'default': 'snapshot'}, 'compress': {
+                    'type': 'str', 'choices': [
+                        '0', '1', 'gzip', 'lzo', 'zstd']}, 'compression_threads': {
+                            'type': 'int'}, 'description': {
+                                'type': 'str', 'default': '{{guestname}}'}, 'fleecing': {
+                                    'type': 'str'}, 'notification_mode': {
+                                        'type': 'str', 'default': 'auto', 'choices': [
+                                            'auto', 'legacy-sendmail', 'notification-system']}, 'mode': {
+                                                'type': 'str', 'required': True, 'choices': [
+                                                    'include', 'all', 'pool']}, 'node': {
+                                                        'type': 'str'}, 'performance_tweaks': {
+                                                            'type': 'str'}, 'pool': {
+                                                                'type': 'str'}, 'protected': {
+                                                                    'type': 'bool'}, 'retention': {
+                                                                        'type': 'str'}, 'storage': {
+                                                                            'type': 'str', 'required': True}, 'vmids': {
+                                                                                'type': 'list', 'elements': 'int'}, 'wait': {
+                                                                                    'type': 'bool', 'default': False}, 'wait_timeout': {
+                                                                                        'type': 'int', 'default': 10}}
     module_args.update(backup_args)
 
     module = AnsibleModule(
@@ -518,17 +590,37 @@ def main():
     storage = module.params['storage']
     vmids = module.params['vmids']
 
-    proxmox.permission_check(storage, mode, node, bandwidth, performance_tweaks, retention, pool, vmids)
+    proxmox.permission_check(
+        storage,
+        mode,
+        node,
+        bandwidth,
+        performance_tweaks,
+        retention,
+        pool,
+        vmids)
+    if module.params["mode"] == "include":
+        proxmox.check_vmids(module.params["vmids"])
+    node_endpoints = proxmox.check_relevant_nodes(module.params["node"])
     try:
-        result = proxmox.backup_create(module.params, check_mode=module.check_mode)
+        result = proxmox.backup_create(
+            module.params, module.check_mode, node_endpoints)
     except Exception as e:
-        module.fail_json(msg="Creating backups failed with exception: %s" % to_native(e))
+        module.fail_json(
+            msg="Creating backups failed with exception: %s" % to_native(e))
     if module.check_mode:
-        module.exit_json(backups=result, changed=True, msg="Backups would be created")
+        module.exit_json(backups=result, changed=True,
+                         msg="Backups would be created")
+    elif len([entry for entry in result if entry["upid"] == "OK"]) == len(result):
+        module.exit_json(
+            backups=result,
+            changed=False,
+            msg="Backup request sent to proxmox, no tasks created")
     elif module.params['wait']:
-        module.exit_json(backups=result, changed=True, msg="Backups created and no errors reported")
+        module.exit_json(backups=result, changed=True, msg="Backups succeeded")
     else:
-        module.exit_json(backups=result, changed=True, msg="Backups issued towards proxmox")
+        module.exit_json(backups=result, changed=True,
+                         msg="Backup tasks created")
 
 
 if __name__ == '__main__':
