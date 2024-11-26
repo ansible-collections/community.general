@@ -72,7 +72,6 @@
       environment:
         HOMEBREW_NO_AUTO_UPDATE: "True"
   when:
-    - ansible_python_version.split('.')[0] == '2'
     - ansible_os_family == 'Darwin'
 
 - name: Ensure backports.lzma is present to create test archive (pip)
