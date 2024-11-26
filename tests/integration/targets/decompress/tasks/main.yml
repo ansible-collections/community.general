@@ -52,6 +52,11 @@
     - ansible_python_version.split('.')[0] == '2'
     - ansible_os_family != 'Darwin'
 
+- name: Ensure backports.lzma is present to create test archive (pip)
+  pip: name=backports.lzma state=latest
+  when: ansible_python_version.split('.')[0] == '2'
+  register: backports_lzma_pip
+
 - name: Generate compressed files
   shell: |
     gzip < {{ item }} > {{ item }}.gz
@@ -80,3 +85,8 @@
   block:
     - import_tasks: dest.yml
     - import_tasks: cleanup.yml
+
+# Test cleanup
+- name: Remove backports.lzma if previously installed (pip)
+  pip: name=backports.lzma state=absent
+  when: backports_lzma_pip is changed
