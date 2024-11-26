@@ -244,8 +244,8 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
     def request_backup(
             self,
-            request_body: dict,
-            node_endpoints: list):
+            request_body,
+            node_endpoints):
         task_ids = []
 
         for node in node_endpoints:
@@ -259,7 +259,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 [{"node": node, "upid": upid, "status": "unknown", "log": "%s" % tasklog}])
         return task_ids
 
-    def check_relevant_nodes(self, node: str):
+    def check_relevant_nodes(self, node):
         nodes = [item["node"] for item in self._get_resources(
             "node") if item["status"] == "online"]
         if node and node not in nodes:
@@ -272,11 +272,11 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
     def check_storage_permissions(
             self,
-            permissions: dict,
-            storage: str,
-            bandwidth: int,
-            performance: str,
-            retention: bool):
+            permissions,
+            storage,
+            bandwidth,
+            performance,
+            retention):
         # Check for Datastore.AllocateSpace in the permission tree
         if "/" in permissions.keys() and permissions["/"].get(
                 "Datastore.AllocateSpace", 0) == 1:
@@ -356,7 +356,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 changed=False,
                 msg="Insufficient permissions: You dont have the VM.Backup permission")
 
-    def check_if_storage_exists(self, storage: str, node: str):
+    def check_if_storage_exists(self, storage, node):
         storages = self.get_storages(type=None)
         # Loop through all cluster storages and get all matching storages
         validated_storagepath = [
@@ -380,7 +380,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 changed=False, msg="Storage %s is not accessible for node %s" %
                 (storage, node))
 
-    def check_vmids(self, vmids: list):
+    def check_vmids(self, vmids):
         cluster_vmids = [vm['vmid'] for vm in self._get_resources("vm")]
         if not cluster_vmids:
             self.module.warn(
@@ -392,7 +392,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 "VMIDs %s not found. This task will fail if one VMID does not exist" %
                 ', '.join(vmids_not_found))
 
-    def wait_for_timeout(self, timeout: int, raw_tasks: list):
+    def wait_for_timeout(self, timeout, raw_tasks):
 
         # filter all entries, which did not get a task id from the Cluster
         tasks = []
@@ -464,14 +464,14 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
     def permission_check(
             self,
-            storage: str,
-            mode: str,
-            node: str,
-            bandwidth: int,
-            performance_tweaks: str,
-            retention: bool,
-            pool: str,
-            vmids: list):
+            storage,
+            mode,
+            node,
+            bandwidth,
+            performance_tweaks,
+            retention,
+            pool,
+            vmids):
         permissions = self._get_permissions()
         self.check_if_storage_exists(storage, node)
         self.check_storage_permissions(
@@ -481,7 +481,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         else:
             self.check_general_backup_permission(permissions, pool)
 
-    def prepare_request_parameters(self, module_arguments: dict):
+    def prepare_request_parameters(self, module_arguments):
         # ensure only valid post parameters are passed to proxmox
         # list of dict items to replace with (new_val, old_val)
         post_params = [("bwlimit", "bandwidth"),
@@ -531,9 +531,9 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 
     def backup_create(
             self,
-            module_arguments: dict,
-            check_mode: bool,
-            node_endpoints: list):
+            module_arguments,
+            check_mode,
+            node_endpoints):
         request_body = self.prepare_request_parameters(module_arguments)
         # stop here, before anything gets changed
         if check_mode:
