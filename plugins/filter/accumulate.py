@@ -34,6 +34,10 @@ EXAMPLES = '''
        | split('/') | map('split', '/')
        | community.general.accumulate | map('join', '/')
     # Produces: ['', '/some', '/some/path', '/some/path/to', '/some/path/to/my', '/some/path/to/my/file']
+- name: Growing string
+  ansible.builtin.debug:
+    var: "'abc' | community.general.accumulate"
+    # Produces ['a', 'ab', 'abc']
 '''
 
 from itertools import accumulate
