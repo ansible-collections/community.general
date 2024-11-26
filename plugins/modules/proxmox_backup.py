@@ -550,15 +550,23 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 def main():
     module_args = proxmox_auth_argument_spec()
     backup_args = {
+        'backup_mode': {'type': 'str', 'default': 'snapshot', 'choices': [
+            'snapshot', 'suspend', 'stop'
+        ]},
         'bandwidth': {'type': 'int'},
-        'backup_mode': {'type': 'str', 'choices': ['snapshot', 'suspend', 'stop'], 'default': 'snapshot'},
-        'compress': {'type': 'str', 'choices': ['0', '1', 'gzip', 'lzo', 'zstd']},
+        'compress': {'type': 'str', 'choices': [
+            '0', '1', 'gzip', 'lzo', 'zstd'
+        ]},
         'compression_threads': {'type': 'int'},
         'description': {'type': 'str', 'default': '{{guestname}}'},
         'fleecing': {'type': 'str'},
-        'notification_mode': {'type': 'str', 'default': 'auto', 'choices': ['auto', 'legacy-sendmail', 'notification-system']},
-        'mode': {'type': 'str', 'required': True, 'choices': ['include', 'all', 'pool']},
+        'mode': {'type': 'str', 'required': True, 'choices': [
+            'include', 'all', 'pool'
+        ]},
         'node': {'type': 'str'},
+        'notification_mode': {'type': 'str', 'default': 'auto', 'choices': [
+            'auto', 'legacy-sendmail', 'notification-system'
+        ]},
         'performance_tweaks': {'type': 'str'},
         'pool': {'type': 'str'},
         'protected': {'type': 'bool'},
