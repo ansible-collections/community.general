@@ -1,2 +1,2 @@
 bugfixes:
-  - proxmox inventory plugin - fix connection without certificates
+  - proxmox inventory plugin - fix connection without certificates (https://github.com/ansible-collections/community.general/pull/9178).
