@@ -28,10 +28,6 @@ attributes:
   action_group:
     version_added: 10.0.0
 options:
-  bandwidth:
-    description:
-      - Limit the I/O bandwidth (in KiB/s) to send the backup. 0 is unlimited.
-    type: int
   backup_mode:
     description:
       - The mode how proxmox performs backups. The default is, to create a runtime snapshot including memory.
@@ -39,6 +35,10 @@ options:
     type: str
     choices: ['snapshot', 'suspend', 'stop']
     default: snapshot
+  bandwidth:
+    description:
+      - Limit the I/O bandwidth (in KiB/s) to send the backup. 0 is unlimited.
+    type: int
   compress:
     description:
       - Enable additional compression of the backup archive.
@@ -65,12 +65,6 @@ options:
       - Enable backup fleecing. Works only for virtual machines and their disks.
       - Must be entered as a string, containing key-value pairs in a list.
     type: str
-  notification_mode:
-    description:
-      - Determine which notification system to use.
-    type: str
-    choices: ['auto','legacy-sendmail', 'notification-system']
-    default: auto
   mode:
     description:
       - Specifices the mode to select backup targets.
@@ -83,6 +77,12 @@ options:
       - This option is usually used if O(mode=all).
       - If you specify a node id and your vmids or pool do not reside there, they will not be backed up!
     type: str
+  notification_mode:
+    description:
+      - Determine which notification system to use.
+    type: str
+    choices: ['auto','legacy-sendmail', 'notification-system']
+    default: auto
   performance_tweaks:
     description:
       - Enable other performance-related settings.
