@@ -37,9 +37,16 @@ EXAMPLES = '''
 '''
 
 from itertools import accumulate
+from collections.abc import Sequence
+
+from ansible.errors import AnsibleFilterError
 
 
 def list_accumulate(sequence):
+    if not isinstance(sequence, Sequence):
+        raise AnsibleFilterError('Invalid value type (%s) for accumulate (%r)' %
+                                 (type(sequence), sequence))
+
     return accumulate(sequence)
 
 
