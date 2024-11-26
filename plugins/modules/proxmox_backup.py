@@ -92,7 +92,7 @@ options:
     description:
       - Enable other performance-related settings.
       - Must be entered as a string, containing comma separated key-value pairs.
-      - For example: max-workers=2,pbs-entries-max=2.
+      - "For example: max-workers=2,pbs-entries-max=2."
     type: str
   pool:
     description:
