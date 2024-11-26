@@ -391,6 +391,8 @@ def get_slack_message(module, token, channel, ts):
     if info['status'] != 200:
         module.fail_json(msg="failed to get slack message")
     data = module.from_json(response.read())
+    if data['ok'] is False:
+        module.fail_json(msg="failed to get slack message: %s" % data['error'])
     if len(data['messages']) < 1:
         module.fail_json(msg="no messages matching ts: %s" % ts)
     if len(data['messages']) > 1:
