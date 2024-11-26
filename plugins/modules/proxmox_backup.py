@@ -227,10 +227,10 @@ import time
 
 class ProxmoxBackupAnsible(ProxmoxAnsible):
 
-    def _get_permissions(self) -> dict:
+    def _get_permissions(self):
         return self.proxmox_api.access.permissions.get()
 
-    def _get_resources(self, resource_type=None) -> dict:
+    def _get_resources(self, resource_type=None):
         return self.proxmox_api.cluster.resources.get(type=resource_type)
 
     def _get_tasklog(self, node, upid):
@@ -245,7 +245,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def request_backup(
             self,
             request_body: dict,
-            node_endpoints: list) -> list:
+            node_endpoints: list):
         task_ids = []
 
         for node in node_endpoints:
@@ -259,7 +259,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 [{"node": node, "upid": upid, "status": "unknown", "log": "%s" % tasklog}])
         return task_ids
 
-    def check_relevant_nodes(self, node: str) -> list:
+    def check_relevant_nodes(self, node: str):
         nodes = [item["node"] for item in self._get_resources(
             "node") if item["status"] == "online"]
         if node and node not in nodes:
@@ -276,7 +276,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             storage: str,
             bandwidth: int,
             performance: str,
-            retention: bool) -> None:
+            retention: bool):
         # Check for Datastore.AllocateSpace in the permission tree
         if "/" in permissions.keys() and permissions["/"].get(
                 "Datastore.AllocateSpace", 0) == 1:
@@ -307,7 +307,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                     changed=False,
                     msg="Insufficient permissions: Custom retention was requested, but Datastore.Allocate is missing")
 
-    def check_vmid_backup_permission(self, permissions, vmids, pool) -> None:
+    def check_vmid_backup_permission(self, permissions, vmids, pool):
         sufficient_permissions = False
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
@@ -342,7 +342,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 changed=False,
                 msg="Insufficient permissions: You do not have the VM.Backup permission")
 
-    def check_general_backup_permission(self, permissions, pool) -> None:
+    def check_general_backup_permission(self, permissions, pool):
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
             pass
@@ -356,7 +356,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 changed=False,
                 msg="Insufficient permissions: You dont have the VM.Backup permission")
 
-    def check_if_storage_exists(self, storage: str, node: str) -> None:
+    def check_if_storage_exists(self, storage: str, node: str):
         storages = self.get_storages(type=None)
         # Loop through all cluster storages and get all matching storages
         validated_storagepath = [
@@ -380,7 +380,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 changed=False, msg="Storage %s is not accessible for node %s" %
                 (storage, node))
 
-    def check_vmids(self, vmids: list) -> None:
+    def check_vmids(self, vmids: list):
         cluster_vmids = [vm['vmid'] for vm in self._get_resources("vm")]
         if not cluster_vmids:
             self.module.warn(
@@ -392,7 +392,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 "VMIDs %s not found. This task will fail if one VMID does not exist" %
                 ', '.join(vmids_not_found))
 
-    def wait_for_timeout(self, timeout: int, raw_tasks: list) -> list:
+    def wait_for_timeout(self, timeout: int, raw_tasks: list):
 
         # filter all entries, which did not get a task id from the Cluster
         tasks = []
@@ -471,7 +471,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             performance_tweaks: str,
             retention: bool,
             pool: str,
-            vmids: list) -> None:
+            vmids: list):
         permissions = self._get_permissions()
         self.check_if_storage_exists(storage, node)
         self.check_storage_permissions(
@@ -481,7 +481,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         else:
             self.check_general_backup_permission(permissions, pool)
 
-    def prepare_request_parameters(self, module_arguments: dict) -> dict:
+    def prepare_request_parameters(self, module_arguments: dict):
         # ensure only valid post parameters are passed to proxmox
         # list of dict items to replace with (new_val, old_val)
         post_params = [("bwlimit", "bandwidth"),
@@ -533,7 +533,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             self,
             module_arguments: dict,
             check_mode: bool,
-            node_endpoints: list) -> list:
+            node_endpoints: list):
         request_body = self.prepare_request_parameters(module_arguments)
         # stop here, before anything gets changed
         if check_mode:
@@ -550,28 +550,23 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 def main():
     module_args = proxmox_auth_argument_spec()
     backup_args = {
-        'bandwidth': {
-            'type': 'int'}, 'backup_mode': {
-            'type': 'str', 'choices': [
-                'snapshot', 'suspend', 'stop'], 'default': 'snapshot'}, 'compress': {
-                    'type': 'str', 'choices': [
-                        '0', '1', 'gzip', 'lzo', 'zstd']}, 'compression_threads': {
-                            'type': 'int'}, 'description': {
-                                'type': 'str', 'default': '{{guestname}}'}, 'fleecing': {
-                                    'type': 'str'}, 'notification_mode': {
-                                        'type': 'str', 'default': 'auto', 'choices': [
-                                            'auto', 'legacy-sendmail', 'notification-system']}, 'mode': {
-                                                'type': 'str', 'required': True, 'choices': [
-                                                    'include', 'all', 'pool']}, 'node': {
-                                                        'type': 'str'}, 'performance_tweaks': {
-                                                            'type': 'str'}, 'pool': {
-                                                                'type': 'str'}, 'protected': {
-                                                                    'type': 'bool'}, 'retention': {
-                                                                        'type': 'str'}, 'storage': {
-                                                                            'type': 'str', 'required': True}, 'vmids': {
-                                                                                'type': 'list', 'elements': 'int'}, 'wait': {
-                                                                                    'type': 'bool', 'default': False}, 'wait_timeout': {
-                                                                                        'type': 'int', 'default': 10}}
+        'bandwidth': {'type': 'int'},
+        'backup_mode': {'type': 'str', 'choices': ['snapshot', 'suspend', 'stop'], 'default': 'snapshot'},
+        'compress': {'type': 'str', 'choices': ['0', '1', 'gzip', 'lzo', 'zstd']},
+        'compression_threads': {'type': 'int'},
+        'description': {'type': 'str', 'default': '{{guestname}}'},
+        'fleecing': {'type': 'str'},
+        'notification_mode': {'type': 'str', 'default': 'auto', 'choices': ['auto', 'legacy-sendmail', 'notification-system']},
+        'mode': {'type': 'str', 'required': True, 'choices': ['include', 'all', 'pool']},
+        'node': {'type': 'str'},
+        'performance_tweaks': {'type': 'str'},
+        'pool': {'type': 'str'},
+        'protected': {'type': 'bool'},
+        'retention': {'type': 'str'},
+        'storage': {'type': 'str', 'required': True},
+        'vmids': {'type': 'list', 'elements': 'int'},
+        'wait': {'type': 'bool', 'default': False},
+        'wait_timeout': {'type': 'int', 'default': 10}}
     module_args.update(backup_args)
 
     module = AnsibleModule(
