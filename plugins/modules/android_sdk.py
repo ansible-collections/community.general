@@ -8,7 +8,8 @@ class AndroidSdk(StateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
-            package=dict(type='list', elements='str', aliases=['pkg', 'name'])
+            package=dict(type='list', elements='str', aliases=['pkg', 'name']),
+            update=dict(type='bool', default=False)
         )
     )
     use_old_vardict = False
@@ -22,18 +23,23 @@ class AndroidSdk(StateModuleHelper):
             packages.append(fmt_pkg)
         return packages
 
-    def state_present(self):
+    def __state_fallback__(self):
         packages = self._get_formatted_packages()
         with self.sdkmanager('state name') as ctx:
             ctx.run(name=packages)
 
-    def state_absent(self):
-        packages = self._get_formatted_packages()
-        with self.sdkmanager('state name') as ctx:
-            ctx.run(name=packages)
+    def update_packages(self):
+        with self.sdkmanager('update') as ctx:
+            ctx.run()
 
     def __init_module__(self):
         self.sdkmanager = sdkmanager_runner(self.module)
+
+    def __run__(self):
+        super().__run__()
+
+        if self.vars.update:
+            self.update_packages()
 
 
 def format_cmdline_package(package, version):
@@ -44,7 +50,7 @@ def format_cmdline_package(package, version):
 
 
 def package_split(package):
-    parts = re.split(r'=', package, maxsplit=1)
+    parts = package.split('=', maxsplit=1)
     if len(parts) > 1:
         return parts
     return parts[0], None

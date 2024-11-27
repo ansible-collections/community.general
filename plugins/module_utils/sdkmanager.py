@@ -13,6 +13,7 @@ def sdkmanager_runner(module, **kwargs):
         command='sdkmanager',
         arg_formats=dict(
             state=cmd_runner_fmt.as_map(_state_map),
-            name=cmd_runner_fmt.as_list()
-        )
+            name=cmd_runner_fmt.as_list(),
+            update=cmd_runner_fmt.as_bool("--update")
+        ),
     )
