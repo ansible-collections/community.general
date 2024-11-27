@@ -767,9 +767,6 @@ def main():
         # Process a creation
         result['changed'] = True
 
-        if 'id' not in desired_realm:
-            module.fail_json(msg='id needs to be specified when creating a new realm')
-
         if module._diff:
             result['diff'] = dict(before='', after=sanitize_cr(desired_realm))
 
@@ -778,11 +775,11 @@ def main():
 
         # create it
         kc.create_realm(desired_realm)
-        after_realm = kc.get_realm_by_id(desired_realm['id'])
+        after_realm = kc.get_realm_by_id(desired_realm['realm'])
 
         result['end_state'] = sanitize_cr(after_realm)
 
-        result['msg'] = 'Realm %s has been created.' % desired_realm['id']
+        result['msg'] = 'Realm %s has been created.' % desired_realm['realm']
         module.exit_json(**result)
 
     else:
