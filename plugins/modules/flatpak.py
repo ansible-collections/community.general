@@ -419,6 +419,8 @@ def main():
     if not binary:
         module.fail_json(msg="Executable '%s' was not found on the system." % executable, **result)
 
+    module.run_command_environ_update = dict(LANGUAGE='C', LC_ALL='C')
+
     installed, not_installed = flatpak_exists(module, binary, name, method)
     if state == 'absent' and installed:
         uninstall_flat(module, binary, installed, method)
