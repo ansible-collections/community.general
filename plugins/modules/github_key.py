@@ -162,7 +162,7 @@ def create_key(session, name, pubkey, check_mode):
             'key': pubkey,
             'title': name,
             'url': 'http://example.com/CHECK_MODE_GITHUB_KEY',
-            'created_at': datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
+            'created_at': datetime.datetime.strftime(now_t, '%Y-%m-%dT%H:%M:%SZ'),
             'read_only': False,
             'verified': False
         }
