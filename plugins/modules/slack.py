@@ -77,7 +77,7 @@ options:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
       - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel }}) to get RV(ignore:channel) from previous task run.
-      - The token needs history scope to get information on the message to edit (channels:history,groups:history,mpim:history,im:history).
+      - The token needs history scope to get information on the message to edit (C(channels:history,groups:history,mpim:history,im:history)).
       - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
     version_added: 1.2.0
