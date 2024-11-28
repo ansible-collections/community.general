@@ -157,12 +157,10 @@ class Decompress(ModuleHelper):
         b_dest = to_bytes(self.vars.dest, errors='surrogate_or_strict')
         b_src = to_bytes(self.vars.src, errors='surrogate_or_strict')
         if not os.path.exists(b_src):
-            msg = "Path does not exist: '%s'" % b_src
             if self.vars.remove and os.path.exists(b_dest):
-                self.warn(msg)
                 self.module.exit_json(changed=False)
             else:
-                self.do_raise(msg=msg)
+                self.do_raise(msg="Path does not exist: '%s'" % b_src)
         if os.path.isdir(b_src):
             self.do_raise(msg="Cannot decompress directory '%s'" % b_src)
         if os.path.isdir(b_dest):

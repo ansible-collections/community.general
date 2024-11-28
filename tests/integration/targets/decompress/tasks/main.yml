@@ -46,7 +46,9 @@
           RedHat: xz-devel
           Suse: xz-devel
     - name: Ensure liblzma-dev is present to install backports-lzma
-      package: name={{ liblzma_dev_package[ansible_os_family] }} state=latest
+      package:
+        name: "{{ liblzma_dev_package[ansible_os_family] }}"
+        state: latest
       when: ansible_os_family in liblzma_dev_package.keys()
   when:
     - ansible_python_version.split('.')[0] == '2'
@@ -58,7 +60,8 @@
       command: which brew
       register: brew_which
     - name: Get owner of brew binary
-      stat: path="{{ brew_which.stdout }}"
+      stat:
+        path: "{{ brew_which.stdout }}"
       register: brew_stat
     - name: "Install package"
       homebrew:
@@ -75,9 +78,12 @@
     - ansible_os_family == 'Darwin'
 
 - name: Ensure backports.lzma is present to create test archive (pip)
-  pip: name=backports.lzma state=latest
+  pip:
+    name: backports.lzma
+    state: latest
   when: ansible_python_version.split('.')[0] == '2'
-  register: backports_lzma_pip
+  notify:
+    - delete backports.lzma
 
 - name: Generate compressed files
   shell: |
@@ -107,8 +113,3 @@
   block:
     - import_tasks: dest.yml
     - import_tasks: cleanup.yml
-
-# Test cleanup
-- name: Remove backports.lzma if previously installed (pip)
-  pip: name=backports.lzma state=absent
-  when: backports_lzma_pip is changed

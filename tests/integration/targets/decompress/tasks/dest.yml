@@ -13,12 +13,12 @@
     - { orig: "{{ remote_tmp_dir }}/file.txt.gz", new: "{{ remote_tmp_dir }}/dest" }
 
 - name: Decompress a file without specifying destination
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/dest.txt.gz"
     remove: true
 
 - name: Decompress a file which lacks extension without specifying destination
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/dest"
     remove: true
 

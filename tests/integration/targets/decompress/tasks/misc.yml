@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Decompress with check mode enabled
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/file.txt.gz"
     dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
     format: gz
@@ -12,7 +12,7 @@
   register: decompressed_check_mode
 
 - name: Decompress second time with check mode enabled
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/file.txt.gz"
     dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
     format: gz
@@ -45,13 +45,13 @@
     remote_src: true
 
 - name: Decompress, deleting original file
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/file_copied.txt.gz"
     dest: "{{ remote_tmp_dir }}/file_copied.txt"
     remove: true
 
 - name: Decompress non existing src
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/file_copied.txt.gz"
     dest: "{{ remote_tmp_dir }}/file_copied.txt"
     remove: true

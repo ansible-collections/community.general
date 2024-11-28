@@ -8,7 +8,7 @@
     decompressed_mode: "0640"
 
 - name: Simple decompress ({{ format }} test)
-  community.general.decompress:
+  decompress:
     src: "{{ remote_tmp_dir }}/file.txt.{{ format }}"
     dest: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
     format: "{{ format }}"
