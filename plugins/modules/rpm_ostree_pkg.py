@@ -40,6 +40,14 @@ options:
       choices: [ 'absent', 'present' ]
       default: 'present'
       type: str
+    apply_live:
+      description:
+      - Adds the options C(--apply-live) when O(state=present).
+      - Option is ignored when O(state=absent).
+      - For more information, please see U(https://coreos.github.io/rpm-ostree/apply-live/).
+      type: bool
+      default: false
+      version_added: 10.1.0
 author:
     - Dusty Mabe (@dustymabe)
     - Abhijeet Kasurde (@Akasurde)
@@ -55,6 +63,12 @@ EXAMPLES = r'''
   community.general.rpm_ostree_pkg:
     name: nfs-utils
     state: absent
+
+- name: Apply the overlay package live
+  community.general.rpm_ostree:
+    name: nfs-utils
+    state: present
+    apply_live: true
 
 # In case a different transaction is currently running the module would fail.
 # Adding a delay can help mitigate this problem:
@@ -104,6 +118,12 @@ cmd:
     returned: always
     type: str
     sample: 'rpm-ostree uninstall --allow-inactive --idempotent --unchanged-exit-77 nfs-utils'
+needs_reboot:
+    description: Determine if machine needs a reboot to apply current changes.
+    returned: success
+    type: bool
+    sample: true
+    version_added: 10.1.0
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -124,18 +144,23 @@ class RpmOstreePkg:
             stdout='',
             stderr='',
             cmd='',
+            needs_reboot=False,
         )
 
         # Ensure rpm-ostree command exists
         cmd = [self.module.get_bin_path('rpm-ostree', required=True)]
 
         # Decide action to perform
-        if self.state in ('present'):
+        if self.state == 'present':
             results['action'] = 'install'
             cmd.append('install')
-        elif self.state in ('absent'):
+        elif self.state == 'absent':
             results['action'] = 'uninstall'
             cmd.append('uninstall')
+
+        # Add the options to the command line
+        if self.params['apply_live'] and self.state == 'present':
+            cmd.extend(['--apply-live', '--assumeyes'])
 
         # Additional parameters
         cmd.extend(['--allow-inactive', '--idempotent', '--unchanged-exit-77'])
@@ -144,6 +169,10 @@ class RpmOstreePkg:
             results['packages'].append(pkg)
 
         rc, out, err = self.module.run_command(cmd)
+
+        # Determine if system needs a reboot to apply change
+        if 'Changes queued for next boot. Run "systemctl reboot" to start a reboot' in out:
+            results['needs_reboot'] = True
 
         results.update(dict(
             rc=rc,
@@ -179,6 +208,10 @@ def main():
                 required=True,
                 type='list',
                 elements='str',
+            ),
+            apply_live=dict(
+                type='bool',
+                default=False,
             ),
         ),
     )
