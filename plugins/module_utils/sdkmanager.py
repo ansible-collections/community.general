@@ -14,6 +14,8 @@ def sdkmanager_runner(module, **kwargs):
         arg_formats=dict(
             state=cmd_runner_fmt.as_map(_state_map),
             name=cmd_runner_fmt.as_list(),
-            update=cmd_runner_fmt.as_bool("--update")
+            update=cmd_runner_fmt.as_fixed("--update"),
+            installed=cmd_runner_fmt.as_fixed("--list_installed")
         ),
+        **kwargs
     )
