@@ -72,13 +72,12 @@ options:
             - The full path for the target root directory.
         type: str
         version_added: '10.1.0'
-    repository:
+    repositories:
         description:
             - Repository URL(s) to prepend to the repository list for the
               package installation.
               The URL can be a URL to a repository for
               remote repositories or a path for local repositories.
-        aliases: [repositories]
         type: list
         elements: str
         version_added: '10.1.0'
@@ -127,7 +126,7 @@ EXAMPLES = '''
   community.general.xbps:
     name: base-system
     state: present
-    repository: https://repo-default.voidlinux.org/current
+    repositories: https://repo-default.voidlinux.org/current
     root: /mnt
 '''
 
@@ -159,8 +158,8 @@ def append_flags(module, xbps_path, cmd):
     """Appends the repository/root flags when needed"""
     if module.params["root"]:
         cmd = "%s -r %s" % (cmd, module.params["root"])
-    if module.params["repository"] and not cmd.startswith(xbps_path["remove"]):
-        for repo in module.params["repository"]:
+    if module.params["repositories"] and not cmd.startswith(xbps_path["remove"]):
+        for repo in module.params["repositories"]:
             cmd = "%s --repository=%s" % (cmd, repo)
 
     return cmd
@@ -350,7 +349,7 @@ def main():
             update_cache=dict(default=True, type='bool'),
             upgrade_xbps=dict(default=True, type='bool'),
             root=dict(type='str'),
-            repository=dict(type='list', aliases=['repositories'], elements='str'),
+            repositories=dict(type='list', elements='str'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         supports_check_mode=True)
