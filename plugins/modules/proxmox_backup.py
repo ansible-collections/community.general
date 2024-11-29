@@ -373,8 +373,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def check_if_storage_exists(self, storage, node):
         storages = self.get_storages(type=None)
         # Loop through all cluster storages and get all matching storages
-        validated_storagepath = [
-            storageentry for storageentry in storages if storageentry["storage"] == storage]
+        validated_storagepath = filter(lambda storageentry: storageentry["storage"] == storage, storages)
         if not validated_storagepath:
             self.module.fail_json(
                 changed=False,
@@ -568,12 +567,12 @@ def main():
         'backup_mode': {'type': 'str', 'default': 'snapshot', 'choices': [
             'snapshot', 'suspend', 'stop'
         ]},
-        'bandwidth': {'type': 'int'},
-        'compress': {'type': 'str', 'choices': [
-            '0', '1', 'gzip', 'lzo', 'zstd'
+        "bandwidth": {"type": "int"},
         "change_detection_mode": {"type": "str", "choices": [
             "legacy", "data", "metadata"
         ]},
+        "compress": {"type": "str", "choices": [
+            "0", "1", "gzip", "lzo", "zstd"
         ]},
         'compression_threads': {'type': 'int'},
         'description': {'type': 'str', 'default': '{{guestname}}'},
