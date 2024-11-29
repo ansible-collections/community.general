@@ -373,7 +373,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
     def check_if_storage_exists(self, storage, node):
         storages = self.get_storages(type=None)
         # Loop through all cluster storages and get all matching storages
-        validated_storagepath = filter(lambda storageentry: storageentry["storage"] == storage, storages)
+        validated_storagepath = [storageentry for storageentry in storages if storageentry["storage"] == storage]
         if not validated_storagepath:
             self.module.fail_json(
                 changed=False,
