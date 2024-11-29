@@ -39,6 +39,14 @@ options:
     description:
       - Limit the I/O bandwidth (in KiB/s) to write backup. V(0) is unlimited.
     type: int
+  change_detection_mode:
+    description: 
+      - Set the change detection mode (available from Proxmox VE 8.3).
+      - > 
+        Is only used when backing up containers, 
+        Proxmox silently ignores this option when applied to kvm guests.
+    type: str
+    choices: ["legacy",  "data", "metadata"]
   compress:
     description:
       - Enable additional compression of the backup archive.
@@ -496,6 +504,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                        ("mode", "backup_mode"),
                        ("notes-template", "description"),
                        ("notification-mode", "notification_mode"),
+                       ("pbs-change-detection-mode", "change_detection_mode"),
                        ("performance", "performance_tweaks"),
                        ("pool", "pool"),
                        ("protected", "protected"),
@@ -562,6 +571,9 @@ def main():
         'bandwidth': {'type': 'int'},
         'compress': {'type': 'str', 'choices': [
             '0', '1', 'gzip', 'lzo', 'zstd'
+        "change_detection_mode": {"type": "str", "choices": [
+            "legacy", "data", "metadata"
+        ]},
         ]},
         'compression_threads': {'type': 'int'},
         'description': {'type': 'str', 'default': '{{guestname}}'},
