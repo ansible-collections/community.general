@@ -266,7 +266,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             upid = self._post_vzdump(node, request_body)
             if upid != "OK":
                 tasklog = ", ".join(
-                    [logentry["t"] for logentry in self._get_tasklog(node, upid)[-4:]])
+                    [logentry["t"] for logentry in self._get_tasklog(node, upid)])
             else:
                 tasklog = ""
             task_ids.extend(
@@ -348,7 +348,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 self.module.fail_json(
                     changed=False, msg="Insufficient permissions: "
                     "You dont have the VM.Backup permission for VMID %s" %
-                    ', '.join(failed_vmids))
+                    ", ".join(failed_vmids))
             sufficient_permissions = True
         # Finally, when no check succeeded, fail
         if not sufficient_permissions:
@@ -381,7 +381,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 storage)
 
     def check_vmids(self, vmids):
-        cluster_vmids = [vm['vmid'] for vm in self._get_resources("vm")]
+        cluster_vmids = [vm["vmid"] for vm in self._get_resources("vm")]
         if not cluster_vmids:
             self.module.warn(
                 "VM.Audit permission is missing or there are no VMs. This task might fail if one VMID does not exist")
@@ -390,7 +390,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         if vmids_not_found:
             self.module.warn(
                 "VMIDs %s not found. This task will fail if one VMID does not exist" %
-                ', '.join(vmids_not_found))
+                ", ".join(vmids_not_found))
 
     def wait_for_timeout(self, timeout, raw_tasks):
 
@@ -419,7 +419,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                             node["status"] = "failed"
                     except Exception as e:
                         self.module.fail_json(
-                            msg='Unable to retrieve API task ID from node %s: %s' %
+                            msg="Unable to retrieve API task ID from node %s: %s" %
                             (node["node"], e))
             if len([item for item in tasks if item["status"]
                    != "unknown"]) == len(tasks):
@@ -434,28 +434,28 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                         msg="Reached timeout while waiting for backup task. "
                         "Nodes, who reached the timeout: %s. "
                         "Nodes, which failed: %s" %
-                        (', '.join(timeouted_nodes), ', '.join(failed_nodes)))
+                        (", ".join(timeouted_nodes), ", ".join(failed_nodes)))
                 self.module.fail_json(
                     msg="Reached timeout while waiting for creating VM snapshot. "
                     "Nodes who reached the timeout: %s" %
-                    ', '.join(timeouted_nodes))
+                    ", ".join(timeouted_nodes))
             time.sleep(1)
 
         error_logs = []
         for node in tasks:
             if node["status"] == "failed":
                 tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(
-                    node["node"], node["upid"])[-4:]])
+                    node["node"], node["upid"])])
                 error_logs.append("%s: %s" % (node, tasklog))
         if error_logs:
             self.module.fail_json(
                 msg="An error occured creating the backups. "
                 "These are the last log lines from the failed nodes: %s" %
-                ', '.join(error_logs))
+                ", ".join(error_logs))
 
         for node in tasks:
             tasklog = ", ".join([logentry["t"] for logentry in self._get_tasklog(
-                node["node"], node["upid"])[-4:]])
+                node["node"], node["upid"])])
             node["log"] = "%s" % tasklog
 
         # Finally, reattach ok tasks to show, that all nodes were contacted
@@ -551,8 +551,8 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
 def main():
     module_args = proxmox_auth_argument_spec()
     backup_args = {
-        'backup_mode': {'type': 'str', 'default': 'snapshot', 'choices': [
-            'snapshot', 'suspend', 'stop'
+        "backup_mode": {"type": "str", "default": "snapshot", "choices": [
+            "snapshot", "suspend", "stop"
         ]},
         "bandwidth": {"type": "int"},
         "change_detection_mode": {"type": "str", "choices": [
@@ -561,43 +561,43 @@ def main():
         "compress": {"type": "str", "choices": [
             "0", "1", "gzip", "lzo", "zstd"
         ]},
-        'compression_threads': {'type': 'int'},
-        'description': {'type': 'str', 'default': '{{guestname}}'},
-        'fleecing': {'type': 'str'},
-        'mode': {'type': 'str', 'required': True, 'choices': [
-            'include', 'all', 'pool'
+        "compression_threads": {"type": "int"},
+        "description": {"type": "str", "default": "{{guestname}}"},
+        "fleecing": {"type": "str"},
+        "mode": {"type": "str", "required": True, "choices": [
+            "include", "all", "pool"
         ]},
-        'node': {'type': 'str'},
-        'notification_mode': {'type': 'str', 'default': 'auto', 'choices': [
-            'auto', 'legacy-sendmail', 'notification-system'
+        "node": {"type": "str"},
+        "notification_mode": {"type": "str", "default": "auto", "choices": [
+            "auto", "legacy-sendmail", "notification-system"
         ]},
-        'performance_tweaks': {'type': 'str'},
-        'pool': {'type': 'str'},
-        'protected': {'type': 'bool'},
-        'retention': {'type': 'str'},
-        'storage': {'type': 'str', 'required': True},
-        'vmids': {'type': 'list', 'elements': 'int'},
-        'wait': {'type': 'bool', 'default': False},
-        'wait_timeout': {'type': 'int', 'default': 10}}
+        "performance_tweaks": {"type": "str"},
+        "pool": {"type": "str"},
+        "protected": {"type": "bool"},
+        "retention": {"type": "str"},
+        "storage": {"type": "str", "required": True},
+        "vmids": {"type": "list", "elements": "int"},
+        "wait": {"type": "bool", "default": False},
+        "wait_timeout": {"type": "int", "default": 10}}
     module_args.update(backup_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
         required_if=[
-            ('mode', 'include', ('vmids',), True),
-            ('mode', 'pool', ('pool',))
+            ("mode", "include", ("vmids",), True),
+            ("mode", "pool", ("pool",))
         ]
     )
     proxmox = ProxmoxBackupAnsible(module)
-    bandwidth = module.params['bandwidth']
-    mode = module.params['mode']
-    node = module.params['node']
-    performance_tweaks = module.params['performance_tweaks']
-    pool = module.params['pool']
-    retention = module.params['retention']
-    storage = module.params['storage']
-    vmids = module.params['vmids']
+    bandwidth = module.params["bandwidth"]
+    mode = module.params["mode"]
+    node = module.params["node"]
+    performance_tweaks = module.params["performance_tweaks"]
+    pool = module.params["pool"]
+    retention = module.params["retention"]
+    storage = module.params["storage"]
+    vmids = module.params["vmids"]
 
     proxmox.permission_check(
         storage,
@@ -625,12 +625,12 @@ def main():
             backups=result,
             changed=False,
             msg="Backup request sent to proxmox, no tasks created")
-    elif module.params['wait']:
+    elif module.params["wait"]:
         module.exit_json(backups=result, changed=True, msg="Backups succeeded")
     else:
         module.exit_json(backups=result, changed=True,
                          msg="Backup tasks created")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
