@@ -380,19 +380,6 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
                 msg="Storage %s does not exist in the cluster" %
                 storage)
 
-        # Check if the node specified for backups has access to the storage
-        if node:
-            for storageentry in validated_storagepath:
-                if node in storageentry.get(
-                        "nodes",
-                        "").split(",") or storageentry.get(
-                        "shared",
-                        0) == 1:
-                    return
-            self.module.fail_json(
-                changed=False, msg="Storage %s is not accessible for node %s" %
-                (storage, node))
-
     def check_vmids(self, vmids):
         cluster_vmids = [vm['vmid'] for vm in self._get_resources("vm")]
         if not cluster_vmids:
