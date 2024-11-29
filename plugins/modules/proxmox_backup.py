@@ -40,10 +40,10 @@ options:
       - Limit the I/O bandwidth (in KiB/s) to write backup. V(0) is unlimited.
     type: int
   change_detection_mode:
-    description: 
+    description:
       - Set the change detection mode (available from Proxmox VE 8.3).
-      - > 
-        Is only used when backing up containers, 
+      - >
+        Is only used when backing up containers,
         Proxmox silently ignores this option when applied to kvm guests.
     type: str
     choices: ["legacy",  "data", "metadata"]
@@ -62,13 +62,13 @@ options:
   description:
     description:
       - Specify the description of the backup.
-      - Needs to be a single line, newline and backslash need to be escaped as V(\\n) and V(\\\\\) respectively.
-      - > 
-        If you need variable interpolation, you can set the content as usual 
+      - Needs to be a single line, newline and backslash need to be escaped as V(\\n) and V(\\\\) respectively.
+      - >
+        If you need variable interpolation, you can set the content as usual
         through ansible jinja templating and/or let Proxmox substitute templates.
       - >
-        Proxmox currently supports V({{cluster}}), V({{guestname}}), 
-        V({{node}}), and V({{vmid}}) as templating variables. 
+        Proxmox currently supports V({{cluster}}), V({{guestname}}),
+        V({{node}}), and V({{vmid}}) as templating variables.
         Since this is also a jinja delimiter, you need to set these values as raw jinja.
     default: "{{guestname}}"
     type: str
@@ -224,9 +224,9 @@ backups:
       choices: ["unknown", "success", "failed"]
     upid:
       description: >
-        Proxmox cluster UPID, which is needed to lookup task info. 
-        Is RV(OK), when a cluster node did not create a task after being called, 
-        e.g. due to no matching targets. 
+        Proxmox cluster UPID, which is needed to lookup task info.
+        Returns OK, when a cluster node did not create a task after being called,
+        e.g. due to no matching targets.
       returned: on success
       type: str
 '''
