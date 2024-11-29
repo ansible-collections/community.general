@@ -14,7 +14,7 @@ DOCUMENTATION = r'''
 module: proxmox_backup
 author: "Raphael Grieger (@IamLunchbox) <r.grieger@hotmail.com>"
 short_description: Start a VM backup in Proxmox VE cluster
-version_added: 10.0.0
+version_added: 10.1.0
 description:
   - Allows you to create backups of KVM and LXC guests in Proxmox VE cluster.
   - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup schedule.
