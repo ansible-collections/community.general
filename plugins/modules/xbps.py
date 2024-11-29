@@ -154,11 +154,11 @@ def is_installed(xbps_output):
     return bool(len(xbps_output))
 
 
-def append_flags(module, xbps_path, cmd):
+def append_flags(module, xbps_path, cmd, skip_repo=False):
     """Appends the repository/root flags when needed"""
     if module.params["root"]:
         cmd = "%s -r %s" % (cmd, module.params["root"])
-    if module.params["repositories"] and not cmd.startswith(xbps_path["remove"]):
+    if module.params["repositories"] and not cmd.startswith(xbps_path["remove"]) and not skip_repo:
         for repo in module.params["repositories"]:
             cmd = "%s --repository=%s" % (cmd, repo)
 
@@ -169,7 +169,7 @@ def query_package(module, xbps_path, name, state="present"):
     """Returns Package info"""
     if state == "present":
         lcmd = "%s %s" % (xbps_path['query'], name)
-        lcmd = append_flags(module, xbps_path, lcmd)
+        lcmd = append_flags(module, xbps_path, lcmd, skip_repo=True)
         lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
         if not is_installed(lstdout):
             # package is not installed locally
