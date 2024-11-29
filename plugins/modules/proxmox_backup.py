@@ -18,7 +18,7 @@ version_added: 10.1.0
 description:
   - Allows you to create backups of KVM and LXC guests in Proxmox VE cluster.
   - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup schedule.
-  - The mininum required privileges to use this module are VM.Backup and Datastore.AllocateSpace.
+  - The mininum required privileges to use this module are C(VM.Backup) and C(Datastore.AllocateSpace).
   - Most options are optional and if unspecified will be chosen by the Cluster and its default values.
 attributes:
   check_mode:
@@ -30,35 +30,39 @@ attributes:
 options:
   backup_mode:
     description:
-      - The mode how proxmox performs backups. The default is, to create a runtime snapshot including memory.
+      - The mode how Proxmox performs backups. The default is, to create a runtime snapshot including memory.
       - Check U(https://pve.proxmox.com/pve-docs/chapter-vzdump.html#_backup_modes) for an explanation of the differences.
     type: str
-    choices: ['snapshot', 'suspend', 'stop']
+    choices: ["snapshot", "suspend", "stop"]
     default: snapshot
   bandwidth:
     description:
-      - Limit the I/O bandwidth (in KiB/s) to send the backup. 0 is unlimited.
+      - Limit the I/O bandwidth (in KiB/s) to write backup. V(0) is unlimited.
     type: int
   compress:
     description:
       - Enable additional compression of the backup archive.
-      - 0 will use the proxmox recommended value, depending on your storage target.
+      - V(0) will use the Proxmox recommended value, depending on your storage target.
     type: str
-    choices: [ '0', '1', 'gzip', 'lzo', 'zstd' ]
+    choices: ["0", "1", "gzip", "lzo", "zstd"]
   compression_threads:
     description:
       - The number of threads zstd will use to compress the backup.
-      - 0 uses 50% of the available cores, anything larger then 0 will use exactly as many threads.
-      - Is ignored if you specify O(compress=gzip) or O(compress=lzo)
+      - V(0) uses 50% of the available cores, anything larger than V(0) will use exactly as many threads.
+      - Is ignored if you specify O(compress=gzip) or O(compress=lzo).
     type: int
   description:
     description:
-      - Specify the description for the backup.
-      - Template string for generating notes for the backup(s).
-      - Can contain variables which will be replaced by their values.
-      - Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future.
-      - Needs to be a single line, newline and backslash need to be escaped as `\n` and `\\` respectively.
-    default: '{{guestname}}'
+      - Specify the description of the backup.
+      - Needs to be a single line, newline and backslash need to be escaped as V(\\n) and V(\\\\\) respectively.
+      - > 
+        If you need variable interpolation, you can set the content as usual 
+        through ansible jinja templating and/or let Proxmox substitute templates.
+      - >
+        Proxmox currently supports V({{cluster}}), V({{guestname}}), 
+        V({{node}}), and V({{vmid}}) as templating variables. 
+        Since this is also a jinja delimiter, you need to set these values as raw jinja.
+    default: "{{guestname}}"
     type: str
   fleecing:
     description:
@@ -68,26 +72,26 @@ options:
   mode:
     description:
       - Specifices the mode to select backup targets.
-    choices: ['include', 'all', 'pool']
+    choices: ["include", "all", "pool"]
     required: true
     type: str
   node:
     description:
       - Only execute the backup job for the given node.
       - This option is usually used if O(mode=all).
-      - If you specify a node id and your vmids or pool do not reside there, they will not be backed up!
+      - If you specify a node ID and your vmids or pool do not reside there, they will not be backed up!
     type: str
   notification_mode:
     description:
       - Determine which notification system to use.
     type: str
-    choices: ['auto','legacy-sendmail', 'notification-system']
+    choices: ["auto","legacy-sendmail", "notification-system"]
     default: auto
   performance_tweaks:
     description:
       - Enable other performance-related settings.
       - Must be entered as a string, containing comma separated key-value pairs.
-      - "For example: max-workers=2,pbs-entries-max=2."
+      - "For example: V(max-workers=2,pbs-entries-max=2)."
     type: str
   pool:
     description:
@@ -106,12 +110,12 @@ options:
     description:
       - >
         Use custom retention options instead of those from the default cluster
-        configuration (which is usually 'keep-all').
+        configuration (which is usually V("keep-all")).
       - Always requires Datastore.Allocate permission at the storage endpoint.
       - >
         Specifying a retention time other than V(keep-all=1) might trigger pruning on the datastore,
         if an existing backup should be deleted target due to your specified timeframe.
-      - Deleting requires Datastore.Modify or Datastore.Prune permissions on the backup storage.
+      - Deleting requires C(Datastore.Modify) or C(Datastore.Prune) permissions on the backup storage.
     type: str
   storage:
     description:
@@ -127,6 +131,7 @@ options:
   wait:
     description:
       - Wait for the backup to be finished.
+      - Fails, if job does not succeed successfully within the given timeout.
     type: bool
     default: false
   wait_timeout:
@@ -135,8 +140,6 @@ options:
       - Will only be evaluated, if O(wait=true).
     type: int
     default: 10
-notes:
-  - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
 requirements: ["proxmoxer", "requests"]
 extends_documentation_fragment:
   - community.general.proxmox.actiongroup_proxmox
@@ -145,7 +148,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: Backup all vms in the proxmox cluster to storage mypbs
+- name: Backup all vms in the Proxmox cluster to storage mypbs
   community.general.proxmox_backup:
     api_user: root@pam
     api_password: secret
@@ -203,16 +206,19 @@ backups:
   elements: dict
   contains:
     node:
-      description: Node id.
+      description: Node ID.
       returned: on success
       type: str
     status:
       description: Last known task status. Will be unknown, if O(wait=false).
       returned: on success
       type: str
-      choices: ['unknown', 'success', 'failed']
+      choices: ["unknown", "success", "failed"]
     upid:
-      description: Proxmox cluster UPID, which is needed to lookup task info.
+      description: >
+        Proxmox cluster UPID, which is needed to lookup task info. 
+        Is RV(OK), when a cluster node did not create a task after being called, 
+        e.g. due to no matching targets. 
       returned: on success
       type: str
 '''
