@@ -214,7 +214,6 @@ def update_package_db(module, xbps_path):
     """Returns True if update_package_db changed"""
     cmd = "%s -S" % (xbps_path['install'])
     cmd = append_flags(module, xbps_path, cmd)
-    rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if module.params['accept_pubkey']:
         stdin = "y\n"
     else:
@@ -278,7 +277,7 @@ def remove_packages(module, xbps_path, packages):
             continue
 
         cmd = "%s -y %s" % (xbps_path['remove'], package)
-        cmd = append_flags(module, xbps_path, cmd)
+        cmd = append_flags(module, xbps_path, cmd, skip_repo=True)
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
