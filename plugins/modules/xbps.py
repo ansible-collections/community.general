@@ -128,6 +128,23 @@ EXAMPLES = '''
     state: present
     upgrade_xbps: false
 
+- name: Find repository keys to install into a new void system on a mounted partition
+  ansible.builtin.find:
+    path: /var/db/xbps/keys
+    pattern: "*.plist"
+  register: xbps_keys
+
+- name: Copy repository keys to into a new void system on a mounted partition
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item }}"
+    dest: "/mnt/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: xbps_keys.matched > 0
+  loop: "{{ xbps_keys.files | map(attribute='path') }}"
+
 - name: Install a new void system on a mounted partition
   community.general.xbps:
     name: base-system
