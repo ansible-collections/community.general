@@ -81,6 +81,12 @@ options:
         type: list
         elements: str
         version_added: '10.1.0'
+    accept_pubkey:
+        description:
+            - Wether or not repository signing keys should be automatically accepted.
+        type: bool
+        default: false
+        version_added: '10.1.0'
 '''
 
 EXAMPLES = '''
@@ -192,7 +198,14 @@ def update_package_db(module, xbps_path):
     cmd = "%s -S" % (xbps_path['install'])
     cmd = append_flags(module, xbps_path, cmd)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
+    if module.params['accept_pubkey']:
+        stdin = "y\n"
+    else:
+        stdin= "n\n"
+    rc, stdout, stderr = module.run_command(cmd, check_rc=False, data=stdin)
 
+    if "Failed to import pubkey" in stderr:
+        module.fail_json(msg="Failed to import pubkey for repository")
     if rc != 0:
         module.fail_json(msg="Could not update package db")
     if "avg rate" in stdout:
@@ -350,6 +363,7 @@ def main():
             upgrade_xbps=dict(default=True, type='bool'),
             root=dict(type='str'),
             repositories=dict(type='list', elements='str'),
+            accept_pubkey=dict(default=False, type='bool')
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         supports_check_mode=True)
