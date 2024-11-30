@@ -25,8 +25,6 @@ attributes:
     support: full
   diff_mode:
     support: none
-  action_group:
-    version_added: 10.0.0
 options:
   backup_mode:
     description:
