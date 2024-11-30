@@ -18,8 +18,9 @@ version_added: 10.1.0
 description:
   - Allows you to create backups of KVM and LXC guests in Proxmox VE cluster.
   - Offers the GUI functionality of creating a single backup as well as using the run-now functionality from the cluster backup schedule.
-  - The mininum required privileges to use this module are C(VM.Backup) and C(Datastore.AllocateSpace).
+  - The mininum required privileges to use this module are C(VM.Backup) and C(Datastore.AllocateSpace) for the respective VMs and storage.
   - Most options are optional and if unspecified will be chosen by the Cluster and its default values.
+  - Note that this module B(is not idempotent). It always starts a new backup (when not in check mode).
 attributes:
   check_mode:
     support: full
