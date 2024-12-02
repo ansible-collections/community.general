@@ -1,0 +1,4 @@
+minor_changes:
+  - redfish_utils module utils - remove redundant code (https://github.com/ansible-collections/community.general/pull/9190).
+deprecated_features:
+  - redfish_utils module utils - deprecate method ``RedfishUtils._init_session()`` (https://github.com/ansible-collections/community.general/pull/9190).
