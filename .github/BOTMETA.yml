@@ -506,6 +506,8 @@ files:
     ignore: skornehl
   $modules/dconf.py:
     maintainers: azaghal
+  $modules/decompress.py:
+    maintainers: shamilovstas
   $modules/deploy_helper.py:
     maintainers: ramondelafuente
   $modules/dimensiondata_network.py:

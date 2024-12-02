@@ -1,0 +1,29 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set mode for decompressed file ({{ format }} test)
+  set_fact:
+    decompressed_mode: "0640"
+
+- name: Simple decompress ({{ format }} test)
+  decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.{{ format }}"
+    dest: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+    format: "{{ format }}"
+    mode: "{{ decompressed_mode }}"
+  register: first_decompression
+
+- name: Stat decompressed file ({{ format }} test)
+  stat:
+    path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
+  register: decompressed_file_stat
+
+- name: Check that file was decompressed correctly ({{ format }} test)
+  assert:
+    that:
+      - first_decompression.changed
+      - decompressed_file_stat.stat.exists
+      - decompressed_file_stat.stat.mode == decompressed_mode
+      - orig_file_stat.stat.checksum == decompressed_file_stat.stat.checksum

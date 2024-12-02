@@ -1,0 +1,115 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Copy test files
+  copy:
+    src: "files/"
+    dest: "{{ remote_tmp_dir }}"
+
+- name: Get original file stat
+  stat:
+    path: "{{ remote_tmp_dir }}/file.txt"
+  register: orig_file_stat
+
+- name: Set supported formats
+  set_fact:
+    formats:
+      - bz2
+      - gz
+      - xz
+
+- name: Ensure xz is present to create compressed files (not Debian)
+  package:
+    name:
+      - xz
+      - bzip2
+    state: latest
+  when:
+    - ansible_system != 'FreeBSD'
+    - ansible_os_family != 'Darwin'
+    - ansible_os_family != 'Debian'
+
+- name: Ensure xz is present to create compressed files (Debian)
+  package:
+    name: xz-utils
+    state: latest
+  when: ansible_os_family == 'Debian'
+
+- name: Install prerequisites for backports.lzma when using python2 (non OSX)
+  block:
+    - name: Set liblzma package name depending on the OS
+      set_fact:
+        liblzma_dev_package:
+          Debian: liblzma-dev
+          RedHat: xz-devel
+          Suse: xz-devel
+    - name: Ensure liblzma-dev is present to install backports-lzma
+      package:
+        name: "{{ liblzma_dev_package[ansible_os_family] }}"
+        state: latest
+      when: ansible_os_family in liblzma_dev_package.keys()
+  when:
+    - ansible_python_version.split('.')[0] == '2'
+    - ansible_os_family != 'Darwin'
+
+- name: Install prerequisites for backports.lzma when using python2 (OSX)
+  block:
+    - name: Find brew binary
+      command: which brew
+      register: brew_which
+    - name: Get owner of brew binary
+      stat:
+        path: "{{ brew_which.stdout }}"
+      register: brew_stat
+    - name: "Install package"
+      homebrew:
+        name: xz
+        state: present
+        update_homebrew: false
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      # Newer versions of brew want to compile a package which takes a long time. Do not upgrade homebrew until a
+      # proper solution can be found
+      environment:
+        HOMEBREW_NO_AUTO_UPDATE: "True"
+  when:
+    - ansible_os_family == 'Darwin'
+
+- name: Ensure backports.lzma is present to create test archive (pip)
+  pip:
+    name: backports.lzma
+    state: latest
+  when: ansible_python_version.split('.')[0] == '2'
+  notify:
+    - delete backports.lzma
+
+- name: Generate compressed files
+  shell: |
+    gzip < {{ item }} > {{ item }}.gz
+    bzip2 < {{ item }} > {{ item }}.bz2
+    xz < {{ item }} > {{ item }}.xz
+  loop:
+    - "{{ remote_tmp_dir }}/file.txt"
+    - "{{ remote_tmp_dir }}/second_file.txt"
+
+# Run tests
+- name: Run core tests
+  block:
+    - include_tasks: core.yml
+      loop: "{{ formats }}"
+      loop_control:
+        loop_var: format
+    - import_tasks: cleanup.yml
+
+
+- name: Run idempotency and check mode tests
+  block:
+    - import_tasks: misc.yml
+    - import_tasks: cleanup.yml
+
+- name: Run tests for destination file
+  block:
+    - import_tasks: dest.yml
+    - import_tasks: cleanup.yml
