@@ -1117,6 +1117,8 @@ files:
   $modules/proxmox_kvm.py:
     ignore: skvidal
     maintainers: helldorado krauthosting
+  $modules/proxmox_backup.py:
+    maintainers: IamLunchbox
   $modules/proxmox_nic.py:
     maintainers: Kogelvis krauthosting
   $modules/proxmox_node_info.py:
