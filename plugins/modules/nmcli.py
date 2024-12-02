@@ -1058,6 +1058,38 @@ options:
                       You can encode using this Ansible jinja2 expression: V("0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}").
                     - This is only used when O(vpn.ipsec-enabled=true).
                 type: str
+    sriov:
+        description:
+            - Allow to configure SR-IOV settings.
+            - 'An up-to-date list of supported attributes can be found here:
+              U(https://networkmanager.pages.freedesktop.org/NetworkManager/NetworkManager/settings-sriov.html).'
+        type: dict
+        version_added: 10.1.0
+        suboptions:
+            autoprobe-drivers:
+                description:
+                    - Whether to autoprobe virtual functions by a compatible driver.
+                type: int
+            eswitch-encap-mode:
+                description:
+                    - Select the eswitch encapsulation support.
+                type: int
+            eswitch-inline-mode:
+                description:
+                    - Select the eswitch inline-mode of the device.
+                type: int
+            eswitch-mode:
+                description:
+                    - Select the eswitch mode of the device.
+                type: int
+            total-vfs:
+                description: Number of virtual functions to create. Consult your NIC documentation for the maximum number of VFs supported.
+                type: int
+            vfs:
+                description:
+                    - 'Virtual function descriptors in the form: V(INDEX [ATTR=VALUE[ ATTR=VALUE]...]).'
+                    - Multiple VFs can be specified using a comma as separator, for example V(2 mac=00:11:22:33:44:55 spoof-check=true,3 vlans=100).
+                type: str
 '''
 
 EXAMPLES = r'''
@@ -1687,6 +1719,7 @@ class Nmcli(object):
         self.wireguard = module.params['wireguard']
         self.vpn = module.params['vpn']
         self.transport_mode = module.params['transport_mode']
+        self.sriov = module.params['sriov']
 
         if self.method4:
             self.ipv4_method = self.method4
@@ -1951,6 +1984,13 @@ class Nmcli(object):
             options.update({
                 'infiniband.transport-mode': self.transport_mode,
             })
+
+        if self.type == 'ethernet':
+            if self.sriov:
+                for name, value in self.sriov.items():
+                    options.update({
+                        'sriov.%s' % name: value,
+                    })
 
         # Convert settings values based on the situation.
         for setting, value in options.items():
@@ -2607,6 +2647,7 @@ def main():
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
+            sriov=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
