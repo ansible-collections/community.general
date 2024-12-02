@@ -190,6 +190,15 @@ def extract_field(dictionary, field='name'):
     return [cs[field] for cs in dictionary]
 
 
+def normalize_scopes(scopes):
+    scopes_copy = scopes.copy()
+    if isinstance(scopes_copy.get('default_clientscopes'), list):
+        scopes_copy['default_clientscopes'] = sorted(scopes_copy['default_clientscopes'])
+    if isinstance(scopes_copy.get('optional_clientscopes'), list):
+        scopes_copy['optional_clientscopes'] = sorted(scopes_copy['optional_clientscopes'])
+    return scopes_copy
+
+
 def main():
     """
     Module keycloak_clientscope_type
@@ -244,7 +253,7 @@ def main():
     })
 
     if module._diff:
-        result['diff'] = dict(before=result['existing'], after=result['proposed'])
+        result['diff'] = dict(before=normalize_scopes(result['existing']), after=normalize_scopes(result['proposed']))
 
     default_clientscopes_add = clientscopes_to_add(default_clientscopes_existing, default_clientscopes_real)
     optional_clientscopes_add = clientscopes_to_add(optional_clientscopes_existing, optional_clientscopes_real)
