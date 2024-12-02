@@ -357,6 +357,28 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_ETHERNET_ADD_SRIOV_VFS = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'sriov': {
+            'total-vfs': 16,
+            'vfs': '0 spoof-check=true vlans=100',
+        },
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_ETHERNET_ADD_SRIOV_VFS_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+sriov.total-vfs:                        16
+sriov.vfs:                              0 spoof-check=true vlans=100
+"""
+
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
     {
         'type': 'ethernet',
@@ -1804,6 +1826,12 @@ def mocked_ethernet_connection_with_ipv6_static_address_multiple_static_routes_c
                    (0, TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_sriov_vfs_create(mocker):
+    mocker_set(mocker,
+               execute_return=(0, TESTCASE_ETHERNET_ADD_SRIOV_VFS_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
@@ -3312,6 +3340,41 @@ def test_ethernet_connection_static_ipv6_address_multiple_static_routes_with_met
     assert results['changed']
 
 
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_SRIOV_VFS, indirect=['patch_ansible_module'])
+def test_ethernet_connection_sriov_vfs_create(
+        mocked_ethernet_connection_with_sriov_vfs_create, capfd):
+    """
+    Test : Create ethernet connection with SR-IOV VFs
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'con-name', 'non_existent_nw_device',
+                  'sriov.total-vfs', '16',
+                  'sriov.vfs', '0 spoof-check=true vlans=100']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC, indirect=['patch_ansible_module'])
 def test_ethernet_connection_static_ipv6_address_static_route_with_metric_create(
         mocked_ethernet_connection_with_ipv6_static_address_static_route_with_metric_create, capfd):
@@ -4384,6 +4447,7 @@ def test_bond_connection_unchanged(mocked_generic_connection_diff_check, capfd):
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
             transport_mode=dict(type='str', choices=['datagram', 'connected']),
+            sriov=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
