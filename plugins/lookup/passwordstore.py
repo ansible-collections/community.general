@@ -582,9 +582,9 @@ class LookupModule(LookupBase):
                     if self.paramvals['overwrite']:
                         with self.opt_lock('write'):
                             result.append(self.update_password())
-                    elif self.paramvals["subkey"] != "password" and not self.passdict.get(self.paramvals['subkey']):  # password exists but not the subkey
-                        with self.opt_lock('write'):
-                            result.append(self.update_password())
+                        if self.paramvals["subkey"] != "password" and not self.passdict.get(self.paramvals['subkey']):  # password exists but not the subkey
+                            with self.opt_lock('write'):
+                                result.append(self.update_password())
                     else:
                         result.append(self.get_passresult())
                 else:                     # password does not exist
