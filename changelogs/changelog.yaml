@@ -1664,3 +1664,13 @@ releases:
       - 9052-modprobe-bugfix.yml
       - 9084-collection_version-importlib.yml
     release_date: '2024-11-03'
+  8.6.8:
+    changes:
+      bugfixes:
+        - github_key - in check mode, a faulty call to ```datetime.strftime(...)```
+          was being made which generated an exception (https://github.com/ansible-collections/community.general/issues/9185).
+      release_summary: Maintenance release for inclusion in Ansible 9.13.0.
+    fragments:
+      - 8.6.8.yml
+      - 9186-fix-broken-check-mode-in-github-key.yml
+    release_date: '2024-12-02'

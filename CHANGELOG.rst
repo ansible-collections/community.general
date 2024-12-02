@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 7.0.0.
 
+v8.6.8
+======
+
+Release Summary
+---------------
+
+Maintenance release for inclusion in Ansible 9.13.0.
+
+Bugfixes
+--------
+
+- github_key - in check mode, a faulty call to ```datetime.strftime(...)``` was being made which generated an exception (https://github.com/ansible-collections/community.general/issues/9185).
+
 v8.6.7
 ======
 
