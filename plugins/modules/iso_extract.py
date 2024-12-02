@@ -67,6 +67,15 @@ options:
     - The path to the C(7z) executable to use for extracting files from the ISO.
     - If not provided, it will assume the value V(7z).
     type: path
+  password:
+    description:
+    - Password used to decrypt files from the ISO.
+    - Will only be used if 7z is used.
+    - The password is used as a command line argument to 7z. This is a B(potential security risk) that
+      allows passwords to be revealed if someone else can list running processes on the same machine
+      in the right moment.
+    type: str
+    version_added: 10.1.0
 notes:
 - Only the file checksum (content) is taken into account when extracting files
   from the ISO image. If O(force=false), only checks the presence of the file.
@@ -100,6 +109,7 @@ def main():
             dest=dict(type='path', required=True),
             files=dict(type='list', elements='str', required=True),
             force=dict(type='bool', default=True),
+            password=dict(type='str', no_log=True),
             executable=dict(type='path'),  # No default on purpose
         ),
         supports_check_mode=True,
@@ -108,6 +118,7 @@ def main():
     dest = module.params['dest']
     files = module.params['files']
     force = module.params['force']
+    password = module.params['password']
     executable = module.params['executable']
 
     result = dict(
@@ -154,7 +165,10 @@ def main():
 
     # Use 7zip when we have a binary, otherwise try to mount
     if binary:
-        cmd = [binary, 'x', image, '-o%s' % tmp_dir] + extract_files
+        cmd = [binary, 'x', image, '-o%s' % tmp_dir]
+        if password:
+            cmd += ["-p%s" % password]
+        cmd += extract_files
     else:
         cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
 
