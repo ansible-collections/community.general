@@ -1,0 +1,2 @@
+bugfixes:
+  - slack - fail if Slack API response is not OK with error message (https://github.com/ansible-collections/community.general/pull/9198).
