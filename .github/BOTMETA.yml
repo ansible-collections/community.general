@@ -135,6 +135,8 @@ files:
   $doc_fragments/xenserver.py:
     labels: xenserver
     maintainers: bvitnik
+  $filters/accumulate.py:
+    maintainers: VannTen
   $filters/counter.py:
     maintainers: keilr
   $filters/crc32.py:
