@@ -21,6 +21,7 @@
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
+    dynamicforward: '10080'
     state: present
   register: options_add
   check_mode: true
@@ -55,6 +56,7 @@
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
+    dynamicforward: '10080'
     state: present
   register: options_add
 
@@ -78,6 +80,7 @@
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
+    dynamicforward: '10080'
     state: present
   register: options_add_again
 
@@ -105,6 +108,7 @@
       - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -118,6 +122,7 @@
     controlmaster: no
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
+    dynamicforward: '11080'
     state: present
   register: options_update
 
@@ -143,6 +148,7 @@
     controlmaster: no
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
+    dynamicforward: '11080'
     state: present
   register: options_update
 
@@ -171,6 +177,7 @@
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -204,6 +211,7 @@
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -255,8 +263,9 @@
       - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
 
-# Proxycommand and ProxyJump are mutually exclusive. 
+# Proxycommand and ProxyJump are mutually exclusive.
 # Reset ssh_config before testing options with proxyjump
 
 - name: Copy sample config file
@@ -276,6 +285,7 @@
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
+    dynamicforward: '10080'
     state: present
   register: options_add
   check_mode: true
@@ -310,6 +320,7 @@
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
+    dynamicforward: '10080'
     state: present
   register: options_add
 
@@ -333,6 +344,7 @@
     controlmaster: "auto"
     controlpath: "~/.ssh/sockets/%r@%h-%p"
     controlpersist: yes
+    dynamicforward: '10080'
     state: present
   register: options_add_again
 
@@ -360,6 +372,7 @@
       - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -373,6 +386,7 @@
     controlmaster: no
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
+    dynamicforward: '11080'
     state: present
   register: options_update
 
@@ -398,6 +412,7 @@
     controlmaster: no
     controlpath: "~/.ssh/new-sockets/%r@%h-%p"
     controlpersist: "600"
+    dynamicforward: '11080'
     state: present
   register: options_update
 
@@ -426,6 +441,7 @@
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -459,6 +475,7 @@
       - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -510,3 +527,4 @@
       - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
       - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
       - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
