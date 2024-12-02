@@ -1,0 +1,2 @@
+minor_changes:
+  - homebrew - greatly speed up module when multiple packages are passed in the ``name`` option (https://github.com/ansible-collections/community.general/pull/9181).
