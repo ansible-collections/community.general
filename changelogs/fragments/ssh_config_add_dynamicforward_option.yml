@@ -1,0 +1,2 @@
+minor_changes:
+  - ssh_config - add ``dynamicforward`` option (https://github.com/ansible-collections/community.general/pull/9192).
