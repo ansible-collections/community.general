@@ -1,2 +1,0 @@
-bugfixes:
-  - github_key - in check mode, a faulty call to ```datetime.strftime(...)``` was being made which generated an exception (https://github.com/ansible-collections/community.general/issues/9185).

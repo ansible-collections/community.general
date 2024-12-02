@@ -6,6 +6,67 @@ Community General Release Notes
 
 This changelog describes changes after version 9.0.0.
 
+v10.1.0
+=======
+
+Release Summary
+---------------
+
+Regular bugfix and feature release.
+
+Minor Changes
+-------------
+
+- alternatives - add ``family`` parameter that allows to utilize the ``--family`` option available in RedHat version of update-alternatives (https://github.com/ansible-collections/community.general/issues/5060, https://github.com/ansible-collections/community.general/pull/9096).
+- cloudflare_dns - add support for ``comment`` and ``tags`` (https://github.com/ansible-collections/community.general/pull/9132).
+- deps module utils - add ``deps.clear()`` to clear out previously declared dependencies (https://github.com/ansible-collections/community.general/pull/9179).
+- homebrew - greatly speed up module when multiple packages are passed in the ``name`` option (https://github.com/ansible-collections/community.general/pull/9181).
+- homebrew - remove duplicated package name validation (https://github.com/ansible-collections/community.general/pull/9076).
+- iso_extract - adds ``password`` parameter that is passed to 7z (https://github.com/ansible-collections/community.general/pull/9159).
+- launchd - add ``plist`` option for services such as sshd, where the plist filename doesn't match the service name (https://github.com/ansible-collections/community.general/pull/9102).
+- nmcli - add ``sriov`` parameter that enables support for SR-IOV settings (https://github.com/ansible-collections/community.general/pull/9168).
+- pipx - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9180).
+- pipx_info - add return value ``version`` (https://github.com/ansible-collections/community.general/pull/9180).
+- proxmox_template - add server side artifact fetching support (https://github.com/ansible-collections/community.general/pull/9113).
+- redfish_command - add ``update_custom_oem_header``, ``update_custom_oem_params``, and ``update_custom_oem_mime_type`` options (https://github.com/ansible-collections/community.general/pull/9123).
+- redfish_utils module utils - remove redundant code (https://github.com/ansible-collections/community.general/pull/9190).
+- rpm_ostree_pkg - added the options ``apply_live`` (https://github.com/ansible-collections/community.general/pull/9167).
+- rpm_ostree_pkg - added the return value ``needs_reboot`` (https://github.com/ansible-collections/community.general/pull/9167).
+- scaleway_lb - minor simplification in the code (https://github.com/ansible-collections/community.general/pull/9189).
+- ssh_config - add ``dynamicforward`` option (https://github.com/ansible-collections/community.general/pull/9192).
+
+Deprecated Features
+-------------------
+
+- opkg - deprecate value ``""`` for parameter ``force`` (https://github.com/ansible-collections/community.general/pull/9172).
+- redfish_utils module utils - deprecate method ``RedfishUtils._init_session()`` (https://github.com/ansible-collections/community.general/pull/9190).
+
+Bugfixes
+--------
+
+- dnf_config_manager - fix hanging when prompting to import GPG keys (https://github.com/ansible-collections/community.general/pull/9124, https://github.com/ansible-collections/community.general/issues/8830).
+- dnf_config_manager - forces locale to ``C`` before module starts. If the locale was set to non-English, the output of the ``dnf config-manager`` could not be parsed (https://github.com/ansible-collections/community.general/pull/9157, https://github.com/ansible-collections/community.general/issues/9046).
+- flatpak - force the locale language to ``C`` when running the flatpak command (https://github.com/ansible-collections/community.general/pull/9187, https://github.com/ansible-collections/community.general/issues/8883).
+- gio_mime - fix command line when determining version of ``gio`` (https://github.com/ansible-collections/community.general/pull/9171, https://github.com/ansible-collections/community.general/issues/9158).
+- github_key - in check mode, a faulty call to ```datetime.strftime(...)``` was being made which generated an exception (https://github.com/ansible-collections/community.general/issues/9185).
+- homebrew_cask - allow ``+`` symbol in Homebrew cask name validation regex (https://github.com/ansible-collections/community.general/pull/9128).
+- keycloak_clientscope_type - sort the default and optional clientscope lists to improve the diff (https://github.com/ansible-collections/community.general/pull/9202).
+- slack - fail if Slack API response is not OK with error message (https://github.com/ansible-collections/community.general/pull/9198).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- community.general.accumulate - Produce a list of accumulated sums of the input list contents.
+
+New Modules
+-----------
+
+- community.general.decompress - Decompresses compressed files.
+- community.general.proxmox_backup - Start a VM backup in Proxmox VE cluster.
+
 v10.0.1
 =======
 
