@@ -56,6 +56,9 @@
   - assert:
       that:
         - package_result.changed
+        - "package_result.msg == 'Package installed: gnu-tar'"
+        - "package_result.changed_pkgs == ['gnu-tar']"
+        - "package_result.unchanged_pkgs == []"
 
   - name: Again install {{ package_name }} package using homebrew
     homebrew:
@@ -69,6 +72,41 @@
   - assert:
       that:
         - not package_result.changed
+        - "package_result.msg == 'Package already installed: gnu-tar'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+  - name: Unlink {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: unlinked
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Package unlinked: gnu-tar'"
+        - "package_result.changed_pkgs == ['gnu-tar']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Link {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: linked
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Package linked: gnu-tar'"
+        - "package_result.changed_pkgs == ['gnu-tar']"
+        - "package_result.unchanged_pkgs == []"
 
   - name: Uninstall {{ package_name }} package using homebrew
     homebrew:
@@ -82,6 +120,9 @@
   - assert:
       that:
         - package_result.changed
+        - "package_result.msg == 'Package uninstalled: gnu-tar'"
+        - "package_result.changed_pkgs == ['gnu-tar']"
+        - "package_result.unchanged_pkgs == []"
 
   - name: Again uninstall {{ package_name }} package using homebrew
     homebrew:
@@ -95,3 +136,188 @@
   - assert:
       that:
         - not package_result.changed
+        - "package_result.msg == 'Package already uninstalled: gnu-tar'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+  - name: Upgrade {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: latest
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Package upgraded: gnu-tar'"
+        - "package_result.changed_pkgs == ['gnu-tar']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Again upgrade {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: latest
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
+        - "package_result.msg == 'Package already upgraded: gnu-tar'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+- vars:
+    package_names:
+      - gnu-tar
+      - gnu-time
+
+  block:
+  - name: Make sure {{ package_names }} packages are not installed
+    homebrew:
+      name: "{{ package_names }}"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install only {{ package_names[0] }} package using homebrew
+    homebrew:
+      name: "{{ package_names[0] }}"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
+  - name: Install {{ package_names }} packages using homebrew (one is already installed)
+    homebrew:
+      name: "{{ package_names }}"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Changed: 1, Unchanged: 1'"
+        - "package_result.changed_pkgs == ['gnu-time']"
+        - "package_result.unchanged_pkgs == ['gnu-tar']"
+
+  - name: Again install {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
+        - "package_result.msg == 'Changed: 0, Unchanged: 2'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+  - name: Unlink {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: unlinked
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+        - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Link {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: linked
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+        - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Uninstall {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+        - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Again uninstall {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
+        - "package_result.msg == 'Changed: 0, Unchanged: 2'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+  - name: Upgrade {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: latest
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Changed: 2, Unchanged: 0'"
+        - "package_result.changed_pkgs | sort == ['gnu-tar', 'gnu-time']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Again upgrade {{ package_names }} packages using homebrew
+    homebrew:
+      name: "{{ package_names }}"
+      state: latest
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
+        - "package_result.msg == 'Changed: 0, Unchanged: 2'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
