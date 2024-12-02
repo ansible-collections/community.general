@@ -55,7 +55,6 @@ class RedfishUtils(object):
         self.strip_etag_quotes = strip_etag_quotes
         self.ciphers = ciphers
         self._vendor = None
-        self._init_session()
 
     def _auth_params(self, headers):
         """
@@ -411,7 +410,7 @@ class RedfishUtils(object):
         return msg, data
 
     def _init_session(self):
-        pass
+        self.module.deprecate("Method _init_session is deprecated and will be removed.", version="11.0.0", collection_name="community.general")
 
     def _get_vendor(self):
         # If we got the vendor info once, don't get it again
