@@ -83,7 +83,7 @@ options:
         version_added: '10.1.0'
     accept_pubkey:
         description:
-            - Wether or not repository signing keys should be automatically accepted.
+            - Whether or not repository signing keys should be automatically accepted.
         type: bool
         default: false
         version_added: '10.1.0'
