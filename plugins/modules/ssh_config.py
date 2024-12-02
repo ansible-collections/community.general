@@ -139,6 +139,11 @@ options:
       - Sets the C(ControlPersist) option.
     type: str
     version_added: 8.1.0
+  dynamicforward:
+    description:
+      - Sets the C(DynamicForward) option.
+    type: str
+    version_added: 10.1.0
 requirements:
 - paramiko
 '''
@@ -272,6 +277,7 @@ class SSHConfig(object):
             controlmaster=self.params.get('controlmaster'),
             controlpath=self.params.get('controlpath'),
             controlpersist=fix_bool_str(self.params.get('controlpersist')),
+            dynamicforward=self.params.get('dynamicforward'),
         )
 
         config_changed = False
@@ -376,6 +382,7 @@ def main():
             controlmaster=dict(type='str', default=None, choices=['yes', 'no', 'ask', 'auto', 'autoask']),
             controlpath=dict(type='str', default=None),
             controlpersist=dict(type='str', default=None),
+            dynamicforward=dict(type='str'),
             user=dict(default=None, type='str'),
             user_known_hosts_file=dict(type='str', default=None),
         ),
