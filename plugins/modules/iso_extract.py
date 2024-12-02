@@ -71,7 +71,7 @@ options:
     description:
     - Password used to decrypt files from the ISO.
     - Will only be used if 7z is used.
-    - Password is used as an argument to 7z. This is a security risk that allows password to be revealed.
+    - The password is used as a command line argument to 7z. This is a **potential security risk** that allows passwords to be revealed if someone else can list running processes on the same machine in the right moment.
     type: str
     version_added: 10.1.0
 notes:
