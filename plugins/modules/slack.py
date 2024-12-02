@@ -76,7 +76,8 @@ options:
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
-      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel_id }}) to get RV(ignore:channel_id) from previous task run.
+      - If supplied O(channel) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel }}) to get RV(ignore:channel) from previous task run.
+      - The token needs history scope to get information on the message to edit (C(channels:history,groups:history,mpim:history,im:history)).
       - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
     version_added: 1.2.0
@@ -391,6 +392,8 @@ def get_slack_message(module, token, channel, ts):
     if info['status'] != 200:
         module.fail_json(msg="failed to get slack message")
     data = module.from_json(response.read())
+    if data.get('ok') is False:
+        module.fail_json(msg="failed to get slack message: %s" % data)
     if len(data['messages']) < 1:
         module.fail_json(msg="no messages matching ts: %s" % ts)
     if len(data['messages']) > 1:
