@@ -1,0 +1,2 @@
+deprecated_features:
+  - opkg - deprecate value ``""`` for parameter ``force`` (https://github.com/ansible-collections/community.general/pull/9172).
