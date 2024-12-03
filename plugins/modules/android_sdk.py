@@ -12,10 +12,10 @@ class AndroidSdk(StateModuleHelper):
         )
     )
     use_old_vardict = False
-    output_params = ('installed')
+    output_params = ('installed', 'removed')
 
     @staticmethod
-    def package_split(package):
+    def arg_package_split(package):
         parts = package.split('=', maxsplit=1)
         if len(parts) > 1:
             return parts
@@ -26,42 +26,38 @@ class AndroidSdk(StateModuleHelper):
 
     def _parse_packages(self):
         arg_pkgs = self.vars.package
-        packages = []
+        packages = set()
         for arg_pkg in arg_pkgs:
-            pkg, version = AndroidSdk.package_split(arg_pkg)
+            pkg, version = AndroidSdk.arg_package_split(arg_pkg)
             package = Package(pkg, version)
-            packages.append(package)
+            packages.add(package)
+
+        if len(packages) < len(arg_pkgs):
+            self.do_raise("Packages may not repeat")
         return packages
 
     def state_present(self):
         packages = self._parse_packages()
         installed = self.sdkmanager.get_installed_packages()
-        pending_installation = []
-        for package in packages:
-            for existing in installed:
-                if existing.name == package.name:
-                    if existing.version == package.version:
-                        pass  # do nothing, package exists
-                    # else:
-                    # package exists, but needs to be updated/downgraded
-                else:
-                    pending_installation.append(package)
+        pending_installation = packages.difference(installed)
         self.sdkmanager.install_packages(pending_installation)
+        self.vars.installed = AndroidSdk._packages_to_str(pending_installation)
 
     def state_absent(self):
         packages = self._parse_packages()
         installed = self.sdkmanager.get_installed_packages()
-        to_be_deleted = []
-        for package in packages:
-            for existing in installed:
-                if existing == package:
-                    to_be_deleted.append(package)
+        to_be_deleted = packages.intersection(installed)
         self.sdkmanager.uninstall_packages(to_be_deleted)
+        self.vars.removed = AndroidSdk._packages_to_str(to_be_deleted)
 
     def update_packages(self):
         pass
         # with self.sdkmanager('update') as ctx:
         #     ctx.run()
+
+    @staticmethod
+    def _packages_to_str(packages):
+        return [{'name': x.name, 'version': x.version} for x in packages]
 
     def __run__(self):
         super().__run__()

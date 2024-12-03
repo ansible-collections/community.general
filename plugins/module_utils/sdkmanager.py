@@ -32,6 +32,14 @@ class Package:
     def __str__(self):
         return "%s;%s (%s)" % (self.name, self.version, self.description)
 
+    def __hash__(self):
+        return hash((self.name, self.version))
+
+    def __ne__(self, other):
+        if not isinstance(other, Package):
+            return True
+        return self.name != other.name or self.version != other
+
     def __eq__(self, other):
         if not isinstance(other, Package):
             return False
@@ -51,6 +59,13 @@ class AndroidSdkManager(object):
         re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<version>\S+)\s+\|\s(?P<description>.+)\s\|\s+(\S+)$')
     )
 
+    @staticmethod
+    def package_split(package):
+        parts = package.split(';', maxsplit=1)
+        if len(parts) > 1:
+            return parts
+        return parts[0], None
+
     def __init__(self, runner):
         self.runner = runner
 
@@ -58,7 +73,7 @@ class AndroidSdkManager(object):
         with self.runner('installed') as ctx:
             rc, stdout, stderr = ctx.run()
 
-            packages = []
+            packages = set()
             data = stdout.split('\n')
 
             lines_count = len(data)
@@ -72,8 +87,9 @@ class AndroidSdkManager(object):
                 else:
                     p = self._RE_INSTALLED_PACKAGES.search(line)
                     if p:
-                        package = Package(p.group('name'), p.group('version'), p.group('description'))
-                        packages.append(package)
+                        name = AndroidSdkManager.package_split(p.group('name'))[0]
+                        package = Package(name, p.group('version'), p.group('description'))
+                        packages.add(package)
                 i += 1
             return packages
 
@@ -86,6 +102,9 @@ class AndroidSdkManager(object):
     def apply_packages_changes(self, packages, state):
         if len(packages) == 0:
             return
-        command_arg = ''.join(x.get_formatted() for x in packages)
+        command_arg = [x.get_formatted() for x in packages]
+        # ValueError: ['build-tools;34.0.0', 'build-tools;35.0.0']
+        # raise ValueError(command_arg)
         with self.runner('state name') as ctx:
             ctx.run(name=command_arg, state=state)
+
