@@ -1,12 +1,9 @@
-import re
-
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.sdkmanager import sdkmanager_runner
+from ansible_collections.community.general.plugins.module_utils.sdkmanager import sdkmanager_runner, Package, \
+    AndroidSdkManager
 
 
 class AndroidSdk(StateModuleHelper):
-    _RE_INSTALLED_PACKAGES_HEADER = re.compile(r'^\s+Path\s+|\s+Version\s+|\s+Description\s+|\s+Location\s+$')
-    _RE_INSTALLED_PACKAGES = re.compile(r'^\s+(\S+)\s+\|\s+(\S+)\s+\|\s(.+)\s\|\s+(\S+)$')
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
@@ -17,67 +14,44 @@ class AndroidSdk(StateModuleHelper):
     use_old_vardict = False
     output_params = ('installed')
 
-    def _get_formatted_packages(self):
+    def __init_module__(self):
+        self.sdkmanager = AndroidSdkManager(sdkmanager_runner(self.module))
+
+    def _parse_packages(self):
         arg_pkgs = self.vars.package
         packages = []
         for arg_pkg in arg_pkgs:
             pkg, version = package_split(arg_pkg)
-            fmt_pkg = format_cmdline_package(pkg, version)
-            packages.append(fmt_pkg)
+            package = Package(pkg, version)
+            packages.append(package)
         return packages
 
-    def _get_installed_packages(self):
-        with self.sdkmanager('installed') as ctx:
-            rc, stdout, stderr = ctx.run()
-
-            packages = []
-            data = stdout.split('\n')
-
-            lines_count = len(data)
-
-            i = 0
-
-            while i < lines_count:
-                line = data[i]
-                if self._RE_INSTALLED_PACKAGES_HEADER.match(line):
-                    i += 1
-                else:
-                    p = self._RE_INSTALLED_PACKAGES.search(line)
-                    if p:
-                        name = p.group(1)
-                        version = p.group(2)
-                        description = p.group(3)
-                        packages.append((name, version, description))
-                i += 1
-            return packages
-
     def __state_fallback__(self):
-        packages = self._get_formatted_packages()
+        packages = self._parse_packages()
+        installed = self.sdkmanager.get_installed_packages()
+        pending_installation = []
+        for package in packages:
+            for existing in installed:
+                if existing.name == package.name:
+                    if existing.version == package.version:
+                        pass#do nothing, package exists
+                    # else:
+                        # package exists, but needs to be updated/downgraded
+                else:
+                    pending_installation.append(package)
 
-        installed = self._get_installed_packages()
         self.vars.installed = installed
-        with self.sdkmanager('state name') as ctx:
-            ctx.run(name=packages)
 
     def update_packages(self):
-        with self.sdkmanager('update') as ctx:
-            ctx.run()
-
-    def __init_module__(self):
-        self.sdkmanager = sdkmanager_runner(self.module)
+        pass
+        # with self.sdkmanager('update') as ctx:
+        #     ctx.run()
 
     def __run__(self):
         super().__run__()
 
         if self.vars.update:
             self.update_packages()
-
-
-def format_cmdline_package(package, version):
-    if version is None:
-        return package
-    else:
-        return "%s;%s" % (package, version)
 
 
 def package_split(package):
