@@ -1,0 +1,52 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+
+- name: Install dependencies
+  become: true
+  package:
+    name:
+      - java-21-openjdk
+    state: present
+
+- name: Create Android SDK directory
+  become: true
+  file:
+    path: "{{ android_sdk_location }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+
+- name: Check that sdkmanager is installed
+  stat:
+    path: "{{ android_sdk_location }}/cmdline-tools/latest/bin/sdkmanager"
+  register: sdkmanager_installed
+
+
+- name: Install Android command line tools
+  when: not sdkmanager_installed.stat.exists
+  block:
+    - name: Create Android SDK dir structure
+      file:
+        path: "{{ item.path }}"
+        state: "{{ item.state }}"
+      with_items:
+        - { path: "{{ android_cmdline_temp_dir }}", state: "directory" }
+        - { path: "{{ android_sdk_location }}/cmdline-tools/latest", state: "directory" }
+
+    - name: Download Android command line tools
+      unarchive:
+        src: "{{ commandline_tools_link }}"
+        dest: "{{ android_cmdline_temp_dir }}"
+        remote_src: yes
+        creates: "{{ android_cmdline_temp_dir }}/cmdline-tools"
+      when: not sdkmanager_installed.stat.exists
+
+
+    - name: Fix directory structure
+      copy:
+        src: "{{ android_cmdline_temp_dir }}/cmdline-tools/"
+        dest: "{{ android_sdk_location }}/cmdline-tools/latest"
+        remote_src: yes
+

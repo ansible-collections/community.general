@@ -36,7 +36,7 @@ class Package:
         if not isinstance(other, Package):
             return False
 
-        return self.name == other.name and self.version == other.version and self.description == other.description
+        return self.name == other.name and self.version == other.version
 
     def get_formatted(self):
         if self.version is None:
@@ -78,6 +78,14 @@ class AndroidSdkManager(object):
             return packages
 
     def install_packages(self, packages):
-        install_command_arg = ''.join(x.get_formatted() for x in packages)
+        self.apply_packages_changes(packages, 'present')
+
+    def uninstall_packages(self, packages):
+        self.apply_packages_changes(packages, 'absent')
+
+    def apply_packages_changes(self, packages, state):
+        if len(packages) == 0:
+            return
+        command_arg = ''.join(x.get_formatted() for x in packages)
         with self.runner('state name') as ctx:
-            ctx.run(name=install_command_arg)
+            ctx.run(name=command_arg, state=state)
