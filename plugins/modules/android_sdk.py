@@ -14,13 +14,6 @@ class AndroidSdk(StateModuleHelper):
     use_old_vardict = False
     output_params = ('installed', 'removed')
 
-    @staticmethod
-    def arg_package_split(package):
-        parts = package.split('=', maxsplit=1)
-        if len(parts) > 1:
-            return parts
-        return parts[0], None
-
     def __init_module__(self):
         self.sdkmanager = AndroidSdkManager(sdkmanager_runner(self.module))
 
@@ -28,8 +21,7 @@ class AndroidSdk(StateModuleHelper):
         arg_pkgs = self.vars.package
         packages = set()
         for arg_pkg in arg_pkgs:
-            pkg, version = AndroidSdk.arg_package_split(arg_pkg)
-            package = Package(pkg, version)
+            package = Package(arg_pkg)
             packages.add(package)
 
         if len(packages) < len(arg_pkgs):
@@ -57,7 +49,7 @@ class AndroidSdk(StateModuleHelper):
 
     @staticmethod
     def _packages_to_str(packages):
-        return [{'name': x.name, 'version': x.version} for x in packages]
+        return [x.name for x in packages]
 
     def __run__(self):
         super().__run__()
