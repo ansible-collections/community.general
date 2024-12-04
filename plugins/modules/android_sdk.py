@@ -9,13 +9,18 @@ class AndroidSdk(StateModuleHelper):
             state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
             package=dict(type='list', elements='str', aliases=['pkg', 'name']),
             update=dict(type='bool', default=False)
-        )
+        ),
+        supports_check_mode=True
     )
     use_old_vardict = False
     output_params = ('installed', 'removed')
+    change_params = ('installed', 'removed')
+    diff_params = ('installed', 'removed')
 
     def __init_module__(self):
         self.sdkmanager = AndroidSdkManager(sdkmanager_runner(self.module))
+        self.vars.set('installed', [], change=True)
+        self.vars.set('removed', [], change=True)
 
     def _parse_packages(self):
         arg_pkgs = self.vars.package
@@ -32,15 +37,29 @@ class AndroidSdk(StateModuleHelper):
         packages = self._parse_packages()
         installed = self.sdkmanager.get_installed_packages()
         pending_installation = packages.difference(installed)
-        self.sdkmanager.install_packages(pending_installation)
-        self.vars.installed = AndroidSdk._packages_to_str(pending_installation)
+
+        self.vars.installed = AndroidSdk._map_packages_to_names(pending_installation)
+        if not self.check_mode:
+            self.sdkmanager.install_packages(pending_installation)
 
     def state_absent(self):
         packages = self._parse_packages()
         installed = self.sdkmanager.get_installed_packages()
         to_be_deleted = packages.intersection(installed)
-        self.sdkmanager.uninstall_packages(to_be_deleted)
-        self.vars.removed = AndroidSdk._packages_to_str(to_be_deleted)
+        self.vars.removed = AndroidSdk._map_packages_to_names(to_be_deleted)
+        if not self.check_mode:
+            self.sdkmanager.uninstall_packages(to_be_deleted)
+
+    def state_latest(self):
+        packages = self._parse_packages()
+        installed = self.sdkmanager.get_installed_packages()
+        updatable = self.sdkmanager.get_updatable_packages()
+        not_installed = packages.difference(installed)
+        to_be_installed = not_installed.intersection(updatable)
+        self.vars.installed = AndroidSdk._map_packages_to_names(to_be_installed)
+
+        if not self.check_mode:
+            self.sdkmanager.install_packages(packages)
 
     def update_packages(self):
         pass
@@ -48,7 +67,7 @@ class AndroidSdk(StateModuleHelper):
         #     ctx.run()
 
     @staticmethod
-    def _packages_to_str(packages):
+    def _map_packages_to_names(packages):
         return [x.name for x in packages]
 
     def __run__(self):
