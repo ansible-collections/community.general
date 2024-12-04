@@ -63,7 +63,7 @@ class IniParser(ConfigParser):
     ''' Implements a configparser which sets the correct optionxform '''
 
     def __init__(self):
-        super().__init__(interpolation=None)
+        super().__init__(interpolation=None, allow_no_value=True)
         self.optionxform = str
 
 
