@@ -71,7 +71,7 @@ options:
         description:
             - The full path for the target root directory.
         type: path
-        version_added: '10.1.0'
+        version_added: '10.2.0'
     repositories:
         description:
             - Repository URL(s) to prepend to the repository list for the
@@ -80,13 +80,13 @@ options:
               remote repositories or a path for local repositories.
         type: list
         elements: str
-        version_added: '10.1.0'
+        version_added: '10.2.0'
     accept_pubkey:
         description:
             - Whether or not repository signing keys should be automatically accepted.
         type: bool
         default: false
-        version_added: '10.1.0'
+        version_added: '10.2.0'
 '''
 
 EXAMPLES = '''
@@ -377,7 +377,7 @@ def main():
             upgrade=dict(default=False, type='bool'),
             update_cache=dict(default=True, type='bool'),
             upgrade_xbps=dict(default=True, type='bool'),
-            root=dict(type='str'),
+            root=dict(type='path'),
             repositories=dict(type='list', elements='str'),
             accept_pubkey=dict(default=False, type='bool')
         ),
