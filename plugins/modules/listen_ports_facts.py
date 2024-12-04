@@ -113,7 +113,7 @@ ansible_facts:
           type: str
           sample: "mysqld"
         pid:
-          description: The pid of the listening process.
+          description: The pid of the listening process. If user permissions not allowed, set to C(0).
           returned: always
           type: int
           sample: 1223
