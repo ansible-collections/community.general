@@ -1,0 +1,2 @@
+bugfixes:
+    - jenkins_plugin - use force_basic_auth param to create basic auth headers if set to true
