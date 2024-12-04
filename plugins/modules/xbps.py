@@ -217,7 +217,7 @@ def update_package_db(module, xbps_path):
     if module.params['accept_pubkey']:
         stdin = "y\n"
     else:
-        stdin= "n\n"
+        stdin = "n\n"
     rc, stdout, stderr = module.run_command(cmd, check_rc=False, data=stdin)
 
     if "Failed to import pubkey" in stderr:
