@@ -841,3 +841,654 @@ def test_set_offline_message_when_not_equal_offline(get_instance, instance):
     assert not instance.disable_node.called
 
     assert result.value["changed"] is False
+
+
+class TestConfigureLaunchSSH:
+    @fixture(autouse=True)
+    def node_exists(self, get_instance, instance):
+        instance.node_exists.return_value = True
+
+    def test_configure_when_launcher_is_not_ssh(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.DummyLauncher" />
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {},
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  {}
+</slave>
+""".format(jenkins_node.SSHLauncherConfig.TEMPLATE))
+
+        assert result.value["configured"] is True
+
+    def test_configure_when_not_configured(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher" />
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {},
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_port_when_not_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <port>22</port>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "port": 23,
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <port>23</port>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_port_when_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <port>22</port>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "port": 22,
+            }
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_host_when_unset(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher" />
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host": "my-node.test",
+            }
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(
+            instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <host>my-node.test</host>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_when_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <host>my-node.test</host>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host": "my-node.test",
+            }
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_host_when_not_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <host>my-node.test</host>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host": "my-other-node.test",
+            }
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <host>my-other-node.test</host>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_credentials_id_when_unset(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher" />
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "credentials_id": "deaddead-dead-dead-dead-deaddeaddead",
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <credentialsId>deaddead-dead-dead-dead-deaddeaddead</credentialsId>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_credentials_id_when_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <credentialsId>deaddead-dead-dead-dead-deaddeaddead</credentialsId>
+  </launcher>
+</slave>
+"""
+
+        set_module_args(
+            {
+                "name": "my-node",
+                "state": "present",
+                "launch_ssh": {
+                    "credentials_id": "deaddead-dead-dead-dead-deaddeaddead",
+                },
+            }
+        )
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_credentials_id_when_not_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <credentialsId>deaddead-dead-dead-dead-deaddeaddead</credentialsId>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "credentials_id": "deaddead-dead-dead-dead-deaddeadbeef",
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <credentialsId>deaddead-dead-dead-dead-deaddeadbeef</credentialsId>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_key_verify_known_hosts_when_host_key_verify_is_not_known_hosts(
+        self, instance
+    ):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.DummyStrategy" />
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_known_hosts": True,
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.KnownHostsFileKeyVerificationStrategy" />
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_key_verify_none_when_host_key_verify_is_not_none(
+        self, instance
+    ):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.DummyStrategy" />
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_none": True,
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy" />
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_key_verify_trusted_when_host_key_verify_is_not_trusted(
+        self, instance
+    ):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.DummyStrategy" />
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_trusted": {},
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+      <requireInitialManualTrust>false</requireInitialManualTrust>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_key_verify_trusted_when_not_configured(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+      <requireInitialManualTrust>false</requireInitialManualTrust>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_trusted": {},
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_host_key_verify_trusted_allow_initial_when_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+      <requireInitialManualTrust>false</requireInitialManualTrust>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_trusted": {
+                    "allow_initial": False,
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_host_key_verify_trusted_allow_initial_when_not_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+      <requireInitialManualTrust>false</requireInitialManualTrust>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_trusted": {
+                    "allow_initial": True,
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyTrustedKeyVerificationStrategy">
+      <requireInitialManualTrust>true</requireInitialManualTrust>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    #######
+
+    def test_configure_host_key_verify_provided_when_host_key_verify_is_not_provided(
+        self, instance
+    ):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.DummyStrategy" />
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_provided": {
+                    "algorithm": "ssh-ed25519",
+                    "key": "AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl",
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-ed25519</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_key_verify_provided_algorithm_when_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-ed25519</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_provided": {
+                    "algorithm": "ssh-ed25519",
+                    "key": "AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl",
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_host_key_verify_provided_algorithm_when_not_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-ed25519</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_provided": {
+                    "algorithm": "ssh-rsa",
+                    "key": "AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl",
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-rsa</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
+
+    def test_configure_host_key_verify_provided_key_when_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-ed25519</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_provided": {
+                    "algorithm": "ssh-ed25519",
+                    "key": "AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl",
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert not instance.reconfig_node.called
+
+        assert result.value["configured"] is False
+
+    def test_configure_host_key_verify_provided_key_when_not_equal(self, instance):
+        instance.get_node_config.return_value = """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-ed25519</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+"""
+
+        set_module_args({
+            "name": "my-node",
+            "state": "present",
+            "launch_ssh": {
+                "host_key_verify_provided": {
+                    "algorithm": "ssh-ed25519",
+                    "key": "AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJk",
+                },
+            },
+        })
+
+        with raises(AnsibleExitJson) as result:
+            jenkins_node.main()
+
+        assert_xml_equal(instance.reconfig_node.call_args[0][1], """
+<slave>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.ManuallyProvidedKeyVerificationStrategy">
+      <key>
+        <algorithm>ssh-ed25519</algorithm>
+        <key>AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJk</key>
+      </key>
+    </sshHostKeyVerificationStrategy>
+  </launcher>
+</slave>
+""")
+
+        assert result.value["configured"] is True
