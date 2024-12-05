@@ -380,7 +380,6 @@ def main():
         if not alias and state == "present":
             module.fail_json(msg='Name required when adding non-repo files.')
 
-
     # fill boolean attributes with defaults
     if 'enabled' not in repodata:
         repodata['enabled'] = '0'
