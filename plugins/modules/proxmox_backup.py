@@ -325,7 +325,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
         if "/" in permissions.keys() and permissions["/"].get(
                 "VM.Backup", 0) == 1:
             sufficient_permissions = True
-        elif "/vms" in permissions.keys() and permissions["/"].get(
+        elif "/vms" in permissions.keys() and permissions["/vms"].get(
                 "VM.Backup", 0) == 1:
             sufficient_permissions = True
         elif pool and "/pool/" + pool in permissions.keys() and permissions["/pool/" + pool].get(
