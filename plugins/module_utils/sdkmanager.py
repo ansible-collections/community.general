@@ -45,16 +45,16 @@ class Package:
 
 
 class AndroidSdkManager(object):
-    _RE_INSTALLED_PACKAGES_HEADER = re.compile(r'^\s+Path\s+|\s+Version\s+|\s+Description\s+|\s+Location\s+$')
-    _RE_INSTALLED_PACKAGES = (
-        re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<version>\S+)\s+\|\s(?P<description>.+)\s\|\s+(\S+)$')
-    )
+    _RE_INSTALLED_PACKAGES_HEADER = re.compile(r'^Installed packages:$')
     _RE_UPDATABLE_PACKAGES_HEADER = re.compile(r'^Available Updates:$')
 
-    # Example: '   platform-tools | 27.0.0    | 35.0.2'
-    _RE_UPDATABLE_PACKAGE = (
-        re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<old_version>\S+)\s+\|\s+(?P<new_version>\S+)\s*$')
+    # Example: '  platform-tools     | 27.0.0  | Android SDK Platform-Tools 27 | platform-tools  '
+    _RE_INSTALLED_PACKAGE = (
+        re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<version>\S+)\s+\|\s(?P<description>.+)\s\|\s+(\S+)\s*$')
     )
+
+    # Example: '   platform-tools | 27.0.0    | 35.0.2'
+    _RE_UPDATABLE_PACKAGE = re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<old_version>\S+)\s+\|\s+(?P<new_version>\S+)\s*$')
 
     def __init__(self, runner):
         self.runner = runner
@@ -63,24 +63,29 @@ class AndroidSdkManager(object):
         with self.runner('installed') as ctx:
             rc, stdout, stderr = ctx.run()
 
-            packages = set()
             data = stdout.split('\n')
 
-            lines_count = len(data)
-
+            installed_section_found = False
             i = 0
+            lines_count = len(data)
+            packages = set()
 
             while i < lines_count:
-                line = data[i]
-                if self._RE_INSTALLED_PACKAGES_HEADER.match(line):
-                    i += 1
+
+                if not installed_section_found:
+                    installed_section_found = self._RE_INSTALLED_PACKAGES_HEADER.match(data[i])
+                    if installed_section_found:
+                        i += 3
+                    else:
+                        i += 1
+                    continue
                 else:
-                    p = self._RE_INSTALLED_PACKAGES.search(line)
+                    p = self._RE_INSTALLED_PACKAGE.search(data[i])
                     if p:
                         package = Package(p.group('name'))
                         packages.add(package)
                 i += 1
-            return packages
+        return packages
 
     def get_updatable_packages(self):
         with self.runner('list newer') as ctx:
@@ -92,7 +97,6 @@ class AndroidSdkManager(object):
             lines_count = len(data)
             packages = set()
 
-            dbg = []
             while i < lines_count:
                 if not updatable_section_found:
                     updatable_section_found = self._RE_UPDATABLE_PACKAGES_HEADER.match(data[i])
@@ -109,23 +113,20 @@ class AndroidSdkManager(object):
                     continue
                 else:
                     p = self._RE_UPDATABLE_PACKAGE.match(data[i])
-                    dbg.append((data[i], p is not None))
                     if p:
                         packages.add(Package(p.group('name')))
                     i += 1
         return packages
 
     def install_packages(self, packages):
-        self.apply_packages_changes(packages, 'present')
+        return self.apply_packages_changes(packages, 'present')
 
     def uninstall_packages(self, packages):
-        self.apply_packages_changes(packages, 'absent')
+        return self.apply_packages_changes(packages, 'absent')
 
     def apply_packages_changes(self, packages, state):
         if len(packages) == 0:
-            return
+            return 0, '', ''
         command_arg = [x.name for x in packages]
-        # ValueError: ['build-tools;34.0.0', 'build-tools;35.0.0']
-        # raise ValueError(command_arg)
         with self.runner('state name') as ctx:
-            ctx.run(name=command_arg, state=state)
+            return ctx.run(name=command_arg, state=state)

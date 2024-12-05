@@ -1,0 +1,69 @@
+- import_tasks: setup.yml
+
+- name: Setup environment
+  environment:
+    PATH: '{{ ansible_env.PATH }}:{{ android_sdk_location }}/cmdline-tools/latest/bin'
+    ANDROID_HOME: "{{ android_sdk_location }}"
+  block:
+
+    - name: Accept all licenses
+      shell: 'yes | sdkmanager --licenses'
+      changed_when: false
+
+    - name: Install build-tools;34.0.0
+      android_sdk:
+        name: build-tools;34.0.0
+        state: present
+      register: build_tools_installed
+
+    - name: Install build-tools;34.0.0 second time
+      android_sdk:
+        name: build-tools;34.0.0
+        state: present
+      register: build_tools_installed2
+
+    - name: Stat build-tools
+      stat:
+        path: "{{ android_sdk_location }}/build-tools/34.0.0"
+      register: build_tools_34_0_0
+
+    - name: Delete build-tools;34.0.0
+      android_sdk:
+        name: build-tools;34.0.0
+        state: absent
+      register: build_tools_deleted
+
+    - name: Delete build-tools;34.0.0 second time
+      android_sdk:
+        name: build-tools;34.0.0
+        state: absent
+      register: build_tools_deleted2
+
+    - name: Download old platform-tools
+      unarchive:
+        src: https://dl.google.com/android/repository/platform-tools_r27.0.0-linux.zip
+        remote_src: true
+        dest: "{{ android_sdk_location }}"
+
+    - name: Try installing platform-tools from sdkmanager
+      android_sdk:
+        name: platform-tools
+        state: present
+      register: platform_tools_present
+
+    - name: Install (update) platform-tools
+      android_sdk:
+        name: platform-tools
+        state: latest
+      register: platform_tools_updated
+
+    - name: Run tests
+      assert:
+        that:
+          - build_tools_34_0_0.stat.exists
+          - build_tools_installed.changed
+          - not build_tools_installed2.changed
+          - build_tools_deleted.changed
+          - not build_tools_deleted2.changed
+          - not platform_tools_present.changed
+          - platform_tools_updated.changed

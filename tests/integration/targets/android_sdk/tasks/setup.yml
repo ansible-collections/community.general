@@ -7,22 +7,24 @@
   become: true
   package:
     name:
-      - java-21-openjdk
+#      - java-21-openjdk-headless
+      - openjdk-17-jdk-headless
+      - unzip
     state: present
 
+- name: Print env
+  debug:
+    var: ansible_env
+
 - name: Create Android SDK directory
-  become: true
   file:
     path: "{{ android_sdk_location }}"
     state: directory
-    owner: vagrant
-    group: vagrant
 
 - name: Check that sdkmanager is installed
   stat:
     path: "{{ android_sdk_location }}/cmdline-tools/latest/bin/sdkmanager"
   register: sdkmanager_installed
-
 
 - name: Install Android command line tools
   when: not sdkmanager_installed.stat.exists
@@ -49,4 +51,3 @@
         src: "{{ android_cmdline_temp_dir }}/cmdline-tools/"
         dest: "{{ android_sdk_location }}/cmdline-tools/latest"
         remote_src: yes
-

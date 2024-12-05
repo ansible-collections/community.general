@@ -3,5 +3,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 android_cmdline_temp_dir: "/tmp/cmdlinetools"
-android_sdk_location: /usr/local/android/sdk
+android_sdk_location: "/tmp/androidsdk"
 commandline_tools_link: https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
