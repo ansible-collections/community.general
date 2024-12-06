@@ -815,7 +815,11 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         if lxc is not None:
             if update is None:
                 # TODO: Remove deprecation warning in version 11.0.0
-                self.module.deprecate(msg="The default value of False for 'update' has been deprecated and will be changed to True in version 11.0.0.")
+                self.module.deprecate(
+                    msg="The default value of False for 'update' has been deprecated and will be changed to True in version 11.0.0.",
+                    version="11.0.0",
+                    collection_name="community.general"
+                )
                 update = False
 
             if update:
