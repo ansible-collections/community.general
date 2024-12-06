@@ -21,6 +21,7 @@ def sdkmanager_runner(module, **kwargs):
             list=cmd_runner_fmt.as_fixed('--list'),
             newer=cmd_runner_fmt.as_fixed("--newer")
         ),
+        force_lang="C.UTF-8",
         **kwargs
     )
 
