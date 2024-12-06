@@ -40,7 +40,7 @@ class AndroidSdk(StateModuleHelper):
 
         self.vars.installed = AndroidSdk._map_packages_to_names(pending_installation)
         if not self.check_mode:
-            rc, stdout, stderr = self.sdkmanager.install_packages(packages)
+            rc, stdout, stderr = self.sdkmanager.install_packages(pending_installation)
             if rc != 0:
                 self.do_raise("Could not install packages: %s" % stderr)
 
@@ -50,7 +50,7 @@ class AndroidSdk(StateModuleHelper):
         to_be_deleted = packages.intersection(installed)
         self.vars.removed = AndroidSdk._map_packages_to_names(to_be_deleted)
         if not self.check_mode:
-            rc, stdout, stderr = self.sdkmanager.uninstall_packages(packages)
+            rc, stdout, stderr = self.sdkmanager.uninstall_packages(to_be_deleted)
             if rc != 0:
                 self.do_raise("Could not uninstall packages: %s" % stderr)
 
@@ -59,11 +59,11 @@ class AndroidSdk(StateModuleHelper):
         installed = self.sdkmanager.get_installed_packages()
         updatable = self.sdkmanager.get_updatable_packages()
         not_installed = packages.difference(installed)
-        to_be_installed = not_installed.intersection(updatable)
+        to_be_installed = not_installed.union(updatable)
         self.vars.installed = AndroidSdk._map_packages_to_names(to_be_installed)
 
         if not self.check_mode:
-            rc, stdout, stderr = self.sdkmanager.install_packages(packages)
+            rc, stdout, stderr = self.sdkmanager.install_packages(to_be_installed)
             if rc != 0:
                 self.do_raise("Could not install packages: %s" % stderr)
 
