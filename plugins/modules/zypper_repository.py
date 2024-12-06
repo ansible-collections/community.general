@@ -329,10 +329,10 @@ def main():
             state=dict(choices=['present', 'absent'], default='present'),
             runrefresh=dict(required=False, default=False, type='bool'),
             description=dict(required=False),
-            disable_gpg_check=dict(required=False, default=False, type='bool'),
-            autorefresh=dict(required=False, default=True, type='bool', aliases=['refresh']),
+            disable_gpg_check=dict(required=False, type='bool'),
+            autorefresh=dict(required=False, type='bool', aliases=['refresh']),
             priority=dict(required=False, type='int'),
-            enabled=dict(required=False, default=True, type='bool'),
+            enabled=dict(required=False, type='bool'),
             overwrite_multiple=dict(required=False, default=False, type='bool'),
             auto_import_keys=dict(required=False, default=False, type='bool'),
         ),
@@ -441,17 +441,17 @@ def main():
     # override boolean parameters in repodata with provided entries in module.params
     # in the language that zypper lr -x provides for easier comparison
     if 'enabled' in module.params:
-        if module.params['enabled']:
+        if module.params['enabled'] is not None:
             repodata['enabled'] = '1'
         else:
             repodata['enabled'] = '0'
     if 'disable_gpg_check' in module.params:
-        if module.params['disable_gpg_check']:
+        if module.params['disable_gpg_check'] is not None:
             repodata['gpgcheck'] = '0'
         else:
             repodata['gpgcheck'] = '1'
     if 'autorefresh' in module.params:
-        if module.params['autorefresh']:
+        if module.params['autorefresh'] is not None:
             repodata['autorefresh'] = '1'
         else:
             repodata['autorefresh'] = '0'
