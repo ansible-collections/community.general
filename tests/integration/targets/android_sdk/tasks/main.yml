@@ -57,6 +57,27 @@
         state: latest
       register: platform_tools_updated
 
+    - name: Create new sdk root
+      file:
+        path: "{{ ansible_env.HOME }}/newroot"
+        state: directory
+      register: newroot
+
+    - name: Accept licenses in the new root
+      shell: "yes | sdkmanager --sdk_root={{ newroot.path }} --licenses"
+
+    - name: Install a package to a new root
+      android_sdk:
+        name: build-tools;34.0.0
+        state: present
+        sdk_root: "{{ newroot.path }}"
+      register: new_root_package
+
+    - name: Check package is installed
+      stat:
+        path: "{{ newroot.path }}/build-tools/34.0.0"
+      register: new_root_package_stat
+
     - name: Run tests
       assert:
         that:
@@ -67,3 +88,5 @@
           - not build_tools_deleted2.changed
           - not platform_tools_present.changed
           - platform_tools_updated.changed
+          - new_root_package.changed
+          - new_root_package_stat.stat.exists

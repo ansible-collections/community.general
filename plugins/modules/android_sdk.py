@@ -8,7 +8,8 @@ class AndroidSdk(StateModuleHelper):
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
             package=dict(type='list', elements='str', aliases=['pkg', 'name']),
-            update=dict(type='bool', default=False)
+            update=dict(type='bool', default=False),
+            sdk_root=dict(type='path')
         ),
         supports_check_mode=True
     )

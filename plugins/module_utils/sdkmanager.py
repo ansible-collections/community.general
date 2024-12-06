@@ -19,7 +19,8 @@ def sdkmanager_runner(module, **kwargs):
             update=cmd_runner_fmt.as_fixed("--update"),
             installed=cmd_runner_fmt.as_fixed("--list_installed"),
             list=cmd_runner_fmt.as_fixed('--list'),
-            newer=cmd_runner_fmt.as_fixed("--newer")
+            newer=cmd_runner_fmt.as_fixed("--newer"),
+            sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root", ignore_none=True)
         ),
         force_lang="C.UTF-8",
         **kwargs
@@ -61,7 +62,7 @@ class AndroidSdkManager(object):
         self.runner = runner
 
     def get_installed_packages(self):
-        with self.runner('installed') as ctx:
+        with self.runner('installed sdk_root') as ctx:
             rc, stdout, stderr = ctx.run()
 
             data = stdout.split('\n')
@@ -89,7 +90,7 @@ class AndroidSdkManager(object):
         return packages
 
     def get_updatable_packages(self):
-        with self.runner('list newer') as ctx:
+        with self.runner('list newer sdk_root') as ctx:
             rc, stdout, stderr = ctx.run()
             data = stdout.split('\n')
 
@@ -129,5 +130,5 @@ class AndroidSdkManager(object):
         if len(packages) == 0:
             return 0, '', ''
         command_arg = [x.name for x in packages]
-        with self.runner('state name') as ctx:
+        with self.runner('state name sdk_root') as ctx:
             return ctx.run(name=command_arg, state=state)
