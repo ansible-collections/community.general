@@ -82,6 +82,8 @@ class AndroidSdkManager(object):
     _RE_UPDATABLE_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*\S+\s*$')
 
     _RE_UNKNOWN_PACKAGE = re.compile(r'^Warning: Failed to find package \'(?P<package>\S+)\'\s*$')
+    _RE_ACCEPT_LICENSE = re.compile(r'^The following packages can not be installed since their licenses or those of '
+                                    r'the packages they depend on were not accepted')
 
     def __init__(self, runner):
         self.runner = runner
@@ -128,7 +130,6 @@ class AndroidSdkManager(object):
 
     def _try_parse_stderr(self, stderr):
         data = stderr.split('\n')
-
         for line in data:
             unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
             if unknown_package_regex:
@@ -145,8 +146,17 @@ class AndroidSdkManager(object):
         if len(packages) == 0:
             return 0, '', ''
         command_arg = [x.name for x in packages]
-        with self.runner('state name sdk_root channel') as ctx:
-            rc, stdout, stderr = ctx.run(name=command_arg, state=state)
+
+        data = 'N'  # Answer 'No' in case sdkmanager wants us to accept license
+        with self.runner('state name sdk_root channel', data=data) as ctx:
+            rc, stdout, stderr = ctx.run(name=command_arg, state=state, data=data)
+
+            data = stdout.split('\n')
+
+            for line in data:
+                if self._RE_ACCEPT_LICENSE.match(line):
+                    raise SdkManagerException("Licenses for some packages were not accepted")
+
             if rc != 0:
                 err = self._try_parse_stderr(stderr)
                 if err:
