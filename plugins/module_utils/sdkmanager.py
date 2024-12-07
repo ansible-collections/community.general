@@ -1,3 +1,7 @@
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
 import re
 
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
@@ -7,6 +11,20 @@ _state_map = {
     "present": "--install",
     "absent": "--uninstall"
 }
+
+# sdkmanager --help 2>&1 | grep -A 2 -- --channel
+_channel_map = {
+    "stable": 0,
+    "beta": 1,
+    "dev": 2,
+    "canary": 3
+}
+
+
+def map_channel(channel_name):
+    if channel_name not in _channel_map:
+        raise ValueError("Unknown channel name '%s'" % channel_name)
+    return _channel_map[channel_name]
 
 
 def sdkmanager_runner(module, **kwargs):
@@ -20,7 +38,8 @@ def sdkmanager_runner(module, **kwargs):
             installed=cmd_runner_fmt.as_fixed("--list_installed"),
             list=cmd_runner_fmt.as_fixed('--list'),
             newer=cmd_runner_fmt.as_fixed("--newer"),
-            sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root", ignore_none=True)
+            sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root", ignore_none=True),
+            channel=cmd_runner_fmt.as_func(lambda x: ["{0}={1}".format("--channel", map_channel(x))])
         ),
         force_lang="C.UTF-8",
         **kwargs
@@ -62,7 +81,7 @@ class AndroidSdkManager(object):
         self.runner = runner
 
     def get_installed_packages(self):
-        with self.runner('installed sdk_root') as ctx:
+        with self.runner('installed sdk_root channel') as ctx:
             rc, stdout, stderr = ctx.run()
 
             data = stdout.split('\n')
@@ -90,7 +109,7 @@ class AndroidSdkManager(object):
         return packages
 
     def get_updatable_packages(self):
-        with self.runner('list newer sdk_root') as ctx:
+        with self.runner('list newer sdk_root channel') as ctx:
             rc, stdout, stderr = ctx.run()
             data = stdout.split('\n')
 
@@ -130,5 +149,5 @@ class AndroidSdkManager(object):
         if len(packages) == 0:
             return 0, '', ''
         command_arg = [x.name for x in packages]
-        with self.runner('state name sdk_root') as ctx:
+        with self.runner('state name sdk_root channel') as ctx:
             return ctx.run(name=command_arg, state=state)

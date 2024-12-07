@@ -1,0 +1,4 @@
+- name: delete_newroot
+  file:
+    path: "{{ newroot.path }}"
+    state: absent

@@ -1,3 +1,7 @@
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.sdkmanager import sdkmanager_runner, Package, \
     AndroidSdkManager
@@ -9,7 +13,8 @@ class AndroidSdk(StateModuleHelper):
             state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
             package=dict(type='list', elements='str', aliases=['pkg', 'name']),
             update=dict(type='bool', default=False),
-            sdk_root=dict(type='path')
+            sdk_root=dict(type='path'),
+            channel=dict(type='str', default='stable', choices=['stable', 'beta', 'dev', 'canary'])
         ),
         supports_check_mode=True
     )

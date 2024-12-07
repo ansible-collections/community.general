@@ -62,6 +62,7 @@
         path: "{{ ansible_env.HOME }}/newroot"
         state: directory
       register: newroot
+      notify: delete_newroot
 
     - name: Accept licenses in the new root
       shell: "yes | sdkmanager --sdk_root={{ newroot.path }} --licenses"
@@ -78,6 +79,13 @@
         path: "{{ newroot.path }}/build-tools/34.0.0"
       register: new_root_package_stat
 
+    - name: Install a package from canary channel
+      android_sdk:
+        name: build-tools;33.0.0
+        state: present
+        channel: canary
+      register: package_canary
+
     - name: Run tests
       assert:
         that:
@@ -90,3 +98,4 @@
           - platform_tools_updated.changed
           - new_root_package.changed
           - new_root_package_stat.stat.exists
+          - package_canary.changed
