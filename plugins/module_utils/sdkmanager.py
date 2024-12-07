@@ -83,60 +83,41 @@ class AndroidSdkManager(object):
     def get_installed_packages(self):
         with self.runner('installed sdk_root channel') as ctx:
             rc, stdout, stderr = ctx.run()
-
-            data = stdout.split('\n')
-
-            installed_section_found = False
-            i = 0
-            lines_count = len(data)
-            packages = set()
-
-            while i < lines_count:
-
-                if not installed_section_found:
-                    installed_section_found = self._RE_INSTALLED_PACKAGES_HEADER.match(data[i])
-                    if installed_section_found:
-                        i += 3
-                    else:
-                        i += 1
-                    continue
-                else:
-                    p = self._RE_INSTALLED_PACKAGE.search(data[i])
-                    if p:
-                        package = Package(p.group('name'))
-                        packages.add(package)
-                i += 1
-        return packages
+            return self._parse_packages(stdout, self._RE_INSTALLED_PACKAGES_HEADER, self._RE_INSTALLED_PACKAGE)
 
     def get_updatable_packages(self):
         with self.runner('list newer sdk_root channel') as ctx:
             rc, stdout, stderr = ctx.run()
-            data = stdout.split('\n')
+            return self._parse_packages(stdout, self._RE_UPDATABLE_PACKAGES_HEADER, self._RE_UPDATABLE_PACKAGE)
 
-            updatable_section_found = False
-            i = 0
-            lines_count = len(data)
-            packages = set()
+    @staticmethod
+    def _parse_packages(stdout, header_regexp, row_regexp):
+        data = stdout.split('\n')
 
-            while i < lines_count:
-                if not updatable_section_found:
-                    updatable_section_found = self._RE_UPDATABLE_PACKAGES_HEADER.match(data[i])
-                    if updatable_section_found:
-                        # Table has the following structure. Once it is found, 2 lines need to be skipped
-                        #
-                        # Available Updates:                                <--- we are here
-                        #   ID             | Installed | Available
-                        #   -------        | -------   | -------
-                        #   platform-tools | 27.0.0    | 35.0.2             <--- skip to here
-                        i += 3  # skip table header
-                    else:
-                        i += 1  # just iterate next until we find the section's header
-                    continue
+        updatable_section_found = False
+        i = 0
+        lines_count = len(data)
+        packages = set()
+
+        while i < lines_count:
+            if not updatable_section_found:
+                updatable_section_found = header_regexp.match(data[i])
+                if updatable_section_found:
+                    # Table has the following structure. Once it is found, 2 lines need to be skipped
+                    #
+                    # Available Updates:                                <--- we are here
+                    #   ID             | Installed | Available
+                    #   -------        | -------   | -------
+                    #   platform-tools | 27.0.0    | 35.0.2             <--- skip to here
+                    i += 3  # skip table header
                 else:
-                    p = self._RE_UPDATABLE_PACKAGE.match(data[i])
-                    if p:
-                        packages.add(Package(p.group('name')))
-                    i += 1
+                    i += 1  # just iterate next until we find the section's header
+                continue
+            else:
+                p = row_regexp.match(data[i])
+                if p:
+                    packages.add(Package(p.group('name')))
+                i += 1
         return packages
 
     def install_packages(self, packages):
