@@ -71,11 +71,11 @@ class AndroidSdkManager(object):
 
     # Example: '  platform-tools     | 27.0.0  | Android SDK Platform-Tools 27 | platform-tools  '
     _RE_INSTALLED_PACKAGE = (
-        re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<version>\S+)\s+\|\s(?P<description>.+)\s\|\s+(\S+)\s*$')
+        re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*.+\s*\|\s*(\S+)\s*$')
     )
 
     # Example: '   platform-tools | 27.0.0    | 35.0.2'
-    _RE_UPDATABLE_PACKAGE = re.compile(r'^\s+(?P<name>\S+)\s+\|\s+(?P<old_version>\S+)\s+\|\s+(?P<new_version>\S+)\s*$')
+    _RE_UPDATABLE_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*\S+\s*$')
 
     def __init__(self, runner):
         self.runner = runner
