@@ -2,6 +2,20 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
+RETURN = r"""
+installed:
+    description: a list of packages that have been installed
+    returned: when packages have changed
+    type: list
+    sample: ['build-tools;34.0.0', 'platform-tools']
+    
+removed:
+    description: a list of packages that have been removed
+    returned: when packages have changed
+    type: list
+    sample: ['build-tools;34.0.0', 'platform-tools']
+"""
+
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.sdkmanager import sdkmanager_runner, Package, \
     AndroidSdkManager
