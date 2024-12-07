@@ -65,6 +65,10 @@ class Package:
         return self.name == other.name
 
 
+class SdkManagerException(Exception):
+    pass
+
+
 class AndroidSdkManager(object):
     _RE_INSTALLED_PACKAGES_HEADER = re.compile(r'^Installed packages:$')
     _RE_UPDATABLE_PACKAGES_HEADER = re.compile(r'^Available Updates:$')
@@ -76,6 +80,8 @@ class AndroidSdkManager(object):
 
     # Example: '   platform-tools | 27.0.0    | 35.0.2'
     _RE_UPDATABLE_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*\S+\s*$')
+
+    _RE_UNKNOWN_PACKAGE = re.compile(r'^Warning: Failed to find package \'(?P<package>\S+)\'\s*$')
 
     def __init__(self, runner):
         self.runner = runner
@@ -120,6 +126,15 @@ class AndroidSdkManager(object):
                 i += 1
         return packages
 
+    def _try_parse_stderr(self, stderr):
+        data = stderr.split('\n')
+
+        for line in data:
+            unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
+            if unknown_package_regex:
+                package = unknown_package_regex.group('package')
+                raise SdkManagerException("Unknown package %s" % package)
+
     def install_packages(self, packages):
         return self.apply_packages_changes(packages, 'present')
 
@@ -131,4 +146,9 @@ class AndroidSdkManager(object):
             return 0, '', ''
         command_arg = [x.name for x in packages]
         with self.runner('state name sdk_root channel') as ctx:
-            return ctx.run(name=command_arg, state=state)
+            rc, stdout, stderr = ctx.run(name=command_arg, state=state)
+            if rc != 0:
+                err = self._try_parse_stderr(stderr)
+                if err:
+                    raise err
+            return rc, stdout, stderr
