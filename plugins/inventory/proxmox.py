@@ -298,7 +298,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             token_secret = self.proxmox_token_secret.strip()
 
             # Build token string without newlines
-            token = f'{user}!{token_id}={token_secret}'.strip()
+            token = f'{user}!{token_id}={token_secret}'
 
             # Set headers with clean token
             self.headers = {'Authorization': f'PVEAPIToken={token}'.strip()}
