@@ -301,7 +301,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             token = f'{user}!{token_id}={token_secret}'
 
             # Set headers with clean token
-            self.headers = {'Authorization': f'PVEAPIToken={token}'.strip()}
+            self.headers = {'Authorization': f'PVEAPIToken={token}'}
 
     def _get_json(self, url, ignore_errors=None):
 
