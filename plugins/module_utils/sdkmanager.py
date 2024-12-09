@@ -7,13 +7,13 @@ import re
 from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
 
-_state_map = {
+__state_map = {
     "present": "--install",
     "absent": "--uninstall"
 }
 
 # sdkmanager --help 2>&1 | grep -A 2 -- --channel
-_channel_map = {
+__channel_map = {
     "stable": 0,
     "beta": 1,
     "dev": 2,
@@ -21,10 +21,10 @@ _channel_map = {
 }
 
 
-def map_channel(channel_name):
-    if channel_name not in _channel_map:
+def __map_channel(channel_name):
+    if channel_name not in __channel_map:
         raise ValueError("Unknown channel name '%s'" % channel_name)
-    return _channel_map[channel_name]
+    return __channel_map[channel_name]
 
 
 def sdkmanager_runner(module, **kwargs):
@@ -32,16 +32,16 @@ def sdkmanager_runner(module, **kwargs):
         module,
         command='sdkmanager',
         arg_formats=dict(
-            state=cmd_runner_fmt.as_map(_state_map),
+            state=cmd_runner_fmt.as_map(__state_map),
             name=cmd_runner_fmt.as_list(),
             update=cmd_runner_fmt.as_fixed("--update"),
             installed=cmd_runner_fmt.as_fixed("--list_installed"),
             list=cmd_runner_fmt.as_fixed('--list'),
             newer=cmd_runner_fmt.as_fixed("--newer"),
             sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root", ignore_none=True),
-            channel=cmd_runner_fmt.as_func(lambda x: ["{0}={1}".format("--channel", map_channel(x))])
+            channel=cmd_runner_fmt.as_func(lambda x: ["{0}={1}".format("--channel", __map_channel(x))])
         ),
-        force_lang="C.UTF-8",
+        force_lang="C.UTF-8",  # Without this, sdkmanager binary crashes
         **kwargs
     )
 
@@ -98,44 +98,6 @@ class AndroidSdkManager(object):
             rc, stdout, stderr = ctx.run()
             return self._parse_packages(stdout, self._RE_UPDATABLE_PACKAGES_HEADER, self._RE_UPDATABLE_PACKAGE)
 
-    @staticmethod
-    def _parse_packages(stdout, header_regexp, row_regexp):
-        data = stdout.split('\n')
-
-        updatable_section_found = False
-        i = 0
-        lines_count = len(data)
-        packages = set()
-
-        while i < lines_count:
-            if not updatable_section_found:
-                updatable_section_found = header_regexp.match(data[i])
-                if updatable_section_found:
-                    # Table has the following structure. Once it is found, 2 lines need to be skipped
-                    #
-                    # Available Updates:                                <--- we are here
-                    #   ID             | Installed | Available
-                    #   -------        | -------   | -------
-                    #   platform-tools | 27.0.0    | 35.0.2             <--- skip to here
-                    i += 3  # skip table header
-                else:
-                    i += 1  # just iterate next until we find the section's header
-                continue
-            else:
-                p = row_regexp.match(data[i])
-                if p:
-                    packages.add(Package(p.group('name')))
-                i += 1
-        return packages
-
-    def _try_parse_stderr(self, stderr):
-        data = stderr.split('\n')
-        for line in data:
-            unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
-            if unknown_package_regex:
-                package = unknown_package_regex.group('package')
-                raise SdkManagerException("Unknown package %s" % package)
-
     def apply_packages_changes(self, packages):
         """ Install or delete packages, depending on the `module.vars.state` parameter """
         if len(packages) == 0:
@@ -157,3 +119,41 @@ class AndroidSdkManager(object):
                 if err:
                     raise err
             return rc, stdout, stderr
+
+    def _try_parse_stderr(self, stderr):
+        data = stderr.split('\n')
+        for line in data:
+            unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
+            if unknown_package_regex:
+                package = unknown_package_regex.group('package')
+                raise SdkManagerException("Unknown package %s" % package)
+
+    @staticmethod
+    def _parse_packages(stdout, header_regexp, row_regexp):
+        data = stdout.split('\n')
+
+        updatable_section_found = False
+        i = 0
+        lines_count = len(data)
+        packages = set()
+
+        while i < lines_count:
+            if not updatable_section_found:
+                updatable_section_found = header_regexp.match(data[i])
+                if updatable_section_found:
+                    # Table has the following structure. Once header is found, 2 lines need to be skipped
+                    #
+                    # Available Updates:                                <--- we are here
+                    #   ID             | Installed | Available
+                    #   -------        | -------   | -------
+                    #   platform-tools | 27.0.0    | 35.0.2             <--- skip to here
+                    i += 3  # skip table header
+                else:
+                    i += 1  # just iterate next until we find the section's header
+                continue
+            else:
+                p = row_regexp.match(data[i])
+                if p:
+                    packages.add(Package(p.group('name')))
+                i += 1
+        return packages
