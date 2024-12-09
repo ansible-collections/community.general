@@ -1,36 +1,103 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2024, Stanislav Shamilov <shamilovstas@protonmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
+DOCUMENTATION = r'''
+---
+module: android_sdk
+short_description: Manages Android SDK packages
+description:
+    - Manages Android SDK packages.
+    - Allows installation from different channels (stable, beta, dev, canary).
+    - Allows installation of packages to a non-default SDK root directory.
+author: Stanislav Shamilov (@shamilovstas)
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  name:
+    description:
+      - A name of an Android SDK package (for instance, V(build-tools;34.0.0)).
+    aliases: ['package', 'pkg']
+    type: list
+    elements: str
+  state:
+    description:
+      - Indicates the desired package(s) state.
+      - V(present) ensures that package(s) is/are present.
+      - V(absent) ensures that package(s) is/are absent.
+      - V(latest) ensures that package(s) is/are installed and updated to the latest version(s).
+    choices: ['present', 'absent', 'latest']
+    default: present
+    type: str
+  sdk_root:
+    description:
+      - Provides path for an alternative directory to install Android SDK packages to. By default, all packages
+        are installed to the directory where C(sdkmanager) is installed.
+    type: path
+  channel:
+    description:
+      - Indicates what channel must C(sdkmanager) use for installation of packages.
+    choices: ['stable', 'beta', 'dev', 'canary']
+    default: stable
+    type: str
+requirements:
+  - C(java) >= 17
+  - C(sdkmanager) Command line tool for installing Android SDK packages.
+notes:
+  - It is assumed that all necessary licenses for the packages that are to be installed are accepted before using
+    this module. If there are any unaccepted licenses, the module will fail. In order to accept all licenses that
+    have not been already accepted, one may use the C(sdkmanager --licenses) command
+    (see U(https://developer.android.com/tools/sdkmanager#accept-licenses)).
+seealso:
+  - name: sdkmanager tool documentation
+    description: Detailed information of how to install and use sdkmanager command line tool.
+    link: https://developer.android.com/tools/sdkmanager
+'''
+
 EXAMPLES = r'''
+- name: Before installing Android SDK packages, all licenses must be accepted
+  shell: "yes | sdkmanager --licenses"
+  
 - name: Install build-tools;34.0.0
   community.general.android_sdk:
     name: build-tools;34.0.0
     state: present
-    
+
 - name: Install build-tools;34.0.0 and platform-tools
   community.general.android_sdk:
-    name: 
+    name:
       - build-tools;34.0.0
       - platform-tools
     state: present
-    
+
 - name: Delete build-tools;34.0.0
   community.general.android_sdk:
     name: build-tools;34.0.0
     state: absent
-    
+
 - name: Install platform-tools or update if installed
   community.general.android_sdk:
     name: platform-tools
     state: latest
-    
+
 - name: Install build-tools;34.0.0 to a different SDK root
   community.general.android_sdk:
     name: build-tools;34.0.0
     state: present
     sdk_root: "/path/to/new/root"
-    
+
 - name: Install a package from another channel
   community.general.android_sdk:
     name: some-package-present-in-canary-channel
@@ -44,7 +111,7 @@ installed:
     returned: when packages have changed
     type: list
     sample: ['build-tools;34.0.0', 'platform-tools']
-    
+
 removed:
     description: a list of packages that have been removed
     returned: when packages have changed
