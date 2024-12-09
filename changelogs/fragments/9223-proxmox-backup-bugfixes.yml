@@ -1,0 +1,2 @@
+bugfixes:
+    - proxmox_backup - fix incorrect key lookup in vmid permission check (https://github.com/ansible-collections/community.general/pull/9223).
