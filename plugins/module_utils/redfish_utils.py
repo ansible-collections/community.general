@@ -3616,7 +3616,7 @@ class RedfishUtils(object):
 
     def verify_bios_attributes(self, bios_attributes):
         # This method verifies BIOS attributes against the provided input
-        server_bios = self.get_multi_bios_attributes()
+        server_bios = self.get_bios_attributes(self.systems_uri)
         if server_bios["ret"] is False:
             return server_bios
 
@@ -3625,8 +3625,8 @@ class RedfishUtils(object):
 
         # Verify bios_attributes with BIOS settings available in the server
         for key, value in bios_attributes.items():
-            if key in server_bios["entries"][0][1]:
-                if server_bios["entries"][0][1][key] != value:
+            if key in server_bios["entries"]:
+                if server_bios["entries"][key] != value:
                     bios_dict.update({key: value})
             else:
                 wrong_param.update({key: value})
