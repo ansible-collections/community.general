@@ -67,6 +67,26 @@ options:
         type: bool
         default: true
         version_added: '0.2.0'
+    root:
+        description:
+            - The full path for the target root directory.
+        type: path
+        version_added: '10.2.0'
+    repositories:
+        description:
+            - Repository URL(s) to prepend to the repository list for the
+              package installation.
+              The URL can be a URL to a repository for
+              remote repositories or a path for local repositories.
+        type: list
+        elements: str
+        version_added: '10.2.0'
+    accept_pubkey:
+        description:
+            - Whether or not repository signing keys should be automatically accepted.
+        type: bool
+        default: false
+        version_added: '10.2.0'
 '''
 
 EXAMPLES = '''
@@ -107,6 +127,30 @@ EXAMPLES = '''
     name: foo
     state: present
     upgrade_xbps: false
+
+- name: Find repository keys to install into a new void system on a mounted partition
+  ansible.builtin.find:
+    path: /var/db/xbps/keys
+    pattern: "*.plist"
+  register: xbps_keys
+
+- name: Copy repository keys to into a new void system on a mounted partition
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ item }}"
+    dest: "/mnt/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: xbps_keys.matched > 0
+  loop: "{{ xbps_keys.files | map(attribute='path') }}"
+
+- name: Install a new void system on a mounted partition
+  community.general.xbps:
+    name: base-system
+    state: present
+    repositories: https://repo-default.voidlinux.org/current
+    root: /mnt
 '''
 
 RETURN = '''
@@ -133,16 +177,29 @@ def is_installed(xbps_output):
     return bool(len(xbps_output))
 
 
+def append_flags(module, xbps_path, cmd, skip_repo=False):
+    """Appends the repository/root flags when needed"""
+    if module.params["root"]:
+        cmd = "%s -r %s" % (cmd, module.params["root"])
+    if module.params["repositories"] and not cmd.startswith(xbps_path["remove"]) and not skip_repo:
+        for repo in module.params["repositories"]:
+            cmd = "%s --repository=%s" % (cmd, repo)
+
+    return cmd
+
+
 def query_package(module, xbps_path, name, state="present"):
     """Returns Package info"""
     if state == "present":
         lcmd = "%s %s" % (xbps_path['query'], name)
+        lcmd = append_flags(module, xbps_path, lcmd, skip_repo=True)
         lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
         if not is_installed(lstdout):
             # package is not installed locally
             return False, False
 
         rcmd = "%s -Sun" % (xbps_path['install'])
+        rcmd = append_flags(module, xbps_path, rcmd)
         rrc, rstdout, rstderr = module.run_command(rcmd, check_rc=False)
         if rrc == 0 or rrc == 17:
             """Return True to indicate that the package is installed locally,
@@ -156,8 +213,15 @@ def query_package(module, xbps_path, name, state="present"):
 def update_package_db(module, xbps_path):
     """Returns True if update_package_db changed"""
     cmd = "%s -S" % (xbps_path['install'])
-    rc, stdout, stderr = module.run_command(cmd, check_rc=False)
+    cmd = append_flags(module, xbps_path, cmd)
+    if module.params['accept_pubkey']:
+        stdin = "y\n"
+    else:
+        stdin = "n\n"
+    rc, stdout, stderr = module.run_command(cmd, check_rc=False, data=stdin)
 
+    if "Failed to import pubkey" in stderr:
+        module.fail_json(msg="Failed to import pubkey for repository")
     if rc != 0:
         module.fail_json(msg="Could not update package db")
     if "avg rate" in stdout:
@@ -168,6 +232,7 @@ def update_package_db(module, xbps_path):
 
 def upgrade_xbps(module, xbps_path, exit_on_success=False):
     cmdupgradexbps = "%s -uy xbps" % (xbps_path['install'])
+    cmdupgradexbps = append_flags(module, xbps_path, cmdupgradexbps)
     rc, stdout, stderr = module.run_command(cmdupgradexbps, check_rc=False)
     if rc != 0:
         module.fail_json(msg='Could not upgrade xbps itself')
@@ -177,6 +242,8 @@ def upgrade(module, xbps_path):
     """Returns true is full upgrade succeeds"""
     cmdupgrade = "%s -uy" % (xbps_path['install'])
     cmdneedupgrade = "%s -un" % (xbps_path['install'])
+    cmdupgrade = append_flags(module, xbps_path, cmdupgrade)
+    cmdneedupgrade = append_flags(module, xbps_path, cmdneedupgrade)
 
     rc, stdout, stderr = module.run_command(cmdneedupgrade, check_rc=False)
     if rc == 0:
@@ -210,6 +277,7 @@ def remove_packages(module, xbps_path, packages):
             continue
 
         cmd = "%s -y %s" % (xbps_path['remove'], package)
+        cmd = append_flags(module, xbps_path, cmd, skip_repo=True)
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
@@ -242,6 +310,7 @@ def install_packages(module, xbps_path, state, packages):
         module.exit_json(changed=False, msg="Nothing to Install")
 
     cmd = "%s -y %s" % (xbps_path['install'], " ".join(toInstall))
+    cmd = append_flags(module, xbps_path, cmd)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
     if rc == 16 and module.params['upgrade_xbps']:
@@ -308,6 +377,9 @@ def main():
             upgrade=dict(default=False, type='bool'),
             update_cache=dict(default=True, type='bool'),
             upgrade_xbps=dict(default=True, type='bool'),
+            root=dict(type='path'),
+            repositories=dict(type='list', elements='str'),
+            accept_pubkey=dict(default=False, type='bool')
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         supports_check_mode=True)
