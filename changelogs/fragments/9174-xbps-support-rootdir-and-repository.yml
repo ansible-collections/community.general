@@ -1,0 +1,2 @@
+minor_changes:
+  - xbps - add ``root`` and ``repository`` options to enable bootstrapping new void installations (https://github.com/ansible-collections/community.general/pull/9174).
