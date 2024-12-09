@@ -136,20 +136,15 @@ class AndroidSdkManager(object):
                 package = unknown_package_regex.group('package')
                 raise SdkManagerException("Unknown package %s" % package)
 
-    def install_packages(self, packages):
-        return self.apply_packages_changes(packages, 'present')
-
-    def uninstall_packages(self, packages):
-        return self.apply_packages_changes(packages, 'absent')
-
-    def apply_packages_changes(self, packages, state):
+    def apply_packages_changes(self, packages):
+        """ Install or delete packages, depending on the `module.vars.state` parameter """
         if len(packages) == 0:
             return 0, '', ''
         command_arg = [x.name for x in packages]
 
         data = 'N'  # Answer 'No' in case sdkmanager wants us to accept license
         with self.runner('state name sdk_root channel', data=data) as ctx:
-            rc, stdout, stderr = ctx.run(name=command_arg, state=state, data=data)
+            rc, stdout, stderr = ctx.run(name=command_arg, data=data)
 
             data = stdout.split('\n')
 
