@@ -2,7 +2,43 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-RETURN = r"""
+EXAMPLES = r'''
+- name: Install build-tools;34.0.0
+  community.general.android_sdk:
+    name: build-tools;34.0.0
+    state: present
+    
+- name: Install build-tools;34.0.0 and platform-tools
+  community.general.android_sdk:
+    name: 
+      - build-tools;34.0.0
+      - platform-tools
+    state: present
+    
+- name: Delete build-tools;34.0.0
+  community.general.android_sdk:
+    name: build-tools;34.0.0
+    state: absent
+    
+- name: Install platform-tools or update if installed
+  community.general.android_sdk:
+    name: platform-tools
+    state: latest
+    
+- name: Install build-tools;34.0.0 to a different SDK root
+  community.general.android_sdk:
+    name: build-tools;34.0.0
+    state: present
+    sdk_root: "/path/to/new/root"
+    
+- name: Install a package from another channel
+  community.general.android_sdk:
+    name: some-package-present-in-canary-channel
+    state: present
+    channel: canary
+'''
+
+RETURN = r'''
 installed:
     description: a list of packages that have been installed
     returned: when packages have changed
@@ -14,7 +50,7 @@ removed:
     returned: when packages have changed
     type: list
     sample: ['build-tools;34.0.0', 'platform-tools']
-"""
+'''
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.sdkmanager import sdkmanager_runner, Package, \
