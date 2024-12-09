@@ -26,7 +26,6 @@ class AndroidSdk(StateModuleHelper):
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present', 'absent', 'latest']),
             package=dict(type='list', elements='str', aliases=['pkg', 'name']),
-            update=dict(type='bool', default=False),
             sdk_root=dict(type='path'),
             channel=dict(type='str', default='stable', choices=['stable', 'beta', 'dev', 'canary'])
         ),
@@ -87,20 +86,9 @@ class AndroidSdk(StateModuleHelper):
             if rc != 0:
                 self.do_raise("Could not install packages: %s" % stderr)
 
-    def update_packages(self):
-        pass
-        # with self.sdkmanager('update') as ctx:
-        #     ctx.run()
-
     @staticmethod
     def _map_packages_to_names(packages):
         return [x.name for x in packages]
-
-    def __run__(self):
-        super().__run__()
-
-        if self.vars.update:
-            self.update_packages()
 
 
 def main():
