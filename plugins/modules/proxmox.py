@@ -1536,7 +1536,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         else:
             return to_native(vmid)
 
-    def handle_api_timeout(self, vmid, node, taskid, timeout, timeout_msg = ""):
+    def handle_api_timeout(self, vmid, node, taskid, timeout, timeout_msg=""):
         if timeout_msg != "":
             timeout_msg = "%s " % timeout_msg
 
