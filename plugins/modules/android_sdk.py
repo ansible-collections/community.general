@@ -137,7 +137,6 @@ class AndroidSdk(StateModuleHelper):
     use_old_vardict = False
     output_params = ('installed', 'removed')
     change_params = ('installed', 'removed')
-    diff_params = ('installed', 'removed')
 
     def __init_module__(self):
         self.sdkmanager = AndroidSdkManager(sdkmanager_runner(self.module))
