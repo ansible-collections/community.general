@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2024, Stanislav Shamilov <shamilovstas@protonmail.com>
@@ -121,9 +120,7 @@ class AndroidSdkManager(object):
                     raise SdkManagerException("Licenses for some packages were not accepted")
 
             if rc != 0:
-                err = self._try_parse_stderr(stderr)
-                if err:
-                    raise err
+                self._try_parse_stderr(stderr)
             return rc, stdout, stderr
 
     def _try_parse_stderr(self, stderr):
