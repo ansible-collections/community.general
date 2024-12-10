@@ -375,6 +375,8 @@ files:
     maintainers: $team_redfish
   $module_utils/remote_management/lxca/common.py:
     maintainers: navalkp prabhosa
+  $module_utils/sdkmanager.py:
+    maintainers: shamilovstas
   $module_utils/scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
@@ -420,6 +422,8 @@ files:
     ignore: DavidWittman jiuka
     labels: alternatives
     maintainers: mulby
+  $modules/android_sdk.py:
+    maintainers: shamilovstas
   $modules/ansible_galaxy_install.py:
     maintainers: russoz
   $modules/apache2_mod_proxy.py:
