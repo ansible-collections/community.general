@@ -6,9 +6,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: proxmox
 short_description: Management of instances in Proxmox VE cluster
@@ -306,9 +307,9 @@ extends_documentation_fragment:
   - community.general.proxmox.documentation
   - community.general.proxmox.selection
   - community.general.attributes
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create new container with minimal options
   community.general.proxmox:
     vmid: 100
@@ -599,30 +600,32 @@ EXAMPLES = r'''
     api_password: 1q2w3e
     api_host: node1
     state: absent
-'''
+"""
 
 import re
 import time
 
-from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-
-
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    ansible_to_proxmox_bool, proxmox_auth_argument_spec, ProxmoxAnsible)
+    ProxmoxAnsible,
+    ansible_to_proxmox_bool,
+    proxmox_auth_argument_spec,
+)
+from ansible_collections.community.general.plugins.module_utils.version import (
+    LooseVersion,
+)
 
 
 def get_proxmox_args():
     return dict(
-        vmid=dict(type='int', required=False),
+        vmid=dict(type="int", required=False),
         node=dict(),
         pool=dict(),
         password=dict(no_log=True),
         hostname=dict(),
         ostemplate=dict(),
-        disk=dict(type='str'),
+        disk=dict(type="str"),
         disk_volume=dict(
             type="dict",
             options=dict(
@@ -642,12 +645,12 @@ def get_proxmox_args():
                 ("host_path", "size"),
             ],
         ),
-        cores=dict(type='int'),
-        cpus=dict(type='int'),
-        memory=dict(type='int'),
-        swap=dict(type='int'),
-        netif=dict(type='dict'),
-        mounts=dict(type='dict'),
+        cores=dict(type="int"),
+        cpus=dict(type="int"),
+        memory=dict(type="int"),
+        swap=dict(type="int"),
+        netif=dict(type="dict"),
+        mounts=dict(type="dict"),
         mount_volumes=dict(
             type="list",
             elements="dict",
@@ -671,29 +674,55 @@ def get_proxmox_args():
             ],
         ),
         ip_address=dict(),
-        ostype=dict(default='auto', choices=[
-            'auto', 'debian', 'devuan', 'ubuntu', 'centos', 'fedora', 'opensuse', 'archlinux', 'alpine', 'gentoo', 'nixos', 'unmanaged'
-        ]),
-        onboot=dict(type='bool'),
-        features=dict(type='list', elements='str'),
-        startup=dict(type='list', elements='str'),
-        storage=dict(default='local'),
-        cpuunits=dict(type='int'),
+        ostype=dict(
+            default="auto",
+            choices=[
+                "auto",
+                "debian",
+                "devuan",
+                "ubuntu",
+                "centos",
+                "fedora",
+                "opensuse",
+                "archlinux",
+                "alpine",
+                "gentoo",
+                "nixos",
+                "unmanaged",
+            ],
+        ),
+        onboot=dict(type="bool"),
+        features=dict(type="list", elements="str"),
+        startup=dict(type="list", elements="str"),
+        storage=dict(default="local"),
+        cpuunits=dict(type="int"),
         nameserver=dict(),
         searchdomain=dict(),
-        timeout=dict(type='int', default=30),
-        update=dict(type='bool'),
-        force=dict(type='bool', default=False),
-        purge=dict(type='bool', default=False),
-        state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'template']),
-        pubkey=dict(type='str'),
-        unprivileged=dict(type='bool', default=True),
-        description=dict(type='str'),
-        hookscript=dict(type='str'),
-        timezone=dict(type='str'),
-        clone=dict(type='int'),
-        clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
-        tags=dict(type='list', elements='str')
+        timeout=dict(type="int", default=30),
+        update=dict(type="bool"),
+        force=dict(type="bool", default=False),
+        purge=dict(type="bool", default=False),
+        state=dict(
+            default="present",
+            choices=[
+                "present",
+                "absent",
+                "stopped",
+                "started",
+                "restarted",
+                "template",
+            ],
+        ),
+        pubkey=dict(type="str"),
+        unprivileged=dict(type="bool", default=True),
+        description=dict(type="str"),
+        hookscript=dict(type="str"),
+        timezone=dict(type="str"),
+        clone=dict(type="int"),
+        clone_type=dict(
+            default="opportunistic", choices=["full", "linked", "opportunistic"]
+        ),
+        tags=dict(type="list", elements="str"),
     )
 
 
@@ -704,11 +733,11 @@ def get_ansible_module():
     return AnsibleModule(
         argument_spec=module_args,
         required_if=[
-            ('state', 'present', ['node', 'hostname']),
+            ("state", "present", ["node", "hostname"]),
             # Require one of clone, ostemplate, or update.
             # Together with mutually_exclusive this ensures that we either
             # clone a container or create a new one from a template file.
-            ('state', 'present', ('clone', 'ostemplate', 'update'), True),
+            ("state", "present", ("clone", "ostemplate", "update"), True),
         ],
         required_together=[("api_token_id", "api_token_secret")],
         required_one_of=[("api_password", "api_token_id")],
@@ -724,76 +753,78 @@ def get_ansible_module():
 
 class ProxmoxLxcAnsible(ProxmoxAnsible):
     MINIMUM_VERSIONS = {
-        'disk_volume': '5.0',
-        'mount_volumes': '5.0',
-        'tags': '6.1',
-        'timezone': '6.3',
+        "disk_volume": "5.0",
+        "mount_volumes": "5.0",
+        "tags": "6.1",
+        "timezone": "6.3",
     }
 
     def __init__(self, module):
         super(ProxmoxLxcAnsible, self).__init__(module)
 
-        self.VZ_TYPE = 'openvz' if self.version() < LooseVersion('4.0') else 'lxc'
+        self.VZ_TYPE = "openvz" if self.version() < LooseVersion("4.0") else "lxc"
         self.params = self.module.params
 
     def run(self):
-        state = self.params.get('state')
+        state = self.params.get("state")
 
-        vmid = self.params.get('vmid')
-        hostname = self.params.get('hostname')
+        vmid = self.params.get("vmid")
+        hostname = self.params.get("hostname")
 
         if not vmid and not hostname:
             self.module.fail_json(msg="Either VMID or hostname must be provided.")
 
-        if state == 'present':
+        if state == "present":
             if hostname is None:
-                self.module.fail_json(msg="Hostname must be provided when state is 'present'.")
+                self.module.fail_json(
+                    msg="Hostname must be provided when state is 'present'."
+                )
             else:
                 self.lxc_present(
                     vmid,
                     hostname,
-                    node=self.params.get('node'),
-                    update=self.params.get('update'),
-                    force=self.params.get('force'),
+                    node=self.params.get("node"),
+                    update=self.params.get("update"),
+                    force=self.params.get("force"),
                 )
-        elif state == 'absent':
+        elif state == "absent":
             self.lxc_absent(
                 vmid,
                 hostname,
-                node=self.params.get('node'),
-                timeout=self.params.get('timeout'),
-                purge=self.params.get('purge'),
+                node=self.params.get("node"),
+                timeout=self.params.get("timeout"),
+                purge=self.params.get("purge"),
             )
-        elif state == 'started':
+        elif state == "started":
             self.lxc_started(
                 vmid,
                 hostname,
-                node=self.params.get('node'),
-                timeout=self.params.get('timeout'),
+                node=self.params.get("node"),
+                timeout=self.params.get("timeout"),
             )
-        elif state == 'stopped':
+        elif state == "stopped":
             self.lxc_stopped(
                 vmid,
                 hostname,
-                node=self.params.get('node'),
-                timeout=self.params.get('timeout'),
-                force=self.params.get('force'),
+                node=self.params.get("node"),
+                timeout=self.params.get("timeout"),
+                force=self.params.get("force"),
             )
-        elif state == 'restarted':
+        elif state == "restarted":
             self.lxc_restarted(
                 vmid,
                 hostname,
-                node=self.params.get('node'),
-                timeout=self.params.get('timeout'),
-                force=self.params.get('force'),
+                node=self.params.get("node"),
+                timeout=self.params.get("timeout"),
+                force=self.params.get("force"),
             )
-        elif state == 'template':
+        elif state == "template":
             self.lxc_to_template(
                 vmid,
                 hostname,
-                node=self.params.get('node'),
-                timeout=self.params.get('timeout'),
-                force=self.params.get('force'),
+                node=self.params.get("node"),
+                timeout=self.params.get("timeout"),
+                force=self.params.get("force"),
             )
 
     def lxc_present(self, vmid, hostname, node, update, force):
@@ -801,14 +832,16 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         try:
             lxc = self.get_lxc_resource(vmid, hostname)
-            vmid = vmid or lxc['id'].split('/')[-1]
-            node = node or lxc['node']
+            vmid = vmid or lxc["id"].split("/")[-1]
+            node = node or lxc["node"]
         except LookupError:
             lxc = None
             vmid = vmid or self.get_nextvmid()
 
         if node is None:
-            raise ValueError("Argument 'node' is None, but should be found from VMID/hostname or provided.")
+            raise ValueError(
+                "Argument 'node' is None, but should be found from VMID/hostname or provided."
+            )
 
         # check if the container exists already
         if lxc is not None:
@@ -817,57 +850,64 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 self.module.deprecate(
                     msg="The default value of False for 'update' has been deprecated and will be changed to True in version 11.0.0.",
                     version="11.0.0",
-                    collection_name="community.general"
+                    collection_name="community.general",
                 )
                 update = False
 
             if update:
                 # Update it if we should
                 identifier = self.format_vm_identifier(vmid, hostname)
-                features = self.params.get('features')
+                features = self.params.get("features")
                 if features is not None:
                     features = ",".join(features)
-                startup = self.params.get('startup')
+                startup = self.params.get("startup")
                 if startup is not None:
                     startup = ",".join(startup)
                 self.update_lxc_instance(
                     vmid,
                     node,
-                    cores=self.params.get('cores'),
-                    cpus=self.params.get('cpus'),
-                    cpuunits=self.params.get('cpuunits'),
-                    description=self.params.get('description'),
-                    disk=self.params.get('disk'),
-                    disk_volume=self.params.get('disk_volume'),
+                    cores=self.params.get("cores"),
+                    cpus=self.params.get("cpus"),
+                    cpuunits=self.params.get("cpuunits"),
+                    description=self.params.get("description"),
+                    disk=self.params.get("disk"),
+                    disk_volume=self.params.get("disk_volume"),
                     features=features,
-                    hookscript=self.params.get('hookscript'),
-                    hostname=self.params.get('hostname'),
-                    ip_address=self.params.get('ip_address'),
-                    memory=self.params.get('memory'),
-                    mounts=self.params.get('mounts'),
-                    mount_volumes=self.params.get('mount_volumes'),
-                    nameserver=self.params.get('nameserver'),
-                    netif=self.params.get('netif'),
-                    onboot=ansible_to_proxmox_bool(self.params.get('onboot')),
-                    searchdomain=self.params.get('searchdomain'),
+                    hookscript=self.params.get("hookscript"),
+                    hostname=self.params.get("hostname"),
+                    ip_address=self.params.get("ip_address"),
+                    memory=self.params.get("memory"),
+                    mounts=self.params.get("mounts"),
+                    mount_volumes=self.params.get("mount_volumes"),
+                    nameserver=self.params.get("nameserver"),
+                    netif=self.params.get("netif"),
+                    onboot=ansible_to_proxmox_bool(self.params.get("onboot")),
+                    searchdomain=self.params.get("searchdomain"),
                     startup=startup,
-                    swap=self.params.get('swap'),
-                    tags=self.params.get('tags'),
-                    timezone=self.params.get('timezone'),
+                    swap=self.params.get("swap"),
+                    tags=self.params.get("tags"),
+                    timezone=self.params.get("timezone"),
                 )
-                self.module.exit_json(changed=True, vmid=vmid, msg="VM %s has been updated." % identifier)
+                self.module.exit_json(
+                    changed=True, vmid=vmid, msg="VM %s has been updated." % identifier
+                )
             elif not force:
                 # We're done if it shouldn't be forcefully created
-                identifier = self.format_vm_identifier(vmid, lxc['name'])
-                self.module.exit_json(changed=False, vmid=vmid, msg="VM %s already exists." % identifier)
-            self.module.debug("VM %s already exists, but we don't update and instead forcefully recreate it." % identifier)
+                identifier = self.format_vm_identifier(vmid, lxc["name"])
+                self.module.exit_json(
+                    changed=False, vmid=vmid, msg="VM %s already exists." % identifier
+                )
+            self.module.debug(
+                "VM %s already exists, but we don't update and instead forcefully recreate it."
+                % identifier
+            )
 
         self.new_lxc_instance(
             vmid,
             hostname,
-            node=self.params.get('node'),
-            clone_from=self.params.get('clone'),
-            ostemplate=self.params.get('ostemplate'),
+            node=self.params.get("node"),
+            clone_from=self.params.get("clone"),
+            ostemplate=self.params.get("ostemplate"),
             force=force,
         )
 
@@ -876,122 +916,156 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             lxc = self.get_lxc_resource(vmid, hostname)
         except LookupError:
             identifier = self.format_vm_identifier(vmid, hostname)
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is already absent." % (identifier))
+            self.module.exit_json(
+                changed=False, vmid=vmid, msg="VM %s is already absent." % (identifier)
+            )
 
-        vmid = vmid or lxc['id'].split('/')[-1]
-        node = node or lxc['node']
+        vmid = vmid or lxc["id"].split("/")[-1]
+        node = node or lxc["node"]
 
         lxc_status = self.get_lxc_status(vmid, node)
         identifier = self.format_vm_identifier(vmid, hostname)
 
-        if lxc_status == 'running':
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion." % identifier)
-        if lxc_status == 'mounted':
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is mounted. Stop it with force option before deletion." % identifier)
+        if lxc_status == "running":
+            self.module.exit_json(
+                changed=False,
+                vmid=vmid,
+                msg="VM %s is running. Stop it before deletion." % identifier,
+            )
+        if lxc_status == "mounted":
+            self.module.exit_json(
+                changed=False,
+                vmid=vmid,
+                msg="VM %s is mounted. Stop it with force option before deletion."
+                % identifier,
+            )
 
         self.remove_lxc_instance(vmid, node, timeout, purge)
-        self.module.exit_json(changed=True, vmid=vmid, msg="VM %s removed." % identifier)
+        self.module.exit_json(
+            changed=True, vmid=vmid, msg="VM %s removed." % identifier
+        )
 
     def lxc_started(self, vmid, hostname, node, timeout):
         lxc = self.get_lxc_resource(vmid, hostname)
-        vmid = vmid or lxc['id'].split('/')[-1]
-        hostname = hostname or lxc['name']
+        vmid = vmid or lxc["id"].split("/")[-1]
+        hostname = hostname or lxc["name"]
         identifier = self.format_vm_identifier(vmid, hostname)
-        node = node or lxc['node']
-        lxc_status = self.get_lxc_status(vmid, lxc['node'])
+        node = node or lxc["node"]
+        lxc_status = self.get_lxc_status(vmid, lxc["node"])
 
-        if lxc_status == 'running':
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is already running." % identifier)
+        if lxc_status == "running":
+            self.module.exit_json(
+                changed=False, vmid=vmid, msg="VM %s is already running." % identifier
+            )
 
         self.start_lxc_instance(vmid, node, timeout)
-        self.module.exit_json(changed=True, vmid=vmid, msg="VM %s started." % identifier)
+        self.module.exit_json(
+            changed=True, vmid=vmid, msg="VM %s started." % identifier
+        )
 
     def lxc_stopped(self, vmid, hostname, node, timeout, force):
         lxc = self.get_lxc_resource(vmid, hostname)
-        vmid = vmid or lxc['id'].split('/')[-1]
-        hostname = hostname or lxc['name']
+        vmid = vmid or lxc["id"].split("/")[-1]
+        hostname = hostname or lxc["name"]
         identifier = self.format_vm_identifier(vmid, hostname)
-        node = node or lxc['node']
+        node = node or lxc["node"]
         lxc_status = self.get_lxc_status(vmid, node)
 
-        if lxc_status == 'mounted':
+        if lxc_status == "mounted":
             if force:
                 self.umount_lxc_instance(vmid, hostname, timeout)
             else:
                 self.module.exit_json(
                     changed=False,
                     vmid=vmid,
-                    msg="VM %s is already stopped, but mounted. Use force option to umount it." % identifier
+                    msg="VM %s is already stopped, but mounted. Use force option to umount it."
+                    % identifier,
                 )
 
-        if lxc_status == 'stopped':
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped." % identifier)
+        if lxc_status == "stopped":
+            self.module.exit_json(
+                changed=False, vmid=vmid, msg="VM %s is already stopped." % identifier
+            )
 
         self.stop_lxc_instance(vmid, node, timeout, force)
-        self.module.exit_json(changed=True, vmid=vmid, msg="VM %s stopped." % identifier)
+        self.module.exit_json(
+            changed=True, vmid=vmid, msg="VM %s stopped." % identifier
+        )
 
     def lxc_restarted(self, vmid, hostname, node, timeout, force):
         lxc = self.get_lxc_resource(vmid, hostname)
 
-        vmid = vmid or lxc['id'].split('/')[-1]
-        hostname = hostname or lxc['name']
-        node = node or lxc['node']
+        vmid = vmid or lxc["id"].split("/")[-1]
+        hostname = hostname or lxc["name"]
+        node = node or lxc["node"]
 
         identifier = self.format_vm_identifier(vmid, hostname)
         lxc_status = self.get_lxc_status(vmid, node)
 
-        if lxc_status in ['stopped', 'mounted']:
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running." % identifier)
+        if lxc_status in ["stopped", "mounted"]:
+            self.module.exit_json(
+                changed=False, vmid=vmid, msg="VM %s is not running." % identifier
+            )
 
         self.stop_lxc_instance(vmid, node, timeout, force)
         self.start_lxc_instance(vmid, node, timeout)
-        self.module.exit_json(changed=True, vmid=vmid, msg="VM %s is restarted." % identifier)
+        self.module.exit_json(
+            changed=True, vmid=vmid, msg="VM %s is restarted." % identifier
+        )
 
     def lxc_to_template(self, vmid, hostname, node, timeout, force):
         lxc = self.get_lxc_resource(vmid, hostname)
-        vmid = vmid or lxc['id'].split('/')[-1]
-        hostname = hostname or lxc['name']
-        node = node or lxc['node']
+        vmid = vmid or lxc["id"].split("/")[-1]
+        hostname = hostname or lxc["name"]
+        node = node or lxc["node"]
         identifier = self.format_vm_identifier(vmid, hostname)
 
         if self.is_template_container(node, vmid):
-            self.module.exit_json(changed=False, vmid=vmid, msg="VM %s is already a template." % identifier)
+            self.module.exit_json(
+                changed=False,
+                vmid=vmid,
+                msg="VM %s is already a template." % identifier,
+            )
 
         lxc_status = self.get_lxc_status(vmid, node)
-        if lxc_status == 'running' and force:
+        if lxc_status == "running" and force:
             self.stop_instance(vmid, hostname, node, timeout, force)
 
         proxmox_node = self.proxmox_api.nodes(node)
         getattr(proxmox_node, self.VZ_TYPE)(vmid).template.post()
-        self.module.exit_json(changed=True, vmid=vmid, msg="VM %s converted to template." % identifier)
+        self.module.exit_json(
+            changed=True, vmid=vmid, msg="VM %s converted to template." % identifier
+        )
 
     def update_lxc_instance(self, vmid, node, **kwargs):
         if self.VZ_TYPE != "lxc":
-            self.module.fail_json(msg="Updating LXC containers is only supported for LXC-enabled clusters in PVE 4.0 and above.")
+            self.module.fail_json(
+                msg="Updating LXC containers is only supported for LXC-enabled clusters in PVE 4.0 and above."
+            )
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
-        self.validate_tags(kwargs.get('tags', []))
+        self.validate_tags(kwargs.get("tags", []))
 
         disk_updates = self.process_disk_keys(
             vmid,
             node,
-            kwargs.pop('disk', None),
-            kwargs.pop('disk_volume', None),
+            kwargs.pop("disk", None),
+            kwargs.pop("disk_volume", None),
         )
         mounts_updates = self.process_mount_keys(
             vmid,
             node,
-            kwargs.pop('mounts', None),
-            kwargs.pop('mount_volumes', None),
+            kwargs.pop("mounts", None),
+            kwargs.pop("mount_volumes", None),
         )
         kwargs.update(disk_updates)
         kwargs.update(mounts_updates)
 
-        if 'cpus' in kwargs:
-            kwargs['cpulimit'] = kwargs.pop('cpus')
-        if 'netif' in kwargs:
-            kwargs.update(kwargs.pop('netif'))
+        if "cpus" in kwargs:
+            kwargs["cpulimit"] = kwargs.pop("cpus")
+        if "netif" in kwargs:
+            kwargs.update(kwargs.pop("netif"))
 
         # fetch current config
         proxmox_node = self.proxmox_api.nodes(node)
@@ -1005,8 +1079,8 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 diff[arg] = value
             elif isinstance(value, str):
                 # compare all string values as lists as some of them may be lists separated by commas. order doesn't matter
-                current_values = current_config[arg].split(',')
-                requested_values = value.split(',')
+                current_values = current_config[arg].split(",")
+                requested_values = value.split(",")
                 for new_value in requested_values:
                     if new_value not in current_values:
                         diff[arg] = value
@@ -1017,10 +1091,14 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 diff[arg] = value
 
         if not diff:
-            self.module.exit_json(changed=False, vmid=vmid, msg="Container config is already up to date.")
+            self.module.exit_json(
+                changed=False, vmid=vmid, msg="Container config is already up to date."
+            )
 
         # update the config
-        getattr(proxmox_node, self.VZ_TYPE)(vmid).config.put(vmid=vmid, node=node, **kwargs)
+        getattr(proxmox_node, self.VZ_TYPE)(vmid).config.put(
+            vmid=vmid, node=node, **kwargs
+        )
 
     def new_lxc_instance(self, vmid, hostname, node, clone_from, ostemplate, force):
         identifier = self.format_vm_identifier(vmid, hostname)
@@ -1030,20 +1108,24 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 vmid,
                 node,
                 clone_from,
-                clone_type=self.params.get('clone_type'),
-                timeout=self.params.get('timeout'),
-                description=self.params.get('description'),
+                clone_type=self.params.get("clone_type"),
+                timeout=self.params.get("timeout"),
+                description=self.params.get("description"),
                 hostname=hostname,
-                pool=self.params.get('pool'),
-                storage=self.params.get('storage'),
+                pool=self.params.get("pool"),
+                storage=self.params.get("storage"),
             )
-            self.module.exit_json(changed=True, vmid=vmid, msg="Cloned VM %s from %d" % (identifier, clone_from))
+            self.module.exit_json(
+                changed=True,
+                vmid=vmid,
+                msg="Cloned VM %s from %d" % (identifier, clone_from),
+            )
 
         if ostemplate is not None:
-            features = self.params.get('features')
+            features = self.params.get("features")
             if features is not None:
                 features = ",".join(features)
-            startup = self.params.get('startup')
+            startup = self.params.get("startup")
             if startup is not None:
                 startup = ",".join(startup)
 
@@ -1051,59 +1133,68 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 vmid,
                 node,
                 ostemplate,
-                timeout=self.params.get('timeout'),
-                cores=self.params.get('cores'),
-                cpus=self.params.get('cpus'),
-                cpuunits=self.params.get('cpuunits'),
-                description=self.params.get('description'),
-                disk=self.params.get('disk'),
-                disk_volume=self.params.get('disk_volume'),
+                timeout=self.params.get("timeout"),
+                cores=self.params.get("cores"),
+                cpus=self.params.get("cpus"),
+                cpuunits=self.params.get("cpuunits"),
+                description=self.params.get("description"),
+                disk=self.params.get("disk"),
+                disk_volume=self.params.get("disk_volume"),
                 features=features,
                 force=ansible_to_proxmox_bool(force),
-                hookscript=self.params.get('hookscript'),
+                hookscript=self.params.get("hookscript"),
                 hostname=hostname,
-                ip_address=self.params.get('ip_address'),
-                memory=self.params.get('memory'),
-                mounts=self.params.get('mounts'),
-                mount_volumes=self.params.get('mount_volumes'),
-                nameserver=self.params.get('nameserver'),
-                netif=self.params.get('netif'),
-                onboot=ansible_to_proxmox_bool(self.params.get('onboot')),
-                ostype=self.params.get('ostype'),
-                password=self.params.get('password'),
-                pool=self.params.get('pool'),
-                pubkey=self.params.get('pubkey'),
-                searchdomain=self.params.get('searchdomain'),
+                ip_address=self.params.get("ip_address"),
+                memory=self.params.get("memory"),
+                mounts=self.params.get("mounts"),
+                mount_volumes=self.params.get("mount_volumes"),
+                nameserver=self.params.get("nameserver"),
+                netif=self.params.get("netif"),
+                onboot=ansible_to_proxmox_bool(self.params.get("onboot")),
+                ostype=self.params.get("ostype"),
+                password=self.params.get("password"),
+                pool=self.params.get("pool"),
+                pubkey=self.params.get("pubkey"),
+                searchdomain=self.params.get("searchdomain"),
                 startup=startup,
-                storage=self.params.get('storage'),
-                swap=self.params.get('swap'),
-                tags=self.params.get('tags'),
-                timezone=self.params.get('timezone'),
-                unprivileged=ansible_to_proxmox_bool(self.params.get('unprivileged')),
+                storage=self.params.get("storage"),
+                swap=self.params.get("swap"),
+                tags=self.params.get("tags"),
+                timezone=self.params.get("timezone"),
+                unprivileged=ansible_to_proxmox_bool(self.params.get("unprivileged")),
             )
-            self.module.exit_json(changed=True, vmid=vmid, msg="Created VM %s from template %s" % (identifier, ostemplate))
+            self.module.exit_json(
+                changed=True,
+                vmid=vmid,
+                msg="Created VM %s from template %s" % (identifier, ostemplate),
+            )
 
-        self.module.fail_json(vmid=vmid, msg="VM %s does not exist but neither clone nor ostemplate were specified!" % identifier)
+        self.module.fail_json(
+            vmid=vmid,
+            msg="VM %s does not exist but neither clone nor ostemplate were specified!"
+            % identifier,
+        )
 
     def create_lxc_instance(self, vmid, node, ostemplate, timeout, **kwargs):
-        template_store = ostemplate.split(':')[0]
+        template_store = ostemplate.split(":")[0]
         if not self.content_check(node, ostemplate, template_store):
             self.module.fail_json(
                 vmid=vmid,
-                msg="ostemplate %s does not exist on node %s and storage %s." % (ostemplate, node, template_store)
+                msg="ostemplate %s does not exist on node %s and storage %s."
+                % (ostemplate, node, template_store),
             )
 
         disk_updates = self.process_disk_keys(
             vmid,
             node,
-            kwargs.pop('disk'),
-            kwargs.pop('disk_volume'),
+            kwargs.pop("disk"),
+            kwargs.pop("disk_volume"),
         )
         mounts_updates = self.process_mount_keys(
             vmid,
             node,
-            kwargs.pop('mounts'),
-            kwargs.pop('mount_volumes'),
+            kwargs.pop("mounts"),
+            kwargs.pop("mount_volumes"),
         )
         kwargs.update(disk_updates)
         kwargs.update(mounts_updates)
@@ -1111,40 +1202,49 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         # Remove empty values from kwargs
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
-        self.validate_tags(kwargs.get('tags', []))
+        self.validate_tags(kwargs.get("tags", []))
 
         if self.VZ_TYPE == "lxc":
-            if 'cpus' in kwargs:
-                kwargs['cpuunits'] = kwargs.pop('cpus')
-            kwargs.update(kwargs.pop('netif', {}))
+            if "cpus" in kwargs:
+                kwargs["cpuunits"] = kwargs.pop("cpus")
+            kwargs.update(kwargs.pop("netif", {}))
         else:
-            if 'mount_volumes' in kwargs:
-                kwargs.pop('mount_volumes')
-                self.module.warn("'mount_volumes' is not supported for non-LXC clusters. Ignoring keyword.")
+            if "mount_volumes" in kwargs:
+                kwargs.pop("mount_volumes")
+                self.module.warn(
+                    "'mount_volumes' is not supported for non-LXC clusters. Ignoring keyword."
+                )
 
-        if 'pubkey' in kwargs:
-            pubkey = kwargs.pop('pubkey')
-            if self.version() >= LooseVersion('4.2'):
-                kwargs['ssh-public-key'] = pubkey
+        if "pubkey" in kwargs:
+            pubkey = kwargs.pop("pubkey")
+            if self.version() >= LooseVersion("4.2"):
+                kwargs["ssh-public-key"] = pubkey
             else:
-                self.module.warn("'pubkey' is not supported for PVE 4.1 and below. Ignoring keyword.")
+                self.module.warn(
+                    "'pubkey' is not supported for PVE 4.1 and below. Ignoring keyword."
+                )
 
-        if kwargs.get('ostype') == 'auto':
-            kwargs.pop('ostype')
+        if kwargs.get("ostype") == "auto":
+            kwargs.pop("ostype")
 
         proxmox_node = self.proxmox_api.nodes(node)
-        taskid = getattr(proxmox_node, self.VZ_TYPE).create(vmid=vmid, ostemplate=ostemplate, **kwargs)
+        taskid = getattr(proxmox_node, self.VZ_TYPE).create(
+            vmid=vmid, ostemplate=ostemplate, **kwargs
+        )
         self.handle_api_timeout(
             vmid,
             node,
             taskid,
             timeout,
-            "Reached timeout while waiting for creation of VM %s from template %s" % (vmid, ostemplate)
+            "Reached timeout while waiting for creation of VM %s from template %s"
+            % (vmid, ostemplate),
         )
 
     def clone_lxc_instance(self, vmid, node, clone_from, clone_type, timeout, **kwargs):
         if self.VZ_TYPE != "lxc":
-            self.module.fail_json(msg="Cloning is only supported for LXC-enabled clusters in PVE 4.0 and above.")
+            self.module.fail_json(
+                msg="Cloning is only supported for LXC-enabled clusters in PVE 4.0 and above."
+            )
 
         # Remove empty values from kwargs
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
@@ -1154,38 +1254,46 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         create_full_copy = not target_is_template
 
         # Only accept parameters that are compatible with the clone endpoint.
-        valid_clone_parameters = ['hostname', 'pool', 'description']
+        valid_clone_parameters = ["hostname", "pool", "description"]
 
-        if 'storage' not in kwargs and target_is_template:
+        if "storage" not in kwargs and target_is_template:
             # Cloning a template, so create a full copy instead of a linked copy
             create_full_copy = True
-        elif 'storage' not in kwargs and not target_is_template:
-            self.module.fail_json(changed=False, msg="Clone target container is not a template, storage needs to be specified.")
+        elif "storage" not in kwargs and not target_is_template:
+            self.module.fail_json(
+                changed=False,
+                msg="Clone target container is not a template, storage needs to be specified.",
+            )
 
         if clone_type == "linked" and not target_is_template:
-            self.module.fail_json(changed=False, msg="Cloning type 'linked' is only supported for template containers.")
+            self.module.fail_json(
+                changed=False,
+                msg="Cloning type 'linked' is only supported for template containers.",
+            )
         elif clone_type == "opportunistic" and not target_is_template:
             # Cloned container is not a template, so we need our 'storage' parameter
-            valid_clone_parameters.append('storage')
+            valid_clone_parameters.append("storage")
         elif clone_type == "full":
             create_full_copy = True
-            valid_clone_parameters.append('storage')
+            valid_clone_parameters.append("storage")
 
         clone_parameters = {}
-        clone_parameters['full'] = ansible_to_proxmox_bool(create_full_copy)
+        clone_parameters["full"] = ansible_to_proxmox_bool(create_full_copy)
 
         for param in valid_clone_parameters:
             if param in kwargs:
                 clone_parameters[param] = kwargs[param]
 
         proxmox_node = self.proxmox_api.nodes(node)
-        taskid = getattr(proxmox_node, self.VZ_TYPE)(clone_from).clone.post(newid=vmid, **clone_parameters)
+        taskid = getattr(proxmox_node, self.VZ_TYPE)(clone_from).clone.post(
+            newid=vmid, **clone_parameters
+        )
         self.handle_api_timeout(
             vmid,
             node,
             taskid,
             timeout,
-            timeout_msg="Reached timeout while waiting for VM to clone."
+            timeout_msg="Reached timeout while waiting for VM to clone.",
         )
 
     def start_lxc_instance(self, vmid, node, timeout):
@@ -1197,23 +1305,25 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             node,
             taskid,
             timeout,
-            timeout_msg="Reached timeout while waiting for VM to start."
+            timeout_msg="Reached timeout while waiting for VM to start.",
         )
 
     def stop_lxc_instance(self, vmid, node, timeout, force):
         stop_params = {}
         if force:
-            stop_params['forceStop'] = 1
+            stop_params["forceStop"] = 1
 
         proxmox_node = self.proxmox_api.nodes(node)
-        taskid = getattr(proxmox_node, self.VZ_TYPE)(vmid).status.shutdown.post(**stop_params)
+        taskid = getattr(proxmox_node, self.VZ_TYPE)(vmid).status.shutdown.post(
+            **stop_params
+        )
 
         self.handle_api_timeout(
             vmid,
             node,
             taskid,
             timeout,
-            timeout_msg="Reached timeout while waiting for VM to stop."
+            timeout_msg="Reached timeout while waiting for VM to stop.",
         )
 
     def umount_lxc_instance(self, vmid, node, timeout):
@@ -1225,13 +1335,13 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             node,
             taskid,
             timeout,
-            timeout_msg="Reached timeout while waiting for VM to be unmounted."
+            timeout_msg="Reached timeout while waiting for VM to be unmounted.",
         )
 
     def remove_lxc_instance(self, vmid, node, timeout, purge):
         delete_params = {}
         if purge:
-            delete_params['purge'] = 1
+            delete_params["purge"] = 1
 
         proxmox_node = self.proxmox_api.nodes(node)
         taskid = getattr(proxmox_node, self.VZ_TYPE).delete(vmid, **delete_params)
@@ -1241,7 +1351,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             node,
             taskid,
             timeout,
-            timeout_msg="Reached timeout while waiting for VM to be removed."
+            timeout_msg="Reached timeout while waiting for VM to be removed.",
         )
 
     def process_disk_keys(self, vmid, node, disk, disk_volume):
@@ -1269,12 +1379,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                 disk_volume = self.parse_disk_string(disk)
 
         if disk_volume is not None:
-            disk_dict = self.build_volume(
-                vmid,
-                node,
-                key="rootfs",
-                **disk_volume,
-            )
+            disk_dict = self.build_volume(vmid, node, key="rootfs", **disk_volume)
 
         if self.VZ_TYPE != "lxc":
             disk_dict["disk"] = disk_dict.pop("rootfs")
@@ -1336,7 +1441,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             "/mnt/bindmounts/shared,mp=/shared"
             "volume=/dev/USB01,mp=/mnt/usb01"
         """
-        args = disk_string.split(',')
+        args = disk_string.split(",")
         # If the volume is not explicitly defined but implicit by only passing a key,
         # add the "volume=" key prefix for ease of parsing.
         args = ["volume=" + arg if "=" not in arg else arg for arg in args]
@@ -1366,7 +1471,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         volume_string = disk_kwargs.pop("volume")
         match = pattern.match(volume_string)
         if match is None:
-            raise ValueError(f"Invalid volume string: {volume_string}")
+            raise ValueError(("Invalid volume string: %s", volume_string))
         match_dict = match.groupdict()
         match_dict = {k: v for k, v in match_dict.items() if v is not None}
 
@@ -1395,7 +1500,19 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         return disk_kwargs
 
-    def build_volume(self, vmid, node, key, storage, volume, host_path, size, mountpoint, options, **kwargs):
+    def build_volume(
+        self,
+        vmid,
+        node,
+        key,
+        storage,
+        volume,
+        host_path,
+        size,
+        mountpoint,
+        options,
+        **kwargs,
+    ):
         """
         Build a volume string for the specified VM.
 
@@ -1421,7 +1538,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             A host directory to mount into the container
         """
         if size is not None and size.isdigit():
-            size += 'G'  # default to GiB
+            size += "G"  # default to GiB
         # Handle volume checks/creation
         # TODO: Change the code below to pattern matching once only Python 3.10+ is supported
         # 1. Check if defined volume exists
@@ -1442,7 +1559,9 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             )
         # 2. If volume not defined (but storage is), check if it exists
         elif storage is not None:
-            proxmox_node = self.proxmox_api.nodes(node)  # The node must exist, but not the LXC
+            proxmox_node = self.proxmox_api.nodes(
+                node
+            )  # The node must exist, but not the LXC
             try:
                 vol = proxmox_node.lxc(vmid).get("config").get(key)
                 volume = self.parse_disk_string(vol).get("volume")
@@ -1453,18 +1572,24 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             # If not, we have proxmox create one using the special syntax
             except Exception:
                 if size is None:
-                    raise ValueError("Size must be provided for storage-backed volume creation.")
-                elif size.endswith('G'):
-                    size = size.rstrip('G')
+                    raise ValueError(
+                        "Size must be provided for storage-backed volume creation."
+                    )
+                elif size.endswith("G"):
+                    size = size.rstrip("G")
                     vol_string = "{storage}:{size}".format(storage=storage, size=size)
                 else:
-                    raise ValueError("Size must be provided in GiB for storage-backed volume creation. Convert it to GiB or allocate a new storage manually.")
+                    raise ValueError(
+                        "Size must be provided in GiB for storage-backed volume creation. Convert it to GiB or allocate a new storage manually."
+                    )
         # 3. If we have a host_path, we don't have storage, a volume, or a size
         # Then we don't have to do anything, just build and return the vol_string
         elif host_path is not None:
             vol_string = ""
         else:
-            raise ValueError("Could not build a valid volume string. One of volume, storage, or host_path must be provided.")
+            raise ValueError(
+                "Could not build a valid volume string. One of volume, storage, or host_path must be provided."
+            )
 
         if host_path is not None:
             vol_string += "," + host_path
@@ -1473,10 +1598,14 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             vol_string += f",mp={mountpoint}"
 
         if options is not None:
-            vol_string += "," + ",".join(["{0}={1}".format(k, v) for k, v in options.items()])
+            vol_string += "," + ",".join(
+                ["{0}={1}".format(k, v) for k, v in options.items()]
+            )
 
         if kwargs:
-            vol_string += "," + ",".join(["{0}={1}".format(k, v) for k, v in kwargs.items()])
+            vol_string += "," + ",".join(
+                ["{0}={1}".format(k, v) for k, v in kwargs.items()]
+            )
         return {key: vol_string}
 
     def get_lxc_resource(self, vmid, hostname):
@@ -1488,17 +1617,19 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         elif hostname:
             vm = self.get_lxc_resource_by_hostname(hostname)
 
-        vmid = vmid or vm['vmid']
-        if vm['type'] != self.VZ_TYPE:
+        vmid = vmid or vm["vmid"]
+        if vm["type"] != self.VZ_TYPE:
             identifier = self.format_vm_identifier(vmid, hostname)
-            self.module.fail_json(msg="The specified VM %s is not an %s." % (identifier, self.VZ_TYPE))
+            self.module.fail_json(
+                msg="The specified VM %s is not an %s." % (identifier, self.VZ_TYPE)
+            )
 
         return vm
 
     def get_lxc_resource_by_id(self, vmid):
         vms = self.get_vm_resources()
 
-        vms = [vm for vm in vms if vm['vmid'] == vmid]
+        vms = [vm for vm in vms if vm["vmid"] == vmid]
         if len(vms) == 0:
             raise LookupError("VM with VMID %d does not exist in cluster." % vmid)
 
@@ -1507,19 +1638,26 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
     def get_lxc_resource_by_hostname(self, hostname):
         vms = self.get_vm_resources()
 
-        vms = [vm for vm in vms if vm['name'] == hostname]
+        vms = [vm for vm in vms if vm["name"] == hostname]
         if len(vms) == 0:
-            raise LookupError("VM with hostname %s does not exist in cluster." % hostname)
+            raise LookupError(
+                "VM with hostname %s does not exist in cluster." % hostname
+            )
         elif len(vms) > 1:
-            raise ValueError("Multiple VMs found with hostname %s. Please specify VMID." % hostname)
+            raise ValueError(
+                "Multiple VMs found with hostname %s. Please specify VMID." % hostname
+            )
 
         return vms[0]
 
     def get_vm_resources(self):
         try:
-            return self.proxmox_api.cluster.resources.get(type='vm')
+            return self.proxmox_api.cluster.resources.get(type="vm")
         except Exception as e:
-            self.module.fail_json(msg="Unable to retrieve list of %s VMs from cluster resources: %s" % (self.VZ_TYPE, e))
+            self.module.fail_json(
+                msg="Unable to retrieve list of %s VMs from cluster resources: %s"
+                % (self.VZ_TYPE, e)
+            )
 
     def get_lxc_status(self, vmid, node_name):
         try:
@@ -1549,24 +1687,25 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         self.module.fail_json(
             vmid=vmid,
             taskid=taskid,
-            msg="%sLast line in task before timeout: %s" % (timeout_msg, self.proxmox_api.nodes(node).tasks(taskid).log.get()[:1])
+            msg="%sLast line in task before timeout: %s"
+            % (timeout_msg, self.proxmox_api.nodes(node).tasks(taskid).log.get()[:1]),
         )
 
     def is_template_container(self, node, target):
         """Check if the specified container is a template."""
         proxmox_node = self.proxmox_api.nodes(node)
         config = getattr(proxmox_node, self.VZ_TYPE)(target).config.get()
-        return config.get('template', False)
+        return config.get("template", False)
 
     def content_check(self, node, ostemplate, template_store):
         """Check if the specified ostemplate is present in the specified storage."""
         proxmox_node = self.proxmox_api.nodes(node)
         storage_contents = proxmox_node.storage(template_store).content.get()
-        return any(content['volid'] == ostemplate for content in storage_contents)
+        return any(content["volid"] == ostemplate for content in storage_contents)
 
     def validate_tags(self, tags):
         """Check if the specified tags are valid."""
-        re_tag = re.compile(r'^[a-z0-9_][a-z0-9_\-\+\.]*$')
+        re_tag = re.compile(r"^[a-z0-9_][a-z0-9_\-\+\.]*$")
         for tag in tags:
             if not re_tag.match(tag):
                 self.module.fail_json(msg="%s is not a valid tag" % tag)
@@ -1594,5 +1733,5 @@ def main():
         module.fail_json(msg="An error occurred: %s" % to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
