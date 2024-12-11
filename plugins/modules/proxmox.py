@@ -75,9 +75,9 @@ options:
       size:
         description:
           - O(disk_volume.size) is the size of the storage to use.
-          - If no unit is added, the size is given in GB.
+          - The size is given in GiB.
           - Required only if O(disk_volume.storage) is defined, and mutually exclusive with O(disk_volume.host_path).
-        type: str
+        type: int
       host_path:
         description:
           - O(disk_volume.host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
@@ -158,9 +158,9 @@ options:
       size:
         description:
           - O(mount_volumes[].size) is the size of the storage to use.
-          - The size is given in GB.
+          - The size is given in GiB.
           - Required only if O(mount_volumes[].storage) is defined and mutually exclusive with O(mount_volumes[].host_path).
-        type: str
+        type: int
       host_path:
         description:
           - O(mount_volumes[].host_path) defines a bind or device path on the PVE host to use for the C(rootfs).
@@ -1495,7 +1495,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         return disk_kwargs
 
-    def build_volume(self, vmid, node, key, storage, volume, host_path, size, mountpoint, options, **kwargs):
+    def build_volume(self, vmid, node, key, storage=None, volume=None, host_path=None, size=None, mountpoint=None, options=None, **kwargs):
         """
         Build a volume string for the specified VM.
 
@@ -1520,7 +1520,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             Only a storage name and size (to create a new volume or assign the volume automatically)
             A host directory to mount into the container
         """
-        if size is not None and size.isdigit():
+        if size is not None:
             size += "G"  # default to GiB
         # Handle volume checks/creation
         # TODO: Change the code below to pattern matching once only Python 3.10+ is supported
