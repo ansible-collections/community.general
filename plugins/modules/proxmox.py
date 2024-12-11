@@ -1707,6 +1707,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                     ),
                 )
 
+
 def isfloat(value):
     if value is None:
         return False
