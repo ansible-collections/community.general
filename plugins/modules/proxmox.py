@@ -1506,7 +1506,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             storage (str, optional): The storage pool where the volume resides. Defaults to None.
             volume (str, optional): The name of the volume. Defaults to None.
             host_path (str, optional): The host path to mount. Defaults to None.
-            size (str, optional): The size of the volume in GiB. Defaults to None.
+            size (str | int, optional): The size of the volume in GiB. Defaults to None.
             mountpoint (str, optional): The mountpoint for the volume. Defaults to None.
             options (Dict[str, Any], optional): Additional options for the volume. Defaults to None.
             **kwargs: Additional keyword arguments.
@@ -1520,7 +1520,9 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             Only a storage name and size (to create a new volume or assign the volume automatically)
             A host directory to mount into the container
         """
-        if size is not None:
+        if isinstance(size, int):
+            size = str(size)
+        if size is not None and isfloat(size):
             size += "G"  # default to GiB
         # Handle volume checks/creation
         # TODO: Change the code below to pattern matching once only Python 3.10+ is supported
@@ -1704,6 +1706,15 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
                         option=option, version=version, pve_version=self.version()
                     ),
                 )
+
+def isfloat(value):
+    if value is None:
+        return False
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 
 def main():
