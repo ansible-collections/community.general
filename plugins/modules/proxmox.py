@@ -1410,12 +1410,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         mounts_dict = {}
         for mount_config in mount_volumes:
             mount_key = mount_config.pop("id")
-            mount_dict = self.build_volume(
-                vmid,
-                node,
-                key=mount_key,
-                **mount_config,
-            )
+            mount_dict = self.build_volume(vmid, node, key=mount_key, **mount_config)
             mounts_dict.update(mount_dict)
 
         return mounts_dict
@@ -1500,19 +1495,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
 
         return disk_kwargs
 
-    def build_volume(
-        self,
-        vmid,
-        node,
-        key,
-        storage,
-        volume,
-        host_path,
-        size,
-        mountpoint,
-        options,
-        **kwargs,
-    ):
+    def build_volume(self, vmid, node, key, storage, volume, host_path, size, mountpoint, options, **kwargs):
         """
         Build a volume string for the specified VM.
 
