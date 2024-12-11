@@ -631,7 +631,7 @@ def get_proxmox_args():
             options=dict(
                 storage=dict(type="str"),
                 volume=dict(type="str"),
-                size=dict(type="str"),
+                size=dict(type="int"),
                 host_path=dict(type="path"),
                 options=dict(type="dict"),
             ),
@@ -658,7 +658,7 @@ def get_proxmox_args():
                 id=(dict(type="str", required=True)),
                 storage=dict(type="str"),
                 volume=dict(type="str"),
-                size=dict(type="str"),
+                size=dict(type="int"),
                 host_path=dict(type="path"),
                 mountpoint=dict(type="path", required=True),
                 options=dict(type="dict"),
