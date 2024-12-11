@@ -1,0 +1,78 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Accept all licenses (FreeBSD)
+  shell: 'yes | sdkmanager --licenses'
+  changed_when: false
+
+- name: Install sources;android-26 (FreeBSD)
+  android_sdk:
+    name: sources;android-26
+    state: present
+  register: sources_android_26_installed
+
+- name: Install sources;android-26 (FreeBSD)
+  android_sdk:
+    name: sources;android-26
+    state: present
+  register: sources_android_26_installed2
+
+- name: Stat build-tools (FreeBSD)
+  stat:
+    path: "{{ android_sdk_location }}/sources/android-26"
+  register: sources_android_26
+
+- name: Delete sources;android-26 (FreeBSD)
+  android_sdk:
+    name: sources;android-26
+    state: absent
+  register: sources_android_26_deleted
+
+- name: sources;android-26 second time (FreeBSD)
+  android_sdk:
+    name: sources;android-26
+    state: absent
+  register: sources_android_26_deleted2
+
+- name: Create new sdk root (FreeBSD)
+  file:
+    path: "{{ ansible_env.HOME }}/newroot"
+    state: directory
+  register: newroot
+  notify: delete_newroot
+
+- name: Accept licenses in the new root (FreeBSD)
+  shell: "yes | sdkmanager --sdk_root={{ newroot.path }} --licenses"
+
+- name: Install a package to a new root (FreeBSD)
+  android_sdk:
+    name: sources;android-26
+    state: present
+    sdk_root: "{{ newroot.path }}"
+  register: new_root_package
+
+- name: Check package is installed (FreeBSD)
+  stat:
+    path: "{{ newroot.path }}/sources/android-26"
+  register: new_root_package_stat
+
+- name: Install a package from canary channel (FreeBSD)
+  android_sdk:
+    name: sources;android-26
+    state: present
+    channel: canary
+  register: package_canary
+
+- name: Run tests (FreeBSD)
+  assert:
+    that:
+      - sources_android_26.stat.exists
+      - sources_android_26_installed.changed
+      - not sources_android_26_installed2.changed
+      - sources_android_26_deleted.changed
+      - not sources_android_26_deleted2.changed
+      - new_root_package.changed
+      - new_root_package_stat.stat.exists
+      - package_canary.changed

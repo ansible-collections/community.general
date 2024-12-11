@@ -1,0 +1,98 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Accept all licenses
+  shell: 'yes | sdkmanager --licenses'
+  changed_when: false
+
+- name: Install build-tools;34.0.0
+  android_sdk:
+    name: build-tools;34.0.0
+    state: present
+  register: build_tools_installed
+
+- name: Install build-tools;34.0.0 second time
+  android_sdk:
+    name: build-tools;34.0.0
+    state: present
+  register: build_tools_installed2
+
+- name: Stat build-tools
+  stat:
+    path: "{{ android_sdk_location }}/build-tools/34.0.0"
+  register: build_tools_34_0_0
+
+- name: Delete build-tools;34.0.0
+  android_sdk:
+    name: build-tools;34.0.0
+    state: absent
+  register: build_tools_deleted
+
+- name: Delete build-tools;34.0.0 second time
+  android_sdk:
+    name: build-tools;34.0.0
+    state: absent
+  register: build_tools_deleted2
+
+- name: Download old platform-tools
+  unarchive:
+    src: https://dl.google.com/android/repository/platform-tools_r27.0.0-linux.zip
+    remote_src: true
+    dest: "{{ android_sdk_location }}"
+
+- name: Try installing platform-tools from sdkmanager
+  android_sdk:
+    name: platform-tools
+    state: present
+  register: platform_tools_present
+
+- name: Install (update) platform-tools
+  android_sdk:
+    name: platform-tools
+    state: latest
+  register: platform_tools_updated
+
+- name: Create new sdk root
+  file:
+    path: "{{ ansible_env.HOME }}/newroot"
+    state: directory
+  register: newroot
+  notify: delete_newroot
+
+- name: Accept licenses in the new root
+  shell: "yes | sdkmanager --sdk_root={{ newroot.path }} --licenses"
+
+- name: Install a package to a new root
+  android_sdk:
+    name: build-tools;34.0.0
+    state: present
+    sdk_root: "{{ newroot.path }}"
+  register: new_root_package
+
+- name: Check package is installed
+  stat:
+    path: "{{ newroot.path }}/build-tools/34.0.0"
+  register: new_root_package_stat
+
+- name: Install a package from canary channel
+  android_sdk:
+    name: build-tools;33.0.0
+    state: present
+    channel: canary
+  register: package_canary
+
+- name: Run tests
+  assert:
+    that:
+      - build_tools_34_0_0.stat.exists
+      - build_tools_installed.changed
+      - not build_tools_installed2.changed
+      - build_tools_deleted.changed
+      - not build_tools_deleted2.changed
+      - not platform_tools_present.changed
+      - platform_tools_updated.changed
+      - new_root_package.changed
+      - new_root_package_stat.stat.exists
+      - package_canary.changed
