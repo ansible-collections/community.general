@@ -1578,7 +1578,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             vol_string += "," + host_path
 
         if mountpoint is not None:
-            vol_string += (",mp=%s", mountpoint)
+            vol_string += ",mp={}".format(mountpoint)
 
         if options is not None:
             vol_string += "," + ",".join(
