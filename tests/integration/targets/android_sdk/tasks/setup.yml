@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -13,6 +18,30 @@
       - "{{ openjdk_pkg }}"
       - unzip
     state: present
+  when: ansible_os_family != 'Darwin'
+
+- name: Install dependencies (OSX)
+  block:
+    - name: Find brew binary
+      command: which brew
+      register: brew_which
+    - name: Get owner of brew binary
+      stat:
+        path: "{{ brew_which.stdout }}"
+      register: brew_stat
+    - name: "Install package"
+      homebrew:
+        name:
+          - "{{ openjdk_pkg }}"
+          - unzip
+        state: present
+        update_homebrew: false
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+      environment:
+        HOMEBREW_NO_AUTO_UPDATE: "True"
+  when:
+    - ansible_os_family == 'Darwin'
 
 - name: Create Android SDK directory
   file:
