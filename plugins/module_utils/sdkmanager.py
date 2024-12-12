@@ -43,7 +43,7 @@ def sdkmanager_runner(module, **kwargs):
             installed=cmd_runner_fmt.as_fixed("--list_installed"),
             list=cmd_runner_fmt.as_fixed('--list'),
             newer=cmd_runner_fmt.as_fixed("--newer"),
-            sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root", ignore_none=True),
+            sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root"),
             channel=cmd_runner_fmt.as_func(lambda x: ["{0}={1}".format("--channel", __map_channel(x))])
         ),
         force_lang="C.UTF-8",  # Without this, sdkmanager binary crashes

@@ -25,6 +25,7 @@ attributes:
     support: full
   diff_mode:
     support: none
+version_added: 10.2.0
 options:
   name:
     description:
