@@ -112,9 +112,7 @@ class AndroidSdkManager(object):
         with self.runner('state name sdk_root channel', data=data) as ctx:
             rc, stdout, stderr = ctx.run(name=command_arg, data=data)
 
-            data = stdout.splitlines()
-
-            for line in data:
+            for line in stdout.splitlines():
                 if self._RE_ACCEPT_LICENSE.match(line):
                     raise SdkManagerException("Licenses for some packages were not accepted")
 
