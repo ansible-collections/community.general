@@ -294,7 +294,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             performance,
             retention):
         # Check for Datastore.AllocateSpace in the permission tree
-        if not has_permission(permissions, "Datastore.AllocateSpace", search_scopes=["/", "/storage", "/storage" + storage]):
+        if not has_permission(permissions, "Datastore.AllocateSpace", search_scopes=["/", "/storage/", "/storage" + storage]):
             self.module.fail_json(changed=False, msg="Insufficient permission: Datastore.AllocateSpace is missing")
 
         if (bandwidth or performance) and has_permission(permissions, "Sys.Modify", search_scopes=["/"], expected=0):
