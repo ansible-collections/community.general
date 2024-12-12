@@ -45,7 +45,7 @@ def sdkmanager_runner(module, **kwargs):
             sdk_root=cmd_runner_fmt.as_opt_eq_val("--sdk_root"),
             channel=cmd_runner_fmt.as_func(lambda x: ["{0}={1}".format("--channel", __map_channel(x))])
         ),
-        force_lang="auto",  # Without this, sdkmanager binary crashes
+        force_lang="C.UTF-8",  # Without this, sdkmanager binary crashes
         **kwargs
     )
 
