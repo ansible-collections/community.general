@@ -11,7 +11,7 @@
 # java >= 17 is not available in RHEL and CentOS7 repos, which is required for sdkmanager to run
 - name: Bail out if not supported
   when:
-  -  "ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<')"
+  - "ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<')"
   ansible.builtin.meta: end_play
 
 - name: Run android_sdk tests
