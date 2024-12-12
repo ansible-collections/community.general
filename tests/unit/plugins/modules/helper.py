@@ -13,17 +13,20 @@ import yaml
 import pytest
 
 
+from ansible.module_utils.common._collections_compat import Sequence
+
+
 class Helper(object):
     @staticmethod
-    def from_list(test_module, ansible_module, test_cases):
-        helper = Helper(test_module, ansible_module, test_cases=test_cases)
+    def from_list(test_module, ansible_module, test_spec):
+        helper = Helper(test_module, ansible_module, test_spec=test_spec)
         return helper
 
     @staticmethod
     def from_file(test_module, ansible_module, filename):
         with open(filename, "r") as test_cases:
-            test_cases_data = yaml.safe_load(test_cases)
-        return Helper.from_list(test_module, ansible_module, test_cases_data)
+            test_spec = yaml.safe_load(test_cases)
+        return Helper.from_list(test_module, ansible_module, test_spec)
 
     @staticmethod
     def from_module(ansible_module, test_module_name, test_spec=None):
@@ -35,11 +38,15 @@ class Helper(object):
     def add_func_to_test_module(self, name, func):
         setattr(self.test_module, name, func)
 
-    def __init__(self, test_module, ansible_module, test_cases):
+    def __init__(self, test_module, ansible_module, test_spec):
         self.test_module = test_module
         self.ansible_module = ansible_module
         self.test_cases = []
         self.fixtures = {}
+        if isinstance(test_spec, Sequence):
+            test_cases = test_spec
+        else:  # it is a dict
+            test_cases = test_spec['test_cases']
 
         for test_case in test_cases:
             tc = ModuleTestCase.make_test_case(test_case, test_module)
