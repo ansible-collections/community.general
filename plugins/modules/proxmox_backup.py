@@ -301,7 +301,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             self.module.fail_json(changed=False, msg="Insufficient permission: Performance_tweaks and bandwidth require 'Sys.Modify' permission for '/'")
 
         if retention:
-            if not has_permission(permissions, "Datastore.Allocate", search_scopes=["/", "/storage", "/storage" + storage]):
+            if not has_permission(permissions, "Datastore.Allocate", search_scopes=["/", "/storage", "/storage/" + storage]):
                 self.module.fail_json(changed=False, msg="Insufficient permissions: Custom retention was requested, but Datastore.Allocate is missing")
 
     def check_vmid_backup_permission(self, permissions, vmids, pool):
