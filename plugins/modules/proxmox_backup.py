@@ -328,7 +328,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             self.module.fail_json(changed=False, msg="Insufficient permissions: You do not have the VM.Backup permission")
 
     def check_general_backup_permission(self, permissions, pool):
-        if not has_permission(permissions, "VM.Backup", search_scopes=["/", "/vms"] + (["/vms" + pool] if pool else [])):
+        if not has_permission(permissions, "VM.Backup", search_scopes=["/", "/vms"] + (["/pool" + pool] if pool else [])):
             self.module.fail_json(changed=False, msg="Insufficient permissions: You dont have the VM.Backup permission")
 
     def check_if_storage_exists(self, storage, node):
