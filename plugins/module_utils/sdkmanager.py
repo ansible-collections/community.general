@@ -10,8 +10,7 @@ __metaclass__ = type
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils import cmd_runner_fmt
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt
 
 __state_map = {
     "present": "--install",
@@ -113,7 +112,7 @@ class AndroidSdkManager(object):
         with self.runner('state name sdk_root channel', data=data) as ctx:
             rc, stdout, stderr = ctx.run(name=command_arg, data=data)
 
-            data = stdout.split('\n')
+            data = stdout.splitlines()
 
             for line in data:
                 if self._RE_ACCEPT_LICENSE.match(line):
@@ -124,7 +123,7 @@ class AndroidSdkManager(object):
             return rc, stdout, stderr
 
     def _try_parse_stderr(self, stderr):
-        data = stderr.split('\n')
+        data = stderr.splitlines()
         for line in data:
             unknown_package_regex = self._RE_UNKNOWN_PACKAGE.match(line)
             if unknown_package_regex:
@@ -133,7 +132,7 @@ class AndroidSdkManager(object):
 
     @staticmethod
     def _parse_packages(stdout, header_regexp, row_regexp):
-        data = stdout.split('\n')
+        data = stdout.splitlines()
 
         updatable_section_found = False
         i = 0

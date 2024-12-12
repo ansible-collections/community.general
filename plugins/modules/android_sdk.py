@@ -145,15 +145,10 @@ class AndroidSdk(StateModuleHelper):
         self.vars.set('removed', [], change=True)
 
     def _parse_packages(self):
-        arg_pkgs = self.vars.package
-        packages = set()
-        for arg_pkg in arg_pkgs:
-            package = Package(arg_pkg)
-            packages.add(package)
-
-        if len(packages) < len(arg_pkgs):
+        arg_pkgs = set(self.vars.package)
+        if len(arg_pkgs) < len(self.vars.package):
             self.do_raise("Packages may not repeat")
-        return packages
+        return set([Package(p) for p in arg_pkgs])
 
     def state_present(self):
         packages = self._parse_packages()

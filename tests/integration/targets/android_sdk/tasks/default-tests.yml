@@ -59,26 +59,19 @@
     state: latest
   register: platform_tools_updated
 
-- name: Create new sdk root
-  file:
-    path: "{{ ansible_env.HOME }}/newroot"
-    state: directory
-  register: newroot
-  notify: delete_newroot
-
 - name: Accept licenses in the new root
-  shell: "yes | sdkmanager --sdk_root={{ newroot.path }} --licenses"
+  shell: "yes | sdkmanager --sdk_root={{ remote_tmp_dir }} --licenses"
 
 - name: Install a package to a new root
   android_sdk:
     name: build-tools;34.0.0
     state: present
-    sdk_root: "{{ newroot.path }}"
+    sdk_root: "{{ remote_tmp_dir }}"
   register: new_root_package
 
 - name: Check package is installed
   stat:
-    path: "{{ newroot.path }}/build-tools/34.0.0"
+    path: "{{ remote_tmp_dir }}/build-tools/34.0.0"
   register: new_root_package_stat
 
 - name: Install a package from canary channel
