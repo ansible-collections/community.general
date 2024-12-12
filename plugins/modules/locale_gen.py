@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: locale_gen
 short_description: Creates or removes locales
 description:
-  - Manages locales by editing /etc/locale.gen and invoking C(locale-gen).
+    - Manages locales in Ubuntu systems.
 author:
   - Augustus Kling (@AugustusKling)
 extends_documentation_fragment:
@@ -33,11 +33,18 @@ options:
   state:
     type: str
     description:
-      - Whether the locale shall be present.
-    choices: [absent, present]
+      - Whether the locales shall be present.
+    choices: [ absent, present ]
     default: present
 notes:
-  - This module does not support RHEL-based systems.
+  - >
+    If C(/etc/locale.gen) exists, the module will assume to be using the B(glibc) mechanism,
+    else if C(/var/lib/locales/supported.d/) exists it will assume to be using the B(Debian) mechanism,
+    else it will raise an error.
+  - When using glibc mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
+  - When using Debian mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running C(locale-gen).
+  - Currently the module is B(only supported for Ubuntu) systems.
+  - This module requires the package C(locales) installed in Ubuntu systems.
 """
 
 EXAMPLES = r"""
@@ -63,22 +70,25 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import c
 from ansible_collections.community.general.plugins.module_utils.locale_gen import locale_runner, locale_gen_runner
 
 
-class LocaleGen(StateModuleHelper):
-    LOCALE_NORMALIZATION = {
-        ".utf8": ".UTF-8",
-        ".eucjp": ".EUC-JP",
-        ".iso885915": ".ISO-8859-15",
-        ".cp1251": ".CP1251",
-        ".koi8r": ".KOI8-R",
-        ".armscii8": ".ARMSCII-8",
-        ".euckr": ".EUC-KR",
-        ".gbk": ".GBK",
-        ".gb18030": ".GB18030",
-        ".euctw": ".EUC-TW",
-    }
-    LOCALE_GEN = "/etc/locale.gen"
-    LOCALE_SUPPORTED = "/var/lib/locales/supported.d/"
+ETC_LOCALE_GEN = "/etc/locale.gen"
+VAR_LIB_LOCALES = "/var/lib/locales/supported.d"
+VAR_LIB_LOCALES_LOCAL = os.path.join(VAR_LIB_LOCALES, "local")
+SUPPORTED_LOCALES = "/usr/share/i18n/SUPPORTED"
+LOCALE_NORMALIZATION = {
+    ".utf8": ".UTF-8",
+    ".eucjp": ".EUC-JP",
+    ".iso885915": ".ISO-8859-15",
+    ".cp1251": ".CP1251",
+    ".koi8r": ".KOI8-R",
+    ".armscii8": ".ARMSCII-8",
+    ".euckr": ".EUC-KR",
+    ".gbk": ".GBK",
+    ".gb18030": ".GB18030",
+    ".euctw": ".EUC-TW",
+}
 
+
+class LocaleGen(StateModuleHelper):
     output_params = ["name"]
     module = dict(
         argument_spec=dict(
@@ -90,14 +100,29 @@ class LocaleGen(StateModuleHelper):
     use_old_vardict = False
 
     def __init_module__(self):
-        self.vars.set("ubuntu_mode", False)
-        if os.path.exists(self.LOCALE_SUPPORTED):
+        self.MECHANISMS=dict(
+            debian=dict(
+                available=SUPPORTED_LOCALES,
+                apply_change=self.apply_change_debian,
+            ),
+            glibc=dict(
+                available=ETC_LOCALE_GEN,
+                apply_change=self.apply_change_glibc,
+            ),
+        )
+
+        if os.path.exists(ETC_LOCALE_GEN):
+            self.vars.ubuntu_mode = False
+            self.vars.mechanism = "glibc"
+        elif os.path.exists(VAR_LIB_LOCALES):
             self.vars.ubuntu_mode = True
+            self.vars.mechanism = "debian"
         else:
-            if not os.path.exists(self.LOCALE_GEN):
-                self.do_raise("{0} and {1} are missing. Is the package \"locales\" installed?".format(
-                    self.LOCALE_SUPPORTED, self.LOCALE_GEN
-                ))
+            self.do_raise('{0} and {1} are missing. Is the package "locales" installed?'.format(
+                VAR_LIB_LOCALES, ETC_LOCALE_GEN
+            ))
+
+        self.runner = locale_runner(self.module)
 
         self.assert_available()
         self.vars.set("is_present", self.is_present(), output=False)
@@ -115,24 +140,20 @@ class LocaleGen(StateModuleHelper):
         checking either :
         * if the locale is present in /etc/locales.gen
         * or if the locale is present in /usr/share/i18n/SUPPORTED"""
-        __regexp = r'^#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$'
-        if self.vars.ubuntu_mode:
-            __locales_available = '/usr/share/i18n/SUPPORTED'
-        else:
-            __locales_available = '/etc/locale.gen'
+        regexp = r'^#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$'
+        locales_available = self.MECHANISMS[self.vars.mechanism]["available"]
 
-        re_compiled = re.compile(__regexp)
-        with open(__locales_available, 'r') as fd:
+        re_compiled = re.compile(regexp)
+        with open(locales_available, 'r') as fd:
             lines = fd.readlines()
-            res = [re_compiled.match(line) for line in lines]
-            if self.verbosity >= 4:
-                self.vars.available_lines = lines
+        res = [re_compiled.match(line) for line in lines]
+        self.vars.set("available_lines", lines, verbosity=4)
 
-            locales_not_found = []
-            for locale in self.vars.name:
-                # Check if the locale is not found in any of the matches
-                if not any(match and match.group("locale") == locale for match in res):
-                    locales_not_found.append(locale)
+        locales_not_found = []
+        for locale in self.vars.name:
+            # Check if the locale is not found in any of the matches
+            if not any(match and match.group("locale") == locale for match in res):
+                locales_not_found.append(locale)
 
         # locale may be installed but not listed in the file, for example C.UTF-8 in some systems
         locales_not_found = self.locale_get_not_present(locales_not_found)
@@ -160,13 +181,13 @@ class LocaleGen(StateModuleHelper):
     def fix_case(self, name):
         """locale -a might return the encoding in either lower or upper case.
         Passing through this function makes them uniform for comparisons."""
-        for s, r in self.LOCALE_NORMALIZATION.items():
+        for s, r in LOCALE_NORMALIZATION.items():
             name = name.replace(s, r)
         return name
 
-    def set_locale(self, names, enabled=True):
+    def set_locale_glibc(self, names, enabled=True):
         """ Sets the state of the locale. Defaults to enabled. """
-        with open("/etc/locale.gen", 'r') as fr:
+        with open(ETC_LOCALE_GEN, 'r') as fr:
             lines = fr.readlines()
 
         locale_regexes = []
@@ -185,10 +206,10 @@ class LocaleGen(StateModuleHelper):
                 lines[i] = search.sub(replace, lines[i])
 
         # Write the modified content back to the file
-        with open("/etc/locale.gen", 'w') as fw:
+        with open(ETC_LOCALE_GEN, 'w') as fw:
             fw.writelines(lines)
 
-    def apply_change(self, targetState, names):
+    def apply_change_glibc(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
@@ -196,13 +217,13 @@ class LocaleGen(StateModuleHelper):
         names -- Names list including encoding such as de_CH.UTF-8.
         """
 
-        self.set_locale(names, enabled=(targetState == "present"))
+        self.set_locale_glibc(names, enabled=(targetState == "present"))
 
         runner = locale_gen_runner(self.module)
         with runner() as ctx:
             ctx.run()
 
-    def apply_change_ubuntu(self, targetState, names):
+    def apply_change_debian(self, targetState, names):
         """Create or remove locale.
 
         Keyword arguments:
@@ -218,9 +239,9 @@ class LocaleGen(StateModuleHelper):
                 ctx.run()
         else:
             # Delete locale involves discarding the locale from /var/lib/locales/supported.d/local and regenerating all locales.
-            with open("/var/lib/locales/supported.d/local", "r") as fr:
+            with open(VAR_LIB_LOCALES_LOCAL, "r") as fr:
                 content = fr.readlines()
-            with open("/var/lib/locales/supported.d/local", "w") as fw:
+            with open(VAR_LIB_LOCALES_LOCAL, "w") as fw:
                 for line in content:
                     locale, charset = line.split(' ')
                     if locale not in names:
@@ -234,10 +255,7 @@ class LocaleGen(StateModuleHelper):
     def __state_fallback__(self):
         if self.vars.state_tracking == self.vars.state:
             return
-        if self.vars.ubuntu_mode:
-            self.apply_change_ubuntu(self.vars.state, self.vars.name)
-        else:
-            self.apply_change(self.vars.state, self.vars.name)
+        self.MECHANISMS[self.vars.mechanism]["apply_change"](self.vars.state, self.vars.name)
 
 
 def main():
