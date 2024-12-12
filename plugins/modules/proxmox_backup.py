@@ -315,7 +315,7 @@ class ProxmoxBackupAnsible(ProxmoxAnsible):
             failed_vmids = []
             for vm in vmids:
                 vm_path = "/vms/" + str(vm)
-                if permissions.get(vm_path, {}).get("VM.Backup", 1) == 0:
+                if has_permission(permissions, "VM.Backup", search_scopes=[vm_path], default=1, expected=0):
                     failed_vmids.append(str(vm))
             if failed_vmids:
                 self.module.fail_json(
