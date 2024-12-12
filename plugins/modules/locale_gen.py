@@ -100,7 +100,7 @@ class LocaleGen(StateModuleHelper):
     use_old_vardict = False
 
     def __init_module__(self):
-        self.MECHANISMS=dict(
+        self.MECHANISMS = dict(
             debian=dict(
                 available=SUPPORTED_LOCALES,
                 apply_change=self.apply_change_debian,
