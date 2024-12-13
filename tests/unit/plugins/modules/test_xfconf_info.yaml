@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
 - id: test_simple_property_get
   input:
     channel: xfwm4
@@ -14,7 +17,7 @@
   mocks:
     run_command:
     - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+      environ: *env-def
       rc: 0
       out: "100\n"
       err: ""
