@@ -475,4 +475,4 @@ TEST_CASES = [
     ),
 ]
 
-Helper.from_list(sys.modules[__name__], snap, TEST_CASES)
+Helper.from_spec(sys.modules[__name__], snap, TEST_CASES)

@@ -13,20 +13,25 @@ import yaml
 import pytest
 
 
+from ansible.module_utils.common._collections_compat import Sequence
+
+
 class Helper(object):
+    TEST_SPEC_VALID_SECTIONS = ["anchors", "test_cases"]
+
     @staticmethod
-    def from_list(test_module, ansible_module, test_cases):
-        helper = Helper(test_module, ansible_module, test_cases=test_cases)
+    def from_spec(test_module, ansible_module, test_spec, mocks=None):
+        helper = Helper(test_module, ansible_module, test_spec=test_spec, mocks=mocks)
         return helper
 
     @staticmethod
-    def from_file(test_module, ansible_module, filename):
+    def from_file(test_module, ansible_module, filename, mocks=None):
         with open(filename, "r") as test_cases:
-            test_cases_data = yaml.safe_load(test_cases)
-        return Helper.from_list(test_module, ansible_module, test_cases_data)
+            test_spec = yaml.safe_load(test_cases)
+        return Helper.from_spec(test_module, ansible_module, test_spec, mocks)
 
     @staticmethod
-    def from_module(ansible_module, test_module_name, test_spec=None):
+    def from_module(ansible_module, test_module_name, test_spec=None, mocks=None):
         test_module = sys.modules[test_module_name]
         if test_spec is None:
             test_spec = test_module.__file__.replace('.py', '.yaml')
@@ -35,14 +40,22 @@ class Helper(object):
     def add_func_to_test_module(self, name, func):
         setattr(self.test_module, name, func)
 
-    def __init__(self, test_module, ansible_module, test_cases):
+    def __init__(self, test_module, ansible_module, test_spec, mocks=None):
         self.test_module = test_module
         self.ansible_module = ansible_module
         self.test_cases = []
         self.fixtures = {}
+        if isinstance(test_spec, Sequence):
+            test_cases = test_spec
+        else:  # it is a dict
+            test_cases = test_spec['test_cases']
+            spec_diff = set(test_spec.keys()) - set(self.TEST_SPEC_VALID_SECTIONS)
+            if spec_diff:
+                raise ValueError("Test specification contain unknown keys: {0}".format(", ".join(spec_diff)))
+        self.mocks_map = {m.name: m for m in mocks} if mocks else {}
 
         for test_case in test_cases:
-            tc = ModuleTestCase.make_test_case(test_case, test_module)
+            tc = ModuleTestCase.make_test_case(test_case, test_module, self.mocks_map)
             self.test_cases.append(tc)
             self.fixtures.update(tc.fixtures)
         self.set_test_func()
@@ -99,7 +112,7 @@ class ModuleTestCase:
         self.id = id
         self.input = input
         self.output = output
-        self._mocks = mocks
+        self.mock_specs = mocks
         self.mocks = {}
         self.flags = flags
 
@@ -124,23 +137,23 @@ class ModuleTestCase:
         )
 
     @staticmethod
-    def make_test_case(test_case, test_module):
+    def make_test_case(test_case_spec, test_module, mocks_map):
         tc = ModuleTestCase(
-            id=test_case["id"],
-            input=test_case.get("input", {}),
-            output=test_case.get("output", {}),
-            mocks=test_case.get("mocks", {}),
-            flags=test_case.get("flags", {})
+            id=test_case_spec["id"],
+            input=test_case_spec.get("input", {}),
+            output=test_case_spec.get("output", {}),
+            mocks=test_case_spec.get("mocks", {}),
+            flags=test_case_spec.get("flags", {})
         )
-        tc.build_mocks(test_module)
+        tc.build_mocks(test_module, mocks_map)
         return tc
 
-    def build_mocks(self, test_module):
-        for mock, mock_spec in self._mocks.items():
-            mock_class = self.get_mock_class(test_module, mock)
-            self.mocks[mock] = mock_class.build_mock(mock_spec)
+    def build_mocks(self, test_module, mocks_map):
+        for mock_name, mock_spec in self.mock_specs.items():
+            mock_class = mocks_map.get(mock_name, self.get_mock_class(test_module, mock_name))
+            self.mocks[mock_name] = mock_class.build_mock(mock_spec)
 
-            self._fixtures.update(self.mocks[mock].fixtures())
+            self._fixtures.update(self.mocks[mock_name].fixtures())
 
     @staticmethod
     def get_mock_class(test_module, mock):
@@ -187,6 +200,10 @@ class ModuleTestCase:
 
 
 class TestCaseMock:
+    @property
+    def name(self):
+        raise NotImplementedError()
+
     @classmethod
     def build_mock(cls, mock_specs):
         return cls(mock_specs)
@@ -205,6 +222,10 @@ class TestCaseMock:
 
 
 class RunCommandMock(TestCaseMock):
+    @property
+    def name(self):
+        return "run_command"
+
     def __str__(self):
         return "<RunCommandMock specs={specs}>".format(specs=self.mock_specs)
 
@@ -214,7 +235,7 @@ class RunCommandMock(TestCaseMock):
     def fixtures(self):
         @pytest.fixture
         def patch_bin(mocker):
-            def mockie(self, path, *args, **kwargs):
+            def mockie(self_, path, *args, **kwargs):
                 return "/testbin/{0}".format(path)
             mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', mockie)
 
