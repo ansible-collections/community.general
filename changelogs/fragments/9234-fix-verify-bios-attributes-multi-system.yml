@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_utils module utils - Fix ``VerifyBiosAttributes`` command on multi system resource nodes (https://github.com/ansible-collections/community.general/pull/9234).
