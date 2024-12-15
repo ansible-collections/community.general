@@ -321,3 +321,37 @@
         - "package_result.msg == 'Changed: 0, Unchanged: 2'"
         - "package_result.changed_pkgs == []"
         - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
+
+# Test alias handling with sqlite (that is aliased to sqlite3)
+- block:
+  - name: Install sqlite package using alias (sqlite3)
+    homebrew:
+      name: "sqlite3"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - package_result.changed
+        - "package_result.msg == 'Package installed: sqlite3'"
+        - "package_result.changed_pkgs == ['sqlite3']"
+        - "package_result.unchanged_pkgs == []"
+
+  - name: Again install sqlite package using alias (sqlite3)
+    homebrew:
+      name: "sqlite3"
+      state: present
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
+        - "package_result.msg == 'Package already installed: sqlite3'"
+        - "package_result.changed_pkgs == []"
+        - "package_result.unchanged_pkgs == ['sqlite3']"
