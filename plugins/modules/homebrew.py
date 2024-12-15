@@ -380,8 +380,8 @@ class Homebrew(object):
             raise HomebrewException(self.message)
 
     def _extract_package_name(self, package_detail):
-        canonical_name = package_detail.get("name") or package_detail["token"] # For ex: 'sqlite' ('name' is for formulae, 'token' for casks)
-        all_valid_names = set(package_detail.get("aliases", [])) # For ex: {'sqlite3'}
+        canonical_name = package_detail.get("name") or package_detail["token"]  # For ex: 'sqlite' ('name' is for formulae, 'token' for casks)
+        all_valid_names = set(package_detail.get("aliases", []))  # For ex: {'sqlite3'}
         all_valid_names.add(canonical_name)
 
         # Then make sure the user provided name resurface.
