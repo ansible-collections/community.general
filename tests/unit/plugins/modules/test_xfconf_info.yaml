@@ -24,7 +24,6 @@ test_cases:
     version: "4.18.1"
   mocks:
     run_command:
-    - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
     - command: [/testbin/xfconf-query, --version]
       environ: *env-def
       rc: 0
