@@ -324,6 +324,14 @@
 
 # Test alias handling with sqlite (that is aliased to sqlite3)
 - block:
+  - name: Make sure sqlite package is not installed
+    homebrew:
+      name: "sqlite"
+      state: absent
+      update_homebrew: false
+    become: true
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
   - name: Install sqlite package using alias (sqlite3)
     homebrew:
       name: "sqlite3"
