@@ -84,9 +84,6 @@ seealso:
 '''
 
 EXAMPLES = r'''
-- name: Before installing Android SDK packages, all licenses must be accepted
-  shell: "yes | sdkmanager --licenses"
-
 - name: Install build-tools;34.0.0
   community.general.android_sdk:
     name: build-tools;34.0.0
