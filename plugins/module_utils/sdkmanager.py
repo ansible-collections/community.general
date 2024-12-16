@@ -78,9 +78,7 @@ class AndroidSdkManager(object):
     _RE_UPDATABLE_PACKAGES_HEADER = re.compile(r'^Available Updates:$')
 
     # Example: '  platform-tools     | 27.0.0  | Android SDK Platform-Tools 27 | platform-tools  '
-    _RE_INSTALLED_PACKAGE = (
-        re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*.+\s*\|\s*(\S+)\s*$')
-    )
+    _RE_INSTALLED_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*.+\s*\|\s*(\S+)\s*$')
 
     # Example: '   platform-tools | 27.0.0    | 35.0.2'
     _RE_UPDATABLE_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*\S+\s*$')
@@ -89,8 +87,8 @@ class AndroidSdkManager(object):
     _RE_ACCEPT_LICENSE = re.compile(r'^The following packages can not be installed since their licenses or those of '
                                     r'the packages they depend on were not accepted')
 
-    def __init__(self, runner):
-        self.runner = runner
+    def __init__(self, module):
+        self.runner = sdkmanager_runner(module)
 
     def get_installed_packages(self):
         with self.runner('installed sdk_root channel') as ctx:

@@ -139,8 +139,7 @@ removed:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.sdkmanager import sdkmanager_runner, Package, \
-    AndroidSdkManager
+from ansible_collections.community.general.plugins.module_utils.sdkmanager import Package, AndroidSdkManager
 
 
 class AndroidSdk(StateModuleHelper):
@@ -155,11 +154,9 @@ class AndroidSdk(StateModuleHelper):
         supports_check_mode=True
     )
     use_old_vardict = False
-    output_params = ('installed', 'removed')
-    change_params = ('installed', 'removed')
 
     def __init_module__(self):
-        self.sdkmanager = AndroidSdkManager(sdkmanager_runner(self.module))
+        self.sdkmanager = AndroidSdkManager(self.module)
         self.vars.set('installed', [], change=True)
         self.vars.set('removed', [], change=True)
 
