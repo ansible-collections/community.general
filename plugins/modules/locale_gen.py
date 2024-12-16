@@ -8,15 +8,16 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r"""
+DOCUMENTATION = """
+---
 module: locale_gen
 short_description: Creates or removes locales
 description:
-    - Manages locales in Ubuntu systems.
+- Manages locales in Ubuntu/Debian systems.
 author:
-  - Augustus Kling (@AugustusKling)
+- Augustus Kling (@AugustusKling)
 extends_documentation_fragment:
-  - community.general.attributes
+- community.general.attributes
 attributes:
   check_mode:
     support: full
@@ -27,27 +28,28 @@ options:
     type: list
     elements: str
     description:
-      - Name and encoding of the locales, such as V(en_GB.UTF-8).
-      - Before community.general 9.3.0, this was a string. Using a string still works.
+    - Name and encoding of the locales, such as V(en_GB.UTF-8).
+    - Before community.general 9.3.0, this was a string. Using a string still works.
     required: true
   state:
     type: str
     description:
-      - Whether the locales shall be present.
-    choices: [ absent, present ]
+    - Whether the locales shall be present.
+    choices: [absent, present]
     default: present
 notes:
-  - >
-    If C(/etc/locale.gen) exists, the module will assume to be using the B(glibc) mechanism,
-    else if C(/var/lib/locales/supported.d/) exists it will assume to be using the B(Debian) mechanism,
-    else it will raise an error.
-  - When using glibc mechanism, it manages locales by editing C(/etc/locale.gen) and running C(locale-gen).
-  - When using Debian mechanism, it manages locales by editing C(/var/lib/locales/supported.d/local) and then running C(locale-gen).
-  - Currently the module is B(only supported for Ubuntu) systems.
-  - This module requires the package C(locales) installed in Ubuntu systems.
+- >
+  If C(/etc/locale.gen) exists, the module will assume to be using the B(glibc) mechanism,
+  else if C(/var/lib/locales/supported.d/) exists it will assume to be using the B(Debian) mechanism,
+  else it will raise an error.
+- When using glibc mechanism, it will manage locales by editing C(/etc/locale.gen) and running C(locale-gen).
+- When using Debian mechanism, it will manage locales by editing C(/var/lib/locales/supported.d/local) and then running C(locale-gen).
+- Currently the module is B(only supported for Ubuntu) systems.
+- This module requires the package C(locales) installed in Ubuntu systems.
 """
 
-EXAMPLES = r"""
+EXAMPLES = """
+---
 - name: Ensure a locale exists
   community.general.locale_gen:
     name: de_CH.UTF-8
@@ -56,19 +58,20 @@ EXAMPLES = r"""
 - name: Ensure multiple locales exist
   community.general.locale_gen:
     name:
-      - en_GB.UTF-8
-      - nl_NL.UTF-8
+    - en_GB.UTF-8
+    - nl_NL.UTF-8
     state: present
 """
 
-RETURN = '''
+RETURN = """
+---
 mechanism:
   description: Mechanism used to deploy the locales. It may have the value C(glibc) or C(debian).
   type: str
   returned: success
   sample: glibc
   version_added: 10.2.0
-'''
+"""
 
 import os
 import re
