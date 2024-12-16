@@ -116,7 +116,7 @@ class LocaleGen(StateModuleHelper):
                 apply_change=self.apply_change_debian,
             ),
             glibc=dict(
-                available=ETC_LOCALE_GEN,
+                available=SUPPORTED_LOCALES,
                 apply_change=self.apply_change_glibc,
             ),
         )
@@ -150,7 +150,7 @@ class LocaleGen(StateModuleHelper):
         checking either :
         * if the locale is present in /etc/locales.gen
         * or if the locale is present in /usr/share/i18n/SUPPORTED"""
-        regexp = r'^#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$'
+        regexp = r'^\s*#?\s*(?P<locale>\S+[\._\S]+) (?P<charset>\S+)\s*$'
         locales_available = self.MECHANISMS[self.vars.mechanism]["available"]
 
         re_compiled = re.compile(regexp)
