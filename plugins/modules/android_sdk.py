@@ -66,16 +66,16 @@ notes:
   - For some of the packages installed by C(sdkmanager) is it necessary to accept licenses. Usually it is done through
     command line prompt in a form of a Y/N question when a licensed package is requested to be installed. If there are
     several packages requested for installation and at least two of them belong to different licenses, the C(sdkmanager)
-    tool will prompt for these licenses in a loop. 
-    In order to install packages, the module must be able to answer these license prompts. Currently, it is only 
-    possible to answer one license prompt at a time, meaning that instead of installing multiple packages as a single 
-    invocation of the C(sdkmanager --install) command, it will be done by executing the command independently for each 
+    tool will prompt for these licenses in a loop.
+    In order to install packages, the module must be able to answer these license prompts. Currently, it is only
+    possible to answer one license prompt at a time, meaning that instead of installing multiple packages as a single
+    invocation of the C(sdkmanager --install) command, it will be done by executing the command independently for each
     package. This makes sure that at most only one license prompt will need to be answered.
-    At the time of writing this module, a C(sdkmanager)'s package may belong to at most one license type that needs to 
+    At the time of writing this module, a C(sdkmanager)'s package may belong to at most one license type that needs to
     be accepted. However, if this is changes in the future, the module may hang as there might be more prompts generated
     by the C(sdkmanager) tool which the module won't be able to answer. If this is the case, file an issue and in the
-    meantime, consider accepting all the licenses in advance, as it is described in the C(sdkmanager) 
-    L(documentation,https://developer.android.com/tools/sdkmanager#accept-licenses), for instance, using the 
+    meantime, consider accepting all the licenses in advance, as it is described in the C(sdkmanager)
+    L(documentation,https://developer.android.com/tools/sdkmanager#accept-licenses), for instance, using the
     L(ansible.builtin.command module,https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html)
 seealso:
   - name: sdkmanager tool documentation
