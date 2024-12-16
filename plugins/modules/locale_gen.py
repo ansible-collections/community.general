@@ -62,6 +62,16 @@ EXAMPLES = '''
     state: present
 '''
 
+RETURN = r'''
+- mechanism:
+  description:
+  - Mechanism used to deploy the locales.
+  - It may have the value C(glibc) or C(debian).
+  type: str
+  returned: success
+  version_added: 10.2.0
+'''
+
 import os
 import re
 
