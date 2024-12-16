@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
 - id: test_missing_input
   input: {}
   output:
@@ -25,7 +28,7 @@
   mocks:
     run_command:
     - command: [/testbin/xfconf-query, --version]
-      environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+      environ: *env-def
       rc: 0
       out: &version-output |
         xfconf-query 4.18.1

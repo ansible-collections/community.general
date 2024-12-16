@@ -9,7 +9,7 @@ __metaclass__ = type
 import sys
 
 from ansible_collections.community.general.plugins.modules import snap
-from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
+from .helper import Helper, RunCommandMock
 
 
 issue_6803_status_out = """Name    Version      Rev    Tracking         Publisher    Notes
@@ -475,4 +475,4 @@ TEST_CASES = [
     ),
 ]
 
-Helper.from_spec(sys.modules[__name__], snap, TEST_CASES)
+Helper.from_spec(sys.modules[__name__], snap, TEST_CASES, mocks=[RunCommandMock])

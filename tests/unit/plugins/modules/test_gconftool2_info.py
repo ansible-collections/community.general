@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.modules import gconftool2_info
-from .helper import Helper, RunCommandMock  # pylint: disable=unused-import
+from .helper import Helper, RunCommandMock
 
 
-Helper.from_module(gconftool2_info, __name__)
+Helper.from_module(gconftool2_info, __name__, mocks=[RunCommandMock])
