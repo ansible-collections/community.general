@@ -691,8 +691,8 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         else:
             if fail_reason == ProxmoxAnsible.TASK_TIMED_OUT:
                 self.module.fail_json(
-                    msg= "Reached timeout while resizing disk. Last line in task before timeout: %s" %
-                         self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+                    msg="Reached timeout while resizing disk. Last line in task before timeout: %s" %
+                        self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
                 )
             else:
                 self.module.fail_json(msg="Error occurred on task execution: %s" % fail_reason)
