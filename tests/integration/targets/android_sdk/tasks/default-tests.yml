@@ -85,12 +85,12 @@
   assert:
     that:
       - build_tools_34_0_0.stat.exists
-      - build_tools_installed.changed
-      - not build_tools_installed2.changed
-      - build_tools_deleted.changed
-      - not build_tools_deleted2.changed
-      - not platform_tools_present.changed
-      - platform_tools_updated.changed
-      - new_root_package.changed
+      - build_tools_installed is changed
+      - build_tools_installed2 is not changed
+      - build_tools_deleted is changed
+      - build_tools_deleted2 is not changed
+      - platform_tools_present is not changed
+      - platform_tools_updated is changed
+      - new_root_package is changed
       - new_root_package_stat.stat.exists
-      - package_canary.changed
+      - package_canary is changed

@@ -67,10 +67,10 @@
   assert:
     that:
       - sources_android_26.stat.exists
-      - sources_android_26_installed.changed
-      - not sources_android_26_installed2.changed
-      - sources_android_26_deleted.changed
-      - not sources_android_26_deleted2.changed
-      - new_root_package.changed
+      - sources_android_26_installed is changed
+      - sources_android_26_installed2 is not changed
+      - sources_android_26_deleted is changed
+      - sources_android_26_deleted2 is not changed
+      - new_root_package is changed
       - new_root_package_stat.stat.exists
-      - package_canary.changed
+      - package_canary is changed
