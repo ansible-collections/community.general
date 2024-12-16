@@ -8,12 +8,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Accept all licenses
-  shell: 'yes | sdkmanager --licenses'
-  changed_when: false
-
 - name: Install build-tools;34.0.0
   android_sdk:
+    accept_licenses: true
     name: build-tools;34.0.0
     state: present
   register: build_tools_installed
@@ -50,6 +47,7 @@
 - name: Try installing platform-tools from sdkmanager
   android_sdk:
     name: platform-tools
+    accept_licenses: true
     state: present
   register: platform_tools_present
 
@@ -59,12 +57,10 @@
     state: latest
   register: platform_tools_updated
 
-- name: Accept licenses in the new root
-  shell: "yes | sdkmanager --sdk_root={{ remote_tmp_dir }} --licenses"
-
 - name: Install a package to a new root
   android_sdk:
     name: build-tools;34.0.0
+    accept_licenses: true
     state: present
     sdk_root: "{{ remote_tmp_dir }}"
   register: new_root_package

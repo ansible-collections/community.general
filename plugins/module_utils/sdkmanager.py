@@ -102,23 +102,27 @@ class AndroidSdkManager(object):
             rc, stdout, stderr = ctx.run()
             return self._parse_packages(stdout, self._RE_UPDATABLE_PACKAGES_HEADER, self._RE_UPDATABLE_PACKAGE)
 
-    def apply_packages_changes(self, packages):
+    def apply_packages_changes(self, packages, accept_licenses=False):
         """ Install or delete packages, depending on the `module.vars.state` parameter """
         if len(packages) == 0:
             return 0, '', ''
-        command_arg = [x.name for x in packages]
 
-        data = 'N'  # Answer 'No' in case sdkmanager wants us to accept license
-        with self.runner('state name sdk_root channel', data=data) as ctx:
-            rc, stdout, stderr = ctx.run(name=command_arg, data=data)
+        if accept_licenses:
+            license_prompt_answer = 'y'
+        else:
+            license_prompt_answer = 'N'
+        for package in packages:
+            with self.runner('state name sdk_root channel', data=license_prompt_answer) as ctx:
+                rc, stdout, stderr = ctx.run(name=package.name)
 
-            for line in stdout.splitlines():
-                if self._RE_ACCEPT_LICENSE.match(line):
-                    raise SdkManagerException("Licenses for some packages were not accepted")
+                for line in stdout.splitlines():
+                    if self._RE_ACCEPT_LICENSE.match(line):
+                        raise SdkManagerException("Licenses for some packages were not accepted")
 
-            if rc != 0:
-                self._try_parse_stderr(stderr)
-            return rc, stdout, stderr
+                if rc != 0:
+                    self._try_parse_stderr(stderr)
+                    return rc, stdout, stderr
+        return 0, '', ''
 
     def _try_parse_stderr(self, stderr):
         data = stderr.splitlines()
