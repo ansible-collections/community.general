@@ -193,7 +193,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 t_stdout = to_text(stdout, errors='surrogate_or_strict')
             except UnicodeError as e:
-                raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e))
+                raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e)) from e
 
             iocage_data = [x.split() for x in t_stdout.splitlines()]
             results = {'_meta': {'hostvars': {}}}
