@@ -219,6 +219,7 @@ DOCUMENTATION = r"""
       vmid:
         description:
           - Container ID
+        type: int
         default: proxmox_vmid
         vars:
           - name: proxmox_vmid
