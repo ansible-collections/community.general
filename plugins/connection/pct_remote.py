@@ -11,17 +11,17 @@ __metaclass__ = type
 DOCUMENTATION = r"""
     author: Nils Stein (@mietzen) <github.nstein@mailbox.org>
     name: pct_remote
-    short_description: Run tasks in Proxmox LXC container instances using pct CLI via ssh
+    short_description: Run tasks in Proxmox LXC container instances using pct CLI via SSH
     requirements:
       - paramiko
     description:
-      - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via ssh.
+      - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via SSH.
       - Use the Python SSH implementation (Paramiko) to connect to Proxmox.
     version_added: "9.1.0"
     options:
       remote_addr:
         description:
-          - Address of the remote target
+          - Address of the remote target.
         default: inventory_hostname
         type: string
         vars:
@@ -68,7 +68,7 @@ DOCUMENTATION = r"""
           - name: remote_user
       password:
         description:
-          - Secret used to either login the ssh server or as a passphrase for ssh keys that require it.
+          - Secret used to either login the SSH server or as a passphrase for SSH keys that require it.
           - It can be set from the CLI via the C(--ask-pass) option.
         type: string
         vars:
@@ -81,7 +81,7 @@ DOCUMENTATION = r"""
         description:
           - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.
           - On paramiko versions older than 2.9, this only affects hostkeys.
-          - For behavior matching paramiko<2.9 set this to V(False).
+          - For behavior matching paramiko<2.9 set this to V(false).
         vars:
           - name: ansible_paramiko_use_rsa_sha2_algorithms
         ini:
@@ -101,7 +101,7 @@ DOCUMENTATION = r"""
         type: boolean
       look_for_keys:
         default: True
-        description: "False to disable searching for private key files in ~/.ssh/."
+        description: "Set to V(false) to disable searching for private key files in C(~/.ssh/)."
         env:
           - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
         ini:
