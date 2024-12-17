@@ -55,7 +55,7 @@ DOCUMENTATION = '''
             default: []
     notes:
       - You might want to test the command C(ssh user@host iocage list -l)
-        on the controller before using this inventory plugin.
+        on the controller before using this inventory plugin with O(user) specified and with O(host) other than V(localhost).
       - If you run this inventory plugin on V(localhost) C(ssh) is not used.
         In this case, test the command C(iocage list -l).
       - This inventory plugin creates variables C(iocage_*) for each added host.
