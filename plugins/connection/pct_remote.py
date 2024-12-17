@@ -372,6 +372,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
 SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
 SFTP_CONNECTION_CACHE: dict[str, paramiko.sftp_client.SFTPClient] = {}
 
+
 def become_command():
     """Helper function to get become_command """
     return os.getenv('ANSIBLE_BECOME_METHOD', default=C.DEFAULT_BECOME_METHOD)
@@ -669,8 +670,6 @@ class Connection(ConnectionBase):
         else:
             result = SFTP_CONNECTION_CACHE[cache_key] = self._connect().ssh.open_sftp()
             return result
-
-
 
     def _ssh_fetch_file(self, in_path: str, out_path: str) -> None:
         """ save a remote file to the specified path """
