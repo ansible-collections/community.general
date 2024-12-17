@@ -363,7 +363,7 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
         return packages, rc, stdout, stderr
 
     if m.params['simple_errors']:
-        stdout = get_simple_errors(dom)
+        stdout = get_simple_errors(dom) or stdout
 
     m.fail_json(msg='Zypper run command failed with return code %s.' % rc, rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
 
