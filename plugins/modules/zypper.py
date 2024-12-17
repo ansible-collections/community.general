@@ -147,8 +147,8 @@ options:
     required: false
     default: false
     description:
-      - Provides a simplified error output (parses only the <message> tag text in the XML output)
-    version_added: '10.1.1'
+      - When set to V(true), provide a simplified error output (parses only the C(<message>) tag text in the XML output).
+    version_added: '10.2.0'
 notes:
   - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the O(name)
     option.
