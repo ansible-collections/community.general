@@ -27,6 +27,7 @@
         - result4[0] | length >= 17
         - result4[0] | length <= 29
         - result4[0] | regex_findall("[A-Z]") | length == 3
-        - result4[0].count("-") == 2
+        # If one of the random words is 't-shirt', there are more than 2 dashes...
+        - result4[0].count("-") == 2 or "t-shirt" in result4[0].lower()
         - result5 | length == 1
         - result5[0] | length == 15
