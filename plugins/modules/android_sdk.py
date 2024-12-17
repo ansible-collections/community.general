@@ -73,10 +73,10 @@ notes:
     package. This makes sure that at most only one license prompt will need to be answered.
     At the time of writing this module, a C(sdkmanager)'s package may belong to at most one license type that needs to
     be accepted. However, if this is changes in the future, the module may hang as there might be more prompts generated
-    by the C(sdkmanager) tool which the module won't be able to answer. If this is the case, file an issue and in the
+    by the C(sdkmanager) tool which the module will not be able to answer. If this is the case, file an issue and in the
     meantime, consider accepting all the licenses in advance, as it is described in the C(sdkmanager)
     L(documentation,https://developer.android.com/tools/sdkmanager#accept-licenses), for instance, using the
-    L(ansible.builtin.command module,https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html)
+    M(ansible.builtin.command) module.
 seealso:
   - name: sdkmanager tool documentation
     description: Detailed information of how to install and use sdkmanager command line tool.
