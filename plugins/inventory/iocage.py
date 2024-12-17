@@ -39,7 +39,7 @@ DOCUMENTATION = '''
             description:
               - C(iocage) user.
                 It is expected that the O(user) is able to connect to the
-                O(host) and execute the command C(iocage list).
+                O(host) with SSH and execute the command C(iocage list).
                 This option is not required if O(host) is V(localhost).
             type: str
         get_properties:
