@@ -18,19 +18,19 @@
   loop_control:
     loop_var: locale_basic
 
-- name: Remove /etc/locale.gen
-  ansible.builtin.file:
-    path: /etc/locale.gen
-    state: absent
+# - name: Remove /etc/locale.gen
+#   ansible.builtin.file:
+#     path: /etc/locale.gen
+#     state: absent
 
-- name: Ensure /var/lib/locales/supported.d exists
-  ansible.builtin.file:
-    path: /var/lib/locales/supported.d
-    state: directory
-    recurse: true
+# - name: Ensure /var/lib/locales/supported.d exists
+#   ansible.builtin.file:
+#     path: /var/lib/locales/supported.d
+#     state: directory
+#     recurse: true
 
-- name: Force mechanism to be debian
-  ansible.builtin.include_tasks: basic.yml
-  loop: "{{ locale_list_basic }}"
-  loop_control:
-    loop_var: locale_basic
+# - name: Force mechanism to be debian
+#   ansible.builtin.include_tasks: basic.yml
+#   loop: "{{ locale_list_basic }}"
+#   loop_control:
+#     loop_var: locale_basic
