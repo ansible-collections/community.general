@@ -28,12 +28,11 @@ notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. If you need to use a simple bind to access
     your server, pass the credentials in O(bind_dn) and O(bind_pw).
-version_added: '2.17.6'
 author:
   - Philippe Duveau (@pduveau)
 requirements:
   - python-ldap
-attribute:
+attributes:
   check_mode:
     support: full
   diff_mode:
@@ -52,11 +51,12 @@ options:
       - The value of the increment to apply.
 extends_documentation_fragment:
   - community.general.ldap.documentation
+  - community.general.attributes
 
 '''
 
 
-EXAMPLES = r"""
+EXAMPLES = r'''
 - name: Increments uidNumber 1 Number for example.com
   community.general.ldap_inc:
     dn: "cn=uidNext,ou=unix-management,dc=example,dc=com"
@@ -69,12 +69,12 @@ EXAMPLES = r"""
     dn: "cn=john,ou=posix-users,dc=example,dc=com"
     state: present
     attributes:
-      - uidNumber: "{{ ldap_uidNumber_sequence.value }}
+      - uidNumber: "{{ ldap_uidNumber_sequence.value }}"
   when: ldap_uidNumber_sequence.incremented
-"""
+'''
 
 
-RETURN = r"""
+RETURN = r'''
 result:
   description:
     - attribute received the attributeType changed
@@ -85,7 +85,7 @@ result:
     - incremented: true
     - attribute: "uidNumber"
     - value: "2"
-"""
+'''
 
 import traceback
 
@@ -96,7 +96,6 @@ from ansible_collections.community.general.plugins.module_utils.ldap import Ldap
 LDAP_IMP_ERR = None
 try:
     import ldap
-    from ldap.controls.readentry import ReadEntryControl
 
     HAS_LDAP = True
 except ImportError:
@@ -115,7 +114,8 @@ class LdapInc(LdapGeneric):
         return [(ldap.MOD_INCREMENT, self.attr, [to_bytes(str(self.increment))])]
 
     def serverControls(self):
-        return [ldap.controls.readentry.PostReadControl(attrList=[ self.attr ])]
+        return [ldap.controls.readentry.PostReadControl(attrList=[self.attr])]
+
 
 def main():
     module = AnsibleModule(
@@ -142,7 +142,7 @@ def main():
             changed = True
 
             if not module.check_mode:
-                _, _, _, resp_ctrls = mod.connection.modify_ext_s(
+                i0, i1, i2, resp_ctrls = mod.connection.modify_ext_s(
                     dn=mod.dn,
                     modlist=mod.inc(),
                     serverctrls=mod.serverControls(),
