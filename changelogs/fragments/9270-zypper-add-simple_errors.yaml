@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper - add simple_errors option (https://github.com/ansible-collections/community.general/pull/9270).
