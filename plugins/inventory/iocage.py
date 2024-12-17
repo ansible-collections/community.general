@@ -212,8 +212,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 results['_meta']['hostvars'][iocage_name]['iocage_basejail'] = jail[9]
 
         except Exception as e:
-            raise AnsibleParserError('Failed to parse %s: %s. iocage_data: %s' %
-                                     (to_native(path), to_native(e), to_native(iocage_data))) from e
+            raise AnsibleParserError('Failed to parse %s: %s' %
+                                     (to_native(path), to_native(e))) from e
 
         if get_properties:
             for hostname, host_vars in results['_meta']['hostvars'].items():
