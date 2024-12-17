@@ -375,7 +375,7 @@ files:
     maintainers: $team_redfish
   $module_utils/remote_management/lxca/common.py:
     maintainers: navalkp prabhosa
-  $module_utils/sdkmanager.py:
+  $module_utils/android_sdkmanager.py:
     maintainers: shamilovstas
   $module_utils/scaleway.py:
     labels: cloud scaleway
