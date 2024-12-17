@@ -328,6 +328,7 @@ MissingHostKeyPolicy: type = object
 if paramiko:
     MissingHostKeyPolicy = paramiko.MissingHostKeyPolicy
 
+
 class MyAddPolicy(MissingHostKeyPolicy):
     """
     Based on AutoAddPolicy in paramiko so we can determine when keys are added
@@ -374,6 +375,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
 # keep connection objects on a per host basis to avoid repeated attempts to reconnect
 
 SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
+
 
 def become_command():
     """Helper function to get become_command """
