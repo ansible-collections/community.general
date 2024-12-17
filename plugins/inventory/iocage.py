@@ -174,16 +174,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         cmd = []
         if host != 'localhost':
             user = self.get_option('user')
-            cmd.append(f"ssh {user}@{host}")
+            cmd.append("ssh")
+            cmd.append(f"{user}@{host}")
         if env:
-            cmd.append(' '.join(env))
+            cmd.extend(env)
         cmd.append(self.IOCAGE)
 
         cmd_list = cmd.copy()
-        cmd_list.append('list --header --long')
-        cmd_list = ' '.join(cmd_list)
+        cmd_list.append('list')
+        cmd_list.append('--header')
+        cmd_list.append('--long')
         try:
-            p = Popen(cmd_list, shell=True, text=True, stdout=PIPE, stderr=PIPE)
+            p = Popen(cmd_list, stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
                 raise AnsibleParserError('Failed to run cmd=%s, rc=%s, stderr=%s' %
@@ -217,10 +219,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if get_properties:
             for hostname, host_vars in results['_meta']['hostvars'].items():
                 cmd_get_properties = cmd.copy()
-                cmd_get_properties.append(f"get --all {hostname}")
-                cmd_get_properties = ' '.join(cmd_get_properties)
+                cmd_get_properties.append("get")
+                cmd_get_properties.append("--all")
+                cmd_get_properties.append(f"{hostname}")
                 try:
-                    p = Popen(cmd_get_properties, shell=True, text=True, stdout=PIPE, stderr=PIPE)
+                    p = Popen(cmd_get_properties, stdout=PIPE, stderr=PIPE)
                     stdout, stderr = p.communicate()
                     if p.returncode != 0:
                         raise AnsibleParserError('Failed to run cmd=%s, rc=%s, stderr=%s' %
