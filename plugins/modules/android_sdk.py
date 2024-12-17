@@ -139,7 +139,7 @@ removed:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils.sdkmanager import Package, AndroidSdkManager
+from ansible_collections.community.general.plugins.module_utils.android_sdkmanager import Package, AndroidSdkManager
 
 
 class AndroidSdk(StateModuleHelper):
