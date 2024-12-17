@@ -111,7 +111,7 @@ keyed_groups:
 import re
 from subprocess import Popen, PIPE
 
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.utils.display import Display
@@ -187,13 +187,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             p = Popen(cmd_list, stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if p.returncode != 0:
-                raise AnsibleParserError('Failed to run cmd=%s, rc=%s, stderr=%s' %
-                                         (cmd_list, p.returncode, to_native(stderr)))
+                raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
+                                   (cmd_list, p.returncode, to_native(stderr)))
 
             try:
                 t_stdout = to_text(stdout, errors='surrogate_or_strict')
             except UnicodeError as e:
-                raise AnsibleParserError('Invalid (non unicode) input returned: %s' % to_native(e))
+                raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e))
 
             iocage_data = [x.split() for x in t_stdout.splitlines()]
             results = {'_meta': {'hostvars': {}}}
@@ -225,19 +225,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     p = Popen(cmd_get_properties, stdout=PIPE, stderr=PIPE)
                     stdout, stderr = p.communicate()
                     if p.returncode != 0:
-                        raise AnsibleParserError('Failed to run cmd=%s, rc=%s, stderr=%s' %
-                                                 (cmd_get_properties, p.returncode, to_native(stderr)))
+                        raise AnsibleError('Failed to run cmd=%s, rc=%s, stderr=%s' %
+                                           (cmd_get_properties, p.returncode, to_native(stderr)))
 
                     try:
                         t_stdout = to_text(stdout, errors='surrogate_or_strict')
                     except UnicodeError as e:
-                        raise AnsibleParserError('Invalid (non unicode) input returned: %s' % to_native(e))
+                        raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e))
 
                     iocage_properties = dict([x.split(':', 1) for x in t_stdout.splitlines()])
                     results['_meta']['hostvars'][hostname]['iocage_properties'] = iocage_properties
 
                 except Exception as e:
-                    raise AnsibleParserError('Failed to parse %s: %s' % (to_native(path), to_native(e)))
+                    raise AnsibleError('Failed to get properties: %s' % to_native(e))
 
         return results
 
