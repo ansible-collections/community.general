@@ -20,8 +20,8 @@ DOCUMENTATION = '''
         - Uses a configuration file as an inventory source, it must end
           in C(.iocage.yml) or C(.iocage.yaml).
     extends_documentation_fragment:
-        - constructed
-        - inventory_cache
+        - ansible.builtin.constructed
+        - ansible.builtin.inventory_cache
     options:
         plugin:
             description:
