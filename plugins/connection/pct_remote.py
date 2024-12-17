@@ -284,6 +284,7 @@ EXAMPLES = r"""
 import fcntl
 import os
 import re
+import socket
 import tempfile
 import traceback
 import typing as t
@@ -293,9 +294,10 @@ from ansible import constants as C
 from ansible.errors import (
     AnsibleAuthenticationFailure,
     AnsibleConnectionFailure,
-    AnsibleError
+    AnsibleError,
+    AnsibleFileNotFound,
 )
-from ansible.module_utils.common.text.converters import to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.compat.paramiko import PARAMIKO_IMPORT_ERR, paramiko
 from ansible.module_utils.compat.version import LooseVersion
 from ansible.plugins.connection import ConnectionBase
