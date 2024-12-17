@@ -374,7 +374,7 @@ def get_simple_errors(dom):
     simple_errors = []
     message_xml_tags = dom.getElementsByTagName('message')
 
-    if message_xml_tags is None: 
+    if message_xml_tags is None:
         return None
 
     for x in message_xml_tags:
