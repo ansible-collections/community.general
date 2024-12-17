@@ -311,6 +311,7 @@ from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 from ansible.utils.path import makedirs_safe
 from binascii import hexlify
+from shlex import quote
 
 
 display = Display()
@@ -526,7 +527,7 @@ class Connection(ConnectionBase):
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
         cmd = ['/usr/sbin/pct', 'exec',
-               self.get_option('vmid'), '--', cmd]
+               self.get_option('vmid'), '--', quote(cmd)]
         if self.get_option('remote_user') != 'root':
             cmd = [become_command()] + cmd
         return super().exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
