@@ -368,7 +368,7 @@ class MyAddPolicy(MissingHostKeyPolicy):
 # keep connection objects on a per host basis to avoid repeated attempts to reconnect
 
 SSH_CONNECTION_CACHE: dict[str, paramiko.client.SSHClient] = {}
-
+SFTP_CONNECTION_CACHE: dict[str, paramiko.sftp_client.SFTPClient] = {}
 
 def become_command():
     """Helper function to get become_command """
@@ -521,43 +521,171 @@ class Connection(ConnectionBase):
                self.get_option('vmid'), '--', quote(cmd)]
         if self.get_option('remote_user') != 'root':
             cmd = [become_command()] + cmd
-        return super().exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
+        return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
 
     def put_file(self, in_path: str, out_path: str) -> None:
         ''' transfer a file from local to remote '''
         temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
-            super().exec_command(f'mkdir -p {temp_dir}')
-            super().put_file(in_path, temp_file_path)
+            self._ssh_exec_command(f'mkdir -p {temp_dir}')
+            self._ssh_put_file(in_path, temp_file_path)
             cmd = ['/usr/sbin/pct', 'push',
                    self.get_option('vmid'), temp_file_path, out_path]
             if self.get_option('remote_user') != 'root':
                 cmd = [become_command()] + cmd
-            super().exec_command(' '.join(cmd))
+            self._ssh_exec_command(' '.join(cmd))
         except Exception as e:
             raise AnsibleError(
                 'failed to transfer file to %s!\n%s' % (out_path, e))
         finally:
-            super().exec_command(f'rm -rf {temp_dir}')
+            self._ssh_exec_command(f'rm -rf {temp_dir}')
 
     def fetch_file(self, in_path: str, out_path: str) -> None:
         ''' save a remote file to the specified path '''
         temp_dir = '/tmp/ansible_pct_' + str(uuid.uuid4()).replace('-', '')[:6]
         temp_file_path = f'{temp_dir}/{os.path.basename(in_path)}'
         try:
-            super().exec_command(f'mkdir -p {temp_dir}')
+            self._ssh_exec_command(f'mkdir -p {temp_dir}')
             cmd = ['/usr/sbin/pct', 'pull',
                    self.get_option('vmid'), in_path, temp_file_path]
             if self.get_option('remote_user') != 'root':
                 cmd = [become_command()] + cmd
-            super().exec_command(' '.join(cmd))
-            super().fetch_file(temp_file_path, out_path)
+            self._ssh_exec_command(' '.join(cmd))
+            self._ssh_fetch_file(temp_file_path, out_path)
         except Exception as e:
             raise AnsibleError(
                 'failed to transfer file from %s!\n%s' % (in_path, e))
         finally:
-            super().exec_command(f'rm -rf {temp_dir}')
+            self._ssh_exec_command(f'rm -rf {temp_dir}')
+
+    def _ssh_exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
+        """ run a command on the remote host """
+
+        super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
+
+        if in_data:
+            raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
+
+        bufsize = 4096
+
+        try:
+            self.ssh.get_transport().set_keepalive(5)
+            chan = self.ssh.get_transport().open_session()
+        except Exception as e:
+            text_e = to_text(e)
+            msg = u"Failed to open session"
+            if text_e:
+                msg += u": %s" % text_e
+            raise AnsibleConnectionFailure(to_native(msg))
+
+        # sudo usually requires a PTY (cf. requiretty option), therefore
+        # we give it one by default (pty=True in ansible.cfg), and we try
+        # to initialise from the calling environment when sudoable is enabled
+        if self.get_option('pty') and sudoable:
+            chan.get_pty(term=os.getenv('TERM', 'vt100'), width=int(os.getenv('COLUMNS', 0)), height=int(os.getenv('LINES', 0)))
+
+        display.vvv("EXEC %s" % cmd, host=self.get_option('remote_addr'))
+
+        cmd = to_bytes(cmd, errors='surrogate_or_strict')
+
+        no_prompt_out = b''
+        no_prompt_err = b''
+        become_output = b''
+
+        try:
+            chan.exec_command(cmd)
+            if self.become and self.become.expect_prompt():
+                passprompt = False
+                become_sucess = False
+                while not (become_sucess or passprompt):
+                    display.debug('Waiting for Privilege Escalation input')
+
+                    chunk = chan.recv(bufsize)
+                    display.debug("chunk is: %r" % chunk)
+                    if not chunk:
+                        if b'unknown user' in become_output:
+                            n_become_user = to_native(self.become.get_option('become_user'))
+                            raise AnsibleError('user %s does not exist' % n_become_user)
+                        else:
+                            break
+                            # raise AnsibleError('ssh connection closed waiting for password prompt')
+                    become_output += chunk
+
+                    # need to check every line because we might get lectured
+                    # and we might get the middle of a line in a chunk
+                    for line in become_output.splitlines(True):
+                        if self.become.check_success(line):
+                            become_sucess = True
+                            break
+                        elif self.become.check_password_prompt(line):
+                            passprompt = True
+                            break
+
+                if passprompt:
+                    if self.become:
+                        become_pass = self.become.get_option('become_pass')
+                        chan.sendall(to_bytes(become_pass, errors='surrogate_or_strict') + b'\n')
+                    else:
+                        raise AnsibleError("A password is required but none was supplied")
+                else:
+                    no_prompt_out += become_output
+                    no_prompt_err += become_output
+        except socket.timeout:
+            raise AnsibleError('ssh timed out waiting for privilege escalation.\n' + to_text(become_output))
+
+        stdout = b''.join(chan.makefile('rb', bufsize))
+        stderr = b''.join(chan.makefile_stderr('rb', bufsize))
+
+        return (chan.recv_exit_status(), no_prompt_out + stdout, no_prompt_out + stderr)
+
+    def _ssh_put_file(self, in_path: str, out_path: str) -> None:
+        """ transfer a file from local to remote """
+
+        super(Connection, self).put_file(in_path, out_path)
+
+        display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
+
+        if not os.path.exists(to_bytes(in_path, errors='surrogate_or_strict')):
+            raise AnsibleFileNotFound("file or module does not exist: %s" % in_path)
+
+        try:
+            self.sftp = self.ssh.open_sftp()
+        except Exception as e:
+            raise AnsibleError("failed to open a SFTP connection (%s)" % e)
+
+        try:
+            self.sftp.put(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
+        except IOError:
+            raise AnsibleError("failed to transfer file to %s" % out_path)
+
+    def _connect_sftp(self) -> paramiko.sftp_client.SFTPClient:
+
+        cache_key = "%s__%s__" % (self.get_option('remote_addr'), self.get_option('remote_user'))
+        if cache_key in SFTP_CONNECTION_CACHE:
+            return SFTP_CONNECTION_CACHE[cache_key]
+        else:
+            result = SFTP_CONNECTION_CACHE[cache_key] = self._connect().ssh.open_sftp()
+            return result
+
+
+
+    def _ssh_fetch_file(self, in_path: str, out_path: str) -> None:
+        """ save a remote file to the specified path """
+
+        super(Connection, self).fetch_file(in_path, out_path)
+
+        display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.get_option('remote_addr'))
+
+        try:
+            self.sftp = self._connect_sftp()
+        except Exception as e:
+            raise AnsibleError("failed to open a SFTP connection (%s)" % to_native(e))
+
+        try:
+            self.sftp.get(to_bytes(in_path, errors='surrogate_or_strict'), to_bytes(out_path, errors='surrogate_or_strict'))
+        except IOError:
+            raise AnsibleError("failed to transfer file from %s" % in_path)
 
     def _any_keys_added(self) -> bool:
 
@@ -609,6 +737,11 @@ class Connection(ConnectionBase):
 
         cache_key = self._cache_key()
         SSH_CONNECTION_CACHE.pop(cache_key, None)
+        SFTP_CONNECTION_CACHE.pop(cache_key, None)
+
+        if hasattr(self, 'sftp'):
+            if self.sftp is not None:
+                self.sftp.close()
 
         if self.get_option('host_key_checking') and self.get_option('record_host_keys') and self._any_keys_added():
 
