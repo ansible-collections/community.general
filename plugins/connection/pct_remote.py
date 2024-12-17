@@ -92,14 +92,16 @@ DOCUMENTATION = r"""
         type: boolean
       host_key_auto_add:
         description: "Automatically add host keys."
-        env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
+        env:
+          - name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD
         ini:
           - {key: host_key_auto_add, section: paramiko_connection}
         type: boolean
       look_for_keys:
         default: True
         description: "Set to V(false) to disable searching for private key files in C(~/.ssh/)."
-        env: [{name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS}]
+        env:
+          - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
         ini:
           - {key: look_for_keys, section: paramiko_connection}
         type: boolean
@@ -108,14 +110,15 @@ DOCUMENTATION = r"""
         description:
           - Proxy information for running the connection via a jumphost.
         type: string
-        env: [{name: ANSIBLE_PARAMIKO_PROXY_COMMAND}]
+        env:
+          - name: ANSIBLE_PARAMIKO_PROXY_COMMAND
         ini:
           - {key: proxy_command, section: paramiko_connection}
         vars:
           - name: ansible_paramiko_proxy_command
       pty:
         default: True
-        description: "SUDO usually requires a PTY, True to give a PTY and False to not give a PTY."
+        description: "C(sudo) usually requires a PTY, V(true) to give a PTY and V(false) to not give a PTY."
         env:
           - name: ANSIBLE_PARAMIKO_PTY
         ini:
@@ -125,13 +128,14 @@ DOCUMENTATION = r"""
       record_host_keys:
         default: True
         description: "Save the host keys to a file."
-        env: [{name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS}]
+        env:
+          - name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS
         ini:
           - section: paramiko_connection
             key: record_host_keys
         type: boolean
       host_key_checking:
-        description: "Set this to V(False) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host."
+        description: "Set this to V(false) if you want to avoid host key checking by the underlying tools Ansible uses to connect to the host."
         type: boolean
         default: True
         env:
@@ -209,13 +213,13 @@ DOCUMENTATION = r"""
             option: "--private-key"
       vmid:
         description:
-          - Container ID
+          - LXC Container ID
         type: str
         default: proxmox_vmid
         vars:
           - name: proxmox_vmid
     notes:
-      - When NOT using this plugin as root, you need to have sudo installed on proxmox and setup so we can run it without prompting for the password.
+      - When NOT using this plugin as root, you need to have a become mechanism, e.g. C(sudo), installed on proxmox and setup so we can run it without prompting for the password.
 """
 
 EXAMPLES = r"""
