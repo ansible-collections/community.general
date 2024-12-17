@@ -16,7 +16,10 @@ DOCUMENTATION = '''
     requirements:
         - iocage >= 1.8
     description:
-        - Get inventory hosts from the iocage jail manager.
+        - Get inventory hosts from the iocage jail manager running on O(host).
+        - By default, O(host) is V(localhost). If O(host) is not V(localhost) it
+          is expected that the O(user) is able to connect to the O(host) with
+          SSH and execute the command C(iocage list).
         - Uses a configuration file as an inventory source, it must end
           in C(.iocage.yml) or C(.iocage.yaml).
     extends_documentation_fragment:
@@ -54,12 +57,14 @@ DOCUMENTATION = '''
             elements: str
             default: []
     notes:
-      - You might want to test the command C(ssh user@host iocage list -l)
-        on the controller before using this inventory plugin with O(user) specified and with O(host) other than V(localhost).
+      - You might want to test the command C(ssh user@host iocage list -l) on
+        the controller before using this inventory plugin with O(user) specified
+        and with O(host) other than V(localhost).
       - If you run this inventory plugin on V(localhost) C(ssh) is not used.
         In this case, test the command C(iocage list -l).
       - This inventory plugin creates variables C(iocage_*) for each added host.
-      - The values of these variables are collected from the output of the command C(iocage list -l).
+      - The values of these variables are collected from the output of the
+        command C(iocage list -l).
       - The names of these variables correspond to the output columns.
       - The column C(NAME) is used to name the added host.
 '''
