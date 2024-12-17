@@ -257,6 +257,7 @@ def create_or_update_executions(kc, config, realm='master'):
         changed = False
         after = ""
         before = ""
+        execution = None
         if "authenticationExecutions" in config:
             # Get existing executions on the Keycloak server for this alias
             existing_executions = kc.get_executions_representation(config, realm=realm)
@@ -283,27 +284,27 @@ def create_or_update_executions(kc, config, realm='master'):
                         if new_exec['index'] is None:
                             new_exec_index = exec_index
                         before += str(existing_executions[exec_index]) + '\n'
-                    id_to_update = existing_executions[exec_index]["id"]
+                    execution = existing_executions[exec_index].copy()
                     # Remove exec from list in case 2 exec with same name
                     existing_executions[exec_index].clear()
                 elif new_exec["providerId"] is not None:
                     kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
+                    execution = kc.get_executions_representation(config, realm=realm)[exec_index]
                     exec_found = True
                     exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 elif new_exec["displayName"] is not None:
                     kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm, flowType=new_exec["subFlowType"])
+                    execution = kc.get_executions_representation(config, realm=realm)[exec_index]
                     exec_found = True
                     exec_index = new_exec_index
-                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 if exec_found:
                     changed = True
                     if exec_index != -1:
                         # Update the existing execution
                         updated_exec = {
-                            "id": id_to_update
+                            "id": execution["id"]
                         }
                         # add the execution configuration
                         if new_exec["authenticationConfig"] is not None:
@@ -313,6 +314,8 @@ def create_or_update_executions(kc, config, realm='master'):
                             if key not in ("flowAlias", "authenticationConfig", "subFlowType"):
                                 updated_exec[key] = new_exec[key]
                         if new_exec["requirement"] is not None:
+                            if "priority" in execution:
+                                updated_exec["priority"] = execution["priority"]
                             kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
                         diff = exec_index - new_exec_index
                         kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
