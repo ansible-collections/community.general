@@ -17,7 +17,7 @@ DOCUMENTATION = r"""
     description:
       - Run commands or put/fetch files to an existing Proxmox LXC container using pct CLI via SSH.
       - Use the Python SSH implementation (Paramiko) to connect to Proxmox.
-    version_added: "9.1.0"
+    version_added: "10.1.0"
     options:
       remote_addr:
         description:
@@ -50,7 +50,7 @@ DOCUMENTATION = r"""
       remote_user:
         description:
           - User to login/authenticate as.
-          - It can be set from the CLI via the C(--user) or C(-u) options.
+          - Can be set from the CLI via the C(--user) or C(-u) options.
         type: string
         vars:
           - name: ansible_user
@@ -69,7 +69,7 @@ DOCUMENTATION = r"""
       password:
         description:
           - Secret used to either login the SSH server or as a passphrase for SSH keys that require it.
-          - It can be set from the CLI via the C(--ask-pass) option.
+          - Can be set from the CLI via the C(--ask-pass) option.
         type: string
         vars:
           - name: ansible_password
@@ -85,40 +85,32 @@ DOCUMENTATION = r"""
         vars:
           - name: ansible_paramiko_use_rsa_sha2_algorithms
         ini:
-          - section: paramiko_connection
-            key: use_rsa_sha2_algorithms
+          - {key: use_rsa_sha2_algorithms, section: paramiko_connection}
         env:
-          - name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS
+          - {name: ANSIBLE_PARAMIKO_USE_RSA_SHA2_ALGORITHMS}
         default: True
         type: boolean
       host_key_auto_add:
-        description: Automatically add host keys.
-        env:
-          - name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD
+        description: "Automatically add host keys."
+        env: [{name: ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD}]
         ini:
-          - section: paramiko_connection
-            key: host_key_auto_add
+          - {key: host_key_auto_add, section: paramiko_connection}
         type: boolean
       look_for_keys:
         default: True
         description: "Set to V(false) to disable searching for private key files in C(~/.ssh/)."
-        env:
-          - name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS
+        env: [{name: ANSIBLE_PARAMIKO_LOOK_FOR_KEYS}]
         ini:
-          - section: paramiko_connection
-            key: look_for_keys
+          - {key: look_for_keys, section: paramiko_connection}
         type: boolean
       proxy_command:
         default: ""
         description:
           - Proxy information for running the connection via a jumphost.
-          - Also this plugin will scan 'ssh_args', 'ssh_extra_args' and 'ssh_common_args' from the 'ssh' plugin settings for proxy information if set.
         type: string
-        env:
-          - name: ANSIBLE_PARAMIKO_PROXY_COMMAND
+        env: [{name: ANSIBLE_PARAMIKO_PROXY_COMMAND}]
         ini:
-          - section: paramiko_connection
-            key: proxy_command
+          - {key: proxy_command, section: paramiko_connection}
         vars:
           - name: ansible_paramiko_proxy_command
       pty:
@@ -127,14 +119,13 @@ DOCUMENTATION = r"""
         env:
           - name: ANSIBLE_PARAMIKO_PTY
         ini:
-          - key: pty
-            section: paramiko_connection
+          - section: paramiko_connection
+            key: pty
         type: boolean
       record_host_keys:
         default: True
-        description: "Save the host keys to a file"
-        env:
-          - name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS
+        description: "Save the host keys to a file."
+        env: [{name: ANSIBLE_PARAMIKO_RECORD_HOST_KEYS}]
         ini:
           - section: paramiko_connection
             key: record_host_keys
@@ -157,7 +148,7 @@ DOCUMENTATION = r"""
           - name: ansible_ssh_host_key_checking
           - name: ansible_paramiko_host_key_checking
       use_persistent_connections:
-        description: "Toggles the use of persistence for connections"
+        description: "Toggles the use of persistence for connections."
         type: boolean
         default: False
         env:
