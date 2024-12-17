@@ -33,8 +33,8 @@ DOCUMENTATION = '''
             type: str
         host:
             description: The ip/name of the C(iocage) host.
-            required: true
             type: str
+            default: localhost
         user:
             description:
               - C(iocage) user.
@@ -70,9 +70,8 @@ plugin: community.general.iocage
 host: 10.1.0.73
 user: admin
 
-# user is not required if iocage is running on localhost
+# user is not required if iocage is running on localhost (default)
 plugin: community.general.iocage
-host: localhost
 
 # run cryptography without legacy algorithms
 plugin: community.general.iocage
