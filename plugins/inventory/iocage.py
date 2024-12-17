@@ -32,7 +32,7 @@ DOCUMENTATION = '''
             choices: ['community.general.iocage']
             type: str
         host:
-            description: The ip/name of the C(iocage) host.
+            description: The IP/hostname of the C(iocage) host.
             type: str
             default: localhost
         user:
