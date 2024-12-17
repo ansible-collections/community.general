@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2024, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -125,10 +125,16 @@ value_array:
   - Main
   - Work
   - Tmp
+version:
+  description:
+  - The version of the C(xfconf-query) command.
+  returned: success
+  type: str
+  sample: 4.18.1
 """
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner, get_xfconf_version
 
 
 class XFConfInfo(ModuleHelper):
@@ -146,6 +152,7 @@ class XFConfInfo(ModuleHelper):
 
     def __init_module__(self):
         self.runner = xfconf_runner(self.module, check_rc=True)
+        self.vars.version = get_xfconf_version(self.runner)
         self.vars.set("list_arg", False, output=False)
         self.vars.set("is_array", False)
 
