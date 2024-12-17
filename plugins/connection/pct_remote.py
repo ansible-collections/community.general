@@ -534,7 +534,7 @@ class Connection(ConnectionBase):
             self._ssh_exec_command(f'mkdir -p {temp_dir}')
             self._ssh_put_file(in_path, temp_file_path)
             cmd = ['/usr/sbin/pct', 'push',
-                   self.get_option('vmid'), temp_file_path, out_path]
+                   self.get_option('vmid'), temp_file_path, quote(out_path)]
             if self.get_option('remote_user') != 'root':
                 cmd = [become_command()] + cmd
             self._ssh_exec_command(' '.join(cmd))
@@ -551,7 +551,7 @@ class Connection(ConnectionBase):
         try:
             self._ssh_exec_command(f'mkdir -p {temp_dir}')
             cmd = ['/usr/sbin/pct', 'pull',
-                   self.get_option('vmid'), in_path, temp_file_path]
+                   self.get_option('vmid'), quote(in_path), temp_file_path]
             if self.get_option('remote_user') != 'root':
                 cmd = [become_command()] + cmd
             self._ssh_exec_command(' '.join(cmd))
