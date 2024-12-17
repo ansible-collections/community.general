@@ -59,7 +59,7 @@ DOCUMENTATION = '''
       - If you run this inventory plugin on V(localhost) C(ssh) is not used.
         In this case, test the command C(iocage list -l).
       - This inventory plugin creates variables C(iocage_*) for each added host.
-      - The values of these variables are collected from the output of the command C(iocage list -l)
+      - The values of these variables are collected from the output of the command C(iocage list -l).
       - The names of these variables correspond to the output columns.
       - The column C(NAME) is used to name the added host.
 '''
