@@ -213,7 +213,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         except Exception as e:
             raise AnsibleParserError('Failed to parse %s: %s. iocage_data: %s' %
-                                     (to_native(path), to_native(e), to_native(iocage_data)))
+                                     (to_native(path), to_native(e), to_native(iocage_data))) from e
 
         if get_properties:
             for hostname, host_vars in results['_meta']['hostvars'].items():
