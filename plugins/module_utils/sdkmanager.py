@@ -78,10 +78,10 @@ class AndroidSdkManager(object):
     _RE_UPDATABLE_PACKAGES_HEADER = re.compile(r'^Available Updates:$')
 
     # Example: '  platform-tools     | 27.0.0  | Android SDK Platform-Tools 27 | platform-tools  '
-    _RE_INSTALLED_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*.+\s*\|\s*(\S+)\s*$')
+    _RE_INSTALLED_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*[0-9][^|]*\b\s*\|\s*.+\s*\|\s*(\S+)\s*$')
 
     # Example: '   platform-tools | 27.0.0    | 35.0.2'
-    _RE_UPDATABLE_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*\S+\s*\|\s*\S+\s*$')
+    _RE_UPDATABLE_PACKAGE = re.compile(r'^\s*(?P<name>\S+)\s*\|\s*[0-9][^|]*\b\s*\|\s*[0-9].*\b\s*$')
 
     _RE_UNKNOWN_PACKAGE = re.compile(r'^Warning: Failed to find package \'(?P<package>\S+)\'\s*$')
     _RE_ACCEPT_LICENSE = re.compile(r'^The following packages can not be installed since their licenses or those of '
@@ -134,28 +134,15 @@ class AndroidSdkManager(object):
     def _parse_packages(stdout, header_regexp, row_regexp):
         data = stdout.splitlines()
 
-        updatable_section_found = False
-        i = 0
-        lines_count = len(data)
+        section_found = False
         packages = set()
 
-        while i < lines_count:
-            if not updatable_section_found:
-                updatable_section_found = header_regexp.match(data[i])
-                if updatable_section_found:
-                    # Table has the following structure. Once header is found, 2 lines need to be skipped
-                    #
-                    # Available Updates:                                <--- we are here
-                    #   ID             | Installed | Available
-                    #   -------        | -------   | -------
-                    #   platform-tools | 27.0.0    | 35.0.2             <--- skip to here
-                    i += 3  # skip table header
-                else:
-                    i += 1  # just iterate next until we find the section's header
+        for line in data:
+            if not section_found:
+                section_found = header_regexp.match(line)
                 continue
             else:
-                p = row_regexp.match(data[i])
+                p = row_regexp.match(line)
                 if p:
                     packages.add(Package(p.group('name')))
-                i += 1
         return packages
