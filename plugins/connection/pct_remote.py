@@ -214,7 +214,7 @@ DOCUMENTATION = r"""
       vmid:
         description:
           - LXC Container ID
-        type: str
+        type: int
         default: proxmox_vmid
         vars:
           - name: proxmox_vmid
@@ -527,7 +527,7 @@ class Connection(ConnectionBase):
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
         cmd = ['/usr/sbin/pct', 'exec',
-               self.get_option('vmid'), '--', quote(cmd)]
+               str(self.get_option('vmid')), '--', cmd]
         if self.get_option('remote_user') != 'root':
             cmd = [become_command()] + cmd
         return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
@@ -540,7 +540,7 @@ class Connection(ConnectionBase):
             self._ssh_exec_command(f'mkdir -p {temp_dir}')
             self._ssh_put_file(in_path, temp_file_path)
             cmd = ['/usr/sbin/pct', 'push',
-                   self.get_option('vmid'), temp_file_path, quote(out_path)]
+                   str(self.get_option('vmid')), temp_file_path, out_path]
             if self.get_option('remote_user') != 'root':
                 cmd = [become_command()] + cmd
             self._ssh_exec_command(' '.join(cmd))
@@ -557,7 +557,7 @@ class Connection(ConnectionBase):
         try:
             self._ssh_exec_command(f'mkdir -p {temp_dir}')
             cmd = ['/usr/sbin/pct', 'pull',
-                   self.get_option('vmid'), quote(in_path), temp_file_path]
+                   str(self.get_option('vmid')), in_path, temp_file_path]
             if self.get_option('remote_user') != 'root':
                 cmd = [become_command()] + cmd
             self._ssh_exec_command(' '.join(cmd))
