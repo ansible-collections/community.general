@@ -52,3 +52,6 @@
 
     - name: include tasks to test section_has_values
       include_tasks: tests/08-section.yml
+
+    - name: include tasks to test optional spaces at beginning of option lines
+      include_tasks: tests/09-option_prefix_spaces.yml
