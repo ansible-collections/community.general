@@ -9,23 +9,20 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
----
+DOCUMENTATION = r"""
 module: zfs
 short_description: Manage zfs
 description:
-  - Manages ZFS file systems, volumes, clones and snapshots
+  - Manages ZFS file systems, volumes, clones and snapshots.
 extends_documentation_fragment:
   - community.general.attributes
 attributes:
   check_mode:
     support: partial
     details:
-      - In certain situations it may report a task as changed that will not be reported
-        as changed when C(check_mode) is disabled.
-      - For example, this might occur when the zpool C(altroot) option is set or when
-        a size is written using human-readable notation, such as V(1M) or V(1024K),
-        instead of as an unqualified byte count, such as V(1048576).
+      - In certain situations it may report a task as changed that will not be reported as changed when C(check_mode) is disabled.
+      - For example, this might occur when the zpool C(altroot) option is set or when a size is written using human-readable notation, such as
+        V(1M) or V(1024K), instead of as an unqualified byte count, such as V(1048576).
   diff_mode:
     support: full
 options:
@@ -36,10 +33,9 @@ options:
     type: str
   state:
     description:
-      - Whether to create (V(present)), or remove (V(absent)) a
-        file system, snapshot or volume. All parents/children
-        will be created/destroyed as needed to reach the desired state.
-    choices: [ absent, present ]
+      - Whether to create (V(present)), or remove (V(absent)) a file system, snapshot or volume. All parents/children will be created/destroyed
+        as needed to reach the desired state.
+    choices: [absent, present]
     required: true
     type: str
   origin:
@@ -53,47 +49,47 @@ options:
     type: dict
     default: {}
 author:
-- Johan Wiren (@johanwiren)
-'''
+  - Johan Wiren (@johanwiren)
+"""
 
-EXAMPLES = '''
-- name: Create a new file system called myfs in pool rpool with the setuid property turned off
-  community.general.zfs:
-    name: rpool/myfs
-    state: present
-    extra_zfs_properties:
-      setuid: 'off'
+EXAMPLES = r"""
+  - name: Create a new file system called myfs in pool rpool with the setuid property turned off
+    community.general.zfs:
+      name: rpool/myfs
+      state: present
+      extra_zfs_properties:
+        setuid: 'off'
 
-- name: Create a new volume called myvol in pool rpool.
-  community.general.zfs:
-    name: rpool/myvol
-    state: present
-    extra_zfs_properties:
-      volsize: 10M
+  - name: Create a new volume called myvol in pool rpool.
+    community.general.zfs:
+      name: rpool/myvol
+      state: present
+      extra_zfs_properties:
+        volsize: 10M
 
-- name: Create a snapshot of rpool/myfs file system.
-  community.general.zfs:
-    name: rpool/myfs@mysnapshot
-    state: present
+  - name: Create a snapshot of rpool/myfs file system.
+    community.general.zfs:
+      name: rpool/myfs@mysnapshot
+      state: present
 
-- name: Create a new file system called myfs2 with snapdir enabled
-  community.general.zfs:
-    name: rpool/myfs2
-    state: present
-    extra_zfs_properties:
-      snapdir: enabled
+  - name: Create a new file system called myfs2 with snapdir enabled
+    community.general.zfs:
+      name: rpool/myfs2
+      state: present
+      extra_zfs_properties:
+        snapdir: enabled
 
-- name: Create a new file system by cloning a snapshot
-  community.general.zfs:
-    name: rpool/cloned_fs
-    state: present
-    origin: rpool/myfs@mysnapshot
+  - name: Create a new file system by cloning a snapshot
+    community.general.zfs:
+      name: rpool/cloned_fs
+      state: present
+      origin: rpool/myfs@mysnapshot
 
-- name: Destroy a filesystem
-  community.general.zfs:
-    name: rpool/myfs
-    state: absent
-'''
+  - name: Destroy a filesystem
+    community.general.zfs:
+      name: rpool/myfs
+      state: absent
+"""
 
 import os
 
