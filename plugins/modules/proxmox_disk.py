@@ -453,6 +453,8 @@ msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,
                                                                                 ProxmoxAnsible)
 from re import compile, match, sub
@@ -684,18 +686,26 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         actual_size = disk_config['size']
         if size == actual_size:
             return False, "Disk %s is already %s size" % (disk, size)
-        current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
-        task_success, fail_reason = self.api_task_complete(vm['node'], current_task_id, self.module.params['timeout'])
-        if task_success:
-            return True, "Disk %s resized in VM %s" % (disk, vmid)
-        else:
-            if fail_reason == ProxmoxAnsible.TASK_TIMED_OUT:
-                self.module.fail_json(
-                    msg="Reached timeout while resizing disk. Last line in task before timeout: %s" %
-                        self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
-                )
+
+        # Resize disk API endpoint has changed at v8.0: PUT method become async.
+        version = self.version()
+        pve_major_version = 3 if version < LooseVersion('4.0') else version.version[0]
+        if pve_major_version >= 8:
+            current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
+            task_success, fail_reason = self.api_task_complete(vm['node'], current_task_id, self.module.params['timeout'])
+            if task_success:
+                return True, "Disk %s resized in VM %s" % (disk, vmid)
             else:
-                self.module.fail_json(msg="Error occurred on task execution: %s" % fail_reason)
+                if fail_reason == ProxmoxAnsible.TASK_TIMED_OUT:
+                    self.module.fail_json(
+                        msg="Reached timeout while resizing disk. Last line in task before timeout: %s" %
+                            self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+                    )
+                else:
+                    self.module.fail_json(msg="Error occurred on task execution: %s" % fail_reason)
+        else:
+            self.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(disk=disk, size=size)
+            return True, "Disk %s resized in VM %s" % (disk, vmid)
 
 
 def main():
