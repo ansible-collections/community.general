@@ -384,6 +384,10 @@ def become_command():
     return os.getenv('ANSIBLE_BECOME_METHOD', default=C.DEFAULT_BECOME_METHOD)
 
 
+def shell():
+    return os.getenv('ANSIBLE_EXECUTABLE', default=C.DEFAULT_EXECUTABLE)
+
+
 class Connection(ConnectionBase):
     ''' SSH based connections (paramiko) to Proxmox pct '''
 
@@ -527,7 +531,7 @@ class Connection(ConnectionBase):
     def exec_command(self, cmd: str, in_data: bytes | None = None, sudoable: bool = True) -> tuple[int, bytes, bytes]:
         ''' execute a command inside the proxmox container '''
         cmd = ['/usr/sbin/pct', 'exec',
-               str(self.get_option('vmid')), '--', cmd]
+               str(self.get_option('vmid')), '--', shell(), '-c', quote(cmd)]
         if self.get_option('remote_user') != 'root':
             cmd = [become_command()] + cmd
         return self._ssh_exec_command(' '.join(cmd), in_data=in_data, sudoable=sudoable)
