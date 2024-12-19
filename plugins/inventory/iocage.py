@@ -200,25 +200,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             except UnicodeError as e:
                 raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e)) from e
 
-            iocage_data = [x.split() for x in t_stdout.splitlines()]
-            results = {'_meta': {'hostvars': {}}}
-
-            for jail in iocage_data:
-                iocage_name = jail[1]
-                results['_meta']['hostvars'][iocage_name] = {}
-                results['_meta']['hostvars'][iocage_name]['iocage_jid'] = jail[0]
-                results['_meta']['hostvars'][iocage_name]['iocage_boot'] = jail[2]
-                results['_meta']['hostvars'][iocage_name]['iocage_state'] = jail[3]
-                results['_meta']['hostvars'][iocage_name]['iocage_type'] = jail[4]
-                results['_meta']['hostvars'][iocage_name]['iocage_release'] = jail[5]
-                results['_meta']['hostvars'][iocage_name]['iocage_ip4'] = _parse_ip4(jail[6])
-                results['_meta']['hostvars'][iocage_name]['iocage_ip6'] = jail[7]
-                results['_meta']['hostvars'][iocage_name]['iocage_template'] = jail[8]
-                results['_meta']['hostvars'][iocage_name]['iocage_basejail'] = jail[9]
-
         except Exception as e:
             raise AnsibleParserError('Failed to parse %s: %s' %
                                      (to_native(path), to_native(e))) from e
+
+        results = {'_meta': {'hostvars': {}}}
+        self.get_jails(t_stdout, results)
 
         if get_properties:
             for hostname, host_vars in results['_meta']['hostvars'].items():
@@ -236,15 +223,33 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     try:
                         t_stdout = to_text(stdout, errors='surrogate_or_strict')
                     except UnicodeError as e:
-                        raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e))
-
-                    iocage_properties = dict([x.split(':', 1) for x in t_stdout.splitlines()])
-                    results['_meta']['hostvars'][hostname]['iocage_properties'] = iocage_properties
+                        raise AnsibleError('Invalid (non unicode) input returned: %s' % to_native(e)) from e
 
                 except Exception as e:
-                    raise AnsibleError('Failed to get properties: %s' % to_native(e))
+                    raise AnsibleError('Failed to get properties: %s' % to_native(e)) from e
+
+                self.get_properties(t_stdout, results, hostname)
 
         return results
+
+    def get_jails(self, t_stdout, results):
+        jails = [x.split() for x in t_stdout.splitlines()]
+        for jail in jails:
+            iocage_name = jail[1]
+            results['_meta']['hostvars'][iocage_name] = {}
+            results['_meta']['hostvars'][iocage_name]['iocage_jid'] = jail[0]
+            results['_meta']['hostvars'][iocage_name]['iocage_boot'] = jail[2]
+            results['_meta']['hostvars'][iocage_name]['iocage_state'] = jail[3]
+            results['_meta']['hostvars'][iocage_name]['iocage_type'] = jail[4]
+            results['_meta']['hostvars'][iocage_name]['iocage_release'] = jail[5]
+            results['_meta']['hostvars'][iocage_name]['iocage_ip4'] = _parse_ip4(jail[6])
+            results['_meta']['hostvars'][iocage_name]['iocage_ip6'] = jail[7]
+            results['_meta']['hostvars'][iocage_name]['iocage_template'] = jail[8]
+            results['_meta']['hostvars'][iocage_name]['iocage_basejail'] = jail[9]
+
+    def get_properties(self, t_stdout, results, hostname):
+        properties = dict([x.split(':', 1) for x in t_stdout.splitlines()])
+        results['_meta']['hostvars'][hostname]['iocage_properties'] = properties
 
     def populate(self, results):
         strict = self.get_option('strict')
