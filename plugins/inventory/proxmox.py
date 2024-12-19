@@ -312,7 +312,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             data = []
             s = self._get_session()
             while True:
-                ret = s.get(url, headers=self.headers)
+                ret = s.get(url, headers=self.headers, verify=s.verify)
                 if ignore_errors and ret.status_code in ignore_errors:
                     break
                 ret.raise_for_status()
