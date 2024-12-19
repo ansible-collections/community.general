@@ -144,6 +144,13 @@ options:
         description:
           - Adds C(--clean-deps) option to I(zypper) remove command.
         version_added: '4.6.0'
+    simple_errors:
+        type: bool
+        required: false
+        default: false
+        description:
+          - When set to V(true), provide a simplified error output (parses only the C(<message>) tag text in the XML output).
+        version_added: '10.2.0'
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the O(name) option.
@@ -191,6 +198,12 @@ EXAMPLES = '''
   community.general.zypper:
     name: '*'
     state: latest
+
+- name: Install latest packages but dump error messages in a simplified format
+  community.general.zypper:
+    name: '*'
+    state: latest
+    simple_errors: true
 
 - name: Apply all available patches
   community.general.zypper:
@@ -350,7 +363,25 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
             return parse_zypper_xml(m, cmd, fail_not_found=fail_not_found, packages=packages)
 
         return packages, rc, stdout, stderr
+
+    if m.params['simple_errors']:
+        simple_errors = get_simple_errors(dom)
+        if simple_errors is not None:
+            stdout = simple_errors
+
     m.fail_json(msg='Zypper run command failed with return code %s.' % rc, rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
+
+
+def get_simple_errors(dom):
+    simple_errors = []
+    message_xml_tags = dom.getElementsByTagName('message')
+
+    if message_xml_tags is None:
+        return None
+
+    for x in message_xml_tags:
+        simple_errors.append(x.firstChild.data)
+    return " ".join(simple_errors)
 
 
 def get_cmd(m, subcommand):
@@ -557,6 +588,7 @@ def main():
             allow_vendor_change=dict(required=False, default=False, type='bool'),
             replacefiles=dict(required=False, default=False, type='bool'),
             clean_deps=dict(required=False, default=False, type='bool'),
+            simple_errors=dict(required=False, default=False, type='bool'),
         ),
         supports_check_mode=True
     )
