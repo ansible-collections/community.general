@@ -346,6 +346,8 @@ However, you can set output variables specifically for that exception, if you so
 
 .. code-block:: python
 
+    from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelperException
+
     def __init_module__(self):
         if not complex_validation():
             self.do_raise("Validation failed!")
@@ -354,10 +356,15 @@ However, you can set output variables specifically for that exception, if you so
         awesomeness = calculate_awesomeness()
         if awesomeness > 1000:
             self.do_raise("Over awesome, I cannot handle it!", update_output={"awesomeness": awesomeness})
+            # which is just a convenience shortcut for
+            raise ModuleHelperException("...", update_output={...})
 
 All exceptions derived from ``Exception`` are captured and translated into a ``fail_json()`` call.
 However, if you do want to call ``self.module.fail_json()`` yourself it will work,
 just keep in mind that there will be no automatic handling of output variables in that case.
+
+Behind the curtains, all ``do_raise()`` does is to raise a ``ModuleHelperException``.
+If you want to create specialized error handling for your code, the best way is to extend that clas and raise it when needed.
 
 .. _ansible_collections.community.general.docsite.guide_modulehelper.statemh:
 
