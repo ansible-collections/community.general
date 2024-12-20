@@ -18,7 +18,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: ldap_inc
-short_description: Use the Modify-Increment ldap V3 feature to increment an attribute value
+short_description: Use the Modify-Increment LDAP V3 feature to increment an attribute value
 description:
   - Atomically increments the value of an attribute and return its new value.
 notes:
